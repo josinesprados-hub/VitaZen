@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil',
+  // No apiVersion specified — SDK uses its bundled default
+  // This avoids version mismatch errors with Stripe API
 });
 
 export const PLANS = {
