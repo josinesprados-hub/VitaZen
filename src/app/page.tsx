@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-      <img src="/images/v-logo.svg" alt="VitaZen" className="w-12 h-12 animate-pulse" />
+      <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse" />
     </div>
   );
 }

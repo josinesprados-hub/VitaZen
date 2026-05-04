@@ -1,4 +1,4 @@
-const LOGO_URL = `${process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc'}/images/v-gold-logo.png`;
+const LOGO_URL = `${process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc'}/images/vitazen-logo.png`;
 
 const baseStyles = `
   background-color: #000000;

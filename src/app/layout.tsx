@@ -13,8 +13,16 @@ export const metadata: Metadata = {
   title: 'VitaZen — Transforma tu vida',
   description: 'Ecosistema premium de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Riqueza y Crecimiento.',
   icons: {
-    icon: '/images/v-logo.svg',
+    icon: [
+      { url: '/images/vitazen-logo.png' },
+      { url: '/images/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/images/apple-touch-icon.png', sizes: '180x180' },
+    ],
   },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
