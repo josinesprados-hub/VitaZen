@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'VitaZen — Transforma tu vida',
   description: 'Ecosistema premium de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Riqueza y Crecimiento.',
   icons: {
-    icon: '/images/v-gold-logo.png',
+    icon: '/images/v-logo.svg',
   },
 };
 

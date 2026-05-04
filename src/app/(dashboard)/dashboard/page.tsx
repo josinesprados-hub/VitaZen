@@ -72,7 +72,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-10 h-10 animate-pulse" />
+        <img src="/images/v-logo.svg" alt="VitaZen" className="w-10 h-10 animate-pulse" />
       </div>
     );
   }

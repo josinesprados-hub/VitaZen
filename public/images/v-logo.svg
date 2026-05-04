@@ -2,12 +2,11 @@
   <rect width="512" height="512" rx="80" ry="80" fill="#c8a55a"/>
   <text
     x="256"
-    y="340"
+    y="350"
     font-family="'Georgia', 'Times New Roman', serif"
-    font-size="320"
+    font-size="300"
     font-weight="bold"
-    fill="#000000"
+    fill="#FFFFFF"
     text-anchor="middle"
-    dominant-baseline="auto"
   >V</text>
 </svg>
