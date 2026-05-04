@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4" />
+          <img src="/images/v-logo.svg" alt="VitaZen" className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-[#c8a55a] text-3xl font-bold tracking-widest">VITAZEN</h1>
           <p className="text-[#999] mt-2 text-sm">Transforma tu vida, un imperio a la vez</p>
         </div>

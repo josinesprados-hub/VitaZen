@@ -19,7 +19,7 @@ export default function DashboardLayout({
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse" />
+          <img src="/images/v-logo.svg" alt="VitaZen" className="w-12 h-12 animate-pulse" />
           <p className="text-[#c8a55a] text-sm">Cargando...</p>
         </div>
       </div>
