@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════
+// USER & AUTH
+// ═══════════════════════════════════════════
+
+model User {
+  id                String   @id @default(cuid())
+  firebaseUid       String   @unique
+  email             String   @unique
+  name              String?
+  avatarUrl         String?
+  plan              String   @default("FREE") // FREE | PREMIUM
+  stripeCustomerId  String?  @unique
+  emailVerified     Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  subscriptions     Subscription[]
+  aiThreads         AIThread[]
+  aiUsage           AIUsage?
+  wellnessLogs      WellnessLog[]
+  meditationSessions MeditationSession[]
+  journalEntries    JournalEntry[]
+  dailyChallenges   UserChallenge[]
+  habitLogs         HabitLog[]
+  nutritionLogs     NutritionLog[]
+  financeLogs       FinanceLog[]
+  empireProgress    EmpireProgress[]
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  stripeSubscriptionId String   @unique
+  stripePriceId        String
+  status               String   @default("active") // active | canceled | past_due | incomplete
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// AI SYSTEM
+// ═══════════════════════════════════════════
+
+model AIThread {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("Nueva conversación")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIMessage[]
+}
+
+model AIMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  role      String   // user | assistant
+  content   String
+  createdAt DateTime @default(now())
+
+  thread AIThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+}
+
+model AIUsage {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  count     Int      @default(0)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// CHALLENGES
+// ═══════════════════════════════════════════
+
+model DailyChallenge {
+  id          String   @id @default(cuid())
+  category    String   // disciplina | mentalidad | habitos | productividad | salud
+  title       String
+  description String
+  difficulty  String   @default("medium") // easy | medium | hard
+  createdAt   DateTime @default(now())
+
+  userChallenges UserChallenge[]
+}
+
+model UserChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  challengeId String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  date        DateTime
+
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge DailyChallenge @relation(fields: [challengeId], references: [id])
+
+  @@unique([userId, date])
+}
+
+// ═══════════════════════════════════════════
+// WELLNESS & TRACKING
+// ═══════════════════════════════════════════
+
+model WellnessLog {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  mood      Int      // 1-5
+  energy    Int      // 1-5
+  sleep     Int      // 1-5
+  stress    Int      // 1-5
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model MeditationSession {
+  id          String   @id @default(cuid())
+  userId      String
+  duration    Int      // minutes
+  type        String   // guided | breathing | body_scan | mindfulness
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  mood      Int?     // 1-5
+  gratitude String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// EMPIRE-SPECIFIC TRACKING
+// ═══════════════════════════════════════════
+
+model HabitLog {
+  id              String    @id @default(cuid())
+  userId          String
+  name            String
+  description     String?
+  frequency       String    @default("daily") // daily | weekly | custom
+  streak          Int       @default(0)
+  lastCompletedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model NutritionLog {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  meals     String?  // JSON string with meal data
+  water     Int      @default(0) // glasses
+  calories  Int?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model FinanceLog {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  type        String   // income | expense
+  category    String
+  amount      Float
+  description String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+// ═══════════════════════════════════════════
+// EMPIRE SYSTEM
+// ═══════════════════════════════════════════
+
+model EmpireProgress {
+  id       String  @id @default(cuid())
+  userId   String
+  empire   String  // disciplina | mente | energia | riqueza | crecimiento
+  level    Int     @default(1)
+  xp       Int     @default(0)
+  streak   Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, empire])
+}
+
+model EmpireTip {
+  id        String   @id @default(cuid())
+  empire    String   // disciplina | mente | energia | riqueza | crecimiento
+  title     String
+  content   String
+  plan      String   @default("FREE") // FREE | PREMIUM
+  createdAt DateTime @default(now())
+}

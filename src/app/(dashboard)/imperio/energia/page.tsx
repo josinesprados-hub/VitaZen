@@ -1,0 +1,224 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useApi } from '@/hooks/useApi';
+import { Zap, Droplets, Flame, Apple, Lightbulb } from 'lucide-react';
+
+interface WellnessLog {
+  id: string;
+  date: string;
+  mood: number;
+  energy: number;
+  sleep: number;
+  stress: number;
+  notes: string | null;
+}
+
+interface NutritionLog {
+  id: string;
+  date: string;
+  meals: string | null;
+  water: number;
+  calories: number | null;
+  notes: string | null;
+}
+
+interface Tip {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export default function EnergiaPage() {
+  const { apiFetch } = useApi();
+  const [wellnessLogs, setWellnessLogs] = useState<WellnessLog[]>([]);
+  const [nutrition, setNutrition] = useState<NutritionLog[]>([]);
+  const [tips, setTips] = useState<Tip[]>([]);
+  const [showWellness, setShowWellness] = useState(false);
+  const [showNutrition, setShowNutrition] = useState(false);
+  const [wellnessForm, setWellnessForm] = useState({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
+  const [nutritionForm, setNutritionForm] = useState({ meals: '', water: 0, calories: 0, notes: '' });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [wRes, nRes, tRes] = await Promise.all([
+          apiFetch('/api/wellness'),
+          apiFetch('/api/nutrition'),
+          apiFetch('/api/empire/tips?empire=energia'),
+        ]);
+        if (wRes.ok) { const d = await wRes.json(); setWellnessLogs(d.logs); }
+        if (nRes.ok) { const d = await nRes.json(); setNutrition(d.logs); }
+        if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+
+  const submitWellness = async () => {
+    const res = await apiFetch('/api/wellness', {
+      method: 'POST',
+      body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...wellnessForm }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setWellnessLogs([data.log, ...wellnessLogs]);
+      setShowWellness(false);
+    }
+  };
+
+  const submitNutrition = async () => {
+    const res = await apiFetch('/api/nutrition', {
+      method: 'POST',
+      body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...nutritionForm }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setNutrition([data.log, ...nutrition]);
+      setShowNutrition(false);
+    }
+  };
+
+  const RatingInput = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
+    <div>
+      <label className="text-sm text-[#999] mb-1 block">{label}</label>
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button key={n} onClick={() => onChange(n)}
+            className={`w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#c8a55a]'}`}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Zap size={32} className="text-[#c8a55a] animate-pulse" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+          <Zap size={28} className="text-[#c8a55a]" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-white">Imperio Energía</h1>
+          <p className="text-[#999] text-sm">Nutrición, salud física y vitalidad diaria</p>
+        </div>
+      </div>
+
+      {/* Wellness Log */}
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">Wellness Log</h2>
+          <button onClick={() => setShowWellness(!showWellness)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
+            + Registrar hoy
+          </button>
+        </div>
+        {showWellness && (
+          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
+            <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
+            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+            <RatingInput label="Sueño" value={wellnessForm.sleep} onChange={(v) => setWellnessForm({ ...wellnessForm, sleep: v })} />
+            <RatingInput label="Estrés" value={wellnessForm.stress} onChange={(v) => setWellnessForm({ ...wellnessForm, stress: v })} />
+            <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-sm placeholder-[#666] h-20 resize-none" />
+            <div className="flex gap-2">
+              <button onClick={submitWellness} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-lg text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={() => setShowWellness(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
+            </div>
+          </div>
+        )}
+        {wellnessLogs.length > 0 ? (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {wellnessLogs.slice(0, 7).map((log) => (
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
+                <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
+                <div className="flex gap-3 text-xs">
+                  <span className="text-[#c8a55a]">Animo: {log.mood}</span>
+                  <span className="text-[#c8a55a]">Energia: {log.energy}</span>
+                  <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[#666] text-sm text-center py-4">Registra tu primer wellness log</p>
+        )}
+      </div>
+
+      {/* Nutrition */}
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">Nutrición</h2>
+          <button onClick={() => setShowNutrition(!showNutrition)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
+            + Registrar hoy
+          </button>
+        </div>
+        {showNutrition && (
+          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
+            <textarea placeholder="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-sm placeholder-[#666] h-20 resize-none" />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm text-[#999] mb-1 block">Vasos de agua</label>
+                <input type="number" value={nutritionForm.water} onChange={(e) => setNutritionForm({ ...nutritionForm, water: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-sm" />
+              </div>
+              <div>
+                <label className="text-sm text-[#999] mb-1 block">Calorías</label>
+                <input type="number" value={nutritionForm.calories} onChange={(e) => setNutritionForm({ ...nutritionForm, calories: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-sm" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={submitNutrition} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-lg text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={() => setShowNutrition(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
+            </div>
+          </div>
+        )}
+        {nutrition.length > 0 ? (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {nutrition.slice(0, 7).map((log) => (
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
+                <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
+                <div className="flex gap-3 text-xs">
+                  <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
+                  <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[#666] text-sm text-center py-4">Registra tu primera comida</p>
+        )}
+      </div>
+
+      {/* Tips */}
+      {tips.length > 0 && (
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Lightbulb size={20} className="text-[#c8a55a]" />
+            <h2 className="text-lg font-semibold text-white">Consejos</h2>
+          </div>
+          <div className="space-y-3">
+            {tips.map((tip) => (
+              <div key={tip.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
+                <h3 className="text-[#c8a55a] font-medium text-sm mb-1">{tip.title}</h3>
+                <p className="text-[#999] text-sm">{tip.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

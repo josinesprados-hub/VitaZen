@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #000000;
+  --color-foreground: #FFFFFF;
+  --color-gold: #c8a55a;
+  --color-gold-hover: #d4b468;
+  --color-card: #0a0a0a;
+  --color-card-border: #1a1a1a;
+  --color-muted: #666666;
+  --color-muted-foreground: #999999;
+  --color-destructive: #ef4444;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  border-color: var(--color-card-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c8a55a;
+}
+
+/* Custom focus styles */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #c8a55a !important;
+  box-shadow: 0 0 0 1px #c8a55a;
+}
