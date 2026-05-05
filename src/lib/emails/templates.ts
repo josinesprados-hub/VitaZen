@@ -81,7 +81,7 @@ export function welcomeEmail(name: string): string {
       </tr>
     </table>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="${buttonStyle}">Comienza tu camino</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc'}/dashboard" style="${buttonStyle}">Comienza tu camino</a>
     </div>
   `);
 }
@@ -137,7 +137,7 @@ export function subscriptionConfirmedTemplate(name: string, planName: string): s
       </tr>
     </table>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="${buttonStyle}">Ir al panel</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc'}/dashboard" style="${buttonStyle}">Ir al panel</a>
     </div>
   `);
 }

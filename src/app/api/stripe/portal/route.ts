@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc'}/dashboard`,
     });
 
     return NextResponse.json({ url: session.url });
