@@ -42,19 +42,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const syncUser = async (fbUser: FirebaseUser) => {
     try {
+      console.log('[AUTH DEBUG] syncUser - Firebase UID:', fbUser.uid, 'Email:', fbUser.email);
       const idToken = await fbUser.getIdToken();
+      console.log('[AUTH DEBUG] getIdToken - Token length:', idToken?.length, 'Token prefix:', idToken?.substring(0, 20) + '...');
+      console.log('[AUTH DEBUG] Llamando a /api/auth/sync...');
       const res = await fetch('/api/auth/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
+      console.log('[AUTH DEBUG] /api/auth/sync respuesta - Status:', res.status, 'OK:', res.ok);
 
       if (res.ok) {
         const data = await res.json();
+        console.log('[AUTH DEBUG] /api/auth/sync data:', JSON.stringify(data));
         setUser(data.user);
+        console.log('[AUTH DEBUG] setUser ejecutado correctamente. User:', JSON.stringify(data.user));
+      } else {
+        const errorData = await res.json().catch(() => null);
+        console.error('[AUTH DEBUG] /api/auth/sync error response:', res.status, errorData);
       }
     } catch (error) {
-      console.error('Error syncing user:', error);
+      console.error('[AUTH DEBUG] Error syncing user:', error);
     }
   };
 
@@ -76,31 +85,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      console.log('[AUTH DEBUG] onAuthStateChanged - Firebase user:', fbUser ? `UID: ${fbUser.uid}, Email: ${fbUser.email}` : 'null');
       setFirebaseUser(fbUser);
       if (fbUser) {
         await syncUser(fbUser);
       } else {
+        console.log('[AUTH DEBUG] onAuthStateChanged - No hay usuario Firebase, setUser(null)');
         setUser(null);
       }
       setLoading(false);
+      console.log('[AUTH DEBUG] onAuthStateChanged - loading = false, user state:', fbUser ? 'autenticado' : 'no autenticado');
     });
 
     return () => unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log('[AUTH DEBUG] signInWithEmailAndPassword - Intentando con email:', email);
     const credential = await signInWithEmailAndPassword(auth, email, password);
+    console.log('[AUTH DEBUG] signInWithEmailAndPassword - OK. UID:', credential.user.uid, 'Email:', credential.user.email);
     await syncUser(credential.user);
   };
 
   const signUp = async (email: string, password: string) => {
+    console.log('[AUTH DEBUG] createUserWithEmailAndPassword - Intentando con email:', email);
     const credential = await createUserWithEmailAndPassword(auth, email, password);
+    console.log('[AUTH DEBUG] createUserWithEmailAndPassword - OK. UID:', credential.user.uid, 'Email:', credential.user.email);
     await syncUser(credential.user);
   };
 
   const signInWithGoogle = async () => {
+    console.log('[AUTH DEBUG] signInWithPopup - Abriendo popup de Google...');
     const provider = new GoogleAuthProvider();
     const credential = await signInWithPopup(auth, provider);
+    console.log('[AUTH DEBUG] signInWithPopup - OK. UID:', credential.user.uid, 'Email:', credential.user.email);
     await syncUser(credential.user);
   };
 
