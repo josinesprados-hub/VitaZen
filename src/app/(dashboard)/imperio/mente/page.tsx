@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind } from 'lucide-react';
+import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
@@ -76,6 +76,7 @@ export default function MentePage() {
   const [sessions, setSessions] = useState<Meditation[]>([]);
   const [tips, setTips] = useState<Tip[]>([]);
   const [meditating, setMeditating] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [timer, setTimer] = useState(0);
   const [selectedType, setSelectedType] = useState(BREATHING_TECHNIQUES[0]);
   const [expandedTechnique, setExpandedTechnique] = useState<string | null>(null);
@@ -101,20 +102,22 @@ export default function MentePage() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (meditating) {
+    if (meditating && !paused) {
       interval = setInterval(() => setTimer(t => t + 1), 1000);
     }
     return () => clearInterval(interval);
-  }, [meditating]);
+  }, [meditating, paused]);
 
   const startMeditation = (type: typeof BREATHING_TECHNIQUES[0]) => {
     setSelectedType(type);
     setTimer(0);
+    setPaused(false);
     setMeditating(true);
   };
 
   const endMeditation = async () => {
     setMeditating(false);
+    setPaused(false);
     const duration = Math.max(1, Math.floor(timer / 60));
     const res = await apiFetch('/api/meditation', {
       method: 'POST',
@@ -186,14 +189,23 @@ export default function MentePage() {
         {meditating ? (
           <div className="text-center py-10">
             <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
-            <p className="text-5xl font-bold text-[#c8a55a] mb-1 font-mono">{formatTime(timer)}</p>
+            <p className={`text-5xl font-bold mb-1 font-mono transition-opacity duration-300 ${paused ? 'text-[#c8a55a]/40' : 'text-[#c8a55a]'}`}>{formatTime(timer)}</p>
+            {paused && <p className="text-[#c8a55a]/60 text-xs uppercase tracking-widest mb-1">En pausa</p>}
             <p className="text-[#666] text-sm mb-8">Objetivo: {selectedType.duration} min</p>
-            <button
-              onClick={endMeditation}
-              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
-            >
-              Finalizar sesión
-            </button>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => setPaused(!paused)}
+                className="flex items-center gap-2 bg-[#000000] border border-[#c8a55a]/30 text-[#c8a55a] font-semibold px-6 py-3 rounded-lg hover:bg-[#c8a55a]/10 transition-colors"
+              >
+                {paused ? <><Play size={16} /> Continuar</> : <><Pause size={16} /> Pausar</>}
+              </button>
+              <button
+                onClick={endMeditation}
+                className="bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
+              >
+                Finalizar
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
