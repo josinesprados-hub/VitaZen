@@ -108,7 +108,7 @@ export default function MentePage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Imperio Mente</h1>
-          <p className="text-[#999] text-sm">Meditación, mentor IA y bienestar mental</p>
+          <p className="text-[#999] text-sm">Entrena tu mente, cultiva la calma interior y alcanza la claridad mental</p>
         </div>
       </div>
 
@@ -122,14 +122,17 @@ export default function MentePage() {
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Mentor IA Personal</h3>
-          <p className="text-sm text-[#999]">Tu coach de desarrollo personal disponible 24/7</p>
+          <p className="text-sm text-[#999]">Tu coach de desarrollo personal disponible en cualquier momento</p>
         </div>
-        <span className="text-[#c8a55a] text-sm">Abrir →</span>
+        <span className="text-[#c8a55a] text-sm font-medium">Abrir →</span>
       </Link>
 
       {/* Meditation Timer */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Meditación</h2>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-white">Sesión de Meditación</h2>
+          <p className="text-[#666] text-xs mt-1">Silencia tu mente y conecta con tu interior</p>
+        </div>
         
         {meditating ? (
           <div className="text-center py-8">
@@ -162,7 +165,10 @@ export default function MentePage() {
       {/* Recent Sessions */}
       {sessions.length > 0 && (
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Sesiones recientes</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-white">Historial de Sesiones</h2>
+            <p className="text-[#666] text-xs mt-1">Tu progreso y evolución en la práctica meditativa</p>
+          </div>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {sessions.slice(0, 10).map((session) => (
               <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
@@ -183,10 +189,11 @@ export default function MentePage() {
       {/* Tips */}
       {tips.length > 0 && (
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <Lightbulb size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Consejos</h2>
+            <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
           </div>
+          <p className="text-[#666] text-xs mb-4">Técnicas avanzadas para potenciar tu bienestar mental</p>
           <div className="space-y-3">
             {tips.map((tip) => {
               const isLocked = tip.plan === 'PREMIUM' && !isPremium;

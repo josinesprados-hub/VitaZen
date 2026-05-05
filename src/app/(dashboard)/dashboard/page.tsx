@@ -182,11 +182,11 @@ interface ChallengeData {
 }
 
 const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string; description: string }> = {
-  disciplina: { name: 'Disciplina', icon: Shield, color: '#c8a55a', description: 'Hábitos, desafíos y consistencia' },
-  mente: { name: 'Mente', icon: Brain, color: '#c8a55a', description: 'Meditación, mentor IA y bienestar' },
-  energia: { name: 'Energía', icon: Zap, color: '#c8a55a', description: 'Nutrición, salud física y vitalidad' },
-  riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a', description: 'Finanzas, mentalidad y gestión del dinero' },
-  crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a', description: 'Journal, reflexión y desarrollo' },
+  disciplina: { name: 'Disciplina', icon: Shield, color: '#c8a55a', description: 'Construye hábitos y domina tu consistencia' },
+  mente: { name: 'Mente', icon: Brain, color: '#c8a55a', description: 'Cultiva la calma y la claridad mental' },
+  energia: { name: 'Energía', icon: Zap, color: '#c8a55a', description: 'Optimiza tu cuerpo y vitalidad física' },
+  riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a', description: 'Domina tus finanzas y alcanza la libertad' },
+  crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a', description: 'Expande tu potencial y evoluciona' },
 };
 
 export default function DashboardPage() {

@@ -78,20 +78,21 @@ export default function CrecimientoPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Imperio Crecimiento</h1>
-          <p className="text-[#999] text-sm">Journal, desarrollo personal y reflexión profunda</p>
+          <p className="text-[#999] text-sm">Expande tu potencial, reflexiona con propósito y evoluciona cada día</p>
         </div>
       </div>
 
       {/* Journal */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <BookOpen size={20} className="text-[#c8a55a]" /> Journal
+            <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
           </h2>
           <button onClick={() => setShowAdd(!showAdd)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
             <Plus size={18} className="inline mr-1" /> Nueva entrada
           </button>
         </div>
+        <p className="text-[#666] text-xs mb-4">Escribe, reflexiona y transforma tus pensamientos en acción</p>
 
         {showAdd && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
@@ -164,10 +165,11 @@ export default function CrecimientoPage() {
       {/* Tips */}
       {tips.length > 0 && (
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <Lightbulb size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Consejos</h2>
+            <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
           </div>
+          <p className="text-[#666] text-xs mb-4">Herramientas y métodos para acelerar tu evolución personal</p>
           <div className="space-y-3">
             {tips.map((tip) => {
               const isLocked = tip.plan === 'PREMIUM' && !isPremium;

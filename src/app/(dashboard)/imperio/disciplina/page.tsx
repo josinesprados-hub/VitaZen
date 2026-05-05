@@ -111,18 +111,19 @@ export default function DisciplinaPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Imperio Disciplina</h1>
-          <p className="text-[#999] text-sm">Hábitos, desafíos y consistencia diaria</p>
+          <p className="text-[#999] text-sm">Construye hábitos poderosos, supera desafíos y domina tu consistencia</p>
         </div>
       </div>
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
             <Trophy size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Desafío del día</h2>
+            <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && <span className="text-xs px-2 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>}
           </div>
+          <p className="text-[#666] text-xs mb-3">Supera tu reto de hoy y avanza hacia tu mejor versión</p>
           <h3 className="text-[#c8a55a] font-medium mb-1">{challenge.challenge.title}</h3>
           <p className="text-[#999] text-sm mb-3">{challenge.challenge.description}</p>
           {!challenge.completed && (
@@ -141,7 +142,7 @@ export default function DisciplinaPage() {
 
       {/* Habits */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-semibold text-white">Mis Hábitos</h2>
           <button
             onClick={() => setShowAddHabit(!showAddHabit)}
@@ -150,6 +151,7 @@ export default function DisciplinaPage() {
             <Plus size={18} /> Añadir hábito
           </button>
         </div>
+        <p className="text-[#666] text-xs mb-4">La consistencia transforma las acciones en resultados</p>
 
         {showAddHabit && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
@@ -211,10 +213,11 @@ export default function DisciplinaPage() {
       {/* Tips */}
       {tips.length > 0 && (
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <Lightbulb size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Consejos</h2>
+            <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
           </div>
+          <p className="text-[#666] text-xs mb-4">Estrategias comprobadas para fortalecer tu disciplina</p>
           <div className="space-y-3">
             {tips.map((tip) => {
               const isLocked = tip.plan === 'PREMIUM' && !isPremium;
