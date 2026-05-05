@@ -118,7 +118,7 @@ export default function EnergiaPage() {
       {/* Wellness Log */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">Wellness Log</h2>
+          <h2 className="text-lg font-semibold text-white">Estado físico</h2>
           <button onClick={() => setShowWellness(!showWellness)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
             + Registrar hoy
           </button>
@@ -143,15 +143,15 @@ export default function EnergiaPage() {
               <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
                 <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
                 <div className="flex gap-3 text-xs">
-                  <span className="text-[#c8a55a]">Animo: {log.mood}</span>
-                  <span className="text-[#c8a55a]">Energia: {log.energy}</span>
+                  <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
+                  <span className="text-[#c8a55a]">Energía: {log.energy}</span>
                   <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primer wellness log</p>
+          <p className="text-[#666] text-sm text-center py-4">Registra tu primer estado del día</p>
         )}
       </div>
 

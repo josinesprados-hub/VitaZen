@@ -73,7 +73,7 @@ export default function RiquezaPage() {
           <Gem size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Imperio Riqueza</h1>
+          <h1 className="text-2xl font-bold text-white">Imperio Finanzas</h1>
           <p className="text-[#999] text-sm">Finanzas, mentalidad financiera y gestión del dinero</p>
         </div>
       </div>

@@ -64,7 +64,7 @@ export default function PricingPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Free</h2>
-              <p className="text-[#999] text-sm">Para comenzar tu journey</p>
+              <p className="text-[#999] text-sm">Para comenzar tu camino</p>
             </div>
           </div>
 
@@ -80,7 +80,7 @@ export default function PricingPage() {
               'Acceso a los 5 imperios',
               'Consejos básicos',
               'Desafíos diarios',
-              'Tracking de hábitos',
+              'Seguimiento de hábitos',
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3 text-sm text-[#999]">
                 <Check size={16} className="text-[#666] shrink-0" />
@@ -127,7 +127,7 @@ export default function PricingPage() {
               'Acceso a los 5 imperios',
               'Consejos premium exclusivos',
               'Desafíos diarios',
-              'Tracking completo',
+              'Seguimiento completo',
               'Análisis y recomendaciones',
               'Contenido premium en cada imperio',
             ].map((feature) => (
@@ -152,7 +152,7 @@ export default function PricingPage() {
               disabled={loading}
               className="w-full bg-[#c8a55a] text-black font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 text-sm"
             >
-              {loading ? <Loader2 size={16} className="animate-spin inline" /> : 'Upgrade a Premium'}
+              {loading ? <Loader2 size={16} className="animate-spin inline" /> : 'Mejorar a Premium'}
             </button>
           )}
         </div>

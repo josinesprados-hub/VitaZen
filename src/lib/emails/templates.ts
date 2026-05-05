@@ -72,8 +72,8 @@ export function welcomeEmail(name: string): string {
         <td style="color: #999; font-size: 14px;">Nutrición, salud física, vitalidad</td>
       </tr>
       <tr>
-        <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Riqueza</td>
-        <td style="color: #999; font-size: 14px;">Finanzas, mentalidad, gestión</td>
+        <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Finanzas</td>
+        <td style="color: #999; font-size: 14px;">Finanzas, mentalidad, gestión del dinero</td>
       </tr>
       <tr>
         <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Crecimiento</td>
@@ -81,7 +81,7 @@ export function welcomeEmail(name: string): string {
       </tr>
     </table>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="${buttonStyle}">Comienza tu Journey</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="${buttonStyle}">Comienza tu camino</a>
     </div>
   `);
 }
@@ -137,7 +137,7 @@ export function subscriptionConfirmedTemplate(name: string, planName: string): s
       </tr>
     </table>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="${buttonStyle}">Ir al Dashboard</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="${buttonStyle}">Ir al panel</a>
     </div>
   `);
 }

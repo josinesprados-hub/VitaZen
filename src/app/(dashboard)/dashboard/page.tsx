@@ -31,7 +31,7 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string; de
   disciplina: { name: 'Disciplina', icon: Shield, color: '#c8a55a', description: 'Hábitos, desafíos y consistencia' },
   mente: { name: 'Mente', icon: Brain, color: '#c8a55a', description: 'Meditación, mentor IA y bienestar' },
   energia: { name: 'Energía', icon: Zap, color: '#c8a55a', description: 'Nutrición, salud física y vitalidad' },
-  riqueza: { name: 'Riqueza', icon: Gem, color: '#c8a55a', description: 'Finanzas, mentalidad y gestión' },
+  riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a', description: 'Finanzas, mentalidad y gestión del dinero' },
   crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a', description: 'Journal, reflexión y desarrollo' },
 };
 

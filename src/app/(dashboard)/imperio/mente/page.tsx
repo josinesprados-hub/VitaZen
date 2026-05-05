@@ -22,8 +22,8 @@ interface Tip {
 const MEDITATION_TYPES = [
   { type: 'guided', label: 'Guiada', duration: 10 },
   { type: 'breathing', label: 'Respiración', duration: 5 },
-  { type: 'body_scan', label: 'Body Scan', duration: 15 },
-  { type: 'mindfulness', label: 'Mindfulness', duration: 10 },
+  { type: 'body_scan', label: 'Escaneo corporal', duration: 15 },
+  { type: 'mindfulness', label: 'Atención plena', duration: 10 },
 ];
 
 export default function MentePage() {

@@ -19,7 +19,7 @@ const EMPIRES = [
   { name: 'Disciplina', href: '/imperio/disciplina', icon: Shield, emoji: '⚔️' },
   { name: 'Mente', href: '/imperio/mente', icon: Brain, emoji: '🧠' },
   { name: 'Energía', href: '/imperio/energia', icon: Zap, emoji: '⚡' },
-  { name: 'Riqueza', href: '/imperio/riqueza', icon: Gem, emoji: '💎' },
+  { name: 'Finanzas', href: '/imperio/riqueza', icon: Gem, emoji: '💎' },
   { name: 'Crecimiento', href: '/imperio/crecimiento', icon: TrendingUp, emoji: '📈' },
 ];
 
@@ -112,7 +112,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   }`}
                 >
                   <CreditCard size={20} />
-                  Upgrade to Premium
+                  Mejorar a Premium
                 </Link>
               </>
             )}

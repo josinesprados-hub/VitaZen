@@ -303,7 +303,7 @@ export default function MentorPage() {
                 className="bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
                 onClick={() => setShowLimitModal(false)}
               >
-                Upgrade a Premium
+                Mejorar a Premium
               </Link>
               <button
                 onClick={() => setShowLimitModal(false)}
