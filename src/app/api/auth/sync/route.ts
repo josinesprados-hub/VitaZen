@@ -22,10 +22,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const existingUser = await db.user.findUnique({ where: { firebaseUid: decodedToken.uid } });
+    // Buscar por firebaseUid primero
+    let existingUser = await db.user.findUnique({ where: { firebaseUid: decodedToken.uid } });
+
+    // Si no existe por firebaseUid, buscar por email para evitar P2002
+    if (!existingUser && decodedToken.email) {
+      existingUser = await db.user.findUnique({ where: { email: decodedToken.email } });
+      if (existingUser) {
+        console.log('[AUTH SYNC DEBUG] Usuario encontrado por email (no por firebaseUid). User id:', existingUser.id);
+      }
+    }
+
     const isNewUser = !existingUser;
     console.log('[AUTH SYNC DEBUG] isNewUser:', isNewUser, 'existingUser:', existingUser ? `id: ${existingUser.id}` : 'null');
 
+    // Si el usuario ya existe (por firebaseUid o por email), devolverlo directamente
+    if (existingUser) {
+      const responseData = {
+        user: {
+          id: existingUser.id,
+          firebaseUid: existingUser.firebaseUid,
+          email: existingUser.email,
+          name: existingUser.name,
+          plan: existingUser.plan,
+          avatarUrl: existingUser.avatarUrl,
+        },
+      };
+      console.log('[AUTH SYNC DEBUG] Usuario existente devuelto. Respuesta 200:', JSON.stringify(responseData));
+      return NextResponse.json(responseData);
+    }
+
+    // No existe: crear usuario
     console.log('[AUTH SYNC DEBUG] Llamando a syncUserToDatabase...');
     const user = await syncUserToDatabase(
       decodedToken.uid,
@@ -35,7 +62,7 @@ export async function POST(request: NextRequest) {
     console.log('[AUTH SYNC DEBUG] syncUserToDatabase OK. User id:', user.id, 'email:', user.email, 'plan:', user.plan);
 
     // Send welcome email for new users
-    if (isNewUser && user.email) {
+    if (user.email) {
       console.log('[AUTH SYNC DEBUG] Enviando welcome email a:', user.email);
       await sendWelcomeEmail(user.email, user.name || 'Amigo');
     }
@@ -50,7 +77,7 @@ export async function POST(request: NextRequest) {
         avatarUrl: user.avatarUrl,
       },
     };
-    console.log('[AUTH SYNC DEBUG] Respuesta 200:', JSON.stringify(responseData));
+    console.log('[AUTH SYNC DEBUG] Nuevo usuario creado. Respuesta 200:', JSON.stringify(responseData));
 
     return NextResponse.json(responseData);
   } catch (error) {
