@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Clock, MessageCircle, Lightbulb } from 'lucide-react';
+import { Brain, Play, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
@@ -21,11 +21,52 @@ interface Tip {
   plan: string;
 }
 
-const MEDITATION_TYPES = [
-  { type: 'guided', label: 'Guiada', duration: 10 },
-  { type: 'breathing', label: 'Respiración', duration: 5 },
-  { type: 'body_scan', label: 'Escaneo corporal', duration: 15 },
-  { type: 'mindfulness', label: 'Atención plena', duration: 10 },
+const BREATHING_TECHNIQUES = [
+  {
+    type: 'diaphragmatic',
+    label: 'Diafragmática',
+    subtitle: 'Respiración abdominal',
+    duration: 5,
+    what: 'Respiración profunda que expande el abdomen en lugar del pecho, activando el diafragma.',
+    how: 'Inhala por la nariz (~4 s) expandiendo el abdomen. Pausa breve. Exhala lento (~5–6 s). El pecho se mueve poco.',
+    benefits: 'Reduce estrés y ansiedad al activar el sistema parasimpático. Disminuye cortisol y frecuencia cardíaca. Mejora la oxigenación.',
+  },
+  {
+    type: 'coherence',
+    label: 'Coherencia Cardíaca',
+    subtitle: 'Respiración lenta',
+    duration: 5,
+    what: 'Respiración a ritmo constante que sincroniza el sistema respiratorio con el cardiovascular.',
+    how: 'Inhala 5 s → Exhala 5 s. Ritmo constante de ~6 respiraciones por minuto.',
+    benefits: 'Aumenta la variabilidad de la frecuencia cardíaca (HRV). Mejora la regulación emocional y reduce la ansiedad. Sincroniza respiración y sistema cardiovascular.',
+  },
+  {
+    type: 'mindfulness',
+    label: 'Atención Plena',
+    subtitle: 'Mindfulness',
+    duration: 10,
+    what: 'Observación consciente de la respiración sin modificarla, solo atender al flujo natural del aire.',
+    how: 'Respira de forma natural. Observa la sensación en la nariz, pecho o abdomen. No la modifiques, solo atiéndela.',
+    benefits: 'Reduce ansiedad, depresión y estrés. Mejora la atención y la regulación emocional.',
+  },
+  {
+    type: 'nadi_shodhana',
+    label: 'Nadi Shodhana',
+    subtitle: 'Respiración alterna',
+    duration: 5,
+    what: 'Técnica yogui de respiración alternada por las fosas nasales que equilibra los hemisferios cerebrales.',
+    how: 'Tapa una fosa nasal e inhala por la otra. Cambia y exhala por la contraria. Alterna de forma rítmica.',
+    benefits: 'Reduce estrés y frecuencia cardíaca. Mejora funciones cognitivas y la atención.',
+  },
+  {
+    type: 'box',
+    label: 'Box Breathing',
+    subtitle: 'Respiración cuadrada',
+    duration: 5,
+    what: 'Patrón simétrico de cuatro fases iguales que regula el sistema nervioso autónomo de forma controlada.',
+    how: 'Inhala 4 s → Mantén 4 s → Exhala 4 s → Mantén 4 s. Repite el ciclo.',
+    benefits: 'Mejora el control del estrés agudo. Aumenta la concentración y la claridad mental.',
+  },
 ];
 
 export default function MentePage() {
@@ -36,7 +77,8 @@ export default function MentePage() {
   const [tips, setTips] = useState<Tip[]>([]);
   const [meditating, setMeditating] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [selectedType, setSelectedType] = useState(MEDITATION_TYPES[0]);
+  const [selectedType, setSelectedType] = useState(BREATHING_TECHNIQUES[0]);
+  const [expandedTechnique, setExpandedTechnique] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -65,7 +107,7 @@ export default function MentePage() {
     return () => clearInterval(interval);
   }, [meditating]);
 
-  const startMeditation = (type: typeof MEDITATION_TYPES[0]) => {
+  const startMeditation = (type: typeof BREATHING_TECHNIQUES[0]) => {
     setSelectedType(type);
     setTimer(0);
     setMeditating(true);
@@ -89,6 +131,10 @@ export default function MentePage() {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const toggleTechnique = (type: string) => {
+    setExpandedTechnique(prev => prev === type ? null : type);
   };
 
   if (loading) {
@@ -129,37 +175,100 @@ export default function MentePage() {
 
       {/* Meditation Timer */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-white">Sesión de Meditación</h2>
-          <p className="text-[#666] text-xs mt-1">Silencia tu mente y conecta con tu interior</p>
+        <div className="flex items-center gap-3 mb-4">
+          <Wind size={20} className="text-[#c8a55a]" />
+          <div>
+            <h2 className="text-lg font-semibold text-white">Sesión de Respiración</h2>
+            <p className="text-[#666] text-xs mt-0.5">Selecciona una técnica y comienza a practicar</p>
+          </div>
         </div>
         
         {meditating ? (
-          <div className="text-center py-8">
-            <p className="text-5xl font-bold text-[#c8a55a] mb-2 font-mono">{formatTime(timer)}</p>
-            <p className="text-[#999] mb-6">{selectedType.label} — Objetivo: {selectedType.duration} min</p>
+          <div className="text-center py-10">
+            <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
+            <p className="text-5xl font-bold text-[#c8a55a] mb-1 font-mono">{formatTime(timer)}</p>
+            <p className="text-[#666] text-sm mb-8">Objetivo: {selectedType.duration} min</p>
             <button
               onClick={endMeditation}
               className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
             >
-              Finalizar meditación
+              Finalizar sesión
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {MEDITATION_TYPES.map((med) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {BREATHING_TECHNIQUES.map((tech) => (
               <button
-                key={med.type}
-                onClick={() => startMeditation(med)}
-                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-center hover:border-[#c8a55a]/50 transition-colors"
+                key={tech.type}
+                onClick={() => startMeditation(tech)}
+                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-left hover:border-[#c8a55a]/50 transition-all group"
               >
-                <Play size={24} className="text-[#c8a55a] mx-auto mb-2" />
-                <p className="text-white text-sm font-medium">{med.label}</p>
-                <p className="text-[#666] text-xs">{med.duration} min</p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-white text-sm font-medium group-hover:text-[#c8a55a] transition-colors">{tech.label}</p>
+                  <Play size={14} className="text-[#c8a55a] shrink-0" />
+                </div>
+                <p className="text-[#666] text-xs">{tech.subtitle} · {tech.duration} min</p>
               </button>
             ))}
           </div>
         )}
+      </div>
+
+      {/* Breathing Techniques Guide */}
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <Wind size={20} className="text-[#c8a55a]" />
+          <div>
+            <h2 className="text-lg font-semibold text-white">Guía de Técnicas</h2>
+            <p className="text-[#666] text-xs mt-0.5">Conoce cada técnica antes de practicarla</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {BREATHING_TECHNIQUES.map((tech) => {
+            const isExpanded = expandedTechnique === tech.type;
+            return (
+              <div
+                key={tech.type}
+                className="bg-[#000000] border border-[#1a1a1a] rounded-lg overflow-hidden transition-all"
+              >
+                {/* Collapsed header */}
+                <button
+                  onClick={() => toggleTechnique(tech.type)}
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-[#0a0a0a]/50 transition-colors"
+                >
+                  <div>
+                    <p className="text-white text-sm font-medium">{tech.label}</p>
+                    <p className="text-[#666] text-xs mt-0.5">{tech.subtitle}</p>
+                  </div>
+                  {isExpanded ? (
+                    <ChevronUp size={16} className="text-[#c8a55a] shrink-0" />
+                  ) : (
+                    <ChevronDown size={16} className="text-[#666] shrink-0" />
+                  )}
+                </button>
+
+                {/* Expanded content */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 space-y-3 border-t border-[#1a1a1a] pt-3">
+                    <div>
+                      <p className="text-[#c8a55a] text-xs uppercase tracking-wider font-semibold mb-1">Qué es</p>
+                      <p className="text-[#ccc] text-sm leading-relaxed">{tech.what}</p>
+                    </div>
+                    <div>
+                      <p className="text-[#c8a55a] text-xs uppercase tracking-wider font-semibold mb-1">Cómo practicarla</p>
+                      <p className="text-[#ccc] text-sm leading-relaxed">{tech.how}</p>
+                    </div>
+                    <div>
+                      <p className="text-[#c8a55a] text-xs uppercase tracking-wider font-semibold mb-1">Beneficios</p>
+                      <p className="text-[#ccc] text-sm leading-relaxed">{tech.benefits}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Recent Sessions */}
