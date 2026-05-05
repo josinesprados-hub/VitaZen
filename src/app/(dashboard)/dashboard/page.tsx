@@ -246,17 +246,17 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-12">
       {/* Welcome */}
       <div>
         <h1 className="text-3xl font-bold text-white">
           Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
         </h1>
-        <p className="text-[#999] mt-1">Tu imperio se construye con cada acción. Aquí puedes seguir tu progreso.</p>
+        <p className="text-[#999] mt-2">Construye tu imperio, un hábito a la vez.</p>
       </div>
 
       {/* Frase motivacional */}
-      <div className="flex justify-center py-4">
+      <div className="flex justify-center py-6">
         <p
           className={`text-center text-[#c8a55a]/90 text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 ${fraseVisible ? 'opacity-100' : 'opacity-0'}`}
         >
@@ -266,16 +266,16 @@ export default function DashboardPage() {
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Trophy size={24} className="text-[#c8a55a]" />
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-7">
+          <div className="flex items-center gap-3 mb-5">
+            <Trophy size={22} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
-              <span className="text-xs px-2 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>
             )}
           </div>
-          <h3 className="text-[#c8a55a] font-medium text-lg mb-2">{challenge.challenge.title}</h3>
-          <p className="text-[#999] text-sm mb-4">{challenge.challenge.description}</p>
+          <h3 className="text-[#c8a55a] font-medium text-lg mb-1">{challenge.challenge.title}</h3>
+          <p className="text-[#999] text-sm mb-5">{challenge.challenge.description}</p>
           {!challenge.completed && (
             <button
               onClick={async () => {
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                   setChallenge({ ...challenge, completed: true });
                 }
               }}
-              className="bg-[#c8a55a] text-black font-semibold px-6 py-2 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
             >
               Marcar como completado
             </button>
@@ -297,8 +297,8 @@ export default function DashboardPage() {
 
       {/* Empire Grid */}
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Tus Imperios</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 className="text-xl font-semibold text-white mb-5">Tus Imperios</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
             const empireData = empires.find((e) => e.empire === key);
             const level = empireData?.level || 1;
@@ -310,9 +310,9 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/30 transition-all group"
+                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/30 transition-all group"
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                     <Icon size={22} className="text-[#c8a55a]" />
                   </div>
@@ -322,10 +322,10 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-[#999] mb-4">{config.description}</p>
+                <p className="text-sm text-[#999] mb-5">{config.description}</p>
 
                 {/* Progress bar */}
-                <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2">
+                <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2.5">
                   <div
                     className="bg-[#c8a55a] h-2 rounded-full transition-all"
                     style={{ width: `${progress}%` }}
@@ -347,8 +347,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
           <div className="flex items-center gap-3">
             <Star size={20} className="text-[#c8a55a]" />
             <div>
@@ -357,7 +357,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
           <div className="flex items-center gap-3">
             <Trophy size={20} className="text-[#c8a55a]" />
             <div>
@@ -366,7 +366,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
           <div className="flex items-center gap-3">
             <Flame size={20} className="text-[#c8a55a]" />
             <div>

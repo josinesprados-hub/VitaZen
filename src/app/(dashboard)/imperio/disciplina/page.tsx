@@ -103,7 +103,7 @@ export default function DisciplinaPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-10">
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
@@ -111,21 +111,20 @@ export default function DisciplinaPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Imperio Disciplina</h1>
-          <p className="text-[#999] text-sm">Construye hábitos poderosos, supera desafíos y domina tu consistencia</p>
+          <p className="text-[#999] text-sm">Hábitos, desafíos y consistencia diaria</p>
         </div>
       </div>
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-7">
+          <div className="flex items-center gap-3 mb-4">
             <Trophy size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
-            {challenge.completed && <span className="text-xs px-2 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>}
+            {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>}
           </div>
-          <p className="text-[#666] text-xs mb-3">Supera tu reto de hoy y avanza hacia tu mejor versión</p>
           <h3 className="text-[#c8a55a] font-medium mb-1">{challenge.challenge.title}</h3>
-          <p className="text-[#999] text-sm mb-3">{challenge.challenge.description}</p>
+          <p className="text-[#999] text-sm mb-4">{challenge.challenge.description}</p>
           {!challenge.completed && (
             <button
               onClick={async () => {
@@ -141,8 +140,8 @@ export default function DisciplinaPage() {
       )}
 
       {/* Habits */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-2">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Mis Hábitos</h2>
           <button
             onClick={() => setShowAddHabit(!showAddHabit)}
@@ -151,7 +150,7 @@ export default function DisciplinaPage() {
             <Plus size={18} /> Añadir hábito
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-4">La consistencia transforma las acciones en resultados</p>
+        <p className="text-[#666] text-xs mb-5">La consistencia transforma acciones en resultados</p>
 
         {showAddHabit && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
@@ -179,7 +178,7 @@ export default function DisciplinaPage() {
         {habits.length === 0 ? (
           <p className="text-[#666] text-sm text-center py-8">Aún no tienes hábitos. Crea el primero y comienza tu transformación.</p>
         ) : (
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="space-y-2.5 max-h-96 overflow-y-auto">
             {habits.map((habit) => (
               <div key={habit.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
                 <div className="flex items-center gap-3">
@@ -212,12 +211,12 @@ export default function DisciplinaPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+          <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
           </div>
-          <p className="text-[#666] text-xs mb-4">Estrategias comprobadas para fortalecer tu disciplina</p>
+          <p className="text-[#666] text-xs mb-5">Estrategias para fortalecer tu disciplina</p>
           <div className="space-y-3">
             {tips.map((tip) => {
               const isLocked = tip.plan === 'PREMIUM' && !isPremium;

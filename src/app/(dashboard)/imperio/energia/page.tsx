@@ -109,26 +109,26 @@ export default function EnergiaPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-10">
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Zap size={28} className="text-[#c8a55a]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Imperio Energía</h1>
-          <p className="text-[#999] text-sm">Optimiza tu energía, nutre tu cuerpo y alcanza tu mejor versión física</p>
+          <p className="text-[#999] text-sm">Cuerpo, vitalidad y bienestar físico</p>
         </div>
       </div>
 
       {/* Wellness Log */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-2">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
           <button onClick={() => setShowWellness(!showWellness)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
             + Registrar hoy
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-4">Monitoriza tu estado físico y emocional para tomar mejores decisiones</p>
+        <p className="text-[#666] text-xs mb-5">Monitoriza tu estado físico y emocional</p>
         {showWellness && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
             <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
@@ -162,14 +162,14 @@ export default function EnergiaPage() {
       </div>
 
       {/* Nutrition */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-2">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
           <button onClick={() => setShowNutrition(!showNutrition)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
             + Registrar hoy
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-4">Tu alimentación es la base de tu rendimiento y vitalidad</p>
+        <p className="text-[#666] text-xs mb-5">Tu alimentación es la base de tu rendimiento</p>
         {showNutrition && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
             <textarea placeholder="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
@@ -211,12 +211,12 @@ export default function EnergiaPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+          <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
           </div>
-          <p className="text-[#666] text-xs mb-4">Estrategias para maximizar tu energía y rendimiento físico</p>
+          <p className="text-[#666] text-xs mb-5">Estrategias para maximizar tu energía</p>
           <div className="space-y-3">
             {tips.map((tip) => {
               const isLocked = tip.plan === 'PREMIUM' && !isPremium;

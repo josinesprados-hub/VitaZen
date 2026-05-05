@@ -71,20 +71,20 @@ export default function CrecimientoPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-10">
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <TrendingUp size={28} className="text-[#c8a55a]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Imperio Crecimiento</h1>
-          <p className="text-[#999] text-sm">Expande tu potencial, reflexiona con propósito y evoluciona cada día</p>
+          <p className="text-[#999] text-sm">Reflexión, evolución y crecimiento personal</p>
         </div>
       </div>
 
       {/* Journal */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-2">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
           </h2>
@@ -92,7 +92,7 @@ export default function CrecimientoPage() {
             <Plus size={18} className="inline mr-1" /> Nueva entrada
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-4">Escribe, reflexiona y transforma tus pensamientos en acción</p>
+        <p className="text-[#666] text-xs mb-5">Escribe, reflexiona y transforma</p>
 
         {showAdd && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
@@ -164,12 +164,12 @@ export default function CrecimientoPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+          <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
           </div>
-          <p className="text-[#666] text-xs mb-4">Herramientas y métodos para acelerar tu evolución personal</p>
+          <p className="text-[#666] text-xs mb-5">Herramientas para acelerar tu evolución</p>
           <div className="space-y-3">
             {tips.map((tip) => {
               const isLocked = tip.plan === 'PREMIUM' && !isPremium;

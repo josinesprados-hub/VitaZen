@@ -161,17 +161,17 @@ export default function MentorPage() {
   return (
     <div className="max-w-5xl mx-auto h-[calc(100vh-8rem)]">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-8">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Sparkles size={28} className="text-[#c8a55a]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Mentor IA</h1>
-          <p className="text-[#999] text-sm">Tu guía experto de desarrollo personal disponible en cualquier momento</p>
+          <p className="text-[#999] text-sm">Tu guía experto de desarrollo personal</p>
         </div>
       </div>
 
-      <div className="flex h-[calc(100%-5rem)] gap-4">
+      <div className="flex h-[calc(100%-6rem)] gap-5">
         {/* Thread list */}
         <div className="w-64 shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex flex-col">
           <div className="p-4 border-b border-[#1a1a1a]">

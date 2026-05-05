@@ -62,7 +62,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
 
           {/* Dashboard link */}
-          <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+          <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
             <Link
               href="/dashboard"
               onClick={onClose}
@@ -72,12 +72,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
               }`}
             >
-              <LayoutDashboard size={20} />
+              <LayoutDashboard size={18} />
               Dashboard
             </Link>
 
-            <div className="pt-4 pb-2">
-              <p className="px-4 text-xs text-[#666] uppercase tracking-wider font-semibold">Imperios</p>
+            <div className="pt-5 pb-2">
+              <p className="px-4 text-xs text-[#555] uppercase tracking-widest font-semibold">Imperios</p>
             </div>
 
             {EMPIRES.map((empire) => {
@@ -87,13 +87,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   key={empire.name}
                   href={empire.href}
                   onClick={onClose}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                       : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
                   }`}
                 >
-                  <empire.icon size={20} />
+                  <empire.icon size={18} />
                   {empire.name}
                 </Link>
               );
@@ -101,8 +101,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
             {user?.plan === 'FREE' && (
               <>
-                <div className="pt-4 pb-2">
-                  <p className="px-4 text-xs text-[#666] uppercase tracking-wider font-semibold">Suscripción</p>
+                <div className="pt-5 pb-2">
+                  <p className="px-4 text-xs text-[#555] uppercase tracking-widest font-semibold">Suscripción</p>
                 </div>
                 <Link
                   href="/pricing"
