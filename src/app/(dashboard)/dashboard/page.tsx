@@ -198,14 +198,16 @@ export default function DashboardPage() {
   const [fraseIndex, setFraseIndex] = useState(() => getRandomIndex());
   const [fraseVisible, setFraseVisible] = useState(true);
   const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
+  const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empRes, chRes, metRes] = await Promise.all([
+        const [empRes, chRes, metRes, streakRes] = await Promise.all([
           apiFetch('/api/empire'),
           apiFetch('/api/challenges'),
           apiFetch('/api/dashboard/metrics'),
+          apiFetch('/api/dashboard/streaks'),
         ]);
 
         if (empRes.ok) {
@@ -221,6 +223,11 @@ export default function DashboardPage() {
         if (metRes.ok) {
           const metData = await metRes.json();
           setMetrics(metData);
+        }
+
+        if (streakRes.ok) {
+          const streakData = await streakRes.json();
+          setStreaks(streakData);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -274,6 +281,11 @@ export default function DashboardPage() {
             </div>
             <p className="text-3xl font-bold text-white">{metrics.meditationWeek}</p>
             <p className="text-xs text-[#666] mt-1">sesiones esta semana</p>
+            {streaks && streaks.meditationStreak > 0 && (
+              <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
+                🔥 {streaks.meditationStreak} días seguidos
+              </p>
+            )}
           </div>
 
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
@@ -285,6 +297,11 @@ export default function DashboardPage() {
             </div>
             <p className="text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
             <p className="text-xs text-[#666] mt-1">completados esta semana</p>
+            {streaks && streaks.habitStreak > 0 && (
+              <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
+                🔥 {streaks.habitStreak} días seguidos
+              </p>
+            )}
           </div>
 
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
@@ -296,6 +313,11 @@ export default function DashboardPage() {
             </div>
             <p className="text-3xl font-bold text-white">{metrics.journalWeek}</p>
             <p className="text-xs text-[#666] mt-1">entradas esta semana</p>
+            {streaks && streaks.journalStreak > 0 && (
+              <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
+                🔥 {streaks.journalStreak} días seguidos
+              </p>
+            )}
           </div>
 
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
