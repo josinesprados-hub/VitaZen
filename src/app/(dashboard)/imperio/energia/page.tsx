@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useAuth } from '@/context/AuthContext';
 import { Zap, Droplets, Flame, Apple, Lightbulb } from 'lucide-react';
+import PremiumBlur from '@/components/ui/PremiumBlur';
 
 interface WellnessLog {
   id: string;
@@ -27,10 +29,13 @@ interface Tip {
   id: string;
   title: string;
   content: string;
+  plan: string;
 }
 
 export default function EnergiaPage() {
   const { apiFetch } = useApi();
+  const { user } = useAuth();
+  const isPremium = user?.plan === 'PREMIUM';
   const [wellnessLogs, setWellnessLogs] = useState<WellnessLog[]>([]);
   const [nutrition, setNutrition] = useState<NutritionLog[]>([]);
   const [tips, setTips] = useState<Tip[]>([]);
@@ -210,12 +215,20 @@ export default function EnergiaPage() {
             <h2 className="text-lg font-semibold text-white">Consejos</h2>
           </div>
           <div className="space-y-3">
-            {tips.map((tip) => (
-              <div key={tip.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
-                <h3 className="text-[#c8a55a] font-medium text-sm mb-1">{tip.title}</h3>
-                <p className="text-[#999] text-sm">{tip.content}</p>
-              </div>
-            ))}
+            {tips.map((tip) => {
+              const isLocked = tip.plan === 'PREMIUM' && !isPremium;
+              const tipCard = (
+                <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
+                  <h3 className="text-[#c8a55a] font-medium text-sm mb-1">{tip.title}</h3>
+                  <p className="text-[#999] text-sm">{tip.content}</p>
+                </div>
+              );
+              return (
+                <div key={tip.id}>
+                  {isLocked ? <PremiumBlur>{tipCard}</PremiumBlur> : tipCard}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

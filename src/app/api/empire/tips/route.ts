@@ -16,13 +16,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'empire parameter required' }, { status: 400 });
     }
 
-    // FREE users can only see FREE tips, PREMIUM see all
+    // Return all tips (FREE + PREMIUM) so frontend can show premium as blurred
     const tips = await db.empireTip.findMany({
-      where: {
-        empire,
-        ...(user.plan === 'FREE' ? { plan: 'FREE' } : {}),
-      },
-      orderBy: { createdAt: 'desc' },
+      where: { empire },
+      orderBy: [
+        { plan: 'asc' },   // FREE tips first
+        { createdAt: 'desc' },
+      ],
       take: 10,
     });
 
