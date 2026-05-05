@@ -73,12 +73,15 @@ export function welcomeEmail(name: string): string {
   return emailWrapper(`
     <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; margin: 0 0 32px; letter-spacing: 0.5px; line-height: 1.3;">Bienvenido, ${name}.</h1>
     <p style="color: #888888; font-size: 15px; line-height: 1.8; margin: 0 0 16px;">
-      Tu acceso está listo.
+      Has tomado una decisión que la mayoría evita.
     </p>
     <p style="color: #555555; font-size: 14px; line-height: 1.8; margin: 0;">
-      Lo que viene ahora depende de ti.
+      Trabajar en ti mismo.
     </p>
-    ${ctaButton(`${APP_URL}/dashboard`, 'COMENZAR')}
+    <p style="color: #555555; font-size: 14px; line-height: 1.8; margin: 16px 0 0;">
+      A partir de ahora, cada acción cuenta.
+    </p>
+    ${ctaButton(`${APP_URL}/dashboard`, 'ACCEDER')}
     <p style="color: #2a2a2a; font-size: 11px; margin: 0; text-align: center; line-height: 1.6;">
       Si no creaste esta cuenta, puedes ignorar este mensaje.
     </p>
@@ -89,10 +92,10 @@ export function verifyEmailTemplate(name: string, verificationLink: string): str
   return emailWrapper(`
     <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; margin: 0 0 32px; letter-spacing: 0.5px; line-height: 1.3;">Confirma tu email.</h1>
     <p style="color: #888888; font-size: 15px; line-height: 1.8; margin: 0 0 16px;">
-      Un paso más, ${name}.
+      Un paso más.
     </p>
     <p style="color: #555555; font-size: 14px; line-height: 1.8; margin: 0;">
-      Verifica que eres tú y estarás dentro.
+      Verifica tu acceso y entra.
     </p>
     ${ctaButton(verificationLink, 'CONFIRMAR')}
     <p style="color: #2a2a2a; font-size: 11px; margin: 0; text-align: center; line-height: 1.6;">
@@ -105,10 +108,13 @@ export function resetPasswordTemplate(name: string, resetLink: string): string {
   return emailWrapper(`
     <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; margin: 0 0 32px; letter-spacing: 0.5px; line-height: 1.3;">Restaura tu acceso.</h1>
     <p style="color: #888888; font-size: 15px; line-height: 1.8; margin: 0 0 16px;">
-      Alguien solicitó cambiar tu contraseña.
+      Se ha solicitado un cambio de contraseña.
     </p>
     <p style="color: #555555; font-size: 14px; line-height: 1.8; margin: 0;">
-      Si fuiste tú, continúa. Si no, ignora este email.
+      Si fuiste tú, continúa.
+    </p>
+    <p style="color: #555555; font-size: 14px; line-height: 1.8; margin: 16px 0 0;">
+      Si no lo hiciste, puedes ignorar este mensaje.
     </p>
     ${ctaButton(resetLink, 'RESTABLECER')}
     <p style="color: #2a2a2a; font-size: 11px; margin: 0; text-align: center; line-height: 1.6;">
@@ -119,14 +125,14 @@ export function resetPasswordTemplate(name: string, resetLink: string): string {
 
 export function subscriptionConfirmedTemplate(name: string, planName: string): string {
   return emailWrapper(`
-    <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; margin: 0 0 32px; letter-spacing: 0.5px; line-height: 1.3;">${name}, tu plan está activo.</h1>
+    <h1 style="color: #FFFFFF; font-size: 26px; font-weight: 300; margin: 0 0 32px; letter-spacing: 0.5px; line-height: 1.3;">${name}, acceso completo activado.</h1>
     <p style="color: #888888; font-size: 15px; line-height: 1.8; margin: 0 0 16px;">
-      Acceso completo desbloqueado.
+      Has desbloqueado el siguiente nivel.
     </p>
     <p style="color: #555555; font-size: 14px; line-height: 1.8; margin: 0;">
-      Tu progreso empieza ahora.
+      Ahora empieza el trabajo real.
     </p>
-    ${ctaButton(`${APP_URL}/dashboard`, 'ENTRAR')}
+    ${ctaButton(`${APP_URL}/dashboard`, 'CONTINUAR')}
     <p style="color: #2a2a2a; font-size: 11px; margin: 0; text-align: center; line-height: 1.6;">
       Si tienes alguna duda, estamos aquí.
     </p>
