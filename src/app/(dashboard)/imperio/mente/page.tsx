@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind } from 'lucide-react';
+import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
@@ -138,6 +138,20 @@ export default function MentePage() {
 
   const toggleTechnique = (type: string) => {
     setExpandedTechnique(prev => prev === type ? null : type);
+  };
+
+  const deleteSession = async (sessionId: string) => {
+    try {
+      const res = await apiFetch('/api/meditation', {
+        method: 'DELETE',
+        body: JSON.stringify({ sessionId }),
+      });
+      if (res.ok) {
+        setSessions(prev => prev.filter(s => s.id !== sessionId));
+      }
+    } catch (error) {
+      console.error('Error deleting session:', error);
+    }
   };
 
   if (loading) {
@@ -283,29 +297,46 @@ export default function MentePage() {
         </div>
       </div>
 
-      {/* Recent Sessions */}
-      {sessions.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
-          <div className="mb-5">
+      {/* Session History */}
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="flex items-center gap-3 mb-5">
+          <Clock size={20} className="text-[#c8a55a]" />
+          <div>
             <h2 className="text-lg font-semibold text-white">Historial de Sesiones</h2>
             <p className="text-[#666] text-xs mt-0.5">Tu evolución en la práctica</p>
           </div>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {sessions.slice(0, 10).map((session) => (
-              <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
-                <div className="flex items-center gap-3">
-                  <Clock size={16} className="text-[#c8a55a]" />
-                  <span className="text-sm text-white capitalize">{session.type.replace('_', ' ')}</span>
+        </div>
+
+        {sessions.length === 0 ? (
+          <p className="text-[#666] text-sm text-center py-6">Aún no tienes sesiones registradas</p>
+        ) : (
+          <div className="space-y-2">
+            {sessions.map((session) => (
+              <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#1f1f1f] transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                    <Wind size={16} className="text-[#c8a55a]" />
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-medium capitalize">{session.type.replace('_', ' ')}</p>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(session.completedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-[#999]">
-                  <span>{session.duration} min</span>
-                  <span>{new Date(session.completedAt).toLocaleDateString('es')}</span>
-                </div>
+                <button
+                  onClick={() => deleteSession(session.id)}
+                  className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all"
+                  title="Eliminar sesión"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Tips */}
       {tips.length > 0 && (

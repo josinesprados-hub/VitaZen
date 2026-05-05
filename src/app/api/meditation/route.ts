@@ -2,6 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const { sessionId } = await request.json();
+
+    // Verify the session belongs to the user before deleting
+    const session = await db.meditationSession.findUnique({ where: { id: sessionId } });
+    if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    if (session.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    await db.meditationSession.delete({ where: { id: sessionId } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Meditation DELETE error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
