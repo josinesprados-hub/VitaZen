@@ -125,17 +125,22 @@ export function useAuth() {
   return context;
 }
 
-export async function getProviderMismatchMessage(email: string): Promise<string> {
+export interface ProviderMismatchResult {
+  message: string;
+  provider: 'google' | 'password' | null;
+}
+
+export async function getProviderMismatchMessage(email: string): Promise<ProviderMismatchResult> {
   try {
     const methods = await fetchSignInMethodsForEmail(auth, email);
     if (methods.includes('google.com')) {
-      return 'Este correo ya está vinculado a Google. Inicia sesión con Google.';
+      return { message: 'Este correo ya está vinculado a Google. Inicia sesión con Google.', provider: 'google' };
     }
     if (methods.includes('password')) {
-      return 'Este correo ya está registrado con email y contraseña. Usa ese método para iniciar sesión.';
+      return { message: 'Este correo ya está registrado con email y contraseña. Usa ese método para iniciar sesión.', provider: 'password' };
     }
-    return 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.';
+    return { message: 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.', provider: null };
   } catch {
-    return 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.';
+    return { message: 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.', provider: null };
   }
 }
