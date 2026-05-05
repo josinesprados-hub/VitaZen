@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target } from 'lucide-react';
 
 const FRASES = [
   'La disciplina es el puente entre tus metas y tus logros.',
@@ -199,15 +199,17 @@ export default function DashboardPage() {
   const [fraseVisible, setFraseVisible] = useState(true);
   const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
   const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number } | null>(null);
+  const [progress, setProgress] = useState<{ meditation: { count: number; target: number; percent: number }; habits: { count: number; target: number; percent: number }; journal: { count: number; target: number; percent: number }; totalPercent: number } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empRes, chRes, metRes, streakRes] = await Promise.all([
+        const [empRes, chRes, metRes, streakRes, progRes] = await Promise.all([
           apiFetch('/api/empire'),
           apiFetch('/api/challenges'),
           apiFetch('/api/dashboard/metrics'),
           apiFetch('/api/dashboard/streaks'),
+          apiFetch('/api/dashboard/progress'),
         ]);
 
         if (empRes.ok) {
@@ -228,6 +230,11 @@ export default function DashboardPage() {
         if (streakRes.ok) {
           const streakData = await streakRes.json();
           setStreaks(streakData);
+        }
+
+        if (progRes.ok) {
+          const progData = await progRes.json();
+          setProgress(progData);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -331,6 +338,63 @@ export default function DashboardPage() {
               {metrics.balance >= 0 ? '+' : ''}{metrics.balance.toFixed(2)}€
             </p>
             <p className="text-xs text-[#666] mt-1">balance últimos 30 días</p>
+          </div>
+        </div>
+      )}
+
+      {/* Progreso Semanal */}
+      {progress && (
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Target size={22} className="text-[#c8a55a]" />
+              <h2 className="text-lg font-semibold text-white">Progreso Semanal</h2>
+            </div>
+            <span className="text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
+          </div>
+
+          <div className="space-y-5">
+            {/* Meditación */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-[#999]">Meditación</span>
+                <span className="text-xs text-[#666]">{progress.meditation.count}/{progress.meditation.target} sesiones</span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="bg-[#c8a55a] h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${progress.meditation.percent}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Hábitos */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-[#999]">Hábitos</span>
+                <span className="text-xs text-[#666]">{progress.habits.count}/{progress.habits.target} días activos</span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="bg-[#c8a55a] h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${progress.habits.percent}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Diario */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-[#999]">Diario</span>
+                <span className="text-xs text-[#666]">{progress.journal.count}/{progress.journal.target} entradas</span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="bg-[#c8a55a] h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${progress.journal.percent}%` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
