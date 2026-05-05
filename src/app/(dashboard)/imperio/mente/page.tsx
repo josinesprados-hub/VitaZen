@@ -337,41 +337,56 @@ export default function MentePage() {
 
       {/* Session History */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
-        <div className="flex items-center gap-3 mb-5">
-          <Clock size={20} className="text-[#c8a55a]" />
-          <div>
-            <h2 className="text-lg font-semibold text-white">Historial de Sesiones</h2>
-            <p className="text-[#666] text-xs mt-0.5">Tu evolución en la práctica</p>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <Clock size={20} className="text-[#c8a55a]" />
+            <div>
+              <h2 className="text-lg font-semibold text-white">Historial de Sesiones</h2>
+              <p className="text-[#666] text-xs mt-0.5">Tu evolución en la práctica</p>
+            </div>
           </div>
+          {sessions.length > 0 && (
+            <span className="text-xs text-[#666] bg-[#000000] border border-[#1a1a1a] rounded-full px-3 py-1">{sessions.length} sesión{sessions.length !== 1 ? 'es' : ''}</span>
+          )}
         </div>
 
         {sessions.length === 0 ? (
-          <p className="text-[#666] text-sm text-center py-6">Aún no tienes sesiones registradas</p>
+          <div className="text-center py-10">
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/5 flex items-center justify-center mx-auto mb-3">
+              <Wind size={20} className="text-[#c8a55a]/30" />
+            </div>
+            <p className="text-[#666] text-sm">Aún no tienes sesiones registradas</p>
+            <p className="text-[#555] text-xs mt-1">Completa una sesión de respiración para verla aquí</p>
+          </div>
         ) : (
-          <div className="space-y-2">
-            {sessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#1f1f1f] transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                    <Wind size={16} className="text-[#c8a55a]" />
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-medium capitalize">{session.type.replace('_', ' ')}</p>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(session.completedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
+            {sessions.map((session) => {
+              const tech = BREATHING_TECHNIQUES.find(t => t.type === session.type);
+              return (
+                <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                      <Wind size={16} className="text-[#c8a55a]" />
+                    </div>
+                    <div>
+                      <p className="text-white text-sm font-medium">{tech?.label ?? session.type.replace('_', ' ')}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
+                        <span className="text-[#333] text-xs">·</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(session.completedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      </div>
                     </div>
                   </div>
+                  <button
+                    onClick={() => deleteSession(session.id)}
+                    className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all"
+                    title="Eliminar sesión"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => deleteSession(session.id)}
-                  className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all"
-                  title="Eliminar sesión"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
