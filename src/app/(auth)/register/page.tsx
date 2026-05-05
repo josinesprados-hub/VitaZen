@@ -57,6 +57,11 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        setError('Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.');
+        setLoading(false);
+        return;
+      }
       setError('No se ha podido registrar con Google. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
@@ -78,8 +83,8 @@ export default function RegisterPage() {
           <h2 className="text-xl font-semibold text-white mb-6">Crear tu cuenta</h2>
 
           {error && (
-            <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/20 rounded-lg p-4 mb-4">
+              <p className="text-[#c8a55a] text-sm">{error}</p>
             </div>
           )}
 
