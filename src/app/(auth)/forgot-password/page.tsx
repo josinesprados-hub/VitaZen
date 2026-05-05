@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -18,19 +16,22 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      console.log('[EMAIL DEBUG] Firebase sendPasswordResetEmail — Enviando a:', email);
-      await sendPasswordResetEmail(auth, email);
-      console.log('[EMAIL DEBUG] Firebase sendPasswordResetEmail — Email enviado correctamente');
-      setSuccess(true);
-    } catch (err: any) {
-      console.error('[EMAIL DEBUG] Firebase sendPasswordResetEmail — Error:', err.code, err.message);
-      if (err.code === 'auth/user-not-found') {
-        setError('No existe ninguna cuenta asociada a este email');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('La dirección de email no es válida');
-      } else {
-        setError('No se ha podido enviar el email de recuperación. Inténtalo de nuevo.');
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'No se pudo enviar el email de recuperación.');
+        return;
       }
+
+      setSuccess(true);
+    } catch (err) {
+      setError('Error de conexión. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -61,7 +62,7 @@ export default function ForgotPasswordPage() {
           {success && (
             <div className="bg-green-900/20 border border-green-800 rounded-lg p-3 mb-4">
               <p className="text-green-400 text-sm">
-                Email enviado correctamente. Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.
+                Si el email existe en nuestro sistema, recibirás un enlace de recuperación.
               </p>
             </div>
           )}
