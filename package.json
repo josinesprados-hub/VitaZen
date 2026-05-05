@@ -89,6 +89,9 @@
     "zod": "^4.0.2",
     "zustand": "^5.0.6"
   },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/react": "^19",
