@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet } from 'lucide-react';
 
 const FRASES = [
   'La disciplina es el puente entre tus metas y tus logros.',
@@ -197,13 +197,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [fraseIndex, setFraseIndex] = useState(() => getRandomIndex());
   const [fraseVisible, setFraseVisible] = useState(true);
+  const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empRes, chRes] = await Promise.all([
+        const [empRes, chRes, metRes] = await Promise.all([
           apiFetch('/api/empire'),
           apiFetch('/api/challenges'),
+          apiFetch('/api/dashboard/metrics'),
         ]);
 
         if (empRes.ok) {
@@ -214,6 +216,11 @@ export default function DashboardPage() {
         if (chRes.ok) {
           const chData = await chRes.json();
           setChallenge(chData.challenge);
+        }
+
+        if (metRes.ok) {
+          const metData = await metRes.json();
+          setMetrics(metData);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -254,6 +261,57 @@ export default function DashboardPage() {
         </h1>
         <p className="text-[#999] mt-2">Construye tu imperio, un hábito a la vez.</p>
       </div>
+
+      {/* Metrics */}
+      {metrics && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <Wind size={18} className="text-[#c8a55a]" />
+              </div>
+              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Meditación</span>
+            </div>
+            <p className="text-3xl font-bold text-white">{metrics.meditationWeek}</p>
+            <p className="text-xs text-[#666] mt-1">sesiones esta semana</p>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <CheckCircle size={18} className="text-[#c8a55a]" />
+              </div>
+              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Hábitos</span>
+            </div>
+            <p className="text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
+            <p className="text-xs text-[#666] mt-1">completados esta semana</p>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <BookOpen size={18} className="text-[#c8a55a]" />
+              </div>
+              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Diario</span>
+            </div>
+            <p className="text-3xl font-bold text-white">{metrics.journalWeek}</p>
+            <p className="text-xs text-[#666] mt-1">entradas esta semana</p>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <Wallet size={18} className="text-[#c8a55a]" />
+              </div>
+              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+            </div>
+            <p className={`text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+              {metrics.balance >= 0 ? '+' : ''}{metrics.balance.toFixed(2)}€
+            </p>
+            <p className="text-xs text-[#666] mt-1">balance últimos 30 días</p>
+          </div>
+        </div>
+      )}
 
       {/* Frase motivacional */}
       <div className="flex justify-center py-6">
