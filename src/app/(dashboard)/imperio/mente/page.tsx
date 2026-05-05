@@ -114,7 +114,7 @@ export default function MentePage() {
 
       {/* AI Mentor CTA */}
       <Link
-        href="/imperio/mente/mentor"
+        href="/imperio/mentor"
         className="flex items-center gap-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/30 transition-all group"
       >
         <div className="w-12 h-12 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">

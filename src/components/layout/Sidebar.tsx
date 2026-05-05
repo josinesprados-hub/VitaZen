@@ -9,6 +9,7 @@ import {
   Zap,
   Gem,
   TrendingUp,
+  Sparkles,
   LayoutDashboard,
   CreditCard,
   LogOut,
@@ -21,6 +22,7 @@ const EMPIRES = [
   { name: 'Energía', href: '/imperio/energia', icon: Zap, emoji: '⚡' },
   { name: 'Finanzas', href: '/imperio/riqueza', icon: Gem, emoji: '💎' },
   { name: 'Crecimiento', href: '/imperio/crecimiento', icon: TrendingUp, emoji: '📈' },
+  { name: 'Mentor', href: '/imperio/mentor', icon: Sparkles, emoji: '✨' },
 ];
 
 interface SidebarProps {
