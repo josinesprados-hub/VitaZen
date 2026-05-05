@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, getProviderMismatchMessage } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -42,7 +42,12 @@ export default function LoginPage() {
         return;
       }
       if (err.code === 'auth/account-exists-with-different-credential') {
-        setError('Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.');
+        const email = err.customData?.email as string | undefined;
+        if (email) {
+          setError(await getProviderMismatchMessage(email));
+        } else {
+          setError('Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.');
+        }
         setLoading(false);
         return;
       }

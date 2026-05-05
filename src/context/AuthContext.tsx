@@ -9,6 +9,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
+  fetchSignInMethodsForEmail,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -122,4 +123,19 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+}
+
+export async function getProviderMismatchMessage(email: string): Promise<string> {
+  try {
+    const methods = await fetchSignInMethodsForEmail(auth, email);
+    if (methods.includes('google.com')) {
+      return 'Este correo ya está vinculado a Google. Inicia sesión con Google.';
+    }
+    if (methods.includes('password')) {
+      return 'Este correo ya está registrado con email y contraseña. Usa ese método para iniciar sesión.';
+    }
+    return 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.';
+  } catch {
+    return 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.';
+  }
 }
