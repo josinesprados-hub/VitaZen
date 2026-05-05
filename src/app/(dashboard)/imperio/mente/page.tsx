@@ -82,6 +82,7 @@ export default function MentePage() {
   const [expandedTechnique, setExpandedTechnique] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [completedSession, setCompletedSession] = useState<{ duration: number; type: string } | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,17 +144,20 @@ export default function MentePage() {
     setExpandedTechnique(prev => prev === type ? null : type);
   };
 
-  const deleteSession = async (sessionId: string) => {
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
     try {
       const res = await apiFetch('/api/meditation', {
         method: 'DELETE',
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId: pendingDeleteId }),
       });
       if (res.ok) {
-        setSessions(prev => prev.filter(s => s.id !== sessionId));
+        setSessions(prev => prev.filter(s => s.id !== pendingDeleteId));
       }
     } catch (error) {
       console.error('Error deleting session:', error);
+    } finally {
+      setPendingDeleteId(null);
     }
   };
 
@@ -198,6 +202,39 @@ export default function MentePage() {
             >
               Cerrar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Overlay */}
+      {pendingDeleteId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]"
+          onClick={() => setPendingDeleteId(null)}
+        >
+          <div
+            className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl p-8 text-center max-w-xs mx-4 animate-[scaleIn_300ms_ease-out]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Eliminar sesión</h3>
+            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => setPendingDeleteId(null)}
+                className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors"
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -378,7 +415,7 @@ export default function MentePage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => deleteSession(session.id)}
+                    onClick={() => setPendingDeleteId(session.id)}
                     className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all"
                     title="Eliminar sesión"
                   >
