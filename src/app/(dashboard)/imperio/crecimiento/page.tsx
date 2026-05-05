@@ -32,6 +32,10 @@ export default function CrecimientoPage() {
   const [form, setForm] = useState({ title: '', content: '', mood: 3, gratitude: '' });
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', content: '', mood: 3, gratitude: '' });
+  const [editSaving, setEditSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +66,42 @@ export default function CrecimientoPage() {
     }
   };
 
+  const startEdit = (entry: JournalEntry) => {
+    setEditingEntry(entry);
+    setEditForm({ title: entry.title, content: entry.content, mood: entry.mood || 3, gratitude: entry.gratitude || '' });
+  };
+
+  const saveEdit = async () => {
+    if (!editingEntry) return;
+    setEditSaving(true);
+    try {
+      const res = await apiFetch('/api/journal', {
+        method: 'PUT',
+        body: JSON.stringify({ entryId: editingEntry.id, ...editForm }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setEntries(prev => prev.map(e => e.id === editingEntry.id ? data.entry : e));
+        setEditingEntry(null);
+      }
+    } catch (error) { console.error('Error updating entry:', error); }
+    finally { setEditSaving(false); }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    try {
+      const res = await apiFetch('/api/journal', {
+        method: 'DELETE',
+        body: JSON.stringify({ entryId: pendingDeleteId }),
+      });
+      if (res.ok) {
+        setEntries(prev => prev.filter(e => e.id !== pendingDeleteId));
+      }
+    } catch (error) { console.error('Error deleting entry:', error); }
+    finally { setPendingDeleteId(null); }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -72,6 +112,63 @@ export default function CrecimientoPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
+      {/* Edit Journal Entry Overlay */}
+      {editingEntry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setEditingEntry(null)}>
+          <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-md mx-4 w-full animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-6">Editar entrada</h3>
+            <div className="space-y-3">
+              <input type="text" placeholder="Título" value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+              <textarea placeholder="Contenido" value={editForm.content} onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666] h-28 resize-none" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Ánimo (1-5)</label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button key={n} onClick={() => setEditForm({ ...editForm, mood: n })}
+                        className={`w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666]'}`}>
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Gratitud</label>
+                  <input type="text" placeholder="Agradecido por..." value={editForm.gratitude} onChange={(e) => setEditForm({ ...editForm, gratitude: e.target.value })}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-7">
+              <button onClick={() => setEditingEntry(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Overlay */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setPendingDeleteId(null)}>
+          <div className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl p-8 text-center max-w-xs mx-4 animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Eliminar entrada</h3>
+            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <div className="flex items-center justify-center gap-3">
+              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <TrendingUp size={28} className="text-[#c8a55a]" />
@@ -128,7 +225,7 @@ export default function CrecimientoPage() {
         {entries.length > 0 ? (
           <div className="space-y-3 max-h-[500px] overflow-y-auto">
             {entries.map((entry) => (
-              <div key={entry.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
+              <div key={entry.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-[#c8a55a] font-medium">{entry.title}</h3>
                   <div className="flex items-center gap-2">
@@ -138,6 +235,10 @@ export default function CrecimientoPage() {
                       </span>
                     )}
                     <span className="text-xs text-[#666]">{new Date(entry.createdAt).toLocaleDateString('es')}</span>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => startEdit(entry)} className="p-1 rounded hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={12} /></button>
+                      <button onClick={() => setPendingDeleteId(entry.id)} className="p-1 rounded hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={12} /></button>
+                    </div>
                   </div>
                 </div>
                 <p className="text-[#999] text-sm whitespace-pre-wrap">

@@ -48,3 +48,50 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const { entryId, title, content, mood, gratitude } = await request.json();
+
+    const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
+    if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
+    if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    const updated = await db.journalEntry.update({
+      where: { id: entryId },
+      data: { title, content, mood, gratitude },
+    });
+
+    return NextResponse.json({ entry: updated });
+  } catch (error) {
+    console.error('Journal PUT error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const { entryId } = await request.json();
+
+    const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
+    if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
+    if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    await db.journalEntry.delete({ where: { id: entryId } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Journal DELETE error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

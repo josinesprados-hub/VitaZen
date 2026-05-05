@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb } from 'lucide-react';
+import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
 interface Habit {
@@ -38,6 +38,10 @@ export default function DisciplinaPage() {
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabit, setNewHabit] = useState({ name: '', description: '', frequency: 'daily' });
   const [loading, setLoading] = useState(true);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', description: '', frequency: 'daily' });
+  const [editSaving, setEditSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,14 +88,44 @@ export default function DisciplinaPage() {
     }
   };
 
+  const startEdit = (habit: Habit) => {
+    setEditingHabit(habit);
+    setEditForm({ name: habit.name, description: habit.description || '', frequency: habit.frequency });
+  };
+
+  const saveEdit = async () => {
+    if (!editingHabit) return;
+    setEditSaving(true);
+    try {
+      const res = await apiFetch('/api/habits', {
+        method: 'PUT',
+        body: JSON.stringify({ habitId: editingHabit.id, ...editForm }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHabits(habits.map(h => h.id === editingHabit.id ? data.habit : h));
+        setEditingHabit(null);
+      }
+    } catch (error) { console.error('Error updating habit:', error); }
+    finally { setEditSaving(false); }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    try {
+      const res = await apiFetch('/api/habits', {
+        method: 'DELETE',
+        body: JSON.stringify({ habitId: pendingDeleteId }),
+      });
+      if (res.ok) {
+        setHabits(habits.filter(h => h.id !== pendingDeleteId));
+      }
+    } catch (error) { console.error('Error deleting habit:', error); }
+    finally { setPendingDeleteId(null); }
+  };
+
   const deleteHabit = async (habitId: string) => {
-    const res = await apiFetch('/api/habits', {
-      method: 'DELETE',
-      body: JSON.stringify({ habitId }),
-    });
-    if (res.ok) {
-      setHabits(habits.filter(h => h.id !== habitId));
-    }
+    setPendingDeleteId(habitId);
   };
 
   if (loading) {
@@ -104,6 +138,51 @@ export default function DisciplinaPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
+      {/* Edit Habit Overlay */}
+      {editingHabit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setEditingHabit(null)}>
+          <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-sm mx-4 w-full animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-6">Editar hábito</h3>
+            <div className="space-y-3">
+              <input type="text" placeholder="Nombre del hábito" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+              <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+              <select value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors appearance-none">
+                <option value="daily">Diario</option>
+                <option value="weekly">Semanal</option>
+                <option value="monthly">Mensual</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-7">
+              <button onClick={() => setEditingHabit(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Overlay */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setPendingDeleteId(null)}>
+          <div className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl p-8 text-center max-w-xs mx-4 animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Eliminar hábito</h3>
+            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <div className="flex items-center justify-center gap-3">
+              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
@@ -193,14 +272,17 @@ export default function DisciplinaPage() {
                     {habit.description && <p className="text-[#666] text-xs">{habit.description}</p>}
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
                   {habit.streak > 0 && (
                     <span className="flex items-center gap-1 text-[#c8a55a] text-xs">
                       <Flame size={14} /> {habit.streak}
                     </span>
                   )}
-                  <button onClick={() => deleteHabit(habit.id)} className="text-[#666] hover:text-red-400 transition-colors">
-                    <Trash2 size={16} />
+                  <button onClick={() => startEdit(habit)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar">
+                    <Pencil size={14} />
+                  </button>
+                  <button onClick={() => deleteHabit(habit.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar">
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>

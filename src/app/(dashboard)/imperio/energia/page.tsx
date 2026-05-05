@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Droplets, Flame, Apple, Lightbulb } from 'lucide-react';
+import { Zap, Droplets, Flame, Apple, Lightbulb, Pencil, Trash2 } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
 interface WellnessLog {
@@ -44,6 +44,13 @@ export default function EnergiaPage() {
   const [wellnessForm, setWellnessForm] = useState({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
   const [nutritionForm, setNutritionForm] = useState({ meals: '', water: 0, calories: 0, notes: '' });
   const [loading, setLoading] = useState(true);
+  const [editingWellness, setEditingWellness] = useState<WellnessLog | null>(null);
+  const [editWellnessForm, setEditWellnessForm] = useState({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
+  const [editWellnessSaving, setEditWellnessSaving] = useState(false);
+  const [editingNutrition, setEditingNutrition] = useState<NutritionLog | null>(null);
+  const [editNutritionForm, setEditNutritionForm] = useState({ meals: '', water: 0, calories: 0, notes: '' });
+  const [editNutritionSaving, setEditNutritionSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<{ id: string; type: 'wellness' | 'nutrition' } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,6 +107,70 @@ export default function EnergiaPage() {
     </div>
   );
 
+  const startEditWellness = (log: WellnessLog) => {
+    setEditingWellness(log);
+    setEditWellnessForm({ mood: log.mood, energy: log.energy, sleep: log.sleep, stress: log.stress, notes: log.notes || '' });
+  };
+
+  const saveEditWellness = async () => {
+    if (!editingWellness) return;
+    setEditWellnessSaving(true);
+    try {
+      const res = await apiFetch('/api/wellness', {
+        method: 'PUT',
+        body: JSON.stringify({ logId: editingWellness.id, ...editWellnessForm }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setWellnessLogs(prev => prev.map(l => l.id === editingWellness.id ? data.log : l));
+        setEditingWellness(null);
+      }
+    } catch (error) { console.error('Error updating wellness log:', error); }
+    finally { setEditWellnessSaving(false); }
+  };
+
+  const startEditNutrition = (log: NutritionLog) => {
+    setEditingNutrition(log);
+    setEditNutritionForm({ meals: log.meals || '', water: log.water, calories: log.calories || 0, notes: log.notes || '' });
+  };
+
+  const saveEditNutrition = async () => {
+    if (!editingNutrition) return;
+    setEditNutritionSaving(true);
+    try {
+      const res = await apiFetch('/api/nutrition', {
+        method: 'PUT',
+        body: JSON.stringify({ logId: editingNutrition.id, ...editNutritionForm }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNutrition(prev => prev.map(l => l.id === editingNutrition.id ? data.log : l));
+        setEditingNutrition(null);
+      }
+    } catch (error) { console.error('Error updating nutrition log:', error); }
+    finally { setEditNutritionSaving(false); }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    try {
+      const endpoint = pendingDeleteId.type === 'wellness' ? '/api/wellness' : '/api/nutrition';
+      const bodyKey = 'logId';
+      const res = await apiFetch(endpoint, {
+        method: 'DELETE',
+        body: JSON.stringify({ [bodyKey]: pendingDeleteId.id }),
+      });
+      if (res.ok) {
+        if (pendingDeleteId.type === 'wellness') {
+          setWellnessLogs(prev => prev.filter(l => l.id !== pendingDeleteId.id));
+        } else {
+          setNutrition(prev => prev.filter(l => l.id !== pendingDeleteId.id));
+        }
+      }
+    } catch (error) { console.error('Error deleting log:', error); }
+    finally { setPendingDeleteId(null); }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -110,6 +181,79 @@ export default function EnergiaPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
+      {/* Edit Wellness Overlay */}
+      {editingWellness && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setEditingWellness(null)}>
+          <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-sm mx-4 w-full animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-6">Editar bienestar</h3>
+            <div className="space-y-4">
+              <RatingInput label="Estado de ánimo" value={editWellnessForm.mood} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, mood: v })} />
+              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+              <RatingInput label="Sueño" value={editWellnessForm.sleep} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, sleep: v })} />
+              <RatingInput label="Estrés" value={editWellnessForm.stress} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, stress: v })} />
+              <textarea placeholder="Notas (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666] h-20 resize-none" />
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-7">
+              <button onClick={() => setEditingWellness(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={saveEditWellness} disabled={editWellnessSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editWellnessSaving ? 'Guardando...' : 'Guardar'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Nutrition Overlay */}
+      {editingNutrition && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setEditingNutrition(null)}>
+          <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-sm mx-4 w-full animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-6">Editar nutrición</h3>
+            <div className="space-y-3">
+              <textarea placeholder="Comidas del día" value={editNutritionForm.meals} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, meals: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666] h-20 resize-none" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
+                  <input type="number" value={editNutritionForm.water} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, water: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
+                  <input type="number" value={editNutritionForm.calories} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, calories: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-7">
+              <button onClick={() => setEditingNutrition(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={saveEditNutrition} disabled={editNutritionSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editNutritionSaving ? 'Guardando...' : 'Guardar'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Overlay */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setPendingDeleteId(null)}>
+          <div className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl p-8 text-center max-w-xs mx-4 animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Eliminar registro</h3>
+            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <div className="flex items-center justify-center gap-3">
+              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Zap size={28} className="text-[#c8a55a]" />
@@ -146,12 +290,18 @@ export default function EnergiaPage() {
         {wellnessLogs.length > 0 ? (
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {wellnessLogs.slice(0, 7).map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 group hover:border-[#222] transition-colors">
                 <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
-                <div className="flex gap-3 text-xs">
-                  <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
-                  <span className="text-[#c8a55a]">Energía: {log.energy}</span>
-                  <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-2 text-xs">
+                    <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
+                    <span className="text-[#c8a55a]">Energía: {log.energy}</span>
+                    <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEditWellness(log)} className="p-1 rounded hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={12} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-1 rounded hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={12} /></button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -195,11 +345,17 @@ export default function EnergiaPage() {
         {nutrition.length > 0 ? (
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {nutrition.slice(0, 7).map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 group hover:border-[#222] transition-colors">
                 <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
-                <div className="flex gap-3 text-xs">
-                  <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
-                  <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-2 text-xs">
+                    <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
+                    <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEditNutrition(log)} className="p-1 rounded hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={12} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-1 rounded hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={12} /></button>
+                  </div>
                 </div>
               </div>
             ))}

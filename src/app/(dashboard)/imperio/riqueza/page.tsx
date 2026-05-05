@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb } from 'lucide-react';
+import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2 } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
 interface FinanceLog {
@@ -31,6 +31,10 @@ export default function RiquezaPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '' });
   const [loading, setLoading] = useState(true);
+  const [editingLog, setEditingLog] = useState<FinanceLog | null>(null);
+  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '' });
+  const [editSaving, setEditSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +64,42 @@ export default function RiquezaPage() {
     }
   };
 
+  const startEdit = (log: FinanceLog) => {
+    setEditingLog(log);
+    setEditForm({ type: log.type, category: log.category, amount: log.amount, description: log.description || '', date: log.date.split('T')[0] });
+  };
+
+  const saveEdit = async () => {
+    if (!editingLog) return;
+    setEditSaving(true);
+    try {
+      const res = await apiFetch('/api/finance', {
+        method: 'PUT',
+        body: JSON.stringify({ logId: editingLog.id, date: editForm.date, type: editForm.type, category: editForm.category, amount: editForm.amount, description: editForm.description }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLogs(prev => prev.map(l => l.id === editingLog.id ? data.log : l));
+        setEditingLog(null);
+      }
+    } catch (error) { console.error('Error updating finance log:', error); }
+    finally { setEditSaving(false); }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    try {
+      const res = await apiFetch('/api/finance', {
+        method: 'DELETE',
+        body: JSON.stringify({ logId: pendingDeleteId }),
+      });
+      if (res.ok) {
+        setLogs(prev => prev.filter(l => l.id !== pendingDeleteId));
+      }
+    } catch (error) { console.error('Error deleting finance log:', error); }
+    finally { setPendingDeleteId(null); }
+  };
+
   const totalIncome = logs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
   const totalExpense = logs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
 
@@ -73,6 +113,58 @@ export default function RiquezaPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
+      {/* Edit Finance Log Overlay */}
+      {editingLog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setEditingLog(null)}>
+          <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-sm mx-4 w-full animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-6">Editar registro</h3>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <button onClick={() => setEditForm({ ...editForm, type: 'income' })}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                  Ingreso
+                </button>
+                <button onClick={() => setEditForm({ ...editForm, type: 'expense' })}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                  Gasto
+                </button>
+              </div>
+              <input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+              <input type="text" placeholder="Categoría" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+              <input type="number" placeholder="Cantidad (€)" value={editForm.amount || ''} onChange={(e) => setEditForm({ ...editForm, amount: parseFloat(e.target.value) || 0 })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+              <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-7">
+              <button onClick={() => setEditingLog(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Overlay */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]" onClick={() => setPendingDeleteId(null)}>
+          <div className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl p-8 text-center max-w-xs mx-4 animate-[scaleIn_300ms_ease-out]" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Eliminar registro</h3>
+            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <div className="flex items-center justify-center gap-3">
+              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Gem size={28} className="text-[#c8a55a]" />
@@ -137,7 +229,7 @@ export default function RiquezaPage() {
         {logs.length > 0 ? (
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {logs.map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3">
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 group hover:border-[#222] transition-colors">
                 <div className="flex items-center gap-3">
                   {log.type === 'income' ? <TrendingUp size={16} className="text-[#c8a55a]" /> : <TrendingDown size={16} className="text-red-400" />}
                   <div>
@@ -145,11 +237,17 @@ export default function RiquezaPage() {
                     {log.description && <p className="text-xs text-[#666]">{log.description}</p>}
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className={`text-sm font-medium ${log.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400'}`}>
-                    {log.type === 'income' ? '+' : '-'}{log.amount.toFixed(2)}€
-                  </p>
-                  <p className="text-xs text-[#666]">{new Date(log.date).toLocaleDateString('es')}</p>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <p className={`text-sm font-medium ${log.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+                      {log.type === 'income' ? '+' : '-'}{log.amount.toFixed(2)}€
+                    </p>
+                    <p className="text-xs text-[#666]">{new Date(log.date).toLocaleDateString('es')}</p>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEdit(log)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={13} /></button>
+                    <button onClick={() => setPendingDeleteId(log.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={13} /></button>
+                  </div>
                 </div>
               </div>
             ))}

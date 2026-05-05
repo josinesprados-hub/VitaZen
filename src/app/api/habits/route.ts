@@ -93,6 +93,31 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const { habitId, name, description, frequency } = await request.json();
+
+    const habit = await db.habitLog.findUnique({ where: { id: habitId } });
+    if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
+    if (habit.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    const updated = await db.habitLog.update({
+      where: { id: habitId },
+      data: { name, description, frequency },
+    });
+
+    return NextResponse.json({ habit: updated });
+  } catch (error) {
+    console.error('Habits PUT error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
