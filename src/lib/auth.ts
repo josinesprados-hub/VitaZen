@@ -15,7 +15,8 @@ export async function getAuthUser(idToken: string) {
   const decodedToken = await verifyFirebaseToken(idToken);
   if (!decodedToken) return null;
 
-  const user = await db.user.findUnique({
+  // Search by firebaseUid first
+  let user = await db.user.findUnique({
     where: { firebaseUid: decodedToken.uid },
     include: {
       aiUsage: true,
@@ -26,6 +27,24 @@ export async function getAuthUser(idToken: string) {
       },
     },
   });
+
+  // If not found by firebaseUid, search by email (same logic as /api/auth/sync)
+  if (!user && decodedToken.email) {
+    user = await db.user.findUnique({
+      where: { email: decodedToken.email },
+      include: {
+        aiUsage: true,
+        subscriptions: {
+          where: { status: 'active' },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+    if (user) {
+      console.log('[CRUD DEBUG] getAuthUser: found user by email (not firebaseUid). user.id:', user.id);
+    }
+  }
 
   return user;
 }

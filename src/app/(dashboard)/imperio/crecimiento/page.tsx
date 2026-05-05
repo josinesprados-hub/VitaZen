@@ -75,6 +75,7 @@ export default function CrecimientoPage() {
     if (!editingEntry) return;
     setEditSaving(true);
     try {
+      console.log('[CRUD DEBUG] Journal PUT - entryId:', editingEntry.id);
       const res = await apiFetch('/api/journal', {
         method: 'PUT',
         body: JSON.stringify({ entryId: editingEntry.id, ...editForm }),
@@ -83,6 +84,9 @@ export default function CrecimientoPage() {
         const data = await res.json();
         setEntries(prev => prev.map(e => e.id === editingEntry.id ? data.entry : e));
         setEditingEntry(null);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] Journal PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating entry:', error); }
     finally { setEditSaving(false); }
@@ -91,12 +95,16 @@ export default function CrecimientoPage() {
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
     try {
+      console.log('[CRUD DEBUG] Journal DELETE - entryId:', pendingDeleteId);
       const res = await apiFetch('/api/journal', {
         method: 'DELETE',
         body: JSON.stringify({ entryId: pendingDeleteId }),
       });
       if (res.ok) {
         setEntries(prev => prev.filter(e => e.id !== pendingDeleteId));
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] Journal DELETE failed:', res.status, errData);
       }
     } catch (error) { console.error('Error deleting entry:', error); }
     finally { setPendingDeleteId(null); }

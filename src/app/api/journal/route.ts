@@ -56,7 +56,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { entryId, title, content, mood, gratitude } = await request.json();
+    const body = await request.json();
+    const { entryId, title, content, mood, gratitude } = body;
+    console.log('[CRUD DEBUG] Journal PUT - entryId:', entryId, 'userId:', user.id);
 
     const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
@@ -81,7 +83,9 @@ export async function DELETE(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { entryId } = await request.json();
+    const body = await request.json();
+    const { entryId } = body;
+    console.log('[CRUD DEBUG] Journal DELETE - entryId:', entryId, 'userId:', user.id);
 
     const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });

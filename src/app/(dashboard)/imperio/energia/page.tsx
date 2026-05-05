@@ -116,6 +116,7 @@ export default function EnergiaPage() {
     if (!editingWellness) return;
     setEditWellnessSaving(true);
     try {
+      console.log('[CRUD DEBUG] Wellness PUT - logId:', editingWellness.id);
       const res = await apiFetch('/api/wellness', {
         method: 'PUT',
         body: JSON.stringify({ logId: editingWellness.id, ...editWellnessForm }),
@@ -124,6 +125,9 @@ export default function EnergiaPage() {
         const data = await res.json();
         setWellnessLogs(prev => prev.map(l => l.id === editingWellness.id ? data.log : l));
         setEditingWellness(null);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] Wellness PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating wellness log:', error); }
     finally { setEditWellnessSaving(false); }
@@ -138,6 +142,7 @@ export default function EnergiaPage() {
     if (!editingNutrition) return;
     setEditNutritionSaving(true);
     try {
+      console.log('[CRUD DEBUG] Nutrition PUT - logId:', editingNutrition.id);
       const res = await apiFetch('/api/nutrition', {
         method: 'PUT',
         body: JSON.stringify({ logId: editingNutrition.id, ...editNutritionForm }),
@@ -146,6 +151,9 @@ export default function EnergiaPage() {
         const data = await res.json();
         setNutrition(prev => prev.map(l => l.id === editingNutrition.id ? data.log : l));
         setEditingNutrition(null);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] Nutrition PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating nutrition log:', error); }
     finally { setEditNutritionSaving(false); }
@@ -156,6 +164,7 @@ export default function EnergiaPage() {
     try {
       const endpoint = pendingDeleteId.type === 'wellness' ? '/api/wellness' : '/api/nutrition';
       const bodyKey = 'logId';
+      console.log('[CRUD DEBUG] DELETE - endpoint:', endpoint, 'logId:', pendingDeleteId.id, 'type:', pendingDeleteId.type);
       const res = await apiFetch(endpoint, {
         method: 'DELETE',
         body: JSON.stringify({ [bodyKey]: pendingDeleteId.id }),
@@ -166,6 +175,9 @@ export default function EnergiaPage() {
         } else {
           setNutrition(prev => prev.filter(l => l.id !== pendingDeleteId.id));
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] DELETE failed:', res.status, errData);
       }
     } catch (error) { console.error('Error deleting log:', error); }
     finally { setPendingDeleteId(null); }

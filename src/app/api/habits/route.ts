@@ -100,7 +100,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { habitId, name, description, frequency } = await request.json();
+    const body = await request.json();
+    const { habitId, name, description, frequency } = body;
+    console.log('[CRUD DEBUG] Habits PUT - habitId:', habitId, 'userId:', user.id);
 
     const habit = await db.habitLog.findUnique({ where: { id: habitId } });
     if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
@@ -125,7 +127,9 @@ export async function DELETE(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { habitId } = await request.json();
+    const body = await request.json();
+    const { habitId } = body;
+    console.log('[CRUD DEBUG] Habits DELETE - habitId:', habitId, 'userId:', user.id);
 
     await db.habitLog.deleteMany({ where: { id: habitId, userId: user.id } });
 

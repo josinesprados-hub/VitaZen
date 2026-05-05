@@ -97,6 +97,7 @@ export default function DisciplinaPage() {
     if (!editingHabit) return;
     setEditSaving(true);
     try {
+      console.log('[CRUD DEBUG] Habits PUT - habitId:', editingHabit.id);
       const res = await apiFetch('/api/habits', {
         method: 'PUT',
         body: JSON.stringify({ habitId: editingHabit.id, ...editForm }),
@@ -105,6 +106,9 @@ export default function DisciplinaPage() {
         const data = await res.json();
         setHabits(habits.map(h => h.id === editingHabit.id ? data.habit : h));
         setEditingHabit(null);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] Habits PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating habit:', error); }
     finally { setEditSaving(false); }
@@ -113,12 +117,16 @@ export default function DisciplinaPage() {
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
     try {
+      console.log('[CRUD DEBUG] Habits DELETE - habitId:', pendingDeleteId);
       const res = await apiFetch('/api/habits', {
         method: 'DELETE',
         body: JSON.stringify({ habitId: pendingDeleteId }),
       });
       if (res.ok) {
         setHabits(habits.filter(h => h.id !== pendingDeleteId));
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('[CRUD DEBUG] Habits DELETE failed:', res.status, errData);
       }
     } catch (error) { console.error('Error deleting habit:', error); }
     finally { setPendingDeleteId(null); }

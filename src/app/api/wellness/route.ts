@@ -61,7 +61,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { logId, mood, energy, sleep, stress, notes } = await request.json();
+    const body = await request.json();
+    const { logId, mood, energy, sleep, stress, notes } = body;
+    console.log('[CRUD DEBUG] Wellness PUT - logId:', logId, 'userId:', user.id);
 
     const log = await db.wellnessLog.findUnique({ where: { id: logId } });
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
@@ -86,7 +88,9 @@ export async function DELETE(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { logId } = await request.json();
+    const body = await request.json();
+    const { logId } = body;
+    console.log('[CRUD DEBUG] Wellness DELETE - logId:', logId, 'userId:', user.id);
 
     const log = await db.wellnessLog.findUnique({ where: { id: logId } });
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });

@@ -9,7 +9,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { sessionId, duration, type } = await request.json();
+    const body = await request.json();
+    const { sessionId, duration, type } = body;
+    console.log('[CRUD DEBUG] Meditation PUT - sessionId:', sessionId, 'userId:', user.id);
 
     // Verify the session belongs to the user before updating
     const session = await db.meditationSession.findUnique({ where: { id: sessionId } });
@@ -35,7 +37,9 @@ export async function DELETE(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { sessionId } = await request.json();
+    const body = await request.json();
+    const { sessionId } = body;
+    console.log('[CRUD DEBUG] Meditation DELETE - sessionId:', sessionId, 'userId:', user.id);
 
     // Verify the session belongs to the user before deleting
     const session = await db.meditationSession.findUnique({ where: { id: sessionId } });
