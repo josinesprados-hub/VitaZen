@@ -18,9 +18,12 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
+      console.log('[EMAIL DEBUG] Firebase sendPasswordResetEmail — Enviando a:', email);
       await sendPasswordResetEmail(auth, email);
+      console.log('[EMAIL DEBUG] Firebase sendPasswordResetEmail — Email enviado correctamente');
       setSuccess(true);
     } catch (err: any) {
+      console.error('[EMAIL DEBUG] Firebase sendPasswordResetEmail — Error:', err.code, err.message);
       if (err.code === 'auth/user-not-found') {
         setError('No existe ninguna cuenta asociada a este email');
       } else if (err.code === 'auth/invalid-email') {
