@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle } from 'lucide-react';
+import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
@@ -83,6 +83,10 @@ export default function MentePage() {
   const [loading, setLoading] = useState(true);
   const [completedSession, setCompletedSession] = useState<{ duration: number; type: string } | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [editingSession, setEditingSession] = useState<Meditation | null>(null);
+  const [editDuration, setEditDuration] = useState<number>(0);
+  const [editType, setEditType] = useState<string>('');
+  const [editSaving, setEditSaving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -144,6 +148,32 @@ export default function MentePage() {
     setExpandedTechnique(prev => prev === type ? null : type);
   };
 
+  const startEdit = (session: Meditation) => {
+    setEditingSession(session);
+    setEditDuration(session.duration);
+    setEditType(session.type);
+  };
+
+  const saveEdit = async () => {
+    if (!editingSession) return;
+    setEditSaving(true);
+    try {
+      const res = await apiFetch('/api/meditation', {
+        method: 'PUT',
+        body: JSON.stringify({ sessionId: editingSession.id, duration: editDuration, type: editType }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSessions(prev => prev.map(s => s.id === editingSession.id ? data.session : s));
+        setEditingSession(null);
+      }
+    } catch (error) {
+      console.error('Error updating session:', error);
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
     try {
@@ -202,6 +232,66 @@ export default function MentePage() {
             >
               Cerrar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Session Overlay */}
+      {editingSession && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]"
+          onClick={() => setEditingSession(null)}
+        >
+          <div
+            className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-sm mx-4 w-full animate-[scaleIn_300ms_ease-out]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-6">Editar sesión</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">Duración (min)</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={editDuration}
+                  onChange={(e) => setEditDuration(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">Tipo de respiración</label>
+                <select
+                  value={editType}
+                  onChange={(e) => setEditType(e.target.value)}
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors appearance-none"
+                >
+                  {BREATHING_TECHNIQUES.map((tech) => (
+                    <option key={tech.type} value={tech.type}>{tech.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 mt-7">
+              <button
+                onClick={() => setEditingSession(null)}
+                className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveEdit}
+                disabled={editSaving}
+                className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {editSaving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -414,13 +504,22 @@ export default function MentePage() {
                       </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setPendingDeleteId(session.id)}
-                    className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all"
-                    title="Eliminar sesión"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => startEdit(session)}
+                      className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all"
+                      title="Editar sesión"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      onClick={() => setPendingDeleteId(session.id)}
+                      className="p-2 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all"
+                      title="Eliminar sesión"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               );
             })}
