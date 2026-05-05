@@ -10,6 +10,13 @@ const TOKEN_EXPIRY_HOURS = 1;
 // POST — Request password reset (generates token + sends email)
 export async function POST(request: NextRequest) {
   try {
+    // [RESET DEBUG] Verificar que Prisma reconoce el modelo
+    console.log('[RESET DEBUG] db.passwordResetToken exists:', !!db.passwordResetToken);
+    if (!db.passwordResetToken) {
+      console.error('[RESET DEBUG] db.passwordResetToken is undefined — Prisma Client desactualizado');
+      return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
+    }
+
     const { email } = await request.json();
 
     if (!email || typeof email !== 'string') {
@@ -68,6 +75,13 @@ export async function POST(request: NextRequest) {
 // PUT — Validate token + update password
 export async function PUT(request: NextRequest) {
   try {
+    // [RESET DEBUG] Verificar que Prisma reconoce el modelo
+    console.log('[RESET DEBUG] db.passwordResetToken exists:', !!db.passwordResetToken);
+    if (!db.passwordResetToken) {
+      console.error('[RESET DEBUG] db.passwordResetToken is undefined — Prisma Client desactualizado');
+      return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
+    }
+
     const { token, newPassword } = await request.json();
 
     if (!token || typeof token !== 'string') {
