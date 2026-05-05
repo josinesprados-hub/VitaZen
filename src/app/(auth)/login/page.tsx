@@ -23,7 +23,7 @@ export default function LoginPage() {
       await signIn(email, password);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.code === 'auth/invalid-credential' ? 'Credenciales incorrectas' : 'Error al iniciar sesión');
+      setError(err.code === 'auth/invalid-credential' ? 'Credenciales incorrectas. Verifica tu email y contraseña.' : 'No se ha podido iniciar sesión. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      setError('Error al iniciar sesión con Google');
+      setError('No se ha podido iniciar sesión con Google. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function LoginPage() {
 
         {/* Form Card */}
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-8">
-          <h2 className="text-xl font-semibold text-white mb-6">Iniciar sesión</h2>
+          <h2 className="text-xl font-semibold text-white mb-6">Acceder a tu cuenta</h2>
 
           {error && (
             <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4">
@@ -110,7 +110,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Iniciando...' : 'Iniciar sesión'}
+              {loading ? 'Accediendo...' : 'Iniciar sesión'}
             </button>
           </form>
 
@@ -140,9 +140,9 @@ export default function LoginPage() {
 
           <div className="mt-4 text-center">
             <p className="text-[#999] text-sm">
-              ¿No tienes cuenta?{' '}
+              ¿Aún no tienes cuenta?{' '}
               <Link href="/register" className="text-[#c8a55a] hover:underline">
-                Regístrate
+                Crea tu cuenta
               </Link>
             </p>
           </div>

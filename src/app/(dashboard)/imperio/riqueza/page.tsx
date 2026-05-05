@@ -155,7 +155,7 @@ export default function RiquezaPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primer movimiento</p>
+          <p className="text-[#666] text-sm text-center py-4">Registra tu primer movimiento y toma control de tus finanzas</p>
         )}
       </div>
 

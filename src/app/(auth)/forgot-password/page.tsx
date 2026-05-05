@@ -22,11 +22,11 @@ export default function ForgotPasswordPage() {
       setSuccess(true);
     } catch (err: any) {
       if (err.code === 'auth/user-not-found') {
-        setError('No existe una cuenta con este email');
+        setError('No existe ninguna cuenta asociada a este email');
       } else if (err.code === 'auth/invalid-email') {
-        setError('Email no válido');
+        setError('La dirección de email no es válida');
       } else {
-        setError('Error al enviar el email de recuperación');
+        setError('No se ha podido enviar el email de recuperación. Inténtalo de nuevo.');
       }
     } finally {
       setLoading(false);
@@ -44,9 +44,9 @@ export default function ForgotPasswordPage() {
 
         {/* Form Card */}
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-8">
-          <h2 className="text-xl font-semibold text-white mb-2">Recuperar contraseña</h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Recuperar tu contraseña</h2>
           <p className="text-[#999] text-sm mb-6">
-            Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.
+            Introduce tu email y te enviaremos un enlace para restablecerla.
           </p>
 
           {error && (
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
           {success && (
             <div className="bg-green-900/20 border border-green-800 rounded-lg p-3 mb-4">
               <p className="text-green-400 text-sm">
-                Email enviado. Revisa tu bandeja de entrada y sigue las instrucciones.
+                Email enviado correctamente. Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.
               </p>
             </div>
           )}
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
 
           <div className="mt-6 text-center">
             <Link href="/login" className="text-[#c8a55a] hover:underline text-sm">
-              Volver a iniciar sesión
+              Volver al inicio de sesión
             </Link>
           </div>
         </div>

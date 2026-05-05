@@ -150,7 +150,7 @@ const FRASES = [
   'La diferencia entre querer y lograr está en el plan.',
   'La inversión en conocimiento paga los mejores intereses.',
   'Cada gasto innecesario roba tiempo de tu libertad futura.',
-  'La verdadera riqueza es no depender de nadie económicamente.',
+  'La verdadera libertad financiera es no depender de nadie económicamente.',
   'El dinero bien gestionado es tranquilidad bien ganada.',
 ];
 
@@ -252,7 +252,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold text-white">
           Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
         </h1>
-        <p className="text-[#999] mt-1">Tu imperio se construye cada día. Aquí está tu progreso.</p>
+        <p className="text-[#999] mt-1">Tu imperio se construye con cada acción. Aquí puedes seguir tu progreso.</p>
       </div>
 
       {/* Frase motivacional */}
@@ -269,7 +269,7 @@ export default function DashboardPage() {
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <Trophy size={24} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Desafío del día</h2>
+            <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
               <span className="text-xs px-2 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>
             )}
@@ -333,7 +333,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-[#666]">
-                  <span>{Math.round(progress)}% al siguiente nivel</span>
+                  <span>{Math.round(progress)}% para el siguiente nivel</span>
                   {streak > 0 && (
                     <span className="flex items-center gap-1 text-[#c8a55a]">
                       <Flame size={12} /> {streak} días
@@ -353,7 +353,7 @@ export default function DashboardPage() {
             <Star size={20} className="text-[#c8a55a]" />
             <div>
               <p className="text-2xl font-bold text-white">{empires.reduce((sum, e) => sum + e.xp, 0)}</p>
-              <p className="text-xs text-[#999]">XP Total</p>
+              <p className="text-xs text-[#999]">XP total</p>
             </div>
           </div>
         </div>
@@ -362,7 +362,7 @@ export default function DashboardPage() {
             <Trophy size={20} className="text-[#c8a55a]" />
             <div>
               <p className="text-2xl font-bold text-white">{empires.reduce((sum, e) => sum + e.level, 0)}</p>
-              <p className="text-xs text-[#999]">Niveles Totales</p>
+              <p className="text-xs text-[#999]">Niveles totales</p>
             </div>
           </div>
         </div>
@@ -373,7 +373,7 @@ export default function DashboardPage() {
               <p className="text-2xl font-bold text-white">
                 {Math.max(...empires.map((e) => e.streak), 0)}
               </p>
-              <p className="text-xs text-[#999]">Mejor Racha</p>
+              <p className="text-xs text-[#999]">Mejor racha</p>
             </div>
           </div>
         </div>

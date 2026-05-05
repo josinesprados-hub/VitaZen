@@ -177,7 +177,7 @@ export default function DisciplinaPage() {
         )}
 
         {habits.length === 0 ? (
-          <p className="text-[#666] text-sm text-center py-8">No tienes hábitos aún. Crea el primero.</p>
+          <p className="text-[#666] text-sm text-center py-8">Aún no tienes hábitos. Crea el primero y comienza tu transformación.</p>
         ) : (
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {habits.map((habit) => (

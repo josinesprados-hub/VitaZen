@@ -158,7 +158,7 @@ export default function CrecimientoPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-8">Escribe tu primera entrada de journal</p>
+          <p className="text-[#666] text-sm text-center py-8">Escribe tu primera entrada y comienza a documentar tu evolución</p>
         )}
       </div>
 

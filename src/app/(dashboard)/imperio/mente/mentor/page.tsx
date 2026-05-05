@@ -85,14 +85,14 @@ export default function MentorPage() {
       } else {
         const data = await res.json();
         if (data.error?.includes('Maximum')) {
-          alert('Máximo 5 conversaciones. Elimina una para crear otra.');
+          alert('Has alcanzado el límite de 5 conversaciones. Elimina una para crear otra nueva.');
         }
       }
     } catch (e) { console.error(e); }
   };
 
   const deleteThread = async (threadId: string) => {
-    if (!confirm('¿Eliminar esta conversación?')) return;
+    if (!confirm('¿Deseas eliminar esta conversación?')) return;
     try {
       const res = await apiFetch('/api/ai/threads', {
         method: 'DELETE',
@@ -196,7 +196,7 @@ export default function MentorPage() {
               </div>
             ))}
             {threads.length === 0 && (
-              <p className="text-[#666] text-xs text-center py-4">Sin conversaciones</p>
+              <p className="text-[#666] text-xs text-center py-4">Sin conversaciones aún</p>
             )}
           </div>
           {user?.plan === 'FREE' && remaining !== null && (
@@ -221,7 +221,7 @@ export default function MentorPage() {
                       <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
                       <p className="text-[#999] text-sm max-w-md">
                         {user?.plan === 'PREMIUM'
-                          ? 'Soy tu mentor experto en desarrollo personal. Pregúntame cualquier cosa sobre hábitos, mentalidad, productividad o crecimiento personal.'
+                          ? 'Soy tu mentor experto en desarrollo personal. Pregúntame lo que necesites sobre hábitos, mindset, productividad o crecimiento personal.'
                           : 'Soy tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
                       </p>
                     </div>
@@ -281,7 +281,7 @@ export default function MentorPage() {
               <div className="text-center">
                 <Brain size={48} className="text-[#c8a55a] mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">Mentor IA</h3>
-                <p className="text-[#999] text-sm">Crea una conversación para empezar</p>
+                <p className="text-[#999] text-sm">Crea una conversación para comenzar</p>
               </div>
             </div>
           )}
@@ -295,7 +295,7 @@ export default function MentorPage() {
             <Lock size={48} className="text-[#c8a55a] mx-auto mb-4" />
             <h3 className="text-xl font-bold text-white mb-2">Límite diario alcanzado</h3>
             <p className="text-[#999] mb-6">
-              Has usado tus 10 mensajes diarios del plan Free. Actualiza a Premium para mensajes ilimitados y un mentor más avanzado.
+              Has utilizado tus 10 mensajes diarios del plan Free. Mejora a Premium para disfrutar de mensajes ilimitados y un mentor más avanzado.
             </p>
             <div className="flex gap-3 justify-center">
               <Link

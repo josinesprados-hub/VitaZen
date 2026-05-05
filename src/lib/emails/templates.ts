@@ -61,23 +61,23 @@ export function welcomeEmail(name: string): string {
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 32px;">
       <tr>
         <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Disciplina</td>
-        <td style="color: #999; font-size: 14px;">Hábitos, desafíos, consistencia</td>
+        <td style="color: #999; font-size: 14px;">Hábitos, desafíos y consistencia</td>
       </tr>
       <tr>
         <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Mente</td>
-        <td style="color: #999; font-size: 14px;">Meditación, mentor IA, bienestar</td>
+        <td style="color: #999; font-size: 14px;">Meditación, mentor IA y bienestar</td>
       </tr>
       <tr>
         <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Energía</td>
-        <td style="color: #999; font-size: 14px;">Nutrición, salud física, vitalidad</td>
+        <td style="color: #999; font-size: 14px;">Nutrición, salud física y vitalidad</td>
       </tr>
       <tr>
         <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Finanzas</td>
-        <td style="color: #999; font-size: 14px;">Finanzas, mentalidad, gestión del dinero</td>
+        <td style="color: #999; font-size: 14px;">Finanzas, mindset y gestión del dinero</td>
       </tr>
       <tr>
         <td style="padding: 12px 0; color: #c8a55a; font-size: 15px;">&#9670; Imperio Crecimiento</td>
-        <td style="color: #999; font-size: 14px;">Journal, reflexión, desarrollo</td>
+        <td style="color: #999; font-size: 14px;">Diario personal, reflexión y desarrollo</td>
       </tr>
     </table>
     <div style="text-align: center;">
@@ -93,10 +93,10 @@ export function verifyEmailTemplate(name: string, verificationLink: string): str
       Verifica tu dirección de email para activar tu cuenta de VitaZen y acceder a todos los imperios.
     </p>
     <div style="text-align: center;">
-      <a href="${verificationLink}" style="${buttonStyle}">Confirmar Email</a>
+      <a href="${verificationLink}" style="${buttonStyle}">Confirmar email</a>
     </div>
     <p style="color: #666; font-size: 14px; margin-top: 24px; text-align: center;">
-      Este enlace expira en 24 horas.
+      Este enlace caduca en 24 horas.
     </p>
   `);
 }
@@ -111,7 +111,7 @@ export function resetPasswordTemplate(name: string, resetLink: string): string {
       <a href="${resetLink}" style="${buttonStyle}">Restablecer Contraseña</a>
     </div>
     <p style="color: #666; font-size: 14px; margin-top: 24px; text-align: center;">
-      Este enlace expira en 1 hora. Si no solicitaste este cambio, ignora este email.
+      Este enlace caduca en 1 hora. Si no solicitaste este cambio, ignora este email.
     </p>
   `);
 }

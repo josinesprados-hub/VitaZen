@@ -21,11 +21,11 @@ export default function PricingPage() {
         }
       } else {
         const data = await res.json();
-        alert(data.error || 'Error al procesar la suscripción');
+        alert(data.error || 'No se ha podido procesar la suscripción. Inténtalo de nuevo.');
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Error al conectar con Stripe');
+      alert('No se ha podido conectar con el servicio de pagos. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function PricingPage() {
     <div className="max-w-4xl mx-auto py-8">
       <div className="text-center mb-12">
         <h1 className="text-3xl font-bold text-white mb-3">Elige tu plan</h1>
-        <p className="text-[#999] text-lg">Desbloquea todo el potencial de tu transformación</p>
+        <p className="text-[#999] text-lg">Desbloquea todo el potencial de tu transformación personal</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -64,7 +64,7 @@ export default function PricingPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Free</h2>
-              <p className="text-[#999] text-sm">Para comenzar tu camino</p>
+              <p className="text-[#999] text-sm">Para comenzar tu camino de crecimiento</p>
             </div>
           </div>
 
@@ -111,7 +111,7 @@ export default function PricingPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Premium</h2>
-              <p className="text-[#c8a55a] text-sm">Para una transformación real</p>
+              <p className="text-[#c8a55a] text-sm">Para una transformación real y duradera</p>
             </div>
           </div>
 

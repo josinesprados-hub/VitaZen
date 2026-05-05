@@ -34,11 +34,11 @@ export default function RegisterPage() {
       router.push('/dashboard');
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
-        setError('Este email ya está registrado');
+        setError('Este email ya está registrado. Inicia sesión o usa otro email.');
       } else if (err.code === 'auth/weak-password') {
         setError('La contraseña debe tener al menos 6 caracteres');
       } else {
-        setError('Error al crear la cuenta');
+        setError('No se ha podido crear la cuenta. Inténtalo de nuevo.');
       }
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
-      setError('Error al registrarse con Google');
+      setError('No se ha podido registrar con Google. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -70,12 +70,12 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-[#c8a55a] text-3xl font-bold tracking-widest">VITAZEN</h1>
-          <p className="text-[#999] mt-2 text-sm">Comienza tu transformación</p>
+          <p className="text-[#999] mt-2 text-sm">Comienza tu transformación personal</p>
         </div>
 
         {/* Form Card */}
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-8">
-          <h2 className="text-xl font-semibold text-white mb-6">Crear cuenta</h2>
+          <h2 className="text-xl font-semibold text-white mb-6">Crear tu cuenta</h2>
 
           {error && (
             <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4">
@@ -91,7 +91,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors"
-                placeholder="Tu nombre"
+                placeholder="Tu nombre completo"
               />
             </div>
 
@@ -144,7 +144,7 @@ export default function RegisterPage() {
                   }}
                   required
                   className={`w-full bg-[#000000] border rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors ${passwordMatch ? 'border-[#1a1a1a]' : 'border-red-500'}`}
-                  placeholder="Repite tu contraseña"
+                  placeholder="Repite tu contraseña para verificar"
                 />
                 <button
                   type="button"
@@ -168,7 +168,7 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+              {loading ? 'Creando tu cuenta...' : 'Crear cuenta'}
             </button>
           </form>
 

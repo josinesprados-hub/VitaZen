@@ -157,7 +157,7 @@ export default function EnergiaPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primer estado del día</p>
+          <p className="text-[#666] text-sm text-center py-4">Registra tu primer estado del día y conoce tu bienestar</p>
         )}
       </div>
 
@@ -205,7 +205,7 @@ export default function EnergiaPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primera comida</p>
+          <p className="text-[#666] text-sm text-center py-4">Registra tu primera comida y toma control de tu nutrición</p>
         )}
       </div>
 
