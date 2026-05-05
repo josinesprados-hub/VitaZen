@@ -46,3 +46,13 @@ input:focus, textarea:focus, select:focus {
   border-color: #c8a55a !important;
   box-shadow: 0 0 0 1px #c8a55a;
 }
+
+/* Modal animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

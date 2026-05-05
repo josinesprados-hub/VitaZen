@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer } from 'lucide-react';
+import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 
@@ -81,6 +81,7 @@ export default function MentePage() {
   const [selectedType, setSelectedType] = useState(BREATHING_TECHNIQUES[0]);
   const [expandedTechnique, setExpandedTechnique] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [completedSession, setCompletedSession] = useState<{ duration: number; type: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,9 +120,11 @@ export default function MentePage() {
     setMeditating(false);
     setPaused(false);
     const duration = Math.max(1, Math.floor(timer / 60));
+    const type = selectedType.type;
+    setCompletedSession({ duration, type });
     const res = await apiFetch('/api/meditation', {
       method: 'POST',
-      body: JSON.stringify({ duration, type: selectedType.type }),
+      body: JSON.stringify({ duration, type }),
     });
     if (res.ok) {
       const data = await res.json();
@@ -164,6 +167,41 @@ export default function MentePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
+      {/* Completion Overlay */}
+      {completedSession && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]"
+          onClick={() => setCompletedSession(null)}
+        >
+          <div
+            className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-10 text-center max-w-sm mx-4 animate-[scaleIn_300ms_ease-out]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <CheckCircle size={32} className="text-[#c8a55a]" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Sesión completada</h3>
+            <p className="text-[#c8a55a] text-sm font-medium capitalize mb-4">{completedSession.type.replace('_', ' ')}</p>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="flex items-center gap-1.5 text-xs text-[#999]">
+                <Timer size={13} />
+                <span>{completedSession.duration} min</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-[#999]">
+                <Wind size={13} />
+                <span className="capitalize">{completedSession.type.replace('_', ' ')}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setCompletedSession(null)}
+              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
