@@ -12,6 +12,7 @@ import {
   Sparkles,
   LayoutDashboard,
   Clock,
+  Trophy,
   CreditCard,
   LogOut,
   X,
@@ -88,6 +89,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               <Clock size={18} />
               Timeline
+            </Link>
+
+            <Link
+              href="/logros"
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                pathname === '/logros'
+                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+              }`}
+            >
+              <Trophy size={18} />
+              Logros
             </Link>
 
             <div className="pt-5 pb-2">

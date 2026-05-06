@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock } from 'lucide-react';
 
 const FRASES = [
   'La disciplina es el puente entre tus metas y tus logros.',
@@ -200,16 +200,19 @@ export default function DashboardPage() {
   const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
   const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number } | null>(null);
   const [progress, setProgress] = useState<{ meditation: { count: number; target: number; percent: number }; habits: { count: number; target: number; percent: number }; journal: { count: number; target: number; percent: number }; totalPercent: number } | null>(null);
+  const [achievements, setAchievements] = useState<{ key: string; title: string; description: string; category: string; icon: string; target: number; current: number; percent: number; unlocked: boolean; unlockedAt: string | null }[] | null>(null);
+  const [achievementsStats, setAchievementsStats] = useState<{ total: number; unlocked: number; percent: number } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empRes, chRes, metRes, streakRes, progRes] = await Promise.all([
+        const [empRes, chRes, metRes, streakRes, progRes, achRes] = await Promise.all([
           apiFetch('/api/empire'),
           apiFetch('/api/challenges'),
           apiFetch('/api/dashboard/metrics'),
           apiFetch('/api/dashboard/streaks'),
           apiFetch('/api/dashboard/progress'),
+          apiFetch('/api/achievements'),
         ]);
 
         if (empRes.ok) {
@@ -235,6 +238,12 @@ export default function DashboardPage() {
         if (progRes.ok) {
           const progData = await progRes.json();
           setProgress(progData);
+        }
+
+        if (achRes.ok) {
+          const achData = await achRes.json();
+          setAchievements(achData.achievements);
+          setAchievementsStats(achData.stats);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -489,6 +498,69 @@ export default function DashboardPage() {
           })}
         </div>
       </div>
+
+      {/* Achievements Preview */}
+      {achievementsStats && achievements && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <Trophy size={22} className="text-[#c8a55a]" />
+              <h2 className="text-xl font-semibold text-white">Logros</h2>
+              <span className="text-xs text-[#666]">{achievementsStats.unlocked}/{achievementsStats.total}</span>
+            </div>
+            <Link href="/logros" className="text-xs text-[#c8a55a] hover:underline">
+              Ver todos
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {achievements
+              .sort((a, b) => {
+                if (a.unlocked && !b.unlocked) return -1;
+                if (!a.unlocked && b.unlocked) return 1;
+                return b.percent - a.percent;
+              })
+              .slice(0, 5)
+              .map((ach) => {
+                const isUnlocked = ach.unlocked;
+                return (
+                  <div
+                    key={ach.key}
+                    className={`rounded-xl p-4 transition-all duration-300 group ${
+                      isUnlocked
+                        ? 'bg-[#0a0a0a] border border-[#c8a55a]/20 hover:border-[#c8a55a]/40'
+                        : 'bg-[#080808] border border-[#1a1a1a]'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 transition-transform duration-300 group-hover:scale-110 ${
+                          isUnlocked ? 'bg-[#c8a55a]/15' : 'bg-[#111]'
+                        }`}
+                      >
+                        {isUnlocked ? (
+                          <Crown size={18} className="text-[#c8a55a]" />
+                        ) : (
+                          <Lock size={18} className="text-[#333]" />
+                        )}
+                      </div>
+                      <h4 className={`text-xs font-semibold truncate w-full ${isUnlocked ? 'text-white' : 'text-[#555]'}`}>
+                        {ach.title}
+                      </h4>
+                      <p className="text-[10px] text-[#555] mt-0.5 truncate w-full">{ach.description}</p>
+                      <div className="w-full bg-[#1a1a1a] rounded-full h-1 mt-2 overflow-hidden">
+                        <div
+                          className={`h-1 rounded-full transition-all duration-700 ${isUnlocked ? 'bg-[#c8a55a]' : 'bg-[#333]'}`}
+                          style={{ width: `${ach.percent}%` }}
+                        />
+                      </div>
+                      <span className="text-[9px] text-[#555] mt-1">{ach.percent}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">

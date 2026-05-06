@@ -35,6 +35,7 @@ model User {
   financeLogs       FinanceLog[]
   empireProgress    EmpireProgress[]
   passwordResetTokens PasswordResetToken[]
+  achievements      Achievement[]
 }
 
 model PasswordResetToken {
@@ -247,4 +248,20 @@ model EmpireTip {
   content   String
   plan      String   @default("FREE") // FREE | PREMIUM
   createdAt DateTime @default(now())
+}
+
+// ═══════════════════════════════════════════
+// ACHIEVEMENTS
+// ═══════════════════════════════════════════
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  key         String   // e.g. "meditation_7", "journal_first", "habits_10"
+  unlockedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId])
 }
