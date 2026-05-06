@@ -17,6 +17,7 @@ import {
   CreditCard,
   LogOut,
   X,
+  Lightbulb,
 } from 'lucide-react';
 
 const EMPIRES = [
@@ -116,6 +117,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               <Sunrise size={18} />
               Check-in
+            </Link>
+
+            <Link
+              href="/insights"
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                pathname === '/insights'
+                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+              }`}
+            >
+              <Lightbulb size={18} />
+              Insights
             </Link>
 
             <div className="pt-5 pb-2">

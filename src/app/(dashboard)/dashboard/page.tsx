@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 
 const FRASES = [
   'La disciplina es el puente entre tus metas y tus logros.',
@@ -205,11 +205,13 @@ export default function DashboardPage() {
   const [achievementsStats, setAchievementsStats] = useState<{ total: number; unlocked: number; percent: number } | null>(null);
   const [todayCheckin, setTodayCheckin] = useState<any | null>(null);
   const [showCheckinModal, setShowCheckinModal] = useState(false);
+  const [dashboardInsights, setDashboardInsights] = useState<{ id: string; type: string; category: string; icon: string; title: string; description: string }[] | null>(null);
+  const [insightsScore, setInsightsScore] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empRes, chRes, metRes, streakRes, progRes, achRes, checkRes] = await Promise.all([
+        const [empRes, chRes, metRes, streakRes, progRes, achRes, checkRes, insRes] = await Promise.all([
           apiFetch('/api/empire'),
           apiFetch('/api/challenges'),
           apiFetch('/api/dashboard/metrics'),
@@ -217,6 +219,7 @@ export default function DashboardPage() {
           apiFetch('/api/dashboard/progress'),
           apiFetch('/api/achievements'),
           apiFetch('/api/checkin?mode=today'),
+          apiFetch('/api/insights'),
         ]);
 
         if (empRes.ok) {
@@ -256,6 +259,12 @@ export default function DashboardPage() {
           if (!checkData.today) {
             setShowCheckinModal(true);
           }
+        }
+
+        if (insRes.ok) {
+          const insData = await insRes.json();
+          setDashboardInsights(insData.insights);
+          setInsightsScore(insData.summary?.score ?? null);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -461,6 +470,49 @@ export default function DashboardPage() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Insights Preview */}
+      {dashboardInsights && dashboardInsights.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <Sparkles size={22} className="text-[#c8a55a]" />
+              <h2 className="text-xl font-semibold text-white">Insights Semanales</h2>
+              {insightsScore !== null && (
+                <span className="text-xs text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full font-medium">
+                  {insightsScore}/100
+                </span>
+              )}
+            </div>
+            <Link href="/insights" className="text-xs text-[#c8a55a] hover:underline flex items-center gap-1">
+              Ver todo <ArrowRight size={12} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dashboardInsights.slice(0, 3).map((insight) => {
+              const borderClass = insight.type === 'positive'
+                ? 'border-[#22c55e]/15 hover:border-[#22c55e]/30'
+                : insight.type === 'warning'
+                ? 'border-[#e8a849]/15 hover:border-[#e8a849]/30'
+                : 'border-[#1a1a1a] hover:border-[#2a2a2a]';
+              return (
+                <div
+                  key={insight.id}
+                  className={`bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 ${borderClass}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl shrink-0">{insight.icon}</span>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-semibold text-white mb-1">{insight.title}</h3>
+                      <p className="text-xs text-[#999] leading-relaxed line-clamp-2">{insight.description}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

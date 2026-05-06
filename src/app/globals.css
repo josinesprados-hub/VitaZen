@@ -159,3 +159,23 @@ html { scroll-behavior: smooth; }
 .h-1\.5 > div {
   transition: width 0.7s ease-out, background-color 0.5s ease;
 }
+
+/* ═══════════════════════════════════════════
+   Insights Styles
+   ═══════════════════════════════════════════ */
+
+/* Insight card entrance animation */
+.insight-card {
+  transition: all 0.2s ease;
+}
+.insight-card:hover {
+  transform: translateY(-1px);
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
