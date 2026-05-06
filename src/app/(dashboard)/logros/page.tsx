@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import {
   Wind,
@@ -15,6 +15,8 @@ import {
   Lock,
   Filter,
   PiggyBank,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -84,31 +86,64 @@ export default function LogrosPage() {
   const { apiFetch } = useApi();
   const [data, setData] = useState<AchievementsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
 
-  const fetchAchievements = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiFetch('/api/achievements');
-      if (res.ok) {
-        const json = await res.json();
-        setData(json);
-      }
-    } catch (err) {
-      console.error('[ACHIEVEMENTS] Error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [apiFetch]);
-
   useEffect(() => {
+    let cancelled = false;
+
+    const fetchAchievements = async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await apiFetch('/api/achievements');
+        if (!cancelled && res.ok) {
+          const json = await res.json();
+          setData(json);
+        } else if (!cancelled) {
+          setError(true);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('[ACHIEVEMENTS] Error:', err);
+          setError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchAchievements();
-  }, [fetchAchievements]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [apiFetch]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-10 h-10 animate-pulse" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
+          <AlertCircle size={32} className="text-[#666]" />
+          <p className="text-[#999] text-sm">No se pudieron cargar los logros</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-2 text-[#c8a55a] text-sm hover:underline"
+          >
+            <RefreshCw size={14} />
+            Reintentar
+          </button>
+        </div>
       </div>
     );
   }

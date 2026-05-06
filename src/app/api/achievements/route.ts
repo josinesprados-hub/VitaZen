@@ -57,65 +57,79 @@ const ACHIEVEMENTS: AchievementDef[] = [
 
 // ═══════════════════════════════════════════
 // PROGRESS CALCULATION
+// All DB queries run in parallel via Promise.all
 // ═══════════════════════════════════════════
 
 async function calculateProgress(userId: string): Promise<Record<string, number>> {
-  const progress: Record<string, number> = {};
+  // Run all count queries in parallel — one round-trip instead of 8+
+  const [
+    meditationCount,
+    journalCount,
+    wellnessCount,
+    habitsCount,
+    maxStreakResult,
+    nutritionCount,
+    financeCount,
+    incomeCount,
+    userData,
+  ] = await Promise.all([
+    db.meditationSession.count({ where: { userId } }),
+    db.journalEntry.count({ where: { userId } }),
+    db.wellnessLog.count({ where: { userId } }),
+    db.habitLog.count({ where: { userId } }),
+    db.habitLog.findMany({
+      where: { userId },
+      select: { streak: true },
+      orderBy: { streak: 'desc' },
+      take: 1,
+    }),
+    db.nutritionLog.count({ where: { userId } }),
+    db.financeLog.count({ where: { userId } }),
+    db.financeLog.count({ where: { userId, type: 'income' } }),
+    db.user.findUnique({ where: { id: userId }, select: { createdAt: true } }),
+  ]);
 
-  // Meditación — total sessions
-  const meditationCount = await db.meditationSession.count({ where: { userId } });
+  const progress: Record<string, number> = {};
+  const maxStreak = maxStreakResult[0]?.streak || 0;
+
+  // Meditación
   progress['meditation_first'] = Math.min(meditationCount, 1);
   progress['meditation_7'] = Math.min(meditationCount, 7);
   progress['meditation_14'] = Math.min(meditationCount, 14);
   progress['meditation_30'] = Math.min(meditationCount, 30);
   progress['meditation_50'] = Math.min(meditationCount, 50);
 
-  // Diario — total entries
-  const journalCount = await db.journalEntry.count({ where: { userId } });
+  // Diario
   progress['journal_first'] = Math.min(journalCount, 1);
   progress['journal_7'] = Math.min(journalCount, 7);
   progress['journal_30'] = Math.min(journalCount, 30);
   progress['journal_50'] = Math.min(journalCount, 50);
 
-  // Bienestar — total logs
-  const wellnessCount = await db.wellnessLog.count({ where: { userId } });
+  // Bienestar
   progress['wellness_first'] = Math.min(wellnessCount, 1);
   progress['wellness_7'] = Math.min(wellnessCount, 7);
   progress['wellness_30'] = Math.min(wellnessCount, 30);
 
-  // Hábitos — total habits + max streak
-  const habitsCount = await db.habitLog.count({ where: { userId } });
+  // Hábitos
   progress['habits_first'] = Math.min(habitsCount, 1);
   progress['habits_5'] = Math.min(habitsCount, 5);
   progress['habits_10'] = Math.min(habitsCount, 10);
-
-  const maxStreakResult = await db.habitLog.findMany({
-    where: { userId },
-    select: { streak: true },
-    orderBy: { streak: 'desc' },
-    take: 1,
-  });
-  const maxStreak = maxStreakResult[0]?.streak || 0;
   progress['habits_streak_7'] = Math.min(maxStreak, 7);
 
-  // Nutrición — total logs
-  const nutritionCount = await db.nutritionLog.count({ where: { userId } });
+  // Nutrición
   progress['nutrition_first'] = Math.min(nutritionCount, 1);
   progress['nutrition_7'] = Math.min(nutritionCount, 7);
   progress['nutrition_30'] = Math.min(nutritionCount, 30);
 
-  // Finanzas — total logs + income count
-  const financeCount = await db.financeLog.count({ where: { userId } });
-  const incomeCount = await db.financeLog.count({ where: { userId, type: 'income' } });
+  // Finanzas
   progress['finance_first'] = Math.min(financeCount, 1);
   progress['finance_savings_first'] = Math.min(incomeCount, 1);
   progress['finance_10'] = Math.min(financeCount, 10);
   progress['finance_30'] = Math.min(financeCount, 30);
 
-  // General — days since registration
-  const user = await db.user.findUnique({ where: { id: userId }, select: { createdAt: true } });
-  if (user) {
-    const daysSince = Math.floor((Date.now() - user.createdAt.getTime()) / 86400000);
+  // General
+  if (userData) {
+    const daysSince = Math.floor((Date.now() - userData.createdAt.getTime()) / 86400000);
     progress['general_30_days'] = Math.min(daysSince, 30);
   }
 
@@ -127,53 +141,59 @@ async function calculateProgress(userId: string): Promise<Record<string, number>
 // ═══════════════════════════════════════════
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Fetch unlocked achievements + progress data in parallel
+    const [unlocked, progressData] = await Promise.all([
+      db.achievement.findMany({ where: { userId: user.id } }),
+      calculateProgress(user.id),
+    ]);
+
+    const unlockedKeys = new Set(unlocked.map((a) => a.key));
+    const unlockedMap = new Map(unlocked.map((a) => [a.key, a.unlockedAt.toISOString()]));
+
+    // Build response
+    const achievements = ACHIEVEMENTS.map((def) => {
+      const current = progressData[def.key] || 0;
+      const isUnlocked = unlockedKeys.has(def.key);
+      const percent = Math.min(Math.round((current / def.target) * 100), 100);
+
+      return {
+        key: def.key,
+        title: def.title,
+        description: def.description,
+        category: def.category,
+        icon: def.icon,
+        target: def.target,
+        current,
+        percent,
+        unlocked: isUnlocked,
+        unlockedAt: isUnlocked ? unlockedMap.get(def.key) || null : null,
+      };
+    });
+
+    const totalUnlocked = achievements.filter((a) => a.unlocked).length;
+    const totalAchievements = achievements.length;
+
+    return NextResponse.json({
+      achievements,
+      stats: {
+        total: totalAchievements,
+        unlocked: totalUnlocked,
+        percent: Math.round((totalUnlocked / totalAchievements) * 100),
+      },
+    });
+  } catch (error) {
+    console.error('Achievements error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const user = await getAuthUser(authHeader.split('Bearer ')[1]);
-  if (!user) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  }
-
-  // Get unlocked achievements
-  const unlocked = await db.achievement.findMany({ where: { userId: user.id } });
-  const unlockedKeys = new Set(unlocked.map((a) => a.key));
-  const unlockedMap = new Map(unlocked.map((a) => [a.key, a.unlockedAt.toISOString()]));
-
-  // Calculate progress for all achievements
-  const progressData = await calculateProgress(user.id);
-
-  // Build response
-  const achievements = ACHIEVEMENTS.map((def) => {
-    const current = progressData[def.key] || 0;
-    const isUnlocked = unlockedKeys.has(def.key);
-    const percent = Math.min(Math.round((current / def.target) * 100), 100);
-
-    return {
-      key: def.key,
-      title: def.title,
-      description: def.description,
-      category: def.category,
-      icon: def.icon,
-      target: def.target,
-      current,
-      percent,
-      unlocked: isUnlocked,
-      unlockedAt: isUnlocked ? unlockedMap.get(def.key) || null : null,
-    };
-  });
-
-  const totalUnlocked = achievements.filter((a) => a.unlocked).length;
-  const totalAchievements = achievements.length;
-
-  return NextResponse.json({
-    achievements,
-    stats: {
-      total: totalAchievements,
-      unlocked: totalUnlocked,
-      percent: Math.round((totalUnlocked / totalAchievements) * 100),
-    },
-  });
 }
