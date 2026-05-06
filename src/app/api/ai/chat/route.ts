@@ -95,14 +95,47 @@ export async function POST(request: NextRequest) {
       await incrementAIUsage(user.id);
     }
 
-    // Update thread title if first message
+    // Auto-generate title using AI if this is the first exchange
     const messageCount = await db.aIMessage.count({ where: { threadId } });
     if (messageCount <= 2 && thread.title === 'Nueva conversación') {
-      await db.aIThread.update({
-        where: { id: threadId },
-        data: { title: content.slice(0, 50) + (content.length > 50 ? '...' : '') },
-      });
+      try {
+        const titleCompletion = await groq.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: 'Genera un título corto de máximo 6 palabras para esta conversación. Solo el título, sin comillas ni explicaciones. En español.',
+            },
+            {
+              role: 'user',
+              content: content.slice(0, 200),
+            },
+          ],
+          temperature: 0.3,
+          max_tokens: 20,
+        });
+
+        const generatedTitle = titleCompletion.choices[0]?.message?.content?.trim();
+        if (generatedTitle && generatedTitle.length > 0 && generatedTitle.length <= 80) {
+          await db.aIThread.update({
+            where: { id: threadId },
+            data: { title: generatedTitle },
+          });
+        }
+      } catch {
+        // Fallback to simple title if AI generation fails
+        await db.aIThread.update({
+          where: { id: threadId },
+          data: { title: content.slice(0, 50) + (content.length > 50 ? '...' : '') },
+        });
+      }
     }
+
+    // Update thread updatedAt timestamp
+    await db.aIThread.update({
+      where: { id: threadId },
+      data: { updatedAt: new Date() },
+    });
 
     const newLimitCheck = await checkAILimit(user.id, user.plan);
 

@@ -72,3 +72,22 @@ input:focus, textarea:focus, select:focus {
 
 /* Smooth scroll */
 html { scroll-behavior: smooth; }
+
+/* Chat message fade-in */
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+  animation: messageIn 0.35s ease-out both;
+}
+
+/* Thread hover glow */
+.thread-item:hover {
+  box-shadow: inset 0 0 0 1px rgba(200, 165, 90, 0.08);
+}
+
+/* Sidebar collapse transition */
+.sidebar-transition {
+  transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
