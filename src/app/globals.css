@@ -54,6 +54,35 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ═══════════════════════════════════════════
+   Page Transitions
+   ═══════════════════════════════════════════ */
+
+/* Premium page transition — subtle fade + translateY on navigation.
+   Applied via template.tsx which re-mounts on each route change.
+   Duration kept short (0.25s) for snappy, refined feel. */
+@keyframes pageTransitionEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageTransitionEnter 0.25s ease-out both;
+}
+
+/* Respect reduced motion preferences — disable page transitions */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════
    Core Animations
    ═══════════════════════════════════════════ */
 
