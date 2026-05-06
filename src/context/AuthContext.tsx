@@ -20,6 +20,7 @@ interface UserData {
   name: string | null;
   plan: string;
   avatarUrl: string | null;
+  onboardingCompleted?: boolean;
 }
 
 interface AuthContextType {

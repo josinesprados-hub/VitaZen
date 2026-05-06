@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
+import { OnboardingRecommendations } from '@/components/dashboard/OnboardingRecommendations';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 
 const FRASES = [
@@ -319,6 +320,9 @@ export default function DashboardPage() {
 
       {/* Hero: Estado Actual */}
       <EmotionalHero />
+
+      {/* Onboarding Recommendations */}
+      <OnboardingRecommendations />
 
       {/* Welcome */}
       <div>

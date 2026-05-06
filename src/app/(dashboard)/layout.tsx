@@ -31,6 +31,11 @@ export default function DashboardLayout({
     return null;
   }
 
+  if (user.onboardingCompleted === false) {
+    router.push('/onboarding');
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-[#000000]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

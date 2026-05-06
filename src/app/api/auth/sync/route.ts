@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
           name: existingUser.name,
           plan: existingUser.plan,
           avatarUrl: existingUser.avatarUrl,
+          onboardingCompleted: existingUser.onboardingCompleted,
         },
       };
       console.log('[AUTH SYNC DEBUG] Usuario existente devuelto. Respuesta 200:', JSON.stringify(responseData));
@@ -75,6 +76,7 @@ export async function POST(request: NextRequest) {
         name: user.name,
         plan: user.plan,
         avatarUrl: user.avatarUrl,
+        onboardingCompleted: user.onboardingCompleted,
       },
     };
     console.log('[AUTH SYNC DEBUG] Nuevo usuario creado. Respuesta 200:', JSON.stringify(responseData));

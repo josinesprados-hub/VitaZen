@@ -430,3 +430,78 @@ html { scroll-behavior: smooth; }
 .hero-glow {
   border-radius: 1rem;
 }
+
+/* ═══════════════════════════════════════════
+   Onboarding Animations
+   ═══════════════════════════════════════════ */
+
+/* Step entrance animation */
+@keyframes onboardingStepIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Step exit animation */
+@keyframes onboardingStepOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+.onboarding-step-enter {
+  animation: onboardingStepIn 0.4s ease-out both;
+}
+
+.onboarding-step-exit {
+  animation: onboardingStepOut 0.25s ease-in both;
+}
+
+/* Welcome logo entrance */
+@keyframes onboardingLogoIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.onboarding-logo-enter {
+  animation: onboardingLogoIn 0.6s ease-out both;
+}
+
+/* Option card pop on selection */
+@keyframes onboardingOptionPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.onboarding-option-pop {
+  animation: onboardingOptionPop 0.3s ease-out;
+}
+
+/* Completion glow */
+@keyframes onboardingCompleteGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  50% { box-shadow: 0 0 40px 8px rgba(200, 165, 90, 0.1); }
+}
+.onboarding-complete-glow {
+  animation: onboardingCompleteGlow 2s ease-in-out infinite;
+}
+
+/* Progress bar for onboarding steps */
+.onboarding-progress-fill {
+  transition: width 0.5s ease-out;
+}

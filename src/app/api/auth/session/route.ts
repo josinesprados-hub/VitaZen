@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         name: user.name,
         plan: user.plan,
         avatarUrl: user.avatarUrl,
+        onboardingCompleted: user.onboardingCompleted,
         aiUsage: user.aiUsage
           ? {
               count: user.aiUsage.count,
