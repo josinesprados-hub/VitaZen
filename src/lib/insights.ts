@@ -54,7 +54,7 @@ export interface InsightsResult {
 // Data gathering
 // ─────────────────────────────────────────
 
-interface RawData {
+export interface RawData {
   thisWeekCheckins: any[];
   prevWeekCheckins: any[];
   thisWeekHabits: any[];
@@ -71,7 +71,7 @@ interface RawData {
   empireProgress: any[];
 }
 
-async function gatherData(userId: string): Promise<RawData> {
+export async function gatherData(userId: string): Promise<RawData> {
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);

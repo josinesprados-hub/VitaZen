@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
+import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 
 const FRASES = [
@@ -315,6 +316,9 @@ export default function DashboardPage() {
           }}
         />
       )}
+
+      {/* Hero: Estado Actual */}
+      <EmotionalHero />
 
       {/* Welcome */}
       <div>
