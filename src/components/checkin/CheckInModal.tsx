@@ -127,28 +127,28 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 modal-backdrop"
+        className="absolute inset-0 premium-modal-backdrop"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-md modal-content overflow-hidden"
+        className="relative w-full sm:max-w-md modal-content overflow-hidden keyboard-aware"
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#555] hover:text-white transition-colors z-10"
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#555] hover:text-white hover:bg-[#1a1a1a] transition-colors z-10"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
 
         {step === 0 && (
           /* Intro Step */
-          <div className="p-8 text-center">
+          <div className="p-6 sm:p-8 text-center safe-top">
             <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <Sunrise size={28} className="text-[#c8a55a]" />
             </div>
@@ -173,7 +173,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
 
         {step === 1 && (
           /* Form Step */
-          <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[75dvh] overflow-y-auto scroll-contain safe-bottom">
             <div className="text-center mb-2">
               <h3 className="text-lg font-bold text-white">¿Cómo estás hoy?</h3>
               <p className="text-xs text-[#666]">Sé honesto, sin juicio</p>
@@ -195,7 +195,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
                 onChange={(e) => setIntention(e.target.value)}
                 placeholder="¿Qué te propones hoy?"
                 maxLength={120}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-[#c8a55a] transition-colors text-sm"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-[#c8a55a] transition-colors text-base sm:text-sm"
               />
             </div>
 
@@ -210,7 +210,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
                 placeholder="Algo que quieras recordar..."
                 maxLength={300}
                 rows={2}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-[#c8a55a] transition-colors text-sm resize-none"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-[#c8a55a] transition-colors text-base sm:text-sm resize-none"
               />
             </div>
 
@@ -226,7 +226,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
 
         {step === 2 && (
           /* Done Step */
-          <div className="p-8 text-center">
+          <div className="p-6 sm:p-8 text-center safe-bottom">
             <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/15 flex items-center justify-center mx-auto mb-5">
               <span className="text-3xl">✓</span>
             </div>

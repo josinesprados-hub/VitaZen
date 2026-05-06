@@ -178,10 +178,10 @@ export function EmotionalHero() {
 
         <div className="relative z-10">
           {/* Header: Status + Recommendation */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-5 sm:mb-8">
             {/* Left: Status */}
-            <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 rounded-xl ${config.iconBg} flex items-center justify-center shrink-0 ${config.pulseClass}`}>
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${config.iconBg} flex items-center justify-center shrink-0 ${config.pulseClass}`}>
                 <Sparkles size={22} className="text-[#c8a55a]" />
               </div>
               <div>
@@ -212,14 +212,14 @@ export function EmotionalHero() {
           </div>
 
           {/* Metrics rings */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 sm:gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-2">
             {metricsEntries.map(([key, metric]) => (
               <MetricRing key={key} metric={metric} metricKey={key} />
             ))}
           </div>
 
           {/* Subtle bottom line */}
-          <div className="mt-6 pt-4 border-t border-[#1a1a1a]/60">
+          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-[#1a1a1a]/60">
             <div className="flex items-center justify-between">
               <p className="text-[10px] text-[#444] uppercase tracking-widest font-medium">
                 Lectura basada en tu actividad real

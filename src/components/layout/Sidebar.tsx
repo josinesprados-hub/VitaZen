@@ -43,13 +43,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {/* Mobile overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-[#0a0a0a] border-r border-[#1a1a1a] z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[#0a0a0a] border-r border-[#1a1a1a] z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 safe-top safe-bottom ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -66,11 +66,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
 
           {/* Dashboard link */}
-          <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+          <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto scroll-contain">
             <Link
               href="/dashboard"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/dashboard'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -83,7 +83,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/timeline"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/timeline'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -96,7 +96,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/logros"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/logros'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -109,7 +109,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/checkin"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/checkin'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -122,7 +122,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/insights"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/insights'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -143,7 +143,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   key={empire.name}
                   href={empire.href}
                   onClick={onClose}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                     isActive
                       ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                       : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -163,7 +163,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 <Link
                   href="/pricing"
                   onClick={onClose}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                     pathname === '/pricing'
                       ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                       : 'text-[#c8a55a] hover:bg-[#c8a55a]/10'
@@ -189,7 +189,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </div>
             <button
               onClick={signOut}
-              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#999] hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+              className="flex items-center gap-2 w-full px-4 py-3 text-sm text-[#999] hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
             >
               <LogOut size={16} />
               Cerrar sesión

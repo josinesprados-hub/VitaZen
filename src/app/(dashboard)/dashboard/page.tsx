@@ -297,7 +297,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10">
+    <div className="max-w-7xl mx-auto space-y-5 sm:space-y-10 overflow-x-contain">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -327,12 +327,12 @@ export default function DashboardPage() {
 
       {/* Welcome */}
       <div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">
               Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
             </h1>
-            <p className="text-[#999] mt-2">Construye tu imperio, un hábito a la vez.</p>
+            <p className="text-[#999] mt-1 sm:mt-2 text-sm sm:text-base">Construye tu imperio, un hábito a la vez.</p>
           </div>
           {todayCheckin && (
             <button
@@ -362,15 +362,15 @@ export default function DashboardPage() {
 
       {/* Metrics */}
       {metrics && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <Wind size={18} className="text-[#c8a55a]" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <Wind size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Meditación</span>
             </div>
-            <p className="text-3xl font-bold text-white">{metrics.meditationWeek}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white">{metrics.meditationWeek}</p>
             <p className="text-xs text-[#666] mt-1">sesiones esta semana</p>
             {streaks && streaks.meditationStreak > 0 && (
               <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
@@ -379,14 +379,14 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <CheckCircle size={18} className="text-[#c8a55a]" />
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <CheckCircle size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Hábitos</span>
             </div>
-            <p className="text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
             <p className="text-xs text-[#666] mt-1">completados esta semana</p>
             {streaks && streaks.habitStreak > 0 && (
               <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
@@ -395,14 +395,14 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <BookOpen size={18} className="text-[#c8a55a]" />
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <BookOpen size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Diario</span>
             </div>
-            <p className="text-3xl font-bold text-white">{metrics.journalWeek}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white">{metrics.journalWeek}</p>
             <p className="text-xs text-[#666] mt-1">entradas esta semana</p>
             {streaks && streaks.journalStreak > 0 && (
               <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
@@ -411,14 +411,14 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <Wallet size={18} className="text-[#c8a55a]" />
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <Wallet size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
             </div>
-            <p className={`text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+            <p className={`text-lg sm:text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
               {metrics.balance >= 0 ? '+' : ''}{metrics.balance.toFixed(2)}€
             </p>
             <p className="text-xs text-[#666] mt-1">balance últimos 30 días</p>
@@ -428,8 +428,8 @@ export default function DashboardPage() {
 
       {/* Progreso Semanal */}
       {progress && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
             <div className="flex items-center gap-3">
               <Target size={22} className="text-[#c8a55a]" />
               <h2 className="text-lg font-semibold text-white">Progreso Semanal</h2>
@@ -437,7 +437,7 @@ export default function DashboardPage() {
             <span className="text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             {/* Meditación */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -486,10 +486,10 @@ export default function DashboardPage() {
       {/* Insights Preview */}
       {dashboardInsights && dashboardInsights.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div className="flex items-center gap-3">
               <Sparkles size={22} className="text-[#c8a55a]" />
-              <h2 className="text-xl font-semibold text-white">Insights Semanales</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Insights Semanales</h2>
               {insightsScore !== null && (
                 <span className="text-xs text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full font-medium">
                   {insightsScore}/100
@@ -500,7 +500,7 @@ export default function DashboardPage() {
               Ver todo <ArrowRight size={12} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {dashboardInsights.slice(0, 3).map((insight) => {
               const borderClass = insight.type === 'positive'
                 ? 'border-[#22c55e]/15 hover:border-[#22c55e]/30'
@@ -510,7 +510,7 @@ export default function DashboardPage() {
               return (
                 <div
                   key={insight.id}
-                  className={`bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 ${borderClass}`}
+                  className={`bg-[#0a0a0a] border rounded-xl p-4 sm:p-5 transition-all duration-200 ${borderClass}`}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-xl shrink-0">{insight.icon}</span>
@@ -527,9 +527,9 @@ export default function DashboardPage() {
       )}
 
       {/* Frase motivacional */}
-      <div className="flex justify-center py-6">
+      <div className="flex justify-center py-4 sm:py-6">
         <p
-          className={`text-center text-[#c8a55a]/90 text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 ${fraseVisible ? 'opacity-100' : 'opacity-0'}`}
+          className={`text-center text-[#c8a55a]/90 text-base sm:text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 px-4 ${fraseVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           «{FRASES[fraseIndex]}»
         </p>
@@ -537,8 +537,8 @@ export default function DashboardPage() {
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-7">
-          <div className="flex items-center gap-3 mb-5">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3.5 sm:p-7">
+          <div className="flex items-center gap-3 mb-3 sm:mb-5">
             <Trophy size={22} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
@@ -546,7 +546,7 @@ export default function DashboardPage() {
             )}
           </div>
           <h3 className="text-[#c8a55a] font-medium text-lg mb-1">{challenge.challenge.title}</h3>
-          <p className="text-[#999] text-sm mb-5">{challenge.challenge.description}</p>
+          <p className="text-[#999] text-sm mb-4">{challenge.challenge.description}</p>
           {!challenge.completed && (
             <button
               onClick={async () => {
@@ -568,8 +568,8 @@ export default function DashboardPage() {
 
       {/* Empire Grid */}
       <div>
-        <h2 className="text-xl font-semibold text-white mb-5">Tus Imperios</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-5">Tus Imperios</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
           {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
             const empireData = empires.find((e) => e.empire === key);
             const level = empireData?.level || 1;
@@ -581,11 +581,11 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/30 transition-all group"
+                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/30 transition-all group touch-press"
               >
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                    <Icon size={22} className="text-[#c8a55a]" />
+                <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-5">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                    <Icon size={20} className="text-[#c8a55a]" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{config.name}</h3>
@@ -593,7 +593,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-[#999] mb-5">{config.description}</p>
+                <p className="text-sm text-[#999] mb-3 sm:mb-5">{config.description}</p>
 
                 {/* Progress bar */}
                 <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2.5">
@@ -620,17 +620,17 @@ export default function DashboardPage() {
       {/* Achievements Preview */}
       {achievementsStats && achievements && (
         <div>
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div className="flex items-center gap-3">
               <Trophy size={22} className="text-[#c8a55a]" />
-              <h2 className="text-xl font-semibold text-white">Logros</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Logros</h2>
               <span className="text-xs text-[#666]">{achievementsStats.unlocked}/{achievementsStats.total}</span>
             </div>
             <Link href="/logros" className="text-xs text-[#c8a55a] hover:underline">
               Ver todos
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             {achievements
               .sort((a, b) => {
                 if (a.unlocked && !b.unlocked) return -1;
@@ -681,8 +681,8 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
           <div className="flex items-center gap-3">
             <Star size={20} className="text-[#c8a55a]" />
             <div>
@@ -691,20 +691,20 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Trophy size={20} className="text-[#c8a55a]" />
             <div>
-              <p className="text-2xl font-bold text-white">{empires.reduce((sum, e) => sum + e.level, 0)}</p>
+              <p className="text-lg sm:text-2xl font-bold text-white">{empires.reduce((sum, e) => sum + e.level, 0)}</p>
               <p className="text-xs text-[#999]">Niveles totales</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
-          <div className="flex items-center gap-3">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Flame size={20} className="text-[#c8a55a]" />
             <div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-lg sm:text-2xl font-bold text-white">
                 {Math.max(...empires.map((e) => e.streak), 0)}
               </p>
               <p className="text-xs text-[#999]">Mejor racha</p>

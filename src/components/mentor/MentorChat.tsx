@@ -417,16 +417,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const IconComponent = headerIcon === 'brain' ? Brain : Sparkles;
 
   return (
-    <div className="max-w-6xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
+    <div className="max-w-6xl mx-auto h-[calc(100dvh-5.5rem)] sm:h-[calc(100vh-8rem)] flex flex-col overflow-x-contain">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <IconComponent size={24} className="text-[#c8a55a]" />
+      <div className="flex items-center justify-between mb-2 sm:mb-5">
+        <div className="flex items-center gap-2.5 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+            <IconComponent size={18} className="text-[#c8a55a] sm:w-6 sm:h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-white">Mentor IA</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-white">Mentor IA</h1>
               {/* Discreet Premium badge */}
               {isPremium && (
                 <span className="badge-premium gap-1">
@@ -470,12 +470,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 gap-4 min-h-0">
+      <div className="flex flex-1 gap-2 sm:gap-4 min-h-0">
         {/* ────────── Sidebar ────────── */}
         <div
           className={`shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
             sidebarOpen ? 'w-72' : 'w-0 border-0'
-          }`}
+          } hidden sm:flex`}
         >
           {/* Back + New button */}
           <div className="p-3 border-b border-[#1a1a1a] space-y-2">
@@ -822,7 +822,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {activeThread ? (
             <>
               {/* Chat header bar with thread info */}
-              <div className="px-5 py-3 border-b border-[#1a1a1a] flex items-center justify-between">
+              <div className="px-4 sm:px-5 py-3 border-b border-[#1a1a1a] flex items-center justify-between">
                 <div className="flex items-center gap-2 min-w-0">
                   <MessageCircle size={14} className="text-[#c8a55a] shrink-0" />
                   <p className="text-sm text-white truncate">
@@ -866,7 +866,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 scroll-contain">
                 {messages.length === 0 && (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center animate-in">
@@ -881,8 +881,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       </p>
                       <div className="flex flex-wrap justify-center gap-2 mt-4">
                         {[
-                          '¿Cómo puedo mejorar mi disciplina?',
-                          'Quiero crear nuevos hábitos',
+                          '¿Cómo mejorar mi disciplina?',
+                          'Crear nuevos hábitos',
                           'Necesito motivación',
                         ].map((suggestion) => (
                           <button
@@ -907,7 +907,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
                   >
                     <div
-                      className={`max-w-[80%] rounded-2xl p-4 ${
+                      className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
                         msg.role === 'user'
                           ? 'bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-br-md'
                           : isPremium
@@ -936,7 +936,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               </div>
 
               {/* Input area with inline limit warning */}
-              <div className="p-4 border-t border-[#1a1a1a]">
+              <div className="p-3 sm:p-4 border-t border-[#1a1a1a] safe-bottom keyboard-aware">
                 {/* Low message warning */}
                 {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
                   <div className="mb-2 flex items-center gap-2 text-[10px] text-[#e8a849] bg-[#e8a849]/5 border border-[#e8a849]/10 rounded-lg px-3 py-1.5">

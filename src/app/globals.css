@@ -29,6 +29,25 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Safe areas for iPhone notch / home indicator */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Prevent iOS bounce overscroll revealing background */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Viewport fit cover for iPhone safe areas */
+@supports (padding: env(safe-area-inset-top)) {
+  html {
+    viewport-fit: cover;
+  }
+}
+
+/* Ensure html/body fill viewport on mobile without awkward bounce gaps */
+html, body {
+  min-height: 100dvh;
 }
 
 /* Custom scrollbar */
@@ -51,6 +70,71 @@ input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #c8a55a !important;
   box-shadow: 0 0 0 1px #c8a55a;
+}
+
+/* ═══════════════════════════════════════════
+   Mobile Touch & Interaction
+   ═══════════════════════════════════════════ */
+
+/* Minimum touch target — 44px Apple HIG guideline */
+button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+  min-height: 44px;
+}
+
+/* Touch target for small inline elements — ensure tap area via padding */
+.pill, .badge-premium, .badge-free {
+  min-height: 32px;
+}
+.pill {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+/* Disable tap highlight on mobile for cleaner feel */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text selection on interactive elements */
+button, [role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent iOS input zoom (font-size >= 16px prevents auto-zoom) */
+@media (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* Smooth horizontal scroll for pill containers */
+.scroll-snap-x {
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+.scroll-snap-x > * {
+  scroll-snap-align: start;
+}
+
+/* Horizontal pill/filters scroll — momentum + snap + hide scrollbar */
+.scroll-pills {
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.scroll-pills::-webkit-scrollbar { display: none; }
+.scroll-pills { -ms-overflow-style: none; scrollbar-width: none; }
+.scroll-pills > * {
+  scroll-snap-align: start;
 }
 
 /* ═══════════════════════════════════════════
@@ -170,6 +254,25 @@ html { scroll-behavior: smooth; }
   border: 1px solid rgba(200, 165, 90, 0.2);
   border-radius: 1rem;
   animation: scaleIn 0.25s ease-out both;
+}
+
+/* Mobile: bottom-sheet style modal for small screens */
+@media (max-width: 767px) {
+  .modal-content {
+    border-radius: 1.25rem 1.25rem 0 0;
+    max-height: 92dvh;
+    margin-top: auto;
+    width: 100%;
+    /* safe area for home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .modal-content-destructive {
+    border-radius: 1.25rem 1.25rem 0 0;
+    max-height: 92dvh;
+    margin-top: auto;
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 /* Delete modal variant */
@@ -630,4 +733,110 @@ html { scroll-behavior: smooth; }
 /* Bar transition for recap metric bars */
 .recap-bar-transition {
   transition: width 0.8s ease-out, background-color 0.5s ease;
+}
+
+/* ═══════════════════════════════════════════
+   Mobile Responsive Helpers
+   ═══════════════════════════════════════════ */
+
+/* Reduce card padding on mobile for better density */
+@media (max-width: 767px) {
+  .card-primary {
+    border-radius: 0.875rem;
+  }
+  .hero-section-card {
+    padding: 1.125rem;
+    border-radius: 0.875rem;
+  }
+  .pill {
+    font-size: 10px;
+    padding: 0.375rem 0.75rem;
+  }
+  /* Smaller icon containers on mobile */
+  .icon-sm {
+    width: 2rem;
+    height: 2rem;
+  }
+  .icon-md {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  .icon-lg {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  .icon-xl {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+/* iPhone bottom safe area padding for fixed elements */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* iPhone top safe area padding for fixed elements */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ═══════════════════════════════════════════
+   Premium Mobile Refinements
+   ═══════════════════════════════════════════ */
+
+/* Prevent iOS bounce overscroll on scroll containers */
+@media (max-width: 767px) {
+  .scroll-contain {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Keyboard-aware layout: when virtual keyboard is open on iOS,
+   dvh units adjust. This class ensures content doesn't get hidden. */
+@media (max-width: 767px) {
+  .keyboard-aware {
+    position: relative;
+  }
+  /* When input is focused, ensure the parent scrolls to reveal it */
+  .keyboard-aware:has(input:focus, textarea:focus) {
+    scroll-padding-bottom: 200px;
+  }
+}
+
+/* Active press state for touch feedback — subtle scale-down */
+@media (hover: none) and (pointer: coarse) {
+  .touch-press:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+  .touch-press-sm:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Improved mobile text readability */
+@media (max-width: 767px) {
+  /* Prevent awkward text breaks on small screens */
+  h1, h2, h3 {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+  /* Slightly tighter line-height on mobile for density */
+  .text-mobile-compact {
+    line-height: 1.35;
+  }
+}
+
+/* Mobile-specific: reduce section spacing for denser layout */
+@media (max-width: 767px) {
+  .mobile-space-y > * + * {
+    margin-top: 0.75rem;
+  }
+}
+
+/* Fix: prevent horizontal overflow from edge-to-edge elements */
+.overflow-x-contain {
+  overflow-x: hidden;
 }

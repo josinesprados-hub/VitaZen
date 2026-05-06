@@ -144,9 +144,9 @@ export default function OnboardingPage() {
   const progressPercent = ((step + 1) / TOTAL_STEPS) * 100;
 
   return (
-    <div className="min-h-screen bg-[#000000] flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-[100dvh] bg-[#000000] flex flex-col items-center justify-center px-5 py-8 safe-top safe-bottom">
       {/* Progress Bar */}
-      <div className="w-full max-w-lg mb-8">
+      <div className="w-full max-w-lg mb-6 sm:mb-8">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] text-[#555] uppercase tracking-widest font-medium">
             Paso {step + 1} de {TOTAL_STEPS}
@@ -164,7 +164,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Step Content */}
-      <div className={`w-full max-w-lg ${animating ? 'onboarding-step-exit' : 'onboarding-step-enter'}`}>
+      <div className={`w-full max-w-lg ${animating ? 'onboarding-step-exit' : 'onboarding-step-enter'} overflow-x-contain`}>
         {step === 0 && (
           <WelcomeStep
             userName={user?.name}
@@ -238,7 +238,7 @@ export default function OnboardingPage() {
 function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: () => void }) {
   return (
     <div className="text-center">
-      <div className="onboarding-logo-enter mb-8">
+      <div className="onboarding-logo-enter mb-6 sm:mb-8">
         <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#c8a55a]/10 border border-[#c8a55a]/20 flex items-center justify-center onboarding-complete-glow">
           <Sparkles size={36} className="text-[#c8a55a]" />
         </div>
@@ -280,12 +280,12 @@ function GoalsStep({
 }) {
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">¿Qué quieres lograr?</h2>
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">¿Qué quieres lograr?</h2>
         <p className="text-[#999] text-sm">Selecciona los objetivos que más resuenen contigo.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-8">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-6 sm:mb-8">
         {GOAL_OPTIONS.map((goal) => {
           const isSelected = selected.includes(goal);
           return (
@@ -356,12 +356,12 @@ function FocusStep({
 }) {
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Tu foco principal</h2>
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tu foco principal</h2>
         <p className="text-[#999] text-sm">Elige el área donde quieres concentrar tu energía ahora.</p>
       </div>
 
-      <div className="space-y-3 mb-8">
+      <div className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
         {FOCUS_OPTIONS.map((option) => {
           const isSelected = selected === option.key;
           const Icon = option.icon;
@@ -483,12 +483,12 @@ function LevelsStep({
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Tu estado actual</h2>
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tu estado actual</h2>
         <p className="text-[#999] text-sm">Nos ayuda a adaptar tu experiencia desde el inicio.</p>
       </div>
 
-      <div className="space-y-6 mb-8">
+      <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
         {levels.map((item) => (
           <div
             key={item.key}
@@ -569,8 +569,8 @@ function HabitsStep({
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Tus primeros hábitos</h2>
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tus primeros hábitos</h2>
         <p className="text-[#999] text-sm">
           Elige hábitos para empezar. Los crearemos por ti.
         </p>
@@ -581,7 +581,7 @@ function HabitsStep({
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-8">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-6 sm:mb-8">
         {HABIT_OPTIONS.map((habit) => {
           const isSelected = selected.includes(habit.name);
           return (

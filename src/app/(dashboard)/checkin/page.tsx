@@ -155,11 +155,11 @@ export default function CheckinPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 sm:mb-8">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Sunrise size={24} className="text-[#c8a55a]" />
-            <h1 className="text-2xl font-bold text-white">Check-in Diario</h1>
+          <div className="flex items-center gap-3 mb-1.5">
+            <Sunrise size={20} className="text-[#c8a55a] sm:w-6 sm:h-6" />
+            <h1 className="text-lg sm:text-2xl font-bold text-white">Check-in Diario</h1>
           </div>
           <p className="text-[#999] text-sm">Conecta contigo cada día</p>
         </div>
@@ -167,13 +167,13 @@ export default function CheckinPage() {
           onClick={() => setShowModal(true)}
           className="bg-[#c8a55a] text-[#000000] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
         >
-          {todayCheckin ? 'Editar hoy' : 'Check-in de hoy'}
+          {todayCheckin ? 'Editar hoy' : 'Check-in'}
         </button>
       </div>
 
       {/* Today Summary */}
       {todayCheckin && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-6 mb-8">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3.5 sm:p-6 mb-5 sm:mb-8">
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
             <div>
@@ -181,7 +181,7 @@ export default function CheckinPage() {
               <p className="text-[#c8a55a] text-xs font-medium italic">«{todayCheckin.intention}»</p>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-2 sm:gap-3">
             {[
               { label: 'Emoción', val: todayCheckin.emotion },
               { label: 'Energía', val: todayCheckin.energy },
@@ -203,20 +203,20 @@ export default function CheckinPage() {
       {/* Trends */}
       {trends && (
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={18} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Tendencias</h2>
             <span className="text-xs text-[#666]">últimos {trends.totalDays} días</span>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
             {METRIC_CONFIG.map((metric) => {
               const Icon = metric.icon;
               const val = (trends as any)[metric.key] as number;
               return (
                 <div
                   key={metric.key}
-                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/20 transition-colors"
+                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-4 hover:border-[#c8a55a]/20 transition-colors touch-press"
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <Icon size={14} className="text-[#c8a55a]" />
@@ -233,7 +233,7 @@ export default function CheckinPage() {
 
       {/* History */}
       <div>
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-4">
           <Calendar size={18} className="text-[#c8a55a]" />
           <h2 className="text-lg font-semibold text-white">Historial</h2>
         </div>

@@ -145,16 +145,16 @@ export default function TimelinePage() {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Clock size={24} className="text-[#c8a55a]" />
-          <h1 className="text-2xl font-bold text-white">Timeline</h1>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 mb-1.5">
+          <Clock size={22} className="text-[#c8a55a]" />
+          <h1 className="text-lg sm:text-2xl font-bold text-white">Timeline</h1>
         </div>
         <p className="text-[#999] text-sm">Tu historial completo de actividad</p>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-pills">
         {CATEGORIES.map((cat) => {
           const isActive = activeFilter === cat.key;
           const Icon = cat.icon;
@@ -162,7 +162,7 @@ export default function TimelinePage() {
             <button
               key={cat.key}
               onClick={() => handleFilter(cat.key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 touch-press-sm ${
                 isActive
                   ? 'bg-[#c8a55a] text-[#000000]'
                   : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-[#c8a55a]/30 hover:text-[#c8a55a]'
@@ -227,7 +227,7 @@ export default function TimelinePage() {
                         </div>
 
                         {/* Card */}
-                        <div className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-all duration-300 group-hover:bg-[#0d0d0d]">
+                        <div className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-all duration-300 group-hover:bg-[#0d0d0d] touch-press">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
