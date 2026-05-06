@@ -102,24 +102,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     console.log('[AUTH DEBUG] signInWithEmailAndPassword - Intentando con email:', email);
-    const credential = await signInWithEmailAndPassword(auth, email, password);
-    console.log('[AUTH DEBUG] signInWithEmailAndPassword - OK. UID:', credential.user.uid, 'Email:', credential.user.email);
-    await syncUser(credential.user);
+    await signInWithEmailAndPassword(auth, email, password);
+    // syncUser handled by onAuthStateChanged — no duplicate call
   };
 
   const signUp = async (email: string, password: string) => {
     console.log('[AUTH DEBUG] createUserWithEmailAndPassword - Intentando con email:', email);
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log('[AUTH DEBUG] createUserWithEmailAndPassword - OK. UID:', credential.user.uid, 'Email:', credential.user.email);
-    await syncUser(credential.user);
+    await createUserWithEmailAndPassword(auth, email, password);
+    // syncUser handled by onAuthStateChanged — no duplicate call
   };
 
   const signInWithGoogle = async () => {
     console.log('[AUTH DEBUG] signInWithPopup - Abriendo popup de Google...');
     const provider = new GoogleAuthProvider();
-    const credential = await signInWithPopup(auth, provider);
-    console.log('[AUTH DEBUG] signInWithPopup - OK. UID:', credential.user.uid, 'Email:', credential.user.email);
-    await syncUser(credential.user);
+    await signInWithPopup(auth, provider);
+    // syncUser handled by onAuthStateChanged — no duplicate call
   };
 
   const signOut = async () => {
