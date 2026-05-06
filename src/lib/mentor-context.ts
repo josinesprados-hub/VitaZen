@@ -4,6 +4,10 @@ import { db } from './db';
 // MENTOR CONTEXT BUILDER
 // Gathers recent user activity to personalize
 // AI mentor responses with soft contextual awareness
+//
+// FREE: basic context (recent check-in, streaks summary)
+// PREMIUM: full context (emotional trends, habits detail,
+//   meditations, conversations, empire progress, weekly activity)
 // ═══════════════════════════════════════════
 
 interface UserContext {
@@ -49,9 +53,11 @@ interface UserContext {
 
 /**
  * Fetch recent user activity for contextual mentor responses.
+ * FREE users get basic context, PREMIUM users get full advanced context.
  * Only pulls the most recent and relevant data — keeps it lightweight.
  */
-export async function buildMentorContext(userId: string): Promise<UserContext> {
+export async function buildMentorContext(userId: string, plan: string = 'FREE'): Promise<UserContext> {
+  const isPremium = plan === 'PREMIUM';
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
@@ -68,32 +74,32 @@ export async function buildMentorContext(userId: string): Promise<UserContext> {
     weeklyCheckins,
     user,
   ] = await Promise.all([
-    // Last 5 emotional check-ins
+    // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
       where: { userId, date: { gte: thirtyDaysAgo } },
       orderBy: { date: 'desc' },
-      take: 5,
+      take: isPremium ? 5 : 2,
     }),
 
-    // Active habits with streaks
+    // Active habits with streaks: FREE gets 4, PREMIUM gets 8
     db.habitLog.findMany({
       where: { userId, streak: { gt: 0 } },
       orderBy: { streak: 'desc' },
-      take: 8,
+      take: isPremium ? 8 : 4,
     }),
 
-    // Last 5 meditation sessions
+    // Meditation sessions: FREE gets 2, PREMIUM gets 5
     db.meditationSession.findMany({
       where: { userId, completedAt: { gte: thirtyDaysAgo } },
       orderBy: { completedAt: 'desc' },
-      take: 5,
+      take: isPremium ? 5 : 2,
     }),
 
-    // Last 3 active conversation threads (for recent topics)
+    // Recent conversation threads: FREE gets 1, PREMIUM gets 3
     db.aIThread.findMany({
       where: { userId, archived: false },
       orderBy: { updatedAt: 'desc' },
-      take: 3,
+      take: isPremium ? 3 : 1,
       include: {
         messages: {
           orderBy: { createdAt: 'desc' },
@@ -103,25 +109,25 @@ export async function buildMentorContext(userId: string): Promise<UserContext> {
       },
     }),
 
-    // Empire progress
-    db.empireProgress.findMany({
-      where: { userId },
-    }),
+    // Empire progress: PREMIUM only
+    isPremium
+      ? db.empireProgress.findMany({ where: { userId } })
+      : Promise.resolve([]),
 
-    // Weekly meditation count
-    db.meditationSession.count({
-      where: { userId, completedAt: { gte: sevenDaysAgo } },
-    }),
+    // Weekly meditation count: PREMIUM only
+    isPremium
+      ? db.meditationSession.count({ where: { userId, completedAt: { gte: sevenDaysAgo } } })
+      : Promise.resolve(0),
 
-    // Weekly journal count
-    db.journalEntry.count({
-      where: { userId, createdAt: { gte: sevenDaysAgo } },
-    }),
+    // Weekly journal count: PREMIUM only
+    isPremium
+      ? db.journalEntry.count({ where: { userId, createdAt: { gte: sevenDaysAgo } } })
+      : Promise.resolve(0),
 
-    // Weekly checkin count
-    db.dailyCheckin.count({
-      where: { userId, date: { gte: sevenDaysAgo } },
-    }),
+    // Weekly checkin count: PREMIUM only
+    isPremium
+      ? db.dailyCheckin.count({ where: { userId, date: { gte: sevenDaysAgo } } })
+      : Promise.resolve(0),
 
     // User data
     db.user.findUnique({
@@ -130,11 +136,13 @@ export async function buildMentorContext(userId: string): Promise<UserContext> {
     }),
   ]);
 
-  // Weekly habit completions (habits completed in last 7 days)
-  const weeklyHabits = habitStreaks.filter(h => {
-    if (!h.lastCompletedAt) return false;
-    return h.lastCompletedAt >= sevenDaysAgo;
-  }).length;
+  // Weekly habit completions (PREMIUM only)
+  const weeklyHabits = isPremium
+    ? habitStreaks.filter(h => {
+        if (!h.lastCompletedAt) return false;
+        return h.lastCompletedAt >= sevenDaysAgo;
+      }).length
+    : 0;
 
   return {
     userName: user?.name || null,
@@ -181,7 +189,8 @@ export async function buildMentorContext(userId: string): Promise<UserContext> {
 // ═══════════════════════════════════════════
 // CONTEXT FORMATTER
 // Converts raw data into a concise text block
-// for the AI system prompt
+// for the AI system prompt.
+// FREE: basic summary, PREMIUM: full detailed context.
 // ═══════════════════════════════════════════
 
 const EMPIRE_NAMES: Record<string, string> = {
@@ -204,7 +213,40 @@ function daysAgo(date: Date): number {
   return Math.floor((Date.now() - date.getTime()) / 86400000);
 }
 
-export function formatContextForPrompt(ctx: UserContext): string {
+/**
+ * Format context for FREE users — basic, concise summary.
+ */
+function formatBasicContext(ctx: UserContext): string {
+  const lines: string[] = [];
+
+  if (ctx.userName) {
+    lines.push(`Nombre del usuario: ${ctx.userName}`);
+  }
+
+  // Just the latest check-in summary
+  if (ctx.recentCheckins.length > 0) {
+    const latest = ctx.recentCheckins[0];
+    const days = daysAgo(latest.date);
+    lines.push(`\nEstado reciente:`);
+    lines.push(`- Último check-in: ${days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`}`);
+    lines.push(`- Emoción: ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, Energía: ${latest.energy}/5`);
+  }
+
+  // Brief streak summary
+  if (ctx.habitStreaks.length > 0) {
+    lines.push(`\nHábitos:`);
+    ctx.habitStreaks.slice(0, 3).forEach(h => {
+      lines.push(`- ${h.name}: racha de ${h.streak} días`);
+    });
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Format context for PREMIUM users — full detailed context with trends and insights.
+ */
+function formatAdvancedContext(ctx: UserContext): string {
   const lines: string[] = [];
 
   // User name
@@ -212,7 +254,7 @@ export function formatContextForPrompt(ctx: UserContext): string {
     lines.push(`Nombre del usuario: ${ctx.userName}`);
   }
 
-  // Recent emotional check-ins (only if there's data)
+  // Recent emotional check-ins with trends
   if (ctx.recentCheckins.length > 0) {
     const latest = ctx.recentCheckins[0];
     const days = daysAgo(latest.date);
@@ -237,7 +279,7 @@ export function formatContextForPrompt(ctx: UserContext): string {
     }
   }
 
-  // Habit streaks
+  // Habit streaks with detail
   if (ctx.habitStreaks.length > 0) {
     lines.push(`\nHábitos activos:`);
     ctx.habitStreaks.forEach(h => {
@@ -303,8 +345,19 @@ export function formatContextForPrompt(ctx: UserContext): string {
 }
 
 /**
+ * Format context based on user plan.
+ */
+export function formatContextForPrompt(ctx: UserContext): string {
+  if (ctx.plan === 'PREMIUM') {
+    return formatAdvancedContext(ctx);
+  }
+  return formatBasicContext(ctx);
+}
+
+/**
  * Build the full system prompt with injected context.
- * Appends user context to the base system prompt in a natural way.
+ * FREE users get basic contextual awareness.
+ * PREMIUM users get full contextual awareness with deeper instructions.
  */
 export function buildContextualSystemPrompt(
   basePrompt: string,
@@ -316,18 +369,33 @@ export function buildContextualSystemPrompt(
     return basePrompt;
   }
 
+  const isPremium = context.plan === 'PREMIUM';
+
+  const contextRules = isPremium
+    ? `REGLAS DE USO DEL CONTEXTO (AVANZADO):
+- Usa este contexto para personalizar tus respuestas de forma natural y profunda.
+- No menciones explícitamente "según tus datos" o "veo en tu registro". Simplemente intégralo.
+- Ejemplo: si el usuario tiene buena racha de hábitos, di algo como "Has mantenido buena consistencia estos días."
+- Ejemplo: si el estrés ha subido, di algo como "Últimamente el estrés ha estado más presente."
+- Ejemplo: si hablaste de problemas de enfoque recientemente, retoma: "La semana pasada mencionaste dificultades con el enfoque..."
+- Referencia tendencias emocionales, sesiones de meditación y progreso de imperios cuando sea relevante.
+- No repitas la misma referencia contextual en cada respuesta. Varía.
+- Si no hay contexto relevante para la pregunta, responde sin forzar referencias.
+- Mantén el tono calmado y premium. No seas invasivo ni excesivamente emocional.
+- Construye continuidad entre sesiones: conecta temas de conversaciones anteriores.`
+    : `REGLAS DE USO DEL CONTEXTO (BÁSICO):
+- Usa este contexto para personalizar tus respuestas de forma natural y sutil.
+- No menciones explícitamente "según tus datos". Simplemente intégralo.
+- Si el usuario tiene buena racha, puedes decir "Has mantenido buena consistencia."
+- No repitas la misma referencia en cada respuesta.
+- Si no hay contexto relevante, responde sin forzar referencias.
+- Mantén el tono calmado y profesional.`;
+
   return `${basePrompt}
 
 ═══ CONTEXTO DEL USUARIO (datos recientes) ═══
 ${contextBlock}
 ═══ FIN CONTEXTO ═══
 
-REGLAS DE USO DEL CONTEXTO:
-- Usa este contexto para personalizar tus respuestas de forma natural y sutil.
-- No menciones explícitamente "según tus datos" o "veo en tu registro". Simplemente intégralo.
-- Ejemplo: si el usuario tiene buena racha de hábitos, di algo como "Has mantenido buena consistencia estos días."
-- Ejemplo: si el estrés ha subido, di algo como "Últimamente el estrés ha estado más presente."
-- No repitas la misma referencia contextual en cada respuesta. Varía.
-- Si no hay contexto relevante para la pregunta, responde sin forzar referencias.
-- Mantén el tono calmado y premium. No seas invasivo ni excesivamente emocional.`;
+${contextRules}`;
 }

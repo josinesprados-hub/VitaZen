@@ -24,6 +24,12 @@ import {
   Inbox,
   MessageSquareOff,
   BrainCircuit,
+  Crown,
+  Zap,
+  Infinity as InfinityIcon,
+  ShieldCheck,
+  BookOpen,
+  Lightbulb,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -107,10 +113,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [dailyLimit, setDailyLimit] = useState<number>(15);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [historyLimited, setHistoryLimited] = useState(false);
 
   // Tab: 'active' | 'archived'
   const [tab, setTab] = useState<'active' | 'archived'>('active');
@@ -135,6 +143,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   // Persist active thread in localStorage
   const STORAGE_KEY = 'vitazen_active_thread';
+
+  const isPremium = user?.plan === 'PREMIUM';
 
   // Close context menu on click outside
   useEffect(() => {
@@ -178,6 +188,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         const data = await res.json();
         const allThreads: Thread[] = data.threads;
         setThreads(allThreads);
+        setHistoryLimited(!!data.historyLimited);
         if (allThreads.length > 0) {
           let savedThreadId: string | null = null;
           try { savedThreadId = localStorage.getItem(STORAGE_KEY); } catch {}
@@ -198,6 +209,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (res.ok) {
         const data = await res.json();
         setMessages(data.messages);
+        setHistoryLimited(!!data.historyLimited);
       }
     } catch (e) { console.error(e); }
   }, [apiFetch]);
@@ -319,8 +331,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       });
 
       if (res.status === 403) {
+        const data = await res.json();
         setShowLimitModal(true);
         setRemaining(0);
+        setDailyLimit(data.limit || 15);
+        // Remove the optimistic user message since it was blocked
+        setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         return;
       }
 
@@ -334,6 +350,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         };
         setMessages(prev => [...prev, assistantMessage]);
         setRemaining(data.remaining);
+        setDailyLimit(data.limit || 15);
         setIsContextual(!!data.contextual);
 
         // Refresh threads to get updated title and updatedAt
@@ -341,6 +358,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         if (threadsRes.ok) {
           const threadsData = await threadsRes.json();
           setThreads(threadsData.threads);
+          setHistoryLimited(!!threadsData.historyLimited);
         }
       }
     } catch (e) { console.error(e); }
@@ -364,6 +382,15 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }, {});
 
   const dateGroupOrder = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Anterior'];
+
+  // Progress bar color based on remaining messages
+  const getProgressColor = (rem: number, limit: number) => {
+    if (!isFinite(limit)) return '#c8a55a';
+    const pct = rem / limit;
+    if (pct > 0.5) return '#c8a55a';
+    if (pct > 0.25) return '#e8a849';
+    return '#ef4444';
+  };
 
   // ─────────────────────────────────────────
   // Context menu handler
@@ -401,11 +428,40 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             <IconComponent size={24} className="text-[#c8a55a]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">Mentor IA</h1>
-            <p className="text-[#999] text-xs">Tu guía experto de desarrollo personal</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold text-white">Mentor IA</h1>
+              {/* Discreet Premium badge */}
+              {isPremium && (
+                <span className="premium-badge inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
+                  <Crown size={10} className="shrink-0" />
+                  Premium
+                </span>
+              )}
+            </div>
+            <p className="text-[#999] text-xs">
+              {isPremium
+                ? 'Tu mentor experto con memoria avanzada'
+                : 'Tu guía de desarrollo personal'}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* Message counter pill for FREE users */}
+          {!isPremium && remaining !== null && (
+            <div className="message-counter-pill flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a]">
+              <Zap size={12} className={remaining <= 3 ? 'text-red-400' : 'text-[#c8a55a]'} />
+              <span className={remaining <= 3 ? 'text-red-400' : 'text-[#c8a55a]'}>
+                {remaining}/{dailyLimit}
+              </span>
+            </div>
+          )}
+          {/* Premium infinity indicator */}
+          {isPremium && (
+            <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/15">
+              <InfinityIcon size={12} className="text-[#c8a55a]" />
+              <span className="text-[#c8a55a]">Sin límite</span>
+            </div>
+          )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
@@ -508,7 +564,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         onClick={() => {
                           if (editingThreadId !== thread.id) {
                             setActiveThread(thread.id);
-                            // If opening an archived thread, keep it visible in chat
                           }
                         }}
                       >
@@ -601,23 +656,56 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             )}
           </div>
 
-          {/* Message counter for FREE users */}
-          {user?.plan === 'FREE' && remaining !== null && (
+          {/* Message counter for FREE users — elegant bottom bar */}
+          {!isPremium && remaining !== null && (
             <div className="p-3 border-t border-[#1a1a1a]">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-[#666]">Mensajes hoy</span>
-                <span className="text-[#c8a55a] font-medium">
-                  {remaining === Infinity ? '∞' : remaining}
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-[#666] flex items-center gap-1.5">
+                  <Zap size={10} />
+                  Mensajes hoy
+                </span>
+                <span className={`font-semibold ${
+                  remaining === 0 ? 'text-red-400' :
+                  remaining <= 3 ? 'text-[#e8a849]' :
+                  'text-[#c8a55a]'
+                }`}>
+                  {remaining}/{dailyLimit}
                 </span>
               </div>
-              {remaining !== Infinity && (
-                <div className="mt-1.5 h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#c8a55a] rounded-full transition-all duration-500"
-                    style={{ width: `${(remaining / 10) * 100}%` }}
-                  />
-                </div>
+              <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700 ease-out"
+                  style={{
+                    width: `${Math.max((remaining / dailyLimit) * 100, 0)}%`,
+                    backgroundColor: getProgressColor(remaining, dailyLimit),
+                  }}
+                />
+              </div>
+              {remaining <= 3 && remaining > 0 && (
+                <p className="text-[10px] text-[#e8a849] mt-1.5 flex items-center gap-1">
+                  <Crown size={10} />
+                  Premium sin límites
+                </p>
               )}
+              {remaining === 0 && (
+                <button
+                  onClick={() => setShowLimitModal(true)}
+                  className="w-full mt-2 text-[10px] text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-lg py-1.5 hover:bg-[#c8a55a]/15 transition-colors flex items-center justify-center gap-1"
+                >
+                  <Crown size={10} />
+                  Desbloquear mensajes ilimitados
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Premium contextual memory indicator in sidebar */}
+          {isPremium && (
+            <div className="p-3 border-t border-[#1a1a1a]">
+              <div className="flex items-center gap-2 text-[10px] text-[#c8a55a]/70">
+                <BrainCircuit size={12} className="shrink-0" />
+                <span>Memoria contextual avanzada</span>
+              </div>
             </div>
           )}
         </div>
@@ -755,16 +843,24 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     <button
                       onMouseEnter={() => setShowContextTooltip(true)}
                       onMouseLeave={() => setShowContextTooltip(false)}
-                      className="flex items-center gap-1.5 text-[10px] text-[#c8a55a]/70 hover:text-[#c8a55a] transition-colors px-2 py-1 rounded-full border border-[#c8a55a]/15 hover:border-[#c8a55a]/30"
+                      className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
+                        isPremium
+                          ? 'text-[#c8a55a]/80 hover:text-[#c8a55a] border-[#c8a55a]/20 hover:border-[#c8a55a]/40'
+                          : 'text-[#c8a55a]/60 hover:text-[#c8a55a] border-[#c8a55a]/15 hover:border-[#c8a55a]/30'
+                      }`}
                     >
                       <BrainCircuit size={12} className="shrink-0" />
-                      <span className="hidden sm:inline">Contextual activo</span>
+                      <span className="hidden sm:inline">
+                        {isPremium ? 'Contexto avanzado' : 'Contextual activo'}
+                      </span>
                     </button>
                     {/* Tooltip */}
                     {showContextTooltip && (
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2 shadow-xl context-menu z-10">
+                      <div className="absolute right-0 top-full mt-2 w-60 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 shadow-xl context-menu z-10">
                         <p className="text-[11px] text-[#999] leading-relaxed">
-                          El mentor usa tu actividad reciente para personalizar respuestas.
+                          {isPremium
+                            ? 'El mentor usa tu actividad, emociones y conversaciones previas para ofrecerte respuestas profundas y personalizadas.'
+                            : 'El mentor usa tu actividad reciente para personalizar respuestas.'}
                         </p>
                       </div>
                     )}
@@ -782,8 +878,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       </div>
                       <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
                       <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
-                        {user?.plan === 'PREMIUM'
-                          ? 'Soy tu mentor experto en desarrollo personal. Pregúntame lo que necesites sobre hábitos, mindset, productividad o crecimiento personal.'
+                        {isPremium
+                          ? 'Soy tu mentor experto con memoria avanzada. Recuerdo tu progreso, emociones y conversaciones para ofrecerte orientación profundamente personalizada.'
                           : 'Soy tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
                       </p>
                       <div className="flex flex-wrap justify-center gap-2 mt-4">
@@ -817,6 +913,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       className={`max-w-[80%] rounded-2xl p-4 ${
                         msg.role === 'user'
                           ? 'bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-br-md'
+                          : isPremium
+                          ? 'bg-[#080808] border border-[#c8a55a]/10 rounded-bl-md'
                           : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
                       }`}
                     >
@@ -826,7 +924,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 ))}
                 {sending && (
                   <div className="flex justify-start animate-in">
-                    <div className="bg-[#000000] border border-[#1a1a1a] rounded-2xl rounded-bl-md p-4">
+                    <div className={`border rounded-2xl rounded-bl-md p-4 ${
+                      isPremium ? 'bg-[#080808] border-[#c8a55a]/10' : 'bg-[#000000] border-[#1a1a1a]'
+                    }`}>
                       <div className="flex gap-1.5">
                         <span className="w-2 h-2 bg-[#c8a55a] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                         <span className="w-2 h-2 bg-[#c8a55a] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -838,8 +938,22 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input */}
+              {/* Input area with inline limit warning */}
               <div className="p-4 border-t border-[#1a1a1a]">
+                {/* Low message warning */}
+                {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
+                  <div className="mb-2 flex items-center gap-2 text-[10px] text-[#e8a849] bg-[#e8a849]/5 border border-[#e8a849]/10 rounded-lg px-3 py-1.5">
+                    <Zap size={10} className="shrink-0" />
+                    <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
+                    <button
+                      onClick={() => setShowLimitModal(true)}
+                      className="ml-auto text-[#c8a55a] hover:text-[#d4b468] flex items-center gap-1"
+                    >
+                      <Crown size={10} />
+                      Premium
+                    </button>
+                  </div>
+                )}
                 <form
                   onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
                   className="flex gap-2"
@@ -849,13 +963,21 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Escribe tu mensaje..."
-                    className="flex-1 bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3 text-white text-sm placeholder-[#555] focus:border-[#c8a55a] transition-colors"
-                    disabled={sending}
+                    placeholder={
+                      !isPremium && remaining === 0
+                        ? 'Límite diario alcanzado'
+                        : 'Escribe tu mensaje...'
+                    }
+                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-sm placeholder-[#555] transition-colors ${
+                      !isPremium && remaining === 0
+                        ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
+                        : 'border-[#1a1a1a] focus:border-[#c8a55a]'
+                    }`}
+                    disabled={sending || (!isPremium && remaining === 0)}
                   />
                   <button
                     type="submit"
-                    disabled={sending || !input.trim()}
+                    disabled={sending || !input.trim() || (!isPremium && remaining === 0)}
                     className="bg-[#c8a55a] text-black font-semibold px-5 py-3 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Send size={18} />
@@ -883,31 +1005,69 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         </div>
       </div>
 
-      {/* ────────── Limit Modal ────────── */}
+      {/* ────────── Premium Limit Modal ────────── */}
       {showLimitModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-in">
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-8 max-w-md w-full text-center context-menu">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
-              <Lock size={32} className="text-[#c8a55a]" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Límite diario alcanzado</h3>
-            <p className="text-[#999] mb-6 text-sm leading-relaxed">
-              Has utilizado tus 10 mensajes diarios del plan Free. Mejora a Premium para disfrutar de mensajes ilimitados y un mentor más avanzado.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <Link
-                href="/pricing"
-                className="bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
-                onClick={() => setShowLimitModal(false)}
-              >
-                Mejorar a Premium
-              </Link>
-              <button
-                onClick={() => setShowLimitModal(false)}
-                className="text-[#999] px-6 py-3 hover:text-white transition-colors text-sm"
-              >
-                Cerrar
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 premium-modal-backdrop">
+          <div className="premium-modal bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
+            {/* Gradient top accent */}
+            <div className="h-1 bg-gradient-to-r from-[#c8a55a]/0 via-[#c8a55a] to-[#c8a55a]/0" />
+
+            <div className="p-8 text-center">
+              {/* Icon */}
+              <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 border border-[#c8a55a]/20 flex items-center justify-center mx-auto mb-5">
+                <Crown size={28} className="text-[#c8a55a]" />
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-2">
+                Has alcanzado el límite diario
+              </h3>
+              <p className="text-[#999] mb-6 text-sm leading-relaxed">
+                Tu plan Free incluye {dailyLimit} mensajes diarios con el Mentor IA. Con Premium, disfrutarás de una experiencia sin límites y mucho más personal.
+              </p>
+
+              {/* Benefits grid */}
+              <div className="grid grid-cols-2 gap-3 mb-6 text-left">
+                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
+                  <MessageCircle size={16} className="text-[#c8a55a] mb-2" />
+                  <p className="text-xs text-white font-medium mb-0.5">Mensajes ilimitados</p>
+                  <p className="text-[10px] text-[#666]">Conversaciones sin límite diario</p>
+                </div>
+                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
+                  <BrainCircuit size={16} className="text-[#c8a55a] mb-2" />
+                  <p className="text-xs text-white font-medium mb-0.5">Memoria avanzada</p>
+                  <p className="text-[10px] text-[#666]">Mentor que recuerda tu progreso</p>
+                </div>
+                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
+                  <BookOpen size={16} className="text-[#c8a55a] mb-2" />
+                  <p className="text-xs text-white font-medium mb-0.5">Historial completo</p>
+                  <p className="text-[10px] text-[#666]">Acceso a todas tus conversaciones</p>
+                </div>
+                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
+                  <Lightbulb size={16} className="text-[#c8a55a] mb-2" />
+                  <p className="text-xs text-white font-medium mb-0.5">Insights inteligentes</p>
+                  <p className="text-[10px] text-[#666]">Respuestas más profundas y útiles</p>
+                </div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="space-y-3">
+                <Link
+                  href="/pricing"
+                  className="block w-full bg-[#c8a55a] text-black font-semibold py-3.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm text-center"
+                  onClick={() => setShowLimitModal(false)}
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <Crown size={16} />
+                    Mejorar a Premium
+                  </span>
+                </Link>
+                <button
+                  onClick={() => setShowLimitModal(false)}
+                  className="w-full text-[#666] py-2.5 hover:text-[#999] transition-colors text-sm"
+                >
+                  Continuar con el plan Free
+                </button>
+              </div>
             </div>
           </div>
         </div>

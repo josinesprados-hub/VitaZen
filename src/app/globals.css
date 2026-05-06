@@ -109,3 +109,53 @@ html { scroll-behavior: smooth; }
 .archive-badge {
   animation: archivePulse 2s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════
+   Premium Mentor Styles
+   ═══════════════════════════════════════════ */
+
+/* Premium badge subtle shimmer */
+.premium-badge {
+  animation: premiumShimmer 3s ease-in-out infinite;
+}
+@keyframes premiumShimmer {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* Premium modal backdrop with blur */
+.premium-modal-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Premium modal entrance */
+.premium-modal {
+  animation: premiumModalIn 0.3s ease-out both;
+}
+@keyframes premiumModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Message counter pill hover */
+.message-counter-pill {
+  transition: all 0.2s ease;
+}
+.message-counter-pill:hover {
+  border-color: #3a3a3a;
+  background-color: #1a1a1a;
+}
+
+/* Progress bar smooth animation */
+.h-1\.5 > div {
+  transition: width 0.7s ease-out, background-color 0.5s ease;
+}

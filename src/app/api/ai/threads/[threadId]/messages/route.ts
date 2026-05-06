@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 
+// FREE users see last 50 messages per thread, PREMIUM sees all
+const MESSAGES_LIMIT_FREE = 50;
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ threadId: string }> }
@@ -28,12 +31,20 @@ export async function GET(
       return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
 
+    const isPremium = user.plan === 'PREMIUM';
+
+    // FREE users see limited messages, PREMIUM sees all
     const messages = await db.aIMessage.findMany({
       where: { threadId },
       orderBy: { createdAt: 'asc' },
+      ...(isPremium ? {} : { take: MESSAGES_LIMIT_FREE }),
     });
 
-    return NextResponse.json({ messages });
+    return NextResponse.json({
+      messages,
+      historyLimited: !isPremium,
+      historyLimit: MESSAGES_LIMIT_FREE,
+    });
   } catch (error) {
     console.error('Get messages error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

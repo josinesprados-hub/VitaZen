@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
-import { checkAILimit, incrementAIUsage } from '@/lib/limits';
+import { checkAILimit, incrementAIUsage, getDailyLimit } from '@/lib/limits';
 import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
 
 export async function POST(request: NextRequest) {
@@ -18,6 +18,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const isPremium = user.plan === 'PREMIUM';
+    const dailyLimit = getDailyLimit(user.plan);
+
     // Check AI limits
     const limitCheck = await checkAILimit(user.id, user.plan);
     if (!limitCheck.allowed) {
@@ -25,6 +28,8 @@ export async function POST(request: NextRequest) {
         {
           error: 'Daily message limit reached. Upgrade to Premium for unlimited messages.',
           remaining: 0,
+          limit: dailyLimit,
+          plan: user.plan,
         },
         { status: 403 }
       );
@@ -54,19 +59,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Get conversation history (last 20 messages)
+    // Get conversation history: FREE last 10 messages, PREMIUM last 30
+    const historyLimit = isPremium ? 30 : 10;
     const history = await db.aIMessage.findMany({
       where: { threadId },
       orderBy: { createdAt: 'asc' },
-      take: 20,
+      take: historyLimit,
     });
 
     // Build contextual system prompt with user's recent activity
-    const basePrompt = user.plan === 'PREMIUM' ? SYSTEM_PROMPTS.PREMIUM : SYSTEM_PROMPTS.FREE;
+    const basePrompt = isPremium ? SYSTEM_PROMPTS.PREMIUM : SYSTEM_PROMPTS.FREE;
     let systemPrompt: string = basePrompt;
 
     try {
-      const userContext = await buildMentorContext(user.id);
+      const userContext = await buildMentorContext(user.id, user.plan);
       systemPrompt = buildContextualSystemPrompt(basePrompt, userContext);
     } catch (ctxError) {
       // If context building fails, fall back to base prompt — never block the chat
@@ -81,12 +87,12 @@ export async function POST(request: NextRequest) {
       })),
     ];
 
-    // Call Groq API
+    // Call Groq API — PREMIUM gets more tokens and creativity
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: groqMessages,
-      temperature: user.plan === 'PREMIUM' ? 0.8 : 0.5,
-      max_tokens: user.plan === 'PREMIUM' ? 2048 : 512,
+      temperature: isPremium ? 0.8 : 0.5,
+      max_tokens: isPremium ? 2048 : 800,
     });
 
     const assistantContent = completion.choices[0]?.message?.content || 'Lo siento, no pude generar una respuesta.';
@@ -101,7 +107,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Increment usage for FREE users
-    if (user.plan !== 'PREMIUM') {
+    if (!isPremium) {
       await incrementAIUsage(user.id);
     }
 
@@ -152,7 +158,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: assistantContent,
       remaining: newLimitCheck.remaining,
+      limit: dailyLimit,
       contextual: true,
+      plan: user.plan,
     });
   } catch (error) {
     console.error('AI chat error:', error);

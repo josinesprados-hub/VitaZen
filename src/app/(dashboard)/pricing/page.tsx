@@ -75,8 +75,10 @@ export default function PricingPage() {
 
           <ul className="space-y-3 mb-8">
             {[
-              '10 mensajes IA diarios',
+              '15 mensajes IA diarios',
               'Mentor IA básico',
+              'Memoria contextual básica',
+              'Historial de conversaciones reciente',
               'Acceso a los 5 imperios',
               'Consejos básicos',
               'Desafíos diarios',
@@ -124,12 +126,15 @@ export default function PricingPage() {
             {[
               'Mensajes IA ilimitados',
               'Mentor IA avanzado y profundo',
+              'Memoria contextual avanzada',
+              'Historial completo de conversaciones',
               'Acceso a los 5 imperios',
               'Consejos premium exclusivos',
               'Desafíos diarios',
               'Seguimiento completo',
               'Análisis y recomendaciones',
               'Contenido premium en cada imperio',
+              'Acceso prioritario a nuevas funciones',
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3 text-sm text-white">
                 <Check size={16} className="text-[#c8a55a] shrink-0" />

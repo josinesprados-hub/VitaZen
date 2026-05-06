@@ -5,6 +5,9 @@ import { db } from '@/lib/db';
 const MAX_THREADS_FREE = 20;
 const MAX_THREADS_PREMIUM = 100;
 
+// History limits: FREE sees last 10 threads, PREMIUM sees all
+const HISTORY_LIMIT_FREE = 10;
+
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
@@ -18,6 +21,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const isPremium = user.plan === 'PREMIUM';
+
     // Support ?archived=true|false filter
     const { searchParams } = new URL(request.url);
     const archivedParam = searchParams.get('archived');
@@ -29,9 +34,13 @@ export async function GET(request: NextRequest) {
     }
     // If no param, return all threads (both active and archived)
 
+    // FREE users see limited recent threads, PREMIUM sees all
+    const threadLimit = isPremium ? undefined : HISTORY_LIMIT_FREE;
+
     const threads = await db.aIThread.findMany({
       where,
       orderBy: { updatedAt: 'desc' },
+      take: threadLimit,
       include: {
         messages: {
           orderBy: { createdAt: 'desc' },
@@ -40,7 +49,11 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ threads });
+    return NextResponse.json({
+      threads,
+      historyLimited: !isPremium,
+      historyLimit: HISTORY_LIMIT_FREE,
+    });
   } catch (error) {
     console.error('Get threads error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

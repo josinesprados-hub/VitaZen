@@ -1,7 +1,14 @@
 import { db } from './db';
 import { startOfDay, addDays } from 'date-fns';
 
-const FREE_DAILY_LIMIT = 10;
+const FREE_DAILY_LIMIT = 15;
+
+/**
+ * Get the daily message limit for a given plan.
+ */
+export function getDailyLimit(plan: string): number {
+  return plan === 'PREMIUM' ? Infinity : FREE_DAILY_LIMIT;
+}
 
 export async function checkAILimit(userId: string, plan: string): Promise<{ allowed: boolean; remaining: number }> {
   if (plan === 'PREMIUM') {
