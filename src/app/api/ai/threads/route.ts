@@ -18,8 +18,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Support ?archived=true|false filter
+    const { searchParams } = new URL(request.url);
+    const archivedParam = searchParams.get('archived');
+    const where: Record<string, unknown> = { userId: user.id };
+    if (archivedParam === 'true') {
+      where.archived = true;
+    } else if (archivedParam === 'false') {
+      where.archived = false;
+    }
+    // If no param, return all threads (both active and archived)
+
     const threads = await db.aIThread.findMany({
-      where: { userId: user.id },
+      where,
       orderBy: { updatedAt: 'desc' },
       include: {
         messages: {
@@ -51,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const maxThreads = user.plan === 'PREMIUM' ? MAX_THREADS_PREMIUM : MAX_THREADS_FREE;
     const threadCount = await db.aIThread.count({
-      where: { userId: user.id },
+      where: { userId: user.id, archived: false },
     });
 
     if (threadCount >= maxThreads) {
@@ -90,10 +101,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const { threadId, title } = await request.json();
+    const { threadId, title, archived } = await request.json();
 
-    if (!threadId || !title) {
-      return NextResponse.json({ error: 'threadId and title required' }, { status: 400 });
+    if (!threadId) {
+      return NextResponse.json({ error: 'threadId required' }, { status: 400 });
     }
 
     const thread = await db.aIThread.findFirst({
@@ -104,14 +115,18 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
 
+    const data: Record<string, unknown> = {};
+    if (title !== undefined) data.title = (title as string).slice(0, 100);
+    if (archived !== undefined) data.archived = archived;
+
     const updated = await db.aIThread.update({
       where: { id: threadId },
-      data: { title: title.slice(0, 100) },
+      data,
     });
 
     return NextResponse.json({ thread: updated });
   } catch (error) {
-    console.error('Rename thread error:', error);
+    console.error('Update thread error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -139,6 +154,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
 
+    // Delete thread — cascade deletes associated messages
     await db.aIThread.delete({ where: { id: threadId } });
 
     return NextResponse.json({ success: true });

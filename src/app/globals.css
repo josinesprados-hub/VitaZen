@@ -91,3 +91,21 @@ html { scroll-behavior: smooth; }
 .sidebar-transition {
   transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
+
+/* Context menu animation */
+@keyframes contextMenuIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.context-menu {
+  animation: contextMenuIn 0.18s ease-out both;
+}
+
+/* Archive badge pulse */
+@keyframes archivePulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.archive-badge {
+  animation: archivePulse 2s ease-in-out infinite;
+}
