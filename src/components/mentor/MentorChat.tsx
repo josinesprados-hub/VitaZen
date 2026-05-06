@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   Inbox,
   MessageSquareOff,
+  BrainCircuit,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -123,6 +124,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   // Delete confirmation modal
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Contextual indicator
+  const [isContextual, setIsContextual] = useState(false);
+  const [showContextTooltip, setShowContextTooltip] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
@@ -329,6 +334,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         };
         setMessages(prev => [...prev, assistantMessage]);
         setRemaining(data.remaining);
+        setIsContextual(!!data.contextual);
 
         // Refresh threads to get updated title and updatedAt
         const threadsRes = await apiFetch('/api/ai/threads');
@@ -743,6 +749,27 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     </span>
                   )}
                 </div>
+                {/* Contextual indicator */}
+                {isContextual && (
+                  <div className="relative shrink-0">
+                    <button
+                      onMouseEnter={() => setShowContextTooltip(true)}
+                      onMouseLeave={() => setShowContextTooltip(false)}
+                      className="flex items-center gap-1.5 text-[10px] text-[#c8a55a]/70 hover:text-[#c8a55a] transition-colors px-2 py-1 rounded-full border border-[#c8a55a]/15 hover:border-[#c8a55a]/30"
+                    >
+                      <BrainCircuit size={12} className="shrink-0" />
+                      <span className="hidden sm:inline">Contextual activo</span>
+                    </button>
+                    {/* Tooltip */}
+                    {showContextTooltip && (
+                      <div className="absolute right-0 top-full mt-2 w-56 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2 shadow-xl context-menu z-10">
+                        <p className="text-[11px] text-[#999] leading-relaxed">
+                          El mentor usa tu actividad reciente para personalizar respuestas.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Messages */}

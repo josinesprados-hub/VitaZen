@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
 import { checkAILimit, incrementAIUsage } from '@/lib/limits';
+import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,8 +61,17 @@ export async function POST(request: NextRequest) {
       take: 20,
     });
 
-    // Build messages for Groq
-    const systemPrompt = user.plan === 'PREMIUM' ? SYSTEM_PROMPTS.PREMIUM : SYSTEM_PROMPTS.FREE;
+    // Build contextual system prompt with user's recent activity
+    const basePrompt = user.plan === 'PREMIUM' ? SYSTEM_PROMPTS.PREMIUM : SYSTEM_PROMPTS.FREE;
+    let systemPrompt: string = basePrompt;
+
+    try {
+      const userContext = await buildMentorContext(user.id);
+      systemPrompt = buildContextualSystemPrompt(basePrompt, userContext);
+    } catch (ctxError) {
+      // If context building fails, fall back to base prompt — never block the chat
+      console.error('Context build error (non-blocking):', ctxError);
+    }
 
     const groqMessages = [
       { role: 'system' as const, content: systemPrompt },
@@ -142,6 +152,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: assistantContent,
       remaining: newLimitCheck.remaining,
+      contextual: true,
     });
   } catch (error) {
     console.error('AI chat error:', error);
