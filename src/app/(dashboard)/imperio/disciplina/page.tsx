@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 
 interface Habit {
   id: string;
@@ -263,7 +264,14 @@ export default function DisciplinaPage() {
         )}
 
         {habits.length === 0 ? (
-          <p className="text-[#666] text-sm text-center py-8">Aún no tienes hábitos. Crea el primero y comienza tu transformación.</p>
+          <PremiumEmptyState
+            icon={Check}
+            title="Aún no tienes hábitos"
+            subtitle="Crea el primero y comienza tu transformación"
+            cta="Añadir hábito"
+            onCta={() => setShowAddHabit(true)}
+            size="sm"
+          />
         ) : (
           <div className="space-y-2.5 max-h-96 overflow-y-auto">
             {habits.map((habit) => (

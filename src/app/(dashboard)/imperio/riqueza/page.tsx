@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2 } from 'lucide-react';
+import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2, Wallet } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 
 interface FinanceLog {
   id: string;
@@ -261,7 +262,14 @@ export default function RiquezaPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primer movimiento y toma control de tus finanzas</p>
+          <PremiumEmptyState
+            icon={Wallet}
+            title="Sin movimientos registrados"
+            subtitle="Registra tu primer movimiento y toma control de tus finanzas"
+            cta="Añadir movimiento"
+            onCta={() => setShowAdd(true)}
+            size="sm"
+          />
         )}
       </div>
 

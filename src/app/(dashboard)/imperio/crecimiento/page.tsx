@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { TrendingUp, Plus, BookOpen, Heart, Lightbulb, Pencil, Trash2 } from 'lucide-react';
+import { TrendingUp, Plus, BookOpen, Heart, Lightbulb, Pencil, Trash2, BookOpenText } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 
 interface JournalEntry {
   id: string;
@@ -267,7 +268,14 @@ export default function CrecimientoPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-8">Escribe tu primera entrada y comienza a documentar tu evolución</p>
+          <PremiumEmptyState
+            icon={BookOpenText}
+            title="Tu diario está en blanco"
+            subtitle="Escribe tu primera entrada y comienza a documentar tu evolución"
+            cta="Nueva entrada"
+            onCta={() => setShowAdd(true)}
+            size="sm"
+          />
         )}
       </div>
 

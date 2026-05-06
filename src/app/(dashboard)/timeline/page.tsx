@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import {
   Wind,
   BookOpen,
@@ -178,13 +179,12 @@ export default function TimelinePage() {
       {loading ? (
         <TimelineSkeleton />
       ) : items.length === 0 ? (
-        <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-full bg-[#0a0a0a] border border-[#1a1a1a] flex items-center justify-center mx-auto mb-4">
-            <Clock size={24} className="text-[#555]" />
-          </div>
-          <p className="text-[#666] text-sm">Aún no hay actividad registrada</p>
-          <p className="text-[#444] text-xs mt-1">Comienza registrando tu primera actividad</p>
-        </div>
+        <PremiumEmptyState
+          icon={Clock}
+          title="Aún no hay actividad registrada"
+          subtitle="Comienza registrando tu primera actividad"
+          size="lg"
+        />
       ) : (
         <div className="relative">
           {/* Vertical line */}

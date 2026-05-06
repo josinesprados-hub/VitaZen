@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import {
   Sunrise,
   TrendingUp,
@@ -238,13 +239,14 @@ export default function CheckinPage() {
         </div>
 
         {checkins.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-14 h-14 rounded-full bg-[#0a0a0a] border border-[#1a1a1a] flex items-center justify-center mx-auto mb-4">
-              <Sunrise size={22} className="text-[#555]" />
-            </div>
-            <p className="text-[#555] text-sm">Aún no tienes check-ins registrados</p>
-            <p className="text-[#444] text-xs mt-1">Comienza con tu primer check-in diario</p>
-          </div>
+        <PremiumEmptyState
+          icon={Sunrise}
+          title="Aún no tienes check-ins registrados"
+          subtitle="Comienza con tu primer check-in diario"
+          cta="Hacer check-in"
+          onCta={() => setShowModal(true)}
+          size="md"
+        />
         ) : (
           <div className="space-y-2">
             {checkins.map((c) => (

@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Droplets, Flame, Apple, Lightbulb, Pencil, Trash2 } from 'lucide-react';
+import { Zap, Droplets, Flame, Apple, Heart, Lightbulb, Pencil, Trash2 } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 
 interface WellnessLog {
   id: string;
@@ -319,7 +320,14 @@ export default function EnergiaPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primer estado del día y conoce tu bienestar</p>
+          <PremiumEmptyState
+            icon={Heart}
+            title="Sin registros de bienestar"
+            subtitle="Registra tu primer estado del día y conoce tu bienestar"
+            cta="Registrar hoy"
+            onCta={() => setShowWellness(true)}
+            size="sm"
+          />
         )}
       </div>
 
@@ -373,7 +381,14 @@ export default function EnergiaPage() {
             ))}
           </div>
         ) : (
-          <p className="text-[#666] text-sm text-center py-4">Registra tu primera comida y toma control de tu nutrición</p>
+          <PremiumEmptyState
+            icon={Apple}
+            title="Sin registros nutricionales"
+            subtitle="Registra tu primera comida y toma control de tu nutrición"
+            cta="Registrar hoy"
+            onCta={() => setShowNutrition(true)}
+            size="sm"
+          />
         )}
       </div>
 

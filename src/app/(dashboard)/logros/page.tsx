@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { LogrosSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import {
   Wind,
   BookOpen,
@@ -242,9 +243,12 @@ export default function LogrosPage() {
       )}
 
       {filteredAchievements.length === 0 && (
-        <div className="text-center py-20">
-          <p className="text-[#555] text-sm">No hay logros en esta categoría</p>
-        </div>
+        <PremiumEmptyState
+          icon={Trophy}
+          title="No hay logros en esta categoría"
+          subtitle="Explora otras categorías para ver tus logros"
+          size="md"
+        />
       )}
     </div>
   );

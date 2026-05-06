@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 
 interface Meditation {
   id: string;
@@ -486,13 +487,13 @@ export default function MentePage() {
         </div>
 
         {sessions.length === 0 ? (
-          <div className="text-center py-10">
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/5 flex items-center justify-center mx-auto mb-3">
-              <Wind size={20} className="text-[#c8a55a]/30" />
-            </div>
-            <p className="text-[#666] text-sm">Aún no tienes sesiones registradas</p>
-            <p className="text-[#555] text-xs mt-1">Completa una sesión de respiración para verla aquí</p>
-          </div>
+          <PremiumEmptyState
+            icon={Wind}
+            title="Aún no tienes sesiones registradas"
+            subtitle="Completa una sesión de respiración para verla aquí"
+            size="sm"
+            variant="gold"
+          />
         ) : (
           <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
             {sessions.map((session) => {

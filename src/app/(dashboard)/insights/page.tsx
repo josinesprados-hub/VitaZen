@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
 import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import {
   Sparkles,
   ArrowLeft,
@@ -161,11 +162,15 @@ export default function InsightsPage() {
 
   if (!data) {
     return (
-      <div className="max-w-4xl mx-auto text-center py-20">
-        <p className="text-[#999]">No se pudieron cargar los insights.</p>
-        <Link href="/dashboard" className="text-[#c8a55a] text-sm hover:underline mt-2 inline-block">
-          Volver al dashboard
-        </Link>
+      <div className="max-w-4xl mx-auto">
+        <PremiumEmptyState
+          icon={Sparkles}
+          title="No se pudieron cargar los insights"
+          subtitle="Inténtalo de nuevo más tarde"
+          cta="Volver al dashboard"
+          onCta={() => window.location.href = '/dashboard'}
+          size="lg"
+        />
       </div>
     );
   }
@@ -308,13 +313,13 @@ export default function InsightsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-10 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-4">
-            <Sparkles size={24} className="text-[#444]" />
-          </div>
-          <p className="text-[#555] text-sm font-medium mb-1">Sin insights esta semana</p>
-          <p className="text-[#444] text-xs">Registra más actividad para recibir insights personalizados</p>
-        </div>
+        <PremiumEmptyState
+          icon={Sparkles}
+          title="Sin insights esta semana"
+          subtitle="Registra más actividad para recibir insights personalizados"
+          size="md"
+          variant="gold"
+        />
       )}
 
       {/* Detailed Metrics Grid */}
