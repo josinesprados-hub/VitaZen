@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock } from 'lucide-react';
+import { CheckInModal } from '@/components/checkin/CheckInModal';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise } from 'lucide-react';
 
 const FRASES = [
   'La disciplina es el puente entre tus metas y tus logros.',
@@ -202,17 +203,20 @@ export default function DashboardPage() {
   const [progress, setProgress] = useState<{ meditation: { count: number; target: number; percent: number }; habits: { count: number; target: number; percent: number }; journal: { count: number; target: number; percent: number }; totalPercent: number } | null>(null);
   const [achievements, setAchievements] = useState<{ key: string; title: string; description: string; category: string; icon: string; target: number; current: number; percent: number; unlocked: boolean; unlockedAt: string | null }[] | null>(null);
   const [achievementsStats, setAchievementsStats] = useState<{ total: number; unlocked: number; percent: number } | null>(null);
+  const [todayCheckin, setTodayCheckin] = useState<any | null>(null);
+  const [showCheckinModal, setShowCheckinModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empRes, chRes, metRes, streakRes, progRes, achRes] = await Promise.all([
+        const [empRes, chRes, metRes, streakRes, progRes, achRes, checkRes] = await Promise.all([
           apiFetch('/api/empire'),
           apiFetch('/api/challenges'),
           apiFetch('/api/dashboard/metrics'),
           apiFetch('/api/dashboard/streaks'),
           apiFetch('/api/dashboard/progress'),
           apiFetch('/api/achievements'),
+          apiFetch('/api/checkin?mode=today'),
         ]);
 
         if (empRes.ok) {
@@ -244,6 +248,14 @@ export default function DashboardPage() {
           const achData = await achRes.json();
           setAchievements(achData.achievements);
           setAchievementsStats(achData.stats);
+        }
+
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          setTodayCheckin(checkData.today);
+          if (!checkData.today) {
+            setShowCheckinModal(true);
+          }
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -277,12 +289,57 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-12">
+      {/* Check-in Modal */}
+      {showCheckinModal && (
+        <CheckInModal
+          onClose={() => setShowCheckinModal(false)}
+          initialData={todayCheckin}
+          onSave={async (data) => {
+            const res = await apiFetch('/api/checkin', {
+              method: 'POST',
+              body: JSON.stringify(data),
+            });
+            if (res.ok) {
+              const result = await res.json();
+              setTodayCheckin(result.checkin);
+            }
+          }}
+        />
+      )}
+
       {/* Welcome */}
       <div>
-        <h1 className="text-3xl font-bold text-white">
-          Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
-        </h1>
-        <p className="text-[#999] mt-2">Construye tu imperio, un hábito a la vez.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white">
+              Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
+            </h1>
+            <p className="text-[#999] mt-2">Construye tu imperio, un hábito a la vez.</p>
+          </div>
+          {todayCheckin && (
+            <button
+              onClick={() => setShowCheckinModal(true)}
+              className="flex items-center gap-2 bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl px-4 py-2.5 hover:border-[#c8a55a]/40 transition-all group"
+            >
+              <Sunrise size={16} className="text-[#c8a55a]" />
+              <span className="text-xs text-[#999] group-hover:text-white transition-colors">Check-in de hoy</span>
+            </button>
+          )}
+        </div>
+        {todayCheckin && (
+          <div className="mt-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-4 py-3 flex items-center gap-4">
+            <span className="text-lg">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-[#c8a55a] font-medium truncate">«{todayCheckin.intention}»</p>
+              <p className="text-[10px] text-[#555]">
+                Energía {todayCheckin.energy}/5 · Enfoque {todayCheckin.focus}/5 · Estrés {todayCheckin.stress}/5
+              </p>
+            </div>
+            <Link href="/checkin" className="text-[10px] text-[#555] hover:text-[#c8a55a] transition-colors whitespace-nowrap">
+              Historial
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Metrics */}

@@ -36,6 +36,7 @@ model User {
   empireProgress    EmpireProgress[]
   passwordResetTokens PasswordResetToken[]
   achievements      Achievement[]
+  dailyCheckins     DailyCheckin[]
 }
 
 model PasswordResetToken {
@@ -263,5 +264,28 @@ model Achievement {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, key])
+  @@index([userId])
+}
+
+// ═══════════════════════════════════════════
+// DAILY CHECK-IN
+// ═══════════════════════════════════════════
+
+model DailyCheckin {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  emotion     Int      // 1-5 emotional state
+  energy      Int      // 1-5
+  focus       Int      // 1-5
+  stress      Int      // 1-5
+  intention   String   // daily intention
+  note        String?  // optional note
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
   @@index([userId])
 }

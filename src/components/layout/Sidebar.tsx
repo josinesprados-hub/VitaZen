@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Clock,
   Trophy,
+  Sunrise,
   CreditCard,
   LogOut,
   X,
@@ -102,6 +103,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               <Trophy size={18} />
               Logros
+            </Link>
+
+            <Link
+              href="/checkin"
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                pathname === '/checkin'
+                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+              }`}
+            >
+              <Sunrise size={18} />
+              Check-in
             </Link>
 
             <div className="pt-5 pb-2">
