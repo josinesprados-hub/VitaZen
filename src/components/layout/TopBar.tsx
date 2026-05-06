@@ -28,12 +28,12 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
         <div className="flex items-center gap-4">
           {user?.plan === 'FREE' && (
-            <span className="text-xs px-3 py-1 rounded-full border border-[#c8a55a]/30 text-[#c8a55a]">
+            <span className="badge-free">
               FREE
             </span>
           )}
           {user?.plan === 'PREMIUM' && (
-            <span className="text-xs px-3 py-1 rounded-full bg-[#c8a55a] text-black font-semibold">
+            <span className="badge-premium">
               PREMIUM
             </span>
           )}

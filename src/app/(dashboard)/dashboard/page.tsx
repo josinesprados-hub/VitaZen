@@ -298,7 +298,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12">
+    <div className="max-w-7xl mx-auto space-y-10">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -358,7 +358,7 @@ export default function DashboardPage() {
       {/* Metrics */}
       {metrics && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <Wind size={18} className="text-[#c8a55a]" />
@@ -374,7 +374,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <CheckCircle size={18} className="text-[#c8a55a]" />
@@ -390,7 +390,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <BookOpen size={18} className="text-[#c8a55a]" />
@@ -406,7 +406,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 hover:border-[#c8a55a]/20 transition-colors">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <Wallet size={18} className="text-[#c8a55a]" />
@@ -593,7 +593,7 @@ export default function DashboardPage() {
                 {/* Progress bar */}
                 <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2.5">
                   <div
-                    className="bg-[#c8a55a] h-2 rounded-full transition-all"
+                    className="bg-[#c8a55a] h-2 rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>

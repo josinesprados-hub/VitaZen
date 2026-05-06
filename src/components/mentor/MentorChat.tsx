@@ -432,7 +432,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               <h1 className="text-xl font-bold text-white">Mentor IA</h1>
               {/* Discreet Premium badge */}
               {isPremium && (
-                <span className="premium-badge inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
+                <span className="badge-premium gap-1">
                   <Crown size={10} className="shrink-0" />
                   Premium
                 </span>
@@ -793,8 +793,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
         {/* ────────── Delete Confirmation Modal ────────── */}
         {deleteConfirm && (
-          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-in">
-            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-8 max-w-sm w-full text-center context-menu">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+            <div className="modal-content-destructive p-8 max-w-sm w-full text-center">
               <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle size={28} className="text-red-400" />
               </div>

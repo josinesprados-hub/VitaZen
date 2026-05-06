@@ -19,14 +19,14 @@ const STATUS_CONFIG: Record<EmotionalStatus, {
   estable: {
     gradient: 'from-[#c8a55a]/8 via-[#0a0a0a] to-[#0a0a0a]',
     glowColor: 'rgba(200, 165, 90, 0.08)',
-    iconBg: 'bg-[#c8a55a]/12',
+    iconBg: 'bg-[#c8a55a]/10',
     label: 'Estable',
     pulseClass: '',
   },
   en_progreso: {
     gradient: 'from-[#c8a55a]/12 via-[#0a0a0a] to-[#0a0a0a]',
     glowColor: 'rgba(200, 165, 90, 0.12)',
-    iconBg: 'bg-[#c8a55a]/15',
+    iconBg: 'bg-[#c8a55a]/10',
     label: 'En progreso',
     pulseClass: 'hero-pulse-gold',
   },
@@ -40,7 +40,7 @@ const STATUS_CONFIG: Record<EmotionalStatus, {
   enfocado: {
     gradient: 'from-[#c8a55a]/15 via-[#0a0a0a] to-[#0a0a0a]',
     glowColor: 'rgba(200, 165, 90, 0.15)',
-    iconBg: 'bg-[#c8a55a]/18',
+    iconBg: 'bg-[#c8a55a]/10',
     label: 'Enfocado',
     pulseClass: 'hero-pulse-gold',
   },
@@ -206,7 +206,7 @@ export function EmotionalHero() {
               <div>
                 <div className="flex items-center gap-2.5 mb-1">
                   <h2 className="text-lg font-semibold text-white">Estado actual</h2>
-                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/15">
+                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
                     {config.label}
                   </span>
                 </div>

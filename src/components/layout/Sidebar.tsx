@@ -70,7 +70,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/dashboard"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === '/dashboard'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -83,7 +83,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/timeline"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === '/timeline'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -96,7 +96,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/logros"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === '/logros'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -109,7 +109,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/checkin"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === '/checkin'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -122,7 +122,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/insights"
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === '/insights'
                   ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
@@ -163,7 +163,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 <Link
                   href="/pricing"
                   onClick={onClose}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     pathname === '/pricing'
                       ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
                       : 'text-[#c8a55a] hover:bg-[#c8a55a]/10'

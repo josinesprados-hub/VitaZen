@@ -176,7 +176,7 @@ export default function InsightsPage() {
   const { summary, insights, comparison } = data;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-10">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

@@ -130,14 +130,13 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 modal-backdrop"
         onClick={onClose}
-        style={{ animation: 'fadeIn 0.3s ease-out' }}
       />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-md bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl overflow-hidden animate-in"
+        className="relative w-full max-w-md modal-content overflow-hidden"
       >
         {/* Close button */}
         <button
@@ -159,7 +158,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             </p>
             <button
               onClick={() => setStep(1)}
-              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+              className="w-full btn-primary py-3 rounded-xl text-sm"
             >
               Comenzar
             </button>
@@ -218,7 +217,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             <button
               onClick={handleSave}
               disabled={saving || !intention.trim()}
-              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full btn-primary py-3 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {saving ? 'Guardando...' : 'Confirmar check-in'}
             </button>
@@ -238,7 +237,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             <p className="text-[#c8a55a] font-medium italic mb-6">«{intention}»</p>
             <button
               onClick={onClose}
-              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+              className="w-full btn-primary py-3 rounded-xl text-sm"
             >
               Continuar
             </button>

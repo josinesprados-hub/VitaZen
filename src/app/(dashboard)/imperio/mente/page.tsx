@@ -212,11 +212,11 @@ export default function MentePage() {
       {/* Completion Overlay */}
       {completedSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
           onClick={() => setCompletedSession(null)}
         >
           <div
-            className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-10 text-center max-w-sm mx-4 animate-[scaleIn_300ms_ease-out]"
+            className="modal-content p-10 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
@@ -247,11 +247,11 @@ export default function MentePage() {
       {/* Edit Session Overlay */}
       {editingSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
           onClick={() => setEditingSession(null)}
         >
           <div
-            className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl p-8 max-w-sm mx-4 w-full animate-[scaleIn_300ms_ease-out]"
+            className="modal-content p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
@@ -307,11 +307,11 @@ export default function MentePage() {
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-[fadeIn_200ms_ease-out]"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
           onClick={() => setPendingDeleteId(null)}
         >
           <div
-            className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl p-8 text-center max-w-xs mx-4 animate-[scaleIn_300ms_ease-out]"
+            className="modal-content-destructive p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
