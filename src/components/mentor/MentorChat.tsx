@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { MentorSkeleton } from '@/components/ui/PremiumSkeleton';
 import {
   Brain,
   Send,
@@ -410,11 +411,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // ─────────────────────────────────────────
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Sparkles size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <MentorSkeleton />;
   }
 
   const IconComponent = headerIcon === 'brain' ? Brain : Sparkles;

@@ -313,6 +313,54 @@ html { scroll-behavior: smooth; }
   50% { opacity: 1; }
 }
 
+/* Premium skeleton shimmer — gold-tinted sweep on dark surface */
+.premium-shimmer {
+  background: linear-gradient(
+    110deg,
+    #111111 0%,
+    #111111 40%,
+    #1a1a1a 50%,
+    #111111 60%,
+    #111111 100%
+  );
+  background-size: 300% 100%;
+  animation: premiumSkeletonShimmer 2s ease-in-out infinite;
+}
+
+/* Subtle gold-tinted shimmer variant for accent elements */
+.premium-shimmer-gold {
+  background: linear-gradient(
+    110deg,
+    #111111 0%,
+    #111111 40%,
+    #1c1810 50%,
+    #111111 60%,
+    #111111 100%
+  );
+  background-size: 300% 100%;
+  animation: premiumSkeletonShimmer 2s ease-in-out infinite;
+}
+
+@keyframes premiumSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Skeleton entrance — fades in gently instead of appearing abruptly */
+.skeleton-entrance {
+  animation: skeletonEntrance 0.4s ease-out both;
+}
+@keyframes skeletonEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Archive badge pulse */
 .archive-badge {
   animation: archivePulse 2s ease-in-out infinite;

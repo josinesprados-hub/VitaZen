@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
+import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
 import {
   Sparkles,
   ArrowLeft,
@@ -155,11 +156,7 @@ export default function InsightsPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Sparkles size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <InsightsSkeleton />;
   }
 
   if (!data) {

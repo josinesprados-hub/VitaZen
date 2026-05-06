@@ -8,6 +8,7 @@ import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { OnboardingRecommendations } from '@/components/dashboard/OnboardingRecommendations';
 import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
+import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 
 const FRASES = [
@@ -292,11 +293,7 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-10 h-10 animate-pulse" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (

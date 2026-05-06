@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { LogrosSkeleton } from '@/components/ui/PremiumSkeleton';
 import {
   Wind,
   BookOpen,
@@ -123,11 +124,7 @@ export default function LogrosPage() {
   }, [apiFetch]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-10 h-10 animate-pulse" />
-      </div>
-    );
+    return <LogrosSkeleton />;
   }
 
   if (error) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { EmotionalHeroSkeleton } from '@/components/ui/PremiumSkeleton';
 import { Zap, Brain, Leaf, Repeat, TrendingUp, Activity, ArrowUpRight, ArrowDownRight, Minus, Sparkles } from 'lucide-react';
 import type { EmotionalStatus, EmotionalMetric, EmotionalState } from '@/lib/emotional-state';
 
@@ -158,27 +159,7 @@ export function EmotionalHero() {
 
   // Loading skeleton
   if (loading) {
-    return (
-      <div className="hero-section-container animate-pulse">
-        <div className="hero-section-card">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-[#1a1a1a]" />
-            <div className="space-y-2">
-              <div className="h-5 w-36 bg-[#1a1a1a] rounded" />
-              <div className="h-3 w-52 bg-[#111] rounded" />
-            </div>
-          </div>
-          <div className="flex justify-between px-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 rounded-full bg-[#1a1a1a]" />
-                <div className="h-2.5 w-12 bg-[#111] rounded" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <EmotionalHeroSkeleton />;
   }
 
   if (!state) return null;

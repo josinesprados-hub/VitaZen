@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
+import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
 import {
   Sunrise,
   TrendingUp,
@@ -126,11 +127,7 @@ export default function CheckinPage() {
   }, [fetchData]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-10 h-10 animate-pulse" />
-      </div>
-    );
+    return <CheckinSkeleton />;
   }
 
   return (

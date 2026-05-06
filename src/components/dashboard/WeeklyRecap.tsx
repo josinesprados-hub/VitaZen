@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { WeeklyRecapSkeleton } from '@/components/ui/PremiumSkeleton';
 import {
   CalendarRange,
   Activity,
@@ -172,24 +173,7 @@ export function WeeklyRecap() {
 
   // Loading skeleton
   if (loading) {
-    return (
-      <div className="recap-fade-in">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7 animate-pulse">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#1a1a1a]" />
-            <div className="space-y-2">
-              <div className="h-5 w-48 bg-[#1a1a1a] rounded" />
-              <div className="h-3 w-32 bg-[#111] rounded" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-[#111] rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <WeeklyRecapSkeleton />;
   }
 
   if (!data) return null;
