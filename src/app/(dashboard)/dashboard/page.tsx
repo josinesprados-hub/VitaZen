@@ -7,6 +7,7 @@ import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { OnboardingRecommendations } from '@/components/dashboard/OnboardingRecommendations';
+import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 
 const FRASES = [
@@ -323,6 +324,9 @@ export default function DashboardPage() {
 
       {/* Onboarding Recommendations */}
       <OnboardingRecommendations />
+
+      {/* Weekly Recap */}
+      <WeeklyRecap />
 
       {/* Welcome */}
       <div>
