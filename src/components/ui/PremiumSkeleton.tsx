@@ -593,7 +593,7 @@ export function CheckinSkeleton() {
               <SkeletonLine width="20%" className="h-2.5 mt-1" />
               <div className="flex items-end gap-1 h-16 mt-2">
                 {[1, 2, 3, 4, 5, 6, 7].map((bar) => (
-                  <SkeletonBlock key={bar} className="flex-1 rounded-t-sm" style={{ height: `${30 + Math.random() * 60}%` }} />
+                  <SkeletonBlock key={bar} className="flex-1 rounded-t-sm" style={{ height: `${30 + ((i * 17 + bar * 11) % 60)}%` }} />
                 ))}
               </div>
             </SkeletonCard>

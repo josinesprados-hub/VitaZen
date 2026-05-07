@@ -40,9 +40,12 @@ export default function PricingPage() {
         if (data.url) {
           window.location.href = data.url;
         }
+      } else {
+        alert('No se ha podido abrir el portal de gestión. Inténtalo de nuevo.');
       }
     } catch (error) {
       console.error('Portal error:', error);
+      alert('No se ha podido conectar con el servicio de pagos. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }

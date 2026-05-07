@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   Sunrise,
   TrendingUp,
@@ -91,10 +92,12 @@ export default function CheckinPage() {
   const [trends, setTrends] = useState<TrendsData | null>(null);
   const [todayCheckin, setTodayCheckin] = useState<CheckinData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const [todayRes, historyRes, trendsRes] = await Promise.all([
         apiFetch('/api/checkin?mode=today'),
@@ -116,8 +119,14 @@ export default function CheckinPage() {
         const data = await trendsRes.json();
         setTrends(data.trends || null);
       }
+
+      // If all three fail, show error
+      if (!todayRes.ok && !historyRes.ok && !trendsRes.ok) {
+        setFetchError(true);
+      }
     } catch (err) {
       console.error('[CHECKIN PAGE] Error:', err);
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -145,6 +154,19 @@ export default function CheckinPage() {
 
   if (loading) {
     return <CheckinSkeleton />;
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudieron cargar los check-ins"
+          onRetry={fetchData}
+          size="md"
+        />
+      </div>
+    );
   }
 
   return (

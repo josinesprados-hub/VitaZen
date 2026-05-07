@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 
 interface Meditation {
   id: string;
@@ -88,24 +89,29 @@ export default function MentePage() {
   const [editDuration, setEditDuration] = useState<number>(0);
   const [editType, setEditType] = useState<string>('');
   const [editSaving, setEditSaving] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+    try {
+      const [medRes, tipsRes] = await Promise.all([
+        apiFetch('/api/meditation'),
+        apiFetch('/api/empire/tips?empire=mente'),
+      ]);
+      if (medRes.ok) { const d = await medRes.json(); setSessions(d.sessions); }
+      if (tipsRes.ok) { const d = await tipsRes.json(); setTips(d.tips); }
+    } catch (error) {
+      console.error('Error:', error);
+      setFetchError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFetch]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [medRes, tipsRes] = await Promise.all([
-          apiFetch('/api/meditation'),
-          apiFetch('/api/empire/tips?empire=mente'),
-        ]);
-        if (medRes.ok) { const d = await medRes.json(); setSessions(d.sessions); }
-        if (tipsRes.ok) { const d = await tipsRes.json(); setTips(d.tips); }
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -128,13 +134,17 @@ export default function MentePage() {
     const duration = Math.max(1, Math.floor(timer / 60));
     const type = selectedType.type;
     setCompletedSession({ duration, type });
-    const res = await apiFetch('/api/meditation', {
-      method: 'POST',
-      body: JSON.stringify({ duration, type }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setSessions([data.session, ...sessions]);
+    try {
+      const res = await apiFetch('/api/meditation', {
+        method: 'POST',
+        body: JSON.stringify({ duration, type }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSessions([data.session, ...sessions]);
+      }
+    } catch (error) {
+      console.error('Error saving meditation:', error);
     }
     setTimer(0);
   };
@@ -204,6 +214,19 @@ export default function MentePage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <Brain size={32} className="text-[#c8a55a] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el imperio"
+          onRetry={fetchData}
+          size="md"
+        />
       </div>
     );
   }

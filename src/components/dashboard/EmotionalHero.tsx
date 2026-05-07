@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { EmotionalHeroSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { Zap, Brain, Leaf, Repeat, TrendingUp, Activity, ArrowUpRight, ArrowDownRight, Minus, Sparkles } from 'lucide-react';
 import type { EmotionalStatus, EmotionalMetric, EmotionalState } from '@/lib/emotional-state';
 
@@ -139,30 +140,46 @@ export function EmotionalHero() {
   const { apiFetch } = useApi();
   const [state, setState] = useState<EmotionalState | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchState = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await apiFetch('/api/emotional-state');
+      if (res.ok) {
+        const data = await res.json();
+        setState(data);
+      } else {
+        setError(true);
+      }
+    } catch (error) {
+      console.error('Error fetching emotional state:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFetch]);
 
   useEffect(() => {
-    const fetchState = async () => {
-      try {
-        const res = await apiFetch('/api/emotional-state');
-        if (res.ok) {
-          const data = await res.json();
-          setState(data);
-        }
-      } catch (error) {
-        console.error('Error fetching emotional state:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchState();
-  }, []);
+  }, [fetchState]);
 
   // Loading skeleton
   if (loading) {
     return <EmotionalHeroSkeleton />;
   }
 
-  if (!state) return null;
+  if (error || !state) {
+    return (
+      <PremiumErrorState
+        variant="loading"
+        size="sm"
+        onRetry={fetchState}
+        className="hero-section-card"
+      />
+    );
+  }
 
   const config = STATUS_CONFIG[state.status];
   const metricsEntries = Object.entries(state.metrics) as [string, EmotionalMetric][];

@@ -81,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('[Auth] refresh error:', error);
+      setSyncError(true);
     }
   }, [firebaseUser]);
 

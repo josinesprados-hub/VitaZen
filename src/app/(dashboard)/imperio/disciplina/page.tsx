@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 
 interface Habit {
   id: string;
@@ -43,49 +44,62 @@ export default function DisciplinaPage() {
   const [editForm, setEditForm] = useState({ name: '', description: '', frequency: 'daily' });
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+    try {
+      const [habRes, chRes, tipsRes] = await Promise.all([
+        apiFetch('/api/habits'),
+        apiFetch('/api/challenges'),
+        apiFetch('/api/empire/tips?empire=disciplina'),
+      ]);
+      if (habRes.ok) { const d = await habRes.json(); setHabits(d.habits); }
+      if (chRes.ok) { const d = await chRes.json(); setChallenge(d.challenge); }
+      if (tipsRes.ok) { const d = await tipsRes.json(); setTips(d.tips); }
+    } catch (error) {
+      console.error('Error:', error);
+      setFetchError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFetch]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [habRes, chRes, tipsRes] = await Promise.all([
-          apiFetch('/api/habits'),
-          apiFetch('/api/challenges'),
-          apiFetch('/api/empire/tips?empire=disciplina'),
-        ]);
-        if (habRes.ok) { const d = await habRes.json(); setHabits(d.habits); }
-        if (chRes.ok) { const d = await chRes.json(); setChallenge(d.challenge); }
-        if (tipsRes.ok) { const d = await tipsRes.json(); setTips(d.tips); }
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const addHabit = async () => {
     if (!newHabit.name.trim()) return;
-    const res = await apiFetch('/api/habits', {
-      method: 'POST',
-      body: JSON.stringify(newHabit),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setHabits([data.habit, ...habits]);
-      setNewHabit({ name: '', description: '', frequency: 'daily' });
-      setShowAddHabit(false);
+    try {
+      const res = await apiFetch('/api/habits', {
+        method: 'POST',
+        body: JSON.stringify(newHabit),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHabits([data.habit, ...habits]);
+        setNewHabit({ name: '', description: '', frequency: 'daily' });
+        setShowAddHabit(false);
+      }
+    } catch (error) {
+      console.error('Error adding habit:', error);
     }
   };
 
   const completeHabit = async (habitId: string) => {
-    const res = await apiFetch('/api/habits', {
-      method: 'PATCH',
-      body: JSON.stringify({ habitId }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setHabits(habits.map(h => h.id === habitId ? data.habit : h));
+    try {
+      const res = await apiFetch('/api/habits', {
+        method: 'PATCH',
+        body: JSON.stringify({ habitId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHabits(habits.map(h => h.id === habitId ? data.habit : h));
+      }
+    } catch (error) {
+      console.error('Error completing habit:', error);
     }
   };
 
@@ -141,6 +155,19 @@ export default function DisciplinaPage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <Shield size={32} className="text-[#c8a55a] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el imperio"
+          onRetry={fetchData}
+          size="md"
+        />
       </div>
     );
   }
@@ -216,8 +243,10 @@ export default function DisciplinaPage() {
           {!challenge.completed && (
             <button
               onClick={async () => {
-                const res = await apiFetch('/api/challenges/complete', { method: 'POST', body: JSON.stringify({ challengeId: challenge.challenge.id }) });
-                if (res.ok) setChallenge({ ...challenge, completed: true });
+                try {
+                  const res = await apiFetch('/api/challenges/complete', { method: 'POST', body: JSON.stringify({ challengeId: challenge.challenge.id }) });
+                  if (res.ok) setChallenge({ ...challenge, completed: true });
+                } catch (error) { console.error('Error completing challenge:', error); }
               }}
               className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
             >

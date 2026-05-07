@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { WeeklyRecapSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   CalendarRange,
   Activity,
@@ -151,32 +152,47 @@ export function WeeklyRecap() {
   const { apiFetch } = useApi();
   const [data, setData] = useState<RecapData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
   const isPremium = user?.plan === 'PREMIUM';
 
-  useEffect(() => {
-    const fetchRecap = async () => {
-      try {
-        const res = await apiFetch('/api/weekly-recap');
-        if (res.ok) {
-          const result = await res.json();
-          setData(result);
-        }
-      } catch (error) {
-        console.error('Error fetching weekly recap:', error);
-      } finally {
-        setLoading(false);
+  const fetchRecap = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await apiFetch('/api/weekly-recap');
+      if (res.ok) {
+        const result = await res.json();
+        setData(result);
+      } else {
+        setError(true);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching weekly recap:', error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFetch]);
+
+  useEffect(() => {
     fetchRecap();
-  }, []);
+  }, [fetchRecap]);
 
   // Loading skeleton
   if (loading) {
     return <WeeklyRecapSkeleton />;
   }
 
-  if (!data) return null;
+  if (!data || error) {
+    return (
+      <PremiumErrorState
+        variant="loading"
+        size="sm"
+        onRetry={fetchRecap}
+      />
+    );
+  }
 
   // Score ring
   const scoreRadius = 38;

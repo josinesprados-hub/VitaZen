@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { TrendingUp, Plus, BookOpen, Heart, Lightbulb, Pencil, Trash2, BookOpenText } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 
 interface JournalEntry {
   id: string;
@@ -37,34 +38,42 @@ export default function CrecimientoPage() {
   const [editForm, setEditForm] = useState({ title: '', content: '', mood: 3, gratitude: '' });
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+    try {
+      const [jRes, tRes] = await Promise.all([
+        apiFetch('/api/journal'),
+        apiFetch('/api/empire/tips?empire=crecimiento'),
+      ]);
+      if (jRes.ok) { const d = await jRes.json(); setEntries(d.entries); }
+      if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
+    } catch (e) {
+      console.error(e);
+      setFetchError(true);
+    } finally { setLoading(false); }
+  }, [apiFetch]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [jRes, tRes] = await Promise.all([
-          apiFetch('/api/journal'),
-          apiFetch('/api/empire/tips?empire=crecimiento'),
-        ]);
-        if (jRes.ok) { const d = await jRes.json(); setEntries(d.entries); }
-        if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
-    };
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const submitEntry = async () => {
     if (!form.title.trim() || !form.content.trim()) return;
-    const res = await apiFetch('/api/journal', {
-      method: 'POST',
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setEntries([data.entry, ...entries]);
-      setShowAdd(false);
-      setForm({ title: '', content: '', mood: 3, gratitude: '' });
-    }
+    try {
+      const res = await apiFetch('/api/journal', {
+        method: 'POST',
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setEntries([data.entry, ...entries]);
+        setShowAdd(false);
+        setForm({ title: '', content: '', mood: 3, gratitude: '' });
+      }
+    } catch (error) { console.error('Error submitting entry:', error); }
   };
 
   const startEdit = (entry: JournalEntry) => {
@@ -115,6 +124,19 @@ export default function CrecimientoPage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <TrendingUp size={32} className="text-[#c8a55a] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el imperio"
+          onRetry={fetchData}
+          size="md"
+        />
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   Wind,
   BookOpen,
@@ -99,10 +100,12 @@ export default function TimelinePage() {
   const { apiFetch } = useApi();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
 
   const fetchTimeline = useCallback(async (category?: string) => {
     setLoading(true);
+    setFetchError(false);
     try {
       const params = new URLSearchParams();
       if (category && category !== 'all') params.set('category', category);
@@ -112,9 +115,12 @@ export default function TimelinePage() {
       if (res.ok) {
         const data = await res.json();
         setItems(data.items || []);
+      } else {
+        setFetchError(true);
       }
     } catch (err) {
       console.error('[TIMELINE] Error:', err);
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -178,6 +184,13 @@ export default function TimelinePage() {
       {/* Timeline */}
       {loading ? (
         <TimelineSkeleton />
+      ) : fetchError ? (
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el timeline"
+          onRetry={() => fetchTimeline(activeFilter === 'all' ? undefined : activeFilter)}
+          size="md"
+        />
       ) : items.length === 0 ? (
         <PremiumEmptyState
           icon={Clock}

@@ -137,6 +137,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [editTitle, setEditTitle] = useState('');
   const [historyLimited, setHistoryLimited] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [actionError, setActionError] = useState('');
 
   // Tab: 'active' | 'archived'
   const [tab, setTab] = useState<'active' | 'archived'>('active');
@@ -204,6 +205,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       editInputRef.current.select();
     }
   }, [editingThreadId]);
+
+  // Auto-dismiss action errors after 3s
+  useEffect(() => {
+    if (!actionError) return;
+    const timer = setTimeout(() => setActionError(''), 3000);
+    return () => clearTimeout(timer);
+  }, [actionError]);
 
   // ─────────────────────────────────────────
   // Data fetching
@@ -275,7 +283,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           alert('Has alcanzado el límite de conversaciones. Elimina una para crear otra nueva.');
         }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setActionError('No se pudo crear la conversación'); }
   };
 
   const deleteThread = async (threadId: string) => {
@@ -293,7 +301,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           try { localStorage.removeItem(STORAGE_KEY); } catch {}
         }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setActionError('No se pudo eliminar'); }
     finally { setDeleteConfirm(null); }
   };
 
@@ -317,7 +325,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           }
         }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setActionError('No se pudo archivar'); }
   };
 
   const unarchiveThread = async (threadId: string) => {
@@ -329,7 +337,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (res.ok) {
         setThreads(prev => prev.map(t => t.id === threadId ? { ...t, archived: false } : t));
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setActionError('No se pudo restaurar'); }
   };
 
   const renameThread = async (threadId: string, newTitle: string) => {
@@ -345,7 +353,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (res.ok) {
         setThreads(prev => prev.map(t => t.id === threadId ? { ...t, title: newTitle.trim() } : t));
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setActionError('No se pudo renombrar'); }
     finally { setEditingThreadId(null); }
   };
 
@@ -1078,6 +1086,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           )}
         </div>
       </div>
+
+      {/* Action error toast — auto-dismisses */}
+      {actionError && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#c8a55a]/20 text-[#c8a55a] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
+          onClick={() => setActionError('')}
+        >
+          {actionError}
+        </div>
+      )}
 
       {/* ────────── Premium Limit Modal ────────── */}
       {showLimitModal && (

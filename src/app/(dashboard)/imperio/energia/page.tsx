@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Zap, Droplets, Flame, Apple, Heart, Lightbulb, Pencil, Trash2 } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 
 interface WellnessLog {
   id: string;
@@ -52,46 +53,56 @@ export default function EnergiaPage() {
   const [editNutritionForm, setEditNutritionForm] = useState({ meals: '', water: 0, calories: 0, notes: '' });
   const [editNutritionSaving, setEditNutritionSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<{ id: string; type: 'wellness' | 'nutrition' } | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+    try {
+      const [wRes, nRes, tRes] = await Promise.all([
+        apiFetch('/api/wellness'),
+        apiFetch('/api/nutrition'),
+        apiFetch('/api/empire/tips?empire=energia'),
+      ]);
+      if (wRes.ok) { const d = await wRes.json(); setWellnessLogs(d.logs); }
+      if (nRes.ok) { const d = await nRes.json(); setNutrition(d.logs); }
+      if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
+    } catch (e) {
+      console.error(e);
+      setFetchError(true);
+    } finally { setLoading(false); }
+  }, [apiFetch]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [wRes, nRes, tRes] = await Promise.all([
-          apiFetch('/api/wellness'),
-          apiFetch('/api/nutrition'),
-          apiFetch('/api/empire/tips?empire=energia'),
-        ]);
-        if (wRes.ok) { const d = await wRes.json(); setWellnessLogs(d.logs); }
-        if (nRes.ok) { const d = await nRes.json(); setNutrition(d.logs); }
-        if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
-    };
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const submitWellness = async () => {
-    const res = await apiFetch('/api/wellness', {
-      method: 'POST',
-      body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...wellnessForm }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setWellnessLogs([data.log, ...wellnessLogs]);
-      setShowWellness(false);
-    }
+    try {
+      const res = await apiFetch('/api/wellness', {
+        method: 'POST',
+        body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...wellnessForm }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setWellnessLogs([data.log, ...wellnessLogs]);
+        setShowWellness(false);
+      }
+    } catch (error) { console.error('Error submitting wellness:', error); }
   };
 
   const submitNutrition = async () => {
-    const res = await apiFetch('/api/nutrition', {
-      method: 'POST',
-      body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...nutritionForm }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setNutrition([data.log, ...nutrition]);
-      setShowNutrition(false);
-    }
+    try {
+      const res = await apiFetch('/api/nutrition', {
+        method: 'POST',
+        body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...nutritionForm }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNutrition([data.log, ...nutrition]);
+        setShowNutrition(false);
+      }
+    } catch (error) { console.error('Error submitting nutrition:', error); }
   };
 
   const RatingInput = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
@@ -188,6 +199,19 @@ export default function EnergiaPage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <Zap size={32} className="text-[#c8a55a] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el imperio"
+          onRetry={fetchData}
+          size="md"
+        />
       </div>
     );
   }

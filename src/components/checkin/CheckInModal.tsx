@@ -111,6 +111,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [intention, setIntention] = useState(initialData?.intention || '');
   const [note, setNote] = useState(initialData?.note || '');
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const [step, setStep] = useState(0); // 0: intro, 1: form, 2: done
 
   // Lock body scroll when modal is open
@@ -122,11 +123,13 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const handleSave = async () => {
     if (!intention.trim()) return;
     setSaving(true);
+    setSaveError(false);
     try {
       await onSave({ emotion, energy, focus, stress, intention: intention.trim(), note: note.trim() || undefined });
       setStep(2);
     } catch (err) {
       console.error('[CHECKIN] Error saving:', err);
+      setSaveError(true);
     } finally {
       setSaving(false);
     }
@@ -227,6 +230,11 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             >
               {saving ? 'Guardando...' : 'Confirmar check-in'}
             </button>
+            {saveError && (
+              <p className="text-center text-xs text-red-400 mt-2">
+                No se pudo guardar. Inténtalo de nuevo.
+              </p>
+            )}
           </div>
         )}
 

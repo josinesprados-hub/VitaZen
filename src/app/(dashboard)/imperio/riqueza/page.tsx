@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2, Wallet } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 
 interface FinanceLog {
   id: string;
@@ -36,33 +37,41 @@ export default function RiquezaPage() {
   const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '' });
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+    try {
+      const [fRes, tRes] = await Promise.all([
+        apiFetch('/api/finance'),
+        apiFetch('/api/empire/tips?empire=riqueza'),
+      ]);
+      if (fRes.ok) { const d = await fRes.json(); setLogs(d.logs); }
+      if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
+    } catch (e) {
+      console.error(e);
+      setFetchError(true);
+    } finally { setLoading(false); }
+  }, [apiFetch]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [fRes, tRes] = await Promise.all([
-          apiFetch('/api/finance'),
-          apiFetch('/api/empire/tips?empire=riqueza'),
-        ]);
-        if (fRes.ok) { const d = await fRes.json(); setLogs(d.logs); }
-        if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
-    };
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const submitFinance = async () => {
-    const res = await apiFetch('/api/finance', {
-      method: 'POST',
-      body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...form }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setLogs([data.log, ...logs]);
-      setShowAdd(false);
-      setForm({ type: 'expense', category: '', amount: 0, description: '' });
-    }
+    try {
+      const res = await apiFetch('/api/finance', {
+        method: 'POST',
+        body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...form }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLogs([data.log, ...logs]);
+        setShowAdd(false);
+        setForm({ type: 'expense', category: '', amount: 0, description: '' });
+      }
+    } catch (error) { console.error('Error submitting finance:', error); }
   };
 
   const startEdit = (log: FinanceLog) => {
@@ -116,6 +125,19 @@ export default function RiquezaPage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <Gem size={32} className="text-[#c8a55a] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el imperio"
+          onRetry={fetchData}
+          size="md"
+        />
       </div>
     );
   }
