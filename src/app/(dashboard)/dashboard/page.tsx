@@ -453,7 +453,7 @@ export default function DashboardPage() {
               </div>
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
             </div>
-            <p className={`text-lg sm:text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+            <p className={`text-2xl sm:text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
               {metrics.balance >= 0 ? '+' : ''}{metrics.balance.toFixed(2)}€
             </p>
             <p className="text-xs text-[#666] mt-1">balance últimos 30 días</p>
@@ -577,7 +577,7 @@ export default function DashboardPage() {
             <Trophy size={22} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
-              <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/20 text-[#c8a55a]">Completado</span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium">Completado</span>
             )}
           </div>
           <h3 className="text-[#c8a55a] font-medium text-lg mb-1">{challenge.challenge.title}</h3>
@@ -593,7 +593,7 @@ export default function DashboardPage() {
                   setChallenge({ ...challenge, completed: true });
                 }
               }}
-              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
             >
               Marcar como completado
             </button>
@@ -707,17 +707,17 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-5">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
-          <div className="flex items-center gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2.5 sm:gap-4">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Star size={20} className="text-[#c8a55a]" />
             <div>
-              <p className="text-2xl font-bold text-white">{totalXp}</p>
+              <p className="text-lg sm:text-2xl font-bold text-white">{totalXp}</p>
               <p className="text-xs text-[#999]">XP total</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
           <div className="flex items-center gap-2 sm:gap-3">
             <Trophy size={20} className="text-[#c8a55a]" />
             <div>
@@ -726,7 +726,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
           <div className="flex items-center gap-2 sm:gap-3">
             <Flame size={20} className="text-[#c8a55a]" />
             <div>

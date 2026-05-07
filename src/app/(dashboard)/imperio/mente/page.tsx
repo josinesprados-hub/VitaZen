@@ -209,7 +209,7 @@ export default function MentePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10">
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Completion Overlay */}
       {completedSession && (
         <div
@@ -237,7 +237,7 @@ export default function MentePage() {
             </div>
             <button
               onClick={() => setCompletedSession(null)}
-              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
+              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors"
             >
               Cerrar
             </button>
@@ -289,14 +289,14 @@ export default function MentePage() {
             <div className="flex items-center justify-center gap-3 mt-7">
               <button
                 onClick={() => setEditingSession(null)}
-                className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors"
+                className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={saveEdit}
                 disabled={editSaving}
-                className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {editSaving ? 'Guardando...' : 'Guardar'}
               </button>
@@ -323,13 +323,13 @@ export default function MentePage() {
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setPendingDeleteId(null)}
-                className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors"
+                className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmDelete}
-                className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors"
+                className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors"
               >
                 Eliminar
               </button>
@@ -365,7 +365,7 @@ export default function MentePage() {
       </Link>
 
       {/* Meditation Timer */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center gap-3 mb-5">
           <Wind size={20} className="text-[#c8a55a]" />
           <div>
@@ -383,13 +383,13 @@ export default function MentePage() {
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setPaused(!paused)}
-                className="flex items-center gap-2 bg-[#000000] border border-[#c8a55a]/30 text-[#c8a55a] font-semibold px-6 py-3 rounded-lg hover:bg-[#c8a55a]/10 transition-colors"
+                className="flex items-center gap-2 bg-[#000000] border border-[#c8a55a]/30 text-[#c8a55a] font-semibold px-6 py-3 rounded-xl hover:bg-[#c8a55a]/10 transition-colors"
               >
                 {paused ? <><Play size={16} /> Continuar</> : <><Pause size={16} /> Pausar</>}
               </button>
               <button
                 onClick={endMeditation}
-                className="bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
+                className="bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-xl hover:bg-[#d4b468] transition-colors"
               >
                 Finalizar
               </button>
@@ -415,7 +415,7 @@ export default function MentePage() {
       </div>
 
       {/* Breathing Techniques Guide */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center gap-3 mb-5">
           <Wind size={20} className="text-[#c8a55a]" />
           <div>
@@ -472,7 +472,7 @@ export default function MentePage() {
       </div>
 
       {/* Session History */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <Clock size={20} className="text-[#c8a55a]" />
@@ -538,7 +538,7 @@ export default function MentePage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>

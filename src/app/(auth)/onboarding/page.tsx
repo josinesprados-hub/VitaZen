@@ -254,7 +254,7 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
 
       <button
         onClick={onNext}
-        className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-8 py-3 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+        className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
       >
         Comenzar
         <ArrowRight size={16} />
@@ -329,7 +329,7 @@ function GoalsStep({
         <button
           onClick={onNext}
           disabled={selected.length === 0}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Continuar
           <ArrowRight size={16} />
@@ -419,7 +419,7 @@ function FocusStep({
         <button
           onClick={onNext}
           disabled={!selected}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Continuar
           <ArrowRight size={16} />
@@ -534,7 +534,7 @@ function LevelsStep({
         </button>
         <button
           onClick={onNext}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
         >
           Continuar
           <ArrowRight size={16} />
@@ -626,7 +626,7 @@ function HabitsStep({
         <button
           onClick={onComplete}
           disabled={saving || selected.length === 0}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {saving ? (
             <>

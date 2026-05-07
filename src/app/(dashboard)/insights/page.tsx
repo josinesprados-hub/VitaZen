@@ -185,15 +185,15 @@ export default function InsightsPage() {
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors">
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard" className="p-2.5 rounded-xl text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors">
             <ArrowLeft size={20} />
           </Link>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-white">Insights Semanales</h1>
               {isPremium && (
-                <span className="premium-badge inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                   <Crown size={10} />
                   Premium
                 </span>
@@ -484,7 +484,7 @@ export default function InsightsPage() {
           </p>
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+            className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
           >
             <Crown size={16} />
             Mejorar a Premium

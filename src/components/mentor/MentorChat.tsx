@@ -451,21 +451,21 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Header */}
       <div className="flex items-center justify-between mb-2 sm:mb-5">
         <div className="flex items-center gap-2.5 sm:gap-4">
-          <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <IconComponent size={18} className="text-[#c8a55a] sm:w-6 sm:h-6" />
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+            <IconComponent size={24} className="text-[#c8a55a] sm:w-7 sm:h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold text-white">Mentor IA</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">Mentor IA</h1>
               {/* Discreet Premium badge */}
               {isPremium && (
-                <span className="badge-premium gap-1">
+                <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                   <Crown size={10} className="shrink-0" />
                   Premium
                 </span>
               )}
             </div>
-            <p className="text-[#999] text-xs">
+            <p className="text-[#999] text-sm">
               {isPremium
                 ? 'Tu mentor experto con memoria avanzada'
                 : 'Tu guía de desarrollo personal'}

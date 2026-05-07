@@ -120,7 +120,7 @@ export default function CrecimientoPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10">
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Edit Journal Entry Overlay */}
       {editingEntry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setEditingEntry(null)}>
@@ -154,8 +154,8 @@ export default function CrecimientoPage() {
               </div>
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
-              <button onClick={() => setEditingEntry(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={() => setEditingEntry(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -171,8 +171,8 @@ export default function CrecimientoPage() {
             <h3 className="text-lg font-bold text-white mb-2">Eliminar entrada</h3>
             <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
             <div className="flex items-center justify-center gap-3">
-              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-lg hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors">Eliminar</button>
+              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function CrecimientoPage() {
       </div>
 
       {/* Journal */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
@@ -225,14 +225,14 @@ export default function CrecimientoPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitEntry} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-lg text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={submitEntry} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
               <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
         )}
 
         {entries.length > 0 ? (
-          <div className="space-y-3 max-h-[500px] overflow-y-auto">
+          <div className="space-y-2 max-h-96 overflow-y-auto">
             {entries.map((entry) => (
               <div key={entry.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center justify-between mb-2">
@@ -245,8 +245,8 @@ export default function CrecimientoPage() {
                     )}
                     <span className="text-xs text-[#666]">{new Date(entry.createdAt).toLocaleDateString('es')}</span>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => startEdit(entry)} className="p-1 rounded hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={12} /></button>
-                      <button onClick={() => setPendingDeleteId(entry.id)} className="p-1 rounded hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={12} /></button>
+                      <button onClick={() => startEdit(entry)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={14} /></button>
+                      <button onClick={() => setPendingDeleteId(entry.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={14} /></button>
                     </div>
                   </div>
                 </div>
@@ -281,7 +281,7 @@ export default function CrecimientoPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
