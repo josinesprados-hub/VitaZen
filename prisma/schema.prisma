@@ -21,6 +21,9 @@ model User {
   city              String?
   age               Int?
   bio               String?
+  weeklyEmailSummary Boolean @default(true)
+  dailyReminders    Boolean @default(false)
+  privacyStatsVisible Boolean @default(false)
   plan              String   @default("FREE") // FREE | PREMIUM
   stripeCustomerId  String?  @unique
   emailVerified     Boolean  @default(false)

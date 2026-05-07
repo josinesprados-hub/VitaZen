@@ -20,6 +20,7 @@ import {
   X,
   Lightbulb,
   UserCircle,
+  Settings,
 } from 'lucide-react';
 
 const EMPIRES = [
@@ -154,6 +155,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               <UserCircle size={18} />
               Perfil
+            </Link>
+
+            <Link
+              href="/ajustes"
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
+                pathname === '/ajustes'
+                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+              }`}
+            >
+              <Settings size={18} />
+              Ajustes
             </Link>
 
             <div className="pt-5 pb-2">

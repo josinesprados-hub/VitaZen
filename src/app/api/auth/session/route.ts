@@ -27,6 +27,10 @@ export async function GET(request: NextRequest) {
         city: user.city,
         age: user.age,
         bio: user.bio,
+        weeklyEmailSummary: user.weeklyEmailSummary,
+        dailyReminders: user.dailyReminders,
+        privacyStatsVisible: user.privacyStatsVisible,
+        emailVerified: user.emailVerified,
         createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
         aiUsage: user.aiUsage

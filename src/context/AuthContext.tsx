@@ -24,6 +24,10 @@ interface UserData {
   city: string | null;
   age: number | null;
   bio: string | null;
+  weeklyEmailSummary?: boolean;
+  dailyReminders?: boolean;
+  privacyStatsVisible?: boolean;
+  emailVerified?: boolean;
   createdAt?: string;
   onboardingCompleted?: boolean;
 }
