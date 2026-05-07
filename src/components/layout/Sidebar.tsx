@@ -19,6 +19,7 @@ import {
   LogOut,
   X,
   Lightbulb,
+  UserCircle,
 } from 'lucide-react';
 
 const EMPIRES = [
@@ -142,6 +143,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               Insights
             </Link>
 
+            <Link
+              href="/perfil"
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
+                pathname === '/perfil'
+                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+              }`}
+            >
+              <UserCircle size={18} />
+              Perfil
+            </Link>
+
             <div className="pt-5 pb-2">
               <p className="px-4 text-xs text-[#555] uppercase tracking-widest font-semibold">Imperios</p>
             </div>
@@ -188,15 +202,23 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
           {/* User section */}
           <div className="border-t border-[#1a1a1a] p-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#c8a55a]/20 flex items-center justify-center text-[#c8a55a] text-sm font-bold">
-                {user?.name?.charAt(0)?.toUpperCase() || 'V'}
+            <Link
+              href="/perfil"
+              onClick={onClose}
+              className="flex items-center gap-3 mb-3 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-9 h-9 rounded-full bg-[#c8a55a]/20 flex items-center justify-center text-[#c8a55a] text-sm font-bold overflow-hidden">
+                {user?.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  user?.name?.charAt(0)?.toUpperCase() || 'V'
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{user?.name || 'Usuario'}</p>
                 <p className="text-xs text-[#c8a55a]">{user?.plan || 'FREE'}</p>
               </div>
-            </div>
+            </Link>
             <button
               onClick={async () => {
                 await signOut();

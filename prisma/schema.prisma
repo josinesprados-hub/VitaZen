@@ -17,6 +17,10 @@ model User {
   email             String   @unique
   name              String?
   avatarUrl         String?
+  country           String?
+  city              String?
+  age               Int?
+  bio               String?
   plan              String   @default("FREE") // FREE | PREMIUM
   stripeCustomerId  String?  @unique
   emailVerified     Boolean  @default(false)

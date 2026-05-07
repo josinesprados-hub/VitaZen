@@ -35,6 +35,11 @@ export async function POST(request: NextRequest) {
           name: existingUser.name,
           plan: existingUser.plan,
           avatarUrl: existingUser.avatarUrl,
+          country: existingUser.country,
+          city: existingUser.city,
+          age: existingUser.age,
+          bio: existingUser.bio,
+          createdAt: existingUser.createdAt,
           onboardingCompleted: existingUser.onboardingCompleted,
         },
       });
@@ -60,6 +65,11 @@ export async function POST(request: NextRequest) {
         name: user.name,
         plan: user.plan,
         avatarUrl: user.avatarUrl,
+        country: user.country,
+        city: user.city,
+        age: user.age,
+        bio: user.bio,
+        createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
       },
     });

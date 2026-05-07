@@ -20,6 +20,11 @@ interface UserData {
   name: string | null;
   plan: string;
   avatarUrl: string | null;
+  country: string | null;
+  city: string | null;
+  age: number | null;
+  bio: string | null;
+  createdAt?: string;
   onboardingCompleted?: boolean;
 }
 

@@ -23,6 +23,11 @@ export async function GET(request: NextRequest) {
         name: user.name,
         plan: user.plan,
         avatarUrl: user.avatarUrl,
+        country: user.country,
+        city: user.city,
+        age: user.age,
+        bio: user.bio,
+        createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
         aiUsage: user.aiUsage
           ? {
