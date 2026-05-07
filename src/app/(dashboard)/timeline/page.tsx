@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import {
   Wind,
   BookOpen,
@@ -150,6 +151,13 @@ export default function TimelinePage() {
 
   return (
     <div className="max-w-3xl mx-auto">
+      {/* Contextual Help */}
+      <ContextualHelp
+        storageKey="vitazen_help_timeline"
+        title="Timeline"
+        text="Aquí se recoge toda tu actividad: meditaciones, hábitos, diario, bienestar, nutrición y finanzas. Filtra por categoría para ver lo que te interese."
+      />
+
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-3 mb-1.5">

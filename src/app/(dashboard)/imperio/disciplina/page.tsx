@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 
@@ -219,6 +220,13 @@ export default function DisciplinaPage() {
           </div>
         </div>
       )}
+
+      {/* Contextual Help */}
+      <ContextualHelp
+        storageKey="vitazen_help_habits"
+        title="Mis Hábitos"
+        text="Crea hábitos y márcalos como completados cada día. Tu racha crece con la consistencia. Puedes editar o eliminar cualquier hábito."
+      />
 
       {/* Header */}
       <div className="flex items-center gap-4">

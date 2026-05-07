@@ -6,6 +6,7 @@ import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import {
   Sunrise,
   TrendingUp,
@@ -244,6 +245,13 @@ export default function CheckinPage() {
           </div>
         </div>
       )}
+
+      {/* Contextual Help */}
+      <ContextualHelp
+        storageKey="vitazen_help_checkin"
+        title="Check-in Diario"
+        text="Registra cómo te sientes cada día. Valora tu emoción, energía, enfoque y estrés para descubrir patrones y mejorar tu bienestar."
+      />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 sm:mb-8">

@@ -34,6 +34,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import Link from 'next/link';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 
 // ─────────────────────────────────────────
 // Types
@@ -543,6 +544,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </button>
         </div>
       </div>
+
+      {/* Contextual Help */}
+      <ContextualHelp
+        storageKey="vitazen_help_mentor"
+        title="Mentor IA"
+        text="Escribe tu pregunta y el mentor te responderá. Crea nuevas conversaciones, renómbralas o archívalas desde el menú lateral."
+      />
 
       {/* Main content */}
       <div className="flex flex-1 gap-2 sm:gap-4 min-h-0">

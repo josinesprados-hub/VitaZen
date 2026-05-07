@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import {
   Sparkles,
   ArrowLeft,
@@ -183,6 +184,13 @@ export default function InsightsPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
+      {/* Contextual Help */}
+      <ContextualHelp
+        storageKey="vitazen_help_insights"
+        title="Insights Semanales"
+        text="Cada semana se analizan tus datos y se generan insights automáticos. Revisa tu puntuación de bienestar y los patrones detectados."
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

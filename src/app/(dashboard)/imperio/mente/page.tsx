@@ -3,8 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Pause, Clock, MessageCircle, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil } from 'lucide-react';
-import Link from 'next/link';
+import { Brain, Play, Pause, Clock, Lightbulb, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -371,21 +370,6 @@ export default function MentePage() {
           <p className="text-[#999] text-sm">Calma interior, claridad mental y respiración consciente</p>
         </div>
       </div>
-
-      {/* AI Mentor CTA */}
-      <Link
-        href="/imperio/mentor"
-        className="flex items-center gap-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/30 transition-all group"
-      >
-        <div className="w-11 h-11 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-          <MessageCircle size={22} className="text-[#c8a55a]" />
-        </div>
-        <div className="flex-1">
-          <h3 className="font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Mentor IA</h3>
-          <p className="text-sm text-[#999]">Tu coach personal disponible 24/7</p>
-        </div>
-        <span className="text-[#c8a55a] text-sm font-medium">Abrir →</span>
-      </Link>
 
       {/* Meditation Timer */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
