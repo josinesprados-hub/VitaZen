@@ -377,7 +377,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 sm:space-y-12 overflow-x-contain">
+    <div className="max-w-7xl mx-auto space-y-3 sm:space-y-12 overflow-x-contain">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -416,7 +416,7 @@ export default function DashboardPage() {
           )}
         </div>
         {todayCheckin && (
-          <div className="mt-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-4 py-3 flex items-center gap-4">
+          <div className="mt-2 sm:mt-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-3 sm:gap-4">
             <span className="text-lg">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-[#c8a55a] font-medium truncate">«{todayCheckin.intention}»</p>
@@ -433,91 +433,91 @@ export default function DashboardPage() {
 
       {/* Metrics */}
       {metrics && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
-            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <Wind size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <Wind size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Meditación</span>
+              <span className="text-[10px] sm:text-xs text-[#666] uppercase tracking-wider font-medium">Meditación</span>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-white">{metrics.meditationWeek}</p>
-            <p className="text-xs text-[#666] mt-1">sesiones esta semana</p>
+            <p className="text-xl sm:text-3xl font-bold text-white">{metrics.meditationWeek}</p>
+            <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
             {streaks && streaks.meditationStreak > 0 && (
-              <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
-                🔥 {streaks.meditationStreak} días
+              <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
+                🔥 {streaks.meditationStreak}d
               </p>
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
-            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <CheckCircle size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <CheckCircle size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Hábitos</span>
+              <span className="text-[10px] sm:text-xs text-[#666] uppercase tracking-wider font-medium">Hábitos</span>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
-            <p className="text-xs text-[#666] mt-1">completados esta semana</p>
+            <p className="text-xl sm:text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
+            <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
             {streaks && streaks.habitStreak > 0 && (
-              <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
-                🔥 {streaks.habitStreak} días
+              <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
+                🔥 {streaks.habitStreak}d
               </p>
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
-            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <BookOpen size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <BookOpen size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Diario</span>
+              <span className="text-[10px] sm:text-xs text-[#666] uppercase tracking-wider font-medium">Diario</span>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-white">{metrics.journalWeek}</p>
-            <p className="text-xs text-[#666] mt-1">entradas esta semana</p>
+            <p className="text-xl sm:text-3xl font-bold text-white">{metrics.journalWeek}</p>
+            <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
             {streaks && streaks.journalStreak > 0 && (
-              <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
-                🔥 {streaks.journalStreak} días
+              <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
+                🔥 {streaks.journalStreak}d
               </p>
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
-            <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                <Wallet size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+            <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                <Wallet size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
               </div>
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+              <span className="text-[10px] sm:text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
             </div>
-            <p className={`text-2xl sm:text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+            <p className={`text-xl sm:text-3xl font-bold ${metrics.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
               {metrics.balance >= 0 ? '+' : ''}{metrics.balance.toFixed(2)}€
             </p>
-            <p className="text-xs text-[#666] mt-1">balance últimos 30 días</p>
+            <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">balance 30 días</p>
           </div>
         </div>
       )}
 
       {/* Progreso Semanal */}
       {progress && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors">
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
-            <div className="flex items-center gap-3">
-              <Target size={22} className="text-[#c8a55a]" />
-              <h2 className="text-lg font-semibold text-white">Progreso Semanal</h2>
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="flex items-center justify-between mb-3 sm:mb-5">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Target size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">Progreso Semanal</h2>
             </div>
-            <span className="text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Meditación */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-[#999]">Meditación</span>
-                <span className="text-xs text-[#666]">{progress.meditation.count}/{progress.meditation.target} sesiones</span>
+              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                <span className="text-xs sm:text-sm text-[#999]">Meditación</span>
+                <span className="text-[10px] sm:text-xs text-[#666]">{progress.meditation.count}/{progress.meditation.target}</span>
               </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-2.5 overflow-hidden">
+              <div className="w-full bg-[#1a1a1a] rounded-full h-2 sm:h-2.5 overflow-hidden">
                 <div
-                  className="bg-[#c8a55a] h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  className="bg-[#c8a55a] h-2 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${progress.meditation.percent}%` }}
                 />
               </div>
@@ -525,13 +525,13 @@ export default function DashboardPage() {
 
             {/* Hábitos */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-[#999]">Hábitos</span>
-                <span className="text-xs text-[#666]">{progress.habits.count}/{progress.habits.target} días activos</span>
+              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                <span className="text-xs sm:text-sm text-[#999]">Hábitos</span>
+                <span className="text-[10px] sm:text-xs text-[#666]">{progress.habits.count}/{progress.habits.target}</span>
               </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-2.5 overflow-hidden">
+              <div className="w-full bg-[#1a1a1a] rounded-full h-2 sm:h-2.5 overflow-hidden">
                 <div
-                  className="bg-[#c8a55a] h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  className="bg-[#c8a55a] h-2 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${progress.habits.percent}%` }}
                 />
               </div>
@@ -539,13 +539,13 @@ export default function DashboardPage() {
 
             {/* Diario */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-[#999]">Diario</span>
-                <span className="text-xs text-[#666]">{progress.journal.count}/{progress.journal.target} entradas</span>
+              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                <span className="text-xs sm:text-sm text-[#999]">Diario</span>
+                <span className="text-[10px] sm:text-xs text-[#666]">{progress.journal.count}/{progress.journal.target}</span>
               </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-2.5 overflow-hidden">
+              <div className="w-full bg-[#1a1a1a] rounded-full h-2 sm:h-2.5 overflow-hidden">
                 <div
-                  className="bg-[#c8a55a] h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  className="bg-[#c8a55a] h-2 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${progress.journal.percent}%` }}
                 />
               </div>
@@ -557,21 +557,21 @@ export default function DashboardPage() {
       {/* Insights Preview */}
       {dashboardInsights && dashboardInsights.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
-            <div className="flex items-center gap-3">
-              <Sparkles size={22} className="text-[#c8a55a]" />
-              <h2 className="text-lg sm:text-xl font-semibold text-white">Insights Semanales</h2>
+          <div className="flex items-center justify-between mb-3 sm:mb-5">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Sparkles size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
+              <h2 className="text-base sm:text-xl font-semibold text-white">Insights Semanales</h2>
               {insightsScore !== null && (
-                <span className="text-xs text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-[10px] sm:text-xs text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-1.5 sm:px-2 py-0.5 rounded-full font-medium">
                   {insightsScore}/100
                 </span>
               )}
             </div>
-            <Link href="/insights" className="text-xs text-[#c8a55a] hover:underline flex items-center gap-1">
+            <Link href="/insights" className="text-[10px] sm:text-xs text-[#c8a55a] hover:underline flex items-center gap-1">
               Ver todo <ArrowRight size={12} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
             {visibleInsights.map((insight) => {
               const borderClass = insight.type === 'positive'
                 ? 'border-[#22c55e]/15 hover:border-[#22c55e]/30'
@@ -581,13 +581,13 @@ export default function DashboardPage() {
               return (
                 <div
                   key={insight.id}
-                  className={`bg-[#0a0a0a] border rounded-xl p-4 sm:p-5 transition-all duration-200 ${borderClass}`}
+                  className={`bg-[#0a0a0a] border rounded-xl p-3 sm:p-5 transition-all duration-200 ${borderClass}`}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl shrink-0">{insight.icon}</span>
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-base sm:text-xl shrink-0">{insight.icon}</span>
                     <div className="min-w-0">
-                      <h3 className="text-sm font-semibold text-white mb-1">{insight.title}</h3>
-                      <p className="text-xs text-[#999] leading-relaxed line-clamp-2">{insight.description}</p>
+                      <h3 className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1">{insight.title}</h3>
+                      <p className="text-[10px] sm:text-xs text-[#999] leading-relaxed line-clamp-2">{insight.description}</p>
                     </div>
                   </div>
                 </div>
@@ -598,9 +598,9 @@ export default function DashboardPage() {
       )}
 
       {/* Frase motivacional */}
-      <div className="flex justify-center py-4 sm:py-6">
+      <div className="flex justify-center py-2 sm:py-6">
         <p
-          className={`text-center text-[#c8a55a]/90 text-base sm:text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 px-4 ${fraseVisible ? 'opacity-100' : 'opacity-0'}`}
+          className={`text-center text-[#c8a55a]/90 text-sm sm:text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 px-4 ${fraseVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           «{FRASES[fraseIndex]}»
         </p>
@@ -608,16 +608,16 @@ export default function DashboardPage() {
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3.5 sm:p-5">
-          <div className="flex items-center gap-3 mb-3 sm:mb-4">
-            <Trophy size={22} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3 sm:p-5">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+            <Trophy size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
+            <h2 className="text-base sm:text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
-              <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium">Completado</span>
+              <span className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium">Completado</span>
             )}
           </div>
-          <h3 className="text-[#c8a55a] font-medium text-lg mb-1">{challenge.challenge.title}</h3>
-          <p className="text-[#999] text-sm mb-4">{challenge.challenge.description}</p>
+          <h3 className="text-[#c8a55a] font-medium text-sm sm:text-lg mb-0.5 sm:mb-1">{challenge.challenge.title}</h3>
+          <p className="text-[#999] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{challenge.challenge.description}</p>
           {!challenge.completed && (
             <button
               onClick={async () => {
@@ -639,8 +639,8 @@ export default function DashboardPage() {
 
       {/* Empire Grid */}
       <div>
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-5">Tus Imperios</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
+        <h2 className="text-base sm:text-xl font-semibold text-white mb-3 sm:mb-5">Tus Imperios</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-5">
           {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
             const empireData = empires.find((e) => e.empire === key);
             const level = empireData?.level || 1;
@@ -652,27 +652,32 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press"
+                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press"
               >
-                <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-5">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                    <Icon size={20} className="text-[#c8a55a]" />
+                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-5">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                    <Icon size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{config.name}</h3>
-                    <p className="text-xs text-[#999]">Nivel {level}</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm sm:text-base font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{config.name}</h3>
+                    <p className="text-[10px] sm:text-xs text-[#999]">Nivel {level}</p>
                   </div>
+                  {streak > 0 && (
+                    <span className="flex items-center gap-0.5 text-[10px] sm:text-xs text-[#c8a55a] sm:hidden">
+                      <Flame size={10} /> {streak}d
+                    </span>
+                  )}
                 </div>
 
                 {/* Progress bar */}
-                <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2.5">
+                <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2 mb-1.5 sm:mb-2.5">
                   <div
-                    className="bg-[#c8a55a] h-2 rounded-full transition-all duration-700 ease-out"
+                    className="bg-[#c8a55a] h-1.5 sm:h-2 rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-[#666]">
+                <div className="hidden sm:flex items-center justify-between text-xs text-[#666]">
                   <span>{Math.round(progress)}% para el siguiente nivel</span>
                   {streak > 0 && (
                     <span className="flex items-center gap-1 text-[#c8a55a]">
@@ -680,6 +685,7 @@ export default function DashboardPage() {
                     </span>
                   )}
                 </div>
+                <p className="sm:hidden text-[10px] text-[#666]">{Math.round(progress)}% sig. nivel</p>
               </Link>
             );
           })}
@@ -689,23 +695,23 @@ export default function DashboardPage() {
       {/* Achievements Preview */}
       {achievementsStats && achievements && (
         <div>
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
-            <div className="flex items-center gap-3">
-              <Trophy size={22} className="text-[#c8a55a]" />
-              <h2 className="text-lg sm:text-xl font-semibold text-white">Logros</h2>
-              <span className="text-xs text-[#666]">{achievementsStats.unlocked}/{achievementsStats.total}</span>
+          <div className="flex items-center justify-between mb-3 sm:mb-5">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Trophy size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
+              <h2 className="text-base sm:text-xl font-semibold text-white">Logros</h2>
+              <span className="text-[10px] sm:text-xs text-[#666]">{achievementsStats.unlocked}/{achievementsStats.total}</span>
             </div>
-            <Link href="/logros" className="text-xs text-[#c8a55a] hover:underline">
+            <Link href="/logros" className="text-[10px] sm:text-xs text-[#c8a55a] hover:underline">
               Ver todos
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-3">
             {(sortedAchievements ?? []).map((ach) => {
                 const isUnlocked = ach.unlocked;
                 return (
                   <div
                     key={ach.key}
-                    className={`rounded-xl p-4 transition-all duration-300 group ${
+                    className={`rounded-xl p-2 sm:p-4 transition-all duration-300 group ${
                       isUnlocked
                         ? 'bg-[#0a0a0a] border border-[#c8a55a]/20 hover:border-[#c8a55a]/40'
                         : 'bg-[#080808] border border-[#1a1a1a]'
@@ -713,27 +719,27 @@ export default function DashboardPage() {
                   >
                     <div className="flex flex-col items-center text-center">
                       <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 transition-transform duration-300 group-hover:scale-110 ${
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center mb-1 sm:mb-2 transition-transform duration-300 group-hover:scale-110 ${
                           isUnlocked ? 'bg-[#c8a55a]/15' : 'bg-[#111]'
                         }`}
                       >
                         {isUnlocked ? (
-                          <Crown size={18} className="text-[#c8a55a]" />
+                          <Crown size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
                         ) : (
-                          <Lock size={18} className="text-[#333]" />
+                          <Lock size={14} className="text-[#333] sm:w-[18px] sm:h-[18px]" />
                         )}
                       </div>
-                      <h4 className={`text-xs font-semibold truncate w-full ${isUnlocked ? 'text-white' : 'text-[#555]'}`}>
+                      <h4 className={`text-[10px] sm:text-xs font-semibold truncate w-full ${isUnlocked ? 'text-white' : 'text-[#555]'}`}>
                         {ach.title}
                       </h4>
-                      <p className="text-[10px] text-[#555] mt-0.5 truncate w-full">{ach.description}</p>
-                      <div className="w-full bg-[#1a1a1a] rounded-full h-1 mt-2 overflow-hidden">
+                      <p className="text-[9px] text-[#555] mt-0.5 truncate w-full hidden sm:block">{ach.description}</p>
+                      <div className="w-full bg-[#1a1a1a] rounded-full h-1 mt-1 sm:mt-2 overflow-hidden">
                         <div
                           className={`h-1 rounded-full transition-all duration-700 ${isUnlocked ? 'bg-[#c8a55a]' : 'bg-[#333]'}`}
                           style={{ width: `${ach.percent}%` }}
                         />
                       </div>
-                      <span className="text-[9px] text-[#555] mt-1">{ach.percent}%</span>
+                      <span className="text-[8px] sm:text-[9px] text-[#555] mt-0.5 sm:mt-1">{ach.percent}%</span>
                     </div>
                   </div>
                 );
@@ -743,33 +749,33 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2.5 sm:gap-4">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Star size={20} className="text-[#c8a55a]" />
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <Star size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-white">{totalXp}</p>
-              <p className="text-xs text-[#999]">XP total</p>
+              <p className="text-base sm:text-2xl font-bold text-white">{totalXp}</p>
+              <p className="text-[10px] sm:text-xs text-[#999]">XP total</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Trophy size={20} className="text-[#c8a55a]" />
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <Trophy size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-white">{totalLevels}</p>
-              <p className="text-xs text-[#999]">Niveles totales</p>
+              <p className="text-base sm:text-2xl font-bold text-white">{totalLevels}</p>
+              <p className="text-[10px] sm:text-xs text-[#999]">Niveles</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Flame size={20} className="text-[#c8a55a]" />
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <Flame size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-white">
+              <p className="text-base sm:text-2xl font-bold text-white">
                 {bestStreak}
               </p>
-              <p className="text-xs text-[#999]">Mejor racha</p>
+              <p className="text-[10px] sm:text-xs text-[#999]">Mejor racha</p>
             </div>
           </div>
         </div>

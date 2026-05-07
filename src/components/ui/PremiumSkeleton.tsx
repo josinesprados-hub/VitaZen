@@ -80,85 +80,85 @@ export function SkeletonMetric({ className }: { className?: string }) {
 /** Dashboard page skeleton */
 export function DashboardSkeleton() {
   return (
-    <div className="max-w-7xl mx-auto space-y-10 skeleton-entrance">
+    <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 skeleton-entrance">
       {/* Hero: Estado Actual placeholder */}
-      <SkeletonCard className="p-7">
-        <div className="flex items-center gap-3 mb-6">
-          <SkeletonIcon size="lg" />
+      <SkeletonCard className="p-4 sm:p-7">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <SkeletonIcon size="md" />
           <div className="space-y-2 flex-1">
-            <SkeletonLine width="45%" className="h-5" />
+            <SkeletonLine width="45%" className="h-4 sm:h-5" />
             <SkeletonLine width="65%" className="h-3" />
           </div>
         </div>
-        <div className="flex justify-between px-2 sm:px-4">
+        <div className="flex justify-between px-1 sm:px-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
-              <SkeletonCircle size={64} />
-              <SkeletonLine width="3rem" className="h-2.5" />
-              <SkeletonLine width="2rem" className="h-2" />
+            <div key={i} className="flex flex-col items-center gap-1.5 sm:gap-2">
+              <SkeletonCircle size={48} />
+              <SkeletonLine width="2.5rem" className="h-2 sm:h-2.5" />
+              <SkeletonLine width="1.5rem" className="h-2" />
             </div>
           ))}
         </div>
       </SkeletonCard>
 
       {/* Weekly Recap placeholder */}
-      <SkeletonCard className="p-7">
-        <div className="flex items-center gap-3 mb-6">
-          <SkeletonIcon size="md" />
+      <SkeletonCard className="p-4 sm:p-7">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <SkeletonIcon size="sm" />
           <div className="space-y-2 flex-1">
-            <SkeletonLine width="50%" className="h-5" />
+            <SkeletonLine width="50%" className="h-4 sm:h-5" />
             <SkeletonLine width="30%" className="h-3" />
           </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <SkeletonBlock key={i} className="h-24 rounded-lg" />
+            <SkeletonBlock key={i} className="h-20 sm:h-24 rounded-lg" />
           ))}
         </div>
       </SkeletonCard>
 
       {/* Welcome section */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <SkeletonLine width="280px" className="h-8" />
-            <SkeletonLine width="200px" className="h-4" />
+            <SkeletonLine width="280px" className="h-6 sm:h-8" />
+            <SkeletonLine width="200px" className="h-3 sm:h-4" />
           </div>
-          <SkeletonBlock className="h-10 w-36 rounded-xl" />
+          <SkeletonBlock className="h-8 sm:h-10 w-28 sm:w-36 rounded-xl" />
         </div>
       </div>
 
       {/* Metrics grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <SkeletonCard key={i} className="p-7">
-            <div className="flex items-center gap-2 mb-3">
+          <SkeletonCard key={i} className="p-3 sm:p-7">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               <SkeletonIcon size="sm" />
-              <SkeletonLine width="60%" className="h-3" />
+              <SkeletonLine width="60%" className="h-2.5 sm:h-3" />
             </div>
-            <SkeletonLine width="40%" className="h-8 mt-2" />
-            <SkeletonLine width="55%" className="h-3 mt-2" />
+            <SkeletonLine width="40%" className="h-6 sm:h-8 mt-1 sm:mt-2" />
+            <SkeletonLine width="55%" className="h-2 sm:h-3 mt-1 sm:mt-2" />
           </SkeletonCard>
         ))}
       </div>
 
       {/* Weekly Progress */}
-      <SkeletonCard className="p-7">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+      <SkeletonCard className="p-3 sm:p-7">
+        <div className="flex items-center justify-between mb-3 sm:mb-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             <SkeletonIcon size="sm" />
-            <SkeletonLine width="140px" className="h-5" />
+            <SkeletonLine width="140px" className="h-4 sm:h-5" />
           </div>
-          <SkeletonLine width="40px" className="h-7" />
+          <SkeletonLine width="40px" className="h-6 sm:h-7" />
         </div>
-        <div className="space-y-5">
+        <div className="space-y-3 sm:space-y-5">
           {[1, 2, 3].map((i) => (
             <div key={i}>
-              <div className="flex items-center justify-between mb-2">
-                <SkeletonLine width="80px" className="h-3" />
-                <SkeletonLine width="100px" className="h-3" />
+              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                <SkeletonLine width="80px" className="h-2.5 sm:h-3" />
+                <SkeletonLine width="60px" className="h-2.5 sm:h-3" />
               </div>
-              <SkeletonBar width="100%" height="0.625rem" className="rounded-full" />
+              <SkeletonBar width="100%" height="0.5rem" className="rounded-full sm:h-[0.625rem]" />
             </div>
           ))}
         </div>
@@ -166,22 +166,22 @@ export function DashboardSkeleton() {
 
       {/* Insights Preview */}
       <div>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between mb-3 sm:mb-5">
+          <div className="flex items-center gap-2 sm:gap-3">
             <SkeletonIcon size="sm" />
-            <SkeletonLine width="160px" className="h-5" />
+            <SkeletonLine width="160px" className="h-4 sm:h-5" />
           </div>
-          <SkeletonLine width="60px" className="h-3" />
+          <SkeletonLine width="60px" className="h-2.5 sm:h-3" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
           {[1, 2, 3].map((i) => (
-            <SkeletonCard key={i} className="p-5">
-              <div className="flex items-start gap-3">
-                <SkeletonCircle size={24} className="shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <SkeletonLine width="70%" className="h-4" />
-                  <SkeletonLine width="100%" className="h-3" />
-                  <SkeletonLine width="85%" className="h-3" />
+            <SkeletonCard key={i} className="p-3 sm:p-5">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <SkeletonCircle size={20} className="shrink-0 sm:size-[24px]" />
+                <div className="flex-1 space-y-1.5 sm:space-y-2">
+                  <SkeletonLine width="70%" className="h-3 sm:h-4" />
+                  <SkeletonLine width="100%" className="h-2.5 sm:h-3" />
+                  <SkeletonLine width="85%" className="h-2.5 sm:h-3" />
                 </div>
               </div>
             </SkeletonCard>
@@ -191,22 +191,22 @@ export function DashboardSkeleton() {
 
       {/* Empire Grid */}
       <div>
-        <SkeletonLine width="120px" className="h-6 mb-5" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <SkeletonLine width="120px" className="h-5 sm:h-6 mb-3 sm:mb-5" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <SkeletonCard key={i} className="p-7">
-              <div className="flex items-center gap-3 mb-5">
-                <SkeletonIcon size="md" />
-                <div className="space-y-2 flex-1">
-                  <SkeletonLine width="60%" className="h-4" />
-                  <SkeletonLine width="40%" className="h-3" />
+            <SkeletonCard key={i} className="p-3 sm:p-7">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
+                <SkeletonIcon size="sm" />
+                <div className="space-y-1.5 sm:space-y-2 flex-1">
+                  <SkeletonLine width="60%" className="h-3 sm:h-4" />
+                  <SkeletonLine width="40%" className="h-2.5 sm:h-3" />
                 </div>
               </div>
-              <SkeletonLine width="80%" className="h-3 mb-5" />
-              <SkeletonBar width="100%" height="0.5rem" className="rounded-full mb-2" />
+              <SkeletonLine width="80%" className="h-2.5 sm:h-3 mb-3 sm:mb-5" />
+              <SkeletonBar width="100%" height="0.375rem" className="rounded-full mb-1.5 sm:mb-2 sm:h-[0.5rem]" />
               <div className="flex justify-between">
-                <SkeletonLine width="50%" className="h-3" />
-                <SkeletonLine width="30%" className="h-3" />
+                <SkeletonLine width="50%" className="h-2.5 sm:h-3" />
+                <SkeletonLine width="30%" className="h-2.5 sm:h-3" />
               </div>
             </SkeletonCard>
           ))}
@@ -214,14 +214,14 @@ export function DashboardSkeleton() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-5">
         {[1, 2, 3].map((i) => (
-          <SkeletonCard key={i} className="p-6">
-            <div className="flex items-center gap-3">
-              <SkeletonCircle size={20} />
-              <div className="space-y-2 flex-1">
-                <SkeletonLine width="50%" className="h-7" />
-                <SkeletonLine width="35%" className="h-3" />
+          <SkeletonCard key={i} className="p-2.5 sm:p-6">
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <SkeletonCircle size={16} />
+              <div className="space-y-1.5 sm:space-y-2 flex-1">
+                <SkeletonLine width="50%" className="h-5 sm:h-7" />
+                <SkeletonLine width="35%" className="h-2 sm:h-3" />
               </div>
             </div>
           </SkeletonCard>
@@ -637,34 +637,34 @@ export function EmotionalHeroSkeleton() {
   return (
     <div className="hero-section-container skeleton-entrance">
       <div className="hero-section-card">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-          <div className="flex items-start gap-4">
-            <SkeletonBlock className="w-12 h-12 rounded-xl shrink-0" />
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-4 sm:mb-8">
+          <div className="flex items-start gap-2 sm:gap-4">
+            <SkeletonBlock className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl shrink-0" />
             <div className="space-y-2">
-              <div className="flex items-center gap-2.5">
-                <SkeletonLine width="120px" className="h-5" />
-                <SkeletonBlock className="h-5 w-16 rounded-full" />
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <SkeletonLine width="100px" className="h-4 sm:h-5" />
+                <SkeletonBlock className="h-4 sm:h-5 w-14 sm:w-16 rounded-full" />
               </div>
-              <SkeletonLine width="280px" className="h-3" />
-              <SkeletonLine width="220px" className="h-3" />
+              <SkeletonLine width="250px" className="h-2.5 sm:h-3" />
+              <SkeletonLine width="200px" className="h-2.5 sm:h-3" />
             </div>
           </div>
-          <div className="sm:text-right space-y-2">
+          <div className="sm:text-right space-y-2 hidden sm:block">
             <SkeletonLine width="200px" className="h-3 sm:ml-auto" />
             <SkeletonLine width="160px" className="h-2.5 sm:ml-auto" />
           </div>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 sm:gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
-              <SkeletonCircle size={64} />
-              <SkeletonLine width="3rem" className="h-2.5" />
-              <SkeletonLine width="2rem" className="h-3" />
+            <div key={i} className="flex flex-col items-center gap-1 sm:gap-2">
+              <SkeletonCircle size={48} />
+              <SkeletonLine width="2.5rem" className="h-2 sm:h-2.5" />
+              <SkeletonLine width="1.5rem" className="h-2.5 sm:h-3" />
             </div>
           ))}
         </div>
-        <div className="mt-6 pt-4 border-t border-[#1a1a1a]/60">
-          <SkeletonLine width="180px" className="h-2.5" />
+        <div className="mt-3 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
+          <SkeletonLine width="140px" className="h-2 sm:h-2.5" />
         </div>
       </div>
     </div>
@@ -677,74 +677,74 @@ export function WeeklyRecapSkeleton() {
     <div className="skeleton-entrance">
       <SkeletonCard className="overflow-hidden">
         {/* Header */}
-        <div className="px-7 pt-7 pb-5 border-b border-[#1a1a1a]/60">
+        <div className="px-4 pt-4 pb-3 sm:px-7 sm:pt-7 sm:pb-5 border-b border-[#1a1a1a]/60">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <SkeletonIcon size="md" />
-              <div className="space-y-2">
-                <SkeletonLine width="160px" className="h-5" />
-                <SkeletonLine width="100px" className="h-2.5" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <SkeletonIcon size="sm" />
+              <div className="space-y-1.5 sm:space-y-2">
+                <SkeletonLine width="130px" className="h-4 sm:h-5" />
+                <SkeletonLine width="80px" className="h-2 sm:h-2.5" />
               </div>
             </div>
-            <SkeletonLine width="120px" className="h-3" />
+            <SkeletonLine width="80px" className="h-2.5 sm:h-3" />
           </div>
         </div>
         {/* Body */}
-        <div className="p-7 space-y-7">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="p-3 sm:p-7 space-y-4 sm:space-y-7">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
             {/* Score placeholder */}
-            <SkeletonCard className="p-6 bg-[#000000]">
-              <div className="flex items-center gap-6">
-                <SkeletonCircle size={96} className="shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <SkeletonLine width="55%" className="h-4" />
-                  <SkeletonLine width="40%" className="h-5" />
-                  <SkeletonLine width="65%" className="h-3" />
+            <SkeletonCard className="p-3 sm:p-6 bg-[#000000]">
+              <div className="flex items-center gap-3 sm:gap-6">
+                <SkeletonCircle size={64} className="shrink-0 sm:size-[96px]" />
+                <div className="flex-1 space-y-1.5 sm:space-y-2">
+                  <SkeletonLine width="55%" className="h-3 sm:h-4" />
+                  <SkeletonLine width="40%" className="h-4 sm:h-5" />
+                  <SkeletonLine width="65%" className="h-2.5 sm:h-3" />
                 </div>
               </div>
             </SkeletonCard>
             {/* Emotional state placeholder */}
-            <SkeletonCard className="p-6 bg-[#000000]">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <SkeletonCircle size={15} />
-                  <SkeletonLine width="120px" className="h-4" />
+            <SkeletonCard className="p-3 sm:p-6 bg-[#000000]">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <SkeletonCircle size={12} />
+                  <SkeletonLine width="100px" className="h-3 sm:h-4" />
                 </div>
-                <SkeletonBlock className="h-5 w-20 rounded-full" />
+                <SkeletonBlock className="h-4 sm:h-5 w-16 sm:w-20 rounded-full" />
               </div>
-              <SkeletonLine width="80%" className="h-3 mb-4" />
-              <div className="space-y-3">
+              <SkeletonLine width="80%" className="h-2.5 sm:h-3 mb-2 sm:mb-4" />
+              <div className="space-y-2 sm:space-y-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <SkeletonCircle size={12} />
-                    <SkeletonLine width="3.5rem" className="h-2.5 shrink-0" />
-                    <SkeletonBar width="100%" height="0.375rem" className="rounded-full flex-1" />
-                    <SkeletonLine width="1.5rem" className="h-2.5 shrink-0" />
+                  <div key={i} className="flex items-center gap-2 sm:gap-3">
+                    <SkeletonCircle size={10} />
+                    <SkeletonLine width="3rem" className="h-2 sm:h-2.5 shrink-0" />
+                    <SkeletonBar width="100%" height="0.25rem" className="rounded-full flex-1 sm:h-[0.375rem]" />
+                    <SkeletonLine width="1.25rem" className="h-2 sm:h-2.5 shrink-0" />
                   </div>
                 ))}
               </div>
             </SkeletonCard>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <SkeletonCard className="p-6 bg-[#000000]">
-              <div className="flex items-center gap-2 mb-5">
-                <SkeletonCircle size={15} />
-                <SkeletonLine width="120px" className="h-4" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
+            <SkeletonCard className="p-3 sm:p-6 bg-[#000000]">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
+                <SkeletonCircle size={12} />
+                <SkeletonLine width="120px" className="h-3 sm:h-4" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <SkeletonBlock key={i} className="h-16 rounded-lg" />
+                  <SkeletonBlock key={i} className="h-14 sm:h-16 rounded-lg" />
                 ))}
               </div>
             </SkeletonCard>
-            <SkeletonCard className="p-6 bg-[#000000]">
-              <div className="flex items-center gap-2 mb-5">
-                <SkeletonCircle size={15} />
-                <SkeletonLine width="160px" className="h-4" />
+            <SkeletonCard className="p-3 sm:p-6 bg-[#000000]">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
+                <SkeletonCircle size={12} />
+                <SkeletonLine width="140px" className="h-3 sm:h-4" />
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <SkeletonBlock key={i} className="h-14 rounded-lg" />
+                  <SkeletonBlock key={i} className="h-12 sm:h-14 rounded-lg" />
                 ))}
               </div>
             </SkeletonCard>

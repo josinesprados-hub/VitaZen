@@ -99,8 +99,8 @@ function MetricRing({ metric, metricKey }: { metric: EmotionalMetric; metricKey:
   const color = getMetricColor(metric.value);
 
   return (
-    <div className="flex flex-col items-center gap-2 group">
-      <div className="relative w-16 h-16 flex items-center justify-center">
+    <div className="flex flex-col items-center gap-1 sm:gap-2 group">
+      <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
         <svg className="absolute inset-0 -rotate-90" viewBox="0 0 64 64">
           <circle
             cx="32" cy="32" r={radius}
@@ -119,12 +119,12 @@ function MetricRing({ metric, metricKey }: { metric: EmotionalMetric; metricKey:
             className="hero-ring-transition"
           />
         </svg>
-        <Icon size={16} style={{ color }} className="relative z-10" />
+        <Icon size={13} style={{ color }} className="relative z-10 sm:w-[16px] sm:h-[16px]" />
       </div>
       <div className="text-center">
-        <p className="text-[11px] text-[#999] leading-tight">{metric.label}</p>
+        <p className="text-[9px] sm:text-[11px] text-[#999] leading-tight">{metric.label}</p>
         <div className="flex items-center justify-center gap-0.5 mt-0.5">
-          <span className="text-xs font-semibold text-white">{metric.value}</span>
+          <span className="text-[10px] sm:text-xs font-semibold text-white">{metric.value}</span>
           <TrendIndicator trend={metric.trend} />
         </div>
       </div>
@@ -195,27 +195,27 @@ export function EmotionalHero() {
 
         <div className="relative z-10">
           {/* Header: Status + Recommendation */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-5 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-3 sm:mb-8">
             {/* Left: Status */}
-            <div className="flex items-start gap-3 sm:gap-4">
-              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${config.iconBg} flex items-center justify-center shrink-0 ${config.pulseClass}`}>
-                <Sparkles size={22} className="text-[#c8a55a]" />
+            <div className="flex items-start gap-2 sm:gap-4">
+              <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-xl ${config.iconBg} flex items-center justify-center shrink-0 ${config.pulseClass}`}>
+                <Sparkles size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
               </div>
               <div>
-                <div className="flex items-center gap-2.5 mb-1">
-                  <h2 className="text-lg font-semibold text-white">Estado actual</h2>
-                  <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
+                <div className="flex items-center gap-2 sm:gap-2.5 mb-0.5 sm:mb-1">
+                  <h2 className="text-base sm:text-lg font-semibold text-white">Estado actual</h2>
+                  <span className="text-[10px] sm:text-[11px] font-medium px-2 sm:px-2.5 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
                     {config.label}
                   </span>
                 </div>
-                <p className="text-[13px] text-[#999] leading-relaxed max-w-md">
+                <p className="text-[11px] sm:text-[13px] text-[#999] leading-relaxed max-w-md line-clamp-2 sm:line-clamp-none">
                   {state.statusDescription}
                 </p>
               </div>
             </div>
 
             {/* Right: Summary + Recommendation */}
-            <div className="sm:text-right shrink-0">
+            <div className="sm:text-right shrink-0 hidden sm:block">
               <p className="text-[13px] text-[#c8a55a]/90 font-light italic leading-relaxed max-w-xs sm:ml-auto">
                 {state.summary}
               </p>
@@ -229,20 +229,20 @@ export function EmotionalHero() {
           </div>
 
           {/* Metrics rings */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2">
             {metricsEntries.map(([key, metric]) => (
               <MetricRing key={key} metric={metric} metricKey={key} />
             ))}
           </div>
 
           {/* Subtle bottom line */}
-          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-[#1a1a1a]/60">
+          <div className="mt-2 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] text-[#444] uppercase tracking-widest font-medium">
-                Lectura basada en tu actividad real
+              <p className="text-[9px] sm:text-[10px] text-[#444] uppercase tracking-widest font-medium">
+                Basado en tu actividad real
               </p>
               {state.plan === 'PREMIUM' && (
-                <span className="text-[9px] text-[#c8a55a]/50 uppercase tracking-wider">
+                <span className="text-[9px] text-[#c8a55a]/50 uppercase tracking-wider hidden sm:inline">
                   Tendencias vs. semana anterior
                 </span>
               )}
