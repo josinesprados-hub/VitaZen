@@ -145,3 +145,27 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// ─── DELETE: remove a checkin ────────────────────────────
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const { checkinId } = await request.json();
+
+    const existing = await db.dailyCheckin.findUnique({ where: { id: checkinId } });
+    if (!existing) return NextResponse.json({ error: 'Checkin not found' }, { status: 404 });
+    if (existing.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    await db.dailyCheckin.delete({ where: { id: checkinId } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Checkin DELETE error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

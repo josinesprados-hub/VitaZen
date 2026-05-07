@@ -14,6 +14,9 @@ import {
   Zap,
   Target,
   AlertTriangle,
+  Clock,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -27,6 +30,7 @@ interface CheckinData {
   stress: number;
   intention: string;
   note: string | null;
+  createdAt: string;
 }
 
 interface TrendsData {
@@ -94,6 +98,8 @@ export default function CheckinPage() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [editingCheckin, setEditingCheckin] = useState<CheckinData | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -138,19 +144,61 @@ export default function CheckinPage() {
 
   const handleModalClose = useCallback(() => {
     setShowModal(false);
+    setEditingCheckin(null);
     fetchData();
   }, [fetchData]);
 
   const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }) => {
-    const res = await apiFetch('/api/checkin', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    if (res.ok) {
-      const result = await res.json();
-      setTodayCheckin(result.checkin);
+    if (editingCheckin) {
+      // PUT - update existing checkin
+      const res = await apiFetch('/api/checkin', {
+        method: 'PUT',
+        body: JSON.stringify({ checkinId: editingCheckin.id, ...data }),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setCheckins(prev => prev.map(c => c.id === editingCheckin.id ? result.checkin : c));
+        if (todayCheckin?.id === editingCheckin.id) {
+          setTodayCheckin(result.checkin);
+        }
+      }
+    } else {
+      // POST - create today's checkin
+      const res = await apiFetch('/api/checkin', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setTodayCheckin(result.checkin);
+      }
     }
-  }, [apiFetch]);
+  }, [apiFetch, editingCheckin, todayCheckin]);
+
+  const startEditCheckin = useCallback((checkin: CheckinData) => {
+    setEditingCheckin(checkin);
+    setShowModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (!pendingDeleteId) return;
+    try {
+      const res = await apiFetch('/api/checkin', {
+        method: 'DELETE',
+        body: JSON.stringify({ checkinId: pendingDeleteId }),
+      });
+      if (res.ok) {
+        setCheckins(prev => prev.filter(c => c.id !== pendingDeleteId));
+        if (todayCheckin?.id === pendingDeleteId) {
+          setTodayCheckin(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting checkin:', error);
+    } finally {
+      setPendingDeleteId(null);
+    }
+  }, [apiFetch, pendingDeleteId, todayCheckin]);
 
   if (loading) {
     return <CheckinSkeleton />;
@@ -175,9 +223,26 @@ export default function CheckinPage() {
       {showModal && (
         <CheckInModal
           onClose={handleModalClose}
-          initialData={todayCheckin}
+          initialData={editingCheckin ? { ...editingCheckin, note: editingCheckin.note ?? undefined } : todayCheckin ? { ...todayCheckin, note: todayCheckin.note ?? undefined } : null}
           onSave={handleCheckinSave}
         />
+      )}
+
+      {/* Delete Confirmation Overlay */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setPendingDeleteId(null)}>
+          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Eliminar check-in</h3>
+            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <div className="flex items-center justify-center gap-3">
+              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Header */}
@@ -190,7 +255,7 @@ export default function CheckinPage() {
           <p className="text-[#999] text-sm">Conecta contigo cada día</p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => { setEditingCheckin(null); setShowModal(true); }}
           className="bg-[#c8a55a] text-[#000000] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
         >
           {todayCheckin ? 'Editar hoy' : 'Check-in'}
@@ -259,9 +324,14 @@ export default function CheckinPage() {
 
       {/* History */}
       <div>
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar size={18} className="text-[#c8a55a]" />
-          <h2 className="text-lg font-semibold text-white">Historial</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={18} className="text-[#c8a55a]" />
+            <h2 className="text-lg font-semibold text-white">Historial</h2>
+          </div>
+          {checkins.length > 0 && (
+            <span className="text-xs text-[#666] bg-[#000000] border border-[#1a1a1a] rounded-full px-3 py-1">{checkins.length} check-in{checkins.length !== 1 ? 's' : ''}</span>
+          )}
         </div>
 
         {checkins.length === 0 ? (
@@ -270,7 +340,7 @@ export default function CheckinPage() {
           title="Aún no tienes check-ins registrados"
           subtitle="Comienza con tu primer check-in diario"
           cta="Hacer check-in"
-          onCta={() => setShowModal(true)}
+          onCta={() => { setEditingCheckin(null); setShowModal(true); }}
           size="md"
         />
         ) : (
@@ -278,13 +348,15 @@ export default function CheckinPage() {
             {checkins.map((c) => (
               <div
                 key={c.id}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/20 transition-colors animate-in"
+                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-lg">{c.emotion >= 4 ? '😊' : c.emotion >= 3 ? '😐' : '😔'}</span>
+                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                    <span className="text-base">{c.emotion >= 4 ? '😊' : c.emotion >= 3 ? '😐' : '😔'}</span>
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#555]">{formatDate(c.date)}</span>
+                      <span className="text-xs text-[#999]">{formatDate(c.date)}</span>
                       <span className="text-[#c8a55a] text-xs font-medium truncate">«{c.intention}»</span>
                     </div>
                     <div className="flex gap-4 mt-1">
@@ -299,7 +371,20 @@ export default function CheckinPage() {
                         </span>
                       ))}
                     </div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(c.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span className="text-[#333] text-xs">·</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(c.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                     {c.note && <p className="text-[10px] text-[#444] mt-1 truncate">{c.note}</p>}
+                  </div>
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
+                    <button onClick={() => startEditCheckin(c)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                      <Pencil size={15} />
+                    </button>
+                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 </div>
               </div>

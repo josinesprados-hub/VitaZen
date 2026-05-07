@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { TrendingUp, Plus, BookOpen, Heart, Lightbulb, Pencil, Trash2, BookOpenText } from 'lucide-react';
+import { TrendingUp, Plus, BookOpen, Heart, Lightbulb, Pencil, Trash2, BookOpenText, Calendar, Clock } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -265,12 +265,16 @@ export default function CrecimientoPage() {
                         <Heart size={12} /> {entry.mood}/5
                       </span>
                     )}
-                    <span className="text-xs text-[#666]">{new Date(entry.createdAt).toLocaleDateString('es')}</span>
                     <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                       <button onClick={() => startEdit(entry)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
                       <button onClick={() => setPendingDeleteId(entry.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
                     </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(entry.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span className="text-[#333] text-xs">·</span>
+                  <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(entry.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
                 <p className="text-[#999] text-sm whitespace-pre-wrap">
                   {expandedEntry === entry.id ? entry.content : entry.content.slice(0, 150) + (entry.content.length > 150 ? '...' : '')}

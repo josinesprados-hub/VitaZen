@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil } from 'lucide-react';
+import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -15,6 +15,7 @@ interface Habit {
   frequency: string;
   streak: number;
   lastCompletedAt: string | null;
+  createdAt: string;
 }
 
 interface Challenge {
@@ -304,7 +305,7 @@ export default function DisciplinaPage() {
         ) : (
           <div className="space-y-2.5 max-h-96 overflow-y-auto">
             {habits.map((habit) => (
-              <div key={habit.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
+              <div key={habit.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => completeHabit(habit.id)}
@@ -319,6 +320,11 @@ export default function DisciplinaPage() {
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
                     {habit.description && <p className="text-[#666] text-xs">{habit.description}</p>}
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(habit.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span className="text-[#333] text-xs">·</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(habit.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -327,12 +333,14 @@ export default function DisciplinaPage() {
                       <Flame size={14} /> {habit.streak}
                     </span>
                   )}
-                  <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
-                    <Pencil size={15} />
-                  </button>
-                  <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar">
-                    <Trash2 size={15} />
-                  </button>
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                      <Pencil size={15} />
+                    </button>
+                    <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

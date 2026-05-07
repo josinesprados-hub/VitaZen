@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2, Wallet } from 'lucide-react';
+import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2, Wallet, Calendar, Clock } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -15,6 +15,7 @@ interface FinanceLog {
   category: string;
   amount: number;
   description: string | null;
+  createdAt: string;
 }
 
 interface Tip {
@@ -266,6 +267,11 @@ export default function RiquezaPage() {
                   <div>
                     <p className="text-sm text-white">{log.category}</p>
                     {log.description && <p className="text-xs text-[#666]">{log.description}</p>}
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span className="text-[#333] text-xs">·</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -273,7 +279,6 @@ export default function RiquezaPage() {
                     <p className={`text-sm font-medium ${log.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400'}`}>
                       {log.type === 'income' ? '+' : '-'}{log.amount.toFixed(2)}€
                     </p>
-                    <p className="text-xs text-[#666]">{new Date(log.date).toLocaleDateString('es')}</p>
                   </div>
                   <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>

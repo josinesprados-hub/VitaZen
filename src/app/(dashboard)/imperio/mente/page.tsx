@@ -533,6 +533,8 @@ export default function MentePage() {
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
                         <span className="text-[#333] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(session.completedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="text-[#333] text-xs">·</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(session.completedAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </div>
                   </div>

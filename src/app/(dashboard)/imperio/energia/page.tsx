@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Droplets, Flame, Apple, Heart, Lightbulb, Pencil, Trash2 } from 'lucide-react';
+import { Zap, Droplets, Flame, Apple, Heart, Lightbulb, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -16,6 +16,7 @@ interface WellnessLog {
   sleep: number;
   stress: number;
   notes: string | null;
+  createdAt: string;
 }
 
 interface NutritionLog {
@@ -25,6 +26,7 @@ interface NutritionLog {
   water: number;
   calories: number | null;
   notes: string | null;
+  createdAt: string;
 }
 
 interface Tip {
@@ -328,17 +330,26 @@ export default function EnergiaPage() {
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {wellnessLogs.slice(0, 7).map((log) => (
               <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
-                <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-2 text-xs">
-                    <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
-                    <span className="text-[#c8a55a]">Energía: {log.energy}</span>
-                    <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                    <Heart size={16} className="text-[#c8a55a]" />
                   </div>
-                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
+                  <div>
+                    <div className="flex gap-2 text-xs mb-1">
+                      <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
+                      <span className="text-[#c8a55a]">Energía: {log.energy}</span>
+                      <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span className="text-[#333] text-xs">·</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
+                  <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
@@ -390,16 +401,25 @@ export default function EnergiaPage() {
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {nutrition.slice(0, 7).map((log) => (
               <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
-                <span className="text-sm text-white">{new Date(log.date).toLocaleDateString('es')}</span>
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-2 text-xs">
-                    <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
-                    <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                    <Apple size={16} className="text-[#c8a55a]" />
                   </div>
-                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
+                  <div>
+                    <div className="flex gap-2 text-xs mb-1">
+                      <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
+                      <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span className="text-[#333] text-xs">·</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
+                  <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
