@@ -263,10 +263,10 @@ export default function CheckinPage() {
                     </div>
                     <div className="flex gap-4 mt-1">
                       {[
-                        { label: 'E', val: c.emotion },
-                        { label: 'N', val: c.energy },
-                        { label: 'F', val: c.focus },
-                        { label: 'S', val: c.stress },
+                        { label: 'Emoc.', val: c.emotion },
+                        { label: 'Energ.', val: c.energy },
+                        { label: 'Enfoq.', val: c.focus },
+                        { label: 'Estrés', val: c.stress },
                       ].map((item) => (
                         <span key={item.label} className="text-[10px] text-[#555]">
                           {item.label} <span className="text-[#c8a55a]/80">{item.val}</span>

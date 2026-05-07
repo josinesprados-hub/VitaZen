@@ -314,7 +314,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 sm:space-y-10 overflow-x-contain">
+    <div className="max-w-7xl mx-auto space-y-6 sm:space-y-12 overflow-x-contain">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -380,7 +380,7 @@ export default function DashboardPage() {
       {/* Metrics */}
       {metrics && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
             <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <Wind size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -391,12 +391,12 @@ export default function DashboardPage() {
             <p className="text-xs text-[#666] mt-1">sesiones esta semana</p>
             {streaks && streaks.meditationStreak > 0 && (
               <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
-                🔥 {streaks.meditationStreak} días seguidos
+                🔥 {streaks.meditationStreak} días
               </p>
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
             <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <CheckCircle size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -407,12 +407,12 @@ export default function DashboardPage() {
             <p className="text-xs text-[#666] mt-1">completados esta semana</p>
             {streaks && streaks.habitStreak > 0 && (
               <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
-                🔥 {streaks.habitStreak} días seguidos
+                🔥 {streaks.habitStreak} días
               </p>
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
             <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <BookOpen size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -423,12 +423,12 @@ export default function DashboardPage() {
             <p className="text-xs text-[#666] mt-1">entradas esta semana</p>
             {streaks && streaks.journalStreak > 0 && (
               <p className="text-xs text-[#c8a55a] mt-2 flex items-center gap-1">
-                🔥 {streaks.journalStreak} días seguidos
+                🔥 {streaks.journalStreak} días
               </p>
             )}
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
             <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <Wallet size={16} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -445,8 +445,8 @@ export default function DashboardPage() {
 
       {/* Progreso Semanal */}
       {progress && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/20 transition-colors">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div className="flex items-center gap-3">
               <Target size={22} className="text-[#c8a55a]" />
               <h2 className="text-lg font-semibold text-white">Progreso Semanal</h2>
@@ -454,7 +454,7 @@ export default function DashboardPage() {
             <span className="text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
           </div>
 
-          <div className="space-y-4 sm:space-y-5">
+          <div className="space-y-4">
             {/* Meditación */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -554,8 +554,8 @@ export default function DashboardPage() {
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3.5 sm:p-7">
-          <div className="flex items-center gap-3 mb-3 sm:mb-5">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3.5 sm:p-5">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
             <Trophy size={22} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
@@ -598,7 +598,7 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-7 hover:border-[#c8a55a]/30 transition-all group touch-press"
+                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-5">
                   <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
@@ -609,8 +609,6 @@ export default function DashboardPage() {
                     <p className="text-xs text-[#999]">Nivel {level}</p>
                   </div>
                 </div>
-
-                <p className="text-sm text-[#999] mb-3 sm:mb-5">{config.description}</p>
 
                 {/* Progress bar */}
                 <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2.5">

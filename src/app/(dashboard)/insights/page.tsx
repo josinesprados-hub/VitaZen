@@ -182,7 +182,7 @@ export default function InsightsPage() {
   const { summary, insights, comparison } = data;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10">
+    <div className="max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -205,7 +205,7 @@ export default function InsightsPage() {
       </div>
 
       {/* Wellness Score Card */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-7">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Activity size={22} className="text-[#c8a55a]" />
@@ -251,7 +251,7 @@ export default function InsightsPage() {
 
       {/* Weekly Comparison (PREMIUM only) */}
       {isPremium && comparison && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-7">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-5">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Comparativa semanal</h2>
@@ -476,7 +476,7 @@ export default function InsightsPage() {
 
       {/* Premium CTA for FREE users */}
       {!isPremium && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-7 text-center">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-5 sm:p-6 text-center">
           <Crown size={28} className="text-[#c8a55a] mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-white mb-2">Desbloquea insights completos</h3>
           <p className="text-[#999] text-sm mb-4 max-w-md mx-auto">

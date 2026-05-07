@@ -903,8 +903,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
                       <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
                         {isPremium
-                          ? 'Soy tu mentor experto con memoria avanzada. Recuerdo tu progreso, emociones y conversaciones para ofrecerte orientación profundamente personalizada.'
-                          : 'Soy tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
+                          ? 'Tu mentor experto con memoria avanzada. Pregúntame lo que necesites.'
+                          : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
                       </p>
                       <div className="flex flex-wrap justify-center gap-2 mt-4">
                         {[

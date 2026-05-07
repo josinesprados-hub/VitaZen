@@ -249,7 +249,7 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
       </h1>
       <p className="text-[#999] text-base mb-2">Tu viaje con VitaZen comienza ahora.</p>
       <p className="text-[#666] text-sm mb-10 max-w-sm mx-auto leading-relaxed">
-        Responde unas breves preguntas para personalizar tu experiencia. Solo tomará un momento.
+        Unas breves preguntas para personalizar tu experiencia.
       </p>
 
       <button
