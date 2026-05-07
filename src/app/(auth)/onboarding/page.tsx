@@ -12,6 +12,7 @@ import {
   Sparkles,
   ArrowRight,
   Check,
+  Crown,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════
@@ -250,6 +251,10 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
       <p className="text-[#999] text-base mb-2">Tu viaje con VitaZen comienza ahora.</p>
       <p className="text-[#666] text-sm mb-10 max-w-sm mx-auto leading-relaxed">
         Unas breves preguntas para personalizar tu experiencia.
+      </p>
+      <p className="text-[10px] text-[#555] flex items-center justify-center gap-1 -mt-6 mb-8">
+        <Crown size={9} className="text-[#c8a55a]/40" />
+        Recomendaciones inteligentes incluidas
       </p>
 
       <button

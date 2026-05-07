@@ -927,6 +927,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                           </button>
                         ))}
                       </div>
+                      {!isPremium && (
+                        <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
+                          <Crown size={9} className="text-[#c8a55a]/40" />
+                          Premium: memoria avanzada y contexto personalizado
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}

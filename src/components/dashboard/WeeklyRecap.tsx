@@ -223,12 +223,20 @@ export function WeeklyRecap() {
                 <p className="text-[11px] text-[#666]">{data.weekLabel}</p>
               </div>
             </div>
-            <Link
-              href="/insights"
-              className="text-[11px] text-[#c8a55a] hover:underline flex items-center gap-1 transition-colors"
-            >
-              Ver insights completos <ArrowRight size={11} />
-            </Link>
+            <div className="flex items-center gap-3">
+              {!isPremium && (
+                <span className="text-[10px] text-[#555] flex items-center gap-1">
+                  <Crown size={9} className="text-[#c8a55a]/40" />
+                  Historial completo con Premium
+                </span>
+              )}
+              <Link
+                href="/insights"
+                className="text-[11px] text-[#c8a55a] hover:underline flex items-center gap-1 transition-colors"
+              >
+                Ver insights completos <ArrowRight size={11} />
+              </Link>
+            </div>
           </div>
         </div>
 

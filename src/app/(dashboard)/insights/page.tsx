@@ -331,6 +331,12 @@ export default function InsightsPage() {
         <div className="flex items-center gap-3 mb-5">
           <Target size={20} className="text-[#c8a55a]" />
           <h2 className="text-lg font-semibold text-white">Desglose semanal</h2>
+          {!isPremium && (
+            <span className="text-[10px] text-[#555] flex items-center gap-1 ml-auto">
+              <Crown size={9} className="text-[#c8a55a]/40" />
+              Tendencias más profundas con Premium
+            </span>
+          )}
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Check-ins */}
