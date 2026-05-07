@@ -201,7 +201,7 @@ export default function DashboardPage() {
   const [empires, setEmpires] = useState<EmpireData[]>([]);
   const [challenge, setChallenge] = useState<ChallengeData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fraseIndex, setFraseIndex] = useState(() => getRandomIndex());
+  const [fraseIndex, setFraseIndex] = useState(0);
   const [fraseVisible, setFraseVisible] = useState(true);
   const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
   const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number } | null>(null);
@@ -214,7 +214,16 @@ export default function DashboardPage() {
   const [insightsScore, setInsightsScore] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState(false);
 
+  // Randomize frase on client only (avoids hydration mismatch)
   useEffect(() => {
+    setFraseIndex(getRandomIndex());
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+
     const fetchData = async () => {
       try {
         const [empRes, chRes, metRes, streakRes, progRes, achRes, checkRes, insRes] = await Promise.all([
@@ -228,35 +237,51 @@ export default function DashboardPage() {
           apiFetch('/api/insights'),
         ]);
 
+        if (cancelled) return;
+
+        let failedCount = 0;
+
         if (empRes.ok) {
           const empData = await empRes.json();
           setEmpires(empData.empires);
+        } else {
+          failedCount++;
         }
 
         if (chRes.ok) {
           const chData = await chRes.json();
           setChallenge(chData.challenge);
+        } else {
+          failedCount++;
         }
 
         if (metRes.ok) {
           const metData = await metRes.json();
           setMetrics(metData);
+        } else {
+          failedCount++;
         }
 
         if (streakRes.ok) {
           const streakData = await streakRes.json();
           setStreaks(streakData);
+        } else {
+          failedCount++;
         }
 
         if (progRes.ok) {
           const progData = await progRes.json();
           setProgress(progData);
+        } else {
+          failedCount++;
         }
 
         if (achRes.ok) {
           const achData = await achRes.json();
           setAchievements(achData.achievements);
           setAchievementsStats(achData.stats);
+        } else {
+          failedCount++;
         }
 
         if (checkRes.ok) {
@@ -265,23 +290,34 @@ export default function DashboardPage() {
           if (!checkData.today) {
             setShowCheckinModal(true);
           }
+        } else {
+          failedCount++;
         }
 
         if (insRes.ok) {
           const insData = await insRes.json();
           setDashboardInsights(insData.insights);
           setInsightsScore(insData.summary?.score ?? null);
+        } else {
+          failedCount++;
+        }
+
+        // Only show error if ALL calls failed (partial data is still useful)
+        if (failedCount === 8) {
+          setFetchError(true);
         }
       } catch (error) {
+        if (cancelled) return;
         console.error('Error fetching dashboard data:', error);
         setFetchError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+    return () => { cancelled = true; };
+  }, [user, apiFetch]);
 
   // Rotar frase cada 80 segundos con fade
   useEffect(() => {
