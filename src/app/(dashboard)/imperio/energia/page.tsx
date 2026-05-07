@@ -335,9 +335,9 @@ export default function EnergiaPage() {
                     <span className="text-[#c8a55a]">Energía: {log.energy}</span>
                     <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => startEditWellness(log)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={14} /></button>
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
                   </div>
                 </div>
               </div>
@@ -396,9 +396,9 @@ export default function EnergiaPage() {
                     <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
                     <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => startEditNutrition(log)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={14} /></button>
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
                   </div>
                 </div>
               </div>

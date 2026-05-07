@@ -308,26 +308,30 @@ export default function DisciplinaPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => completeHabit(habit.id)}
-                    className="w-8 h-8 rounded-full border border-[#1a1a1a] flex items-center justify-center hover:border-[#c8a55a] transition-colors"
+                    className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all touch-press ${
+                      habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString()
+                        ? 'bg-[#c8a55a] border-[#c8a55a] scale-100'
+                        : 'border-[#333] hover:border-[#c8a55a] hover:bg-[#c8a55a]/10'
+                    }`}
                   >
-                    <Check size={14} className="text-[#c8a55a]" />
+                    <Check size={16} className={habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString() ? 'text-black' : 'text-[#c8a55a]'} />
                   </button>
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
                     {habit.description && <p className="text-[#666] text-xs">{habit.description}</p>}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {habit.streak > 0 && (
-                    <span className="flex items-center gap-1 text-[#c8a55a] text-xs">
+                    <span className="flex items-center gap-1 text-[#c8a55a] text-xs mr-1">
                       <Flame size={14} /> {habit.streak}
                     </span>
                   )}
-                  <button onClick={() => startEdit(habit)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar">
-                    <Pencil size={14} />
+                  <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                    <Pencil size={15} />
                   </button>
-                  <button onClick={() => deleteHabit(habit.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar">
-                    <Trash2 size={14} />
+                  <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </div>

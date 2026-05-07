@@ -536,20 +536,20 @@ export default function MentePage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => startEdit(session)}
-                      className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all"
+                      className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press"
                       title="Editar sesión"
                     >
-                      <Pencil size={14} />
+                      <Pencil size={15} />
                     </button>
                     <button
                       onClick={() => setPendingDeleteId(session.id)}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all"
+                      className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press"
                       title="Eliminar sesión"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </div>

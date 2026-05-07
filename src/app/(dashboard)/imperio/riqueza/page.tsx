@@ -275,9 +275,9 @@ export default function RiquezaPage() {
                     </p>
                     <p className="text-xs text-[#666]">{new Date(log.date).toLocaleDateString('es')}</p>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => startEdit(log)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId(log.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all" title="Eliminar"><Trash2 size={14} /></button>
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
+                    <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
                   </div>
                 </div>
               </div>
