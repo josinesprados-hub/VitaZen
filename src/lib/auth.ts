@@ -42,7 +42,7 @@ export async function getAuthUser(idToken: string) {
       },
     });
     if (user) {
-      console.log('[CRUD DEBUG] getAuthUser: found user by email (not firebaseUid). user.id:', user.id);
+      console.log('[Auth] getAuthUser: found user by email (not firebaseUid). user.id:', user.id);
     }
   }
 

@@ -12,7 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, loading, syncError, firebaseUser, refreshUser } = useAuth();
   const router = useRouter();
 
   if (loading) {
@@ -29,13 +29,37 @@ export default function DashboardLayout({
     );
   }
 
+  // Firebase authenticated but sync failed (API down, network error, etc.)
+  // Show retry instead of redirecting to login (prevents redirect loop)
+  if (syncError && firebaseUser && !user) {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-5 text-center px-6">
+          <div className="w-12 h-12 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
+          </div>
+          <div>
+            <p className="text-white text-sm font-medium mb-1">Conectando con el servidor</p>
+            <p className="text-[#666] text-xs">No se pudo verificar tu sesión</p>
+          </div>
+          <button
+            onClick={refreshUser}
+            className="text-[#c8a55a] text-sm hover:underline"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
-    router.push('/login');
+    router.replace('/login');
     return null;
   }
 
   if (user.onboardingCompleted === false) {
-    router.push('/onboarding');
+    router.replace('/onboarding');
     return null;
   }
 

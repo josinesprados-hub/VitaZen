@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
   Shield,
@@ -36,6 +36,7 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, signOut } = useAuth();
 
   return (
@@ -188,7 +189,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </div>
             </div>
             <button
-              onClick={signOut}
+              onClick={async () => {
+                await signOut();
+                router.replace('/login');
+              }}
               className="flex items-center gap-2 w-full px-4 py-3 text-sm text-[#999] hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
             >
               <LogOut size={16} />

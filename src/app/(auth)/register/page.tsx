@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth, getProviderMismatchMessage } from '@/context/AuthContext';
@@ -20,8 +20,15 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [providerHint, setProviderHint] = useState<'google' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Redirect already-authenticated users away from register
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +44,7 @@ export default function RegisterPage() {
 
     try {
       await signUp(email, password);
-      router.push('/dashboard');
+      // Redirect handled by useEffect watching `user`
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         setError('Este email ya está registrado. Inicia sesión o usa otro email.');
@@ -57,7 +64,7 @@ export default function RegisterPage() {
 
     try {
       await signInWithGoogle();
-      router.push('/dashboard');
+      // Redirect handled by useEffect watching `user`
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setLoading(false);

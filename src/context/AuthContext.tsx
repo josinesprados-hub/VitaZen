@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import {
   onAuthStateChanged,
   User as FirebaseUser,
@@ -27,6 +27,7 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   user: UserData | null;
   loading: boolean;
+  syncError: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -40,94 +41,88 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [syncError, setSyncError] = useState(false);
 
-  const syncUser = async (fbUser: FirebaseUser) => {
+  const syncUser = useCallback(async (fbUser: FirebaseUser) => {
     try {
-      console.log('[AUTH DEBUG] syncUser - Firebase UID:', fbUser.uid, 'Email:', fbUser.email);
+      setSyncError(false);
       const idToken = await fbUser.getIdToken();
-      console.log('[AUTH DEBUG] getIdToken - Token length:', idToken?.length, 'Token prefix:', idToken?.substring(0, 20) + '...');
-      console.log('[AUTH DEBUG] Llamando a /api/auth/sync...');
       const res = await fetch('/api/auth/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
-      console.log('[AUTH DEBUG] /api/auth/sync respuesta - Status:', res.status, 'OK:', res.ok);
 
       if (res.ok) {
         const data = await res.json();
-        console.log('[AUTH DEBUG] /api/auth/sync data:', JSON.stringify(data));
         setUser(data.user);
-        console.log('[AUTH DEBUG] setUser ejecutado correctamente. User:', JSON.stringify(data.user));
       } else {
-        const errorData = await res.json().catch(() => null);
-        console.error('[AUTH DEBUG] /api/auth/sync error response:', res.status, errorData);
+        console.error('[Auth] sync failed:', res.status);
+        setSyncError(true);
       }
     } catch (error) {
-      console.error('[AUTH DEBUG] Error syncing user:', error);
+      console.error('[Auth] sync error:', error);
+      setSyncError(true);
     }
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!firebaseUser) return;
     try {
-      const idToken = await firebaseUser.getIdToken();
+      // Force token refresh to get fresh claims/session
+      const idToken = await firebaseUser.getIdToken(true);
       const res = await fetch('/api/auth/session', {
         headers: { Authorization: `Bearer ${idToken}` },
       });
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        setSyncError(false);
       }
     } catch (error) {
-      console.error('Error refreshing user:', error);
+      console.error('[Auth] refresh error:', error);
     }
-  };
+  }, [firebaseUser]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      console.log('[AUTH DEBUG] onAuthStateChanged - Firebase user:', fbUser ? `UID: ${fbUser.uid}, Email: ${fbUser.email}` : 'null');
       setFirebaseUser(fbUser);
       if (fbUser) {
         await syncUser(fbUser);
       } else {
-        console.log('[AUTH DEBUG] onAuthStateChanged - No hay usuario Firebase, setUser(null)');
         setUser(null);
       }
       setLoading(false);
-      console.log('[AUTH DEBUG] onAuthStateChanged - loading = false, user state:', fbUser ? 'autenticado' : 'no autenticado');
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [syncUser]);
 
   const signIn = async (email: string, password: string) => {
-    console.log('[AUTH DEBUG] signInWithEmailAndPassword - Intentando con email:', email);
     await signInWithEmailAndPassword(auth, email, password);
-    // syncUser handled by onAuthStateChanged — no duplicate call
+    // syncUser handled by onAuthStateChanged
   };
 
   const signUp = async (email: string, password: string) => {
-    console.log('[AUTH DEBUG] createUserWithEmailAndPassword - Intentando con email:', email);
     await createUserWithEmailAndPassword(auth, email, password);
-    // syncUser handled by onAuthStateChanged — no duplicate call
+    // syncUser handled by onAuthStateChanged
   };
 
   const signInWithGoogle = async () => {
-    console.log('[AUTH DEBUG] signInWithPopup - Abriendo popup de Google...');
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
-    // syncUser handled by onAuthStateChanged — no duplicate call
+    // syncUser handled by onAuthStateChanged
   };
 
   const signOut = async () => {
     await firebaseSignOut(auth);
     setUser(null);
     setFirebaseUser(null);
+    setSyncError(false);
   };
 
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading, signIn, signUp, signInWithGoogle, signOut, refreshUser }}>
+    <AuthContext.Provider value={{ firebaseUser, user, loading, syncError, signIn, signUp, signInWithGoogle, signOut, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

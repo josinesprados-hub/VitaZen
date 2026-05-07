@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth, getProviderMismatchMessage } from '@/context/AuthContext';
@@ -16,8 +16,15 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [providerHint, setProviderHint] = useState<'google' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, user, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Redirect already-authenticated users away from login
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +34,7 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      router.push('/dashboard');
+      // Redirect handled by useEffect watching `user`
     } catch (err: any) {
       setError(err.code === 'auth/invalid-credential' ? 'Credenciales incorrectas. Verifica tu email y contraseña.' : 'No se ha podido iniciar sesión. Inténtalo de nuevo.');
     } finally {
@@ -41,7 +48,7 @@ export default function LoginPage() {
 
     try {
       await signInWithGoogle();
-      router.push('/dashboard');
+      // Redirect handled by useEffect watching `user`
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setLoading(false);

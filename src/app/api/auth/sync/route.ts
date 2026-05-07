@@ -6,39 +6,28 @@ import { sendWelcomeEmail } from '@/lib/emails/sender';
 export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json();
-    console.log('[AUTH SYNC DEBUG] Request recibido. idToken length:', idToken?.length, 'idToken prefix:', idToken?.substring(0, 20) + '...');
 
     if (!idToken) {
-      console.error('[AUTH SYNC DEBUG] No se recibió idToken');
       return NextResponse.json({ error: 'ID token required' }, { status: 400 });
     }
 
-    console.log('[AUTH SYNC DEBUG] Verificando token Firebase...');
     const decodedToken = await verifyFirebaseToken(idToken);
-    console.log('[AUTH SYNC DEBUG] verifyFirebaseToken resultado:', decodedToken ? `UID: ${decodedToken.uid}, Email: ${decodedToken.email}` : 'null');
 
     if (!decodedToken) {
-      console.error('[AUTH SYNC DEBUG] Token inválido - verifyFirebaseToken devolvió null');
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Buscar por firebaseUid primero
+    // Search by firebaseUid first
     let existingUser = await db.user.findUnique({ where: { firebaseUid: decodedToken.uid } });
 
-    // Si no existe por firebaseUid, buscar por email para evitar P2002
+    // If not found by firebaseUid, search by email to avoid P2002
     if (!existingUser && decodedToken.email) {
       existingUser = await db.user.findUnique({ where: { email: decodedToken.email } });
-      if (existingUser) {
-        console.log('[AUTH SYNC DEBUG] Usuario encontrado por email (no por firebaseUid). User id:', existingUser.id);
-      }
     }
 
-    const isNewUser = !existingUser;
-    console.log('[AUTH SYNC DEBUG] isNewUser:', isNewUser, 'existingUser:', existingUser ? `id: ${existingUser.id}` : 'null');
-
-    // Si el usuario ya existe (por firebaseUid o por email), devolverlo directamente
+    // If user exists, return it directly
     if (existingUser) {
-      const responseData = {
+      return NextResponse.json({
         user: {
           id: existingUser.id,
           firebaseUid: existingUser.firebaseUid,
@@ -48,27 +37,22 @@ export async function POST(request: NextRequest) {
           avatarUrl: existingUser.avatarUrl,
           onboardingCompleted: existingUser.onboardingCompleted,
         },
-      };
-      console.log('[AUTH SYNC DEBUG] Usuario existente devuelto. Respuesta 200:', JSON.stringify(responseData));
-      return NextResponse.json(responseData);
+      });
     }
 
-    // No existe: crear usuario
-    console.log('[AUTH SYNC DEBUG] Llamando a syncUserToDatabase...');
+    // New user: create in database
     const user = await syncUserToDatabase(
       decodedToken.uid,
       decodedToken.email!,
       decodedToken.name
     );
-    console.log('[AUTH SYNC DEBUG] syncUserToDatabase OK. User id:', user.id, 'email:', user.email, 'plan:', user.plan);
 
     // Send welcome email for new users
     if (user.email) {
-      console.log('[AUTH SYNC DEBUG] Enviando welcome email a:', user.email);
       await sendWelcomeEmail(user.email, user.name || 'Amigo');
     }
 
-    const responseData = {
+    return NextResponse.json({
       user: {
         id: user.id,
         firebaseUid: user.firebaseUid,
@@ -78,12 +62,9 @@ export async function POST(request: NextRequest) {
         avatarUrl: user.avatarUrl,
         onboardingCompleted: user.onboardingCompleted,
       },
-    };
-    console.log('[AUTH SYNC DEBUG] Nuevo usuario creado. Respuesta 200:', JSON.stringify(responseData));
-
-    return NextResponse.json(responseData);
+    });
   } catch (error) {
-    console.error('[AUTH SYNC DEBUG] Error en /api/auth/sync:', error);
+    console.error('[Auth] sync error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
