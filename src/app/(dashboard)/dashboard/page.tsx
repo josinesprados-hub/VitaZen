@@ -9,6 +9,7 @@ import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { OnboardingRecommendations } from '@/components/dashboard/OnboardingRecommendations';
 import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 
 const FRASES = [
@@ -211,6 +212,7 @@ export default function DashboardPage() {
   const [showCheckinModal, setShowCheckinModal] = useState(false);
   const [dashboardInsights, setDashboardInsights] = useState<{ id: string; type: string; category: string; icon: string; title: string; description: string }[] | null>(null);
   const [insightsScore, setInsightsScore] = useState<number | null>(null);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -272,6 +274,7 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        setFetchError(true);
       } finally {
         setLoading(false);
       }
@@ -294,6 +297,20 @@ export default function DashboardPage() {
 
   if (loading) {
     return <DashboardSkeleton />;
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-7xl mx-auto min-h-[60dvh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar el dashboard"
+          subtitle="Tu progreso está seguro. Intenta recargar para volver a verlo."
+          onRetry={() => window.location.reload()}
+          size="lg"
+        />
+      </div>
+    );
   }
 
   return (

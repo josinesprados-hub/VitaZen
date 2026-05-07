@@ -6,6 +6,7 @@ import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
 import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   Sparkles,
   ArrowLeft,
@@ -162,13 +163,16 @@ export default function InsightsPage() {
 
   if (!data) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <PremiumEmptyState
-          icon={Sparkles}
+      <div className="max-w-4xl mx-auto min-h-[50dvh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
           title="No se pudieron cargar los insights"
-          subtitle="Inténtalo de nuevo más tarde"
-          cta="Volver al dashboard"
-          onCta={() => window.location.href = '/dashboard'}
+          subtitle="Tu actividad está guardada. Intenta recargar para ver tus datos."
+          onRetry={() => window.location.reload()}
+          secondaryAction={{
+            label: 'Volver al dashboard',
+            href: '/dashboard',
+          }}
           size="lg"
         />
       </div>

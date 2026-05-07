@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { MentorSkeleton } from '@/components/ui/PremiumSkeleton';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   Brain,
   Send,
@@ -120,6 +121,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [historyLimited, setHistoryLimited] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   // Tab: 'active' | 'archived'
   const [tab, setTab] = useState<'active' | 'archived'>('active');
@@ -200,7 +202,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
         }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error(e); 
+      setLoadError(true);
+    }
     finally { setLoading(false); }
   };
 
@@ -412,6 +417,28 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   if (loading) {
     return <MentorSkeleton />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-6xl mx-auto min-h-[60dvh] flex items-center justify-center">
+        <PremiumErrorState
+          variant="loading"
+          title="El mentor no está disponible"
+          subtitle="No se pudo conectar con el asistente. Tu historial está a salvo."
+          onRetry={() => {
+            setLoadError(false);
+            setLoading(true);
+            fetchThreads();
+          }}
+          secondaryAction={{
+            label: 'Volver al dashboard',
+            href: backHref,
+          }}
+          size="lg"
+        />
+      </div>
+    );
   }
 
   const IconComponent = headerIcon === 'brain' ? Brain : Sparkles;

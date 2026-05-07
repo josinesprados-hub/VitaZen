@@ -610,8 +610,8 @@ function HabitsStep({
       </div>
 
       {error && (
-        <div className="bg-red-500/5 border border-red-500/20 rounded-lg p-3 mb-4">
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg p-3 mb-4 error-state-enter">
+          <p className="text-[#c8a55a]/80 text-sm">{error}</p>
         </div>
       )}
 
