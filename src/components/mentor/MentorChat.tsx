@@ -158,6 +158,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
+  const sendingRef = useRef(false);
+  const activeThreadRef = useRef<string | null>(null);
+  const fetchIdRef = useRef(0);
 
   const isPremium = user?.plan === 'PREMIUM';
 
@@ -175,7 +178,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }, []);
 
   useEffect(() => {
+    activeThreadRef.current = activeThread;
     if (activeThread) {
+      setMessages([]); // Clear immediately to avoid flash of old messages
       fetchMessages(activeThread);
       try { localStorage.setItem(STORAGE_KEY, activeThread); } catch {}
     }
@@ -204,6 +209,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         const allThreads: Thread[] = data.threads;
         setThreads(allThreads);
         setHistoryLimited(!!data.historyLimited);
+        // Initialize remaining/limit from server if available
+        if (data.remaining !== undefined && data.remaining !== null) {
+          setRemaining(data.remaining);
+          setDailyLimit(data.limit || 15);
+        }
         if (allThreads.length > 0) {
           let savedThreadId: string | null = null;
           try { savedThreadId = localStorage.getItem(STORAGE_KEY); } catch {}
@@ -222,9 +232,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }, [apiFetch]);
 
   const fetchMessages = useCallback(async (threadId: string) => {
+    const thisFetchId = ++fetchIdRef.current;
     try {
       const res = await apiFetch(`/api/ai/threads/${threadId}/messages`);
-      if (res.ok) {
+      // Only apply if this is still the latest fetch (prevents stale overwrites on rapid thread switching)
+      if (res.ok && fetchIdRef.current === thisFetchId) {
         const data = await res.json();
         setMessages(data.messages);
         setHistoryLimited(!!data.historyLimited);
@@ -244,7 +256,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       });
       if (res.ok) {
         const data = await res.json();
-        setThreads([data.thread, ...threads]);
+        setThreads(prev => [data.thread, ...prev]);
         setActiveThread(data.thread.id);
         setMessages([]);
         setTab('active');
@@ -330,12 +342,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || !activeThread || sending) return;
+    const content = input.trim();
+    if (!content || !activeThread || sendingRef.current) return;
+
+    const sentThreadId = activeThread;
+    sendingRef.current = true;
 
     const userMessage: Message = {
       id: 'temp-' + Date.now(),
       role: 'user',
-      content: input,
+      content,
       createdAt: new Date().toISOString(),
     };
     setMessages(prev => [...prev, userMessage]);
@@ -345,7 +361,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     try {
       const res = await apiFetch('/api/ai/chat', {
         method: 'POST',
-        body: JSON.stringify({ threadId: activeThread, content: input }),
+        body: JSON.stringify({ threadId: sentThreadId, content }),
       });
 
       if (res.status === 403) {
@@ -366,10 +382,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           content: data.message,
           createdAt: new Date().toISOString(),
         };
-        setMessages(prev => [...prev, assistantMessage]);
-        setRemaining(data.remaining);
-        setDailyLimit(data.limit || 15);
-        setIsContextual(!!data.contextual);
+        // Only add response if still on the same thread
+        if (activeThreadRef.current === sentThreadId) {
+          setMessages(prev => [...prev, assistantMessage]);
+          setRemaining(data.remaining);
+          setDailyLimit(data.limit || 15);
+          setIsContextual(!!data.contextual);
+        }
 
         // Refresh threads to get updated title and updatedAt
         const threadsRes = await apiFetch('/api/ai/threads');
@@ -379,8 +398,18 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setHistoryLimited(!!threadsData.historyLimited);
         }
       }
-    } catch (e) { console.error(e); }
-    finally { setSending(false); }
+    } catch (e) {
+      console.error(e);
+      // Remove optimistic user message on network error if still on same thread
+      if (activeThreadRef.current === sentThreadId) {
+        setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+        setInput(content); // Restore input so user can retry
+      }
+    }
+    finally {
+      setSending(false);
+      sendingRef.current = false;
+    }
   };
 
   // ─────────────────────────────────────────
@@ -997,20 +1026,24 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={
-                      !isPremium && remaining === 0
+                      activeThreadData?.archived
+                        ? 'Conversación archivada'
+                        : !isPremium && remaining === 0
                         ? 'Límite diario alcanzado'
                         : 'Escribe tu mensaje...'
                     }
                     className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-sm placeholder-[#555] transition-colors ${
-                      !isPremium && remaining === 0
+                      activeThreadData?.archived
+                        ? 'border-[#333] cursor-not-allowed opacity-40'
+                        : !isPremium && remaining === 0
                         ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
                         : 'border-[#1a1a1a] focus:border-[#c8a55a]'
                     }`}
-                    disabled={sending || (!isPremium && remaining === 0)}
+                    disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
                   />
                   <button
                     type="submit"
-                    disabled={sending || !input.trim() || (!isPremium && remaining === 0)}
+                    disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
                     className="bg-[#c8a55a] text-black font-semibold px-5 py-3 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Send size={18} />
