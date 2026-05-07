@@ -38,13 +38,6 @@ html, body {
   overscroll-behavior: none;
 }
 
-/* Viewport fit cover for iPhone safe areas */
-@supports (padding: env(safe-area-inset-top)) {
-  html {
-    viewport-fit: cover;
-  }
-}
-
 /* Ensure html/body fill viewport on mobile without awkward bounce gaps */
 html, body {
   min-height: 100dvh;
@@ -896,4 +889,47 @@ html { scroll-behavior: smooth; }
 /* Fix: prevent horizontal overflow from edge-to-edge elements */
 .overflow-x-contain {
   overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   Mobile Scroll Locking
+   ═══════════════════════════════════════════ */
+
+/* When sidebar or modal is open, lock body scroll to prevent
+   background scrolling on mobile. Applied via JS class toggle
+   or via :has() when a full-screen overlay is present. */
+body.scroll-locked {
+  overflow: hidden;
+  /* Preserve scroll position on iOS Safari */
+  position: fixed;
+  width: 100%;
+  touch-action: none;
+}
+
+/* Auto lock body scroll when a modal overlay is present on mobile — 
+   covers all imperio page modals, CheckInModal, MentorChat modals, etc.
+   Uses :has() to detect any .modal-backdrop or .premium-modal-backdrop
+   anywhere in the DOM. */
+@media (max-width: 767px) {
+  body:has(.modal-backdrop) {
+    overflow: hidden;
+  }
+  body:has(.premium-modal-backdrop) {
+    overflow: hidden;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   iPhone Safari Bottom Bar Fix
+   ═══════════════════════════════════════════ */
+
+/* On iOS Safari, the bottom bar can overlap fixed elements.
+   Use dvh for heights to account for dynamic viewport. */
+@supports (height: 100dvh) {
+  .h-screen-safe {
+    height: 100dvh;
+  }
+  .min-h-screen-safe {
+    min-height: 100dvh;
+  }
 }

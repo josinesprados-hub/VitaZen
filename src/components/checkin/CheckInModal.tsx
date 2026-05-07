@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Sunrise } from 'lucide-react';
 
 // ─── Emotion Labels ─────────────────────────────────────
@@ -112,6 +112,12 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [note, setNote] = useState(initialData?.note || '');
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(0); // 0: intro, 1: form, 2: done
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.classList.add('scroll-locked');
+    return () => document.body.classList.remove('scroll-locked');
+  }, []);
 
   const handleSave = async () => {
     if (!intention.trim()) return;

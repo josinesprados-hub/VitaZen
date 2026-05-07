@@ -268,7 +268,7 @@ export default function MentePage() {
                   min={1}
                   value={editDuration}
                   onChange={(e) => setEditDuration(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors"
                 />
               </div>
 
@@ -277,7 +277,7 @@ export default function MentePage() {
                 <select
                   value={editType}
                   onChange={(e) => setEditType(e.target.value)}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors appearance-none"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors appearance-none"
                 >
                   {BREATHING_TECHNIQUES.map((tech) => (
                     <option key={tech.type} value={tech.type}>{tech.label}</option>

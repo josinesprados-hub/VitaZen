@@ -193,7 +193,7 @@ export default function LogrosPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scroll-pills -mx-4 px-4 sm:mx-0 sm:px-0">
         {CATEGORIES.map((cat) => {
           const isActive = activeFilter === cat.key;
           const Icon = cat.icon;

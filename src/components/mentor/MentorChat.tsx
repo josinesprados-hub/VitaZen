@@ -164,6 +164,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   const isPremium = user?.plan === 'PREMIUM';
 
+  // Lock body scroll when any modal (delete confirm or limit modal) is open
+  useEffect(() => {
+    if (deleteConfirm || showLimitModal) {
+      document.body.classList.add('scroll-locked');
+      return () => document.body.classList.remove('scroll-locked');
+    }
+  }, [deleteConfirm, showLimitModal]);
+
   // Close context menu on click outside
   useEffect(() => {
     const handler = () => setContextMenu(null);
@@ -645,7 +653,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                                   if (e.key === 'Enter') renameThread(thread.id, editTitle);
                                   if (e.key === 'Escape') setEditingThreadId(null);
                                 }}
-                                className="flex-1 bg-[#000] border border-[#c8a55a] rounded px-2 py-0.5 text-xs text-white focus:outline-none"
+                                className="flex-1 bg-[#000] border border-[#c8a55a] rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
                                 maxLength={100}
                               />
                               <button
