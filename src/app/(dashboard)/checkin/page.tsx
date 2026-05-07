@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, memo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -62,7 +62,7 @@ function formatDate(dateStr: string): string {
 
 // ─── Mini Bar Chart ──────────────────────────────────────
 
-function MiniBarChart({ data, metricKey }: { data: TrendsData['daily']; metricKey: string }) {
+const MiniBarChart = memo(function MiniBarChart({ data, metricKey }: { data: TrendsData['daily']; metricKey: string }) {
   if (data.length === 0) return null;
 
   return (
@@ -81,7 +81,7 @@ function MiniBarChart({ data, metricKey }: { data: TrendsData['daily']; metricKe
       })}
     </div>
   );
-}
+});
 
 // ─── Component ───────────────────────────────────────────
 
@@ -127,6 +127,22 @@ export default function CheckinPage() {
     fetchData();
   }, [fetchData]);
 
+  const handleModalClose = useCallback(() => {
+    setShowModal(false);
+    fetchData();
+  }, [fetchData]);
+
+  const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }) => {
+    const res = await apiFetch('/api/checkin', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const result = await res.json();
+      setTodayCheckin(result.checkin);
+    }
+  }, [apiFetch]);
+
   if (loading) {
     return <CheckinSkeleton />;
   }
@@ -136,21 +152,9 @@ export default function CheckinPage() {
       {/* Modal */}
       {showModal && (
         <CheckInModal
-          onClose={async () => {
-            setShowModal(false);
-            await fetchData();
-          }}
+          onClose={handleModalClose}
           initialData={todayCheckin}
-          onSave={async (data) => {
-            const res = await apiFetch('/api/checkin', {
-              method: 'POST',
-              body: JSON.stringify(data),
-            });
-            if (res.ok) {
-              const result = await res.json();
-              setTodayCheckin(result.checkin);
-            }
-          }}
+          onSave={handleCheckinSave}
         />
       )}
 

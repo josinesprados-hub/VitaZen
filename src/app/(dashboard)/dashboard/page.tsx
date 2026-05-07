@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
@@ -295,6 +295,33 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Memoized computed values to avoid recalculating on every render
+  const totalXp = useMemo(() => empires.reduce((sum, e) => sum + e.xp, 0), [empires]);
+  const totalLevels = useMemo(() => empires.reduce((sum, e) => sum + e.level, 0), [empires]);
+  const bestStreak = useMemo(() => Math.max(...empires.map((e) => e.streak), 0), [empires]);
+
+  const sortedAchievements = useMemo(() => {
+    if (!achievements) return null;
+    return [...achievements].sort((a, b) => {
+      if (a.unlocked && !b.unlocked) return -1;
+      if (!a.unlocked && b.unlocked) return 1;
+      return b.percent - a.percent;
+    }).slice(0, 5);
+  }, [achievements]);
+
+  const visibleInsights = useMemo(() => dashboardInsights?.slice(0, 3) ?? [], [dashboardInsights]);
+
+  const handleCheckinSave = useCallback(async (data: any) => {
+    const res = await apiFetch('/api/checkin', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const result = await res.json();
+      setTodayCheckin(result.checkin);
+    }
+  }, [apiFetch]);
+
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -320,16 +347,7 @@ export default function DashboardPage() {
         <CheckInModal
           onClose={() => setShowCheckinModal(false)}
           initialData={todayCheckin}
-          onSave={async (data) => {
-            const res = await apiFetch('/api/checkin', {
-              method: 'POST',
-              body: JSON.stringify(data),
-            });
-            if (res.ok) {
-              const result = await res.json();
-              setTodayCheckin(result.checkin);
-            }
-          }}
+          onSave={handleCheckinSave}
         />
       )}
 
@@ -518,7 +536,7 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {dashboardInsights.slice(0, 3).map((insight) => {
+            {visibleInsights.map((insight) => {
               const borderClass = insight.type === 'positive'
                 ? 'border-[#22c55e]/15 hover:border-[#22c55e]/30'
                 : insight.type === 'warning'
@@ -646,14 +664,7 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-            {achievements
-              .sort((a, b) => {
-                if (a.unlocked && !b.unlocked) return -1;
-                if (!a.unlocked && b.unlocked) return 1;
-                return b.percent - a.percent;
-              })
-              .slice(0, 5)
-              .map((ach) => {
+            {(sortedAchievements ?? []).map((ach) => {
                 const isUnlocked = ach.unlocked;
                 return (
                   <div
@@ -701,7 +712,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             <Star size={20} className="text-[#c8a55a]" />
             <div>
-              <p className="text-2xl font-bold text-white">{empires.reduce((sum, e) => sum + e.xp, 0)}</p>
+              <p className="text-2xl font-bold text-white">{totalXp}</p>
               <p className="text-xs text-[#999]">XP total</p>
             </div>
           </div>
@@ -710,7 +721,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Trophy size={20} className="text-[#c8a55a]" />
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-white">{empires.reduce((sum, e) => sum + e.level, 0)}</p>
+              <p className="text-lg sm:text-2xl font-bold text-white">{totalLevels}</p>
               <p className="text-xs text-[#999]">Niveles totales</p>
             </div>
           </div>
@@ -720,7 +731,7 @@ export default function DashboardPage() {
             <Flame size={20} className="text-[#c8a55a]" />
             <div>
               <p className="text-lg sm:text-2xl font-bold text-white">
-                {Math.max(...empires.map((e) => e.streak), 0)}
+                {bestStreak}
               </p>
               <p className="text-xs text-[#999]">Mejor racha</p>
             </div>

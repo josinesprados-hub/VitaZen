@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { MentorSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -102,6 +102,21 @@ interface MentorChatProps {
 }
 
 // ─────────────────────────────────────────
+// Module-level constants & helpers
+// ─────────────────────────────────────────
+
+const STORAGE_KEY = 'vitazen_active_thread';
+const DATE_GROUP_ORDER = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Anterior'];
+
+function getProgressColor(rem: number, limit: number): string {
+  if (!isFinite(limit)) return '#c8a55a';
+  const pct = rem / limit;
+  if (pct > 0.5) return '#c8a55a';
+  if (pct > 0.25) return '#e8a849';
+  return '#ef4444';
+}
+
+// ─────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────
 
@@ -144,9 +159,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const editInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
 
-  // Persist active thread in localStorage
-  const STORAGE_KEY = 'vitazen_active_thread';
-
   const isPremium = user?.plan === 'PREMIUM';
 
   // Close context menu on click outside
@@ -184,7 +196,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // Data fetching
   // ─────────────────────────────────────────
 
-  const fetchThreads = async () => {
+  const fetchThreads = useCallback(async () => {
     try {
       const res = await apiFetch('/api/ai/threads');
       if (res.ok) {
@@ -207,7 +219,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       setLoadError(true);
     }
     finally { setLoading(false); }
-  };
+  }, [apiFetch]);
 
   const fetchMessages = useCallback(async (threadId: string) => {
     try {
@@ -372,31 +384,24 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   };
 
   // ─────────────────────────────────────────
-  // Computed
+  // Computed (memoized to avoid re-filtering on every render)
   // ─────────────────────────────────────────
 
-  const activeThreads = threads.filter(t => !t.archived);
-  const archivedThreads = threads.filter(t => t.archived);
-  const visibleThreads = tab === 'active' ? activeThreads : archivedThreads;
+  const activeThreads = useMemo(() => threads.filter(t => !t.archived), [threads]);
+  const archivedThreads = useMemo(() => threads.filter(t => t.archived), [threads]);
+  const visibleThreads = useMemo(() => tab === 'active' ? activeThreads : archivedThreads, [tab, activeThreads, archivedThreads]);
 
   // Group visible threads by date
-  const groupedThreads = visibleThreads.reduce<Record<string, Thread[]>>((acc, thread) => {
+  const groupedThreads = useMemo(() => visibleThreads.reduce<Record<string, Thread[]>>((acc, thread) => {
     const group = getDateGroup(thread.updatedAt);
     if (!acc[group]) acc[group] = [];
     acc[group].push(thread);
     return acc;
-  }, {});
+  }, {}), [visibleThreads]);
 
-  const dateGroupOrder = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Anterior'];
+  const activeThreadData = useMemo(() => threads.find(t => t.id === activeThread) ?? null, [threads, activeThread]);
 
-  // Progress bar color based on remaining messages
-  const getProgressColor = (rem: number, limit: number) => {
-    if (!isFinite(limit)) return '#c8a55a';
-    const pct = rem / limit;
-    if (pct > 0.5) return '#c8a55a';
-    if (pct > 0.25) return '#e8a849';
-    return '#ef4444';
-  };
+  const IconComponent = useMemo(() => headerIcon === 'brain' ? Brain : Sparkles, [headerIcon]);
 
   // ─────────────────────────────────────────
   // Context menu handler
@@ -440,8 +445,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       </div>
     );
   }
-
-  const IconComponent = headerIcon === 'brain' ? Brain : Sparkles;
 
   return (
     <div className="max-w-6xl mx-auto h-[calc(100dvh-5.5rem)] sm:h-[calc(100vh-8rem)] flex flex-col overflow-x-contain">
@@ -566,7 +569,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
           {/* Thread list grouped by date */}
           <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-hide">
-            {dateGroupOrder.map(group => {
+            {DATE_GROUP_ORDER.map(group => {
               const groupThreads = groupedThreads[group];
               if (!groupThreads || groupThreads.length === 0) return null;
               return (
@@ -853,9 +856,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 <div className="flex items-center gap-2 min-w-0">
                   <MessageCircle size={14} className="text-[#c8a55a] shrink-0" />
                   <p className="text-sm text-white truncate">
-                    {threads.find(t => t.id === activeThread)?.title || 'Conversación'}
+                    {activeThreadData?.title || 'Conversación'}
                   </p>
-                  {threads.find(t => t.id === activeThread)?.archived && (
+                  {activeThreadData?.archived && (
                     <span className="shrink-0 text-[10px] bg-[#c8a55a]/10 text-[#c8a55a] px-2 py-0.5 rounded-full border border-[#c8a55a]/20">
                       Archivada
                     </span>
