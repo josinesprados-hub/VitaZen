@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { EmailVerificationBanner } from '@/components/ui/EmailVerificationBanner';
+import { trackEvent } from '@/lib/analytics';
 
 export default function DashboardLayout({
   children,
@@ -15,6 +16,15 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, loading, syncError, firebaseUser, refreshUser } = useAuth();
   const router = useRouter();
+  const sessionTracked = useRef(false);
+
+  // Track daily session — once per mount, deduplicated server-side
+  useEffect(() => {
+    if (user && !loading && !sessionTracked.current) {
+      sessionTracked.current = true;
+      trackEvent({ event: 'daily_session' });
+    }
+  }, [user, loading]);
 
   if (loading) {
     return (

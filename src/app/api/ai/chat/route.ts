@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
 import { checkAILimit, incrementAIUsage, getDailyLimit } from '@/lib/limits';
 import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
+import { trackEvent } from '@/lib/analytics-server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -111,6 +112,9 @@ export async function POST(request: NextRequest) {
     if (!isPremium) {
       await incrementAIUsage(user.id);
     }
+
+    // Track mentor usage (privacy-first, no message content stored)
+    trackEvent({ event: 'mentor_used', userId: user.id, properties: { plan: user.plan, threadId } });
 
     // Auto-generate title using AI if this is the first exchange
     const messageCount = await db.aIMessage.count({ where: { threadId } });

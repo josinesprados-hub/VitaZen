@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth } from '@/lib/firebase-admin';
 import { db } from '@/lib/db';
+import { trackEvent } from '@/lib/analytics-server';
 
 /**
  * POST /api/auth/verify-email
@@ -44,6 +45,9 @@ export async function POST(request: NextRequest) {
       where: { userId: user.id, used: false },
       data: { used: true },
     });
+
+    // Track email verification
+    trackEvent({ event: 'email_verified', userId: user.id });
 
     console.log('[VERIFY] Email verified for user:', user.email);
 

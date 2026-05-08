@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { trackEvent } from '@/lib/analytics-server';
 
 // ─── GET: today's checkin + history ─────────────────────
 
@@ -105,6 +106,9 @@ export async function POST(request: NextRequest) {
       update: { emotion, energy, focus, stress, intention, note },
       create: { userId: user.id, date: today, emotion, energy, focus, stress, intention, note },
     });
+
+    // Track checkin event
+    trackEvent({ event: 'checkin_created', userId: user.id, properties: { emotion, energy, focus, stress } });
 
     // Award XP to mente empire
     await db.empireProgress.upsert({

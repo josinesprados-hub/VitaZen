@@ -333,3 +333,18 @@ model DailyCheckin {
   @@unique([userId, date])
   @@index([userId])
 }
+
+// ═══════════════════════════════════════════
+// ANALYTICS (privacy-first, lightweight)
+// ═══════════════════════════════════════════
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  event      String   // event name (e.g. "user_registered", "checkin_created")
+  userId     String?  // optional — null for anonymous events
+  properties String?  // JSON string for minimal context
+  createdAt  DateTime @default(now())
+
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+}

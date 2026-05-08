@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { trackEvent } from '@/lib/analytics-server';
 
 // GET /api/onboarding — Check onboarding status
 export async function GET(request: NextRequest) {
@@ -102,6 +103,9 @@ export async function POST(request: NextRequest) {
       where: { id: user.id },
       data: { onboardingCompleted: true },
     });
+
+    // Track onboarding completion
+    trackEvent({ event: 'onboarding_completed', userId: user.id, properties: { primaryFocus } });
 
     // Create initial habits from selection
     if (initialHabits && Array.isArray(initialHabits) && initialHabits.length > 0) {

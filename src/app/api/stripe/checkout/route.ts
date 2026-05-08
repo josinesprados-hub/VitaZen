@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { stripe, PLANS } from '@/lib/stripe';
 import { db } from '@/lib/db';
+import { trackEvent } from '@/lib/analytics-server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc'}/pricing?canceled=true`,
       metadata: { userId: user.id },
     });
+
+    // Track premium upgrade click
+    trackEvent({ event: 'premium_upgrade_clicked', userId: user.id });
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

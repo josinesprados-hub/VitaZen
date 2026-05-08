@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { trackEvent } from '@/lib/analytics-server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -79,6 +80,9 @@ export async function PATCH(request: NextRequest) {
       where: { id: habitId },
       data: { streak: newStreak, lastCompletedAt: today },
     });
+
+    // Track habit completion
+    trackEvent({ event: 'habit_completed', userId: user.id, properties: { habitId, streak: newStreak } });
 
     // Award XP to disciplina empire
     await db.empireProgress.upsert({

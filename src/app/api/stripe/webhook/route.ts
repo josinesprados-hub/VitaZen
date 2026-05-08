@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { sendSubscriptionConfirmedEmail } from '@/lib/emails/sender';
+import { trackEvent } from '@/lib/analytics-server';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest) {
             where: { id: userId },
             data: { plan: 'PREMIUM' },
           });
+
+          // Track premium upgrade completion
+          trackEvent({ event: 'premium_upgrade_completed', userId });
 
           await db.subscription.create({
             data: {

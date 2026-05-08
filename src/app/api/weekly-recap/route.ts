@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { generateWeeklyInsights, type WeeklySummary, type WeeklyComparison, type Insight } from '@/lib/insights';
 import { getEmotionalState, type EmotionalState } from '@/lib/emotional-state';
+import { trackEvent } from '@/lib/analytics-server';
 
 // ═══════════════════════════════════════════
 // WEEKLY RECAP API
@@ -178,6 +179,9 @@ export async function GET(request: NextRequest) {
       mentorRecommendation,
       plan: user.plan,
     };
+
+    // Track recap opened (before return so it actually executes)
+    trackEvent({ event: 'recap_opened', userId: user.id, properties: { plan: user.plan } });
 
     return NextResponse.json(recap);
   } catch (error) {

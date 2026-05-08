@@ -4,6 +4,7 @@ import { verifyFirebaseToken, syncUserToDatabase } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { sendWelcomeEmail, sendVerifyEmail } from '@/lib/emails/sender';
 import { adminAuth } from '@/lib/firebase-admin';
+import { trackEvent } from '@/lib/analytics-server';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
@@ -68,6 +69,9 @@ export async function POST(request: NextRequest) {
       decodedToken.email!,
       decodedToken.name
     );
+
+    // Track registration event (privacy-first, no PII)
+    trackEvent({ event: 'user_registered', userId: user.id });
 
     // Send welcome email for new users
     if (user.email) {
