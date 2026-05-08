@@ -73,24 +73,39 @@ export async function POST(request: NextRequest) {
     // Track registration event (privacy-first, no PII)
     trackEvent({ event: 'user_registered', userId: user.id });
 
-    // Send welcome email for new users
+    // Send both emails in PARALLEL — neither blocks the other.
+    // If one fails, the other still works. Registration never blocked.
     if (user.email) {
-      await sendWelcomeEmail(user.email, user.name || 'Amigo');
-    }
+      const emailPromises: Promise<void>[] = [];
 
-    // Send verification email for new users (not Google-authenticated)
-    if (user.email && !decodedToken.email_verified) {
-      try {
-        const verificationLink = await adminAuth.generateEmailVerificationLink(
-          user.email,
-          { url: `${APP_URL}/verify-email?uid=${user.id}` }
+      // 1. Welcome email (always, non-throwing)
+      emailPromises.push(
+        sendWelcomeEmail(user.email, user.name || 'Amigo')
+          .catch((err) => {
+            console.error('[AUTH SYNC] Welcome email failed:', err instanceof Error ? err.message : err);
+          })
+      );
+
+      // 2. Verification email (only for non-Google users)
+      if (!decodedToken.email_verified) {
+        emailPromises.push(
+          (async () => {
+            try {
+              const verificationLink = await adminAuth.generateEmailVerificationLink(
+                user.email!,
+                { url: `${APP_URL}/verify-email?uid=${user.id}` }
+              );
+              await sendVerifyEmail(user.email!, user.name || 'Amigo', verificationLink);
+              console.log('[AUTH SYNC] Verification email sent to:', user.email);
+            } catch (verifyError) {
+              console.error('[AUTH SYNC] Verification email failed:', verifyError instanceof Error ? verifyError.message : verifyError);
+            }
+          })()
         );
-        await sendVerifyEmail(user.email, user.name || 'Amigo', verificationLink);
-        console.log('[AUTH SYNC] Verification email sent to:', user.email);
-      } catch (verifyError) {
-        // Don't fail registration if verification email fails
-        console.error('[AUTH SYNC] Failed to send verification email:', verifyError);
       }
+
+      // Wait for both — but errors are already caught above, so this always resolves
+      await Promise.allSettled(emailPromises);
     }
 
     return NextResponse.json({

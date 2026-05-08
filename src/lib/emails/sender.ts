@@ -19,11 +19,19 @@ export async function sendWelcomeEmail(to: string, name: string) {
     });
     if (result?.data?.id) {
       console.log('[EMAIL] Welcome enviado. ID:', result.data.id);
-    } else if (result?.error) {
-      console.error('[EMAIL] Error Resend welcome:', JSON.stringify(result.error));
+      return; // success
     }
+    // Resend returned an error — throw so the caller knows it failed
+    const errorMsg = result?.error?.message || JSON.stringify(result?.error) || 'Resend error desconocido';
+    console.error('[EMAIL] Error Resend welcome:', errorMsg);
+    throw new Error(`Error enviando welcome email: ${errorMsg}`);
   } catch (error) {
+    // Re-throw our own errors; wrap unexpected errors
+    if (error instanceof Error && error.message.startsWith('Error enviando welcome email')) {
+      throw error;
+    }
     console.error('[EMAIL] Excepción welcome:', error instanceof Error ? error.message : error);
+    throw new Error('No se pudo enviar el welcome email.');
   }
 }
 
