@@ -13,6 +13,7 @@ import { weeklyRecapEmail, type WeeklyRecapEmailData } from './emails/weekly-rec
 import { resend } from './resend';
 
 const FROM_EMAIL = 'VitaZen <no-reply@vitazen.cc>';
+const REPLY_TO = 'hola@vitazen.cc';
 
 // ─────────────────────────────────────────
 // Eligibility: only active users with
@@ -165,14 +166,22 @@ async function sendWeeklyRecapToUser(user: EligibleUser): Promise<{ sent: boolea
   // Fill name
   recapData.name = user.name || user.email.split('@')[0];
 
-  const html = weeklyRecapEmail(recapData);
+  const { html, text, subject } = weeklyRecapEmail(recapData);
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
   try {
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to: user.email,
-      subject: `Tu resumen semanal — VitaZen`,
+      subject,
       html,
+      text,
+      replyTo: REPLY_TO,
+      headers: {
+        'X-Priority': '1',
+        'X-Auto-Response-Suppress': 'OOF',
+        'List-Unsubscribe': `<${APP_URL}/perfil>`,
+      },
     });
 
     if (result?.data?.id) {

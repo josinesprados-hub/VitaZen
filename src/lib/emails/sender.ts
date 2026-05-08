@@ -1,3 +1,9 @@
+// ═══════════════════════════════════════════
+// VITAZEN EMAIL SENDER
+// Deliverability-optimized: text+html multipart,
+// reply-to, consistent from, proper headers
+// ═══════════════════════════════════════════
+
 import { resend } from '../resend';
 import {
   welcomeEmail,
@@ -7,18 +13,27 @@ import {
 } from './templates';
 
 const FROM_EMAIL = 'VitaZen <no-reply@vitazen.cc>';
+const REPLY_TO = 'hola@vitazen.cc';
+
+// ─── Welcome email ───
 
 export async function sendWelcomeEmail(to: string, name: string) {
   console.log('[WELCOME] starting — to:', to, 'name:', name);
   try {
-    const html = welcomeEmail(name);
+    const { html, text, subject } = welcomeEmail(name);
     console.log('[WELCOME] template generated, calling Resend...');
 
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: 'Tu acceso está listo — VitaZen',
+      subject,
       html,
+      text,
+      replyTo: REPLY_TO,
+      headers: {
+        'X-Priority': '1',
+        'X-Auto-Response-Suppress': 'OOF',
+      },
     });
 
     // Log raw Resend response for diagnostics
@@ -26,7 +41,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 
     if (result?.data?.id) {
       console.log('[WELCOME] sent ✓ — ID:', result.data.id);
-      return; // success
+      return;
     }
 
     // Resend returned an error — throw so the caller knows it failed
@@ -44,19 +59,31 @@ export async function sendWelcomeEmail(to: string, name: string) {
   }
 }
 
+// ─── Verify email ───
+
 export async function sendVerifyEmail(to: string, name: string, verificationLink: string) {
   console.log('[EMAIL] Enviando verify a:', to);
   try {
+    const { html, text, subject } = verifyEmailTemplate(name, verificationLink);
+
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: 'Confirma tu email — VitaZen',
-      html: verifyEmailTemplate(name, verificationLink),
+      subject,
+      html,
+      text,
+      replyTo: REPLY_TO,
+      headers: {
+        'X-Priority': '1',
+        'X-Auto-Response-Suppress': 'OOF',
+      },
     });
+
     if (result?.data?.id) {
       console.log('[EMAIL] Verify enviado. ID:', result.data.id);
       return; // success
     }
+
     // Resend returned an error — throw so the caller knows it failed
     const errorMsg = result?.error?.message || JSON.stringify(result?.error) || 'Resend error desconocido';
     console.error('[EMAIL] Error Resend verify:', errorMsg);
@@ -71,15 +98,26 @@ export async function sendVerifyEmail(to: string, name: string, verificationLink
   }
 }
 
+// ─── Reset password email ───
+
 export async function sendResetPasswordEmail(to: string, name: string, resetLink: string) {
   console.log('[EMAIL] Enviando reset-password a:', to);
   try {
+    const { html, text, subject } = resetPasswordTemplate(name, resetLink);
+
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: 'Restaura tu acceso — VitaZen',
-      html: resetPasswordTemplate(name, resetLink),
+      subject,
+      html,
+      text,
+      replyTo: REPLY_TO,
+      headers: {
+        'X-Priority': '1',
+        'X-Auto-Response-Suppress': 'OOF',
+      },
     });
+
     if (result?.data?.id) {
       console.log('[EMAIL] Reset password enviado. ID:', result.data.id);
     } else if (result?.error) {
@@ -90,15 +128,26 @@ export async function sendResetPasswordEmail(to: string, name: string, resetLink
   }
 }
 
+// ─── Subscription confirmed email ───
+
 export async function sendSubscriptionConfirmedEmail(to: string, name: string, planName: string) {
   console.log('[EMAIL] Enviando subscription-confirmed a:', to, 'plan:', planName);
   try {
+    const { html, text, subject } = subscriptionConfirmedTemplate(name, planName);
+
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: `Tu plan ${planName} está activo — VitaZen`,
-      html: subscriptionConfirmedTemplate(name, planName),
+      subject,
+      html,
+      text,
+      replyTo: REPLY_TO,
+      headers: {
+        'X-Priority': '1',
+        'X-Auto-Response-Suppress': 'OOF',
+      },
     });
+
     if (result?.data?.id) {
       console.log('[EMAIL] Subscription confirmed enviado. ID:', result.data.id);
     } else if (result?.error) {
