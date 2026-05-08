@@ -24,4 +24,25 @@ function getFirebaseAdminApp() {
   });
 }
 
-export const adminAuth = getAdminAuth(getFirebaseAdminApp());
+// Lazy initialization via Proxy — defers Firebase Admin setup until first actual use.
+// This prevents build failures when env vars are unavailable during static prerendering.
+// All existing `adminAuth.verifyIdToken()` etc. calls work unchanged.
+let _adminAuth: ReturnType<typeof getAdminAuth> | null = null;
+
+function getLazyAuth() {
+  if (!_adminAuth) {
+    _adminAuth = getAdminAuth(getFirebaseAdminApp());
+  }
+  return _adminAuth;
+}
+
+export const adminAuth = new Proxy({} as ReturnType<typeof getAdminAuth>, {
+  get(_target, prop) {
+    const auth = getLazyAuth();
+    const value = (auth as any)[prop];
+    if (typeof value === 'function') {
+      return value.bind(auth);
+    }
+    return value;
+  },
+});
