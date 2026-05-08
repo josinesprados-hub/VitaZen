@@ -1,12 +1,13 @@
 /**
- * Dashboard Template — Premium Page Transitions
+ * Dashboard Template
  *
- * In Next.js App Router, `template.tsx` re-mounts on every navigation
- * (unlike `layout.tsx` which persists). This allows us to apply a
- * CSS-only entrance animation each time the user navigates between
- * dashboard pages — zero JS overhead, no libraries needed.
+ * Previously used `.page-transition` which started at opacity:0
+ * with animation-fill-mode:both — this caused a critical bug where
+ * the entire dashboard stayed invisible until user clicked/tapped
+ * (WebKit/Chromium compositing bug with nested opacity:0 layers).
  *
- * The animation is defined in globals.css as `.page-transition`.
+ * Now renders immediately without animation wrapper for guaranteed
+ * visible content on every navigation.
  */
 
 export default function DashboardTemplate({
@@ -14,5 +15,5 @@ export default function DashboardTemplate({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="page-transition">{children}</div>;
+  return <>{children}</>;
 }

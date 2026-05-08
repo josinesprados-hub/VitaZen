@@ -134,25 +134,25 @@ button, [role="button"] {
    Page Transitions
    ═══════════════════════════════════════════ */
 
-/* Premium page transition — subtle fade + translateY on navigation.
-   Applied via template.tsx which re-mounts on each route change.
-   Duration kept short (0.25s) for snappy, refined feel. */
+/* Page transition — DISABLED.
+   Previously used opacity:0 + animation-fill-mode:both which caused
+   the entire page to stay invisible until user clicked/tapped.
+   (WebKit/Chromium compositing bug with nested opacity:0 layers.)
+   Content now renders immediately for guaranteed visibility. */
 @keyframes pageTransitionEnter {
   from {
-    opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
 
 .page-transition {
-  animation: pageTransitionEnter 0.25s ease-out both;
+  /* No animation — renders immediately */
 }
 
-/* Respect reduced motion preferences — disable page transitions */
+/* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .page-transition {
     animation: none;
@@ -174,8 +174,8 @@ button, [role="button"] {
 }
 
 @keyframes slideInUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(10px); }
+  to { transform: translateY(0); }
 }
 
 @keyframes contextMenuIn {
@@ -183,7 +183,7 @@ button, [role="button"] {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Unified entrance animation */
+/* Unified entrance animation — transform only, never opacity:0 */
 .animate-in {
   animation: slideInUp 0.35s ease-out both;
 }
@@ -471,17 +471,15 @@ html { scroll-behavior: smooth; }
   100% { background-position: -200% 0; }
 }
 
-/* Skeleton entrance — fades in gently instead of appearing abruptly */
+/* Skeleton entrance — transform only, never opacity:0 */
 .skeleton-entrance {
-  animation: skeletonEntrance 0.4s ease-out both;
+  animation: skeletonEntrance 0.3s ease-out both;
 }
 @keyframes skeletonEntrance {
   from {
-    opacity: 0;
     transform: translateY(4px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -490,38 +488,34 @@ html { scroll-behavior: smooth; }
    Premium Empty State Animation
    ═══════════════════════════════════════════ */
 
-/* Gentle entrance for empty states — calm, intentional */
+/* Gentle entrance for empty states — transform only, never opacity:0 */
 @keyframes emptyStateEnter {
   from {
-    opacity: 0;
     transform: translateY(6px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
 .empty-state-enter {
-  animation: emptyStateEnter 0.5s ease-out both;
+  animation: emptyStateEnter 0.4s ease-out both;
 }
 
 /* ═══════════════════════════════════════════
    Premium Error State Animations
    ═══════════════════════════════════════════ */
 
-/* Gentle entrance for error states — calm, never alarming */
+/* Gentle entrance for error states — transform only, never opacity:0 */
 @keyframes errorStateEnter {
   from {
-    opacity: 0;
     transform: translateY(8px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
 .error-state-enter {
-  animation: errorStateEnter 0.5s ease-out both;
+  animation: errorStateEnter 0.4s ease-out both;
 }
 
 /* Subtle pulse for error icon — calm breathing, not urgent */
@@ -637,19 +631,17 @@ html { scroll-behavior: smooth; }
   overflow: hidden;
 }
 
-/* Hero fade-in entrance */
+/* Hero entrance — transform only, never opacity:0 */
 @keyframes heroFadeIn {
   from {
-    opacity: 0;
     transform: translateY(8px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
 .hero-fade-in {
-  animation: heroFadeIn 0.6s ease-out both;
+  animation: heroFadeIn 0.45s ease-out both;
 }
 
 /* Subtle gold pulse for status icon */
@@ -759,20 +751,17 @@ html { scroll-behavior: smooth; }
    Weekly Recap Section
    ═══════════════════════════════════════════ */
 
-/* Recap entrance animation */
+/* Recap entrance — transform only, never opacity:0, no delay */
 @keyframes recapFadeIn {
   from {
-    opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(8px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
 .recap-fade-in {
-  animation: recapFadeIn 0.7s ease-out both;
-  animation-delay: 0.15s;
+  animation: recapFadeIn 0.4s ease-out both;
 }
 
 /* Ring transition for recap score circle */
@@ -938,24 +927,22 @@ body.scroll-locked {
    Premium Mobile Engagement Polish
    ═══════════════════════════════════════════ */
 
-/* Staggered entrance — cascade elements into view for perceived speed.
-   Use on repeated cards/rows for a premium sequential reveal. */
+/* Staggered entrance — transform only, never opacity:0.
+   Reduced delays to prevent compositing stalls. */
 @keyframes staggerIn {
   from {
-    opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
-.stagger-1 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.05s; }
-.stagger-2 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.10s; }
-.stagger-3 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.15s; }
-.stagger-4 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.20s; }
-.stagger-5 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.25s; }
-.stagger-6 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.30s; }
+.stagger-1 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.03s; }
+.stagger-2 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.06s; }
+.stagger-3 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.09s; }
+.stagger-4 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.12s; }
+.stagger-5 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.15s; }
+.stagger-6 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.18s; }
 
 /* Micro-celebration — brief scale pop for completed actions.
    Applied via JS class toggle for 0.4s then removed. */
@@ -978,19 +965,17 @@ body.scroll-locked {
   display: inline-block;
 }
 
-/* Gentle card entrance — softer than stagger, for section blocks */
+/* Gentle card entrance — transform only, never opacity:0 */
 @keyframes cardEnter {
   from {
-    opacity: 0;
     transform: translateY(6px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
 .card-enter {
-  animation: cardEnter 0.45s ease-out both;
+  animation: cardEnter 0.35s ease-out both;
 }
 
 /* Button active press feedback — stronger than touch-press, for primary actions */
@@ -1132,12 +1117,12 @@ body.scroll-locked {
   opacity: 0.5;
 }
 
-/* Section enter — staggered entrance for empire page sections */
-.section-enter-1 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.05s; }
-.section-enter-2 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.12s; }
-.section-enter-3 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.19s; }
-.section-enter-4 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.26s; }
-.section-enter-5 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.33s; }
+/* Section enter — transform only, reduced delays */
+.section-enter-1 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.03s; }
+.section-enter-2 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.06s; }
+.section-enter-3 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.09s; }
+.section-enter-4 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.12s; }
+.section-enter-5 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.15s; }
 
 /* Rating button feedback — tactile press for 1-5 selectors */
 @media (hover: none) and (pointer: coarse) {
@@ -1240,19 +1225,17 @@ body.scroll-locked {
    Momentum & Retention System — Phase 3
    ═══════════════════════════════════════════ */
 
-/* Micro-reward toast entrance — slides up and fades in */
+/* Micro-reward toast entrance — transform only */
 @keyframes microRewardEnter {
   from {
-    opacity: 0;
     transform: translate(-50%, 12px);
   }
   to {
-    opacity: 1;
     transform: translate(-50%, 0);
   }
 }
 .micro-reward-enter {
-  animation: microRewardEnter 0.35s ease-out both;
+  animation: microRewardEnter 0.3s ease-out both;
 }
 
 /* Micro-reward glow — subtle gold box-shadow */
