@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
+import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 
 // ─── GET: today's checkin + history ─────────────────────
 
@@ -109,6 +110,9 @@ export async function POST(request: NextRequest) {
 
     // Track checkin event
     trackEvent({ event: 'checkin_created', userId: user.id, properties: { emotion, energy, focus, stress } });
+
+    // Auto-complete today's challenge if it matches (non-blocking)
+    tryAutoCompleteChallenge(user.id, 'checkin').catch(() => {});
 
     // Award XP to mente empire
     await db.empireProgress.upsert({

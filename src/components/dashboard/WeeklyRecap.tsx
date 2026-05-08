@@ -150,7 +150,7 @@ function getCategoryHref(category: string): string {
     'emociones': '/checkin',
     'energía': '/imperio/energia',
     'estrés': '/imperio/mente',
-    'diario': '/imperio/mente',
+    'diario': '/imperio/crecimiento',
     'finanzas': '/imperio/riqueza',
     'nutrición': '/imperio/energia',
     'bienestar': '/insights',
@@ -241,7 +241,7 @@ export function WeeklyRecap() {
     { label: 'Check-ins', value: data.progress.checkins, icon: Zap, unit: 'días', href: '/checkin' },
     { label: 'Hábitos', value: data.progress.habitsCompleted, icon: CheckCircle, unit: 'completados', href: '/imperio/disciplina' },
     { label: 'Meditación', value: data.progress.meditationSessions, icon: Wind, unit: 'sesiones', href: '/imperio/mente' },
-    { label: 'Diario', value: data.progress.journalEntries, icon: BookOpen, unit: 'entradas', href: '/imperio/mente' },
+    { label: 'Diario', value: data.progress.journalEntries, icon: BookOpen, unit: 'entradas', href: '/imperio/crecimiento' },
   ];
 
   // Mobile score ring (smaller)
@@ -323,8 +323,8 @@ export function WeeklyRecap() {
         <div className="hidden sm:block p-3 sm:p-7 space-y-4 sm:space-y-7">
           {/* Row 1: Score + Emotional State */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
-            {/* Wellness Score */}
-            <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 flex items-center gap-3 sm:gap-6 hover:border-[#1a1a1a] transition-colors">
+            {/* Wellness Score — clickable to insights */}
+            <Link href="/insights" className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 flex items-center gap-3 sm:gap-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press">
               <div className="relative w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
                 <svg className="absolute inset-0 -rotate-90" viewBox="0 0 96 96">
                   <circle
@@ -350,7 +350,7 @@ export function WeeklyRecap() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1">Puntuación semanal</p>
+                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-[#c8a55a] transition-colors">Puntuación semanal</p>
                 <p className="text-[11px] sm:text-[13px] mb-1.5 sm:mb-3" style={{ color: scoreColor }}>
                   {data.scoreLabel}
                 </p>
@@ -361,7 +361,8 @@ export function WeeklyRecap() {
                   </span>
                 </div>
               </div>
-            </div>
+              <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0" />
+            </Link>
 
             {/* Emotional State — PREMIUM details */}
             <PremiumGate isPremium={isPremium} intensity="light" compact label="Métricas profundas">
@@ -486,51 +487,54 @@ export function WeeklyRecap() {
                   <p className="text-xs sm:text-sm font-semibold text-white">Evolución vs. semana anterior</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Emociones</p>
+                  <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Emociones</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.emotionTrend != null ? `${data.evolution.emotionTrend > 0 ? '+' : ''}${data.evolution.emotionTrend}` : '—'}
                       </span>
                       {data.evolution && <TrendBadge value={data.evolution.emotionTrend} />}
                     </div>
-                  </div>
-                  <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Energía</p>
+                  </Link>
+                  <Link href="/imperio/energia" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.energyTrend != null ? `${data.evolution.energyTrend > 0 ? '+' : ''}${data.evolution.energyTrend}` : '—'}
                       </span>
                       {data.evolution && <TrendBadge value={data.evolution.energyTrend} />}
                     </div>
-                  </div>
-                  <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Estrés</p>
+                  </Link>
+                  <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Estrés</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.stressTrend != null ? (data.evolution.stressTrend > 0 ? '↓ bajó' : '↑ subió') : '—'}
                       </span>
                       {data.evolution && <TrendBadge value={data.evolution.stressTrend} invert />}
                     </div>
-                  </div>
-                  <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Actividad</p>
+                  </Link>
+                  <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Actividad</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.activityTrend != null ? `${data.evolution.activityTrend > 0 ? '+' : ''}${data.evolution.activityTrend}` : '—'}
                       </span>
                       {data.evolution && <TrendBadge value={data.evolution.activityTrend} />}
                     </div>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </PremiumGate>
 
-            {/* Main Insight */}
-            <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
+            {/* Main Insight — clickable to relevant section */}
+            <Link
+              href={data.mainInsight ? getCategoryHref(data.mainInsight.category) : '/insights'}
+              className="block bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press"
+            >
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
                 <Sparkles size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                <p className="text-xs sm:text-sm font-semibold text-white">Principal insight de la semana</p>
+                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Principal insight de la semana</p>
               </div>
               {data.mainInsight ? (
                 <div
@@ -547,6 +551,7 @@ export function WeeklyRecap() {
                       </div>
                       <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed line-clamp-2 sm:line-clamp-none">{data.mainInsight.description}</p>
                     </div>
+                    <ArrowRight size={12} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0 mt-1" />
                   </div>
                 </div>
               ) : (
@@ -556,7 +561,7 @@ export function WeeklyRecap() {
                   <p className="text-[9px] sm:text-[10px] text-[#444]">Registra más actividad para generar insights</p>
                 </div>
               )}
-            </div>
+            </Link>
           </div>
 
           {/* Row 4: Mentor Recommendation — FREE gets truncated, PREMIUM full */}

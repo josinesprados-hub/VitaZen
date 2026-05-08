@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -95,6 +96,9 @@ export async function POST(request: NextRequest) {
       update: { xp: { increment: 15 } },
       create: { userId: user.id, empire: 'mente', xp: 15 },
     });
+
+    // Auto-complete today's challenge if it matches (non-blocking)
+    tryAutoCompleteChallenge(user.id, 'meditation').catch(() => {});
 
     return NextResponse.json({ session });
   } catch (error) {

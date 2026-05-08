@@ -247,28 +247,25 @@ export default function DisciplinaPage() {
         </div>
       </div>
 
-      {/* Daily Challenge */}
+      {/* Daily Challenge — auto-completes when action is performed */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-5 sm:p-6 section-enter-1">
+        <div className={`bg-[#0a0a0a] border rounded-xl p-5 sm:p-6 section-enter-1 transition-all duration-300 ${challenge.completed ? 'border-[#c8a55a]/30' : 'border-[#c8a55a]/20'}`}>
           <div className="flex items-center gap-3 mb-4">
             <Trophy size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
-            {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium">Completado</span>}
+            {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium check-pop">Completado</span>}
           </div>
           <h3 className="text-[#c8a55a] font-medium mb-1">{challenge.challenge.title}</h3>
-          <p className="text-[#999] text-sm mb-4">{challenge.challenge.description}</p>
-          {!challenge.completed && (
-            <button
-              onClick={async () => {
-                try {
-                  const res = await apiFetch('/api/challenges/complete', { method: 'POST', body: JSON.stringify({ challengeId: challenge.challenge.id }) });
-                  if (res.ok) setChallenge({ ...challenge, completed: true });
-                } catch (error) { console.error('Error completing challenge:', error); }
-              }}
-              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm touch-press"
-            >
-              Completar desafío
-            </button>
+          <p className="text-[#999] text-sm mb-4 line-clamp-3">{challenge.challenge.description}</p>
+          {!challenge.completed ? (
+            <p className="text-[11px] text-[#666] flex items-center gap-1.5">
+              <Lightbulb size={12} className="text-[#c8a55a]/60" />
+              Completa la acción correspondiente para completar este desafío automáticamente
+            </p>
+          ) : (
+            <p className="text-[11px] text-[#c8a55a]/80 flex items-center gap-1.5">
+              <Check size={12} /> Desafío completado automáticamente al realizar la acción
+            </p>
           )}
         </div>
       )}

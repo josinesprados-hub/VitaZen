@@ -99,7 +99,7 @@ function getCategoryHref(category: string): string {
     'emociones': '/checkin',
     'energía': '/imperio/energia',
     'estrés': '/imperio/mente',
-    'diario': '/imperio/mente',
+    'diario': '/imperio/crecimiento',
     'finanzas': '/imperio/riqueza',
     'nutrición': '/imperio/energia',
     'bienestar': '/insights',
@@ -233,20 +233,23 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      {/* Wellness Score Card */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      {/* Wellness Score Card — clickable to checkin */}
+      <Link href="/checkin" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Activity size={22} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Puntuación de bienestar</h2>
+            <h2 className="text-lg font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Puntuación de bienestar</h2>
           </div>
-          <div className="text-right">
-            <p className="text-3xl font-bold" style={{ color: getScoreColor(summary.score) }}>
-              {summary.score}
-            </p>
-            <p className="text-xs" style={{ color: getScoreColor(summary.score) }}>
-              {getScoreLabel(summary.score)}
-            </p>
+          <div className="text-right flex items-center gap-2">
+            <div>
+              <p className="text-3xl font-bold" style={{ color: getScoreColor(summary.score) }}>
+                {summary.score}
+              </p>
+              <p className="text-xs" style={{ color: getScoreColor(summary.score) }}>
+                {getScoreLabel(summary.score)}
+              </p>
+            </div>
+            <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0" />
           </div>
         </div>
 
@@ -261,24 +264,29 @@ export default function InsightsPage() {
           />
         </div>
 
-        {/* Activity summary pills */}
+        {/* Activity summary pills — clickable to relevant sections */}
         <div className="flex flex-wrap gap-3">
           {[
-            { icon: Wind, label: 'Meditación', value: `${summary.meditation.sessions} sesiones` },
-            { icon: CheckCircle, label: 'Hábitos', value: `${summary.habits.completed} completados` },
-            { icon: BookOpen, label: 'Diario', value: `${summary.journal.entries} entradas` },
-            { icon: Zap, label: 'Check-ins', value: `${summary.checkins.count} días` },
+            { icon: Wind, label: 'Meditación', value: `${summary.meditation.sessions} sesiones`, href: '/imperio/mente' },
+            { icon: CheckCircle, label: 'Hábitos', value: `${summary.habits.completed} completados`, href: '/imperio/disciplina' },
+            { icon: BookOpen, label: 'Diario', value: `${summary.journal.entries} entradas`, href: '/imperio/crecimiento' },
+            { icon: Zap, label: 'Check-ins', value: `${summary.checkins.count} días`, href: '/checkin' },
           ].map(item => (
-            <div key={item.label} className="flex items-center gap-2 bg-[#111] border border-[#1a1a1a] rounded-lg px-3 py-2">
+            <Link
+              key={item.label}
+              href={item.href}
+              onClick={e => e.stopPropagation()}
+              className="flex items-center gap-2 bg-[#111] border border-[#1a1a1a] rounded-lg px-3 py-2 hover:border-[#c8a55a]/15 transition-colors cursor-pointer"
+            >
               <item.icon size={14} className="text-[#c8a55a]" />
               <span className="text-xs text-[#999]">{item.label}:</span>
               <span className="text-xs text-white font-medium">{item.value}</span>
-            </div>
+            </Link>
           ))}
         </div>
-      </div>
+      </Link>
 
-      {/* Weekly Comparison — PREMIUM gated with blur */}
+      {/* Weekly Comparison — PREMIUM gated with blur, each trend card navigates */}
       <PremiumGate isPremium={isPremium} intensity="medium" label="Comparativa semanal">
         <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-5">
@@ -287,30 +295,30 @@ export default function InsightsPage() {
             <span className="text-[10px] text-[#c8a55a]/60">vs. semana anterior</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-[#666] mb-2">Emociones</p>
+            <Link href="/checkin" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Emociones</p>
               <TrendIndicator value={comparison?.emotionTrend ?? 0} label={`${(comparison?.emotionTrend ?? 0) > 0 ? '+' : ''}${comparison?.emotionTrend ?? 0}`} />
-            </div>
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-[#666] mb-2">Energía</p>
+            </Link>
+            <Link href="/imperio/energia" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
               <TrendIndicator value={comparison?.energyTrend ?? 0} label={`${(comparison?.energyTrend ?? 0) > 0 ? '+' : ''}${comparison?.energyTrend ?? 0}`} />
-            </div>
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-[#666] mb-2">Estrés</p>
+            </Link>
+            <Link href="/imperio/mente" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Estrés</p>
               <TrendIndicator value={comparison?.stressTrend ?? 0} label={(comparison?.stressTrend ?? 0) > 0 ? '↓ bajó' : '↑ subió'} />
-            </div>
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-[#666] mb-2">Actividad total</p>
+            </Link>
+            <Link href="/insights" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Actividad total</p>
               <TrendIndicator value={comparison?.activityTrend ?? 0} label={`${(comparison?.activityTrend ?? 0) > 0 ? '+' : ''}${comparison?.activityTrend ?? 0}`} />
-            </div>
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-[#666] mb-2">Meditación</p>
+            </Link>
+            <Link href="/imperio/mente" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Meditación</p>
               <TrendIndicator value={comparison?.meditationTrend ?? 0} label={`${(comparison?.meditationTrend ?? 0) > 0 ? '+' : ''}${comparison?.meditationTrend ?? 0}`} />
-            </div>
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-              <p className="text-xs text-[#666] mb-2">Hábitos</p>
+            </Link>
+            <Link href="/imperio/disciplina" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Hábitos</p>
               <TrendIndicator value={comparison?.habitTrend ?? 0} label={`${(comparison?.habitTrend ?? 0) > 0 ? '+' : ''}${comparison?.habitTrend ?? 0}`} />
-            </div>
+            </Link>
           </div>
         </div>
       </PremiumGate>
@@ -432,7 +440,7 @@ export default function InsightsPage() {
           </Link>
 
           {/* Journal */}
-          <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
+          <Link href="/imperio/crecimiento" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group touch-press">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Diario</span>
@@ -443,7 +451,7 @@ export default function InsightsPage() {
 
           {/* Wellness — PREMIUM details */}
           <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle bienestar">
-            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+            <Link href="/imperio/energia" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group touch-press">
               <div className="flex items-center gap-2 mb-3">
                 <Brain size={16} className="text-[#c8a55a]" />
                 <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Bienestar</span>
@@ -462,7 +470,7 @@ export default function InsightsPage() {
                   </div>
                 </div>
               )}
-            </div>
+            </Link>
           </PremiumGate>
 
           {/* Nutrition — PREMIUM details */}
@@ -496,7 +504,7 @@ export default function InsightsPage() {
 
           {/* Empire streaks — PREMIUM details */}
           <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle imperios">
-            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+            <Link href="/insights" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group touch-press">
               <div className="flex items-center gap-2 mb-3">
                 <Flame size={16} className="text-[#c8a55a]" />
                 <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Imperios</span>
@@ -506,11 +514,11 @@ export default function InsightsPage() {
               {summary.streaks.bestEmpireName && (
                 <p className="text-[10px] text-[#c8a55a] mt-2">{summary.streaks.bestEmpireName}</p>
               )}
-            </div>
+            </Link>
           </PremiumGate>
 
           {/* Total activity */}
-          <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
+          <Link href="/dashboard" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group touch-press">
             <div className="flex items-center gap-2 mb-3">
               <Activity size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Actividad</span>

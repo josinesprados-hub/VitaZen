@@ -59,7 +59,7 @@ function getCategoryHref(category: string): string {
     'emociones': '/checkin',
     'energía': '/imperio/energia',
     'estrés': '/imperio/mente',
-    'diario': '/imperio/mente',
+    'diario': '/imperio/crecimiento',
     'finanzas': '/imperio/riqueza',
     'nutrición': '/imperio/energia',
     'bienestar': '/insights',
@@ -69,6 +69,30 @@ function getCategoryHref(category: string): string {
     'recomendación': '/imperio/mentor',
   };
   return map[category.toLowerCase()] || '/insights';
+}
+
+// Map challenge categories to their action route (for navigation CTA)
+function getChallengeRoute(category: string): string {
+  const map: Record<string, string> = {
+    'disciplina': '/imperio/disciplina',
+    'habitos': '/imperio/disciplina',
+    'mentalidad': '/imperio/mente',
+    'productividad': '/imperio/crecimiento',
+    'salud': '/checkin',
+  };
+  return map[category.toLowerCase()] || '/imperio/disciplina';
+}
+
+// Get a short label for the challenge CTA based on category
+function getChallengeCTALabel(category: string): string {
+  const map: Record<string, string> = {
+    'disciplina': 'Ir a Hábitos',
+    'habitos': 'Ir a Hábitos',
+    'mentalidad': 'Ir a Mente',
+    'productividad': 'Ir a Diario',
+    'salud': 'Haz Check-in',
+  };
+  return map[category.toLowerCase()] || 'Ir al imperio';
 }
 
 export default function DashboardPage() {
@@ -87,7 +111,6 @@ export default function DashboardPage() {
   const [dashboardInsights, setDashboardInsights] = useState<{ id: string; type: string; category: string; icon: string; title: string; description: string }[] | null>(null);
   const [insightsScore, setInsightsScore] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState(false);
-  const [completingChallenge, setCompletingChallenge] = useState(false);
   const [challengeJustCompleted, setChallengeJustCompleted] = useState(false);
 
   useEffect(() => {
@@ -326,7 +349,7 @@ export default function DashboardPage() {
             )}
           </Link>
 
-          <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press cursor-pointer group">
+          <Link href="/imperio/crecimiento" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press cursor-pointer group">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <BookOpen size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -340,7 +363,7 @@ export default function DashboardPage() {
                 <span className="streak-pulse">🔥</span> {streaks.journalStreak}d
               </p>
             ) : (
-              <p className="text-[9px] sm:text-[10px] text-[#555] mt-1 sm:mt-2 group-hover:text-[#c8a55a]/60 transition-colors">Ir a Mente →</p>
+              <p className="text-[9px] sm:text-[10px] text-[#555] mt-1 sm:mt-2 group-hover:text-[#c8a55a]/60 transition-colors">Ir a Crecimiento →</p>
             )}
           </Link>
 
@@ -360,8 +383,8 @@ export default function DashboardPage() {
       ) : (
         /* Calm fallback placeholder card */
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-          {[['Meditación', Wind], ['Hábitos', CheckCircle], ['Diario', BookOpen], ['Finanzas', Wallet]].map(([label, Icon]) => (
-            <div key={label as string} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+          {[['Meditación', Wind, '/imperio/mente'], ['Hábitos', CheckCircle, '/imperio/disciplina'], ['Diario', BookOpen, '/imperio/crecimiento'], ['Finanzas', Wallet, '/imperio/riqueza']].map(([label, Icon, href]) => (
+            <Link key={label as string} href={href as string} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
               <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
                 <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
                   <Icon size={14} className="text-[#c8a55a]/30 sm:w-[18px] sm:h-[18px]" />
@@ -369,8 +392,8 @@ export default function DashboardPage() {
                 <span className="text-[10px] sm:text-xs text-[#444] uppercase tracking-wider font-medium">{label}</span>
               </div>
               <p className="text-xl sm:text-3xl font-bold text-[#333]">—</p>
-              <p className="text-[10px] sm:text-xs text-[#444] mt-0.5 sm:mt-1">pronto aquí</p>
-            </div>
+              <p className="text-[9px] sm:text-[10px] text-[#555] mt-0.5 sm:mt-1 group-hover:text-[#c8a55a]/60 transition-colors">Ir a {label} →</p>
+            </Link>
           ))}
         </div>
       )}
@@ -435,42 +458,30 @@ export default function DashboardPage() {
 
       {/* Daily Challenge — with calm fallback */}
       {challenge ? (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3 sm:p-5 card-enter">
+        <Link
+          href={getChallengeRoute(challenge.challenge.category)}
+          className="block bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3 sm:p-5 card-enter hover:border-[#c8a55a]/40 transition-all duration-200 cursor-pointer group touch-press"
+        >
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
             <Trophy size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
             <h2 className="text-base sm:text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
               <span className={`text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium ${challengeJustCompleted ? 'check-pop' : ''}`}>Completado</span>
             )}
+            <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/60 transition-colors ml-auto shrink-0" />
           </div>
           <h3 className="text-[#c8a55a] font-medium text-sm sm:text-lg mb-0.5 sm:mb-1">{challenge.challenge.title}</h3>
-          <p className="text-[#999] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{challenge.challenge.description}</p>
-          {!challenge.completed && (
-            <button
-              onClick={async () => {
-                if (completingChallenge) return;
-                setCompletingChallenge(true);
-                try {
-                  const res = await apiFetch('/api/challenges/complete', {
-                    method: 'POST',
-                    body: JSON.stringify({ challengeId: challenge.challenge.id }),
-                  });
-                  if (res.ok) {
-                    setChallenge({ ...challenge, completed: true });
-                    setChallengeJustCompleted(true);
-                    setTimeout(() => setChallengeJustCompleted(false), 600);
-                  }
-                } finally {
-                  setCompletingChallenge(false);
-                }
-              }}
-              disabled={completingChallenge}
-              className={`bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed ${challengeJustCompleted ? 'micro-celebrate' : ''}`}
-            >
-              {completingChallenge ? 'Completando...' : 'Marcar como completado'}
-            </button>
+          <p className="text-[#999] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3">{challenge.challenge.description}</p>
+          {!challenge.completed ? (
+            <span className="inline-flex items-center gap-1.5 bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl group-hover:bg-[#d4b468] transition-colors text-sm">
+              {getChallengeCTALabel(challenge.challenge.category)} <ArrowRight size={14} />
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 bg-[#c8a55a]/15 text-[#c8a55a] font-medium px-4 py-2 rounded-xl text-sm">
+              <CheckCircle size={14} /> Completado automáticamente
+            </span>
           )}
-        </div>
+        </Link>
       ) : (
         /* Calm fallback */
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">

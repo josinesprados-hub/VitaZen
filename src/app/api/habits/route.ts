@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
+import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,6 +43,9 @@ export async function POST(request: NextRequest) {
       update: { xp: { increment: 5 } },
       create: { userId: user.id, empire: 'disciplina', xp: 5 },
     });
+
+    // Auto-complete today's challenge if it matches (non-blocking)
+    tryAutoCompleteChallenge(user.id, 'habit').catch(() => {});
 
     return NextResponse.json({ habit });
   } catch (error) {
@@ -90,6 +94,9 @@ export async function PATCH(request: NextRequest) {
       update: { xp: { increment: 10 }, streak: { increment: 1 } },
       create: { userId: user.id, empire: 'disciplina', xp: 10, streak: 1 },
     });
+
+    // Auto-complete today's challenge if it matches (non-blocking)
+    tryAutoCompleteChallenge(user.id, 'habit').catch(() => {});
 
     return NextResponse.json({ habit: updated });
   } catch (error) {

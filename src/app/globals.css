@@ -1190,3 +1190,48 @@ body.scroll-locked {
   .auth-transition-enter { animation: none; }
   .auth-success-pulse { animation: none; }
 }
+
+/* ═══════════════════════════════════════════
+   Actionable Card Affordance
+   ═══════════════════════════════════════════ */
+
+/* Actionable card — cards that navigate somewhere.
+   Provides clear visual affordance: cursor, hover border, subtle lift. */
+.actionable-card {
+  cursor: pointer;
+  transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+.actionable-card:hover {
+  border-color: rgba(200, 165, 90, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.actionable-card:active {
+  transform: scale(0.98);
+  transition: transform 80ms ease;
+}
+
+/* Mobile: stronger tap feedback for actionable cards */
+@media (hover: none) and (pointer: coarse) {
+  .actionable-card:active {
+    transform: scale(0.97);
+    border-color: rgba(200, 165, 90, 0.35);
+  }
+}
+
+/* Respect reduced motion for actionable cards */
+@media (prefers-reduced-motion: reduce) {
+  .actionable-card {
+    transition: border-color 200ms ease;
+  }
+  .actionable-card:active {
+    transform: none;
+  }
+}
+
+/* Line clamp utilities for mobile text truncation */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
