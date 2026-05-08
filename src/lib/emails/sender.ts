@@ -12,7 +12,7 @@ import {
   subscriptionConfirmedTemplate,
 } from './templates';
 
-const FROM_EMAIL = 'VitaZen <no-reply@vitazen.cc>';
+const FROM_EMAIL = 'VitaZen <hola@vitazen.cc>';
 const REPLY_TO = 'hola@vitazen.cc';
 
 // ─── Welcome email ───

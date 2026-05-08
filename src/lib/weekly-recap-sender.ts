@@ -12,7 +12,7 @@ import { getEmotionalState } from './emotional-state';
 import { weeklyRecapEmail, type WeeklyRecapEmailData } from './emails/weekly-recap';
 import { resend } from './resend';
 
-const FROM_EMAIL = 'VitaZen <no-reply@vitazen.cc>';
+const FROM_EMAIL = 'VitaZen <hola@vitazen.cc>';
 const REPLY_TO = 'hola@vitazen.cc';
 
 // ─────────────────────────────────────────
