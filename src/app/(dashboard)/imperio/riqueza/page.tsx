@@ -288,11 +288,12 @@ export default function RiquezaPage() {
         ) : (
           <PremiumEmptyState
             icon={Wallet}
-            title="Sin movimientos registrados"
-            subtitle="Registra tu primer movimiento y toma control de tus finanzas"
+            title="Tu historial financiero está listo"
+            subtitle="Registra tu primer movimiento y toma control de tus finanzas."
             cta="Añadir movimiento"
             onCta={() => setShowAdd(true)}
             size="sm"
+            variant="gold"
           />
         )}
       </div>

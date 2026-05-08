@@ -220,9 +220,10 @@ export default function TimelinePage() {
       ) : items.length === 0 ? (
         <PremiumEmptyState
           icon={Clock}
-          title="Aún no hay actividad registrada"
-          subtitle="Comienza registrando tu primera actividad"
+          title="Tu historia comenzará aquí"
+          subtitle="Cada acción que registres aparecerá en tu línea del tiempo."
           size="lg"
+          variant="gold"
         />
       ) : (
         <div className="relative">

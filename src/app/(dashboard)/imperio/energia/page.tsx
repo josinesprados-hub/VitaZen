@@ -354,11 +354,12 @@ export default function EnergiaPage() {
         ) : (
           <PremiumEmptyState
             icon={Heart}
-            title="Sin registros de bienestar"
-            subtitle="Registra tu primer estado del día y conoce tu bienestar"
+            title="Tu bienestar merece atención"
+            subtitle="Un simple registro diario te ayuda a conocerte mejor."
             cta="Registrar hoy"
             onCta={() => setShowWellness(true)}
             size="sm"
+            variant="gold"
           />
         )}
       </div>
@@ -424,11 +425,12 @@ export default function EnergiaPage() {
         ) : (
           <PremiumEmptyState
             icon={Apple}
-            title="Sin registros nutricionales"
-            subtitle="Registra tu primera comida y toma control de tu nutrición"
+            title="Tu nutrición, tu energía"
+            subtitle="Registrar lo que comes te ayuda a sentirte mejor cada día."
             cta="Registrar hoy"
             onCta={() => setShowNutrition(true)}
             size="sm"
+            variant="gold"
           />
         )}
       </div>

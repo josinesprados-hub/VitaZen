@@ -19,7 +19,7 @@ function calcStreak(dates: Date[]): number {
   const todayStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
 
   if (!uniqueDays.has(todayStr)) {
-    // No activity today, check from yesterday
+    // No activity today, check from yesterday — graceful: today still counts if yesterday was active
     checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
   }
 
@@ -37,6 +37,23 @@ function calcStreak(dates: Date[]): number {
   return streak;
 }
 
+// Get a human, non-toxic message for streak state
+function getStreakMessage(streak: number, wasActiveYesterday: boolean): { message: string; tone: 'active' | 'warm' | 'gentle' } {
+  if (streak >= 7) {
+    return { message: `${streak} días consecutivos. Tu constancia inspira.`, tone: 'active' };
+  }
+  if (streak >= 3) {
+    return { message: `${streak} días seguidos. Sigue así.`, tone: 'active' };
+  }
+  if (streak >= 1) {
+    return { message: `${streak} día${streak > 1 ? 's' : ''}. Cada paso cuenta.`, tone: 'warm' };
+  }
+  if (wasActiveYesterday) {
+    return { message: 'Hoy es un buen día para retomar.', tone: 'warm' };
+  }
+  return { message: 'Pequeños pasos. Seguimos.', tone: 'gentle' };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
@@ -45,7 +62,7 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     // Fetch all dates for each category
-    const [meditationDates, habitDates, journalDates] = await Promise.all([
+    const [meditationDates, habitDates, journalDates, checkinDates] = await Promise.all([
       db.meditationSession.findMany({
         where: { userId: user.id },
         select: { completedAt: true },
@@ -61,16 +78,47 @@ export async function GET(request: NextRequest) {
         select: { createdAt: true },
         orderBy: { createdAt: 'desc' },
       }),
+      db.dailyCheckin.findMany({
+        where: { userId: user.id },
+        select: { date: true },
+        orderBy: { date: 'desc' },
+      }),
     ]);
 
     const meditationStreak = calcStreak(meditationDates.map(m => m.completedAt));
     const habitStreak = calcStreak(habitDates.map(h => h.lastCompletedAt!));
     const journalStreak = calcStreak(journalDates.map(j => j.createdAt));
+    const checkinStreak = calcStreak(checkinDates.map(c => c.date));
+
+    // General streak: any activity (meditation, habit, journal, or checkin)
+    const allDates = [
+      ...meditationDates.map(m => m.completedAt),
+      ...habitDates.map(h => h.lastCompletedAt!),
+      ...journalDates.map(j => j.createdAt),
+      ...checkinDates.map(c => c.date),
+    ];
+    const generalStreak = calcStreak(allDates);
+
+    // Check if user was active yesterday (for message context)
+    const now = new Date();
+    const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - 24 * 60 * 60 * 1000);
+    const yesterdayStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
+    const uniqueAllDays = new Set<string>();
+    for (const d of allDates) {
+      const day = new Date(d);
+      uniqueAllDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+    }
+    const wasActiveYesterday = uniqueAllDays.has(yesterdayStr);
+
+    const streakMessage = getStreakMessage(generalStreak, wasActiveYesterday);
 
     return NextResponse.json({
       meditationStreak,
       habitStreak,
       journalStreak,
+      checkinStreak,
+      generalStreak,
+      streakMessage,
     });
   } catch (error) {
     console.error('Dashboard streaks error:', error);

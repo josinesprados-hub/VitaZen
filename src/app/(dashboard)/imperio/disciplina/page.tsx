@@ -9,6 +9,7 @@ import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
+import { MicroReward } from '@/components/ui/MicroReward';
 
 interface Habit {
   id: string;
@@ -49,6 +50,7 @@ export default function DisciplinaPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
+  const [showReward, setShowReward] = useState(false);
 
   // Lock body scroll when any modal is open
   useEffect(() => {
@@ -110,6 +112,7 @@ export default function DisciplinaPage() {
         const data = await res.json();
         setHabits(habits.map(h => h.id === habitId ? data.habit : h));
         setJustCompletedId(habitId);
+        setShowReward(true);
         setTimeout(() => setJustCompletedId(null), 600);
       }
     } catch (error) {
@@ -309,11 +312,12 @@ export default function DisciplinaPage() {
         {habits.length === 0 ? (
           <PremiumEmptyState
             icon={Check}
-            title="Aún no tienes hábitos"
-            subtitle="Crea el primero y comienza tu transformación"
-            cta="Añadir hábito"
+            title="Tu espacio de hábitos está listo"
+            subtitle="Empieza con uno pequeño. La consistencia hace el resto."
+            cta="Crear primer hábito"
             onCta={() => setShowAddHabit(true)}
             size="sm"
+            variant="gold"
           />
         ) : (
           <div className="space-y-2.5">
@@ -389,6 +393,8 @@ export default function DisciplinaPage() {
           </div>
         </div>
       )}
+      {/* Micro-reward for habit completion */}
+      <MicroReward trigger={showReward} message="Hábito completado" onComplete={() => setShowReward(false)} />
     </div>
   );
 }

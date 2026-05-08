@@ -8,6 +8,7 @@ import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
+import { MicroReward } from '@/components/ui/MicroReward';
 
 interface JournalEntry {
   id: string;
@@ -40,6 +41,7 @@ export default function CrecimientoPage() {
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
+  const [showReward, setShowReward] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -73,6 +75,7 @@ export default function CrecimientoPage() {
         setEntries([data.entry, ...entries]);
         setShowAdd(false);
         setForm({ title: '', content: '', mood: 3, gratitude: '' });
+        setShowReward(true);
       }
     } catch (error) { console.error('Error submitting entry:', error); }
   };
@@ -293,11 +296,12 @@ export default function CrecimientoPage() {
         ) : (
           <PremiumEmptyState
             icon={BookOpenText}
-            title="Tu diario está en blanco"
-            subtitle="Escribe tu primera entrada y comienza a documentar tu evolución"
+            title="Tu diario espera tus palabras"
+            subtitle="Escribe lo que sientes. No tiene que ser perfecto, solo tuyo."
             cta="Nueva entrada"
             onCta={() => setShowAdd(true)}
             size="sm"
+            variant="gold"
           />
         )}
       </div>
@@ -328,6 +332,8 @@ export default function CrecimientoPage() {
           </div>
         </div>
       )}
+      {/* Micro-reward for journal entry */}
+      <MicroReward trigger={showReward} message="Entrada guardada" onComplete={() => setShowReward(false)} />
     </div>
   );
 }

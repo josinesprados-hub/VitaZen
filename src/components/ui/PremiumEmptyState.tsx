@@ -100,7 +100,7 @@ export default function PremiumEmptyState({
 
       {/* Subtitle */}
       {subtitle && (
-        <p className={cn('text-[#444] mt-1', config.subtitleClass)}>
+        <p className={cn('text-[#555] mt-1', config.subtitleClass)}>
           {subtitle}
         </p>
       )}
@@ -112,7 +112,7 @@ export default function PremiumEmptyState({
           className="mt-5 inline-flex items-center gap-2 text-[#c8a55a] text-xs font-medium
                      bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg px-4 py-2
                      hover:bg-[#c8a55a]/10 hover:border-[#c8a55a]/25
-                     transition-all duration-200"
+                     transition-all duration-200 touch-press"
         >
           {cta}
         </button>

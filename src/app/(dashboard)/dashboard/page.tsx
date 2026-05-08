@@ -12,6 +12,9 @@ import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 import PremiumReflection from '@/components/ui/PremiumReflection';
+import { MomentumCard } from '@/components/dashboard/MomentumCard';
+import { ReturnTrigger } from '@/components/dashboard/ReturnTrigger';
+import { MicroReward } from '@/components/ui/MicroReward';
 
 interface EmpireData {
   empire: string;
@@ -102,7 +105,7 @@ export default function DashboardPage() {
   const [challenge, setChallenge] = useState<ChallengeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
-  const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number } | null>(null);
+  const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number; checkinStreak: number; generalStreak: number; streakMessage: { message: string; tone: string } } | null>(null);
   const [progress, setProgress] = useState<{ meditation: { count: number; target: number; percent: number }; habits: { count: number; target: number; percent: number }; journal: { count: number; target: number; percent: number }; totalPercent: number } | null>(null);
   const [achievements, setAchievements] = useState<{ key: string; title: string; description: string; category: string; icon: string; target: number; current: number; percent: number; unlocked: boolean; unlockedAt: string | null }[] | null>(null);
   const [achievementsStats, setAchievementsStats] = useState<{ total: number; unlocked: number; percent: number } | null>(null);
@@ -259,7 +262,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-3 sm:space-y-12 overflow-x-contain">
+    <div className="max-w-7xl mx-auto space-y-2 sm:space-y-10 overflow-x-contain">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -303,6 +306,34 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Return Trigger — dynamic welcome back message */}
+      <ReturnTrigger />
+
+      {/* Momentum — consistency metric */}
+      <MomentumCard />
+
+      {/* Streak Message — human, not toxic */}
+      {streaks && streaks.generalStreak > 0 && (
+        <div className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 card-enter">
+          <span className={`streak-pulse text-base sm:text-lg ${[3, 7, 14, 21, 30].includes(streaks.generalStreak) ? 'streak-milestone-glow' : ''}`}>🔥</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm text-white font-medium">Racha de {streaks.generalStreak} día{streaks.generalStreak !== 1 ? 's' : ''}</p>
+            <p className="text-[10px] sm:text-xs text-[#999]">{streaks.streakMessage?.message}</p>
+          </div>
+          {streaks.checkinStreak > 0 && (
+            <Link href="/checkin" className="text-[10px] sm:text-xs text-[#c8a55a] hover:underline flex items-center gap-1 shrink-0">
+              Check-in {streaks.checkinStreak}d <ArrowRight size={10} />
+            </Link>
+          )}
+        </div>
+      )}
+      {streaks && streaks.generalStreak === 0 && (
+        <div className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 card-enter">
+          <span className="text-base sm:text-lg">🌱</span>
+          <p className="text-[10px] sm:text-xs text-[#999]">{streaks.streakMessage?.message || 'Cada día es una oportunidad para avanzar.'}</p>
+        </div>
+      )}
 
       {/* Hero: Estado Actual */}
       <EmotionalHero />
@@ -701,7 +732,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Stats — reduced padding on mobile */}
+      {/* Quick Stats — with general streak */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4 card-enter">
         <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
           <div className="flex items-center gap-1.5 sm:gap-3">
@@ -714,6 +745,17 @@ export default function DashboardPage() {
         </Link>
         <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
           <div className="flex items-center gap-1.5 sm:gap-3">
+            <Flame size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
+            <div>
+              <p className="text-sm sm:text-2xl font-bold text-white">
+                {streaks?.generalStreak ?? bestStreak}
+              </p>
+              <p className="text-[9px] sm:text-xs text-[#999]">Racha actual</p>
+            </div>
+          </div>
+        </Link>
+        <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <Trophy size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
               <p className="text-sm sm:text-2xl font-bold text-white">{totalLevels}</p>
@@ -721,18 +763,10 @@ export default function DashboardPage() {
             </div>
           </div>
         </Link>
-        <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <Flame size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
-            <div>
-              <p className="text-sm sm:text-2xl font-bold text-white">
-                {bestStreak}
-              </p>
-              <p className="text-[9px] sm:text-xs text-[#999]">Mejor racha</p>
-            </div>
-          </div>
-        </Link>
       </div>
+
+      {/* Micro-reward for actions */}
+      <MicroReward trigger={challengeJustCompleted} message="Desafío completado" />
     </div>
   );
 }

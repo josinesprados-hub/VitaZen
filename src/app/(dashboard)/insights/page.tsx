@@ -361,8 +361,8 @@ export default function InsightsPage() {
       ) : (
         <PremiumEmptyState
           icon={Sparkles}
-          title="Sin insights esta semana"
-          subtitle="Registra más actividad para recibir insights personalizados"
+          title="Los insights llegarán con tu actividad"
+          subtitle="Registra hábitos, meditaciones o check-ins y los patrones aparecerán solos."
           size="md"
           variant="gold"
         />

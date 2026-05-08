@@ -8,6 +8,7 @@ import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
+import { MicroReward } from '@/components/ui/MicroReward';
 
 interface Meditation {
   id: string;
@@ -493,8 +494,8 @@ export default function MentePage() {
         {sessions.length === 0 ? (
           <PremiumEmptyState
             icon={Wind}
-            title="Aún no tienes sesiones registradas"
-            subtitle="Completa una sesión de respiración para verla aquí"
+            title="Tu espacio de calma te espera"
+            subtitle="Una sola respiración consciente marca la diferencia."
             size="sm"
             variant="gold"
           />
@@ -568,6 +569,8 @@ export default function MentePage() {
           </div>
         </div>
       )}
+      {/* Micro-reward for meditation completion */}
+      <MicroReward trigger={completedSession !== null} message="Sesión completada" />
     </div>
   );
 }

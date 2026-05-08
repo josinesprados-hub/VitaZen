@@ -1235,3 +1235,128 @@ body.scroll-locked {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ═══════════════════════════════════════════
+   Momentum & Retention System — Phase 3
+   ═══════════════════════════════════════════ */
+
+/* Micro-reward toast entrance — slides up and fades in */
+@keyframes microRewardEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+.micro-reward-enter {
+  animation: microRewardEnter 0.35s ease-out both;
+}
+
+/* Micro-reward glow — subtle gold box-shadow */
+@keyframes microRewardGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  50% { box-shadow: 0 0 16px 2px rgba(200, 165, 90, 0.12); }
+}
+.micro-reward-glow {
+  animation: microRewardGlow 1.2s ease-out;
+}
+
+/* Completion shimmer — elegant sweep across completed items */
+@keyframes completionShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.completion-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(200, 165, 90, 0.06) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: completionShimmer 1.2s ease-out;
+}
+
+/* Streak milestone glow — for streak milestones (3, 7, 14, 30...) */
+@keyframes streakMilestoneGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(200, 165, 90, 0.15); }
+}
+.streak-milestone-glow {
+  animation: streakMilestoneGlow 2s ease-in-out infinite;
+}
+
+/* Momentum bar pulse — when momentum is "fuerte" */
+@keyframes momentumPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+.momentum-pulse {
+  animation: momentumPulse 3s ease-in-out infinite;
+}
+
+/* Return trigger accent bar animation */
+@keyframes returnAccentPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.5; }
+}
+.return-accent-pulse {
+  animation: returnAccentPulse 3s ease-in-out infinite;
+}
+
+/* Respect reduced motion for momentum system */
+@media (prefers-reduced-motion: reduce) {
+  .micro-reward-enter { animation: none; }
+  .micro-reward-glow { animation: none; }
+  .completion-shimmer { animation: none; }
+  .streak-milestone-glow { animation: none; }
+  .momentum-pulse { animation: none; }
+  .return-accent-pulse { animation: none; }
+}
+
+/* ═══════════════════════════════════════════
+   Mobile Density Polish — Phase 3
+   ═══════════════════════════════════════════ */
+
+/* Reduce vertical spacing on mobile for key pages */
+@media (max-width: 767px) {
+  /* Dashboard: tighter section gaps */
+  .space-y-3 > * + * {
+    margin-top: 0.5rem;
+  }
+
+  /* Empire pages: reduce section padding */
+  .max-w-4xl.space-y-8 > * + * {
+    margin-top: 1.25rem;
+  }
+
+  /* Insights page: tighter grid gaps */
+  .max-w-5xl.space-y-8 > * + * {
+    margin-top: 1.25rem;
+  }
+
+  /* Cards on mobile: slightly less vertical padding */
+  .card-primary, .card-accent {
+    padding: 0.875rem;
+  }
+
+  /* Hero section: compact on mobile */
+  .hero-section-card {
+    padding: 0.875rem;
+  }
+}
+
+/* Subtle bottom padding for scroll content to avoid sidebar overlap */
+@media (max-width: 767px) {
+  .max-w-7xl,
+  .max-w-5xl,
+  .max-w-4xl,
+  .max-w-3xl {
+    padding-bottom: 2rem;
+  }
+}
