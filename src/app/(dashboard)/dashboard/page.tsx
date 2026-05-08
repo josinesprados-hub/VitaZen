@@ -216,16 +216,7 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Hero: Estado Actual */}
-      <EmotionalHero />
-
-      {/* Onboarding Recommendations */}
-      <OnboardingRecommendations />
-
-      {/* Weekly Recap */}
-      <WeeklyRecap />
-
-      {/* Welcome */}
+      {/* ═══ REORDERED: Welcome + Check-in FIRST ═══ */}
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
@@ -260,8 +251,14 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Metrics */}
-      {metrics && (
+      {/* Hero: Estado Actual */}
+      <EmotionalHero />
+
+      {/* Onboarding Recommendations */}
+      <OnboardingRecommendations />
+
+      {/* Metrics — with calm fallback when data is null */}
+      {metrics ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
@@ -324,113 +321,84 @@ export default function DashboardPage() {
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">balance 30 días</p>
           </div>
         </div>
-      )}
-
-      {/* Progreso Semanal */}
-      {progress && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/20 transition-colors">
-          <div className="flex items-center justify-between mb-3 sm:mb-5">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Target size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
-              <h2 className="text-base sm:text-lg font-semibold text-white">Progreso Semanal</h2>
-            </div>
-            <span className="text-xl sm:text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
-          </div>
-
-          <div className="space-y-3 sm:space-y-4">
-            {/* Meditación */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                <span className="text-xs sm:text-sm text-[#999]">Meditación</span>
-                <span className="text-[10px] sm:text-xs text-[#666]">{progress.meditation.count}/{progress.meditation.target}</span>
-              </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-2 sm:h-2.5 overflow-hidden">
-                <div
-                  className="bg-[#c8a55a] h-2 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${progress.meditation.percent}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Hábitos */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                <span className="text-xs sm:text-sm text-[#999]">Hábitos</span>
-                <span className="text-[10px] sm:text-xs text-[#666]">{progress.habits.count}/{progress.habits.target}</span>
-              </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-2 sm:h-2.5 overflow-hidden">
-                <div
-                  className="bg-[#c8a55a] h-2 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${progress.habits.percent}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Diario */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                <span className="text-xs sm:text-sm text-[#999]">Diario</span>
-                <span className="text-[10px] sm:text-xs text-[#666]">{progress.journal.count}/{progress.journal.target}</span>
-              </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-2 sm:h-2.5 overflow-hidden">
-                <div
-                  className="bg-[#c8a55a] h-2 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${progress.journal.percent}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Insights Preview */}
-      {dashboardInsights && dashboardInsights.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-3 sm:mb-5">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Sparkles size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
-              <h2 className="text-base sm:text-xl font-semibold text-white">Insights Semanales</h2>
-              {insightsScore !== null && (
-                <span className="text-[10px] sm:text-xs text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-1.5 sm:px-2 py-0.5 rounded-full font-medium">
-                  {insightsScore}/100
-                </span>
-              )}
-            </div>
-            <Link href="/insights" className="text-[10px] sm:text-xs text-[#c8a55a] hover:underline flex items-center gap-1">
-              Ver todo <ArrowRight size={12} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-            {visibleInsights.map((insight) => {
-              const borderClass = insight.type === 'positive'
-                ? 'border-[#22c55e]/15 hover:border-[#22c55e]/30'
-                : insight.type === 'warning'
-                ? 'border-[#e8a849]/15 hover:border-[#e8a849]/30'
-                : 'border-[#1a1a1a] hover:border-[#2a2a2a]';
-              return (
-                <div
-                  key={insight.id}
-                  className={`bg-[#0a0a0a] border rounded-xl p-3 sm:p-5 transition-all duration-200 ${borderClass}`}
-                >
-                  <div className="flex items-start gap-2 sm:gap-3">
-                    <span className="text-base sm:text-xl shrink-0">{insight.icon}</span>
-                    <div className="min-w-0">
-                      <h3 className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1">{insight.title}</h3>
-                      <p className="text-[10px] sm:text-xs text-[#999] leading-relaxed line-clamp-2">{insight.description}</p>
-                    </div>
-                  </div>
+      ) : (
+        /* Calm fallback placeholder card */
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          {[['Meditación', Wind], ['Hábitos', CheckCircle], ['Diario', BookOpen], ['Finanzas', Wallet]].map(([label, Icon]) => (
+            <div key={label as string} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+              <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+                  <Icon size={14} className="text-[#c8a55a]/30 sm:w-[18px] sm:h-[18px]" />
                 </div>
-              );
-            })}
-          </div>
+                <span className="text-[10px] sm:text-xs text-[#444] uppercase tracking-wider font-medium">{label}</span>
+              </div>
+              <p className="text-xl sm:text-3xl font-bold text-[#333]">—</p>
+              <p className="text-[10px] sm:text-xs text-[#333] mt-0.5 sm:mt-1">esta semana</p>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Premium Reflection */}
-      <PremiumReflection />
+      {/* Weekly Recap — after metrics, collapsed on mobile */}
+      <WeeklyRecap />
 
-      {/* Daily Challenge */}
-      {challenge && (
+      {/* Empire Grid */}
+      <div>
+        <h2 className="text-base sm:text-xl font-semibold text-white mb-3 sm:mb-5">Tus Imperios</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-5">
+          {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
+            const empireData = empires.find((e) => e.empire === key);
+            const level = empireData?.level || 1;
+            const empireProgress = empireData?.progress || 0;
+            const streak = empireData?.streak || 0;
+            const Icon = config.icon;
+
+            return (
+              <Link
+                key={key}
+                href={`/imperio/${key}`}
+                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press"
+              >
+                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-5">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
+                    <Icon size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm sm:text-base font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{config.name}</h3>
+                    <p className="text-[10px] sm:text-xs text-[#999]">Nivel {level}</p>
+                  </div>
+                  {streak > 0 && (
+                    <span className="flex items-center gap-0.5 text-[10px] sm:text-xs text-[#c8a55a] sm:hidden">
+                      <Flame size={10} /> {streak}d
+                    </span>
+                  )}
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2 mb-1.5 sm:mb-2.5">
+                  <div
+                    className="bg-[#c8a55a] h-1.5 sm:h-2 rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${empireProgress}%` }}
+                  />
+                </div>
+
+                <div className="hidden sm:flex items-center justify-between text-xs text-[#666]">
+                  <span>{Math.round(empireProgress)}% para el siguiente nivel</span>
+                  {streak > 0 && (
+                    <span className="flex items-center gap-1 text-[#c8a55a]">
+                      <Flame size={12} /> {streak} días
+                    </span>
+                  )}
+                </div>
+                <p className="sm:hidden text-[10px] text-[#666]">{Math.round(empireProgress)}% sig. nivel</p>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Daily Challenge — with calm fallback */}
+      {challenge ? (
         <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3 sm:p-5">
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
             <Trophy size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
@@ -465,65 +433,152 @@ export default function DashboardPage() {
             </button>
           )}
         </div>
+      ) : (
+        /* Calm fallback */
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+              <Trophy size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Desafío Diario</h2>
+              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Empire Grid */}
-      <div>
-        <h2 className="text-base sm:text-xl font-semibold text-white mb-3 sm:mb-5">Tus Imperios</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-5">
-          {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
-            const empireData = empires.find((e) => e.empire === key);
-            const level = empireData?.level || 1;
-            const progress = empireData?.progress || 0;
-            const streak = empireData?.streak || 0;
-            const Icon = config.icon;
+      {/* Progreso Semanal — with calm fallback, compact on mobile */}
+      {progress ? (
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2 sm:p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <div className="flex items-center justify-between mb-2 sm:mb-5">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Target size={16} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
+              <h2 className="text-sm sm:text-lg font-semibold text-white">Progreso Semanal</h2>
+            </div>
+            <span className="text-lg sm:text-2xl font-bold text-[#c8a55a]">{progress.totalPercent}%</span>
+          </div>
 
-            return (
-              <Link
-                key={key}
-                href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press"
-              >
-                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-5">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-                    <Icon size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm sm:text-base font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{config.name}</h3>
-                    <p className="text-[10px] sm:text-xs text-[#999]">Nivel {level}</p>
-                  </div>
-                  {streak > 0 && (
-                    <span className="flex items-center gap-0.5 text-[10px] sm:text-xs text-[#c8a55a] sm:hidden">
-                      <Flame size={10} /> {streak}d
-                    </span>
-                  )}
-                </div>
+          <div className="space-y-2 sm:space-y-4">
+            {/* Meditación */}
+            <div>
+              <div className="flex items-center justify-between mb-1 sm:mb-2">
+                <span className="text-[11px] sm:text-sm text-[#999]">Meditación</span>
+                <span className="text-[10px] sm:text-xs text-[#666] hidden sm:inline">{progress.meditation.count}/{progress.meditation.target}</span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2.5 overflow-hidden">
+                <div
+                  className="bg-[#c8a55a] h-1.5 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${progress.meditation.percent}%` }}
+                />
+              </div>
+            </div>
 
-                {/* Progress bar */}
-                <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2 mb-1.5 sm:mb-2.5">
-                  <div
-                    className="bg-[#c8a55a] h-1.5 sm:h-2 rounded-full transition-all duration-700 ease-out"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
+            {/* Hábitos */}
+            <div>
+              <div className="flex items-center justify-between mb-1 sm:mb-2">
+                <span className="text-[11px] sm:text-sm text-[#999]">Hábitos</span>
+                <span className="text-[10px] sm:text-xs text-[#666] hidden sm:inline">{progress.habits.count}/{progress.habits.target}</span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2.5 overflow-hidden">
+                <div
+                  className="bg-[#c8a55a] h-1.5 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${progress.habits.percent}%` }}
+                />
+              </div>
+            </div>
 
-                <div className="hidden sm:flex items-center justify-between text-xs text-[#666]">
-                  <span>{Math.round(progress)}% para el siguiente nivel</span>
-                  {streak > 0 && (
-                    <span className="flex items-center gap-1 text-[#c8a55a]">
-                      <Flame size={12} /> {streak} días
-                    </span>
-                  )}
-                </div>
-                <p className="sm:hidden text-[10px] text-[#666]">{Math.round(progress)}% sig. nivel</p>
-              </Link>
-            );
-          })}
+            {/* Diario */}
+            <div>
+              <div className="flex items-center justify-between mb-1 sm:mb-2">
+                <span className="text-[11px] sm:text-sm text-[#999]">Diario</span>
+                <span className="text-[10px] sm:text-xs text-[#666] hidden sm:inline">{progress.journal.count}/{progress.journal.target}</span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2.5 overflow-hidden">
+                <div
+                  className="bg-[#c8a55a] h-1.5 sm:h-2.5 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${progress.journal.percent}%` }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Calm fallback */
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2 sm:p-5">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+              <Target size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Progreso Semanal</h2>
+              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Achievements Preview */}
-      {achievementsStats && achievements && (
+      {/* Insights Preview — show only 1 on mobile, with calm fallback */}
+      {dashboardInsights && dashboardInsights.length > 0 ? (
+        <div>
+          <div className="flex items-center justify-between mb-3 sm:mb-5">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Sparkles size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
+              <h2 className="text-base sm:text-xl font-semibold text-white">Insights Semanales</h2>
+              {insightsScore !== null && (
+                <span className="text-[10px] sm:text-xs text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-1.5 sm:px-2 py-0.5 rounded-full font-medium">
+                  {insightsScore}/100
+                </span>
+              )}
+            </div>
+            <Link href="/insights" className="text-[10px] sm:text-xs text-[#c8a55a] hover:underline flex items-center gap-1">
+              Ver todo <ArrowRight size={12} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+            {visibleInsights.map((insight, idx) => {
+              const borderClass = insight.type === 'positive'
+                ? 'border-[#22c55e]/15 hover:border-[#22c55e]/30'
+                : insight.type === 'warning'
+                ? 'border-[#e8a849]/15 hover:border-[#e8a849]/30'
+                : 'border-[#1a1a1a] hover:border-[#2a2a2a]';
+              return (
+                <div
+                  key={insight.id}
+                  className={`bg-[#0a0a0a] border rounded-xl p-3 sm:p-5 transition-all duration-200 ${borderClass} ${idx >= 1 ? 'hidden sm:block' : ''}`}
+                >
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-base sm:text-xl shrink-0">{insight.icon}</span>
+                    <div className="min-w-0">
+                      <h3 className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1">{insight.title}</h3>
+                      <p className="text-[10px] sm:text-xs text-[#999] leading-relaxed line-clamp-2">{insight.description}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        /* Calm fallback */
+        <div>
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+              <Sparkles size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Insights Semanales</h2>
+              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Reflection */}
+      <PremiumReflection />
+
+      {/* Achievements Preview — show only 3 on mobile, with calm fallback */}
+      {achievementsStats && achievements && sortedAchievements ? (
         <div>
           <div className="flex items-center justify-between mb-3 sm:mb-5">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -536,12 +591,14 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-3">
-            {(sortedAchievements ?? []).map((ach) => {
+            {sortedAchievements.map((ach, idx) => {
                 const isUnlocked = ach.unlocked;
                 return (
                   <div
                     key={ach.key}
                     className={`rounded-xl p-2 sm:p-4 transition-all duration-300 group ${
+                      idx >= 3 ? 'hidden sm:block' : ''
+                    } ${
                       isUnlocked
                         ? 'bg-[#0a0a0a] border border-[#c8a55a]/20 hover:border-[#c8a55a]/40'
                         : 'bg-[#080808] border border-[#1a1a1a]'
@@ -576,36 +633,49 @@ export default function DashboardPage() {
               })}
           </div>
         </div>
+      ) : (
+        /* Calm fallback */
+        <div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+              <Trophy size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Logros</h2>
+              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Quick Stats */}
+      {/* Quick Stats — reduced padding on mobile */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Star size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
-              <p className="text-base sm:text-2xl font-bold text-white">{totalXp}</p>
-              <p className="text-[10px] sm:text-xs text-[#999]">XP total</p>
+              <p className="text-sm sm:text-2xl font-bold text-white">{totalXp}</p>
+              <p className="text-[9px] sm:text-xs text-[#999]">XP total</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Trophy size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
-              <p className="text-base sm:text-2xl font-bold text-white">{totalLevels}</p>
-              <p className="text-[10px] sm:text-xs text-[#999]">Niveles</p>
+              <p className="text-sm sm:text-2xl font-bold text-white">{totalLevels}</p>
+              <p className="text-[9px] sm:text-xs text-[#999]">Niveles</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Flame size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
-              <p className="text-base sm:text-2xl font-bold text-white">
+              <p className="text-sm sm:text-2xl font-bold text-white">
                 {bestStreak}
               </p>
-              <p className="text-[10px] sm:text-xs text-[#999]">Mejor racha</p>
+              <p className="text-[9px] sm:text-xs text-[#999]">Mejor racha</p>
             </div>
           </div>
         </div>

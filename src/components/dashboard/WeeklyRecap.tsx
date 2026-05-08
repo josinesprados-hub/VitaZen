@@ -5,7 +5,6 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { WeeklyRecapSkeleton } from '@/components/ui/PremiumSkeleton';
-import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   CalendarRange,
   Activity,
@@ -186,12 +185,21 @@ export function WeeklyRecap() {
   }
 
   if (!data || error) {
+    // Calm fallback — no retry button, just elegant nothingness
     return (
-      <PremiumErrorState
-        variant="loading"
-        size="sm"
-        onRetry={fetchRecap}
-      />
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden">
+        <div className="px-4 py-4 sm:px-7 sm:py-7">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#c8a55a]/5 flex items-center justify-center">
+              <CalendarRange size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Resumen semanal</h2>
+              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -217,11 +225,16 @@ export function WeeklyRecap() {
     { label: 'Diario', value: data.progress.journalEntries, icon: BookOpen, unit: 'entradas' },
   ];
 
+  // Mobile score ring (smaller)
+  const mobileScoreRadius = 20;
+  const mobileScoreCircumference = 2 * Math.PI * mobileScoreRadius;
+  const mobileScoreDashoffset = mobileScoreCircumference - (data.score / 100) * mobileScoreCircumference;
+
   return (
     <div className="recap-fade-in">
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden hover:border-[#c8a55a]/15 transition-colors duration-300">
         {/* Header */}
-        <div className="px-4 pt-4 pb-3 sm:px-7 sm:pt-7 sm:pb-5 border-b border-[#1a1a1a]/60">
+        <div className="px-4 pt-4 pb-3 sm:px-7 sm:pt-7 sm:pb-5 sm:border-b sm:border-[#1a1a1a]/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
@@ -255,10 +268,40 @@ export function WeeklyRecap() {
               </Link>
             </div>
           </div>
+
+          {/* Mobile: compact score row — only visible on mobile */}
+          <div className="flex sm:hidden items-center gap-3 mt-3 pt-3 border-t border-[#1a1a1a]/60">
+            <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r={mobileScoreRadius} fill="none" stroke="#1a1a1a" strokeWidth="3" />
+                <circle
+                  cx="24" cy="24" r={mobileScoreRadius}
+                  fill="none"
+                  stroke={scoreColor}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray={mobileScoreCircumference}
+                  strokeDashoffset={mobileScoreDashoffset}
+                  className="recap-ring-transition"
+                />
+              </svg>
+              <span className="text-xs font-bold text-white relative z-10">{data.score}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-white font-medium">{data.scoreLabel}</p>
+              <p className="text-[10px] text-[#666]">{data.progress.totalActivities} acciones</p>
+            </div>
+            <Link
+              href="/insights"
+              className="text-[10px] text-[#c8a55a] hover:underline flex items-center gap-1 transition-colors"
+            >
+              Ver resumen <ArrowRight size={10} />
+            </Link>
+          </div>
         </div>
 
-        {/* Body */}
-        <div className="p-3 sm:p-7 space-y-4 sm:space-y-7">
+        {/* Body — hidden on mobile, visible on sm+ */}
+        <div className="hidden sm:block p-3 sm:p-7 space-y-4 sm:space-y-7">
           {/* Row 1: Score + Emotional State */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
             {/* Wellness Score */}

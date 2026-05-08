@@ -145,7 +145,10 @@ export default function PremiumReflection() {
     };
   }, [advance]);
 
-  if (!reflection) return null;
+  if (!reflection) {
+    // Return a minimal placeholder with the same height structure to prevent layout shift
+    return <div className="py-2 sm:py-6 h-8 sm:h-12" />;
+  }
 
   return (
     <div className="flex justify-center py-2 sm:py-6">

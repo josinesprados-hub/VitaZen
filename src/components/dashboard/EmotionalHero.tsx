@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { EmotionalHeroSkeleton } from '@/components/ui/PremiumSkeleton';
-import PremiumErrorState from '@/components/ui/PremiumErrorState';
+
 import { Zap, Brain, Leaf, Repeat, TrendingUp, Activity, ArrowUpRight, ArrowDownRight, Minus, Sparkles } from 'lucide-react';
 import type { EmotionalStatus, EmotionalMetric, EmotionalState } from '@/lib/emotional-state';
 
@@ -171,13 +171,21 @@ export function EmotionalHero() {
   }
 
   if (error || !state) {
+    // Calm fallback — no retry button, just elegant nothingness
     return (
-      <PremiumErrorState
-        variant="loading"
-        size="sm"
-        onRetry={fetchState}
-        className="hero-section-card"
-      />
+      <div className="hero-section-container">
+        <div className="hero-section-card bg-gradient-to-br from-[#0a0a0a] via-[#0a0a0a] to-[#0a0a0a]">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#c8a55a]/5 flex items-center justify-center shrink-0">
+              <Sparkles size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Estado actual</h2>
+              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -228,15 +236,17 @@ export function EmotionalHero() {
             </div>
           </div>
 
-          {/* Metrics rings */}
+          {/* Metrics rings — show only 3 key metrics on mobile */}
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2">
-            {metricsEntries.map(([key, metric]) => (
-              <MetricRing key={key} metric={metric} metricKey={key} />
+            {metricsEntries.map(([key, metric], idx) => (
+              <div key={key} className={idx >= 3 ? 'hidden sm:flex' : 'flex'}>
+                <MetricRing metric={metric} metricKey={key} />
+              </div>
             ))}
           </div>
 
-          {/* Subtle bottom line */}
-          <div className="mt-2 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
+          {/* Subtle bottom line — hidden on mobile */}
+          <div className="hidden sm:block mt-2 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
             <div className="flex items-center justify-between">
               <p className="text-[9px] sm:text-[10px] text-[#444] uppercase tracking-widest font-medium">
                 Basado en tu actividad real
