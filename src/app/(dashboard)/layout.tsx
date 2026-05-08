@@ -26,7 +26,8 @@ export default function DashboardLayout({
     }
   }, [user, loading]);
 
-  if (loading) {
+  // Show loading only if we don't have Firebase auth yet (initial app load)
+  if (loading && !firebaseUser) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5 skeleton-entrance">
@@ -64,9 +65,25 @@ export default function DashboardLayout({
     );
   }
 
-  if (!user) {
+  // Firebase auth confirmed but server sync still in progress — show brief syncing state
+  // This typically resolves in 1-3 seconds (just a DB lookup for existing users)
+  if (firebaseUser && !user) {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-5 skeleton-entrance">
+          <div className="w-12 h-12 rounded-xl premium-shimmer" />
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
+            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Sincronizando</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // No auth at all — redirect to login
+  if (!user && !firebaseUser) {
     router.replace('/login');
-    // Show loading state instead of null to prevent black flash during redirect
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5 skeleton-entrance">
@@ -80,9 +97,8 @@ export default function DashboardLayout({
     );
   }
 
-  if (user.onboardingCompleted === false) {
+  if (user?.onboardingCompleted === false) {
     router.replace('/onboarding');
-    // Show loading state instead of null to prevent black flash during redirect
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5 skeleton-entrance">

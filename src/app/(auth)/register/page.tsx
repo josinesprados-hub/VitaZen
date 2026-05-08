@@ -21,20 +21,21 @@ export default function RegisterPage() {
   const [providerHint, setProviderHint] = useState<'google' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const { signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
+  const { signUp, signInWithGoogle, user, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
   // Redirect already-authenticated users away from register
   useEffect(() => {
-    if (!authLoading && user) {
-      // Show transition animation before redirecting
-      setTransitioning(true);
-      const timer = setTimeout(() => {
+    if (!authLoading) {
+      if (user) {
+        // Server sync completed — navigate to the correct destination
         router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
-      }, 600);
-      return () => clearTimeout(timer);
+      } else if (firebaseUser) {
+        // Firebase authenticated but server sync still pending — navigate optimistically
+        router.replace('/onboarding');
+      }
     }
-  }, [user, authLoading, router]);
+  }, [user, firebaseUser, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +51,10 @@ export default function RegisterPage() {
 
     try {
       await signUp(email, password);
-      // Redirect handled by useEffect watching `user`
+      // Firebase auth confirmed — navigate to onboarding immediately.
+      // Server sync happens in background via onAuthStateChanged.
+      // No need to wait for server response to confirm what Firebase already confirmed.
+      router.replace('/onboarding');
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         setError('Este email ya está registrado. Inicia sesión o usa otro email.');
@@ -59,7 +63,6 @@ export default function RegisterPage() {
       } else {
         setError('No se ha podido crear la cuenta. Inténtalo de nuevo.');
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -70,7 +73,8 @@ export default function RegisterPage() {
 
     try {
       await signInWithGoogle();
-      // Redirect handled by useEffect watching `user`
+      // Firebase auth confirmed — navigate immediately
+      router.replace('/onboarding');
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setLoading(false);
@@ -90,7 +94,6 @@ export default function RegisterPage() {
         return;
       }
       setError('No se ha podido registrar con Google. Inténtalo de nuevo.');
-    } finally {
       setLoading(false);
     }
   };

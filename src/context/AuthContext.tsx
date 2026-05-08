@@ -42,7 +42,7 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  refreshUser: () => Promise<void>;
+  refreshUser: (options?: { reloadFirebase?: boolean }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,11 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const refreshUser = useCallback(async () => {
+  const refreshUser = useCallback(async (options?: { reloadFirebase?: boolean }) => {
     if (!firebaseUser) return;
     try {
-      // Reload Firebase user first to get latest emailVerified status
-      await firebaseUser.reload();
+      // Only reload Firebase user when explicitly needed (e.g. email verification).
+      // Skipping this saves ~200-500ms on onboarding completion.
+      if (options?.reloadFirebase) {
+        await firebaseUser.reload();
+      }
       // Force token refresh to get fresh claims (including emailVerified)
       const idToken = await firebaseUser.getIdToken(true);
       const res = await fetch('/api/auth/session', {
@@ -98,13 +101,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [firebaseUser]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
-        await syncUser(fbUser);
+        // Fire-and-forget: sync user data in background.
+        // Don't block the loading state — the UI can render immediately
+        // once Firebase auth is confirmed. Server sync (DB lookup, emails,
+        // analytics) all run independently and update `user` when done.
+        syncUser(fbUser);
       } else {
         setUser(null);
       }
+      // Set loading false immediately — Firebase auth state is confirmed.
+      // Components should check both `firebaseUser` and `user`:
+      //   - firebaseUser: Firebase auth confirmed (instant)
+      //   - user: Server sync completed (background, 1-5s)
       setLoading(false);
     });
 

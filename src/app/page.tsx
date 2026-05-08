@@ -6,17 +6,18 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, firebaseUser, loading } = useAuth();
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
+      if (user || firebaseUser) {
+        // Authenticated (Firebase confirmed, sync may still be in progress)
         router.replace('/dashboard');
       } else {
         router.replace('/login');
       }
     }
-  }, [user, loading, router]);
+  }, [user, firebaseUser, loading, router]);
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center">

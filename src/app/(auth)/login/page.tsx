@@ -17,19 +17,21 @@ export default function LoginPage() {
   const [providerHint, setProviderHint] = useState<'google' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const { signIn, signInWithGoogle, user, loading: authLoading } = useAuth();
+  const { signIn, signInWithGoogle, user, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
   // Redirect already-authenticated users away from login
   useEffect(() => {
-    if (!authLoading && user) {
-      setTransitioning(true);
-      const timer = setTimeout(() => {
+    if (!authLoading) {
+      if (user) {
+        // Server sync completed — navigate to the correct destination
         router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
-      }, 600);
-      return () => clearTimeout(timer);
+      } else if (firebaseUser) {
+        // Firebase authenticated but server sync still pending — navigate optimistically
+        router.replace('/onboarding');
+      }
     }
-  }, [user, authLoading, router]);
+  }, [user, firebaseUser, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +41,11 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      // Redirect handled by useEffect watching `user`
+      // Firebase auth confirmed — navigate immediately.
+      // Dashboard layout will redirect to onboarding if needed once sync completes.
+      router.replace('/dashboard');
     } catch (err: any) {
       setError(err.code === 'auth/invalid-credential' ? 'Credenciales incorrectas. Verifica tu email y contraseña.' : 'No se ha podido iniciar sesión. Inténtalo de nuevo.');
-    } finally {
       setLoading(false);
     }
   };
@@ -53,7 +56,8 @@ export default function LoginPage() {
 
     try {
       await signInWithGoogle();
-      // Redirect handled by useEffect watching `user`
+      // Firebase auth confirmed — navigate immediately
+      router.replace('/dashboard');
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setLoading(false);
@@ -73,7 +77,6 @@ export default function LoginPage() {
         return;
       }
       setError('No se ha podido iniciar sesión con Google. Inténtalo de nuevo.');
-    } finally {
       setLoading(false);
     }
   };

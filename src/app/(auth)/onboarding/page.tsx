@@ -75,7 +75,7 @@ const TOTAL_STEPS = 5;
 // ═══════════════════════════════════════════
 
 export default function OnboardingPage() {
-  const { user, loading, refreshUser } = useAuth();
+  const { user, loading, refreshUser, firebaseUser } = useAuth();
   const { apiFetch } = useApi();
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -85,15 +85,19 @@ export default function OnboardingPage() {
   const [error, setError] = useState('');
 
   // Auth guard: redirect if not logged in or already completed onboarding
+  // Uses both firebaseUser (instant) and user (server sync) for smooth transitions
   useEffect(() => {
     if (!loading) {
-      if (!user) {
+      if (!user && !firebaseUser) {
+        // No Firebase auth at all — redirect to login
         router.push('/login');
-      } else if (user.onboardingCompleted) {
+      } else if (user?.onboardingCompleted) {
+        // Server sync confirmed onboarding is complete — go to dashboard
         router.push('/dashboard');
       }
+      // If firebaseUser exists but user is null (sync pending), stay on onboarding
     }
-  }, [user, loading, router]);
+  }, [user, firebaseUser, loading, router]);
 
   const goToStep = useCallback((nextStep: number) => {
     setAnimating(true);
@@ -125,8 +129,8 @@ export default function OnboardingPage() {
     }
   };
 
-  // Loading state
-  if (loading) {
+  // Loading state — only block if we don't have Firebase auth yet
+  if (loading && !firebaseUser) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -137,8 +141,11 @@ export default function OnboardingPage() {
     );
   }
 
-  // Not ready yet (redirecting)
-  if (!user || user.onboardingCompleted) {
+  // Not ready yet (redirecting, or no auth at all)
+  if (!firebaseUser) {
+    return null;
+  }
+  if (user?.onboardingCompleted) {
     return null;
   }
 
@@ -168,7 +175,7 @@ export default function OnboardingPage() {
       <div className={`w-full max-w-lg ${animating ? 'onboarding-step-exit' : 'onboarding-step-enter'} overflow-x-contain`}>
         {step === 0 && (
           <WelcomeStep
-            userName={user?.name}
+            userName={user?.name || firebaseUser?.displayName || firebaseUser?.email?.split('@')[0]}
             onNext={() => goToStep(1)}
           />
         )}
