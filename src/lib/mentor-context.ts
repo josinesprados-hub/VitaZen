@@ -220,24 +220,21 @@ function formatBasicContext(ctx: UserContext): string {
   const lines: string[] = [];
 
   if (ctx.userName) {
-    lines.push(`Nombre del usuario: ${ctx.userName}`);
+    lines.push(`Se llama ${ctx.userName}.`);
   }
 
   // Just the latest check-in summary
   if (ctx.recentCheckins.length > 0) {
     const latest = ctx.recentCheckins[0];
     const days = daysAgo(latest.date);
-    lines.push(`\nEstado reciente:`);
-    lines.push(`- Último check-in: ${days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`}`);
-    lines.push(`- Emoción: ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, Energía: ${latest.energy}/5`);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    lines.push(`Su último check-in fue ${when}: emoción ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, energía ${latest.energy}/5.`);
   }
 
   // Brief streak summary
   if (ctx.habitStreaks.length > 0) {
-    lines.push(`\nHábitos:`);
-    ctx.habitStreaks.slice(0, 3).forEach(h => {
-      lines.push(`- ${h.name}: racha de ${h.streak} días`);
-    });
+    const streaks = ctx.habitStreaks.slice(0, 3).map(h => `${h.name} (${h.streak} días)`).join(', ');
+    lines.push(`Hábitos con racha: ${streaks}.`);
   }
 
   return lines.join('\n');
@@ -251,94 +248,83 @@ function formatAdvancedContext(ctx: UserContext): string {
 
   // User name
   if (ctx.userName) {
-    lines.push(`Nombre del usuario: ${ctx.userName}`);
+    lines.push(`Se llama ${ctx.userName}.`);
   }
 
   // Recent emotional check-ins with trends
   if (ctx.recentCheckins.length > 0) {
     const latest = ctx.recentCheckins[0];
     const days = daysAgo(latest.date);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
 
-    lines.push(`\nEstado emocional reciente:`);
-    lines.push(`- Último check-in: ${days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`}`);
-    lines.push(`- Emoción: ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, Energía: ${latest.energy}/5, Enfoque: ${latest.focus}/5, Estrés: ${latest.stress}/5`);
+    lines.push(`Último check-in ${when}: emoción ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, energía ${latest.energy}/5, enfoque ${latest.focus}/5, estrés ${latest.stress}/5.`);
     if (latest.intention) {
-      lines.push(`- Intención del día: "${latest.intention}"`);
+      lines.push(`Su intención del día: "${latest.intention}"`);
     }
 
     // Trend: compare latest vs previous
     if (ctx.recentCheckins.length >= 2) {
       const prev = ctx.recentCheckins[1];
-      const stressTrend = latest.stress - prev.stress;
-      const energyTrend = latest.energy - prev.energy;
-      const emotionTrend = latest.emotion - prev.emotion;
-
-      if (stressTrend > 0) lines.push(`- Tendencia: estrés en aumento respecto a días anteriores`);
-      if (energyTrend > 0) lines.push(`- Tendencia: energía mejorando`);
-      if (emotionTrend < 0) lines.push(`- Tendencia: estado emocional ha bajado`);
+      const trends: string[] = [];
+      if (latest.stress - prev.stress > 0) trends.push('el estrés ha subido');
+      if (latest.energy - prev.energy > 0) trends.push('la energía ha mejorado');
+      if (latest.emotion - prev.emotion < 0) trends.push('el estado emocional ha bajado');
+      if (trends.length > 0) {
+        lines.push(`Tendencia reciente: ${trends.join(', ')}.`);
+      }
     }
   }
 
   // Habit streaks with detail
   if (ctx.habitStreaks.length > 0) {
-    lines.push(`\nHábitos activos:`);
-    ctx.habitStreaks.forEach(h => {
+    const habitParts = ctx.habitStreaks.map(h => {
       const daysSince = h.lastCompletedAt ? daysAgo(h.lastCompletedAt) : null;
-      const status = daysSince === 0 ? 'completado hoy' : daysSince === 1 ? 'completado ayer' : daysSince !== null ? `último hace ${daysSince} días` : '';
-      lines.push(`- ${h.name}: racha de ${h.streak} días${status ? ` (${status})` : ''}`);
+      const status = daysSince === 0 ? 'hecho hoy' : daysSince === 1 ? 'hecho ayer' : daysSince !== null ? `último hace ${daysSince} días` : '';
+      return `${h.name}: racha ${h.streak} días${status ? ` (${status})` : ''}`;
     });
+    lines.push(`Hábitos activos: ${habitParts.join('. ')}.`);
   }
 
   // Recent meditations
   if (ctx.recentMeditations.length > 0) {
-    const lastMeditation = ctx.recentMeditations[0];
-    const days = daysAgo(lastMeditation.completedAt);
-    lines.push(`\nMeditación:`);
-    lines.push(`- Última sesión: ${lastMeditation.duration} min (${lastMeditation.type}), ${days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`}`);
-    lines.push(`- Total sesiones últimas 2 semanas: ${ctx.recentMeditations.length}`);
+    const last = ctx.recentMeditations[0];
+    const days = daysAgo(last.completedAt);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    lines.push(`Última meditación: ${last.duration} min de ${last.type.replace('_', ' ')} ${when}. ${ctx.recentMeditations.length} sesiones en las últimas 2 semanas.`);
   }
 
   // Recent conversation topics
-  if (ctx.recentConversations.length > 0) {
-    lines.push(`\nTemas recientes de conversación:`);
-    ctx.recentConversations.forEach(c => {
-      if (c.title !== 'Nueva conversación') {
-        const days = daysAgo(c.updatedAt);
-        lines.push(`- "${c.title}" (${days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`})`);
-      }
+  const namedConversations = ctx.recentConversations.filter(c => c.title !== 'Nueva conversación');
+  if (namedConversations.length > 0) {
+    const topics = namedConversations.map(c => {
+      const days = daysAgo(c.updatedAt);
+      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+      return `"${c.title}" (${when})`;
     });
+    lines.push(`Temas recientes de conversación: ${topics.join(', ')}.`);
   }
 
   // Empire progress summary
   const activeEmpires = ctx.empireProgress.filter(e => e.xp > 0 || e.streak > 0);
   if (activeEmpires.length > 0) {
-    lines.push(`\nProgreso de imperios:`);
-    activeEmpires.forEach(e => {
+    const empireParts = activeEmpires.map(e => {
       const name = EMPIRE_NAMES[e.empire] || e.empire;
-      lines.push(`- ${name}: Nivel ${e.level}, ${e.xp} XP${e.streak > 0 ? `, racha ${e.streak} días` : ''}`);
+      return `${name}: nivel ${e.level}, ${e.xp} XP${e.streak > 0 ? `, racha ${e.streak} días` : ''}`;
     });
+    lines.push(`Progreso de imperios: ${empireParts.join('. ')}.`);
   }
 
   // Weekly activity summary
   const wa = ctx.weeklyActivity;
   const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins;
   if (totalActivity > 0) {
-    lines.push(`\nActividad esta semana:`);
     const parts: string[] = [];
     if (wa.meditations > 0) parts.push(`${wa.meditations} meditación${wa.meditations > 1 ? 'es' : ''}`);
     if (wa.habits > 0) parts.push(`${wa.habits} hábito${wa.habits > 1 ? 's' : ''}`);
     if (wa.journals > 0) parts.push(`${wa.journals} entrada${wa.journals > 1 ? 's' : ''} de diario`);
     if (wa.checkins > 0) parts.push(`${wa.checkins} check-in${wa.checkins > 1 ? 's' : ''}`);
-    lines.push(`- ${parts.join(', ')}`);
-
-    // Consistency assessment
-    if (totalActivity >= 14) {
-      lines.push(`- Valoración: alta consistencia esta semana`);
-    } else if (totalActivity >= 7) {
-      lines.push(`- Valoración: actividad moderada esta semana`);
-    } else if (totalActivity <= 2) {
-      lines.push(`- Valoración: poca actividad reciente`);
-    }
+    const assessment = totalActivity >= 14 ? 'Alta consistencia.' : totalActivity >= 7 ? 'Actividad moderada.' : totalActivity <= 2 ? 'Poca actividad reciente.' : '';
+    lines.push(`Esta semana: ${parts.join(', ')}. ${assessment}`);
   }
 
   return lines.join('\n');
@@ -372,30 +358,26 @@ export function buildContextualSystemPrompt(
   const isPremium = context.plan === 'PREMIUM';
 
   const contextRules = isPremium
-    ? `REGLAS DE USO DEL CONTEXTO (AVANZADO):
-- Usa este contexto para personalizar tus respuestas de forma natural y profunda.
-- No menciones explícitamente "según tus datos" o "veo en tu registro". Simplemente intégralo.
-- Ejemplo: si el usuario tiene buena racha de hábitos, di algo como "Has mantenido buena consistencia estos días."
-- Ejemplo: si el estrés ha subido, di algo como "Últimamente el estrés ha estado más presente."
-- Ejemplo: si hablaste de problemas de enfoque recientemente, retoma: "La semana pasada mencionaste dificultades con el enfoque..."
-- Referencia tendencias emocionales, sesiones de meditación y progreso de imperios cuando sea relevante.
-- No repitas la misma referencia contextual en cada respuesta. Varía.
-- Si no hay contexto relevante para la pregunta, responde sin forzar referencias.
-- Mantén el tono calmado y premium. No seas invasivo ni excesivamente emocional.
-- Construye continuidad entre sesiones: conecta temas de conversaciones anteriores.`
-    : `REGLAS DE USO DEL CONTEXTO (BÁSICO):
-- Usa este contexto para personalizar tus respuestas de forma natural y sutil.
-- No menciones explícitamente "según tus datos". Simplemente intégralo.
-- Si el usuario tiene buena racha, puedes decir "Has mantenido buena consistencia."
+    ? `CÓMO USAR ESTE CONTEXTO:
+- Integrar de forma invisible. Nunca digas "según tus datos" ni "veo en tu registro". Simplemente sabes.
+- Si el usuario tiene buena racha: "Vienes con buena consistencia." Si el estrés subió: "Últimamente el estrés ha estado más presente." Natural, sin explicarlo.
+- Conecta temas de conversaciones anteriores cuando encaje: "El otro día mencionaste dificultades con el enfoque..."
+- Varía las referencias. No repitas la misma observación en cada respuesta.
+- Si el contexto no es relevante para la pregunta, no lo fuerces. Responde directamente.
+- Construye continuidad entre sesiones. El usuario debe sentir que le recuerdas.
+- Sé sutil. La personalización se nota en lo natural que suena, no en cuántos datos mencionas.`
+    : `CÓMO USAR ESTE CONTEXTO:
+- Integrar de forma invisible. Nunca digas "según tus datos". Simplemente sabes.
+- Si el usuario tiene buena racha, puedes decir: "Vienes con buena consistencia."
 - No repitas la misma referencia en cada respuesta.
-- Si no hay contexto relevante, responde sin forzar referencias.
-- Mantén el tono calmado y profesional.`;
+- Si el contexto no es relevante, responde directamente sin forzar.
+- Sé sutil. Menos es más.`;
 
   return `${basePrompt}
 
-═══ CONTEXTO DEL USUARIO (datos recientes) ═══
+── Lo que sabes de esta persona ──
 ${contextBlock}
-═══ FIN CONTEXTO ═══
+── Fin ──
 
 ${contextRules}`;
 }
