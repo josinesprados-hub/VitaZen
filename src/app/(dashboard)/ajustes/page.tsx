@@ -47,6 +47,13 @@ export default function AjustesPage() {
     }
   }, [user]);
 
+  // Auto-dismiss errors after 3s
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => setError(null), 3000);
+    return () => clearTimeout(timer);
+  }, [error]);
+
   const handleToggle = async (key: string, value: boolean) => {
     if (!firebaseUser) return;
 

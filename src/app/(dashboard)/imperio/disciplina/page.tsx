@@ -48,6 +48,14 @@ export default function DisciplinaPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
 
+  // Lock body scroll when any modal is open
+  useEffect(() => {
+    if (editingHabit || pendingDeleteId) {
+      document.body.classList.add('scroll-locked');
+      return () => document.body.classList.remove('scroll-locked');
+    }
+  }, [editingHabit, pendingDeleteId]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setFetchError(false);
@@ -311,7 +319,7 @@ export default function DisciplinaPage() {
             size="sm"
           />
         ) : (
-          <div className="space-y-2.5 max-h-96 overflow-y-auto">
+          <div className="space-y-2.5">
             {habits.map((habit) => (
               <div key={habit.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center gap-3">

@@ -49,6 +49,13 @@ export default function PerfilPage() {
     }
   }, [user]);
 
+  // Auto-dismiss errors after 3s
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => setError(null), 3000);
+    return () => clearTimeout(timer);
+  }, [error]);
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -124,6 +131,16 @@ export default function PerfilPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 page-transition">
+      {/* Loading guard — user data must be available */}
+      {!user ? (
+        <div className="flex items-center justify-center min-h-[40vh]">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
+            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
+          </div>
+        </div>
+      ) : (
+      <>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -200,7 +217,7 @@ export default function PerfilPage() {
               <>
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute inset-0 w-24 h-24 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity touch-press"
+                  className={`absolute inset-0 w-24 h-24 rounded-full bg-black/60 flex items-center justify-center transition-opacity touch-press ${editing ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                 >
                   <Camera size={20} className="text-white" />
                 </button>
@@ -392,6 +409,8 @@ export default function PerfilPage() {
             Cerrar
           </button>
         </div>
+      )}
+      </>
       )}
     </div>
   );

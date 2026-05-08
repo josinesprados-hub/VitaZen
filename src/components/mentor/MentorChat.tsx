@@ -834,8 +834,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             <div
               className="fixed z-50 bg-[#111] border border-[#2a2a2a] rounded-xl py-1.5 shadow-2xl shadow-black/60 min-w-[180px] animate-in context-menu"
               style={{
-                top: contextMenu.y + 50,
-                left: Math.min(contextMenu.x + 16, window.innerWidth - 200),
+                top: Math.min(contextMenu.y + 50, window.innerHeight - 200),
+                left: Math.max(8, Math.min(contextMenu.x + 16, window.innerWidth - 200)),
               }}
             >
               {/* Find the thread to check archived status */}
@@ -931,6 +931,28 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             </div>
           </div>
         )}
+
+        {/* ────────── Mobile Thread Picker (visible only on small screens) ────────── */}
+        <div className="sm:hidden flex items-center gap-2 mb-1">
+          <select
+            value={activeThread || ''}
+            onChange={(e) => setActiveThread(e.target.value)}
+            className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white appearance-none focus:border-[#c8a55a]"
+          >
+            {activeThreads.length === 0 && (
+              <option value="">Sin conversaciones</option>
+            )}
+            {activeThreads.map((t) => (
+              <option key={t.id} value={t.id}>{t.title}</option>
+            ))}
+          </select>
+          <button
+            onClick={createThread}
+            className="shrink-0 flex items-center gap-1.5 bg-[#c8a55a] text-black font-semibold px-3 py-2 rounded-lg text-sm touch-press"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
 
         {/* ────────── Chat Area ────────── */}
         <div className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex flex-col min-w-0">

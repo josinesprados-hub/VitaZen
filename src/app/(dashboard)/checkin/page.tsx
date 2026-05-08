@@ -102,6 +102,14 @@ export default function CheckinPage() {
   const [editingCheckin, setEditingCheckin] = useState<CheckinData | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
+  // Lock body scroll when delete confirmation overlay is open
+  useEffect(() => {
+    if (pendingDeleteId) {
+      document.body.classList.add('scroll-locked');
+      return () => document.body.classList.remove('scroll-locked');
+    }
+  }, [pendingDeleteId]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setFetchError(false);
@@ -146,8 +154,9 @@ export default function CheckinPage() {
   const handleModalClose = useCallback(() => {
     setShowModal(false);
     setEditingCheckin(null);
-    fetchData();
-  }, [fetchData]);
+    // Only refetch if data might have changed (new/edited checkin)
+    // The save handler already updates state optimistically
+  }, []);
 
   const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }) => {
     if (editingCheckin) {

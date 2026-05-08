@@ -58,6 +58,7 @@ export default function DashboardPage() {
   const [dashboardInsights, setDashboardInsights] = useState<{ id: string; type: string; category: string; icon: string; title: string; description: string }[] | null>(null);
   const [insightsScore, setInsightsScore] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState(false);
+  const [completingChallenge, setCompletingChallenge] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -443,17 +444,24 @@ export default function DashboardPage() {
           {!challenge.completed && (
             <button
               onClick={async () => {
-                const res = await apiFetch('/api/challenges/complete', {
-                  method: 'POST',
-                  body: JSON.stringify({ challengeId: challenge.challenge.id }),
-                });
-                if (res.ok) {
-                  setChallenge({ ...challenge, completed: true });
+                if (completingChallenge) return;
+                setCompletingChallenge(true);
+                try {
+                  const res = await apiFetch('/api/challenges/complete', {
+                    method: 'POST',
+                    body: JSON.stringify({ challengeId: challenge.challenge.id }),
+                  });
+                  if (res.ok) {
+                    setChallenge({ ...challenge, completed: true });
+                  }
+                } finally {
+                  setCompletingChallenge(false);
                 }
               }}
-              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+              disabled={completingChallenge}
+              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Marcar como completado
+              {completingChallenge ? 'Completando...' : 'Marcar como completado'}
             </button>
           )}
         </div>
