@@ -51,6 +51,26 @@ function getTimeGreeting(): string {
   return 'Buenas noches';
 }
 
+// Map insight categories to their empire/page routes
+function getCategoryHref(category: string): string {
+  const map: Record<string, string> = {
+    'hábitos': '/imperio/disciplina',
+    'meditación': '/imperio/mente',
+    'emociones': '/checkin',
+    'energía': '/imperio/energia',
+    'estrés': '/imperio/mente',
+    'diario': '/imperio/mente',
+    'finanzas': '/imperio/riqueza',
+    'nutrición': '/imperio/energia',
+    'bienestar': '/insights',
+    'consistencia': '/insights',
+    'actividad': '/insights',
+    'imperios': '/insights',
+    'recomendación': '/imperio/mentor',
+  };
+  return map[category.toLowerCase()] || '/insights';
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
@@ -270,7 +290,7 @@ export default function DashboardPage() {
       {/* Metrics — with calm fallback when data is null */}
       {metrics ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 card-enter">
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press cursor-pointer group">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <Wind size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -279,14 +299,16 @@ export default function DashboardPage() {
             </div>
             <p className="text-xl sm:text-3xl font-bold text-white">{metrics.meditationWeek}</p>
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
-            {streaks && streaks.meditationStreak > 0 && (
+            {streaks && streaks.meditationStreak > 0 ? (
               <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
                 <span className="streak-pulse">🔥</span> {streaks.meditationStreak}d
               </p>
+            ) : (
+              <p className="text-[9px] sm:text-[10px] text-[#555] mt-1 sm:mt-2 group-hover:text-[#c8a55a]/60 transition-colors">Ir a Mente →</p>
             )}
-          </div>
+          </Link>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <Link href="/imperio/disciplina" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press cursor-pointer group">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <CheckCircle size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -295,14 +317,16 @@ export default function DashboardPage() {
             </div>
             <p className="text-xl sm:text-3xl font-bold text-white">{metrics.habitsCompleted}</p>
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
-            {streaks && streaks.habitStreak > 0 && (
+            {streaks && streaks.habitStreak > 0 ? (
               <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
                 <span className="streak-pulse">🔥</span> {streaks.habitStreak}d
               </p>
+            ) : (
+              <p className="text-[9px] sm:text-[10px] text-[#555] mt-1 sm:mt-2 group-hover:text-[#c8a55a]/60 transition-colors">Ir a Disciplina →</p>
             )}
-          </div>
+          </Link>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press cursor-pointer group">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <BookOpen size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -311,14 +335,16 @@ export default function DashboardPage() {
             </div>
             <p className="text-xl sm:text-3xl font-bold text-white">{metrics.journalWeek}</p>
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
-            {streaks && streaks.journalStreak > 0 && (
+            {streaks && streaks.journalStreak > 0 ? (
               <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
                 <span className="streak-pulse">🔥</span> {streaks.journalStreak}d
               </p>
+            ) : (
+              <p className="text-[9px] sm:text-[10px] text-[#555] mt-1 sm:mt-2 group-hover:text-[#c8a55a]/60 transition-colors">Ir a Mente →</p>
             )}
-          </div>
+          </Link>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
+          <Link href="/imperio/riqueza" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press cursor-pointer group">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
                 <Wallet size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
@@ -329,7 +355,7 @@ export default function DashboardPage() {
               {metrics.balance >= 0 ? '+' : ''}{metrics.balance.toFixed(2)}€
             </p>
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">balance 30 días</p>
-          </div>
+          </Link>
         </div>
       ) : (
         /* Calm fallback placeholder card */
@@ -462,7 +488,7 @@ export default function DashboardPage() {
 
       {/* Progreso Semanal — with calm fallback, compact on mobile */}
       {progress ? (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2 sm:p-5 hover:border-[#c8a55a]/20 transition-colors">
+        <Link href="/insights" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2 sm:p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
           <div className="flex items-center justify-between mb-2 sm:mb-5">
             <div className="flex items-center gap-2 sm:gap-3">
               <Target size={16} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
@@ -514,7 +540,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ) : (
         /* Calm fallback */
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2 sm:p-5">
@@ -554,19 +580,22 @@ export default function DashboardPage() {
                 : insight.type === 'warning'
                 ? 'border-[#e8a849]/15 hover:border-[#e8a849]/30'
                 : 'border-[#1a1a1a] hover:border-[#2a2a2a]';
+              const insightHref = getCategoryHref(insight.category);
               return (
-                <div
+                <Link
                   key={insight.id}
-                  className={`bg-[#0a0a0a] border rounded-xl p-3 sm:p-5 transition-all duration-200 ${borderClass} ${idx >= 1 ? 'hidden sm:block' : ''}`}
+                  href={insightHref}
+                  className={`bg-[#0a0a0a] border rounded-xl p-3 sm:p-5 transition-all duration-200 cursor-pointer group ${borderClass} ${idx >= 1 ? 'hidden sm:block' : ''}`}
                 >
                   <div className="flex items-start gap-2 sm:gap-3">
                     <span className="text-base sm:text-xl shrink-0">{insight.icon}</span>
-                    <div className="min-w-0">
-                      <h3 className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1">{insight.title}</h3>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-[#c8a55a] transition-colors">{insight.title}</h3>
                       <p className="text-[10px] sm:text-xs text-[#999] leading-relaxed line-clamp-2">{insight.description}</p>
                     </div>
+                    <ArrowRight size={12} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0 mt-1" />
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -606,9 +635,10 @@ export default function DashboardPage() {
             {sortedAchievements.map((ach, idx) => {
                 const isUnlocked = ach.unlocked;
                 return (
-                  <div
+                  <Link
                     key={ach.key}
-                    className={`rounded-xl p-2 sm:p-4 transition-all duration-300 group ${
+                    href="/logros"
+                    className={`rounded-xl p-2 sm:p-4 transition-all duration-300 group cursor-pointer ${
                       idx >= 3 ? 'hidden sm:block' : ''
                     } ${
                       isUnlocked
@@ -640,7 +670,7 @@ export default function DashboardPage() {
                       </div>
                       <span className="text-[8px] sm:text-[9px] text-[#555] mt-0.5 sm:mt-1">{ach.percent}%</span>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
           </div>
@@ -662,7 +692,7 @@ export default function DashboardPage() {
 
       {/* Quick Stats — reduced padding on mobile */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4 card-enter">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
+        <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Star size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
@@ -670,8 +700,8 @@ export default function DashboardPage() {
               <p className="text-[9px] sm:text-xs text-[#999]">XP total</p>
             </div>
           </div>
-        </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
+        </Link>
+        <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Trophy size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
@@ -679,8 +709,8 @@ export default function DashboardPage() {
               <p className="text-[9px] sm:text-xs text-[#999]">Niveles</p>
             </div>
           </div>
-        </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
+        </Link>
+        <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Flame size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
             <div>
@@ -690,7 +720,7 @@ export default function DashboardPage() {
               <p className="text-[9px] sm:text-xs text-[#999]">Mejor racha</p>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );

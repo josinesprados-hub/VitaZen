@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { EmotionalHeroSkeleton } from '@/components/ui/PremiumSkeleton';
+import Link from 'next/link';
 
 import { Zap, Brain, Leaf, Repeat, TrendingUp, Activity, ArrowUpRight, ArrowDownRight, Minus, Sparkles } from 'lucide-react';
 import type { EmotionalStatus, EmotionalMetric, EmotionalState } from '@/lib/emotional-state';
@@ -61,6 +62,15 @@ const METRIC_ICONS: Record<string, any> = {
   activity: Activity,
 };
 
+const METRIC_HREFS: Record<string, string> = {
+  energy: '/imperio/energia',
+  focus: '/insights',
+  stress: '/imperio/mente',
+  consistency: '/imperio/disciplina',
+  progress: '/insights',
+  activity: '/insights',
+};
+
 function getMetricColor(value: number): string {
   if (value >= 70) return '#c8a55a';
   if (value >= 45) return '#999999';
@@ -93,13 +103,14 @@ function TrendIndicator({ trend }: { trend?: 'up' | 'down' | 'stable' }) {
 
 function MetricRing({ metric, metricKey }: { metric: EmotionalMetric; metricKey: string }) {
   const Icon = METRIC_ICONS[metricKey] || Activity;
+  const href = METRIC_HREFS[metricKey] || '/insights';
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (metric.value / 100) * circumference;
   const color = getMetricColor(metric.value);
 
   return (
-    <div className="flex flex-col items-center gap-1 sm:gap-2 group">
+    <Link href={href} className="flex flex-col items-center gap-1 sm:gap-2 group cursor-pointer">
       <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
         <svg className="absolute inset-0 -rotate-90" viewBox="0 0 64 64">
           <circle
@@ -122,13 +133,13 @@ function MetricRing({ metric, metricKey }: { metric: EmotionalMetric; metricKey:
         <Icon size={13} style={{ color }} className="relative z-10 sm:w-[16px] sm:h-[16px]" />
       </div>
       <div className="text-center">
-        <p className="text-[9px] sm:text-[11px] text-[#999] leading-tight">{metric.label}</p>
+        <p className="text-[9px] sm:text-[11px] text-[#999] leading-tight group-hover:text-[#c8a55a]/70 transition-colors">{metric.label}</p>
         <div className="flex items-center justify-center gap-0.5 mt-0.5">
           <span className="text-[10px] sm:text-xs font-semibold text-white">{metric.value}</span>
           <TrendIndicator trend={metric.trend} />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

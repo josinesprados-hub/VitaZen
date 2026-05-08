@@ -143,6 +143,25 @@ function getInsightBorderClass(type: string): string {
   }
 }
 
+function getCategoryHref(category: string): string {
+  const map: Record<string, string> = {
+    'hábitos': '/imperio/disciplina',
+    'meditación': '/imperio/mente',
+    'emociones': '/checkin',
+    'energía': '/imperio/energia',
+    'estrés': '/imperio/mente',
+    'diario': '/imperio/mente',
+    'finanzas': '/imperio/riqueza',
+    'nutrición': '/imperio/energia',
+    'bienestar': '/insights',
+    'consistencia': '/insights',
+    'actividad': '/insights',
+    'imperios': '/insights',
+    'recomendación': '/imperio/mentor',
+  };
+  return map[category.toLowerCase()] || '/insights';
+}
+
 // ─────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────
@@ -219,10 +238,10 @@ export function WeeklyRecap() {
 
   // Progress items
   const progressItems = [
-    { label: 'Check-ins', value: data.progress.checkins, icon: Zap, unit: 'días' },
-    { label: 'Hábitos', value: data.progress.habitsCompleted, icon: CheckCircle, unit: 'completados' },
-    { label: 'Meditación', value: data.progress.meditationSessions, icon: Wind, unit: 'sesiones' },
-    { label: 'Diario', value: data.progress.journalEntries, icon: BookOpen, unit: 'entradas' },
+    { label: 'Check-ins', value: data.progress.checkins, icon: Zap, unit: 'días', href: '/checkin' },
+    { label: 'Hábitos', value: data.progress.habitsCompleted, icon: CheckCircle, unit: 'completados', href: '/imperio/disciplina' },
+    { label: 'Meditación', value: data.progress.meditationSessions, icon: Wind, unit: 'sesiones', href: '/imperio/mente' },
+    { label: 'Diario', value: data.progress.journalEntries, icon: BookOpen, unit: 'entradas', href: '/imperio/mente' },
   ];
 
   // Mobile score ring (smaller)
@@ -397,9 +416,10 @@ export function WeeklyRecap() {
                 {progressItems.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <div
+                    <Link
                       key={item.label}
-                      className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors"
+                      href={item.href}
+                      className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group"
                     >
                       <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                         <Icon size={10} className="text-[#c8a55a] sm:w-[12px] sm:h-[12px]" />
@@ -407,7 +427,7 @@ export function WeeklyRecap() {
                       </div>
                       <p className="text-lg sm:text-xl font-bold text-white">{item.value}</p>
                       <p className="text-[8px] sm:text-[9px] text-[#555]">{item.unit}</p>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -422,9 +442,10 @@ export function WeeklyRecap() {
               {data.topHabits.length > 0 ? (
                 <div className="space-y-2 sm:space-y-3">
                   {data.topHabits.map((habit, idx) => (
-                    <div
+                    <Link
                       key={habit.name}
-                      className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3.5 hover:border-[#c8a55a]/15 transition-colors"
+                      href="/imperio/disciplina"
+                      className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3.5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group"
                     >
                       <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
                         <span className="text-[10px] sm:text-[11px] font-bold text-[#c8a55a]">{idx + 1}</span>
@@ -442,7 +463,7 @@ export function WeeklyRecap() {
                           style={{ width: `${Math.min((habit.streak / 14) * 100, 100)}%` }}
                         />
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
@@ -539,7 +560,7 @@ export function WeeklyRecap() {
           </div>
 
           {/* Row 4: Mentor Recommendation — FREE gets truncated, PREMIUM full */}
-          <div className="bg-gradient-to-r from-[#c8a55a]/5 via-[#0a0a0a] to-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-3 sm:p-6 relative overflow-hidden">
+          <Link href="/imperio/mentor" className="block bg-gradient-to-r from-[#c8a55a]/5 via-[#0a0a0a] to-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-3 sm:p-6 relative overflow-hidden hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
             {/* Subtle glow */}
             <div
               className="absolute inset-0 rounded-xl pointer-events-none"
@@ -562,16 +583,15 @@ export function WeeklyRecap() {
               </p>
               {!isPremium && data.mentorRecommendation.length > 100 && (
                 <div className="mt-2 flex items-center gap-1.5">
-                  <Link
-                    href="/pricing"
-                    className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 hover:text-[#c8a55a] transition-colors flex items-center gap-1"
+                  <span
+                    className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1"
                   >
                     <Crown size={8} /> Recomendación completa con Premium
-                  </Link>
+                  </span>
                 </div>
               )}
             </div>
-          </div>
+          </Link>
 
           {/* Email CTA */}
           <div className="pt-1 pb-0.5 sm:pt-2 sm:pb-1 flex items-center justify-center">

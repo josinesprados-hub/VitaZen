@@ -12,6 +12,7 @@ import ContextualHelp from '@/components/ui/ContextualHelp';
 import {
   Sparkles,
   ArrowLeft,
+  ArrowRight,
   Crown,
   TrendingUp,
   TrendingDown,
@@ -89,6 +90,25 @@ function getScoreLabel(score: number): string {
   if (score >= 60) return 'Bueno';
   if (score >= 40) return 'Mejorable';
   return 'En desarrollo';
+}
+
+function getCategoryHref(category: string): string {
+  const map: Record<string, string> = {
+    'hábitos': '/imperio/disciplina',
+    'meditación': '/imperio/mente',
+    'emociones': '/checkin',
+    'energía': '/imperio/energia',
+    'estrés': '/imperio/mente',
+    'diario': '/imperio/mente',
+    'finanzas': '/imperio/riqueza',
+    'nutrición': '/imperio/energia',
+    'bienestar': '/insights',
+    'consistencia': '/insights',
+    'actividad': '/insights',
+    'imperios': '/insights',
+    'recomendación': '/imperio/mentor',
+  };
+  return map[category.toLowerCase()] || '/insights';
 }
 
 function getInsightBorderClass(type: string): string {
@@ -304,25 +324,30 @@ export default function InsightsPage() {
             <span className="text-xs text-[#666]">{insights.length} detectados</span>
           </div>
           <div className="space-y-3">
-            {insights.map((insight) => (
-              <div
-                key={insight.id}
-                className={`insight-card bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 card-enter ${getInsightBorderClass(insight.type)}`}
-              >
-                <div className="flex items-start gap-4">
-                  <span className="text-2xl shrink-0 mt-0.5">{insight.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <h3 className="text-sm font-semibold text-white">{insight.title}</h3>
-                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider ${getInsightBadgeClass(insight.type)}`}>
-                        {insight.category}
-                      </span>
+            {insights.map((insight) => {
+              const insightHref = getCategoryHref(insight.category);
+              return (
+                <Link
+                  key={insight.id}
+                  href={insightHref}
+                  className={`insight-card bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 card-enter cursor-pointer group ${getInsightBorderClass(insight.type)}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <span className="text-2xl shrink-0 mt-0.5">{insight.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <h3 className="text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{insight.title}</h3>
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider ${getInsightBadgeClass(insight.type)}`}>
+                          {insight.category}
+                        </span>
+                      </div>
+                      <p className="text-sm text-[#999] leading-relaxed">{insight.description}</p>
                     </div>
-                    <p className="text-sm text-[#999] leading-relaxed">{insight.description}</p>
+                    <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0 mt-1" />
                   </div>
-                </div>
-              </div>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -348,7 +373,7 @@ export default function InsightsPage() {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Check-ins */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
             <div className="flex items-center gap-2 mb-3">
               <Zap size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Check-ins</span>
@@ -371,10 +396,10 @@ export default function InsightsPage() {
                 </div>
               </div>
             )}
-          </div>
+          </Link>
 
           {/* Habits */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <Link href="/imperio/disciplina" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Hábitos</span>
@@ -391,10 +416,10 @@ export default function InsightsPage() {
                 )}
               </div>
             )}
-          </div>
+          </Link>
 
           {/* Meditation */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
             <div className="flex items-center gap-2 mb-3">
               <Wind size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Meditación</span>
@@ -404,17 +429,17 @@ export default function InsightsPage() {
             {summary.meditation.avgDuration > 0 && (
               <p className="text-[10px] text-[#666] mt-2">Promedio: {summary.meditation.avgDuration} min/sesión</p>
             )}
-          </div>
+          </Link>
 
           {/* Journal */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Diario</span>
             </div>
             <p className="text-2xl font-bold text-white">{summary.journal.entries}</p>
             <p className="text-[10px] text-[#555] mt-1">entradas esta semana</p>
-          </div>
+          </Link>
 
           {/* Wellness — PREMIUM details */}
           <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle bienestar">
@@ -442,7 +467,7 @@ export default function InsightsPage() {
 
           {/* Nutrition — PREMIUM details */}
           <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle nutrición">
-            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+            <Link href="/imperio/energia" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
               <div className="flex items-center gap-2 mb-3">
                 <Star size={16} className="text-[#c8a55a]" />
                 <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Nutrición</span>
@@ -452,12 +477,12 @@ export default function InsightsPage() {
               {summary.nutrition.avgWater > 0 && (
                 <p className="text-[10px] text-[#666] mt-2">Agua promedio: {summary.nutrition.avgWater} vasos/día</p>
               )}
-            </div>
+            </Link>
           </PremiumGate>
 
           {/* Finance — PREMIUM details */}
           <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle finanzas">
-            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+            <Link href="/imperio/riqueza" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
               <div className="flex items-center gap-2 mb-3">
                 <Gem size={16} className="text-[#c8a55a]" />
                 <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
@@ -466,7 +491,7 @@ export default function InsightsPage() {
                 {summary.finance.balance >= 0 ? '+' : ''}{summary.finance.balance.toFixed(0)}€
               </p>
               <p className="text-[10px] text-[#555] mt-1">balance semanal</p>
-            </div>
+            </Link>
           </PremiumGate>
 
           {/* Empire streaks — PREMIUM details */}
@@ -485,14 +510,14 @@ export default function InsightsPage() {
           </PremiumGate>
 
           {/* Total activity */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+          <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
             <div className="flex items-center gap-2 mb-3">
               <Activity size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Actividad</span>
             </div>
             <p className="text-2xl font-bold text-white">{summary.totalActivities}</p>
             <p className="text-[10px] text-[#555] mt-1">acciones totales esta semana</p>
-          </div>
+          </Link>
         </div>
       </div>
 
