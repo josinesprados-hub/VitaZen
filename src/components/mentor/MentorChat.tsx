@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
+import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
 
 // ─────────────────────────────────────────
 // Types
@@ -622,96 +623,127 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
           {/* Thread list grouped by date */}
           <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-hide">
-            {DATE_GROUP_ORDER.map(group => {
+            {DATE_GROUP_ORDER.map((group, groupIdx) => {
               const groupThreads = groupedThreads[group];
               if (!groupThreads || groupThreads.length === 0) return null;
+              // FREE users: blur groups beyond "Esta semana" (index 3+)
+              const isOldGroup = !isPremium && groupIdx >= 3;
               return (
                 <div key={group} className="animate-in" style={{ animationDelay: '50ms' }}>
-                  <p className="px-3 py-1.5 text-[10px] text-[#555] uppercase tracking-widest font-semibold">
-                    {group}
-                  </p>
-                  <div className="space-y-0.5">
-                    {groupThreads.map((thread) => (
-                      <div
-                        key={thread.id}
-                        className={`group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ${
-                          activeThread === thread.id
-                            ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                            : tab === 'archived'
-                            ? 'text-[#888] hover:bg-[#1a1a1a]/40'
-                            : 'text-[#ccc] hover:bg-[#1a1a1a]/60'
-                        }`}
-                        onClick={() => {
-                          if (editingThreadId !== thread.id) {
-                            setActiveThread(thread.id);
-                          }
-                        }}
-                      >
-                        {thread.archived ? (
-                          <Archive size={14} className="shrink-0 mr-2.5 text-[#555]" />
-                        ) : (
-                          <MessageCircle
-                            size={14}
-                            className={`shrink-0 mr-2.5 ${
-                              activeThread === thread.id ? 'text-[#c8a55a]' : 'text-[#555]'
-                            }`}
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          {editingThreadId === thread.id ? (
-                            <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-                              <input
-                                ref={editInputRef}
-                                type="text"
-                                value={editTitle}
-                                onChange={(e) => setEditTitle(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') renameThread(thread.id, editTitle);
-                                  if (e.key === 'Escape') setEditingThreadId(null);
-                                }}
-                                className="flex-1 bg-[#000] border border-[#c8a55a] rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
-                                maxLength={100}
-                              />
-                              <button
-                                onClick={() => renameThread(thread.id, editTitle)}
-                                className="text-[#c8a55a] hover:text-[#d4b468] p-0.5"
-                              >
-                                <Check size={12} />
-                              </button>
-                              <button
-                                onClick={() => setEditingThreadId(null)}
-                                className="text-[#666] hover:text-white p-0.5"
-                              >
-                                <X size={12} />
-                              </button>
+                  <div className="flex items-center justify-between px-3 py-1.5">
+                    <p className="text-[10px] text-[#555] uppercase tracking-widest font-semibold">
+                      {group}
+                    </p>
+                    {groupIdx === 0 && !isPremium && visibleThreads.length > 5 && (
+                      <PremiumInlineBadge isPremium={isPremium} freeLabel="7 días" premiumLabel="Ilimitado" />
+                    )}
+                  </div>
+                  {isOldGroup ? (
+                    <PremiumGate isPremium={isPremium} intensity="medium" compact label="Historial completo">
+                      <div className="space-y-0.5">
+                        {groupThreads.map((thread) => (
+                          <div
+                            key={thread.id}
+                            className="group flex items-center rounded-lg px-3 py-2.5 text-[#ccc]"
+                          >
+                            <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#555]" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm truncate leading-tight">{thread.title}</p>
+                              <p className="text-[10px] text-[#555] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
                             </div>
+                          </div>
+                        ))}
+                      </div>
+                    </PremiumGate>
+                  ) : (
+                    <div className="space-y-0.5">
+                      {groupThreads.map((thread) => (
+                        <div
+                          key={thread.id}
+                          className={`group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ${
+                            activeThread === thread.id
+                              ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                              : tab === 'archived'
+                              ? 'text-[#888] hover:bg-[#1a1a1a]/40'
+                              : 'text-[#ccc] hover:bg-[#1a1a1a]/60'
+                          }`}
+                          onClick={() => {
+                            if (editingThreadId !== thread.id) {
+                              setActiveThread(thread.id);
+                            }
+                          }}
+                        >
+                          {thread.archived ? (
+                            <Archive size={14} className="shrink-0 mr-2.5 text-[#555]" />
                           ) : (
-                            <>
-                              <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
-                                {thread.title}
-                              </p>
-                              <p className="text-[10px] text-[#555] mt-0.5">
-                                {getRelativeDate(thread.updatedAt)}
-                              </p>
-                            </>
+                            <MessageCircle
+                              size={14}
+                              className={`shrink-0 mr-2.5 ${
+                                activeThread === thread.id ? 'text-[#c8a55a]' : 'text-[#555]'
+                              }`}
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            {editingThreadId === thread.id ? (
+                              <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                                <input
+                                  ref={editInputRef}
+                                  type="text"
+                                  value={editTitle}
+                                  onChange={(e) => setEditTitle(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') renameThread(thread.id, editTitle);
+                                    if (e.key === 'Escape') setEditingThreadId(null);
+                                  }}
+                                  className="flex-1 bg-[#000] border border-[#c8a55a] rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
+                                  maxLength={100}
+                                />
+                                <button
+                                  onClick={() => renameThread(thread.id, editTitle)}
+                                  className="text-[#c8a55a] hover:text-[#d4b468] p-0.5"
+                                >
+                                  <Check size={12} />
+                                </button>
+                                <button
+                                  onClick={() => setEditingThreadId(null)}
+                                  className="text-[#666] hover:text-white p-0.5"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
+                                  {thread.title}
+                                </p>
+                                <p className="text-[10px] text-[#555] mt-0.5">
+                                  {getRelativeDate(thread.updatedAt)}
+                                </p>
+                              </>
+                            )}
+                          </div>
+                          {/* Context menu trigger (⋯) */}
+                          {editingThreadId !== thread.id && (
+                            <button
+                              onClick={(e) => handleContextMenu(e, thread.id)}
+                              className="text-[#444] hover:text-[#c8a55a] p-1 rounded transition-all opacity-0 group-hover:opacity-100 ml-1"
+                              title="Más opciones"
+                            >
+                              <MoreVertical size={14} />
+                            </button>
                           )}
                         </div>
-                        {/* Context menu trigger (⋯) */}
-                        {editingThreadId !== thread.id && (
-                          <button
-                            onClick={(e) => handleContextMenu(e, thread.id)}
-                            className="text-[#444] hover:text-[#c8a55a] p-1 rounded transition-all opacity-0 group-hover:opacity-100 ml-1"
-                            title="Más opciones"
-                          >
-                            <MoreVertical size={14} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
+
+            {/* Premium history gate at bottom of sidebar */}
+            {!isPremium && tab === 'active' && activeThreads.length > 3 && (
+              <PremiumHistoryGate isPremium={isPremium} label="historial completo de conversaciones" />
+            )}
 
             {/* Empty state: active tab */}
             {tab === 'active' && activeThreads.length === 0 && (

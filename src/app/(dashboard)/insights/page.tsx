@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import {
   Sparkles,
@@ -257,8 +258,8 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      {/* Weekly Comparison (PREMIUM only) */}
-      {isPremium && comparison && (
+      {/* Weekly Comparison — PREMIUM gated with blur */}
+      <PremiumGate isPremium={isPremium} intensity="medium" label="Comparativa semanal">
         <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-5">
             <Lightbulb size={20} className="text-[#c8a55a]" />
@@ -268,31 +269,31 @@ export default function InsightsPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
               <p className="text-xs text-[#666] mb-2">Emociones</p>
-              <TrendIndicator value={comparison.emotionTrend} label={`${comparison.emotionTrend > 0 ? '+' : ''}${comparison.emotionTrend}`} />
+              <TrendIndicator value={comparison?.emotionTrend ?? 0} label={`${(comparison?.emotionTrend ?? 0) > 0 ? '+' : ''}${comparison?.emotionTrend ?? 0}`} />
             </div>
             <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
               <p className="text-xs text-[#666] mb-2">Energía</p>
-              <TrendIndicator value={comparison.energyTrend} label={`${comparison.energyTrend > 0 ? '+' : ''}${comparison.energyTrend}`} />
+              <TrendIndicator value={comparison?.energyTrend ?? 0} label={`${(comparison?.energyTrend ?? 0) > 0 ? '+' : ''}${comparison?.energyTrend ?? 0}`} />
             </div>
             <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
               <p className="text-xs text-[#666] mb-2">Estrés</p>
-              <TrendIndicator value={comparison.stressTrend} label={comparison.stressTrend > 0 ? '↓ bajó' : '↑ subió'} />
+              <TrendIndicator value={comparison?.stressTrend ?? 0} label={(comparison?.stressTrend ?? 0) > 0 ? '↓ bajó' : '↑ subió'} />
             </div>
             <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
               <p className="text-xs text-[#666] mb-2">Actividad total</p>
-              <TrendIndicator value={comparison.activityTrend} label={`${comparison.activityTrend > 0 ? '+' : ''}${comparison.activityTrend}`} />
+              <TrendIndicator value={comparison?.activityTrend ?? 0} label={`${(comparison?.activityTrend ?? 0) > 0 ? '+' : ''}${comparison?.activityTrend ?? 0}`} />
             </div>
             <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
               <p className="text-xs text-[#666] mb-2">Meditación</p>
-              <TrendIndicator value={comparison.meditationTrend} label={`${comparison.meditationTrend > 0 ? '+' : ''}${comparison.meditationTrend}`} />
+              <TrendIndicator value={comparison?.meditationTrend ?? 0} label={`${(comparison?.meditationTrend ?? 0) > 0 ? '+' : ''}${comparison?.meditationTrend ?? 0}`} />
             </div>
             <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
               <p className="text-xs text-[#666] mb-2">Hábitos</p>
-              <TrendIndicator value={comparison.habitTrend} label={`${comparison.habitTrend > 0 ? '+' : ''}${comparison.habitTrend}`} />
+              <TrendIndicator value={comparison?.habitTrend ?? 0} label={`${(comparison?.habitTrend ?? 0) > 0 ? '+' : ''}${comparison?.habitTrend ?? 0}`} />
             </div>
           </div>
         </div>
-      )}
+      </PremiumGate>
 
       {/* Insights Cards */}
       {insights.length > 0 ? (
@@ -339,12 +340,11 @@ export default function InsightsPage() {
         <div className="flex items-center gap-3 mb-5">
           <Target size={20} className="text-[#c8a55a]" />
           <h2 className="text-lg font-semibold text-white">Desglose semanal</h2>
-          {!isPremium && (
-            <span className="text-[10px] text-[#555] flex items-center gap-1 ml-auto">
-              <Crown size={9} className="text-[#c8a55a]/40" />
-              Tendencias más profundas con Premium
-            </span>
-          )}
+          <PremiumInlineBadge
+            isPremium={isPremium}
+            freeLabel="Básico"
+            premiumLabel="Tendencias profundas"
+          />
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Check-ins */}
@@ -416,65 +416,73 @@ export default function InsightsPage() {
             <p className="text-[10px] text-[#555] mt-1">entradas esta semana</p>
           </div>
 
-          {/* Wellness */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <Brain size={16} className="text-[#c8a55a]" />
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Bienestar</span>
-            </div>
-            <p className="text-2xl font-bold text-white">{summary.wellness.logs}</p>
-            <p className="text-[10px] text-[#555] mt-1">registros</p>
-            {summary.wellness.logs > 0 && (
-              <div className="mt-3 space-y-1">
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-[#666]">Ánimo</span>
-                  <span className="text-[#c8a55a]">{summary.wellness.avgMood}/5</span>
-                </div>
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-[#666]">Sueño</span>
-                  <span className="text-[#c8a55a]">{summary.wellness.avgSleep}/5</span>
-                </div>
+          {/* Wellness — PREMIUM details */}
+          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle bienestar">
+            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+              <div className="flex items-center gap-2 mb-3">
+                <Brain size={16} className="text-[#c8a55a]" />
+                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Bienestar</span>
               </div>
-            )}
-          </div>
-
-          {/* Nutrition */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <Star size={16} className="text-[#c8a55a]" />
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Nutrición</span>
+              <p className="text-2xl font-bold text-white">{summary.wellness.logs}</p>
+              <p className="text-[10px] text-[#555] mt-1">registros</p>
+              {summary.wellness.logs > 0 && (
+                <div className="mt-3 space-y-1">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-[#666]">Ánimo</span>
+                    <span className="text-[#c8a55a]">{summary.wellness.avgMood}/5</span>
+                  </div>
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-[#666]">Sueño</span>
+                    <span className="text-[#c8a55a]">{summary.wellness.avgSleep}/5</span>
+                  </div>
+                </div>
+              )}
             </div>
-            <p className="text-2xl font-bold text-white">{summary.nutrition.logs}</p>
-            <p className="text-[10px] text-[#555] mt-1">días registrados</p>
-            {summary.nutrition.avgWater > 0 && (
-              <p className="text-[10px] text-[#666] mt-2">Agua promedio: {summary.nutrition.avgWater} vasos/día</p>
-            )}
-          </div>
+          </PremiumGate>
 
-          {/* Finance */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <Gem size={16} className="text-[#c8a55a]" />
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+          {/* Nutrition — PREMIUM details */}
+          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle nutrición">
+            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+              <div className="flex items-center gap-2 mb-3">
+                <Star size={16} className="text-[#c8a55a]" />
+                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Nutrición</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{summary.nutrition.logs}</p>
+              <p className="text-[10px] text-[#555] mt-1">días registrados</p>
+              {summary.nutrition.avgWater > 0 && (
+                <p className="text-[10px] text-[#666] mt-2">Agua promedio: {summary.nutrition.avgWater} vasos/día</p>
+              )}
             </div>
-            <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
-              {summary.finance.balance >= 0 ? '+' : ''}{summary.finance.balance.toFixed(0)}€
-            </p>
-            <p className="text-[10px] text-[#555] mt-1">balance semanal</p>
-          </div>
+          </PremiumGate>
 
-          {/* Empire streaks */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
-            <div className="flex items-center gap-2 mb-3">
-              <Flame size={16} className="text-[#c8a55a]" />
-              <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Imperios</span>
+          {/* Finance — PREMIUM details */}
+          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle finanzas">
+            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+              <div className="flex items-center gap-2 mb-3">
+                <Gem size={16} className="text-[#c8a55a]" />
+                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+              </div>
+              <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+                {summary.finance.balance >= 0 ? '+' : ''}{summary.finance.balance.toFixed(0)}€
+              </p>
+              <p className="text-[10px] text-[#555] mt-1">balance semanal</p>
             </div>
-            <p className="text-2xl font-bold text-white">{summary.streaks.bestEmpireStreak}</p>
-            <p className="text-[10px] text-[#555] mt-1">mejor racha</p>
-            {summary.streaks.bestEmpireName && (
-              <p className="text-[10px] text-[#c8a55a] mt-2">{summary.streaks.bestEmpireName}</p>
-            )}
-          </div>
+          </PremiumGate>
+
+          {/* Empire streaks — PREMIUM details */}
+          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle imperios">
+            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
+              <div className="flex items-center gap-2 mb-3">
+                <Flame size={16} className="text-[#c8a55a]" />
+                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Imperios</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{summary.streaks.bestEmpireStreak}</p>
+              <p className="text-[10px] text-[#555] mt-1">mejor racha</p>
+              {summary.streaks.bestEmpireName && (
+                <p className="text-[10px] text-[#c8a55a] mt-2">{summary.streaks.bestEmpireName}</p>
+              )}
+            </div>
+          </PremiumGate>
 
           {/* Total activity */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors">
@@ -488,20 +496,22 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      {/* Premium CTA for FREE users */}
+      {/* Subtle Premium CTA for FREE users */}
       {!isPremium && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-5 sm:p-6 text-center">
-          <Crown size={28} className="text-[#c8a55a] mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-white mb-2">Desbloquea insights completos</h3>
-          <p className="text-[#999] text-sm mb-4 max-w-md mx-auto">
-            Con Premium recibirás comparativas semanales, recomendaciones contextuales y acceso a todos tus insights.
-          </p>
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
+          <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/8 flex items-center justify-center shrink-0">
+            <Crown size={18} className="text-[#c8a55a]/60" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white mb-0.5">Comparativas y métricas avanzadas</p>
+            <p className="text-[#666] text-xs">Desbloquea tendencias semanales, detalles de bienestar y análisis financiero.</p>
+          </div>
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+            className="inline-flex items-center gap-1.5 bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium px-4 py-2 rounded-xl hover:bg-[#c8a55a]/15 hover:border-[#c8a55a]/30 transition-colors text-xs shrink-0"
           >
-            <Crown size={16} />
-            Mejorar a Premium
+            <Crown size={12} />
+            Premium
           </Link>
         </div>
       )}

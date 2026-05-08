@@ -2,10 +2,13 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useAuth } from '@/context/AuthContext';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import ContextualHelp from '@/components/ui/ContextualHelp';
+import Link from 'next/link';
 import {
   Wind,
   BookOpen,
@@ -15,6 +18,7 @@ import {
   Wallet,
   Filter,
   Clock,
+  Crown,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -99,10 +103,12 @@ function dateGroup(dateStr: string): string {
 
 export default function TimelinePage() {
   const { apiFetch } = useApi();
+  const { user } = useAuth();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
+  const isPremium = user?.plan === 'PREMIUM';
 
   const fetchTimeline = useCallback(async (category?: string) => {
     setLoading(true);
@@ -137,17 +143,24 @@ export default function TimelinePage() {
   };
 
   // Group items by date
-  const grouped: { label: string; items: TimelineItem[] }[] = [];
+  const allGrouped: { label: string; items: TimelineItem[] }[] = [];
   let currentLabel = '';
   for (const item of items) {
     const label = dateGroup(item.date);
     if (label !== currentLabel) {
       currentLabel = label;
-      grouped.push({ label, items: [item] });
+      allGrouped.push({ label, items: [item] });
     } else {
-      grouped[grouped.length - 1].items.push(item);
+      allGrouped[allGrouped.length - 1].items.push(item);
     }
   }
+
+  // FREE users: show only recent groups (up to ~7 days), gate the rest
+  const FREE_VISIBLE_GROUPS = 3; // Hoy, Ayer, Esta semana
+  const grouped = isPremium
+    ? allGrouped
+    : allGrouped.slice(0, FREE_VISIBLE_GROUPS);
+  const hasHiddenHistory = !isPremium && allGrouped.length > FREE_VISIBLE_GROUPS;
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -163,6 +176,11 @@ export default function TimelinePage() {
         <div className="flex items-center gap-3 mb-1.5">
           <Clock size={22} className="text-[#c8a55a]" />
           <h1 className="text-lg sm:text-2xl font-bold text-white">Timeline</h1>
+          <PremiumInlineBadge
+            isPremium={isPremium}
+            freeLabel="7 días"
+            premiumLabel="Historial completo"
+          />
         </div>
         <p className="text-[#999] text-sm">Tu historial completo de actividad</p>
       </div>
@@ -213,7 +231,7 @@ export default function TimelinePage() {
 
           <div className="space-y-10">
             {grouped.map((group) => (
-              <div key={group.label}>
+              <div key={group.label} className="animate-in">
                 {/* Group label */}
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-[39px] flex justify-center hidden sm:flex">
@@ -224,6 +242,7 @@ export default function TimelinePage() {
                   </h2>
                   <div className="flex-1 h-px bg-[#1a1a1a]" />
                 </div>
+
 
                 {/* Items */}
                 <div className="space-y-3">
@@ -306,6 +325,20 @@ export default function TimelinePage() {
               </div>
             ))}
           </div>
+
+          {/* Premium history gate */}
+          {hasHiddenHistory && (
+            <div className="mt-6">
+              <PremiumGate isPremium={false} intensity="medium" label="Historial completo">
+                {/* Dummy blurred items to suggest more content */}
+                <div className="space-y-3">
+                  <div className="h-16 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl" />
+                  <div className="h-16 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl" />
+                </div>
+              </PremiumGate>
+              <PremiumHistoryGate isPremium={isPremium} label="historial completo" />
+            </div>
+          )}
         </div>
       )}
     </div>

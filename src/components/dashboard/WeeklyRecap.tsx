@@ -24,6 +24,7 @@ import {
   Mail,
   Crown,
 } from 'lucide-react';
+import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 
 // ─────────────────────────────────────────
 // Types (match API response)
@@ -300,43 +301,45 @@ export function WeeklyRecap() {
               </div>
             </div>
 
-            {/* Emotional State */}
-            <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
-              <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Heart size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                  <p className="text-xs sm:text-sm font-semibold text-white">Estado emocional</p>
+            {/* Emotional State — PREMIUM details */}
+            <PremiumGate isPremium={isPremium} intensity="light" compact label="Métricas profundas">
+              <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
+                <div className="flex items-center justify-between mb-2 sm:mb-4">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Heart size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
+                    <p className="text-xs sm:text-sm font-semibold text-white">Estado emocional</p>
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
+                    {data.emotionalState.statusLabel}
+                  </span>
                 </div>
-                <span className="text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
-                  {data.emotionalState.statusLabel}
-                </span>
-              </div>
-              <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-none">
-                {data.emotionalState.statusDescription}
-              </p>
-              <div className="space-y-2 sm:space-y-3">
-                {emotionalMetrics.map((metric) => {
-                  const Icon = metric.icon;
-                  const color = getMetricColor(metric.value);
-                  return (
-                    <div key={metric.label} className="flex items-center gap-2 sm:gap-3">
-                      <Icon size={10} style={{ color }} className="shrink-0 sm:w-[12px] sm:h-[12px]" />
-                      <span className="text-[9px] sm:text-[11px] text-[#999] w-14 sm:w-20 shrink-0">{metric.label}</span>
-                      <div className="flex-1 h-1 sm:h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
-                        <div
-                          className="h-1 sm:h-1.5 rounded-full recap-bar-transition"
-                          style={{
-                            width: `${metric.value}%`,
-                            backgroundColor: color,
-                          }}
-                        />
+                <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-none">
+                  {data.emotionalState.statusDescription}
+                </p>
+                <div className="space-y-2 sm:space-y-3">
+                  {emotionalMetrics.map((metric) => {
+                    const Icon = metric.icon;
+                    const color = getMetricColor(metric.value);
+                    return (
+                      <div key={metric.label} className="flex items-center gap-2 sm:gap-3">
+                        <Icon size={10} style={{ color }} className="shrink-0 sm:w-[12px] sm:h-[12px]" />
+                        <span className="text-[9px] sm:text-[11px] text-[#999] w-14 sm:w-20 shrink-0">{metric.label}</span>
+                        <div className="flex-1 h-1 sm:h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+                          <div
+                            className="h-1 sm:h-1.5 rounded-full recap-bar-transition"
+                            style={{
+                              width: `${metric.value}%`,
+                              backgroundColor: color,
+                            }}
+                          />
+                        </div>
+                        <span className="text-[9px] sm:text-[10px] text-[#666] w-6 sm:w-8 text-right">{metric.value}</span>
                       </div>
-                      <span className="text-[9px] sm:text-[10px] text-[#666] w-6 sm:w-8 text-right">{metric.value}</span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </PremiumGate>
           </div>
 
           {/* Row 2: Progress + Top Habits */}
@@ -409,10 +412,10 @@ export function WeeklyRecap() {
             </div>
           </div>
 
-          {/* Row 3: Evolution (PREMIUM) + Main Insight */}
+          {/* Row 3: Evolution (PREMIUM gated with blur) + Main Insight */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
-            {/* Evolution vs Previous Week */}
-            {isPremium && data.evolution ? (
+            {/* Evolution vs Previous Week — PremiumGate */}
+            <PremiumGate isPremium={isPremium} intensity="medium" label="Evolución semanal">
               <div className="bg-[#000000] border border-[#c8a55a]/10 rounded-xl p-3 sm:p-6 hover:border-[#c8a55a]/20 transition-colors">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
                   <TrendingUp size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
@@ -423,55 +426,41 @@ export function WeeklyRecap() {
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Emociones</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
-                        {data.evolution.emotionTrend > 0 ? '+' : ''}{data.evolution.emotionTrend}
+                        {data.evolution?.emotionTrend != null ? `${data.evolution.emotionTrend > 0 ? '+' : ''}${data.evolution.emotionTrend}` : '—'}
                       </span>
-                      <TrendBadge value={data.evolution.emotionTrend} />
+                      {data.evolution && <TrendBadge value={data.evolution.emotionTrend} />}
                     </div>
                   </div>
                   <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Energía</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
-                        {data.evolution.energyTrend > 0 ? '+' : ''}{data.evolution.energyTrend}
+                        {data.evolution?.energyTrend != null ? `${data.evolution.energyTrend > 0 ? '+' : ''}${data.evolution.energyTrend}` : '—'}
                       </span>
-                      <TrendBadge value={data.evolution.energyTrend} />
+                      {data.evolution && <TrendBadge value={data.evolution.energyTrend} />}
                     </div>
                   </div>
                   <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Estrés</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
-                        {data.evolution.stressTrend > 0 ? '↓ bajó' : '↑ subió'}
+                        {data.evolution?.stressTrend != null ? (data.evolution.stressTrend > 0 ? '↓ bajó' : '↑ subió') : '—'}
                       </span>
-                      <TrendBadge value={data.evolution.stressTrend} invert />
+                      {data.evolution && <TrendBadge value={data.evolution.stressTrend} invert />}
                     </div>
                   </div>
                   <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5">Actividad</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
-                        {data.evolution.activityTrend > 0 ? '+' : ''}{data.evolution.activityTrend}
+                        {data.evolution?.activityTrend != null ? `${data.evolution.activityTrend > 0 ? '+' : ''}${data.evolution.activityTrend}` : '—'}
                       </span>
-                      <TrendBadge value={data.evolution.activityTrend} />
+                      {data.evolution && <TrendBadge value={data.evolution.activityTrend} />}
                     </div>
                   </div>
                 </div>
               </div>
-            ) : !isPremium ? (
-              <div className="bg-[#000000] border border-[#c8a55a]/10 rounded-xl p-4 sm:p-6 flex flex-col items-center justify-center text-center hover:border-[#c8a55a]/20 transition-colors">
-                <Crown size={18} className="text-[#c8a55a]/40 mb-2 sm:mb-3 sm:w-[22px] sm:h-[22px]" />
-                <p className="text-[11px] sm:text-[13px] text-white font-medium mb-0.5 sm:mb-1">Evolución semanal</p>
-                <p className="text-[9px] sm:text-[11px] text-[#666] mb-3 sm:mb-4">
-                  Compara tu progreso semana a semana
-                </p>
-                <Link
-                  href="/pricing"
-                  className="text-[9px] sm:text-[10px] text-[#c8a55a] hover:underline flex items-center gap-1"
-                >
-                  <Crown size={9} /> Desbloquear con Premium
-                </Link>
-              </div>
-            ) : null}
+            </PremiumGate>
 
             {/* Main Insight */}
             <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
@@ -506,7 +495,7 @@ export function WeeklyRecap() {
             </div>
           </div>
 
-          {/* Row 4: Mentor Recommendation */}
+          {/* Row 4: Mentor Recommendation — FREE gets truncated, PREMIUM full */}
           <div className="bg-gradient-to-r from-[#c8a55a]/5 via-[#0a0a0a] to-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-3 sm:p-6 relative overflow-hidden">
             {/* Subtle glow */}
             <div
@@ -517,10 +506,27 @@ export function WeeklyRecap() {
               <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                 <Lightbulb size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
                 <p className="text-xs sm:text-sm font-semibold text-white">Recomendación del mentor</p>
+                <PremiumInlineBadge
+                  isPremium={isPremium}
+                  freeLabel="Resumido"
+                  premiumLabel="Completo"
+                />
               </div>
-              <p className="text-[11px] sm:text-[13px] text-[#c8a55a]/90 font-light italic leading-relaxed max-w-2xl line-clamp-3 sm:line-clamp-none">
+              <p className={`text-[11px] sm:text-[13px] text-[#c8a55a]/90 font-light italic leading-relaxed max-w-2xl ${
+                isPremium ? '' : 'line-clamp-2'
+              }`}>
                 {data.mentorRecommendation}
               </p>
+              {!isPremium && data.mentorRecommendation.length > 100 && (
+                <div className="mt-2 flex items-center gap-1.5">
+                  <Link
+                    href="/pricing"
+                    className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 hover:text-[#c8a55a] transition-colors flex items-center gap-1"
+                  >
+                    <Crown size={8} /> Recomendación completa con Premium
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 
