@@ -9,29 +9,38 @@ import {
 const FROM_EMAIL = 'VitaZen <no-reply@vitazen.cc>';
 
 export async function sendWelcomeEmail(to: string, name: string) {
-  console.log('[EMAIL] Enviando welcome a:', to);
+  console.log('[WELCOME] starting — to:', to, 'name:', name);
   try {
+    const html = welcomeEmail(name);
+    console.log('[WELCOME] template generated, calling Resend...');
+
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to,
       subject: 'Tu acceso está listo — VitaZen',
-      html: welcomeEmail(name),
+      html,
     });
+
+    // Log raw Resend response for diagnostics
+    console.log('[WELCOME] Resend raw response — data:', JSON.stringify(result?.data), 'error:', JSON.stringify(result?.error));
+
     if (result?.data?.id) {
-      console.log('[EMAIL] Welcome enviado. ID:', result.data.id);
+      console.log('[WELCOME] sent ✓ — ID:', result.data.id);
       return; // success
     }
+
     // Resend returned an error — throw so the caller knows it failed
     const errorMsg = result?.error?.message || JSON.stringify(result?.error) || 'Resend error desconocido';
-    console.error('[EMAIL] Error Resend welcome:', errorMsg);
+    console.error('[WELCOME] Resend returned error:', errorMsg);
     throw new Error(`Error enviando welcome email: ${errorMsg}`);
   } catch (error) {
     // Re-throw our own errors; wrap unexpected errors
     if (error instanceof Error && error.message.startsWith('Error enviando welcome email')) {
+      console.error('[WELCOME] failed (Resend error):', error.message);
       throw error;
     }
-    console.error('[EMAIL] Excepción welcome:', error instanceof Error ? error.message : error);
-    throw new Error('No se pudo enviar el welcome email.');
+    console.error('[WELCOME] failed (unexpected):', error instanceof Error ? error.message : String(error));
+    throw new Error(`No se pudo enviar el welcome email: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
