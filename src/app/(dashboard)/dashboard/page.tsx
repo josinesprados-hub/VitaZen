@@ -11,158 +11,9 @@ import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
+import PremiumReflection from '@/components/ui/PremiumReflection';
 
-const FRASES = [
-  'La disciplina es el puente entre tus metas y tus logros.',
-  'Cada mañana es una nueva oportunidad para reinventarte.',
-  'El cambio no llega por suerte, llega por decisión.',
-  'Tu mente es tu activo más poderoso. Entrénala.',
-  'No necesitas motivación, necesitas compromiso.',
-  'La excelencia no es un acto, es un hábito constante.',
-  'Lo que hoy parece difícil, mañana será tu rutina.',
-  'El progreso silencioso siempre supera al ruido de las excusas.',
-  'Tu futuro se construye con las decisiones de hoy.',
-  'La incomodidad es el precio del crecimiento.',
-  'No esperes el momento perfecto. Crea el momento.',
-  'Cada paso cuenta, incluso el más pequeño.',
-  'La consistencia vence al talento cuando el talento no es consistente.',
-  'Tu transformación comienza al otro lado de tu zona de confort.',
-  'Las palabras que te dices a ti mismo definen tu realidad.',
-  'La fuerza no viene de la capacidad, viene de la determinación.',
-  'El éxito es la suma de pequeños esfuerzos repetidos cada día.',
-  'No eres lo que piensan de ti, eres lo que decides ser.',
-  'La verdadera libertad nace de la autodisciplina.',
-  'Cada día sin progreso es un día perdido.',
-  'Tu energía fluye hacia donde va tu atención.',
-  'Los obstáculos son caminos disfrazados.',
-  'La paciencia y la persistencia convierten lo imposible en inevitable.',
-  'No te compares con otros, compárate con quien fuiste ayer.',
-  'La claridad de propósito genera poder de acción.',
-  'El dolor de la disciplina pesa gramos; el arrepentimiento pesa toneladas.',
-  'Tu vida cambia cuando tus hábitos cambian.',
-  'Las personas extraordinarias hacen lo que las ordinarias no están dispuestas a hacer.',
-  'La mentalidad lo es todo. Lo crees, lo creas.',
-  'El fracaso no es lo contrario del éxito, es parte del éxito.',
-  'La mejor inversión es la que haces en ti mismo.',
-  'La acción cura el miedo. La inacción lo alimenta.',
-  'No hay atajos hacia lugares que valgan la pena.',
-  'Tu potencial es ilimitado, pero requiere compromiso despiadado.',
-  'La gratitud transforma lo que tienes en suficiente.',
-  'El coraje no es la ausencia de miedo, es la decisión de avanzar.',
-  'La persona que serás en cinco años depende de lo que hagas hoy.',
-  'Lo que toleras, persiste. Lo que confrontas, se transforma.',
-  'La simplicidad es la máxima sofisticación.',
-  'Tu cuerpo escucha todo lo que tu mente dice. Elige bien tus palabras.',
-  'El dinero es un sirviente bueno, pero un amo terrible.',
-  'La riqueza no es tener más, es necesitar menos.',
-  'La educación financiera es la llave que abre puertas invisibles.',
-  'Cada euro invertido en ti mismo regresa multiplicado.',
-  'La abundancia es un estado mental antes de ser un estado bancario.',
-  'Gasta menos de lo que ganas, invierte la diferencia.',
-  'La libertad financiera comienza con un solo hábito correcto.',
-  'No trabajas por dinero, haces que el dinero trabaje por ti.',
-  'La paciencia financiera genera las mayores recompensas.',
-  'Tu relación con el dinero refleja tu relación contigo mismo.',
-  'La salud es la base sobre la que se construye todo lo demás.',
-  'Cuida tu cuerpo, es el único lugar que tienes para vivir.',
-  'La energía que cultivas determina la vida que experimentas.',
-  'Dormir bien no es un lujo, es una estrategia.',
-  'El movimiento es medicina para el cuerpo y la mente.',
-  'Lo que comes no solo alimenta tu cuerpo, alimenta tu estado mental.',
-  'La vitalidad no se hereda, se entrena.',
-  'Un cuerpo fuerte sostiene una mente poderosa.',
-  'La hidratación y el descanso son las herramientas más subestimadas.',
-  'Tu cuerpo te habla. Aprende a escucharlo.',
-  'La respiración consciente puede cambiar tu estado en segundos.',
-  'No hay salud mental sin salud física.',
-  'El silencio interior es el lujo más grande del mundo moderno.',
-  'Meditar no es vaciar la mente, es observarla sin juicio.',
-  'La paz mental no se busca, se practica.',
-  'Tu mente necesita descanso tanto como tu cuerpo.',
-  'La claridad llega cuando dejas de forzar las respuestas.',
-  'Entre el estímulo y la respuesta está tu libertad.',
-  'La atención plena transforma lo ordinario en extraordinario.',
-  'No eres tus pensamientos, eres el observador de ellos.',
-  'La mente calmada ve soluciones que la mente agitada no percibe.',
-  'La verdadera inteligencia es saber cuándo detenerse y reflexionar.',
-  'El bienestar no es un destino, es una práctica diaria.',
-  'Escribir aclara la mente y ordena el caos interior.',
-  'La reflexión convierte la experiencia en sabiduría.',
-  'Cada página de tu journal es un espejo de tu evolución.',
-  'El crecimiento personal no es lineal, es una espiral ascendente.',
-  'Aprender a desaprender es la habilidad más valiosa.',
-  'La curiosidad mantiene joven la mente.',
-  'Lo que no se mide, no se mejora.',
-  'El conocimiento sin acción es solo entretenimiento.',
-  'La humildad es la base de todo aprendizaje genuino.',
-  'Tu historia no define tu destino, tus decisiones sí.',
-  'El desarrollo personal es el proyecto más importante de tu vida.',
-  'Las preguntas correctas son más poderosas que las respuestas rápidas.',
-  'Cada crisis es una oportunidad de redefinirte.',
-  'La madurez llega cuando aceptas lo que no puedes cambiar y mejoras lo que sí.',
-  'No busques aprobación, busca autenticidad.',
-  'La verdadera confianza nace de la competencia.',
-  'El liderazgo empieza por liderarte a ti mismo.',
-  'La vulnerabilidad no es debilidad, es coraje absoluto.',
-  'Quien se conoce a sí mismo no puede ser derrotado.',
-  'La autenticidad es la forma más alta de inteligencia social.',
-  'Tu presencia es tu mayor regalo para los demás.',
-  'El poder silencioso siempre supera al ruido vacío.',
-  'La elegancia está en la simplicidad, no en la exageración.',
-  'Los resultados hablan más fuerte que las intenciones.',
-  'La integridad es hacer lo correcto cuando nadie te observa.',
-  'El carácter se revela en los momentos difíciles.',
-  'No sigas el camino, sé el camino.',
-  'La grandeza no se hereda, se forja cada día.',
-  'Tu legado se construye con acciones, no con palabras.',
-  'La verdadera fuerza es suave, la verdadera suavidad es fuerte.',
-  'El orden exterior refleja el orden interior.',
-  'La belleza de la vida está en los detalles que casi nadie nota.',
-  'La perfección es enemiga de la acción.',
-  'Hazlo mal, pero hazlo. La mejora vendrá después.',
-  'La procrastinación es el robo silencioso del potencial.',
-  'Empieza antes de estar listo. La preparación llega en el camino.',
-  'La mejor manera de predecir el futuro es crearlo.',
-  'El momento de actuar fue ayer. El siguiente mejor momento es ahora.',
-  'No hay nada más caro que una oportunidad ignorada.',
-  'La disciplina no te limita, te libera.',
-  'Lo que no te desafía no te transforma.',
-  'El sacrificio temporal produce resultados permanentes.',
-  'La diferencia entre quien eres y quien quieres ser es lo que haces.',
-  'Renunciar es la única garantía de fracaso.',
-  'El cansancio mental se cura con acción, no con descanso.',
-  'Cada hábito pequeño es un voto por la persona que quieres ser.',
-  'La rutina no es prisión, es libertad disfrazada.',
-  'La diferencia entre un sueño y una meta es una fecha límite.',
-  'El foco es decir no a mil cosas buenas para decir sí a una gran cosa.',
-  'La productividad sin propósito es movimiento vacío.',
-  'No gestionas el tiempo, gestionas tus prioridades.',
-  'El caos externo se domina con orden interno.',
-  'La dirección es más importante que la velocidad.',
-  'Un minuto de planificación ahorra diez de ejecución.',
-  'Las personas con propósito no necesitan motivación externa.',
-  'La concentración es el superpoder del siglo XXI.',
-  'Haz lo difícil primero y el resto será fácil.',
-  'La rutina matutina define la calidad de tu día.',
-  'El primer paso no necesita ser perfecto, necesita ser dado.',
-  'La constancia discreta supera al esfuerzo espectacular.',
-  'No celebres las intenciones, celebra los resultados.',
-  'Tu entorno influye más que tu fuerza de voluntad. Diseñalo.',
-  'La claridad genera acción. La confusión genera parálisis.',
-  'La responsabilidad es el precio de la grandeza.',
-  'No eres responsable de todo lo que te pasa, pero sí de cómo respondes.',
-  'La madurez financiera comienza con un presupuesto honesto.',
-  'El ahorro no es restricción, es libertad futura.',
-  'La diferencia entre querer y lograr está en el plan.',
-  'La inversión en conocimiento paga los mejores intereses.',
-  'Cada gasto innecesario roba tiempo de tu libertad futura.',
-  'La verdadera libertad financiera es no depender de nadie económicamente.',
-  'El dinero bien gestionado es tranquilidad bien ganada.',
-];
-
-function getRandomIndex(exclude?: number): number {
-  let idx: number;
-  do { idx = Math.floor(Math.random() * FRASES.length); } while (idx === exclude);
+while (idx === exclude);
   return idx;
 }
 
@@ -201,8 +52,6 @@ export default function DashboardPage() {
   const [empires, setEmpires] = useState<EmpireData[]>([]);
   const [challenge, setChallenge] = useState<ChallengeData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fraseIndex, setFraseIndex] = useState(0);
-  const [fraseVisible, setFraseVisible] = useState(true);
   const [metrics, setMetrics] = useState<{ meditationWeek: number; habitsCompleted: number; journalWeek: number; balance: number; totalIncome: number; totalExpense: number } | null>(null);
   const [streaks, setStreaks] = useState<{ meditationStreak: number; habitStreak: number; journalStreak: number } | null>(null);
   const [progress, setProgress] = useState<{ meditation: { count: number; target: number; percent: number }; habits: { count: number; target: number; percent: number }; journal: { count: number; target: number; percent: number }; totalPercent: number } | null>(null);
@@ -213,11 +62,6 @@ export default function DashboardPage() {
   const [dashboardInsights, setDashboardInsights] = useState<{ id: string; type: string; category: string; icon: string; title: string; description: string }[] | null>(null);
   const [insightsScore, setInsightsScore] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState(false);
-
-  // Randomize frase on client only (avoids hydration mismatch)
-  useEffect(() => {
-    setFraseIndex(getRandomIndex());
-  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -318,18 +162,6 @@ export default function DashboardPage() {
     fetchData();
     return () => { cancelled = true; };
   }, [user, apiFetch]);
-
-  // Rotar frase cada 80 segundos con fade
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFraseVisible(false);
-      setTimeout(() => {
-        setFraseIndex((prev) => getRandomIndex(prev));
-        setFraseVisible(true);
-      }, 600);
-    }, 80000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Memoized computed values to avoid recalculating on every render
   const totalXp = useMemo(() => empires.reduce((sum, e) => sum + e.xp, 0), [empires]);
@@ -597,14 +429,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Frase motivacional */}
-      <div className="flex justify-center py-2 sm:py-6">
-        <p
-          className={`text-center text-[#c8a55a]/90 text-sm sm:text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 px-4 ${fraseVisible ? 'opacity-100' : 'opacity-0'}`}
-        >
-          «{FRASES[fraseIndex]}»
-        </p>
-      </div>
+      {/* Premium Reflection */}
+      <PremiumReflection />
 
       {/* Daily Challenge */}
       {challenge && (
