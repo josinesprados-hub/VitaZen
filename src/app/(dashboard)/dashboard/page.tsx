@@ -13,10 +13,6 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Star, Wind, BookOpen, CheckCircle, Wallet, Target, Crown, Lock, Sunrise, Sparkles, ArrowRight } from 'lucide-react';
 import PremiumReflection from '@/components/ui/PremiumReflection';
 
-while (idx === exclude);
-  return idx;
-}
-
 interface EmpireData {
   empire: string;
   level: number;
