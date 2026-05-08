@@ -8,6 +8,7 @@ import PremiumBlur from '@/components/ui/PremiumBlur';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 
 interface Habit {
   id: string;
@@ -47,6 +48,7 @@ export default function DisciplinaPage() {
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
+  const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
 
   // Lock body scroll when any modal is open
   useEffect(() => {
@@ -107,6 +109,8 @@ export default function DisciplinaPage() {
       if (res.ok) {
         const data = await res.json();
         setHabits(habits.map(h => h.id === habitId ? data.habit : h));
+        setJustCompletedId(habitId);
+        setTimeout(() => setJustCompletedId(null), 600);
       }
     } catch (error) {
       console.error('Error completing habit:', error);
@@ -162,11 +166,7 @@ export default function DisciplinaPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Shield size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <EmpireSkeleton message="Preparando tus hábitos..." />;
   }
 
   if (fetchError) {
@@ -249,7 +249,7 @@ export default function DisciplinaPage() {
 
       {/* Daily Challenge */}
       {challenge && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-5 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-5 sm:p-6 section-enter-1">
           <div className="flex items-center gap-3 mb-4">
             <Trophy size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
@@ -265,7 +265,7 @@ export default function DisciplinaPage() {
                   if (res.ok) setChallenge({ ...challenge, completed: true });
                 } catch (error) { console.error('Error completing challenge:', error); }
               }}
-              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm touch-press"
             >
               Completar desafío
             </button>
@@ -274,12 +274,12 @@ export default function DisciplinaPage() {
       )}
 
       {/* Habits */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-2">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Mis Hábitos</h2>
           <button
             onClick={() => setShowAddHabit(!showAddHabit)}
-            className="flex items-center gap-2 text-sm text-[#c8a55a] hover:text-[#d4b468]"
+            className="flex items-center gap-2 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
           >
             <Plus size={18} /> Añadir hábito
           </button>
@@ -303,8 +303,8 @@ export default function DisciplinaPage() {
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]"
             />
             <div className="flex gap-2">
-              <button onClick={addHabit} className="bg-[#c8a55a] text-black font-semibold px-5 py-2 rounded-xl text-sm hover:bg-[#d4b468] transition-colors">Guardar</button>
-              <button onClick={() => setShowAddHabit(false)} className="text-[#999] px-4 py-2 text-sm hover:text-white">Cancelar</button>
+              <button onClick={addHabit} className="bg-[#c8a55a] text-black font-semibold px-5 py-2 rounded-xl text-sm hover:bg-[#d4b468] transition-colors touch-press">Guardar</button>
+              <button onClick={() => setShowAddHabit(false)} className="text-[#999] px-4 py-2 text-sm hover:text-white touch-press">Cancelar</button>
             </div>
           </div>
         )}
@@ -326,6 +326,8 @@ export default function DisciplinaPage() {
                   <button
                     onClick={() => completeHabit(habit.id)}
                     className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all touch-press ${
+                      justCompletedId === habit.id ? 'check-pop' : ''
+                    } ${
                       habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString()
                         ? 'bg-[#c8a55a] border-[#c8a55a] scale-100'
                         : 'border-[#333] hover:border-[#c8a55a] hover:bg-[#c8a55a]/10'
@@ -366,7 +368,7 @@ export default function DisciplinaPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>

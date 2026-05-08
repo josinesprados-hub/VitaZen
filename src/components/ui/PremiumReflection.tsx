@@ -146,8 +146,8 @@ export default function PremiumReflection() {
   }, [advance]);
 
   if (!reflection) {
-    // Return a minimal placeholder with the same height structure to prevent layout shift
-    return <div className="py-2 sm:py-6 h-8 sm:h-12" />;
+    // Return a minimal placeholder with gentle pulse to avoid feeling "dead"
+    return <div className="py-2 sm:py-6 h-8 sm:h-12 flex items-center justify-center"><div className="h-2 w-16 rounded-full bg-[#c8a55a]/10 gentle-pulse" /></div>;
   }
 
   return (

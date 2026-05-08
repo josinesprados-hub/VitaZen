@@ -65,7 +65,7 @@ function ValueSlider({
             key={v}
             type="button"
             onClick={() => onChange(v)}
-            className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all duration-200 value-btn ${
               v <= value
                 ? 'bg-[#c8a55a] text-[#000000]'
                 : 'bg-[#1a1a1a] text-[#555] hover:bg-[#222] hover:text-[#888]'
@@ -240,8 +240,8 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
 
         {step === 2 && (
           /* Done Step */
-          <div className="p-6 sm:p-8 text-center safe-bottom">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/15 flex items-center justify-center mx-auto mb-5">
+          <div className="p-6 sm:p-8 text-center safe-bottom card-enter">
+            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/15 flex items-center justify-center mx-auto mb-5 micro-celebrate">
               <span className="text-3xl">✓</span>
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Check-in completado</h2>

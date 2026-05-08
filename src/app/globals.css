@@ -933,3 +933,226 @@ body.scroll-locked {
     min-height: 100dvh;
   }
 }
+
+/* ═══════════════════════════════════════════
+   Premium Mobile Engagement Polish
+   ═══════════════════════════════════════════ */
+
+/* Staggered entrance — cascade elements into view for perceived speed.
+   Use on repeated cards/rows for a premium sequential reveal. */
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.stagger-1 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.05s; }
+.stagger-2 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.10s; }
+.stagger-3 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.15s; }
+.stagger-4 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.20s; }
+.stagger-5 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.25s; }
+.stagger-6 { animation: staggerIn 0.4s ease-out both; animation-delay: 0.30s; }
+
+/* Micro-celebration — brief scale pop for completed actions.
+   Applied via JS class toggle for 0.4s then removed. */
+@keyframes microCelebrate {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.micro-celebrate {
+  animation: microCelebrate 0.4s ease-out;
+}
+
+/* Streak pulse — gentle breathing glow for streak indicators (🔥) */
+@keyframes streakPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.08); }
+}
+.streak-pulse {
+  animation: streakPulse 2.5s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* Gentle card entrance — softer than stagger, for section blocks */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.card-enter {
+  animation: cardEnter 0.45s ease-out both;
+}
+
+/* Button active press feedback — stronger than touch-press, for primary actions */
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.08s ease, background-color 0.15s ease;
+}
+
+/* Value slider button active feedback */
+.value-btn:active {
+  transform: scale(0.92);
+  transition: transform 0.08s ease;
+}
+
+/* Link tap feedback — subtle opacity shift on mobile */
+@media (hover: none) and (pointer: coarse) {
+  a:active {
+    opacity: 0.7;
+    transition: opacity 0.1s ease;
+  }
+}
+
+/* Gentle breathing pulse for loading/waiting states */
+@keyframes gentlePulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+.gentle-pulse {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+/* Check mark celebration — small pop when a check appears */
+@keyframes checkPop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.check-pop {
+  animation: checkPop 0.35s ease-out both;
+}
+
+/* Warmer fallback text style — for "No disponible" states */
+.fallback-warm {
+  color: #555;
+  font-style: italic;
+  font-size: 0.6875rem;
+}
+
+/* Progress bar subtle glow when at 100% */
+@keyframes progressGlow {
+  0%, 100% { box-shadow: 0 0 4px rgba(200, 165, 90, 0); }
+  50% { box-shadow: 0 0 8px rgba(200, 165, 90, 0.3); }
+}
+.progress-complete {
+  animation: progressGlow 2s ease-in-out infinite;
+}
+
+/* Respect reduced motion for all engagement polish */
+@media (prefers-reduced-motion: reduce) {
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6 {
+    animation: none;
+  }
+  .micro-celebrate {
+    animation: none;
+  }
+  .streak-pulse {
+    animation: none;
+  }
+  .card-enter {
+    animation: none;
+  }
+  .check-pop {
+    animation: none;
+  }
+  .progress-complete {
+    animation: none;
+  }
+  .gentle-pulse {
+    animation: none;
+  }
+}
+
+/* Onboarding option touch feedback — same as touch-press but for
+   the selection cards that don't have the class */
+@media (hover: none) and (pointer: coarse) {
+  .onboarding-option-press:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Premium Mobile Engagement Polish — Phase 2
+   ═══════════════════════════════════════════ */
+
+/* Smooth expand/collapse — for form sections that toggle visibility.
+   Wrap content in this class; toggle with max-height + opacity via JS or
+   use with grid-template-rows: 0fr → 1fr pattern. */
+.smooth-expand {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease-out, opacity 0.25s ease-out;
+  opacity: 1;
+}
+.smooth-expand.collapsed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.smooth-expand > div {
+  overflow: hidden;
+}
+
+/* Success flash — brief green-gold highlight for saved/completed actions */
+@keyframes successFlash {
+  0% { background-color: rgba(200, 165, 90, 0); }
+  30% { background-color: rgba(200, 165, 90, 0.08); }
+  100% { background-color: rgba(200, 165, 90, 0); }
+}
+.success-flash {
+  animation: successFlash 0.8s ease-out;
+}
+
+/* Breathing ring — for meditation timer, pulsing border */
+@keyframes breathingRing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(200, 165, 90, 0.08); }
+}
+.breathing-ring {
+  animation: breathingRing 4s ease-in-out infinite;
+}
+
+/* Warm loading message — for empire page skeletons */
+.warm-loading-msg {
+  color: #c8a55a;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0.5;
+}
+
+/* Section enter — staggered entrance for empire page sections */
+.section-enter-1 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.05s; }
+.section-enter-2 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.12s; }
+.section-enter-3 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.19s; }
+.section-enter-4 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.26s; }
+.section-enter-5 { animation: cardEnter 0.45s ease-out both; animation-delay: 0.33s; }
+
+/* Rating button feedback — tactile press for 1-5 selectors */
+@media (hover: none) and (pointer: coarse) {
+  .rating-btn:active {
+    transform: scale(0.9);
+    transition: transform 0.08s ease;
+  }
+}
+
+/* Respect reduced motion for phase 2 animations */
+@media (prefers-reduced-motion: reduce) {
+  .smooth-expand { transition: none; }
+  .success-flash { animation: none; }
+  .breathing-ring { animation: none; }
+  .section-enter-1, .section-enter-2, .section-enter-3, .section-enter-4, .section-enter-5 {
+    animation: none;
+  }
+}

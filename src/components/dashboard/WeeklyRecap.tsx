@@ -195,7 +195,7 @@ export function WeeklyRecap() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Resumen semanal</h2>
-              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+              <p className="fallback-warm">Tu resumen aparecerá con más actividad</p>
             </div>
           </div>
         </div>

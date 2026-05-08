@@ -671,6 +671,69 @@ export function EmotionalHeroSkeleton() {
   );
 }
 
+/** Empire page skeleton — reusable for all 5 empire pages (mente, energia, disciplina, riqueza, crecimiento)
+ *  Provides a warm loading message and structured skeleton matching the empire page layout. */
+export function EmpireSkeleton({ message }: { message: string }) {
+  return (
+    <div className="max-w-4xl mx-auto space-y-8 skeleton-entrance">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <SkeletonIcon size="lg" />
+        <div className="space-y-2">
+          <SkeletonLine width="180px" className="h-7" />
+          <SkeletonLine width="250px" className="h-3.5" />
+        </div>
+      </div>
+
+      {/* Warm loading message */}
+      <div className="flex items-center gap-2.5">
+        <div className="h-2 w-2 rounded-full bg-[#c8a55a] gentle-pulse" />
+        <p className="warm-loading-msg">{message}</p>
+      </div>
+
+      {/* Main content card */}
+      <SkeletonCard className="p-5 sm:p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <SkeletonIcon size="sm" />
+          <div className="space-y-2 flex-1">
+            <SkeletonLine width="45%" className="h-5" />
+            <SkeletonLine width="70%" className="h-3" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[1, 2, 3].map((i) => (
+            <SkeletonBlock key={i} className="h-20 rounded-lg" />
+          ))}
+        </div>
+      </SkeletonCard>
+
+      {/* History / list card */}
+      <SkeletonCard className="p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <SkeletonIcon size="sm" />
+            <SkeletonLine width="130px" className="h-5" />
+          </div>
+          <SkeletonBlock className="h-6 w-24 rounded-full" />
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <SkeletonCard key={i} className="p-4 bg-[#000000]">
+              <div className="flex items-center gap-4">
+                <SkeletonCircle size={40} />
+                <div className="flex-1 space-y-2">
+                  <SkeletonLine width="50%" className="h-3.5" />
+                  <SkeletonLine width="80%" className="h-2.5" />
+                </div>
+              </div>
+            </SkeletonCard>
+          ))}
+        </div>
+      </SkeletonCard>
+    </div>
+  );
+}
+
 /** Weekly Recap skeleton — replaces inline skeleton in WeeklyRecap component */
 export function WeeklyRecapSkeleton() {
   return (

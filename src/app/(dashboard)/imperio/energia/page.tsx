@@ -7,6 +7,7 @@ import { Zap, Droplets, Flame, Apple, Heart, Lightbulb, Pencil, Trash2, Calendar
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 
 interface WellnessLog {
   id: string;
@@ -113,7 +114,7 @@ export default function EnergiaPage() {
       <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} onClick={() => onChange(n)}
-            className={`w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#c8a55a]'}`}>
+            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#c8a55a]'}`}>
             {n}
           </button>
         ))}
@@ -198,11 +199,7 @@ export default function EnergiaPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Zap size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <EmpireSkeleton message="Cargando tu energía..." />;
   }
 
   if (fetchError) {
@@ -304,10 +301,10 @@ export default function EnergiaPage() {
       </div>
 
       {/* Wellness Log */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
-          <button onClick={() => setShowWellness(!showWellness)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
+          <button onClick={() => setShowWellness(!showWellness)} className="touch-press text-sm text-[#c8a55a] hover:text-[#d4b468]">
             + Registrar hoy
           </button>
         </div>
@@ -321,15 +318,15 @@ export default function EnergiaPage() {
             <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
             <div className="flex gap-2">
-              <button onClick={submitWellness} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
-              <button onClick={() => setShowWellness(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
+              <button onClick={submitWellness} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={() => setShowWellness(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
         )}
         {wellnessLogs.length > 0 ? (
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {wellnessLogs.slice(0, 7).map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
                     <Heart size={16} className="text-[#c8a55a]" />
@@ -367,10 +364,10 @@ export default function EnergiaPage() {
       </div>
 
       {/* Nutrition */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="section-enter-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
-          <button onClick={() => setShowNutrition(!showNutrition)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
+          <button onClick={() => setShowNutrition(!showNutrition)} className="touch-press text-sm text-[#c8a55a] hover:text-[#d4b468]">
             + Registrar hoy
           </button>
         </div>
@@ -392,15 +389,15 @@ export default function EnergiaPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitNutrition} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
-              <button onClick={() => setShowNutrition(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
+              <button onClick={submitNutrition} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={() => setShowNutrition(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
         )}
         {nutrition.length > 0 ? (
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {nutrition.slice(0, 7).map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
+              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
                     <Apple size={16} className="text-[#c8a55a]" />
@@ -438,7 +435,7 @@ export default function EnergiaPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+        <div className="section-enter-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>

@@ -307,7 +307,7 @@ export default function InsightsPage() {
             {insights.map((insight) => (
               <div
                 key={insight.id}
-                className={`insight-card bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 ${getInsightBorderClass(insight.type)}`}
+                className={`insight-card bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 card-enter ${getInsightBorderClass(insight.type)}`}
               >
                 <div className="flex items-start gap-4">
                   <span className="text-2xl shrink-0 mt-0.5">{insight.icon}</span>
@@ -336,7 +336,7 @@ export default function InsightsPage() {
       )}
 
       {/* Detailed Metrics Grid */}
-      <div>
+      <div className="card-enter">
         <div className="flex items-center gap-3 mb-5">
           <Target size={20} className="text-[#c8a55a]" />
           <h2 className="text-lg font-semibold text-white">Desglose semanal</h2>

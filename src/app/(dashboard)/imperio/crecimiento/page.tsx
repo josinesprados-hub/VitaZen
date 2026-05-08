@@ -7,6 +7,7 @@ import { TrendingUp, Plus, BookOpen, Heart, Lightbulb, Pencil, Trash2, BookOpenT
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 
 interface JournalEntry {
   id: string;
@@ -121,11 +122,7 @@ export default function CrecimientoPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <TrendingUp size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <EmpireSkeleton message="Preparando tu diario..." />;
   }
 
   if (fetchError) {
@@ -162,7 +159,7 @@ export default function CrecimientoPage() {
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <button key={n} onClick={() => setEditForm({ ...editForm, mood: n })}
-                        className={`w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666]'}`}>
+                        className={`rating-btn w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666]'}`}>
                         {n}
                       </button>
                     ))}
@@ -211,12 +208,12 @@ export default function CrecimientoPage() {
       </div>
 
       {/* Journal */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
           </h2>
-          <button onClick={() => setShowAdd(!showAdd)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
+          <button onClick={() => setShowAdd(!showAdd)} className="text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press">
             <Plus size={18} className="inline mr-1" /> Nueva entrada
           </button>
         </div>
@@ -234,7 +231,7 @@ export default function CrecimientoPage() {
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} onClick={() => setForm({ ...form, mood: n })}
-                      className={`w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#666]'}`}>
+                      className={`rating-btn w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#666]'}`}>
                       {n}
                     </button>
                   ))}
@@ -247,8 +244,8 @@ export default function CrecimientoPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitEntry} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
-              <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
+              <button onClick={submitEntry} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press">Guardar</button>
+              <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
             </div>
           </div>
         )}
@@ -307,7 +304,7 @@ export default function CrecimientoPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>

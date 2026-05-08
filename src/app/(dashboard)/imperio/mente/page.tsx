@@ -7,6 +7,7 @@ import { Brain, Play, Pause, Clock, Lightbulb, ChevronDown, ChevronUp, Wind, Tra
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 
 interface Meditation {
   id: string;
@@ -210,11 +211,7 @@ export default function MentePage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Brain size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <EmpireSkeleton message="Preparando tu espacio de calma..." />;
   }
 
   if (fetchError) {
@@ -259,7 +256,7 @@ export default function MentePage() {
             </div>
             <button
               onClick={() => setCompletedSession(null)}
-              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors"
+              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors touch-press"
             >
               Cerrar
             </button>
@@ -372,7 +369,7 @@ export default function MentePage() {
       </div>
 
       {/* Meditation Timer */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
         <div className="flex items-center gap-3 mb-5">
           <Wind size={20} className="text-[#c8a55a]" />
           <div>
@@ -382,7 +379,7 @@ export default function MentePage() {
         </div>
         
         {meditating ? (
-          <div className="text-center py-10">
+          <div className={`text-center py-10 ${!paused ? 'breathing-ring' : ''}`}>
             <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
             <p className={`text-5xl font-bold mb-1 font-mono transition-opacity duration-300 ${paused ? 'text-[#c8a55a]/40' : 'text-[#c8a55a]'}`}>{formatTime(timer)}</p>
             {paused && <p className="text-[#c8a55a]/60 text-xs uppercase tracking-widest mb-1">En pausa</p>}
@@ -408,7 +405,7 @@ export default function MentePage() {
               <button
                 key={tech.type}
                 onClick={() => startMeditation(tech)}
-                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-left hover:border-[#c8a55a]/50 transition-all group"
+                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-left hover:border-[#c8a55a]/50 transition-all group touch-press"
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-white text-sm font-medium group-hover:text-[#c8a55a] transition-colors">{tech.label}</p>
@@ -422,7 +419,7 @@ export default function MentePage() {
       </div>
 
       {/* Breathing Techniques Guide */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-2">
         <div className="flex items-center gap-3 mb-5">
           <Wind size={20} className="text-[#c8a55a]" />
           <div>
@@ -479,7 +476,7 @@ export default function MentePage() {
       </div>
 
       {/* Session History */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <Clock size={20} className="text-[#c8a55a]" />
@@ -547,7 +544,7 @@ export default function MentePage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-4">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>

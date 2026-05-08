@@ -135,8 +135,8 @@ export default function PerfilPage() {
       {!user ? (
         <div className="flex items-center justify-center min-h-[40vh]">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
+            <div className="h-2 w-2 rounded-full bg-[#c8a55a] gentle-pulse" />
+            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Preparando tu perfil</p>
           </div>
         </div>
       ) : (

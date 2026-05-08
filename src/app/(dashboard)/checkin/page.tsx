@@ -362,10 +362,10 @@ export default function CheckinPage() {
         />
         ) : (
           <div className="space-y-2">
-            {checkins.map((c) => (
+            {checkins.map((c, idx) => (
               <div
                 key={c.id}
-                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors"
+                className={`bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors stagger-${Math.min(idx + 1, 6)}`}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">

@@ -7,6 +7,7 @@ import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2, Wallet,
 import PremiumBlur from '@/components/ui/PremiumBlur';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 
 interface FinanceLog {
   id: string;
@@ -123,11 +124,7 @@ export default function RiquezaPage() {
   const totalExpense = logs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Gem size={32} className="text-[#c8a55a] animate-pulse" />
-      </div>
-    );
+    return <EmpireSkeleton message="Cargando tus finanzas..." />;
   }
 
   if (fetchError) {
@@ -208,16 +205,16 @@ export default function RiquezaPage() {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-5">
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+      <div className="grid grid-cols-3 gap-2 sm:gap-5 section-enter-1">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
           <p className="text-xs text-[#666] mb-1">Ingresos</p>
           <p className="text-xl font-bold text-[#c8a55a]">+{totalIncome.toFixed(2)}€</p>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
           <p className="text-xs text-[#666] mb-1">Gastos</p>
           <p className="text-xl font-bold text-red-400">-{totalExpense.toFixed(2)}€</p>
         </div>
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-6">
           <p className="text-xs text-[#666] mb-1">Balance</p>
           <p className={`text-xl font-bold ${(totalIncome - totalExpense) >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
             {(totalIncome - totalExpense).toFixed(2)}€
@@ -226,10 +223,10 @@ export default function RiquezaPage() {
       </div>
 
       {/* Add Transaction */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-2">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro Financiero</h2>
-          <button onClick={() => setShowAdd(!showAdd)} className="text-sm text-[#c8a55a] hover:text-[#d4b468]">
+          <button onClick={() => setShowAdd(!showAdd)} className="text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press">
             <Plus size={18} className="inline mr-1" /> Añadir
           </button>
         </div>
@@ -253,8 +250,8 @@ export default function RiquezaPage() {
             <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
             <div className="flex gap-2">
-              <button onClick={submitFinance} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
-              <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm">Cancelar</button>
+              <button onClick={submitFinance} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press">Guardar</button>
+              <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
             </div>
           </div>
         )}
@@ -302,7 +299,7 @@ export default function RiquezaPage() {
 
       {/* Tips */}
       {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
           <div className="flex items-center gap-3 mb-4">
             <Lightbulb size={20} className="text-[#c8a55a]" />
             <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>

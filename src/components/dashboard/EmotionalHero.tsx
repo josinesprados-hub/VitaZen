@@ -181,7 +181,7 @@ export function EmotionalHero() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Estado actual</h2>
-              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+              <p className="fallback-warm">Aparecerá con tu primer check-in</p>
             </div>
           </div>
         </div>

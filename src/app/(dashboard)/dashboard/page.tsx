@@ -42,6 +42,15 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string; de
   crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a', description: 'Expande tu potencial y evoluciona' },
 };
 
+// Time-of-day greeting for emotional continuity
+function getTimeGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 6) return 'Buenas noches';
+  if (hour < 12) return 'Buenos días';
+  if (hour < 18) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
@@ -59,6 +68,7 @@ export default function DashboardPage() {
   const [insightsScore, setInsightsScore] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState(false);
   const [completingChallenge, setCompletingChallenge] = useState(false);
+  const [challengeJustCompleted, setChallengeJustCompleted] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -221,14 +231,14 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white">
-              Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
+              {getTimeGreeting()}, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
             </h1>
-            <p className="text-[#999] mt-1 sm:mt-2 text-sm sm:text-base">Construye tu imperio, un hábito a la vez.</p>
+            <p className="text-[#999] mt-1 sm:mt-2 text-sm sm:text-base">Cada día es una oportunidad para avanzar.</p>
           </div>
           {todayCheckin && (
             <button
               onClick={() => setShowCheckinModal(true)}
-              className="flex items-center gap-2 bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl px-4 py-2.5 hover:border-[#c8a55a]/40 transition-all group"
+              className="flex items-center gap-2 bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl px-4 py-2.5 hover:border-[#c8a55a]/40 transition-all group touch-press"
             >
               <Sunrise size={16} className="text-[#c8a55a]" />
               <span className="text-xs text-[#999] group-hover:text-white transition-colors">Check-in de hoy</span>
@@ -236,7 +246,7 @@ export default function DashboardPage() {
           )}
         </div>
         {todayCheckin && (
-          <div className="mt-2 sm:mt-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-3 sm:gap-4">
+          <div className="mt-2 sm:mt-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-3 sm:gap-4 card-enter">
             <span className="text-lg">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-[#c8a55a] font-medium truncate">«{todayCheckin.intention}»</p>
@@ -259,7 +269,7 @@ export default function DashboardPage() {
 
       {/* Metrics — with calm fallback when data is null */}
       {metrics ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 card-enter">
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-2.5 sm:p-5 hover:border-[#c8a55a]/20 transition-colors touch-press">
             <div className="flex items-center gap-1.5 mb-1.5 sm:mb-3 sm:gap-2">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
@@ -271,7 +281,7 @@ export default function DashboardPage() {
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
             {streaks && streaks.meditationStreak > 0 && (
               <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
-                🔥 {streaks.meditationStreak}d
+                <span className="streak-pulse">🔥</span> {streaks.meditationStreak}d
               </p>
             )}
           </div>
@@ -287,7 +297,7 @@ export default function DashboardPage() {
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
             {streaks && streaks.habitStreak > 0 && (
               <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
-                🔥 {streaks.habitStreak}d
+                <span className="streak-pulse">🔥</span> {streaks.habitStreak}d
               </p>
             )}
           </div>
@@ -303,7 +313,7 @@ export default function DashboardPage() {
             <p className="text-[10px] sm:text-xs text-[#666] mt-0.5 sm:mt-1">esta semana</p>
             {streaks && streaks.journalStreak > 0 && (
               <p className="text-[10px] sm:text-xs text-[#c8a55a] mt-1 sm:mt-2 flex items-center gap-1">
-                🔥 {streaks.journalStreak}d
+                <span className="streak-pulse">🔥</span> {streaks.journalStreak}d
               </p>
             )}
           </div>
@@ -333,7 +343,7 @@ export default function DashboardPage() {
                 <span className="text-[10px] sm:text-xs text-[#444] uppercase tracking-wider font-medium">{label}</span>
               </div>
               <p className="text-xl sm:text-3xl font-bold text-[#333]">—</p>
-              <p className="text-[10px] sm:text-xs text-[#333] mt-0.5 sm:mt-1">esta semana</p>
+              <p className="text-[10px] sm:text-xs text-[#444] mt-0.5 sm:mt-1">pronto aquí</p>
             </div>
           ))}
         </div>
@@ -343,10 +353,10 @@ export default function DashboardPage() {
       <WeeklyRecap />
 
       {/* Empire Grid */}
-      <div>
+      <div className="card-enter">
         <h2 className="text-base sm:text-xl font-semibold text-white mb-3 sm:mb-5">Tus Imperios</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-5">
-          {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
+          {Object.entries(EMPIRE_CONFIG).map(([key, config], idx) => {
             const empireData = empires.find((e) => e.empire === key);
             const level = empireData?.level || 1;
             const empireProgress = empireData?.progress || 0;
@@ -357,7 +367,7 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press"
+                className={`bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 hover:border-[#c8a55a]/30 transition-all group touch-press stagger-${Math.min(idx + 1, 5)}`}
               >
                 <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-5">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
@@ -369,7 +379,7 @@ export default function DashboardPage() {
                   </div>
                   {streak > 0 && (
                     <span className="flex items-center gap-0.5 text-[10px] sm:text-xs text-[#c8a55a] sm:hidden">
-                      <Flame size={10} /> {streak}d
+                      <span className="streak-pulse"><Flame size={10} /></span> {streak}d
                     </span>
                   )}
                 </div>
@@ -399,12 +409,12 @@ export default function DashboardPage() {
 
       {/* Daily Challenge — with calm fallback */}
       {challenge ? (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3 sm:p-5">
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3 sm:p-5 card-enter">
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
             <Trophy size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
             <h2 className="text-base sm:text-lg font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
-              <span className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium">Completado</span>
+              <span className={`text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium ${challengeJustCompleted ? 'check-pop' : ''}`}>Completado</span>
             )}
           </div>
           <h3 className="text-[#c8a55a] font-medium text-sm sm:text-lg mb-0.5 sm:mb-1">{challenge.challenge.title}</h3>
@@ -421,13 +431,15 @@ export default function DashboardPage() {
                   });
                   if (res.ok) {
                     setChallenge({ ...challenge, completed: true });
+                    setChallengeJustCompleted(true);
+                    setTimeout(() => setChallengeJustCompleted(false), 600);
                   }
                 } finally {
                   setCompletingChallenge(false);
                 }
               }}
               disabled={completingChallenge}
-              className="bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`bg-[#c8a55a] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed ${challengeJustCompleted ? 'micro-celebrate' : ''}`}
             >
               {completingChallenge ? 'Completando...' : 'Marcar como completado'}
             </button>
@@ -442,7 +454,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Desafío Diario</h2>
-              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+              <p className="fallback-warm">Pronto un nuevo desafío para ti</p>
             </div>
           </div>
         </div>
@@ -512,7 +524,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Progreso Semanal</h2>
-              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+              <p className="fallback-warm">Tu progreso aparecerá aquí</p>
             </div>
           </div>
         </div>
@@ -520,7 +532,7 @@ export default function DashboardPage() {
 
       {/* Insights Preview — show only 1 on mobile, with calm fallback */}
       {dashboardInsights && dashboardInsights.length > 0 ? (
-        <div>
+        <div className="card-enter">
           <div className="flex items-center justify-between mb-3 sm:mb-5">
             <div className="flex items-center gap-2 sm:gap-3">
               <Sparkles size={18} className="text-[#c8a55a] sm:w-[22px] sm:h-[22px]" />
@@ -568,7 +580,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Insights Semanales</h2>
-              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+              <p className="fallback-warm">Los insights llegarán con tu actividad</p>
             </div>
           </div>
         </div>
@@ -642,14 +654,14 @@ export default function DashboardPage() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Logros</h2>
-              <p className="text-[10px] sm:text-[11px] text-[#444]">No disponible</p>
+              <p className="fallback-warm">Sigue avanzando para desbloquearlos</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Quick Stats — reduced padding on mobile */}
-      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4 card-enter">
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-1.5 sm:p-5">
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Star size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
