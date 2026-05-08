@@ -33,6 +33,8 @@ export default function AjustesPage() {
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [savedKeys, setSavedKeys] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const [verifySending, setVerifySending] = useState(false);
+  const [verifySent, setVerifySent] = useState(false);
 
   // Sync settings from user data
   useEffect(() => {
@@ -93,6 +95,36 @@ export default function AjustesPage() {
   const handleSignOut = async () => {
     await signOut();
     router.replace('/login');
+  };
+
+  const handleSendVerification = async () => {
+    if (!firebaseUser || verifySending || verifySent) return;
+    setVerifySending(true);
+    try {
+      const idToken = await firebaseUser.getIdToken();
+      const res = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
+      });
+      const data = await res.json();
+      if (data.alreadyVerified) {
+        await refreshUser();
+        return;
+      }
+      if (res.ok) {
+        setVerifySent(true);
+        setTimeout(() => setVerifySent(false), 60000);
+      } else {
+        setError(data.error || 'Error al enviar');
+      }
+    } catch {
+      setError('Error de conexión');
+    } finally {
+      setVerifySending(false);
+    }
   };
 
   return (
@@ -263,7 +295,32 @@ export default function AjustesPage() {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#999]">Email verificado</p>
-            <p className="text-sm text-white">{user?.emailVerified ? 'Si' : 'No'}</p>
+            {user?.emailVerified ? (
+              <span className="flex items-center gap-1.5 text-sm text-[#c8a55a]">
+                <Check size={14} />
+                Verificado
+              </span>
+            ) : (
+              <button
+                onClick={handleSendVerification}
+                disabled={verifySending || verifySent}
+                className="flex items-center gap-1.5 text-sm text-[#888] hover:text-[#c8a55a] transition-colors disabled:opacity-50"
+              >
+                {verifySending ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Enviando...
+                  </>
+                ) : verifySent ? (
+                  <>
+                    <Check size={14} className="text-[#c8a55a]" />
+                    <span className="text-[#c8a55a]">Enviado</span>
+                  </>
+                ) : (
+                  'Verificar ahora'
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

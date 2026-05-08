@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
+import { verifyFirebaseToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +15,20 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Sync emailVerified from Firebase token to DB if needed
+    try {
+      const decodedToken = await verifyFirebaseToken(idToken);
+      if (decodedToken?.email_verified && !user.emailVerified) {
+        await db.user.update({
+          where: { id: user.id },
+          data: { emailVerified: true },
+        });
+        user.emailVerified = true;
+      }
+    } catch {
+      // Non-critical — don't fail the session request
     }
 
     return NextResponse.json({

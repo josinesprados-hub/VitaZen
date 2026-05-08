@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
+import { EmailVerificationBanner } from '@/components/ui/EmailVerificationBanner';
 
 export default function DashboardLayout({
   children,
@@ -69,6 +70,7 @@ export default function DashboardLayout({
       <div className="lg:ml-64">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />
         <main className="p-4 sm:p-4 lg:p-6 pb-20 sm:pb-6 lg:pb-6 safe-bottom overflow-x-contain">
+          <EmailVerificationBanner />
           {children}
         </main>
       </div>

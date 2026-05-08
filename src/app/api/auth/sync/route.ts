@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyFirebaseToken, syncUserToDatabase } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { sendWelcomeEmail } from '@/lib/emails/sender';
+import { sendWelcomeEmail, sendVerifyEmail } from '@/lib/emails/sender';
+import { adminAuth } from '@/lib/firebase-admin';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +30,15 @@ export async function POST(request: NextRequest) {
 
     // If user exists, return it directly
     if (existingUser) {
+      // Sync emailVerified from Firebase if needed
+      if (decodedToken.email_verified && !existingUser.emailVerified) {
+        await db.user.update({
+          where: { id: existingUser.id },
+          data: { emailVerified: true },
+        });
+        existingUser.emailVerified = true;
+      }
+
       return NextResponse.json({
         user: {
           id: existingUser.id,
@@ -59,6 +71,21 @@ export async function POST(request: NextRequest) {
     // Send welcome email for new users
     if (user.email) {
       await sendWelcomeEmail(user.email, user.name || 'Amigo');
+    }
+
+    // Send verification email for new users (not Google-authenticated)
+    if (user.email && !decodedToken.email_verified) {
+      try {
+        const verificationLink = await adminAuth.generateEmailVerificationLink(
+          user.email,
+          { url: `${APP_URL}/verify-email?uid=${user.id}` }
+        );
+        await sendVerifyEmail(user.email, user.name || 'Amigo', verificationLink);
+        console.log('[AUTH SYNC] Verification email sent to:', user.email);
+      } catch (verifyError) {
+        // Don't fail registration if verification email fails
+        console.error('[AUTH SYNC] Failed to send verification email:', verifyError);
+      }
     }
 
     return NextResponse.json({
