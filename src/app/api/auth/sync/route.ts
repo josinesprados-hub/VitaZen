@@ -8,11 +8,6 @@ import { trackEvent } from '@/lib/analytics-server';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
-// How recent a user must be (in ms) to qualify for a welcome email retry
-// in the "existing user" path. Covers cases where the first sync call
-// failed to send the welcome email (e.g. Resend timeout, cold start, etc.)
-const WELCOME_RETRY_WINDOW_MS = 3 * 60 * 1000; // 3 minutes
-
 export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json();
@@ -46,24 +41,34 @@ export async function POST(request: NextRequest) {
         existingUser.emailVerified = true;
       }
 
-      // ─── Welcome email safety net ───
-      // If the user was created very recently, the welcome email might have
-      // failed on the first sync call (Resend cold-start, timeout, etc.).
-      // Try once more so the user doesn't miss their welcome email.
-      const userAge = Date.now() - existingUser.createdAt.getTime();
-      if (
-        existingUser.email &&
-        !existingUser.emailVerified &&
-        userAge < WELCOME_RETRY_WINDOW_MS
-      ) {
-        console.log('[WELCOME] retry — user created', Math.round(userAge / 1000), 's ago, email not yet verified');
-        sendWelcomeEmail(existingUser.email, existingUser.name || 'Amigo')
-          .then(() => console.log('[WELCOME] retry sent ✓'))
-          .catch((err) => console.error('[WELCOME] retry failed:', err instanceof Error ? err.message : err));
-        // Fire-and-forget: do NOT await — return the response immediately.
-        // This prevents the existing-user path from becoming slow or error-prone.
-      } else {
-        console.log('[WELCOME] skipped — user exists, age:', Math.round(userAge / 1000), 's, verified:', existingUser.emailVerified);
+      // ─── Welcome email retry (with dedup via welcomeEmailSent) ───
+      // Only attempt if: email present, email not yet sent, and user is very new.
+      // Atomic check-and-set prevents duplicate sends from concurrent sync calls.
+      if (existingUser.email && !existingUser.welcomeEmailSent) {
+        const userAge = Date.now() - existingUser.createdAt.getTime();
+        const RETRY_WINDOW_MS = 3 * 60 * 1000; // 3 minutes
+
+        if (userAge < RETRY_WINDOW_MS) {
+          // Atomic: only one sync call wins the race to set welcomeEmailSent
+          const updated = await db.user.updateMany({
+            where: { id: existingUser.id, welcomeEmailSent: false },
+            data: { welcomeEmailSent: true },
+          });
+
+          if (updated.count > 0) {
+            console.log('[WELCOME] retry — user created', Math.round(userAge / 1000), 's ago, sending welcome email');
+            sendWelcomeEmail(existingUser.email, existingUser.name || 'Amigo')
+              .then(() => console.log('[WELCOME] retry sent ✓'))
+              .catch((err) => console.error('[WELCOME] retry failed:', err instanceof Error ? err.message : err));
+            // Fire-and-forget: do NOT await — return the response immediately.
+          } else {
+            console.log('[WELCOME] skipped — another sync already claimed welcome email');
+          }
+        } else {
+          console.log('[WELCOME] skipped — user too old for retry, age:', Math.round(userAge / 1000), 's');
+        }
+      } else if (existingUser.welcomeEmailSent) {
+        console.log('[WELCOME] skipped — welcome email already sent');
       }
 
       return NextResponse.json({
@@ -82,6 +87,7 @@ export async function POST(request: NextRequest) {
           dailyReminders: existingUser.dailyReminders,
           privacyStatsVisible: existingUser.privacyStatsVisible,
           emailVerified: existingUser.emailVerified,
+          welcomeEmailSent: existingUser.welcomeEmailSent,
           createdAt: existingUser.createdAt,
           onboardingCompleted: existingUser.onboardingCompleted,
         },
@@ -89,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ─── New user path ───
-    console.log('[WELCOME] starting — new user, email:', decodedToken.email);
+    console.log('[SYNC] new user — email:', decodedToken.email);
 
     const user = await syncUserToDatabase(
       decodedToken.uid,
@@ -97,27 +103,27 @@ export async function POST(request: NextRequest) {
       decodedToken.name
     );
 
-    // Track registration event (privacy-first, no PII)
-    trackEvent({ event: 'user_registered', userId: user.id });
+    // ─── Atomic welcome email dedup ───
+    // Set welcomeEmailSent = true BEFORE sending the email.
+    // This prevents any concurrent sync call from also sending.
+    // If the email fails, we accept a single missed email over duplicates.
+    if (user.email && !user.welcomeEmailSent) {
+      const claimed = await db.user.updateMany({
+        where: { id: user.id, welcomeEmailSent: false },
+        data: { welcomeEmailSent: true },
+      });
 
-    // Send both emails in PARALLEL — neither blocks the other.
-    // If one fails, the other still works. Registration never blocked.
-    if (user.email) {
-      console.log('[WELCOME] user.email present — scheduling emails for:', user.email);
+      if (claimed.count > 0) {
+        // We won the race — fire emails in background (do NOT await)
+        console.log('[WELCOME] claimed — scheduling welcome email for:', user.email);
 
-      const emailPromises: Promise<void>[] = [];
-
-      // 1. Welcome email (always, non-throwing)
-      emailPromises.push(
+        // 1. Welcome email (fire-and-forget, non-throwing)
         sendWelcomeEmail(user.email, user.name || 'Amigo')
-          .catch((err) => {
-            console.error('[WELCOME] failed in new-user path:', err instanceof Error ? err.message : err);
-          })
-      );
+          .then(() => console.log('[WELCOME] sent ✓'))
+          .catch((err) => console.error('[WELCOME] failed:', err instanceof Error ? err.message : err));
 
-      // 2. Verification email (only for non-Google users)
-      if (!decodedToken.email_verified) {
-        emailPromises.push(
+        // 2. Verification email (only for non-Google users, fire-and-forget)
+        if (!decodedToken.email_verified) {
           (async () => {
             try {
               const verificationLink = await adminAuth.generateEmailVerificationLink(
@@ -129,16 +135,21 @@ export async function POST(request: NextRequest) {
             } catch (verifyError) {
               console.error('[AUTH SYNC] Verification email failed:', verifyError instanceof Error ? verifyError.message : verifyError);
             }
-          })()
-        );
+          })();
+        }
+      } else {
+        console.log('[WELCOME] skipped — another sync already claimed welcome email');
       }
-
-      // Wait for both — but errors are already caught above, so this always resolves
-      await Promise.allSettled(emailPromises);
     } else {
-      console.log('[WELCOME] skipped — user.email is falsy');
+      console.log('[WELCOME] skipped — user.email is falsy or already sent');
     }
 
+    // ─── Analytics — fire-and-forget (never block the response) ───
+    trackEvent({ event: 'user_registered', userId: user.id }).catch(() => {});
+
+    // ─── Return user data IMMEDIATELY ───
+    // No awaiting emails, analytics, or other background operations.
+    // The user gets their data back as fast as the DB write completes.
     return NextResponse.json({
       user: {
         id: user.id,
@@ -155,6 +166,7 @@ export async function POST(request: NextRequest) {
         dailyReminders: user.dailyReminders,
         privacyStatsVisible: user.privacyStatsVisible,
         emailVerified: user.emailVerified,
+        welcomeEmailSent: user.welcomeEmailSent,
         createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
       },

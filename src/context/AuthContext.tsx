@@ -28,6 +28,7 @@ interface UserData {
   dailyReminders?: boolean;
   privacyStatsVisible?: boolean;
   emailVerified?: boolean;
+  welcomeEmailSent?: boolean;
   createdAt?: string;
   onboardingCompleted?: boolean;
 }

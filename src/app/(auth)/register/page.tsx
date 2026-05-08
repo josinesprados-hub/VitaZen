@@ -20,13 +20,19 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [providerHint, setProviderHint] = useState<'google' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
   const { signUp, signInWithGoogle, user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   // Redirect already-authenticated users away from register
   useEffect(() => {
     if (!authLoading && user) {
-      router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
+      // Show transition animation before redirecting
+      setTransitioning(true);
+      const timer = setTimeout(() => {
+        router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
+      }, 600);
+      return () => clearTimeout(timer);
     }
   }, [user, authLoading, router]);
 
@@ -88,6 +94,28 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  // ─── Premium transition overlay: account created → onboarding ───
+  if (transitioning) {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center auth-transition-enter">
+        <div className="flex flex-col items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-[#c8a55a]/10 border border-[#c8a55a]/20 flex items-center justify-center">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#c8a55a] auth-success-pulse" />
+          </div>
+          <div className="text-center">
+            <p className="text-white text-sm font-medium mb-1">Cuenta creada</p>
+            <p className="text-[#666] text-xs">Preparando tu experiencia...</p>
+          </div>
+          <div className="flex items-center gap-1.5 mt-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] animate-pulse" style={{ animationDelay: '0ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] animate-pulse" style={{ animationDelay: '200ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] animate-pulse" style={{ animationDelay: '400ms' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4">
@@ -213,7 +241,12 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creando tu cuenta...' : 'Crear cuenta'}
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  Creando tu cuenta...
+                </span>
+              ) : 'Crear cuenta'}
             </button>
           </form>
 

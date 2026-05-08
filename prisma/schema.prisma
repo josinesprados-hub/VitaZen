@@ -26,6 +26,7 @@ model User {
   plan              String   @default("FREE") // FREE | PREMIUM
   stripeCustomerId  String?  @unique
   emailVerified     Boolean  @default(false)
+  welcomeEmailSent  Boolean  @default(false)
   onboardingCompleted Boolean @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

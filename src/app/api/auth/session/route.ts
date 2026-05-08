@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
         dailyReminders: user.dailyReminders,
         privacyStatsVisible: user.privacyStatsVisible,
         emailVerified: user.emailVerified,
+        welcomeEmailSent: user.welcomeEmailSent,
         createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
         aiUsage: user.aiUsage
