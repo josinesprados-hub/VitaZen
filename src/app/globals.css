@@ -473,7 +473,7 @@ html { scroll-behavior: smooth; }
 
 /* Skeleton entrance — transform only, never opacity:0 */
 .skeleton-entrance {
-  animation: skeletonEntrance 0.3s ease-out both;
+  animation: skeletonEntrance 0.3s ease-out forwards;
 }
 @keyframes skeletonEntrance {
   from {
@@ -498,7 +498,7 @@ html { scroll-behavior: smooth; }
   }
 }
 .empty-state-enter {
-  animation: emptyStateEnter 0.4s ease-out both;
+  animation: emptyStateEnter 0.4s ease-out forwards;
 }
 
 /* ═══════════════════════════════════════════
@@ -515,7 +515,7 @@ html { scroll-behavior: smooth; }
   }
 }
 .error-state-enter {
-  animation: errorStateEnter 0.4s ease-out both;
+  animation: errorStateEnter 0.4s ease-out forwards;
 }
 
 /* Subtle pulse for error icon — calm breathing, not urgent */
@@ -641,7 +641,7 @@ html { scroll-behavior: smooth; }
   }
 }
 .hero-fade-in {
-  animation: heroFadeIn 0.45s ease-out both;
+  animation: heroFadeIn 0.45s ease-out forwards;
 }
 
 /* Subtle gold pulse for status icon */
@@ -761,7 +761,7 @@ html { scroll-behavior: smooth; }
   }
 }
 .recap-fade-in {
-  animation: recapFadeIn 0.4s ease-out both;
+  animation: recapFadeIn 0.4s ease-out forwards;
 }
 
 /* Ring transition for recap score circle */
@@ -937,12 +937,12 @@ body.scroll-locked {
     transform: translateY(0);
   }
 }
-.stagger-1 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.03s; }
-.stagger-2 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.06s; }
-.stagger-3 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.09s; }
-.stagger-4 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.12s; }
-.stagger-5 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.15s; }
-.stagger-6 { animation: staggerIn 0.3s ease-out both; animation-delay: 0.18s; }
+.stagger-1 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.03s; }
+.stagger-2 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.06s; }
+.stagger-3 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.09s; }
+.stagger-4 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.12s; }
+.stagger-5 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.15s; }
+.stagger-6 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.18s; }
 
 /* Micro-celebration — brief scale pop for completed actions.
    Applied via JS class toggle for 0.4s then removed. */
@@ -975,7 +975,7 @@ body.scroll-locked {
   }
 }
 .card-enter {
-  animation: cardEnter 0.35s ease-out both;
+  animation: cardEnter 0.35s ease-out forwards;
 }
 
 /* Button active press feedback — stronger than touch-press, for primary actions */
@@ -1118,11 +1118,11 @@ body.scroll-locked {
 }
 
 /* Section enter — transform only, reduced delays */
-.section-enter-1 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.03s; }
-.section-enter-2 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.06s; }
-.section-enter-3 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.09s; }
-.section-enter-4 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.12s; }
-.section-enter-5 { animation: cardEnter 0.3s ease-out both; animation-delay: 0.15s; }
+.section-enter-1 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.03s; }
+.section-enter-2 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.06s; }
+.section-enter-3 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.09s; }
+.section-enter-4 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.12s; }
+.section-enter-5 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.15s; }
 
 /* Rating button feedback — tactile press for 1-5 selectors */
 @media (hover: none) and (pointer: coarse) {

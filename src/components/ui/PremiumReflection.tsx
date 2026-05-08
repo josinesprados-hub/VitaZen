@@ -133,14 +133,13 @@ export default function PremiumReflection() {
     const idx = state.order[state.position];
     setReflection(REFLECTIONS[idx]);
 
-    // Small delay before showing for a smooth entrance
-    const showTimer = setTimeout(() => setVisible(true), 300);
+    // Show immediately — no artificial delay that causes invisible content
+    setVisible(true);
 
     // Auto-rotate every ~80 seconds
     intervalRef.current = setInterval(() => advance(true), ROTATE_INTERVAL);
 
     return () => {
-      clearTimeout(showTimer);
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [advance]);

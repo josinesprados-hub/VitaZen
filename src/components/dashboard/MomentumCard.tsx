@@ -53,7 +53,21 @@ export function MomentumCard() {
     fetchMomentum();
   }, [fetchMomentum]);
 
-  if (loading || !data) return null;
+  if (loading || !data) {
+    return (
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+            <Activity size={14} className="text-[#c8a55a]/30 sm:w-[18px] sm:h-[18px]" />
+          </div>
+          <div>
+            <h2 className="text-sm sm:text-base font-medium text-[#666]">Momentum</h2>
+            <p className="fallback-warm">Calculando tu consistencia</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const color = getMomentumColor(data.level);
   const barColor = getMomentumBarColor(data.level);

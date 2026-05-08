@@ -65,21 +65,14 @@ export default function DashboardLayout({
     );
   }
 
-  // Firebase auth confirmed but server sync still in progress — show brief syncing state
-  // This typically resolves in 1-3 seconds (just a DB lookup for existing users)
-  if (firebaseUser && !user) {
-    return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5 skeleton-entrance">
-          <div className="w-12 h-12 rounded-xl premium-shimmer" />
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Sincronizando</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Firebase auth confirmed but server sync still in progress —
+  // DON'T block the entire UI. Let the dashboard render with its own
+  // loading state. The child page handles the `!user` case gracefully
+  // with skeletons/fallbacks. Blocking here caused the "black screen
+  // until tap" bug on Android (compositor stall with full-screen
+  // overlay + delayed sync).
+  //
+  // Only block if we have NO Firebase auth AND no user data (handled below).
 
   // No auth at all — redirect to login
   if (!user && !firebaseUser) {
