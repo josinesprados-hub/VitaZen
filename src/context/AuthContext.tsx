@@ -78,7 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     if (!firebaseUser) return;
     try {
-      // Force token refresh to get fresh claims/session
+      // Reload Firebase user first to get latest emailVerified status
+      await firebaseUser.reload();
+      // Force token refresh to get fresh claims (including emailVerified)
       const idToken = await firebaseUser.getIdToken(true);
       const res = await fetch('/api/auth/session', {
         headers: { Authorization: `Bearer ${idToken}` },

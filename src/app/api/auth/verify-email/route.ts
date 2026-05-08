@@ -34,9 +34,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update our database
-    const user = await db.user.update({
+    // Find user in DB — try firebaseUid first, then email as fallback
+    let user = await db.user.findUnique({
       where: { firebaseUid: decodedToken.uid },
+    });
+
+    if (!user && decodedToken.email) {
+      user = await db.user.findUnique({
+        where: { email: decodedToken.email },
+      });
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+    }
+
+    // Update our database
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
       data: { emailVerified: true },
     });
 
@@ -49,15 +64,15 @@ export async function POST(request: NextRequest) {
     // Track email verification
     trackEvent({ event: 'email_verified', userId: user.id });
 
-    console.log('[VERIFY] Email verified for user:', user.email);
+    console.log('[VERIFY] Email verified for user:', updatedUser.email);
 
     return NextResponse.json({
       verified: true,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        emailVerified: user.emailVerified,
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        emailVerified: updatedUser.emailVerified,
       },
     });
   } catch (error) {

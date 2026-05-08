@@ -38,11 +38,19 @@ export async function sendVerifyEmail(to: string, name: string, verificationLink
     });
     if (result?.data?.id) {
       console.log('[EMAIL] Verify enviado. ID:', result.data.id);
-    } else if (result?.error) {
-      console.error('[EMAIL] Error Resend verify:', JSON.stringify(result.error));
+      return; // success
     }
+    // Resend returned an error — throw so the caller knows it failed
+    const errorMsg = result?.error?.message || JSON.stringify(result?.error) || 'Resend error desconocido';
+    console.error('[EMAIL] Error Resend verify:', errorMsg);
+    throw new Error(`Error enviando email de verificación: ${errorMsg}`);
   } catch (error) {
+    // Re-throw our own errors; wrap unexpected errors
+    if (error instanceof Error && error.message.startsWith('Error enviando email')) {
+      throw error;
+    }
     console.error('[EMAIL] Excepción verify:', error instanceof Error ? error.message : error);
+    throw new Error('No se pudo enviar el email de verificación. Inténtalo más tarde.');
   }
 }
 

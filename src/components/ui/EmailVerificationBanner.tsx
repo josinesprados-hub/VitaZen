@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useApi } from '@/hooks/useApi';
+import { sendEmailVerification } from 'firebase/auth';
 import { Mail, CheckCircle, Loader2, X, Send } from 'lucide-react';
 
 /**
@@ -10,9 +12,13 @@ import { Mail, CheckCircle, Loader2, X, Send } from 'lucide-react';
  * A soft, non-blocking banner shown in the dashboard layout when the user's
  * email is not yet verified. It can be dismissed per session (state only —
  * no localStorage persistence to keep it visible as a gentle reminder).
+ *
+ * Uses apiFetch for automatic token refresh on 401.
+ * Falls back to Firebase client SDK if Admin SDK is unavailable.
  */
 export function EmailVerificationBanner() {
   const { user, firebaseUser, refreshUser } = useAuth();
+  const { apiFetch } = useApi();
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -21,7 +27,6 @@ export function EmailVerificationBanner() {
   // Don't show if:
   // - user is verified
   // - user is not loaded
-  // - Google-authenticated users are auto-verified by Firebase
   // - banner was dismissed this session
   if (!user || !firebaseUser) return null;
   if (user.emailVerified) return null;
@@ -34,13 +39,8 @@ export function EmailVerificationBanner() {
     setError('');
 
     try {
-      const idToken = await firebaseUser.getIdToken();
-      const res = await fetch('/api/auth/send-verification', {
+      const res = await apiFetch('/api/auth/send-verification', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
       });
 
       const data = await res.json();
@@ -51,8 +51,34 @@ export function EmailVerificationBanner() {
         return;
       }
 
+      if (data.useClientFallback) {
+        // Firebase Admin couldn't generate a link — use Firebase client SDK directly
+        try {
+          await sendEmailVerification(firebaseUser, {
+            url: `${window.location.origin}/verify-email?uid=${firebaseUser.uid}`,
+          });
+          setSent(true);
+          setTimeout(() => setSent(false), 60000);
+        } catch (fbError: any) {
+          console.error('[BANNER] Client-side sendEmailVerification failed:', fbError);
+          if (fbError?.code === 'auth/too-many-requests') {
+            setError('Demasiados intentos. Espera unos minutos.');
+          } else {
+            setError('No se pudo enviar. Inténtalo más tarde.');
+          }
+        }
+        return;
+      }
+
       if (!res.ok) {
-        setError(data.error || 'Error al enviar');
+        // Handle rate limit with friendly message
+        if (res.status === 429) {
+          setError(data.error || 'Espera un momento antes de reenviar.');
+          // Auto-clear rate limit error after 60s
+          setTimeout(() => setError(''), 60000);
+        } else {
+          setError(data.error || 'Error al enviar');
+        }
         return;
       }
 
@@ -60,7 +86,7 @@ export function EmailVerificationBanner() {
       // Reset sent state after 60 seconds so they can resend
       setTimeout(() => setSent(false), 60000);
     } catch {
-      setError('Error de conexión');
+      setError('Error de conexión. Inténtalo de nuevo.');
     } finally {
       setSending(false);
     }
@@ -78,7 +104,7 @@ export function EmailVerificationBanner() {
         </p>
         <p className="text-xs text-[#666] mt-0.5">
           {sent
-            ? 'Enviado. Revisa tu bandeja de entrada.'
+            ? 'Enviado. Revisa tu bandeja de entrada y spam.'
             : 'Confirma tu acceso para proteger tu cuenta.'
           }
         </p>
