@@ -149,8 +149,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (name && credential.user) {
       try {
         await updateProfile(credential.user, { displayName: name });
-        // Update local firebaseUser state so onboarding page shows the name
-        setFirebaseUser({ ...credential.user });
+        // NOTE: Do NOT call setFirebaseUser here.
+        // onAuthStateChanged will fire and update firebaseUser state.
+        // Calling setFirebaseUser manually causes a double-fire of syncUser,
+        // which creates a race condition for email sending and user creation.
       } catch {
         // Non-critical: name fallback is email prefix via syncUserToDatabase
       }

@@ -26,9 +26,31 @@ export default function DashboardLayout({
     }
   }, [user, loading]);
 
+  // All navigation redirects in a single useEffect.
+  // Calling router.replace() during render causes race conditions and loops.
+  useEffect(() => {
+    if (loading) return;
+
+    // No auth at all → login
+    if (!user && !firebaseUser) {
+      router.replace('/login');
+      return;
+    }
+
+    // Sync failed while we have Firebase auth → onboarding gate handles it
+    if (firebaseUser && !user && syncError) {
+      router.replace('/onboarding');
+      return;
+    }
+
+    // User confirmed but onboarding not completed → onboarding gate
+    if (user && !user.onboardingCompleted) {
+      router.replace('/onboarding');
+      return;
+    }
+  }, [user, firebaseUser, loading, syncError, router]);
+
   // ─── 1. Auth resolving (no firebaseUser yet) ───
-  // While we don't know if the user is authenticated, show simple loading.
-  // NO dashboard. NO retry screen.
   if (loading && !firebaseUser) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
@@ -43,14 +65,7 @@ export default function DashboardLayout({
   }
 
   // ─── 2. Sync pending (firebaseUser confirmed, waiting for server) ───
-  // Show simple loading while server sync completes.
-  // NO dashboard. NO retry screen. NO "Reintentar".
   if (firebaseUser && !user) {
-    // If sync failed, redirect to onboarding gate — it handles sync errors
-    // gracefully and will redirect to dashboard if onboarding is completed.
-    if (syncError) {
-      router.replace('/onboarding');
-    }
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
@@ -63,27 +78,9 @@ export default function DashboardLayout({
     );
   }
 
-  // ─── 3. No auth at all — redirect to login ───
-  if (!user && !firebaseUser) {
-    router.replace('/login');
-    return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5">
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Redirigiendo</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── 4. User data confirmed but onboarding not completed ───
-  // Safety redirect: send user to onboarding gate.
-  // This is NOT "deciding onboarding" — it's redirecting to the gate
-  // that makes the decision. The onboarding page handles the flow.
-  if (user && !user.onboardingCompleted) {
-    router.replace('/onboarding');
+  // ─── 3. No auth or onboarding not completed ───
+  // Redirect handled by useEffect above. Show loading while redirecting.
+  if (!user || !user.onboardingCompleted) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
@@ -96,9 +93,7 @@ export default function DashboardLayout({
     );
   }
 
-  // ─── 5. All checks passed — render dashboard ───
-  // At this point: user exists, onboardingCompleted is true.
-  // The dashboard is safe to render.
+  // ─── 4. All checks passed — render dashboard ───
   return (
     <div className="min-h-screen bg-[#000000]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

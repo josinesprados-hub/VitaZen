@@ -90,6 +90,7 @@ export default function OnboardingPage() {
   // Only redirect if we're certain the user shouldn't be here.
   const completingRef = useRef(false);
   const mountedRef = useRef(false);
+  const retriedSync = useRef(false);
 
   // Auth guard: redirect if not logged in or already completed onboarding.
   // CRITICAL: Only redirect when we have CONFIRMED user data from the server.
@@ -111,6 +112,16 @@ export default function OnboardingPage() {
       // Do NOT redirect — we don't know onboarding status yet.
     }
   }, [user, firebaseUser, loading, saving, router]);
+
+  // When sync fails (syncError=true, user=null), retry sync once.
+  // The onboarding API needs the user to exist in the DB before saving data.
+  // If sync never created the user, the onboarding POST will return 404.
+  useEffect(() => {
+    if (syncError && firebaseUser && !user && !retriedSync.current) {
+      retriedSync.current = true;
+      refreshUser();
+    }
+  }, [syncError, firebaseUser, user, refreshUser]);
 
   // Mark component as mounted
   useEffect(() => {

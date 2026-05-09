@@ -9,7 +9,7 @@ import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { OnboardingRecommendations } from '@/components/dashboard/OnboardingRecommendations';
 import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
-import PremiumErrorState from '@/components/ui/PremiumErrorState';
+
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, CheckCircle, Wallet, Sunrise, ArrowRight } from 'lucide-react';
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
 import { MicroReward } from '@/components/ui/MicroReward';
@@ -189,20 +189,10 @@ export default function DashboardPage() {
     return <DashboardSkeleton />;
   }
 
-  // Check for complete fetch failure
-  if (!empires.length && !metrics && !streaks && !todayCheckin) {
-    return (
-      <div className="max-w-7xl mx-auto min-h-[60dvh] flex items-center justify-center">
-        <PremiumErrorState
-          variant="loading"
-          title="No se pudo cargar el dashboard"
-          subtitle="Tu progreso está seguro. Intenta recargar."
-          onRetry={() => window.location.reload()}
-          size="lg"
-        />
-      </div>
-    );
-  }
+  // NOTE: We do NOT show "No se pudo cargar el dashboard" when data is empty.
+  // A new user who just completed onboarding legitimately has no empires/metrics/streaks/checkins.
+  // The error state should only appear if the fetch itself failed (network error, 401, etc.),
+  // which is handled by the try/catch above. An empty dashboard is a valid state.
 
   return (
     <div className="max-w-7xl mx-auto space-y-1.5 sm:space-y-5 overflow-x-contain">
