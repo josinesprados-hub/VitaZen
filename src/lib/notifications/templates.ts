@@ -91,7 +91,7 @@ const COMEBACK_TEMPLATES: NotificationTemplate[] = [
 const REFLECTION_TEMPLATES: NotificationTemplate[] = [
   {
     title: 'Un momento para ti',
-    body: 'Antes de terminar el día, ¿cómo te sientes? Tu diario te espera.',
+    body: 'Antes de terminar el día, ¿cómo te sientes? Tu espacio te espera.',
     url: '/timeline',
   },
   {
@@ -102,6 +102,31 @@ const REFLECTION_TEMPLATES: NotificationTemplate[] = [
   {
     title: 'Cierra el día',
     body: 'Un pequeño momento de reflexión puede cambiar mucho. Si te apetece.',
+    url: '/timeline',
+  },
+  {
+    title: 'La noche llega',
+    body: '¿Cómo fue tu día? No tienes que escribir nada largo. Solo sentir.',
+    url: '/timeline',
+  },
+  {
+    title: 'Respira hondo',
+    body: 'El día está por terminar. Si tienes un minuto, está tu espacio.',
+    url: '/timeline',
+  },
+  {
+    title: 'Antes de descansar',
+    body: 'Tómate un instante. ¿Qué te queda del día? Tu diario te escucha.',
+    url: '/timeline',
+  },
+  {
+    title: 'El día en silencio',
+    body: 'Un momento quieto antes de dormir. Tu reflexión, a tu ritmo.',
+    url: '/timeline',
+  },
+  {
+    title: 'Aterriza',
+    body: 'El día pasó. Si quieres aterrizar un momento, tu espacio está ahí.',
     url: '/timeline',
   },
 ];

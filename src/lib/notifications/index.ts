@@ -6,4 +6,9 @@
 export { sendNotification, deferNotification, getTodayNotificationCount } from './service';
 export { canSendNotification, isInQuietHours, isDuplicateNotification } from './scheduler';
 export { getTemplate } from './templates';
+export {
+  checkReflectionEligibility,
+  sendReflectionReminder,
+  processReflectionBatch,
+} from './reminders/reflection';
 export * from './types';

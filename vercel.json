@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/weekly-recap",
       "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/reflection-reminder",
+      "schedule": "0 18 * * *"
     }
   ]
 }
