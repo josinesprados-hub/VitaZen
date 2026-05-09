@@ -150,7 +150,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#555] hover:text-white hover:bg-[#1a1a1a] transition-colors z-10"
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#555] hover:text-white hover:bg-[#1a1a1a] transition-colors z-10 close-btn"
         >
           <X size={16} />
         </button>

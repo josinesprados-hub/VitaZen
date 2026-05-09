@@ -55,7 +55,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {/* Mobile overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden sidebar-overlay"
           onClick={onClose}
         />
       )}
@@ -72,7 +72,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-10 h-10" />
               <span className="text-[#c8a55a] text-xl font-bold tracking-widest">VITAZEN</span>
             </Link>
-            <button onClick={onClose} className="lg:hidden text-white hover:text-[#c8a55a]">
+            <button onClick={onClose} className="lg:hidden text-white hover:text-[#c8a55a] close-btn">
               <X size={20} />
             </button>
           </div>

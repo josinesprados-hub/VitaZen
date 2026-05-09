@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md auth-page-enter">
         {/* Logo */}
         <div className="text-center mb-8">
           <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4" />
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
             </button>

@@ -207,7 +207,7 @@ export default function DashboardPage() {
       )}
 
       {/* ═══ 1. Greeting + Check-in ═══ */}
-      <div className="flex items-center justify-between">
+      <div className="dash-section-enter dash-section-delay-1 flex items-center justify-between">
         <h1 className="text-xl sm:text-2xl font-bold text-white">
           {getTimeGreeting()}, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
         </h1>
@@ -222,7 +222,7 @@ export default function DashboardPage() {
 
       {/* Today's check-in summary (compact) */}
       {todayCheckin && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 flex items-center gap-3">
+        <div className="dash-section-enter dash-section-delay-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 flex items-center gap-3">
           <span className="text-base">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
           <p className="text-xs text-[#c8a55a] font-medium truncate flex-1">«{todayCheckin.intention}»</p>
           <span className="text-[10px] text-[#555] shrink-0">E{todayCheckin.energy} · F{todayCheckin.focus} · S{todayCheckin.stress}</span>
@@ -231,14 +231,18 @@ export default function DashboardPage() {
       )}
 
       {/* ═══ 2. Reflection ═══ */}
-      <PremiumReflection />
+      <div className="dash-section-enter dash-section-delay-2">
+        <PremiumReflection />
+      </div>
 
       {/* ═══ 3. Momentum ═══ */}
-      <MomentumCard />
+      <div className="dash-section-enter dash-section-delay-3">
+        <MomentumCard />
+      </div>
 
       {/* ═══ 4. Streak (only when active) ═══ */}
       {streaks && streaks.generalStreak > 0 && (
-        <div className="flex items-center gap-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-1.5">
+        <div className="dash-section-enter dash-section-delay-4 flex items-center gap-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-1.5">
           <span className={`streak-pulse text-sm ${[3, 7, 14, 21, 30].includes(streaks.generalStreak) ? 'streak-milestone-glow' : ''}`}>🔥</span>
           <p className="text-xs text-white font-medium">{streaks.generalStreak}d</p>
           <p className="text-[10px] text-[#999] flex-1">{streaks.streakMessage?.message}</p>
@@ -251,21 +255,25 @@ export default function DashboardPage() {
       )}
 
       {/* ═══ 5. Estado Actual ═══ */}
-      <EmotionalHero />
+      <div className="dash-section-enter dash-section-delay-5">
+        <EmotionalHero />
+      </div>
 
       {/* ═══ 6. Onboarding Recommendations ═══ */}
-      <OnboardingRecommendations />
+      <div className="dash-section-enter dash-section-delay-6">
+        <OnboardingRecommendations />
+      </div>
 
       {/* ═══ 7. Metrics (only when activity exists) ═══ */}
       {hasActivity && metrics && (
-        <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
+        <div className="dash-section-enter dash-section-delay-7 grid grid-cols-4 gap-1.5 sm:gap-3">
           {[
             { label: 'Meditación', value: metrics.meditationWeek, unit: 'sem', href: '/imperio/mente', Icon: Wind, streak: streaks?.meditationStreak },
             { label: 'Hábitos', value: metrics.habitsCompleted, unit: 'sem', href: '/imperio/disciplina', Icon: CheckCircle, streak: streaks?.habitStreak },
             { label: 'Diario', value: metrics.journalWeek, unit: 'sem', href: '/imperio/crecimiento', Icon: BookOpen, streak: streaks?.journalStreak },
             { label: 'Finanzas', value: `${metrics.balance >= 0 ? '+' : ''}${metrics.balance.toFixed(0)}€`, unit: '30d', href: '/imperio/riqueza', Icon: Wallet, streak: null, isFinance: true },
           ].map(({ label, value, unit, href, Icon, streak: metricStreak, isFinance }) => (
-            <Link key={label} href={href} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-4 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group touch-press">
+            <Link key={label} href={href} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-4 hover:border-[#c8a55a]/20 hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 cursor-pointer group touch-press">
               <div className="flex items-center gap-1 mb-1 sm:mb-2">
                 <Icon size={12} className="text-[#c8a55a] sm:w-[14px] sm:h-[14px]" />
                 <span className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider font-medium">{label}</span>
@@ -285,7 +293,7 @@ export default function DashboardPage() {
       )}
 
       {/* ═══ 8. Empire Grid (compact) ═══ */}
-      <div>
+      <div className="dash-section-enter dash-section-delay-7">
         <div className="flex items-center justify-between mb-2 sm:mb-3">
           <h2 className="text-sm sm:text-base font-semibold text-white">Imperios</h2>
           <span className="text-[10px] sm:text-xs text-[#666]">Nivel {empires.reduce((sum, e) => sum + e.level, 0)}</span>
@@ -302,7 +310,7 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3.5 hover:border-[#c8a55a]/25 transition-all group touch-press"
+                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3.5 hover:border-[#c8a55a]/25 hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 group touch-press"
               >
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md bg-[#c8a55a]/10 flex items-center justify-center">
@@ -334,7 +342,7 @@ export default function DashboardPage() {
       {challenge && (
         <Link
           href={getChallengeRoute(challenge.challenge.category)}
-          className="block bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-lg p-2.5 sm:p-4 hover:border-[#c8a55a]/30 transition-all cursor-pointer group touch-press"
+          className="dash-section-enter dash-section-delay-8 block bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-lg p-2.5 sm:p-4 hover:border-[#c8a55a]/30 transition-all cursor-pointer group touch-press"
         >
           <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
             <Trophy size={14} className="text-[#c8a55a]" />
@@ -346,7 +354,7 @@ export default function DashboardPage() {
           </div>
           <h3 className="text-[#c8a55a] font-medium text-xs sm:text-sm mb-0.5">{challenge.challenge.title}</h3>
           {!challenge.completed && (
-            <span className="inline-flex items-center gap-1 bg-[#c8a55a] text-black font-semibold px-3 py-1.5 rounded-lg group-hover:bg-[#d4b468] transition-colors text-xs mt-2">
+            <span className="inline-flex items-center gap-1 bg-[#c8a55a] text-black font-semibold px-3 py-1.5 rounded-lg group-hover:bg-[#d4b468] group-active:scale-[0.97] transition-all duration-200 text-xs mt-2">
               {getChallengeCTALabel(challenge.challenge.category)} <ArrowRight size={12} />
             </span>
           )}
@@ -354,7 +362,11 @@ export default function DashboardPage() {
       )}
 
       {/* ═══ 10. Weekly Recap (only after activity) ═══ */}
-      {hasActivity && <WeeklyRecap />}
+      {hasActivity && (
+        <div className="dash-section-enter dash-section-delay-9">
+          <WeeklyRecap />
+        </div>
+      )}
 
       {/* Micro-reward for actions */}
       <MicroReward trigger={challengeJustCompleted} message="Desafío completado" />

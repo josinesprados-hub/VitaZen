@@ -138,7 +138,7 @@ export default function VerifyEmailClient() {
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4">
-      <div className="w-full max-w-md text-center">
+      <div className="w-full max-w-md text-center auth-page-enter">
         {/* Logo */}
         <div className="mb-10">
           <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-14 h-14 mx-auto mb-4 opacity-90" />
@@ -170,7 +170,7 @@ export default function VerifyEmailClient() {
             </div>
             <button
               onClick={() => router.replace('/dashboard')}
-              className="mt-4 bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm tracking-wide"
+              className="mt-4 bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] text-sm tracking-wide"
             >
               Continuar
             </button>
@@ -188,7 +188,7 @@ export default function VerifyEmailClient() {
             </div>
             <button
               onClick={() => router.replace('/dashboard')}
-              className="mt-4 bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm tracking-wide"
+              className="mt-4 bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] text-sm tracking-wide"
             >
               Continuar
             </button>
@@ -257,7 +257,7 @@ export default function VerifyEmailClient() {
               <button
                 onClick={handleResend}
                 disabled={resendLoading}
-                className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm tracking-wide disabled:opacity-50"
+                className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] text-sm tracking-wide disabled:opacity-50"
               >
                 {resendLoading ? 'Enviando...' : 'Reenviar email de verificación'}
               </button>

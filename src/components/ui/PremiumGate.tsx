@@ -44,7 +44,7 @@ export default function PremiumGate({
       </div>
 
       {/* Overlay */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#080808]/40 rounded-xl transition-colors duration-300 group-hover/premium-gate:bg-[#080808]/30">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#080808]/40 rounded-xl transition-colors duration-300 group-hover/premium-gate:bg-[#080808]/30 premium-overlay-enter">
         <div
           className={`flex flex-col items-center gap-1.5 ${
             compact ? 'scale-90' : ''

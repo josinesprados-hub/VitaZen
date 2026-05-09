@@ -220,6 +220,11 @@ html { scroll-behavior: smooth; }
   background: #0a0a0a;
   border: 1px solid rgba(200, 165, 90, 0.2);
   border-radius: 0.75rem;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.card-accent:hover {
+  border-color: rgba(200, 165, 90, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Inner card — list items, sub-sections */
@@ -227,6 +232,10 @@ html { scroll-behavior: smooth; }
   background: #000000;
   border: 1px solid #1a1a1a;
   border-radius: 0.5rem;
+  transition: border-color var(--transition-base);
+}
+.card-inner:hover {
+  border-color: rgba(200, 165, 90, 0.12);
 }
 
 /* ═══════════════════════════════════════════
@@ -334,6 +343,10 @@ html { scroll-behavior: smooth; }
   border-radius: 9999px;
   transition: all var(--transition-base);
 }
+.pill:active {
+  transform: scale(0.95);
+  transition: transform 0.08s ease;
+}
 
 /* ═══════════════════════════════════════════
    Unified Icon Container System
@@ -399,10 +412,15 @@ html { scroll-behavior: smooth; }
   padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  transition: background-color var(--transition-base);
+  transition: background-color var(--transition-base), transform 0.1s ease, box-shadow 0.2s ease;
 }
 .btn-primary:hover {
   background: #d4b468;
+  box-shadow: 0 2px 12px rgba(200, 165, 90, 0.15);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.08s ease, background-color 0.15s ease;
 }
 .btn-primary:disabled {
   opacity: 0.5;
@@ -1130,6 +1148,152 @@ body.scroll-locked {
     transform: scale(0.9);
     transition: transform 0.08s ease;
   }
+}
+
+/* ═══════════════════════════════════════════
+   Premium Motion & Interaction Polish
+   ═══════════════════════════════════════════ */
+
+/* Sidebar overlay fade */
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sidebar-overlay {
+  animation: overlayFadeIn 0.25s ease-out;
+}
+
+/* Checkbox check animation */
+@keyframes checkScale {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+[data-state="checked"] [data-slot="checkbox-indicator"] {
+  animation: checkScale 0.2s ease-out;
+}
+
+/* Tab content transition */
+[data-slot="tabs-content"] {
+  animation: tabContentIn 0.2s ease-out;
+}
+@keyframes tabContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Premium overlay entrance */
+@keyframes premiumOverlayIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+  }
+}
+.premium-overlay-enter {
+  animation: premiumOverlayIn 0.35s ease-out;
+}
+
+/* Auth page entrance */
+@keyframes authPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.auth-page-enter {
+  animation: authPageIn 0.4s ease-out;
+}
+
+/* Dashboard section stagger */
+@keyframes sectionStaggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dash-section-enter {
+  animation: sectionStaggerIn 0.35s ease-out both;
+}
+.dash-section-delay-1 { animation-delay: 0.04s; }
+.dash-section-delay-2 { animation-delay: 0.08s; }
+.dash-section-delay-3 { animation-delay: 0.12s; }
+.dash-section-delay-4 { animation-delay: 0.16s; }
+.dash-section-delay-5 { animation-delay: 0.20s; }
+.dash-section-delay-6 { animation-delay: 0.24s; }
+.dash-section-delay-7 { animation-delay: 0.28s; }
+.dash-section-delay-8 { animation-delay: 0.32s; }
+.dash-section-delay-9 { animation-delay: 0.36s; }
+.dash-section-delay-10 { animation-delay: 0.40s; }
+
+/* Subtle press feedback for any interactive element */
+.press-subtle {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+.press-subtle:active {
+  transform: scale(0.97);
+}
+
+/* Context menu item press feedback */
+[data-slot="context-menu-item"] {
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+}
+[data-slot="context-menu-item"]:active {
+  transform: scale(0.98);
+}
+
+/* Close button press feedback */
+.close-btn {
+  transition: color 0.15s ease, background-color 0.15s ease, transform 0.08s ease;
+}
+.close-btn:active {
+  transform: scale(0.92);
+}
+
+/* Modal close button touch-press on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .close-btn:active {
+    transform: scale(0.88);
+  }
+}
+
+/* Input focus transition smoothness */
+input, textarea, select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Respect reduced motion for premium motion polish */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-overlay { animation: none; }
+  [data-state="checked"] [data-slot="checkbox-indicator"] { animation: none; }
+  [data-slot="tabs-content"] { animation: none; }
+  .premium-overlay-enter { animation: none; }
+  .auth-page-enter { animation: none; }
+  .dash-section-enter { animation: none; }
+  .press-subtle:active { transform: none; }
+  .context-menu-item:active { transform: none; }
+  .close-btn:active { transform: none; }
+  .card-accent { transition: none; }
+  .card-inner { transition: none; }
+  .btn-primary:hover { box-shadow: none; }
+  input, textarea, select { transition: none; }
 }
 
 /* Respect reduced motion for phase 2 animations */
