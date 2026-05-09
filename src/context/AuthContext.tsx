@@ -55,26 +55,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState(false);
 
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
-    try {
-      setSyncError(false);
-      const idToken = await fbUser.getIdToken();
-      const res = await fetch('/api/auth/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
-      });
+    const attemptSync = async (attempt: number): Promise<boolean> => {
+      try {
+        setSyncError(false);
+        const idToken = await fbUser.getIdToken();
+        const res = await fetch('/api/auth/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        console.error('[Auth] sync failed:', res.status);
-        setSyncError(true);
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          return true;
+        } else {
+          console.error(`[Auth] sync failed (attempt ${attempt}):`, res.status);
+          return false;
+        }
+      } catch (error) {
+        console.error(`[Auth] sync error (attempt ${attempt}):`, error);
+        return false;
       }
-    } catch (error) {
-      console.error('[Auth] sync error:', error);
-      setSyncError(true);
-    }
+    };
+
+    // First attempt
+    const firstOk = await attemptSync(1);
+    if (firstOk) return;
+
+    // Auto-retry once after 1.5s delay for resilience on mobile/slow connections
+    await new Promise((r) => setTimeout(r, 1500));
+    const retryOk = await attemptSync(2);
+    if (retryOk) return;
+
+    // Both attempts failed
+    setSyncError(true);
   }, []);
 
   const refreshUser = useCallback(async (options?: { reloadFirebase?: boolean }) => {

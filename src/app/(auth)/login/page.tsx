@@ -43,9 +43,11 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      // Firebase auth confirmed — navigate immediately.
-      // Dashboard layout will redirect to onboarding if needed once sync completes.
-      router.replace('/dashboard');
+      // Navigate to onboarding — the onboarding page handles redirect
+      // for users who have already completed it. This prevents the race
+      // condition where dashboard renders before user sync completes
+      // and onboardingCompleted is still unknown.
+      router.replace('/onboarding');
     } catch (err: any) {
       setError(err.code === 'auth/invalid-credential' ? 'Credenciales incorrectas. Verifica tu email y contraseña.' : 'No se ha podido iniciar sesión. Inténtalo de nuevo.');
       setLoading(false);
@@ -58,8 +60,8 @@ export default function LoginPage() {
 
     try {
       await signInWithGoogle();
-      // Firebase auth confirmed — navigate immediately
-      router.replace('/dashboard');
+      // Navigate to onboarding — same logic as email sign-in
+      router.replace('/onboarding');
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setLoading(false);

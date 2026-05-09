@@ -75,7 +75,7 @@ const TOTAL_STEPS = 5;
 // ═══════════════════════════════════════════
 
 export default function OnboardingPage() {
-  const { user, loading, refreshUser, firebaseUser } = useAuth();
+  const { user, loading, refreshUser, firebaseUser, syncError } = useAuth();
   const { apiFetch } = useApi();
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -92,8 +92,8 @@ export default function OnboardingPage() {
   const mountedRef = useRef(false);
 
   // Auth guard: redirect if not logged in or already completed onboarding.
-  // CRITICAL: Only redirect on INITIAL mount or if user logs out.
-  // Do NOT redirect when syncUser updates user state mid-onboarding.
+  // CRITICAL: Only redirect when we have CONFIRMED user data from the server.
+  // Never redirect based on assumptions or partial state.
   useEffect(() => {
     // Skip all redirect logic while actively completing onboarding
     if (completingRef.current) return;
@@ -103,11 +103,12 @@ export default function OnboardingPage() {
         // No Firebase auth at all — redirect to login
         router.replace('/login');
       } else if (user?.onboardingCompleted && !saving) {
-        // Server confirmed onboarding complete AND we're not in the middle
-        // of saving — this is a legitimate redirect (e.g. returning user)
+        // Server CONFIRMED onboarding complete (user data available)
+        // AND we're not in the middle of saving — safe to redirect
         router.replace('/dashboard');
       }
-      // If firebaseUser exists but user is null (sync pending), stay on onboarding
+      // If firebaseUser exists but user is null (sync pending), WAIT.
+      // Do NOT redirect — we don't know onboarding status yet.
     }
   }, [user, firebaseUser, loading, saving, router]);
 
@@ -159,7 +160,8 @@ export default function OnboardingPage() {
     }
   };
 
-  // Loading state — only block if we don't have Firebase auth yet
+  // ─── Loading states ───
+  // 1. Initial Firebase auth resolution (no firebaseUser yet)
   if (loading && !firebaseUser) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
@@ -171,10 +173,32 @@ export default function OnboardingPage() {
     );
   }
 
-  // Not ready yet (redirecting, or no auth at all)
+  // 2. Firebase auth confirmed but server sync pending — WAIT for user data.
+  //    Do NOT render the onboarding questions until we KNOW whether
+  //    onboardingCompleted is true or false. Rendering too early causes
+  //    returning users to briefly see the Welcome step before redirect.
+  if (firebaseUser && !user && !syncError) {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse" />
+          <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Sync failed but Firebase auth confirmed — allow onboarding to proceed.
+  //    The user has Firebase auth, so they can still complete the onboarding.
+  //    The onboarding API will create/update user data server-side.
+  //    This prevents the "stuck on loading" bug on mobile when sync fails.
+  //    (If syncError is true and user is null, we proceed with onboarding.)
+
+  // 4. Not ready yet (redirecting, or no auth at all)
   if (!firebaseUser) {
     return null;
   }
+  // 5. Server confirmed onboarding already complete — redirect in progress
   if (user?.onboardingCompleted) {
     return null;
   }
