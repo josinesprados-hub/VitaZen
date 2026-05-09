@@ -202,26 +202,18 @@ export default function OnboardingPage() {
     );
   }
 
-  // 2. Firebase auth confirmed but server sync pending — WAIT for user data.
-  //    Do NOT render the onboarding questions until we KNOW whether
-  //    onboardingCompleted is true or false. Rendering too early causes
-  //    returning users to briefly see the Welcome step before redirect.
-  if (firebaseUser && !user && !syncError) {
-    return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse" />
-          <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 3. Sync failed but Firebase auth confirmed — allow onboarding to proceed.
-  //    The user has Firebase auth, so they can still complete the onboarding.
-  //    The onboarding API will create/update user data server-side.
-  //    This prevents the "stuck on loading" bug on mobile when sync fails.
-  //    (If syncError is true and user is null, we proceed with onboarding.)
+  // 2. Firebase auth confirmed — render onboarding immediately.
+  //    Do NOT gate on `user` being set. The "wait for sync" loading state
+  //    caused the onboarding to never render when sync was slow or failed
+  //    silently. Instead, render questions now and let the useEffect +
+  //    guard #5 handle redirect for returning users once sync confirms
+  //    onboardingCompleted: true. The completingRef prevents mid-flow
+  //    redirects for users actively answering questions.
+  //
+  //    If user is null (sync pending), user?.onboardingCompleted is
+  //    undefined (falsy), so guard #5 is bypassed and questions render.
+  //    When sync completes with onboardingCompleted: true, the useEffect
+  //    redirects to /dashboard.
 
   // 4. Not ready yet (redirecting, or no auth at all)
   if (!firebaseUser) {

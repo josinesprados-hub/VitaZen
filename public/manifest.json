@@ -2,7 +2,7 @@
   "name": "VitaZen",
   "short_name": "VitaZen",
   "description": "Ecosistema premium de desarrollo personal basado en 5 imperios",
-  "start_url": "/dashboard",
+  "start_url": "/onboarding",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#c8a55a",
