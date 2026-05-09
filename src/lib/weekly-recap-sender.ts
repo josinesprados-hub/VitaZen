@@ -178,7 +178,6 @@ async function sendWeeklyRecapToUser(user: EligibleUser): Promise<{ sent: boolea
       text,
       replyTo: REPLY_TO,
       headers: {
-        'X-Priority': '1',
         'X-Auto-Response-Suppress': 'OOF',
         'List-Unsubscribe': `<${APP_URL}/perfil>`,
       },

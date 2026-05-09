@@ -2,6 +2,7 @@
 // VITAZEN EMAIL SENDER
 // Deliverability-optimized: text+html multipart,
 // reply-to, consistent from, proper headers
+// X-Priority only on verify + reset password
 // ═══════════════════════════════════════════
 
 import { resend } from '../resend';
@@ -15,7 +16,7 @@ import {
 const FROM_EMAIL = 'VitaZen <hola@vitazen.cc>';
 const REPLY_TO = 'hola@vitazen.cc';
 
-// ─── Welcome email ───
+// ─── Welcome email (no X-Priority — informational, not urgent) ───
 
 export async function sendWelcomeEmail(to: string, name: string) {
   console.log('[WELCOME] starting — to:', to, 'name:', name);
@@ -31,7 +32,6 @@ export async function sendWelcomeEmail(to: string, name: string) {
       text,
       replyTo: REPLY_TO,
       headers: {
-        'X-Priority': '1',
         'X-Auto-Response-Suppress': 'OOF',
       },
     });
@@ -59,7 +59,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
   }
 }
 
-// ─── Verify email ───
+// ─── Verify email (X-Priority: 1 — action required) ───
 
 export async function sendVerifyEmail(to: string, name: string, verificationLink: string) {
   console.log('[EMAIL] Enviando verify a:', to);
@@ -98,7 +98,7 @@ export async function sendVerifyEmail(to: string, name: string, verificationLink
   }
 }
 
-// ─── Reset password email ───
+// ─── Reset password email (X-Priority: 1 — security action) ───
 
 export async function sendResetPasswordEmail(to: string, name: string, resetLink: string) {
   console.log('[EMAIL] Enviando reset-password a:', to);
@@ -128,7 +128,7 @@ export async function sendResetPasswordEmail(to: string, name: string, resetLink
   }
 }
 
-// ─── Subscription confirmed email ───
+// ─── Subscription confirmed email (no X-Priority — informational) ───
 
 export async function sendSubscriptionConfirmedEmail(to: string, name: string, planName: string) {
   console.log('[EMAIL] Enviando subscription-confirmed a:', to, 'plan:', planName);
@@ -143,7 +143,6 @@ export async function sendSubscriptionConfirmedEmail(to: string, name: string, p
       text,
       replyTo: REPLY_TO,
       headers: {
-        'X-Priority': '1',
         'X-Auto-Response-Suppress': 'OOF',
       },
     });

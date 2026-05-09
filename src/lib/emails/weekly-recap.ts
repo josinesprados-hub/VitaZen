@@ -1,13 +1,16 @@
 // ═══════════════════════════════════════════
 // WEEKLY RECAP EMAIL TEMPLATE
 // Premium dark/gold design, transactional-first
-// Black background, gold accents, clean HTML
+// Black background, V logo, gold accents
 // Optimized for Gmail/Outlook/Apple Mail
 // ═══════════════════════════════════════════
 
 import type { EmailContent } from './types';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
+
+// ─── V Logo CID reference ───
+const V_LOGO_SRC = 'cid:vitazen-logo';
 
 // ─── Types ───
 
@@ -47,6 +50,10 @@ function metricRow(label: string, value: string): string {
     </tr>`;
 }
 
+function sectionLabel(text: string): string {
+  return `<p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${text}</p>`;
+}
+
 // ─── Main template ───
 
 export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
@@ -61,7 +68,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     ? `
     <tr>
       <td style="padding:24px 0 0;">
-        <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">HÁBITOS</p>
+        ${sectionLabel('HÁBITOS')}
         <table width="100%" cellpadding="0" cellspacing="0">
           ${data.topHabits.map(h => metricRow(h.name, `${h.streak} días`)).join('')}
         </table>
@@ -74,7 +81,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     ? `
     <tr>
       <td style="padding:24px 0 0;">
-        <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 6px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">INSIGHT</p>
+        ${sectionLabel('INSIGHT')}
         <p style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.title}</p>
         <p style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.description}</p>
       </td>
@@ -111,14 +118,21 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
       <td align="center" style="padding:48px 16px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
 
-          <!-- Brand -->
+          <!-- V Logo -->
           <tr>
-            <td style="padding:0 40px 28px;text-align:center;">
+            <td style="padding:0 40px 20px;text-align:center;">
+              <img src="${V_LOGO_SRC}" alt="V" width="48" height="48" style="display:inline-block;border:0;outline:none;text-decoration:none;" />
+            </td>
+          </tr>
+
+          <!-- Brand Name -->
+          <tr>
+            <td style="padding:0 40px 24px;text-align:center;">
               <p style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
             </td>
           </tr>
 
-          <!-- Gold accent line -->
+          <!-- Gold Accent Line -->
           <tr>
             <td style="padding:0 40px 0;">
               <div style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;"></div>
@@ -137,7 +151,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <!-- Wellness Score -->
           <tr>
             <td style="padding:28px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;">BIENESTAR</p>
+              ${sectionLabel('BIENESTAR')}
               <p style="color:#ffffff;font-size:32px;font-weight:300;margin:0;line-height:1;">
                 ${data.score}<span style="color:#666;font-size:13px;font-weight:400;"> / 100 · </span><span style="color:#c8a55a;font-size:13px;font-weight:400;">${data.scoreLabel}</span>
               </p>
@@ -147,7 +161,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <!-- Activity -->
           <tr>
             <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;">ACTIVIDAD</p>
+              ${sectionLabel('ACTIVIDAD')}
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${metricRow('Check-ins', String(data.progress.checkins))}
                 ${metricRow('Hábitos completados', String(data.progress.habitsCompleted))}
@@ -160,7 +174,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <!-- Emotional state -->
           <tr>
             <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;">ESTADO EMOCIONAL</p>
+              ${sectionLabel('ESTADO EMOCIONAL')}
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${metricRow('Estado', data.emotionalState.statusLabel)}
                 ${metricRow('Energía', `${data.emotionalState.energy}/100`)}
@@ -178,7 +192,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <!-- Recommendation -->
           <tr>
             <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 6px;font-weight:500;">RECOMENDACIÓN</p>
+              ${sectionLabel('RECOMENDACIÓN')}
               <p style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;">${data.mentorRecommendation}</p>
             </td>
           </tr>
@@ -189,7 +203,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
               <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                 <tr>
                   <td style="background-color:#c8a55a;border-radius:3px;">
-                    <a href="${APP_URL}/dashboard" style="display:inline-block;padding:12px 32px;color:#0a0a0a;font-size:14px;font-weight:500;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:0.5px;">Acceder</a>
+                    <a href="${APP_URL}/dashboard" style="display:inline-block;padding:12px 32px;color:#0a0a0a;font-size:14px;font-weight:500;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:0.5px;">ACCEDER</a>
                   </td>
                 </tr>
               </table>
@@ -199,10 +213,20 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
         </table>
 
         <!-- Footer -->
-        <p style="color:#555;font-size:11px;margin:24px 0 0;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-          VitaZen · vitazen.cc<br>
-          <a href="${APP_URL}/perfil" style="color:#666;text-decoration:underline;">Desactivar resumen semanal</a>
-        </p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+          <tr>
+            <td style="padding:0 40px;">
+              <div style="width:40px;height:1px;background-color:#333;margin:0 auto 20px;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 40px;text-align:center;">
+              <p style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
+              <p style="color:#555;font-size:11px;margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">vitazen.cc</p>
+              <p style="color:#555;font-size:11px;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;"><a href="${APP_URL}/perfil" style="color:#666;text-decoration:underline;">Desactivar resumen semanal</a></p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>

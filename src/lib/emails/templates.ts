@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════
 // VITAZEN EMAIL TEMPLATES
 // Premium dark/gold design, transactional-first
-// Black background, gold accents, clean HTML
+// Black background, V logo, gold accents
 // Optimized for Gmail/Outlook/Apple Mail
 // ═══════════════════════════════════════════
 
@@ -9,7 +9,10 @@ import type { EmailContent } from './types';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
-// ─── Premium dark wrapper: black bg, gold brand, elegant spacing ───
+// ─── V Logo as inline base64 (48x48, ~4KB) ───
+const V_LOGO_SRC = 'cid:vitazen-logo';
+
+// ─── Premium dark wrapper: black bg, V logo, gold brand ───
 
 function emailWrapper(content: string, preheaderText: string): string {
   return `
@@ -41,23 +44,51 @@ function emailWrapper(content: string, preheaderText: string): string {
     <tr>
       <td align="center" style="padding:48px 16px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+
+          <!-- V Logo -->
           <tr>
-            <td style="padding:0 40px 28px;text-align:center;">
+            <td style="padding:0 40px 20px;text-align:center;">
+              <img src="${V_LOGO_SRC}" alt="V" width="48" height="48" style="display:inline-block;border:0;outline:none;text-decoration:none;" />
+            </td>
+          </tr>
+
+          <!-- Brand Name -->
+          <tr>
+            <td style="padding:0 40px 24px;text-align:center;">
               <p style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
             </td>
           </tr>
+
+          <!-- Gold Accent Line -->
           <tr>
             <td style="padding:0 40px 0;">
               <div style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;"></div>
             </td>
           </tr>
+
+          <!-- Content -->
           <tr>
             <td style="padding:32px 40px 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
               ${content}
             </td>
           </tr>
+
         </table>
-        <p style="color:#555;font-size:11px;margin:24px 0 0;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VitaZen · vitazen.cc</p>
+
+        <!-- Footer -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+          <tr>
+            <td style="padding:0 40px;">
+              <div style="width:40px;height:1px;background-color:#333;margin:0 auto 20px;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 40px;text-align:center;">
+              <p style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
+              <p style="color:#555;font-size:11px;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">vitazen.cc</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -85,7 +116,7 @@ const headingStyle = 'color:#ffffff;font-size:20px;font-weight:400;margin:0 0 20
 export function welcomeEmail(name: string): EmailContent {
   const subject = 'Cuenta creada en VitaZen';
   const preheader = 'Tu cuenta se ha creado correctamente.';
-  const html = emailWrapper('<h1 style="' + headingStyle + '">Hola, ' + name + '.</h1><p style="' + textMain + '">Tu cuenta en VitaZen se ha creado correctamente. Ya puedes acceder cuando quieras.</p>' + ctaButton(APP_URL + '/dashboard', 'Acceder') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Si no creaste esta cuenta, puedes ignorar este mensaje.</p>', preheader);
+  const html = emailWrapper('<h1 style="' + headingStyle + '">Hola, ' + name + '.</h1><p style="' + textMain + '">Tu cuenta en VitaZen se ha creado correctamente. Ya puedes acceder cuando quieras.</p>' + ctaButton(APP_URL + '/dashboard', 'ACCEDER') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Si no creaste esta cuenta, puedes ignorar este mensaje.</p>', preheader);
   const text = 'Hola, ' + name + '.\n\nTu cuenta en VitaZen se ha creado correctamente. Ya puedes acceder cuando quieras.\n\nAcceder: ' + APP_URL + '/dashboard\n\nSi no creaste esta cuenta, puedes ignorar este mensaje.';
   return { html, text, subject };
 }
@@ -93,15 +124,15 @@ export function welcomeEmail(name: string): EmailContent {
 export function verifyEmailTemplate(name: string, verificationLink: string): EmailContent {
   const subject = 'Verifica tu email para VitaZen';
   const preheader = name + ', confirma tu dirección de email.';
-  const html = emailWrapper('<h1 style="' + headingStyle + '">Confirma tu email.</h1><p style="' + textMain + '">Haz clic en el enlace para verificar tu dirección de email y activar tu cuenta.</p>' + ctaButton(verificationLink, 'Verificar email') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Este enlace caduca en 24 horas. Si no solicitaste esta verificación, ignora este mensaje.</p>', preheader);
-  const text = 'Confirma tu email.\n\nHaz clic en el enlace para verificar tu dirección de email y activar tu cuenta.\n\nVerificar email: ' + verificationLink + '\n\nEste enlace caduca en 24 horas. Si no solicitaste esta verificación, ignora este mensaje.';
+  const html = emailWrapper('<h1 style="' + headingStyle + '">Confirma tu email.</h1><p style="color:#aaa;font-size:16px;line-height:1.6;margin:0 0 6px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Un paso más.</p><p style="color:#aaa;font-size:16px;line-height:1.6;margin:0 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Verifica tu acceso y entra.</p>' + ctaButton(verificationLink, 'CONFIRMAR') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Este enlace caduca en 24 horas. Si no solicitaste esta verificación, ignora este mensaje.</p>', preheader);
+  const text = 'Confirma tu email.\n\nUn paso más. Verifica tu acceso y entra.\n\nConfirmar: ' + verificationLink + '\n\nEste enlace caduca en 24 horas. Si no solicitaste esta verificación, ignora este mensaje.';
   return { html, text, subject };
 }
 
 export function resetPasswordTemplate(name: string, resetLink: string): EmailContent {
   const subject = 'Restablece tu contraseña de VitaZen';
   const preheader = name + ', se solicitó un cambio de contraseña.';
-  const html = emailWrapper('<h1 style="' + headingStyle + '">Restablece tu contraseña.</h1><p style="' + textMain + '">Recibimos una solicitud para cambiar la contraseña de tu cuenta.</p>' + ctaButton(resetLink, 'Restablecer contraseña') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Este enlace caduca en 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá sin cambios.</p>', preheader);
+  const html = emailWrapper('<h1 style="' + headingStyle + '">Restablece tu contraseña.</h1><p style="' + textMain + '">Recibimos una solicitud para cambiar la contraseña de tu cuenta.</p>' + ctaButton(resetLink, 'RESTABLECER') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Este enlace caduca en 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá sin cambios.</p>', preheader);
   const text = 'Restablece tu contraseña.\n\nRecibimos una solicitud para cambiar la contraseña de tu cuenta.\n\nRestablecer contraseña: ' + resetLink + '\n\nEste enlace caduca en 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá sin cambios.';
   return { html, text, subject };
 }
@@ -109,7 +140,7 @@ export function resetPasswordTemplate(name: string, resetLink: string): EmailCon
 export function subscriptionConfirmedTemplate(name: string, planName: string): EmailContent {
   const subject = 'Tu suscripción a VitaZen está activa';
   const preheader = name + ', tu plan ' + planName + ' está activo.';
-  const html = emailWrapper('<h1 style="' + headingStyle + '">Tu suscripción está activa.</h1><p style="' + textMain + '">Tu plan ' + planName + ' de VitaZen se ha activado correctamente.</p>' + ctaButton(APP_URL + '/dashboard', 'Acceder') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Si tienes alguna pregunta, responde a este email.</p>', preheader);
+  const html = emailWrapper('<h1 style="' + headingStyle + '">Tu suscripción está activa.</h1><p style="' + textMain + '">Tu plan ' + planName + ' de VitaZen se ha activado correctamente.</p>' + ctaButton(APP_URL + '/dashboard', 'ACCEDER') + '<p style="color:#666;font-size:12px;line-height:1.5;margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">Si tienes alguna pregunta, responde a este email.</p>', preheader);
   const text = 'Tu suscripción está activa.\n\nTu plan ' + planName + ' de VitaZen se ha activado correctamente.\n\nAcceder: ' + APP_URL + '/dashboard\n\nSi tienes alguna pregunta, responde a este email.';
   return { html, text, subject };
 }

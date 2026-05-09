@@ -51,7 +51,7 @@ function getStreakMessage(streak: number, wasActiveYesterday: boolean): { messag
   if (wasActiveYesterday) {
     return { message: 'Hoy es un buen día para retomar.', tone: 'warm' };
   }
-  return { message: 'Pequeños pasos. Seguimos.', tone: 'gentle' };
+  return { message: 'Cada día es una oportunidad para avanzar.', tone: 'gentle' };
 }
 
 export async function GET(request: NextRequest) {

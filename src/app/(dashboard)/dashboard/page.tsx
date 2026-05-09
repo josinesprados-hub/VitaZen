@@ -184,9 +184,7 @@ export default function DashboardPage() {
         if (checkRes.ok) {
           const checkData = await checkRes.json();
           setTodayCheckin(checkData.today);
-          if (!checkData.today) {
-            setShowCheckinModal(true);
-          }
+          // No auto-modal: user reaches check-in via soft CTA when ready
         } else {
           failedCount++;
         }
@@ -281,15 +279,14 @@ export default function DashboardPage() {
             </h1>
             <p className="text-[#999] mt-1 sm:mt-2 text-sm sm:text-base">Cada día es una oportunidad para avanzar.</p>
           </div>
-          {todayCheckin && (
-            <button
-              onClick={() => setShowCheckinModal(true)}
-              className="flex items-center gap-2 bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl px-4 py-2.5 hover:border-[#c8a55a]/40 transition-all group touch-press"
-            >
-              <Sunrise size={16} className="text-[#c8a55a]" />
-              <span className="text-xs text-[#999] group-hover:text-white transition-colors">Check-in de hoy</span>
-            </button>
-          )}
+          {/* Soft check-in CTA: always visible, never blocks */}
+          <button
+            onClick={() => setShowCheckinModal(true)}
+            className="flex items-center gap-2 bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl px-4 py-2.5 hover:border-[#c8a55a]/40 transition-all group touch-press"
+          >
+            <Sunrise size={16} className="text-[#c8a55a]" />
+            <span className="text-xs text-[#999] group-hover:text-white transition-colors">{todayCheckin ? 'Check-in de hoy' : 'Haz tu primer check-in'}</span>
+          </button>
         </div>
         {todayCheckin && (
           <div className="mt-2 sm:mt-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-3 sm:gap-4 card-enter">
@@ -331,7 +328,7 @@ export default function DashboardPage() {
       {streaks && streaks.generalStreak === 0 && (
         <div className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-3 py-2 sm:px-4 sm:py-3 card-enter">
           <span className="text-base sm:text-lg">🌱</span>
-          <p className="text-[10px] sm:text-xs text-[#999]">{streaks.streakMessage?.message || 'Cada día es una oportunidad para avanzar.'}</p>
+          <p className="text-[10px] sm:text-xs text-[#999]">Cada día es una oportunidad para avanzar.</p>
         </div>
       )}
 

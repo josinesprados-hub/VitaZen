@@ -15,14 +15,14 @@ import { useEffect, useState } from 'react';
 //   Same day    → "Bienvenido de nuevo."
 //   1 day       → "Mantienes el ritmo."
 //   2-3 days    → "Hace unos días que no aparecías."
-//   4-7 days    → "Pequeños pasos. Seguimos."
+//   4-7 days    → "Bueno verte de nuevo."
 //   7+ days     → "Aquí estás. Eso es lo que importa."
 
 function getReturnMessage(daysSince: number): string {
   if (daysSince <= 0) return 'Bienvenido de nuevo.';
   if (daysSince === 1) return 'Mantienes el ritmo.';
   if (daysSince <= 3) return 'Hace unos días que no aparecías.';
-  if (daysSince <= 7) return 'Pequeños pasos. Seguimos.';
+  if (daysSince <= 7) return 'Bueno verte de nuevo.';
   return 'Aquí estás. Eso es lo que importa.';
 }
 
