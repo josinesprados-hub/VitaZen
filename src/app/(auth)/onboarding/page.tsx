@@ -113,7 +113,10 @@ export default function OnboardingPage() {
     try {
       const res = await apiFetch('/api/onboarding', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          name: user?.name || firebaseUser?.displayName || undefined,
+        }),
       });
       if (res.ok) {
         await refreshUser();

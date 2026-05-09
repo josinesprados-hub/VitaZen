@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { goals, primaryFocus, stressLevel, energyLevel, focusLevel, initialHabits } = body;
+    const { goals, primaryFocus, stressLevel, energyLevel, focusLevel, initialHabits, name } = body;
 
     // Validate required fields
     if (!primaryFocus || !stressLevel || !energyLevel || !focusLevel) {
@@ -74,6 +74,19 @@ export async function POST(request: NextRequest) {
     // Validate levels (1-5)
     if (stressLevel < 1 || stressLevel > 5 || energyLevel < 1 || energyLevel > 5 || focusLevel < 1 || focusLevel > 5) {
       return NextResponse.json({ error: 'Levels must be between 1 and 5' }, { status: 400 });
+    }
+
+    // Update user name if provided and current name is default (email prefix)
+    if (name && typeof name === 'string' && name.trim()) {
+      const currentName = user.name || '';
+      const emailPrefix = user.email?.split('@')[0] || '';
+      const isDefaultName = !currentName || currentName === emailPrefix;
+      if (isDefaultName) {
+        await db.user.update({
+          where: { id: user.id },
+          data: { name: name.trim() },
+        });
+      }
     }
 
     // Save onboarding data

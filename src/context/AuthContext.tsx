@@ -10,6 +10,7 @@ import {
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   fetchSignInMethodsForEmail,
+  updateProfile,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -39,7 +40,7 @@ interface AuthContextType {
   loading: boolean;
   syncError: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: (options?: { reloadFirebase?: boolean }) => Promise<void>;
@@ -127,8 +128,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // syncUser handled by onAuthStateChanged
   };
 
-  const signUp = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+  const signUp = async (email: string, password: string, name?: string) => {
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    // Set displayName on Firebase user so syncUser can pick it up
+    if (name && credential.user) {
+      try {
+        await updateProfile(credential.user, { displayName: name });
+        // Update local firebaseUser state so onboarding page shows the name
+        setFirebaseUser({ ...credential.user });
+      } catch {
+        // Non-critical: name fallback is email prefix via syncUserToDatabase
+      }
+    }
     // syncUser handled by onAuthStateChanged
   };
 

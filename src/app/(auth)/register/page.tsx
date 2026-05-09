@@ -50,7 +50,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await signUp(email, password);
+      await signUp(email, password, name);
       // Firebase auth confirmed — navigate to onboarding immediately.
       // Server sync happens in background via onAuthStateChanged.
       // No need to wait for server response to confirm what Firebase already confirmed.
