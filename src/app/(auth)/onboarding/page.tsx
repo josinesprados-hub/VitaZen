@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
@@ -84,22 +84,45 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  // Auth guard: redirect if not logged in or already completed onboarding
-  // Uses both firebaseUser (instant) and user (server sync) for smooth transitions
+  // ─── Refs to prevent premature redirect during active onboarding ───
+  // Once the user starts answering questions, auth state changes
+  // (e.g. syncUser responses, token refresh) must NOT redirect away.
+  // Only redirect if we're certain the user shouldn't be here.
+  const completingRef = useRef(false);
+  const mountedRef = useRef(false);
+
+  // Auth guard: redirect if not logged in or already completed onboarding.
+  // CRITICAL: Only redirect on INITIAL mount or if user logs out.
+  // Do NOT redirect when syncUser updates user state mid-onboarding.
   useEffect(() => {
+    // Skip all redirect logic while actively completing onboarding
+    if (completingRef.current) return;
+
     if (!loading) {
       if (!user && !firebaseUser) {
         // No Firebase auth at all — redirect to login
-        router.push('/login');
-      } else if (user?.onboardingCompleted) {
-        // Server sync confirmed onboarding is complete — go to dashboard
-        router.push('/dashboard');
+        router.replace('/login');
+      } else if (user?.onboardingCompleted && !saving) {
+        // Server confirmed onboarding complete AND we're not in the middle
+        // of saving — this is a legitimate redirect (e.g. returning user)
+        router.replace('/dashboard');
       }
       // If firebaseUser exists but user is null (sync pending), stay on onboarding
     }
-  }, [user, firebaseUser, loading, router]);
+  }, [user, firebaseUser, loading, saving, router]);
+
+  // Mark component as mounted
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const goToStep = useCallback((nextStep: number) => {
+    // Once the user starts the onboarding (step 0 → 1), lock out redirects.
+    // Auth state changes mid-flow should NOT pull the user out.
+    if (nextStep >= 1) {
+      completingRef.current = true;
+    }
     setAnimating(true);
     setTimeout(() => {
       setStep(nextStep);
@@ -108,6 +131,8 @@ export default function OnboardingPage() {
   }, []);
 
   const handleComplete = async () => {
+    // Lock: prevent any redirect while saving onboarding data
+    completingRef.current = true;
     setSaving(true);
     setError('');
     try {
@@ -120,13 +145,15 @@ export default function OnboardingPage() {
       });
       if (res.ok) {
         await refreshUser();
-        router.push('/dashboard');
+        router.replace('/dashboard');
       } else {
         const errData = await res.json().catch(() => null);
         setError(errData?.error || 'Error al guardar. Inténtalo de nuevo.');
+        completingRef.current = false;
       }
     } catch {
       setError('Error de conexión. Inténtalo de nuevo.');
+      completingRef.current = false;
     } finally {
       setSaving(false);
     }

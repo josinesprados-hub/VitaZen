@@ -25,17 +25,19 @@ export default function RegisterPage() {
   const router = useRouter();
 
   // Redirect already-authenticated users away from register
+  // Only act on INITIAL auth resolution — not on every user state change.
+  // The signUp handler already navigates, so we only need this for
+  // users who land on /register while already logged in.
   useEffect(() => {
-    if (!authLoading) {
-      if (user) {
-        // Server sync completed — navigate to the correct destination
-        router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding');
-      } else if (firebaseUser) {
-        // Firebase authenticated but server sync still pending — navigate optimistically
+    if (!authLoading && (user || firebaseUser)) {
+      // Already authenticated — go to the right place
+      if (user?.onboardingCompleted) {
+        router.replace('/dashboard');
+      } else {
         router.replace('/onboarding');
       }
     }
-  }, [user, firebaseUser, authLoading, router]);
+  }, [authLoading, router]); // Intentionally NOT depending on user/firebaseUser
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
