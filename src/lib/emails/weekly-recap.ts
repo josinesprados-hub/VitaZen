@@ -9,8 +9,9 @@ import type { EmailContent } from './types';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
-// ─── V Logo CID reference ───
-const V_LOGO_SRC = 'cid:vitazen-logo';
+// ─── V Logo: public URL for maximum email client compatibility ───
+// cid: attachments fail in Gmail iOS/Android; public HTTPS URL works everywhere
+const V_LOGO_SRC = 'https://vitazen.cc/images/icon-192x192.png';
 
 // ─── Types ───
 

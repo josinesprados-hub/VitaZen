@@ -9,8 +9,9 @@ import type { EmailContent } from './types';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
-// ─── V Logo as inline base64 (48x48, ~4KB) ───
-const V_LOGO_SRC = 'cid:vitazen-logo';
+// ─── V Logo: public URL for maximum email client compatibility ───
+// cid: attachments fail in Gmail iOS/Android; public HTTPS URL works everywhere
+const V_LOGO_SRC = 'https://vitazen.cc/images/icon-192x192.png';
 
 // ─── Premium dark wrapper: black bg, V logo, gold brand ───
 
