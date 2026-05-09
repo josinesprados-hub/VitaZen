@@ -13,6 +13,7 @@ import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, CheckCircle, Wallet, Sunrise, ArrowRight } from 'lucide-react';
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
 import { MicroReward } from '@/components/ui/MicroReward';
+import PremiumReflection from '@/components/ui/PremiumReflection';
 
 interface EmpireData {
   empire: string;
@@ -229,10 +230,13 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ═══ 2. Momentum ═══ */}
+      {/* ═══ 2. Reflection ═══ */}
+      <PremiumReflection />
+
+      {/* ═══ 3. Momentum ═══ */}
       <MomentumCard />
 
-      {/* ═══ 3. Streak (only when active) ═══ */}
+      {/* ═══ 4. Streak (only when active) ═══ */}
       {streaks && streaks.generalStreak > 0 && (
         <div className="flex items-center gap-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-1.5">
           <span className={`streak-pulse text-sm ${[3, 7, 14, 21, 30].includes(streaks.generalStreak) ? 'streak-milestone-glow' : ''}`}>🔥</span>
@@ -246,13 +250,13 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ═══ 4. Estado Actual ═══ */}
+      {/* ═══ 5. Estado Actual ═══ */}
       <EmotionalHero />
 
-      {/* ═══ 5. Onboarding Recommendations ═══ */}
+      {/* ═══ 6. Onboarding Recommendations ═══ */}
       <OnboardingRecommendations />
 
-      {/* ═══ 6. Metrics (only when activity exists) ═══ */}
+      {/* ═══ 7. Metrics (only when activity exists) ═══ */}
       {hasActivity && metrics && (
         <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
           {[
@@ -280,7 +284,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ═══ 7. Empire Grid (compact) ═══ */}
+      {/* ═══ 8. Empire Grid (compact) ═══ */}
       <div>
         <div className="flex items-center justify-between mb-2 sm:mb-3">
           <h2 className="text-sm sm:text-base font-semibold text-white">Imperios</h2>
@@ -326,7 +330,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ═══ 8. Daily Challenge ═══ */}
+      {/* ═══ 9. Daily Challenge ═══ */}
       {challenge && (
         <Link
           href={getChallengeRoute(challenge.challenge.category)}
@@ -349,7 +353,7 @@ export default function DashboardPage() {
         </Link>
       )}
 
-      {/* ═══ 9. Weekly Recap (only after activity) ═══ */}
+      {/* ═══ 10. Weekly Recap (only after activity) ═══ */}
       {hasActivity && <WeeklyRecap />}
 
       {/* Micro-reward for actions */}

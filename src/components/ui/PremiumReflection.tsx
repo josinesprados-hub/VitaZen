@@ -78,6 +78,7 @@ export default function PremiumReflection() {
   const [reflection, setReflection] = useState('');
   const stateRef = useRef<ReflectionState | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const advance = useCallback((withFade = true) => {
     if (!stateRef.current) return;
@@ -99,10 +100,13 @@ export default function PremiumReflection() {
     const nextText = REFLECTIONS[nextIdx];
 
     if (withFade) {
+      // Clear any pending fade timeout to prevent stale updates
+      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
       setVisible(false);
-      setTimeout(() => {
+      fadeTimeoutRef.current = setTimeout(() => {
         setReflection(nextText);
         setVisible(true);
+        fadeTimeoutRef.current = null;
       }, FADE_DURATION);
     } else {
       setReflection(nextText);
@@ -141,6 +145,7 @@ export default function PremiumReflection() {
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
     };
   }, [advance]);
 
