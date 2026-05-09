@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════
 // WEEKLY RECAP EMAIL TEMPLATE
-// Transactional, clean, text-first
-// White background, minimal HTML, no upsell
-// Deliverability-optimized
+// Premium dark/gold design, transactional-first
+// Black background, gold accents, clean HTML
+// Optimized for Gmail/Outlook/Apple Mail
 // ═══════════════════════════════════════════
 
 import type { EmailContent } from './types';
@@ -43,7 +43,7 @@ function metricRow(label: string, value: string): string {
   return `
     <tr>
       <td style="padding:4px 0;color:#777;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${label}</td>
-      <td style="padding:4px 0;color:#1a1a1a;font-size:13px;text-align:right;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${value}</td>
+      <td style="padding:4px 0;color:#ffffff;font-size:13px;text-align:right;font-weight:400;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${value}</td>
     </tr>`;
 }
 
@@ -60,7 +60,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
   const habitsHtml = hasHabits
     ? `
     <tr>
-      <td style="padding:20px 0 0;">
+      <td style="padding:24px 0 0;">
         <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">HÁBITOS</p>
         <table width="100%" cellpadding="0" cellspacing="0">
           ${data.topHabits.map(h => metricRow(h.name, `${h.streak} días`)).join('')}
@@ -73,69 +73,80 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
   const insightHtml = hasInsight
     ? `
     <tr>
-      <td style="padding:20px 0 0;">
+      <td style="padding:24px 0 0;">
         <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 6px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">INSIGHT</p>
-        <p style="color:#1a1a1a;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.title}</p>
-        <p style="color:#777;font-size:13px;line-height:1.5;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.description}</p>
+        <p style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.title}</p>
+        <p style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.description}</p>
       </td>
     </tr>`
     : '';
 
   const html = `
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>VitaZen</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#f7f7f7;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#080808;-webkit-font-smoothing:antialiased;" bgcolor="#080808">
   <!-- Preheader -->
-  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#f7f7f7;line-height:1px;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#080808;line-height:1px;">
     ${preheader}&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;
   </div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f7f7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#080808;" bgcolor="#080808">
     <tr>
-      <td align="center" style="padding:40px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#ffffff;border-radius:4px;">
+      <td align="center" style="padding:48px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
 
           <!-- Brand -->
           <tr>
-            <td style="padding:36px 40px 0;text-align:left;">
-              <p style="color:#c8a55a;font-size:11px;letter-spacing:5px;margin:0;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
+            <td style="padding:0 40px 28px;text-align:center;">
+              <p style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
             </td>
           </tr>
 
-          <!-- Thin accent -->
+          <!-- Gold accent line -->
           <tr>
-            <td style="padding:16px 40px 0;">
-              <div style="width:20px;height:1px;background-color:#c8a55a;"></div>
+            <td style="padding:0 40px 0;">
+              <div style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;"></div>
             </td>
           </tr>
 
           <!-- Header -->
           <tr>
-            <td style="padding:28px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <p style="color:#aaa;font-size:11px;letter-spacing:2px;margin:0 0 8px;">Resumen semanal</p>
-              <h1 style="color:#1a1a1a;font-size:20px;font-weight:500;margin:0 0 4px;line-height:1.3;">Tu semana, ${data.name}.</h1>
-              <p style="color:#aaa;font-size:12px;margin:0;">${data.weekLabel}</p>
+            <td style="padding:32px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+              <p style="color:#777;font-size:11px;letter-spacing:2px;margin:0 0 8px;">RECAP SEMANAL</p>
+              <h1 style="color:#ffffff;font-size:20px;font-weight:400;margin:0 0 4px;line-height:1.3;letter-spacing:0.3px;">Tu semana, ${data.name}.</h1>
+              <p style="color:#666;font-size:12px;margin:0;">${data.weekLabel}</p>
             </td>
           </tr>
 
           <!-- Wellness Score -->
           <tr>
-            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td style="padding:28px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
               <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;">BIENESTAR</p>
-              <p style="color:#1a1a1a;font-size:28px;font-weight:300;margin:0;line-height:1;">
-                ${data.score}<span style="color:#aaa;font-size:13px;font-weight:400;"> / 100 · ${data.scoreLabel}</span>
+              <p style="color:#ffffff;font-size:32px;font-weight:300;margin:0;line-height:1;">
+                ${data.score}<span style="color:#666;font-size:13px;font-weight:400;"> / 100 · </span><span style="color:#c8a55a;font-size:13px;font-weight:400;">${data.scoreLabel}</span>
               </p>
             </td>
           </tr>
 
           <!-- Activity -->
           <tr>
-            <td style="padding:20px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
               <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;">ACTIVIDAD</p>
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${metricRow('Check-ins', String(data.progress.checkins))}
@@ -148,7 +159,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
 
           <!-- Emotional state -->
           <tr>
-            <td style="padding:20px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
               <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;">ESTADO EMOCIONAL</p>
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${metricRow('Estado', data.emotionalState.statusLabel)}
@@ -166,25 +177,31 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
 
           <!-- Recommendation -->
           <tr>
-            <td style="padding:20px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
               <p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 6px;font-weight:500;">RECOMENDACIÓN</p>
-              <p style="color:#555;font-size:13px;line-height:1.6;margin:0;">${data.mentorRecommendation}</p>
+              <p style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;">${data.mentorRecommendation}</p>
             </td>
           </tr>
 
-          <!-- CTA -->
+          <!-- CTA Button -->
           <tr>
-            <td style="padding:28px 40px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <a href="${APP_URL}/dashboard" style="color:#c8a55a;font-size:14px;text-decoration:none;font-weight:500;">Acceder &rarr;</a>
+            <td style="padding:32px 40px 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;text-align:center;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                <tr>
+                  <td style="background-color:#c8a55a;border-radius:3px;">
+                    <a href="${APP_URL}/dashboard" style="display:inline-block;padding:12px 32px;color:#0a0a0a;font-size:14px;font-weight:500;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:0.5px;">Acceder</a>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
         </table>
 
         <!-- Footer -->
-        <p style="color:#bbb;font-size:11px;margin:20px 0 0;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <p style="color:#555;font-size:11px;margin:24px 0 0;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
           VitaZen · vitazen.cc<br>
-          <a href="${APP_URL}/perfil" style="color:#999;text-decoration:underline;">Desactivar resumen semanal</a>
+          <a href="${APP_URL}/perfil" style="color:#666;text-decoration:underline;">Desactivar resumen semanal</a>
         </p>
       </td>
     </tr>
@@ -192,7 +209,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
 </body>
 </html>`;
 
-  // ─── Plain text version ───
+  // ─── Plain text version (unchanged) ───
 
   const habitsText = hasHabits
     ? '\nHábitos:\n' + data.topHabits.map(h => `  ${h.name}: ${h.streak} días`).join('\n')
