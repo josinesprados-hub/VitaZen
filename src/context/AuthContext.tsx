@@ -102,13 +102,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       // Force token refresh to get fresh claims (including emailVerified)
       const idToken = await firebaseUser.getIdToken(true);
-      const res = await fetch('/api/auth/session', {
+
+      // Try session endpoint first (faster, lookup-only)
+      const sessionRes = await fetch('/api/auth/session', {
         headers: { Authorization: `Bearer ${idToken}` },
       });
-      if (res.ok) {
-        const data = await res.json();
+      if (sessionRes.ok) {
+        const data = await sessionRes.json();
         setUser(data.user);
         setSyncError(false);
+        return;
+      }
+
+      // Session lookup failed — fall back to /api/auth/sync which CREATES
+      // the user if missing. This is critical when the initial syncUser
+      // failed and the user doesn't exist in the DB yet. Without this
+      // fallback, the onboarding retry is useless and emails never send.
+      console.log('[Auth] session lookup failed, falling back to sync');
+      const syncRes = await fetch('/api/auth/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+      if (syncRes.ok) {
+        const data = await syncRes.json();
+        setUser(data.user);
+        setSyncError(false);
+      } else {
+        console.error('[Auth] sync fallback also failed:', syncRes.status);
+        setSyncError(true);
       }
     } catch (error) {
       console.error('[Auth] refresh error:', error);

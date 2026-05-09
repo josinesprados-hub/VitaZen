@@ -148,13 +148,31 @@ export default function OnboardingPage() {
     setSaving(true);
     setError('');
     try {
-      const res = await apiFetch('/api/onboarding', {
+      let res = await apiFetch('/api/onboarding', {
         method: 'POST',
         body: JSON.stringify({
           ...data,
           name: user?.name || firebaseUser?.displayName || undefined,
         }),
       });
+
+      // If user not found in DB (404), the initial sync may have failed.
+      // Force a sync via refreshUser (which falls back to /api/auth/sync),
+      // then retry the onboarding POST once.
+      if (res.status === 404 && firebaseUser) {
+        console.log('[ONBOARDING] User not found in DB, forcing sync retry');
+        await refreshUser();
+        // Small delay to ensure state updates propagate
+        await new Promise(r => setTimeout(r, 500));
+        res = await apiFetch('/api/onboarding', {
+          method: 'POST',
+          body: JSON.stringify({
+            ...data,
+            name: user?.name || firebaseUser?.displayName || undefined,
+          }),
+        });
+      }
+
       if (res.ok) {
         await refreshUser();
         router.replace('/dashboard');
