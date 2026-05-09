@@ -47,6 +47,9 @@ model User {
   achievements      Achievement[]
   dailyCheckins     DailyCheckin[]
   onboardingData    OnboardingData?
+  pushTokens        PushToken[]
+  notificationPreference NotificationPreference?
+  notificationLog   NotificationLog[]
 }
 
 // ═══════════════════════════════════════════
@@ -348,4 +351,60 @@ model AnalyticsEvent {
 
   @@index([event, createdAt])
   @@index([userId, createdAt])
+}
+
+// ═══════════════════════════════════════════
+// NOTIFICATIONS & PUSH
+// ═══════════════════════════════════════════
+
+model PushToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique // FCM device token
+  platform  String   @default("web") // web | ios | android
+  userAgent String?  // browser/device info for dedup
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, active])
+  @@index([token])
+}
+
+model NotificationPreference {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  pushEnabled           Boolean  @default(false)
+  checkinReminders      Boolean  @default(true)
+  streakReminders       Boolean  @default(true)
+  weeklyRecap           Boolean  @default(true)
+  comebackReminders     Boolean  @default(true)
+  reflectionReminders   Boolean  @default(true)
+  quietHoursEnabled     Boolean  @default(true)
+  quietHoursStart       String   @default("22:00") // HH:mm in user timezone
+  quietHoursEnd         String   @default("08:00") // HH:mm in user timezone
+  timezone              String   @default("Europe/Madrid")
+  maxDailyNotifications Int      @default(3) // hard cap per day
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model NotificationLog {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // checkin | streak | weekly_recap | comeback | reflection
+  title       String
+  body        String
+  sentAt      DateTime @default(now())
+  wasDelivered Boolean @default(false) // FCM response confirmed
+  wasInQuietHours Boolean @default(false) // scheduled during quiet hours (deferred)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, sentAt])
+  @@index([userId, sentAt])
 }

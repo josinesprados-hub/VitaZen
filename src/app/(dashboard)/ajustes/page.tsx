@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Switch } from '@/components/ui/switch';
+import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
 import {
   Mail,
   Bell,
@@ -149,11 +150,11 @@ export default function AjustesPage() {
         <p className="text-sm text-[#999] mt-1">Configura tu experiencia en VitaZen</p>
       </div>
 
-      {/* Notifications Section */}
+      {/* Email Notifications Section */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
-          <Bell size={14} />
-          Notificaciones
+          <Mail size={14} />
+          Notificaciones por email
         </h3>
 
         {/* Weekly Email Summary */}
@@ -183,7 +184,7 @@ export default function AjustesPage() {
           </div>
         </div>
 
-        {/* Daily Reminders */}
+        {/* Daily Reminders (email) */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
@@ -210,6 +211,9 @@ export default function AjustesPage() {
           </div>
         </div>
       </div>
+
+      {/* Push Notifications Section */}
+      <NotificationPreferences />
 
       {/* Privacy Section */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
