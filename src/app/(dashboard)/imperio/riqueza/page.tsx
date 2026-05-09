@@ -3,8 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Gem, Plus, TrendingDown, TrendingUp, Lightbulb, Pencil, Trash2, Wallet, Calendar, Clock } from 'lucide-react';
-import PremiumBlur from '@/components/ui/PremiumBlur';
+import { Gem, Plus, TrendingDown, TrendingUp, Pencil, Trash2, Wallet, Calendar, Clock } from 'lucide-react';
+import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -19,19 +19,10 @@ interface FinanceLog {
   createdAt: string;
 }
 
-interface Tip {
-  id: string;
-  title: string;
-  content: string;
-  plan: string;
-}
-
 export default function RiquezaPage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
-  const isPremium = user?.plan === 'PREMIUM';
   const [logs, setLogs] = useState<FinanceLog[]>([]);
-  const [tips, setTips] = useState<Tip[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '' });
   const [loading, setLoading] = useState(true);
@@ -45,12 +36,10 @@ export default function RiquezaPage() {
     setLoading(true);
     setFetchError(false);
     try {
-      const [fRes, tRes] = await Promise.all([
+      const [fRes] = await Promise.all([
         apiFetch('/api/finance'),
-        apiFetch('/api/empire/tips?empire=riqueza'),
       ]);
       if (fRes.ok) { const d = await fRes.json(); setLogs(d.logs); }
-      if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
     } catch (e) {
       console.error(e);
       setFetchError(true);
@@ -299,31 +288,7 @@ export default function RiquezaPage() {
       </div>
 
       {/* Tips */}
-      {tips.length > 0 && (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
-          <div className="flex items-center gap-3 mb-4">
-            <Lightbulb size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
-          </div>
-          <p className="text-[#666] text-xs mb-5">Estrategias financieras para una base sólida</p>
-          <div className="space-y-3">
-            {tips.map((tip) => {
-              const isLocked = tip.plan === 'PREMIUM' && !isPremium;
-              const tipCard = (
-                <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
-                  <h3 className="text-[#c8a55a] font-medium text-sm mb-1">{tip.title}</h3>
-                  <p className="text-[#999] text-sm">{tip.content}</p>
-                </div>
-              );
-              return (
-                <div key={tip.id}>
-                  {isLocked ? <PremiumBlur>{tipCard}</PremiumBlur> : tipCard}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <EmpireTipsSection empire="riqueza" subtitle="Estrategias financieras para una base sólida" />
     </div>
   );
 }

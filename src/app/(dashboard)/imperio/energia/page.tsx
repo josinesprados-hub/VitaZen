@@ -3,8 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Droplets, Flame, Apple, Heart, Lightbulb, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
-import PremiumBlur from '@/components/ui/PremiumBlur';
+import { Zap, Droplets, Flame, Apple, Heart, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
+import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -30,20 +30,11 @@ interface NutritionLog {
   createdAt: string;
 }
 
-interface Tip {
-  id: string;
-  title: string;
-  content: string;
-  plan: string;
-}
-
 export default function EnergiaPage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
-  const isPremium = user?.plan === 'PREMIUM';
   const [wellnessLogs, setWellnessLogs] = useState<WellnessLog[]>([]);
   const [nutrition, setNutrition] = useState<NutritionLog[]>([]);
-  const [tips, setTips] = useState<Tip[]>([]);
   const [showWellness, setShowWellness] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
   const [wellnessForm, setWellnessForm] = useState({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
@@ -62,14 +53,12 @@ export default function EnergiaPage() {
     setLoading(true);
     setFetchError(false);
     try {
-      const [wRes, nRes, tRes] = await Promise.all([
+      const [wRes, nRes] = await Promise.all([
         apiFetch('/api/wellness'),
         apiFetch('/api/nutrition'),
-        apiFetch('/api/empire/tips?empire=energia'),
       ]);
       if (wRes.ok) { const d = await wRes.json(); setWellnessLogs(d.logs); }
       if (nRes.ok) { const d = await nRes.json(); setNutrition(d.logs); }
-      if (tRes.ok) { const d = await tRes.json(); setTips(d.tips); }
     } catch (e) {
       console.error(e);
       setFetchError(true);
@@ -436,31 +425,7 @@ export default function EnergiaPage() {
       </div>
 
       {/* Tips */}
-      {tips.length > 0 && (
-        <div className="section-enter-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Lightbulb size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
-          </div>
-          <p className="text-[#666] text-xs mb-5">Estrategias para maximizar tu energía</p>
-          <div className="space-y-3">
-            {tips.map((tip) => {
-              const isLocked = tip.plan === 'PREMIUM' && !isPremium;
-              const tipCard = (
-                <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
-                  <h3 className="text-[#c8a55a] font-medium text-sm mb-1">{tip.title}</h3>
-                  <p className="text-[#999] text-sm">{tip.content}</p>
-                </div>
-              );
-              return (
-                <div key={tip.id}>
-                  {isLocked ? <PremiumBlur>{tipCard}</PremiumBlur> : tipCard}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <EmpireTipsSection empire="energia" subtitle="Estrategias para maximizar tu energía" />
     </div>
   );
 }
