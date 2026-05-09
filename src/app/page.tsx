@@ -11,8 +11,11 @@ export default function Home() {
   useEffect(() => {
     if (!loading) {
       if (user || firebaseUser) {
-        // Authenticated (Firebase confirmed, sync may still be in progress)
-        router.replace('/dashboard');
+        // Authenticated — always go through the onboarding gate.
+        // Onboarding page redirects to /dashboard if already completed.
+        // This prevents the dashboard from ever rendering before
+        // onboardingCompleted is confirmed.
+        router.replace('/onboarding');
       } else {
         router.replace('/login');
       }

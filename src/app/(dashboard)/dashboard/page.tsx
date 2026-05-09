@@ -88,8 +88,13 @@ export default function DashboardPage() {
   // Whether user has any real activity (determines what to show)
   const [hasActivity, setHasActivity] = useState(false);
 
+  // Safety guard: never render dashboard content without confirmed onboarding.
+  // The layout handles the redirect, but this prevents any flash of content.
+  // Must come AFTER all hooks to respect React rules of hooks.
+  const onboardingConfirmed = user?.onboardingCompleted === true;
+
   useEffect(() => {
-    if (!user) return;
+    if (!user || !onboardingConfirmed) return;
 
     let cancelled = false;
 
@@ -151,7 +156,7 @@ export default function DashboardPage() {
 
     fetchData();
     return () => { cancelled = true; };
-  }, [user, apiFetch]);
+  }, [user, onboardingConfirmed, apiFetch]);
 
   // Re-evaluate activity when data changes
   useEffect(() => {
@@ -173,6 +178,12 @@ export default function DashboardPage() {
       setTodayCheckin(result.checkin);
     }
   }, [apiFetch]);
+
+  // Safety guard: never render dashboard content without confirmed onboarding.
+  // The layout handles the redirect, but this prevents any flash of content.
+  if (!onboardingConfirmed) {
+    return null;
+  }
 
   if (loading) {
     return <DashboardSkeleton />;

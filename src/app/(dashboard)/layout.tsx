@@ -14,21 +14,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, loading, syncError, firebaseUser, refreshUser } = useAuth();
+  const { user, loading, syncError, firebaseUser } = useAuth();
   const router = useRouter();
   const sessionTracked = useRef(false);
-
-  // Auto-retry sync once on error (before showing manual "Reintentar")
-  const [autoRetried, setAutoRetried] = useState(false);
-  useEffect(() => {
-    if (syncError && firebaseUser && !user && !autoRetried) {
-      setAutoRetried(true);
-      const timer = setTimeout(() => {
-        refreshUser();
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [syncError, firebaseUser, user, autoRetried, refreshUser]);
 
   // Track daily session — once per mount, deduplicated server-side
   useEffect(() => {
@@ -38,12 +26,13 @@ export default function DashboardLayout({
     }
   }, [user, loading]);
 
-  // ─── 1. Initial Firebase auth resolution (no firebaseUser yet) ───
+  // ─── 1. Auth resolving (no firebaseUser yet) ───
+  // While we don't know if the user is authenticated, show simple loading.
+  // NO dashboard. NO retry screen.
   if (loading && !firebaseUser) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5 skeleton-entrance">
-          <div className="w-12 h-12 rounded-xl premium-shimmer" />
+        <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
             <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
@@ -53,15 +42,18 @@ export default function DashboardLayout({
     );
   }
 
-  // ─── 2. Firebase auth confirmed but server sync still in progress ───
-  // WAIT for user data before deciding whether to redirect or render.
-  // This prevents the flash where dashboard renders briefly before
-  // the onboarding redirect kicks in.
-  if (firebaseUser && !user && !syncError) {
+  // ─── 2. Sync pending (firebaseUser confirmed, waiting for server) ───
+  // Show simple loading while server sync completes.
+  // NO dashboard. NO retry screen. NO "Reintentar".
+  if (firebaseUser && !user) {
+    // If sync failed, redirect to onboarding gate — it handles sync errors
+    // gracefully and will redirect to dashboard if onboarding is completed.
+    if (syncError) {
+      router.replace('/onboarding');
+    }
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5 skeleton-entrance">
-          <div className="w-12 h-12 rounded-xl premium-shimmer" />
+        <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
             <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
@@ -71,42 +63,12 @@ export default function DashboardLayout({
     );
   }
 
-  // ─── 3. Sync failed (after auto-retry) — show manual retry ───
-  // Auto-retry is handled by the useEffect above. If sync still fails
-  // after auto-retry, show a manual retry button.
-  if (syncError && firebaseUser && !user) {
-    return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5 text-center px-6">
-          <div className="w-12 h-12 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-          </div>
-          <div>
-            <p className="text-white text-sm font-medium mb-1">Conectando con el servidor</p>
-            <p className="text-[#666] text-xs">
-              {autoRetried ? 'No se pudo verificar tu sesión' : 'Reintentando conexión...'}
-            </p>
-          </div>
-          {autoRetried && (
-            <button
-              onClick={refreshUser}
-              className="text-[#c8a55a] text-sm hover:underline"
-            >
-              Reintentar
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // ─── 4. No auth at all — redirect to login ───
+  // ─── 3. No auth at all — redirect to login ───
   if (!user && !firebaseUser) {
     router.replace('/login');
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5 skeleton-entrance">
-          <div className="w-12 h-12 rounded-xl premium-shimmer" />
+        <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
             <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Redirigiendo</p>
@@ -116,15 +78,15 @@ export default function DashboardLayout({
     );
   }
 
-  // ─── 5. User data confirmed but onboarding not completed ───
-  // Using !user.onboardingCompleted instead of === false to also catch undefined
-  // (defensive: if the field is missing from API response, redirect to onboarding).
+  // ─── 4. User data confirmed but onboarding not completed ───
+  // Safety redirect: send user to onboarding gate.
+  // This is NOT "deciding onboarding" — it's redirecting to the gate
+  // that makes the decision. The onboarding page handles the flow.
   if (user && !user.onboardingCompleted) {
     router.replace('/onboarding');
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5 skeleton-entrance">
-          <div className="w-12 h-12 rounded-xl premium-shimmer" />
+        <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
             <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Preparando</p>
@@ -134,7 +96,9 @@ export default function DashboardLayout({
     );
   }
 
-  // ─── 6. All checks passed — render dashboard ───
+  // ─── 5. All checks passed — render dashboard ───
+  // At this point: user exists, onboardingCompleted is true.
+  // The dashboard is safe to render.
   return (
     <div className="min-h-screen bg-[#000000]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

@@ -24,20 +24,14 @@ export default function RegisterPage() {
   const { signUp, signInWithGoogle, user, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect already-authenticated users away from register
-  // Only act on INITIAL auth resolution — not on every user state change.
-  // The signUp handler already navigates, so we only need this for
-  // users who land on /register while already logged in.
+  // Redirect already-authenticated users away from register.
+  // Always send to /onboarding — it is the single gate that decides
+  // whether to show questions or redirect to dashboard.
   useEffect(() => {
     if (!authLoading && (user || firebaseUser)) {
-      // Already authenticated — go to the right place
-      if (user?.onboardingCompleted) {
-        router.replace('/dashboard');
-      } else {
-        router.replace('/onboarding');
-      }
+      router.replace('/onboarding');
     }
-  }, [authLoading, router]); // Intentionally NOT depending on user/firebaseUser
+  }, [authLoading, user, firebaseUser, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
