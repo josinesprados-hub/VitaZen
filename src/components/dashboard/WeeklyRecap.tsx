@@ -82,13 +82,6 @@ interface RecapData {
 // Helpers
 // ─────────────────────────────────────────
 
-function getScoreColor(score: number): string {
-  if (score >= 75) return '#22c55e';
-  if (score >= 50) return '#c8a55a';
-  if (score >= 30) return '#e8a849';
-  return '#ef4444';
-}
-
 function getScoreRingColor(score: number): string {
   if (score >= 75) return '#22c55e';
   if (score >= 50) return '#c8a55a';

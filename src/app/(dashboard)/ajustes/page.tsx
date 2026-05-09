@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Switch } from '@/components/ui/switch';
 import {
-  Settings,
   Mail,
   Bell,
   Eye,
@@ -35,6 +34,14 @@ export default function AjustesPage() {
   const [error, setError] = useState<string | null>(null);
   const [verifySending, setVerifySending] = useState(false);
   const [verifySent, setVerifySent] = useState(false);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(t => clearTimeout(t));
+    };
+  }, []);
 
   // Sync settings from user data
   useEffect(() => {
@@ -83,13 +90,13 @@ export default function AjustesPage() {
 
       // Show saved indicator
       setSavedKeys(prev => new Set(prev).add(key));
-      setTimeout(() => {
+      timersRef.current.push(setTimeout(() => {
         setSavedKeys(prev => {
           const next = new Set(prev);
           next.delete(key);
           return next;
         });
-      }, 2000);
+      }, 2000));
     } catch (err: any) {
       // Revert on error
       setSettings(prev => ({ ...prev, [key]: !value }));
@@ -123,7 +130,7 @@ export default function AjustesPage() {
       }
       if (res.ok) {
         setVerifySent(true);
-        setTimeout(() => setVerifySent(false), 60000);
+        timersRef.current.push(setTimeout(() => setVerifySent(false), 60000));
       } else {
         setError(data.error || 'Error al enviar');
       }

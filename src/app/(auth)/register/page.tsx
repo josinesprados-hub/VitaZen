@@ -20,7 +20,6 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [providerHint, setProviderHint] = useState<'google' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
-  const [transitioning, setTransitioning] = useState(false);
   const { signUp, signInWithGoogle, user, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -93,28 +92,6 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
-
-  // ─── Premium transition overlay: account created → onboarding ───
-  if (transitioning) {
-    return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center auth-transition-enter">
-        <div className="flex flex-col items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-[#c8a55a]/10 border border-[#c8a55a]/20 flex items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#c8a55a] auth-success-pulse" />
-          </div>
-          <div className="text-center">
-            <p className="text-white text-sm font-medium mb-1">Cuenta creada</p>
-            <p className="text-[#666] text-xs">Preparando tu experiencia...</p>
-          </div>
-          <div className="flex items-center gap-1.5 mt-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] animate-pulse" style={{ animationDelay: '0ms' }} />
-            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] animate-pulse" style={{ animationDelay: '200ms' }} />
-            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] animate-pulse" style={{ animationDelay: '400ms' }} />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4">

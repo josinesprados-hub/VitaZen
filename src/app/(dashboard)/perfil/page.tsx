@@ -25,6 +25,14 @@ export default function PerfilPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(t => clearTimeout(t));
+    };
+  }, []);
 
   const [form, setForm] = useState({
     name: '',
@@ -108,7 +116,7 @@ export default function PerfilPage() {
       await refreshUser();
       setEditing(false);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      timersRef.current.push(setTimeout(() => setSaved(false), 2500));
     } catch (err: any) {
       setError(err.message || 'Error al guardar el perfil');
     } finally {

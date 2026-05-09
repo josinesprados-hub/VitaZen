@@ -55,10 +55,12 @@ export function OnboardingRecommendations() {
     // Only fetch for users who might have onboarding data
     if (!user) return;
 
+    let cancelled = false;
+
     const fetchOnboarding = async () => {
       try {
         const res = await apiFetch('/api/onboarding');
-        if (res.ok) {
+        if (res.ok && !cancelled) {
           const data = await res.json();
           setOnboarding(data);
         }
@@ -67,7 +69,8 @@ export function OnboardingRecommendations() {
       }
     };
     fetchOnboarding();
-  }, [user]);
+    return () => { cancelled = true; };
+  }, [user, apiFetch]);
 
   // Don't show if dismissed, no data, or no primary focus
   if (dismissed || !onboarding?.data?.primaryFocus) return null;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
@@ -162,22 +162,23 @@ export default function InsightsPage() {
   const [loading, setLoading] = useState(true);
   const isPremium = user?.plan === 'PREMIUM';
 
-  useEffect(() => {
-    const fetchInsights = async () => {
-      try {
-        const res = await apiFetch('/api/insights');
-        if (res.ok) {
-          const result = await res.json();
-          setData(result);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
+  const fetchInsights = useCallback(async () => {
+    try {
+      const res = await apiFetch('/api/insights');
+      if (res.ok) {
+        const result = await res.json();
+        setData(result);
       }
-    };
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFetch]);
+
+  useEffect(() => {
     fetchInsights();
-  }, []);
+  }, [fetchInsights]);
 
   if (loading) {
     return <InsightsSkeleton />;

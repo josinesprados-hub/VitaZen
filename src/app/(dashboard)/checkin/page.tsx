@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, memo } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -44,10 +44,6 @@ interface TrendsData {
 }
 
 // ─── Helpers ─────────────────────────────────────────────
-
-const EMOTION_LABELS: Record<number, string> = {
-  1: 'Muy bajo', 2: 'Bajo', 3: 'Neutral', 4: 'Bien', 5: 'Excelente',
-};
 
 const METRIC_CONFIG = [
   { key: 'emotion', label: 'Emoción', icon: Heart, color: '#c8a55a' },

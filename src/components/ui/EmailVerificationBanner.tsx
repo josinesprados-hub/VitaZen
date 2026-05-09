@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { sendEmailVerification } from 'firebase/auth';
@@ -23,6 +23,14 @@ export function EmailVerificationBanner() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const [dismissed, setDismissed] = useState(false);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(t => clearTimeout(t));
+    };
+  }, []);
 
   // Don't show if:
   // - user is verified
@@ -58,7 +66,7 @@ export function EmailVerificationBanner() {
             url: `${window.location.origin}/verify-email?uid=${firebaseUser.uid}`,
           });
           setSent(true);
-          setTimeout(() => setSent(false), 60000);
+          timersRef.current.push(setTimeout(() => setSent(false), 60000));
         } catch (fbError: any) {
           console.error('[BANNER] Client-side sendEmailVerification failed:', fbError);
           if (fbError?.code === 'auth/too-many-requests') {
@@ -75,7 +83,7 @@ export function EmailVerificationBanner() {
         if (res.status === 429) {
           setError(data.error || 'Espera un momento antes de reenviar.');
           // Auto-clear rate limit error after 60s
-          setTimeout(() => setError(''), 60000);
+          timersRef.current.push(setTimeout(() => setError(''), 60000));
         } else {
           setError(data.error || 'Error al enviar');
         }
@@ -84,7 +92,7 @@ export function EmailVerificationBanner() {
 
       setSent(true);
       // Reset sent state after 60 seconds so they can resend
-      setTimeout(() => setSent(false), 60000);
+      timersRef.current.push(setTimeout(() => setSent(false), 60000));
     } catch {
       setError('Error de conexión. Inténtalo de nuevo.');
     } finally {
