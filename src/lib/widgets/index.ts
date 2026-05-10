@@ -22,5 +22,9 @@ export {
   onPlanChange,
 } from './triggers';
 
+// Widget rendering
+export { renderReflectionWidget } from './render/reflection-html';
+export type { WidgetSize, ReflectionWidgetRenderOptions } from './render/reflection-html';
+
 // Types
 export * from './types';
