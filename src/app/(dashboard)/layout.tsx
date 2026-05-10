@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { EmailVerificationBanner } from '@/components/ui/EmailVerificationBanner';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { trackEvent } from '@/lib/analytics';
 
 export default function DashboardLayout({
@@ -15,6 +16,7 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, loading, syncError, firebaseUser } = useAuth();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const router = useRouter();
   const sessionTracked = useRef(false);
 
@@ -100,7 +102,7 @@ export default function DashboardLayout({
       <div className="lg:ml-64">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />
         <main className="p-4 sm:p-4 lg:p-6 pb-6 safe-bottom overflow-x-contain">
-          <EmailVerificationBanner />
+          {!screenshotMode && <EmailVerificationBanner />}
           {children}
         </main>
       </div>

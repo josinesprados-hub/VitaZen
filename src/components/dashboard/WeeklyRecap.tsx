@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import Link from 'next/link';
 import { WeeklyRecapSkeleton } from '@/components/ui/PremiumSkeleton';
 import {
@@ -162,13 +163,65 @@ function getCategoryHref(category: string): string {
 export function WeeklyRecap() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [data, setData] = useState<RecapData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = screenshotMode ? true : (user?.plan === 'PREMIUM');
 
   const fetchRecap = useCallback(async () => {
+    // ── Screenshot mode: use mock data, skip API calls ──
+    if (screenshotMode) {
+      setData({
+        weekLabel: '5 — 11 may 2026',
+        score: 73,
+        scoreLabel: 'Bueno',
+        progress: {
+          totalActivities: 34,
+          checkins: 5,
+          habitsCompleted: 12,
+          meditationSessions: 5,
+          journalEntries: 4,
+        },
+        topHabits: [
+          { name: 'Meditación matutina', streak: 7 },
+          { name: 'Registrar finanzas', streak: 9 },
+          { name: 'Lectura 20 páginas', streak: 5 },
+        ],
+        emotionalState: {
+          status: 'enfocado',
+          statusLabel: 'Enfocado',
+          statusDescription: 'Tu energía y enfoque están alineados. Es un buen momento para tareas que requieran concentración profunda.',
+          energy: 75,
+          focus: 82,
+          calm: 65,
+          consistency: 71,
+          recommendation: 'Aprovecha este estado para avanzar en tu objetivo principal del día.',
+        },
+        evolution: {
+          emotionTrend: 0.3,
+          energyTrend: 0.2,
+          stressTrend: -0.15,
+          activityTrend: 0.25,
+          meditationTrend: 0.4,
+          habitTrend: 0.2,
+        },
+        mainInsight: {
+          id: 'demo-recap-insight',
+          type: 'positive',
+          category: 'hábitos',
+          icon: '✅',
+          title: 'Racha de 7 días en hábitos',
+          description: 'Tu constancia en Disciplina es notable. Estás en el percentil superior de consistencia esta semana.',
+        },
+        mentorRecommendation: 'Tu disciplina está dando frutos. La racha de 7 días en hábitos refleja una intención clara. Recomiendo mantener el ritmo y añadir una meditación breve antes de dormir para consolidar el progreso emocional.',
+        plan: 'PREMIUM',
+      });
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(false);
     try {
@@ -185,7 +238,7 @@ export function WeeklyRecap() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
     fetchRecap();

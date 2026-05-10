@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { REFLECTIONS } from '@/lib/reflections';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 
 // ═══════════════════════════════════════════
 // PremiumReflection — rotating reflections
@@ -74,6 +76,7 @@ function saveState(state: ReflectionState): void {
 }
 
 export default function PremiumReflection() {
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [visible, setVisible] = useState(false);
   const [reflection, setReflection] = useState('');
   const stateRef = useRef<ReflectionState | null>(null);
@@ -116,6 +119,13 @@ export default function PremiumReflection() {
 
   // Initialize on mount (client-only, avoids hydration mismatch)
   useEffect(() => {
+    // ── Screenshot mode: use fixed premium reflection ──
+    if (screenshotMode) {
+      setReflection(SCREENSHOT_REFLECTION);
+      setVisible(true);
+      return;
+    }
+
     const state = loadState();
 
     // Advance on every visit (change when returning to dashboard)

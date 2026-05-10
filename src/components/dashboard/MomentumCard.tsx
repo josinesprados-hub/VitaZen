@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { SCREENSHOT_MOMENTUM } from '@/lib/screenshot-data';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 
 interface MomentumData {
@@ -32,10 +34,18 @@ function getLevelLabel(level: string): string {
 
 export function MomentumCard() {
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [data, setData] = useState<MomentumData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchMomentum = useCallback(async () => {
+    // ── Screenshot mode: use mock data, skip API calls ──
+    if (screenshotMode) {
+      setData(SCREENSHOT_MOMENTUM);
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await apiFetch('/api/dashboard/momentum');
       if (res.ok) {
@@ -47,7 +57,7 @@ export function MomentumCard() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
     fetchMomentum();

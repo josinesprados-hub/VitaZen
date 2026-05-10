@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/AuthContext';
+import { ScreenshotModeProvider } from '@/context/ScreenshotModeContext';
 import { ObservabilityInit } from '@/components/observability/ObservabilityInit';
 
 const inter = Inter({
@@ -42,9 +43,11 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased bg-[#000000] text-white font-sans`}>
         <AuthProvider>
-          <ObservabilityInit />
-          {children}
-          <Toaster />
+          <ScreenshotModeProvider>
+            <ObservabilityInit />
+            {children}
+            <Toaster />
+          </ScreenshotModeProvider>
         </AuthProvider>
       </body>
     </html>

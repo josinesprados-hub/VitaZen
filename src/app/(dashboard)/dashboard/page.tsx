@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
@@ -14,6 +15,14 @@ import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, Che
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
 import { MicroReward } from '@/components/ui/MicroReward';
 import PremiumReflection from '@/components/ui/PremiumReflection';
+import {
+  SCREENSHOT_EMPIRES,
+  SCREENSHOT_CHALLENGE,
+  SCREENSHOT_METRICS,
+  SCREENSHOT_STREAKS,
+  SCREENSHOT_TODAY_CHECKIN,
+  SCREENSHOT_USER_NAME,
+} from '@/lib/screenshot-data';
 
 interface EmpireData {
   empire: string;
@@ -77,6 +86,7 @@ function getChallengeCTALabel(category: string): string {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [empires, setEmpires] = useState<EmpireData[]>([]);
   const [challenge, setChallenge] = useState<ChallengeData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,6 +106,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user || !onboardingConfirmed) return;
+
+    // ── Screenshot mode: use mock data, skip API calls ──
+    if (screenshotMode) {
+      setEmpires(SCREENSHOT_EMPIRES);
+      setChallenge(SCREENSHOT_CHALLENGE);
+      setMetrics(SCREENSHOT_METRICS);
+      setStreaks(SCREENSHOT_STREAKS);
+      setTodayCheckin(SCREENSHOT_TODAY_CHECKIN);
+      setHasActivity(true);
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
 
@@ -157,7 +179,7 @@ export default function DashboardPage() {
 
     fetchData();
     return () => { cancelled = true; };
-  }, [user, onboardingConfirmed, apiFetch]);
+  }, [user, onboardingConfirmed, apiFetch, screenshotMode]);
 
   // Re-evaluate activity when data changes
   useEffect(() => {
@@ -180,9 +202,8 @@ export default function DashboardPage() {
     }
   }, [apiFetch]);
 
-  // Safety guard: never render dashboard content without confirmed onboarding.
-  // The layout handles the redirect, but this prevents any flash of content.
-  if (!onboardingConfirmed) {
+  // Screenshot mode bypasses onboarding check — it doesn't need real auth
+  if (!screenshotMode && !onboardingConfirmed) {
     return null;
   }
 
@@ -264,10 +285,12 @@ export default function DashboardPage() {
         <EmotionalHero />
       </div>
 
-      {/* ═══ 7. Onboarding Recommendations ═══ */}
-      <div className="dash-section-enter dash-section-delay-7">
-        <OnboardingRecommendations />
-      </div>
+      {/* ═══ 7. Onboarding Recommendations ═══ (hidden in screenshot mode) */}
+      {!screenshotMode && (
+        <div className="dash-section-enter dash-section-delay-7">
+          <OnboardingRecommendations />
+        </div>
+      )}
 
       {/* ═══ 8. Metrics (only when activity exists) ═══ */}
       {hasActivity && metrics && (

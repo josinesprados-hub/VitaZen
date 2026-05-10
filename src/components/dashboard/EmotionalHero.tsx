@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { SCREENSHOT_EMOTIONAL_STATE } from '@/lib/screenshot-data';
 import { EmotionalHeroSkeleton } from '@/components/ui/PremiumSkeleton';
 import Link from 'next/link';
 
@@ -149,11 +151,19 @@ function MetricRing({ metric, metricKey }: { metric: EmotionalMetric; metricKey:
 
 export function EmotionalHero() {
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [state, setState] = useState<EmotionalState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const fetchState = useCallback(async () => {
+    // ── Screenshot mode: use mock data, skip API calls ──
+    if (screenshotMode) {
+      setState(SCREENSHOT_EMOTIONAL_STATE);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(false);
     try {
@@ -170,7 +180,7 @@ export function EmotionalHero() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
     fetchState();

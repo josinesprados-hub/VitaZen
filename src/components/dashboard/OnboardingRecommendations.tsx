@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { Brain, Shield, Zap, Gem, Sparkles, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -48,12 +49,14 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
 export function OnboardingRecommendations() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [onboarding, setOnboarding] = useState<OnboardingInfo | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     // Only fetch for users who might have onboarding data
-    if (!user) return;
+    // Screenshot mode: skip API call entirely
+    if (!user || screenshotMode) return;
 
     let cancelled = false;
 
@@ -70,7 +73,10 @@ export function OnboardingRecommendations() {
     };
     fetchOnboarding();
     return () => { cancelled = true; };
-  }, [user, apiFetch]);
+  }, [user, apiFetch, screenshotMode]);
+
+  // Screenshot mode: hide completely
+  if (screenshotMode) return null;
 
   // Don't show if dismissed, no data, or no primary focus
   if (dismissed || !onboarding?.data?.primaryFocus) return null;

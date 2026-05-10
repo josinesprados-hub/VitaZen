@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { SCREENSHOT_HABITS, SCREENSHOT_CHALLENGE as SCREENSHOT_HABIT_CHALLENGE } from '@/lib/screenshot-data';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
@@ -31,6 +33,7 @@ interface Challenge {
 export default function DisciplinaPage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -53,6 +56,14 @@ export default function DisciplinaPage() {
   }, [editingHabit, pendingDeleteId]);
 
   const fetchData = useCallback(async () => {
+    // ── Screenshot mode: use mock data, skip API calls ──
+    if (screenshotMode) {
+      setHabits(SCREENSHOT_HABITS);
+      setChallenge(SCREENSHOT_HABIT_CHALLENGE);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setFetchError(false);
     try {
@@ -68,7 +79,7 @@ export default function DisciplinaPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
     fetchData();
@@ -222,12 +233,14 @@ export default function DisciplinaPage() {
         </div>
       )}
 
-      {/* Contextual Help */}
-      <ContextualHelp
-        storageKey="vitazen_help_habits"
-        title="Mis Hábitos"
-        text="Crea hábitos y márcalos como completados cada día. Tu racha crece con la consistencia. Puedes editar o eliminar cualquier hábito."
-      />
+      {/* Contextual Help — hidden in screenshot mode */}
+      {!screenshotMode && (
+        <ContextualHelp
+          storageKey="vitazen_help_habits"
+          title="Mis Hábitos"
+          text="Crea hábitos y márcalos como completados cada día. Tu racha crece con la consistencia. Puedes editar o eliminar cualquier hábito."
+        />
+      )}
 
       {/* Header */}
       <div className="flex items-center gap-4">
@@ -357,8 +370,10 @@ export default function DisciplinaPage() {
         )}
       </div>
 
-      {/* Tips */}
-      <EmpireTipsSection empire="disciplina" subtitle="Estrategias para fortalecer tu disciplina" />
+      {/* Tips — hidden in screenshot mode */}
+      {!screenshotMode && (
+        <EmpireTipsSection empire="disciplina" subtitle="Estrategias para fortalecer tu disciplina" />
+      )}
       {/* Micro-reward for habit completion */}
       <MicroReward trigger={showReward} message="Hábito completado" onComplete={() => setShowReward(false)} />
     </div>

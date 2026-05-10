@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
 import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -9,6 +10,11 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import ContextualHelp from '@/components/ui/ContextualHelp';
+import {
+  SCREENSHOT_INSIGHTS_SUMMARY,
+  SCREENSHOT_INSIGHTS_LIST,
+  SCREENSHOT_WEEKLY_COMPARISON,
+} from '@/lib/screenshot-data';
 import {
   Sparkles,
   ArrowLeft,
@@ -158,11 +164,24 @@ function TrendIndicator({ value, label }: { value: number; label: string }) {
 export default function InsightsPage() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = screenshotMode ? true : (user?.plan === 'PREMIUM');
 
   const fetchInsights = useCallback(async () => {
+    // ── Screenshot mode: use mock data, skip API calls ──
+    if (screenshotMode) {
+      setData({
+        summary: SCREENSHOT_INSIGHTS_SUMMARY,
+        insights: SCREENSHOT_INSIGHTS_LIST,
+        comparison: SCREENSHOT_WEEKLY_COMPARISON,
+        plan: 'PREMIUM',
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await apiFetch('/api/insights');
       if (res.ok) {
@@ -174,7 +193,7 @@ export default function InsightsPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
     fetchInsights();
@@ -206,12 +225,14 @@ export default function InsightsPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      {/* Contextual Help */}
-      <ContextualHelp
-        storageKey="vitazen_help_insights"
-        title="Insights Semanales"
-        text="Cada semana se analizan tus datos y se generan insights automáticos. Revisa tu puntuación de bienestar y los patrones detectados."
-      />
+      {/* Contextual Help — hidden in screenshot mode */}
+      {!screenshotMode && (
+        <ContextualHelp
+          storageKey="vitazen_help_insights"
+          title="Insights Semanales"
+          text="Cada semana se analizan tus datos y se generan insights automáticos. Revisa tu puntuación de bienestar y los patrones detectados."
+        />
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -530,8 +551,8 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      {/* Subtle Premium CTA for FREE users */}
-      {!isPremium && (
+      {/* Subtle Premium CTA for FREE users — hidden in screenshot mode */}
+      {!isPremium && !screenshotMode && (
         <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
           <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/8 flex items-center justify-center shrink-0">
             <Crown size={18} className="text-[#c8a55a]/60" />
