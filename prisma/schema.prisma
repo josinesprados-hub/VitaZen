@@ -50,6 +50,7 @@ model User {
   pushTokens        PushToken[]
   notificationPreference NotificationPreference?
   notificationLog   NotificationLog[]
+  widgetSnapshots   WidgetSnapshot[]
 }
 
 // ═══════════════════════════════════════════
@@ -407,4 +408,27 @@ model NotificationLog {
 
   @@index([userId, type, sentAt])
   @@index([userId, sentAt])
+}
+
+// ═══════════════════════════════════════════
+// WIDGETS — Mobile Widget Snapshots
+// Pre-computed, lightweight payloads for iOS/Android widgets.
+// Snapshots are computed on data change, not on read.
+// This means widget reads are O(1) — no heavy DB queries on every refresh.
+// ═══════════════════════════════════════════
+
+model WidgetSnapshot {
+  id          String   @id @default(cuid())
+  userId      String
+  widgetType  String   // reflection | momentum | checkin | daily_focus | calm_quote
+  data        String   // JSON string — pre-shaped, minimal widget payload
+  version     Int      @default(1) // Schema version for future payload evolution
+  computedAt  DateTime @default(now())
+  expiresAt   DateTime // When this snapshot is considered stale
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, widgetType])
+  @@index([userId, widgetType, expiresAt])
+  @@map("widget_snapshots")
 }

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { onMeditationChange } from '@/lib/widgets/triggers';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -99,6 +100,9 @@ export async function POST(request: NextRequest) {
 
     // Auto-complete today's challenge if it matches (non-blocking)
     tryAutoCompleteChallenge(user.id, 'meditation').catch(() => {});
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onMeditationChange(user.id, user.plan);
 
     return NextResponse.json({ session });
   } catch (error) {

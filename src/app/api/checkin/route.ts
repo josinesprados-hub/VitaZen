@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { onCheckinChange } from '@/lib/widgets/triggers';
 
 // ─── GET: today's checkin + history ─────────────────────
 
@@ -120,6 +121,9 @@ export async function POST(request: NextRequest) {
       update: { xp: { increment: 10 } },
       create: { userId: user.id, empire: 'mente', xp: 10 },
     });
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onCheckinChange(user.id, user.plan);
 
     return NextResponse.json({ checkin });
   } catch (error) {

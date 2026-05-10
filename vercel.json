@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/reflection-reminder",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/widget-maintenance",
+      "schedule": "0 */6 * * *"
     }
   ]
 }
