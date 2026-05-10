@@ -357,10 +357,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         body: JSON.stringify({ threadId }),
       });
       if (res.ok) {
-        setThreads(prev => prev.filter(t => t.id !== threadId));
+        let nextActiveId: string | null = null;
+        setThreads(prev => {
+          const remaining = prev.filter(t => t.id !== threadId);
+          nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
+          return remaining;
+        });
         if (activeThread === threadId) {
-          const remainingThreads = threads.filter(t => t.id !== threadId && !t.archived);
-          setActiveThread(remainingThreads.length > 0 ? remainingThreads[0].id : null);
+          setActiveThread(nextActiveId);
           setMessages([]);
           try { localStorage.removeItem(STORAGE_KEY); } catch {}
         }
@@ -377,12 +381,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       });
       if (res.ok) {
         const data = await res.json();
-        setThreads(prev => prev.map(t => t.id === threadId ? { ...t, archived: true } : t));
+        let nextActiveId: string | null = null;
+        setThreads(prev => {
+          const updated = prev.map(t => t.id === threadId ? { ...t, archived: true } : t);
+          nextActiveId = updated.filter(t => !t.archived)[0]?.id ?? null;
+          return updated;
+        });
         // If the archived thread was active, switch to the next active one
         if (activeThread === threadId) {
-          const activeThreads = threads.filter(t => t.id !== threadId && !t.archived);
-          if (activeThreads.length > 0) {
-            setActiveThread(activeThreads[0].id);
+          if (nextActiveId) {
+            setActiveThread(nextActiveId);
           } else {
             setActiveThread(null);
             setMessages([]);

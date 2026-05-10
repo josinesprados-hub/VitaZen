@@ -14,8 +14,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { sessionId, duration, type } = body;
-    console.log('[CRUD DEBUG] Meditation PUT - sessionId:', sessionId, 'userId:', user.id);
-
     // Verify the session belongs to the user before updating
     const session = await db.meditationSession.findUnique({ where: { id: sessionId } });
     if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
@@ -42,8 +40,6 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
     const { sessionId } = body;
-    console.log('[CRUD DEBUG] Meditation DELETE - sessionId:', sessionId, 'userId:', user.id);
-
     // Verify the session belongs to the user before deleting
     const session = await db.meditationSession.findUnique({ where: { id: sessionId } });
     if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });

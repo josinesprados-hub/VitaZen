@@ -77,7 +77,7 @@ export default function EnergiaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setWellnessLogs([data.log, ...wellnessLogs]);
+        setWellnessLogs(prev => [data.log, ...prev]);
         setShowWellness(false);
       }
     } catch (error) { console.error('Error submitting wellness:', error); }
@@ -91,7 +91,7 @@ export default function EnergiaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setNutrition([data.log, ...nutrition]);
+        setNutrition(prev => [data.log, ...prev]);
         setShowNutrition(false);
       }
     } catch (error) { console.error('Error submitting nutrition:', error); }
@@ -120,7 +120,6 @@ export default function EnergiaPage() {
     if (!editingWellness) return;
     setEditWellnessSaving(true);
     try {
-      console.log('[CRUD DEBUG] Wellness PUT - logId:', editingWellness.id);
       const res = await apiFetch('/api/wellness', {
         method: 'PUT',
         body: JSON.stringify({ logId: editingWellness.id, ...editWellnessForm }),
@@ -131,7 +130,7 @@ export default function EnergiaPage() {
         setEditingWellness(null);
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Wellness PUT failed:', res.status, errData);
+        console.error('Wellness PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating wellness log:', error); }
     finally { setEditWellnessSaving(false); }
@@ -146,7 +145,6 @@ export default function EnergiaPage() {
     if (!editingNutrition) return;
     setEditNutritionSaving(true);
     try {
-      console.log('[CRUD DEBUG] Nutrition PUT - logId:', editingNutrition.id);
       const res = await apiFetch('/api/nutrition', {
         method: 'PUT',
         body: JSON.stringify({ logId: editingNutrition.id, ...editNutritionForm }),
@@ -157,7 +155,7 @@ export default function EnergiaPage() {
         setEditingNutrition(null);
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Nutrition PUT failed:', res.status, errData);
+        console.error('Nutrition PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating nutrition log:', error); }
     finally { setEditNutritionSaving(false); }
@@ -168,7 +166,6 @@ export default function EnergiaPage() {
     try {
       const endpoint = pendingDeleteId.type === 'wellness' ? '/api/wellness' : '/api/nutrition';
       const bodyKey = 'logId';
-      console.log('[CRUD DEBUG] DELETE - endpoint:', endpoint, 'logId:', pendingDeleteId.id, 'type:', pendingDeleteId.type);
       const res = await apiFetch(endpoint, {
         method: 'DELETE',
         body: JSON.stringify({ [bodyKey]: pendingDeleteId.id }),
@@ -181,7 +178,7 @@ export default function EnergiaPage() {
         }
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] DELETE failed:', res.status, errData);
+        console.error('DELETE failed:', res.status, errData);
       }
     } catch (error) { console.error('Error deleting log:', error); }
     finally { setPendingDeleteId(null); }

@@ -181,7 +181,7 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
 
   // Compute rotation state when tips are loaded
   const computeTips = useCallback(() => {
-    if (allTips.length === 0) return { freeTips: [], premiumTips: [] };
+    if (allTips.length === 0) return { freeTips: [], premiumTips: [], changed: false };
 
     const freeTipsAll = allTips.filter(t => t.plan !== 'PREMIUM');
     const premiumTipsAll = allTips.filter(t => t.plan === 'PREMIUM');
@@ -189,7 +189,7 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
     const freeCount = freeTipsAll.length;
     const premiumCount = premiumTipsAll.length;
 
-    // Load or create cycle state
+    // Load or create cycle state (read-only in render)
     let state = loadCycleState(empire, freeCount, premiumCount);
 
     // Advance if 72h have passed
@@ -198,9 +198,8 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
 
     state = newState;
     stateRef.current = state;
-    saveCycleState(empire, state);
-
-    if (changed) setCycleVersion(v => v + 1);
+    // NOTE: saveCycleState is deferred to useEffect below to avoid
+    // side effects (localStorage write) during render.
 
     // Select FREE tips from shuffled order
     const selectedFree: Tip[] = [];
@@ -221,11 +220,19 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
       }
     }
 
-    return { freeTips: selectedFree, premiumTips: selectedPremium };
+    return { freeTips: selectedFree, premiumTips: selectedPremium, changed };
   }, [allTips, empire]);
 
   // Use ref to avoid re-computing on every render
   const tipsResult = computeTips();
+
+  // Persist cycle state changes after render commit (avoids side effects during render)
+  useEffect(() => {
+    if (stateRef.current && tipsResult.changed) {
+      saveCycleState(empire, stateRef.current);
+      setCycleVersion(v => v + 1);
+    }
+  }, [empire, tipsResult.changed]);
 
   return {
     freeTips: tipsResult.freeTips,

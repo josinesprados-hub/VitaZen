@@ -94,7 +94,7 @@ export default function DisciplinaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setHabits([data.habit, ...habits]);
+        setHabits(prev => [data.habit, ...prev]);
         setNewHabit({ name: '', description: '', frequency: 'daily' });
         setShowAddHabit(false);
       }
@@ -111,7 +111,7 @@ export default function DisciplinaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setHabits(habits.map(h => h.id === habitId ? data.habit : h));
+        setHabits(prev => prev.map(h => h.id === habitId ? data.habit : h));
         setJustCompletedId(habitId);
         setShowReward(true);
         setTimeout(() => setJustCompletedId(null), 600);
@@ -130,18 +130,18 @@ export default function DisciplinaPage() {
     if (!editingHabit) return;
     setEditSaving(true);
     try {
-      console.log('[CRUD DEBUG] Habits PUT - habitId:', editingHabit.id);
+
       const res = await apiFetch('/api/habits', {
         method: 'PUT',
         body: JSON.stringify({ habitId: editingHabit.id, ...editForm }),
       });
       if (res.ok) {
         const data = await res.json();
-        setHabits(habits.map(h => h.id === editingHabit.id ? data.habit : h));
+        setHabits(prev => prev.map(h => h.id === editingHabit.id ? data.habit : h));
         setEditingHabit(null);
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Habits PUT failed:', res.status, errData);
+        console.error('Habits PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating habit:', error); }
     finally { setEditSaving(false); }
@@ -150,16 +150,16 @@ export default function DisciplinaPage() {
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
     try {
-      console.log('[CRUD DEBUG] Habits DELETE - habitId:', pendingDeleteId);
+
       const res = await apiFetch('/api/habits', {
         method: 'DELETE',
         body: JSON.stringify({ habitId: pendingDeleteId }),
       });
       if (res.ok) {
-        setHabits(habits.filter(h => h.id !== pendingDeleteId));
+        setHabits(prev => prev.filter(h => h.id !== pendingDeleteId));
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Habits DELETE failed:', res.status, errData);
+        console.error('Habits DELETE failed:', res.status, errData);
       }
     } catch (error) { console.error('Error deleting habit:', error); }
     finally { setPendingDeleteId(null); }

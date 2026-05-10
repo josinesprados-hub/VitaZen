@@ -58,7 +58,7 @@ export default function RiquezaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setLogs([data.log, ...logs]);
+        setLogs(prev => [data.log, ...prev]);
         setShowAdd(false);
         setForm({ type: 'expense', category: '', amount: 0, description: '' });
       }
@@ -74,7 +74,6 @@ export default function RiquezaPage() {
     if (!editingLog) return;
     setEditSaving(true);
     try {
-      console.log('[CRUD DEBUG] Finance PUT - logId:', editingLog.id);
       const res = await apiFetch('/api/finance', {
         method: 'PUT',
         body: JSON.stringify({ logId: editingLog.id, date: editForm.date, type: editForm.type, category: editForm.category, amount: editForm.amount, description: editForm.description }),
@@ -85,7 +84,7 @@ export default function RiquezaPage() {
         setEditingLog(null);
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Finance PUT failed:', res.status, errData);
+        console.error('Finance PUT failed:', res.status, errData);
       }
     } catch (error) { console.error('Error updating finance log:', error); }
     finally { setEditSaving(false); }
@@ -94,7 +93,6 @@ export default function RiquezaPage() {
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
     try {
-      console.log('[CRUD DEBUG] Finance DELETE - logId:', pendingDeleteId);
       const res = await apiFetch('/api/finance', {
         method: 'DELETE',
         body: JSON.stringify({ logId: pendingDeleteId }),
@@ -103,7 +101,7 @@ export default function RiquezaPage() {
         setLogs(prev => prev.filter(l => l.id !== pendingDeleteId));
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Finance DELETE failed:', res.status, errData);
+        console.error('Finance DELETE failed:', res.status, errData);
       }
     } catch (error) { console.error('Error deleting finance log:', error); }
     finally { setPendingDeleteId(null); }

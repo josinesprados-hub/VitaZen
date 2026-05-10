@@ -131,7 +131,7 @@ export default function MentePage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setSessions([data.session, ...sessions]);
+        setSessions(prev => [data.session, ...prev]);
       }
     } catch (error) {
       console.error('Error saving meditation:', error);
@@ -159,7 +159,6 @@ export default function MentePage() {
     if (!editingSession) return;
     setEditSaving(true);
     try {
-      console.log('[CRUD DEBUG] Meditation PUT - sessionId:', editingSession.id);
       const res = await apiFetch('/api/meditation', {
         method: 'PUT',
         body: JSON.stringify({ sessionId: editingSession.id, duration: editDuration, type: editType }),
@@ -170,7 +169,7 @@ export default function MentePage() {
         setEditingSession(null);
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Meditation PUT failed:', res.status, errData);
+        console.error('Meditation PUT failed:', res.status, errData);
       }
     } catch (error) {
       console.error('Error updating session:', error);
@@ -182,7 +181,6 @@ export default function MentePage() {
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
     try {
-      console.log('[CRUD DEBUG] Meditation DELETE - sessionId:', pendingDeleteId);
       const res = await apiFetch('/api/meditation', {
         method: 'DELETE',
         body: JSON.stringify({ sessionId: pendingDeleteId }),
@@ -191,7 +189,7 @@ export default function MentePage() {
         setSessions(prev => prev.filter(s => s.id !== pendingDeleteId));
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('[CRUD DEBUG] Meditation DELETE failed:', res.status, errData);
+        console.error('Meditation DELETE failed:', res.status, errData);
       }
     } catch (error) {
       console.error('Error deleting session:', error);

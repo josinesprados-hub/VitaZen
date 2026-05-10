@@ -64,8 +64,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { logId, mood, energy, sleep, stress, notes } = body;
-    console.log('[CRUD DEBUG] Wellness PUT - logId:', logId, 'userId:', user.id);
-
     const log = await db.wellnessLog.findUnique({ where: { id: logId } });
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -91,8 +89,6 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
     const { logId } = body;
-    console.log('[CRUD DEBUG] Wellness DELETE - logId:', logId, 'userId:', user.id);
-
     const log = await db.wellnessLog.findUnique({ where: { id: logId } });
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

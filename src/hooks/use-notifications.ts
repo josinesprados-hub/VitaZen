@@ -56,44 +56,6 @@ export function useNotifications(): UseNotificationsReturn {
 
   const initRef = useRef(false);
 
-  // Initialize: check support, load preferences
-  useEffect(() => {
-    if (!firebaseUser) {
-      setLoading(false);
-      return;
-    }
-
-    // Only initialize once per auth session
-    if (initRef.current) return;
-    initRef.current = true;
-
-    const init = async () => {
-      const supported = await isPushSupported();
-      setPushSupported(supported);
-      setPermissionState(getPermissionState());
-      await loadPreferences();
-      setLoading(false);
-    };
-
-    init();
-    
-    return () => { initRef.current = false; };
-  }, [firebaseUser, loadPreferences]);
-
-  // Listen for foreground messages
-  useEffect(() => {
-    if (!pushSupported) return;
-
-    const unsubscribe = onForegroundMessage((payload) => {
-      setForegroundNotification(payload.notification || null);
-
-      // Auto-clear after 5 seconds
-      setTimeout(() => setForegroundNotification(null), 5000);
-    });
-
-    return () => unsubscribe();
-  }, [pushSupported]);
-
   const loadPreferences = useCallback(async () => {
     if (!firebaseUser) return;
 
@@ -111,6 +73,61 @@ export function useNotifications(): UseNotificationsReturn {
       console.error('[useNotifications] Error loading preferences:', error);
     }
   }, [firebaseUser]);
+
+  // Initialize: check support, load preferences
+  useEffect(() => {
+    if (!firebaseUser) {
+      setLoading(false);
+      return;
+    }
+
+    // Only initialize once per auth session
+    if (initRef.current) return;
+    initRef.current = true;
+
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        const supported = await isPushSupported();
+        if (cancelled) return;
+        setPushSupported(supported);
+        setPermissionState(getPermissionState());
+        await loadPreferences();
+        if (!cancelled) setLoading(false);
+      } catch (error) {
+        console.error('[useNotifications] Init error:', error);
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    init();
+    
+    return () => {
+      cancelled = true;
+      initRef.current = false;
+    };
+  }, [firebaseUser, loadPreferences]);
+
+  // Listen for foreground messages
+  useEffect(() => {
+    if (!pushSupported) return;
+
+    let autoClearTimer: ReturnType<typeof setTimeout>;
+
+    const unsubscribe = onForegroundMessage((payload) => {
+      setForegroundNotification(payload.notification || null);
+
+      // Auto-clear after 5 seconds
+      clearTimeout(autoClearTimer);
+      autoClearTimer = setTimeout(() => setForegroundNotification(null), 5000);
+    });
+
+    return () => {
+      unsubscribe();
+      clearTimeout(autoClearTimer);
+    };
+  }, [pushSupported]);
 
   const enablePush = useCallback(async (): Promise<boolean> => {
     const token = await requestPushToken();

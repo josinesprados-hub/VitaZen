@@ -67,8 +67,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { entryId, title, content, mood, gratitude } = body;
-    console.log('[CRUD DEBUG] Journal PUT - entryId:', entryId, 'userId:', user.id);
-
     const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
     if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -94,8 +92,6 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
     const { entryId } = body;
-    console.log('[CRUD DEBUG] Journal DELETE - entryId:', entryId, 'userId:', user.id);
-
     const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
     if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

@@ -121,8 +121,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { habitId, name, description, frequency } = body;
-    console.log('[CRUD DEBUG] Habits PUT - habitId:', habitId, 'userId:', user.id);
-
     const habit = await db.habitLog.findUnique({ where: { id: habitId } });
     if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
     if (habit.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -148,8 +146,6 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
     const { habitId } = body;
-    console.log('[CRUD DEBUG] Habits DELETE - habitId:', habitId, 'userId:', user.id);
-
     await db.habitLog.deleteMany({ where: { id: habitId, userId: user.id } });
 
     return NextResponse.json({ success: true });
