@@ -114,10 +114,18 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [saveError, setSaveError] = useState(false);
   const [step, setStep] = useState(0); // 0: intro, 1: form, 2: done
 
-  // Lock body scroll when modal is open
+  // Lock body scroll when modal is open.
+  // Save scroll position before locking (position:fixed on body resets it),
+  // then restore on cleanup.
   useEffect(() => {
+    const scrollY = window.scrollY;
     document.body.classList.add('scroll-locked');
-    return () => document.body.classList.remove('scroll-locked');
+    document.body.style.top = `-${scrollY}px`;
+    return () => {
+      document.body.classList.remove('scroll-locked');
+      document.body.style.top = '';
+      window.scrollTo(0, scrollY);
+    };
   }, []);
 
   const handleSave = async () => {

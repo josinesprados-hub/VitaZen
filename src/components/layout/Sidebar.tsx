@@ -42,11 +42,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const router = useRouter();
   const { user, signOut } = useAuth();
 
-  // Lock body scroll when sidebar is open on mobile
+  // Lock body scroll when sidebar is open on mobile.
+  // Save scroll position before locking (position:fixed on body resets it),
+  // then restore on cleanup.
   useEffect(() => {
     if (open) {
+      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      return () => document.body.classList.remove('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
     }
   }, [open]);
 

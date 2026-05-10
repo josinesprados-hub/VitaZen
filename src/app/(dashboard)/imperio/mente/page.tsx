@@ -83,6 +83,20 @@ export default function MentePage() {
   const [editSaving, setEditSaving] = useState(false);
   const [fetchError, setFetchError] = useState(false);
 
+  // Lock body scroll when modal is open — save/restore scroll position
+  useEffect(() => {
+    if (pendingDeleteId) {
+      const scrollY = window.scrollY;
+      document.body.classList.add('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [pendingDeleteId]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setFetchError(false);
@@ -220,7 +234,7 @@ export default function MentePage() {
       {/* Completion Overlay */}
       {completedSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setCompletedSession(null)}
         >
           <div
@@ -255,7 +269,7 @@ export default function MentePage() {
       {/* Edit Session Overlay */}
       {editingSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setEditingSession(null)}
         >
           <div
@@ -315,7 +329,7 @@ export default function MentePage() {
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setPendingDeleteId(null)}
         >
           <div

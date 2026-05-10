@@ -143,7 +143,7 @@ export default function DashboardLayout({
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="lg:ml-64">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />
-        <main className="p-4 sm:p-4 lg:p-6 pb-6 safe-bottom overflow-x-contain">
+        <main className="p-4 sm:p-4 lg:p-6 pb-6 overflow-x-contain">
           {!screenshotMode && <EmailVerificationBanner />}
           {children}
         </main>

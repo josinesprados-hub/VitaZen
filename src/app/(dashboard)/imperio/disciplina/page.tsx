@@ -47,11 +47,17 @@ export default function DisciplinaPage() {
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
 
-  // Lock body scroll when any modal is open
+  // Lock body scroll when any modal is open — save/restore scroll position
   useEffect(() => {
     if (editingHabit || pendingDeleteId) {
+      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      return () => document.body.classList.remove('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
     }
   }, [editingHabit, pendingDeleteId]);
 
@@ -190,7 +196,7 @@ export default function DisciplinaPage() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Edit Habit Overlay */}
       {editingHabit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setEditingHabit(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setEditingHabit(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-[#c8a55a]" />
@@ -218,7 +224,7 @@ export default function DisciplinaPage() {
 
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setPendingDeleteId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setPendingDeleteId(null)}>
           <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />

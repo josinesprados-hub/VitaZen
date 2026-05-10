@@ -30,6 +30,25 @@ interface NutritionLog {
   createdAt: string;
 }
 
+// Rating input — module-level component to prevent remount flicker.
+// Previously defined inside EnergiaPage, causing React to unmount+remount
+// all rating buttons on every state change (visual flicker + lost :active state).
+function RatingInput({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
+  return (
+    <div>
+      <label className="text-sm text-[#999] mb-1 block">{label}</label>
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button key={n} onClick={() => onChange(n)}
+            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#c8a55a]'}`}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function EnergiaPage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
@@ -48,6 +67,20 @@ export default function EnergiaPage() {
   const [editNutritionSaving, setEditNutritionSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<{ id: string; type: 'wellness' | 'nutrition' } | null>(null);
   const [fetchError, setFetchError] = useState(false);
+
+  // Lock body scroll when modal is open — save/restore scroll position
+  useEffect(() => {
+    if (editingWellness || editingNutrition || pendingDeleteId) {
+      const scrollY = window.scrollY;
+      document.body.classList.add('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [editingWellness, editingNutrition, pendingDeleteId]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -96,20 +129,6 @@ export default function EnergiaPage() {
       }
     } catch (error) { console.error('Error submitting nutrition:', error); }
   };
-
-  const RatingInput = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
-    <div>
-      <label className="text-sm text-[#999] mb-1 block">{label}</label>
-      <div className="flex gap-2">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} onClick={() => onChange(n)}
-            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#c8a55a]'}`}>
-            {n}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
 
   const startEditWellness = (log: WellnessLog) => {
     setEditingWellness(log);
@@ -205,7 +224,7 @@ export default function EnergiaPage() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Edit Wellness Overlay */}
       {editingWellness && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setEditingWellness(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingWellness(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-[#c8a55a]" />
@@ -229,7 +248,7 @@ export default function EnergiaPage() {
 
       {/* Edit Nutrition Overlay */}
       {editingNutrition && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setEditingNutrition(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingNutrition(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-[#c8a55a]" />
@@ -261,7 +280,7 @@ export default function EnergiaPage() {
 
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setPendingDeleteId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
           <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />

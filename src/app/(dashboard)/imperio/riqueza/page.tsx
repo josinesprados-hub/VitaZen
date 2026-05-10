@@ -32,6 +32,20 @@ export default function RiquezaPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
 
+  // Lock body scroll when modal is open — save/restore scroll position
+  useEffect(() => {
+    if (pendingDeleteId) {
+      const scrollY = window.scrollY;
+      document.body.classList.add('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [pendingDeleteId]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setFetchError(false);
@@ -131,7 +145,7 @@ export default function RiquezaPage() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Edit Finance Log Overlay */}
       {editingLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setEditingLog(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingLog(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-[#c8a55a]" />
@@ -167,7 +181,7 @@ export default function RiquezaPage() {
 
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setPendingDeleteId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
           <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />

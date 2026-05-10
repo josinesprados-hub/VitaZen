@@ -31,8 +31,10 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Safe areas for iPhone notch / home indicator */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* Safe area handling is done per-element (safe-top, safe-bottom classes)
+     on fixed/sticky elements like TopBar, Sidebar, and modal content.
+     Body-level padding is intentionally NOT applied here to prevent
+     double safe-area padding when both body and element add env() values. */
 }
 
 /* Prevent iOS bounce overscroll revealing background */
@@ -63,22 +65,36 @@ html, body {
 /* Custom focus styles */
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #c8a55a !important;
+  border-color: #c8a55a;
   box-shadow: 0 0 0 1px #c8a55a;
+}
+/* Error state borders must not be overridden by focus gold */
+input.border-red-500:focus, textarea.border-red-500:focus, select.border-red-500:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px #ef4444;
 }
 
 /* ═══════════════════════════════════════════
    Mobile Touch & Interaction
    ═══════════════════════════════════════════ */
 
-/* Minimum touch target — 44px Apple HIG guideline */
-button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+/* Minimum touch target — 44px Apple HIG guideline.
+   Applied to buttons and explicit interactive roles.
+   <a> tags are excluded from the blanket 44px rule because inline links
+   in text contexts get bloated. Block/flex <a> links (cards, nav items)
+   already have sufficient padding for their tap target. */
+button, [role="button"], input[type="checkbox"], input[type="radio"] {
   min-height: 44px;
 }
 
 /* Touch target for small inline elements — ensure tap area via padding */
 .pill, .badge-premium, .badge-free {
   min-height: 32px;
+}
+
+/* Intentionally small UI elements — override min-height:44px */
+.rating-btn, .value-btn {
+  min-height: auto;
 }
 .pill {
   padding-top: 0.375rem;
@@ -672,7 +688,13 @@ html { scroll-behavior: smooth; }
   }
 }
 
-/* Progress bar smooth animation — legacy selector */
+/* Progress bar smooth animation — uses dedicated class instead of
+   broad .h-1.5 > div selector which could affect non-progress children */
+.progress-bar-fill-animated {
+  transition: width 0.7s ease-out, background-color 0.5s ease;
+}
+/* Legacy selector retained for existing usage, scoped more tightly */
+.progress-bar-track > div,
 .h-1\.5 > div {
   transition: width 0.7s ease-out, background-color 0.5s ease;
 }
@@ -962,7 +984,10 @@ html { scroll-behavior: smooth; }
    or via :has() when a full-screen overlay is present. */
 body.scroll-locked {
   overflow: hidden;
-  /* Preserve scroll position on iOS Safari */
+  /* Preserve scroll position on iOS Safari.
+     JS that adds this class should set body.style.top = `-${scrollY}px`
+     and restore window.scrollTo(0, scrollY) on removal.
+     position:fixed alone resets scroll position to 0. */
   position: fixed;
   width: 100%;
   touch-action: none;
@@ -1063,9 +1088,11 @@ body.scroll-locked {
   transition: transform 0.08s ease;
 }
 
-/* Link tap feedback — subtle opacity shift on mobile */
+/* Link tap feedback — subtle opacity shift on mobile.
+   Excludes links that already have touch-press scale feedback
+   to avoid double visual feedback (scale + opacity). */
 @media (hover: none) and (pointer: coarse) {
-  a:active {
+  a:active:not(.touch-press):not(.touch-press-sm):not(.insight-card) {
     opacity: 0.7;
     transition: opacity 0.1s ease;
   }
@@ -1273,14 +1300,15 @@ body.scroll-locked {
   animation: authPageIn 0.4s ease-out;
 }
 
-/* Dashboard section stagger */
+/* Dashboard section stagger — transform only, never opacity:0.
+   Previous version used opacity:0 with animation-fill-mode:both which
+   caused the same WebKit/Chromium compositing bug where sections could
+   stay permanently invisible on low-end devices. */
 @keyframes sectionStaggerIn {
   from {
-    opacity: 0;
     transform: translateY(6px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }

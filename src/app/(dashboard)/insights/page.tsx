@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
@@ -164,6 +165,7 @@ function TrendIndicator({ value, label }: { value: number; label: string }) {
 export default function InsightsPage() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
+  const router = useRouter();
   const { isActive: screenshotMode } = useScreenshotMode();
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -256,7 +258,7 @@ export default function InsightsPage() {
       </div>
 
       {/* Wellness Score Card — clickable to checkin */}
-      <Link href="/checkin" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press">
+      <div onClick={() => router.push('/checkin')} className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Activity size={22} className="text-[#c8a55a]" />
@@ -306,7 +308,7 @@ export default function InsightsPage() {
             </Link>
           ))}
         </div>
-      </Link>
+      </div>
 
       {/* Weekly Comparison — PREMIUM gated with blur, each trend card navigates */}
       <PremiumGate isPremium={isPremium} intensity="medium" label="Comparativa semanal">

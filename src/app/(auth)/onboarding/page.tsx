@@ -193,7 +193,7 @@ export default function OnboardingPage() {
   // 1. Initial Firebase auth resolution (no firebaseUser yet)
   if (loading && !firebaseUser) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse" />
           <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
@@ -212,7 +212,7 @@ export default function OnboardingPage() {
   //    handler retries sync on 404).
   if (firebaseUser && !user && !syncError) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse" />
           <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
@@ -233,7 +233,7 @@ export default function OnboardingPage() {
   const progressPercent = ((step + 1) / TOTAL_STEPS) * 100;
 
   return (
-    <div className="min-h-[100dvh] bg-[#000000] flex flex-col items-center justify-center px-5 py-8 safe-top safe-bottom">
+    <div className="min-h-[100dvh] bg-[#000000] flex flex-col items-center justify-center px-5 py-8">
       {/* Progress Bar */}
       <div className="w-full max-w-lg mb-6 sm:mb-8">
         <div className="flex items-center justify-between mb-2">
