@@ -339,12 +339,12 @@ export default function InsightsPage() {
                 <Link
                   key={insight.id}
                   href={insightHref}
-                  className={`insight-card bg-[#0a0a0a] border rounded-xl p-5 transition-all duration-200 card-enter cursor-pointer group ${getInsightBorderClass(insight.type)}`}
+                  className={`insight-card bg-[#0a0a0a] border rounded-xl p-4 sm:p-5 cursor-pointer group touch-press ${getInsightBorderClass(insight.type)}`}
                 >
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl shrink-0 mt-0.5">{insight.icon}</span>
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <span className="text-xl sm:text-2xl shrink-0 leading-none">{insight.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5">
+                      <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">{insight.title}</h3>
                         <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider ${getInsightBadgeClass(insight.type)}`}>
                           {insight.category}
@@ -352,7 +352,7 @@ export default function InsightsPage() {
                       </div>
                       <p className="text-sm text-[#999] leading-relaxed">{insight.description}</p>
                     </div>
-                    <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0 mt-1" />
+                    <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0" />
                   </div>
                 </Link>
               );

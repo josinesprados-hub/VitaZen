@@ -609,12 +609,20 @@ html { scroll-behavior: smooth; }
   background-color: #1a1a1a;
 }
 
-/* Insight card hover */
+/* Insight card — border-only hover, no transform (avoids stuck :hover on mobile) */
 .insight-card {
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base);
 }
-.insight-card:hover {
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .insight-card:hover {
+    border-color: rgba(200, 165, 90, 0.15);
+  }
+}
+/* Override global a:active opacity — insight cards use touch-press scale instead */
+@media (hover: none) and (pointer: coarse) {
+  .insight-card:active {
+    opacity: 1;
+  }
 }
 
 /* Progress bar smooth animation — legacy selector */
