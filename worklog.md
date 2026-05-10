@@ -53,3 +53,38 @@ Stage Summary:
 - 11 files changed, 1076 insertions, 1 deletion
 - New files: src/app/(auth)/onboarding/page.tsx, src/app/api/onboarding/route.ts, src/components/dashboard/OnboardingRecommendations.tsx
 - Modified: prisma/schema.prisma, middleware.ts, src/app/(dashboard)/dashboard/page.tsx, src/app/(dashboard)/layout.tsx, src/app/api/auth/session/route.ts, src/app/api/auth/sync/route.ts, src/app/globals.css, src/context/AuthContext.tsx
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: feat: mobile observability and crash monitoring
+
+Work Log:
+- Created full observability system in src/lib/observability/ with 9 modules
+- types.ts: Core types, severity levels, error categories, config constants
+- logger.ts: Lightweight structured logger with buffer+batch, dedup, rate limiting, PII stripping
+- errors.ts: Global error handlers (window.onerror, unhandledrejection) with PII stripping
+- performance.ts: PerformanceObserver for long tasks, LCP, memory pressure, render timing
+- hydration.ts: Hydration mismatch detection via console.error interception
+- boundaries.tsx: Enhanced error boundary components (ObservantErrorBoundary, WidgetErrorBoundary, NotificationErrorBoundary)
+- tracking.ts: Widget error tracking (snapshot, cache, refresh, API, trigger failures)
+- notification-tracking.ts: Push notification error tracking (FCM, tokens, SW, permissions)
+- server-tracking.ts: Background task monitoring (cron, batch, auth sync, API route, network)
+- Created /api/observability/report endpoint for receiving batched reports
+- Created ObservabilityInit component (invisible, zero DOM footprint)
+- Integrated into root layout.tsx (initializes on mount)
+- Added reporting to all 6 error.tsx boundaries (dashboard, auth, onboarding, insights, mentor, dashboard page)
+- Added widget error tracking to snapshot.ts, widget API routes, refresh route
+- Added notification error tracking to service.ts and push-client.ts
+- Added cron failure tracking to all 3 cron routes
+- Added auth sync failure tracking to AuthContext
+- Build successful, committed and pushed
+
+Stage Summary:
+- 28 files changed, 2132 insertions, 5 deletions
+- New module: src/lib/observability/ (9 modules + index)
+- New API: /api/observability/report
+- New component: ObservabilityInit
+- All existing error boundaries now report to observability
+- Widget + notification + cron + auth systems now track failures
+- Commit: "feat: mobile observability and crash monitoring"

@@ -159,6 +159,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [showContextTooltip, setShowContextTooltip] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const sendingRef = useRef(false);
@@ -198,7 +199,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }, [activeThread]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Use scrollTo on the scroll container instead of scrollIntoView.
+    // scrollIntoView causes viewport jumps on iOS Safari when the
+    // virtual keyboard is open, because it tries to scroll the
+    // entire document, not just the chat container.
+    const container = scrollContainerRef.current;
+    if (container) {
+      requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+      });
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -494,16 +504,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }
 
   return (
-    <div className="max-w-6xl mx-auto h-[calc(100dvh-5.5rem)] sm:h-[calc(100vh-8rem)] flex flex-col overflow-x-contain">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2 sm:mb-5">
-        <div className="flex items-center gap-2.5 sm:gap-4">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <IconComponent size={24} className="text-[#c8a55a] sm:w-7 sm:h-7" />
+    <div className="flex flex-col h-[100dvh] -m-4 lg:-m-6 overflow-hidden sm:max-w-6xl sm:mx-auto sm:h-[100dvh]">
+      {/* Header — compact on mobile */}
+      <div className="flex items-center justify-between px-3 py-2 sm:px-0 sm:py-0 sm:mb-5 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+            <IconComponent size={18} className="text-[#c8a55a] sm:w-7 sm:h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold text-white">Mentor IA</h1>
+              <h1 className="text-base sm:text-2xl font-bold text-white">Mentor IA</h1>
               {/* Discreet Premium badge */}
               {isPremium && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
@@ -512,17 +522,17 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 </span>
               )}
             </div>
-            <p className="text-[#999] text-sm">
+            <p className="text-[#999] text-xs sm:text-sm hidden sm:block">
               {isPremium
                 ? 'Tu mentor experto con memoria avanzada'
                 : 'Tu guía de desarrollo personal'}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Message counter pill for FREE users */}
           {!isPremium && remaining !== null && (
-            <div className="message-counter-pill flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a]">
+            <div className="message-counter-pill flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a]">
               <Zap size={12} className={remaining <= 3 ? 'text-red-400' : 'text-[#c8a55a]'} />
               <span className={remaining <= 3 ? 'text-red-400' : 'text-[#c8a55a]'}>
                 {remaining}/{dailyLimit}
@@ -531,14 +541,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           )}
           {/* Premium infinity indicator */}
           {isPremium && (
-            <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/15">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/15">
               <InfinityIcon size={12} className="text-[#c8a55a]" />
-              <span className="text-[#c8a55a]">Sin límite</span>
+              <span className="text-[#c8a55a] hidden sm:inline">Sin límite</span>
             </div>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+            className="p-1.5 sm:p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors hidden sm:flex"
             title={sidebarOpen ? 'Ocultar sidebar' : 'Mostrar sidebar'}
           >
             {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
@@ -546,16 +556,18 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         </div>
       </div>
 
-      {/* Contextual Help */}
-      <ContextualHelp
-        storageKey="vitazen_help_mentor"
-        title="Mentor IA"
-        text="Escribe tu pregunta y el mentor te responderá. Crea nuevas conversaciones, renómbralas o archívalas desde el menú lateral."
-      />
+      {/* Contextual Help — desktop only, saves mobile vertical space */}
+      <div className="hidden sm:block">
+        <ContextualHelp
+          storageKey="vitazen_help_mentor"
+          title="Mentor IA"
+          text="Escribe tu pregunta y el mentor te responderá. Crea nuevas conversaciones, renómbralas o archívalas desde el menú lateral."
+        />
+      </div>
 
-      {/* Main content */}
-      <div className="flex flex-1 gap-2 sm:gap-4 min-h-0">
-        {/* ────────── Sidebar ────────── */}
+      {/* Main content — flex-1 with min-h-0 for proper overflow */}
+      <div className="flex flex-1 gap-0 sm:gap-4 min-h-0 overflow-hidden">
+        {/* ────────── Sidebar (desktop only) ────────── */}
         <div
           className={`shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
             sidebarOpen ? 'w-72' : 'w-0 border-0'
@@ -932,12 +944,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </div>
         )}
 
-        {/* ────────── Mobile Thread Picker (visible only on small screens) ────────── */}
-        <div className="sm:hidden flex items-center gap-2 mb-1">
+        {/* ────────── Mobile Thread Picker — now above chat area ────────── */}
+        <div className="sm:hidden shrink-0 px-2 py-1.5 flex items-center gap-2 border-b border-[#1a1a1a] bg-[#0a0a0a]">
           <select
             value={activeThread || ''}
             onChange={(e) => setActiveThread(e.target.value)}
-            className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white appearance-none focus:border-[#c8a55a]"
+            className="flex-1 bg-[#000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white appearance-none focus:border-[#c8a55a] focus:outline-none"
           >
             {activeThreads.length === 0 && (
               <option value="">Sin conversaciones</option>
@@ -948,18 +960,18 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </select>
           <button
             onClick={createThread}
-            className="shrink-0 flex items-center gap-1.5 bg-[#c8a55a] text-black font-semibold px-3 py-2 rounded-lg text-sm touch-press"
+            className="shrink-0 flex items-center justify-center w-10 h-10 bg-[#c8a55a] text-black font-semibold rounded-lg text-sm touch-press"
           >
-            <Plus size={16} />
+            <Plus size={18} />
           </button>
         </div>
 
-        {/* ────────── Chat Area ────────── */}
-        <div className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex flex-col min-w-0">
+        {/* ────────── Chat Area — full flex column ────────── */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
           {activeThread ? (
             <>
-              {/* Chat header bar with thread info */}
-              <div className="px-4 sm:px-5 py-3 border-b border-[#1a1a1a] flex items-center justify-between">
+              {/* Chat header bar — compact on mobile */}
+              <div className="px-3 py-2 sm:px-5 sm:py-3 border-b border-[#1a1a1a] flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
                   <MessageCircle size={14} className="text-[#c8a55a] shrink-0" />
                   <p className="text-sm text-white truncate">
@@ -1002,8 +1014,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 )}
               </div>
 
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 scroll-contain">
+              {/* Messages — single scroll container with overscroll containment */}
+              <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
                 {messages.length === 0 && (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center animate-in">
@@ -1050,7 +1062,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
                   >
                     <div
-                      className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
+                      className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
                         msg.role === 'user'
                           ? 'bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-br-md'
                           : isPremium
@@ -1058,7 +1070,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                           : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
                       }`}
                     >
-                      <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      <p className="text-sm sm:text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
                     </div>
                   </div>
                 ))}
@@ -1078,8 +1090,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input area with inline limit warning */}
-              <div className="p-3 sm:p-4 border-t border-[#1a1a1a] safe-bottom keyboard-aware">
+              {/* Input area — safe-area for iPhone home indicator */}
+              <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
                 {/* Low message warning */}
                 {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
                   <div className="mb-2 flex items-center gap-2 text-[10px] text-[#e8a849] bg-[#e8a849]/5 border border-[#e8a849]/10 rounded-lg px-3 py-1.5">
@@ -1103,6 +1115,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    enterKeyHint="send"
+                    autoComplete="off"
                     placeholder={
                       activeThreadData?.archived
                         ? 'Conversación archivada'
@@ -1110,19 +1124,19 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         ? 'Límite diario alcanzado'
                         : 'Escribe tu mensaje...'
                     }
-                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-sm placeholder-[#555] transition-colors ${
+                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base sm:text-sm placeholder-[#555] transition-colors ${
                       activeThreadData?.archived
                         ? 'border-[#333] cursor-not-allowed opacity-40'
                         : !isPremium && remaining === 0
                         ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
-                        : 'border-[#1a1a1a] focus:border-[#c8a55a]'
+                        : 'border-[#1a1a1a] focus:border-[#c8a55a] focus:outline-none'
                     }`}
                     disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
                   />
                   <button
                     type="submit"
                     disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
-                    className="bg-[#c8a55a] text-black font-semibold px-5 py-3 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="bg-[#c8a55a] text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
                   >
                     <Send size={18} />
                   </button>
@@ -1130,16 +1144,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center animate-in">
-                <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
-                  <IconComponent size={32} className="text-[#c8a55a]" />
+            <div className="flex items-center justify-center flex-1 min-h-0">
+              <div className="text-center animate-in px-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
+                  <IconComponent size={28} className="text-[#c8a55a] sm:size-8" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">Mentor IA</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
                 <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
                 <button
                   onClick={createThread}
-                  className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+                  className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold px-5 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm touch-press"
                 >
                   <Plus size={16} /> Nueva conversación
                 </button>
