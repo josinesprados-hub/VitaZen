@@ -19,20 +19,28 @@
 export * from './types';
 
 // Logger (main API)
-export { reportError, reportPerformance, flush, getSessionId, installVisibilityHandler } from './logger';
+import { reportError, reportPerformance, flush, getSessionId, installVisibilityHandler } from './logger';
+export { reportError, reportPerformance, flush, getSessionId, installVisibilityHandler };
 
 // Global error handlers
-export { installGlobalErrorHandlers, uninstallGlobalErrorHandlers } from './errors';
+import { installGlobalErrorHandlers, uninstallGlobalErrorHandlers } from './errors';
+export { installGlobalErrorHandlers, uninstallGlobalErrorHandlers };
 
 // Performance instrumentation
-export {
+import {
   installPerformanceObservers,
   startRenderMeasure,
   measurePageLoad,
 } from './performance';
+export {
+  installPerformanceObservers,
+  startRenderMeasure,
+  measurePageLoad,
+};
 
 // Hydration detection
-export { installHydrationDetection, reportHydrationMismatch } from './hydration';
+import { installHydrationDetection, reportHydrationMismatch } from './hydration';
+export { installHydrationDetection, reportHydrationMismatch };
 
 // Error boundaries
 export {
