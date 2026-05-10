@@ -14,6 +14,7 @@ import {
 } from './types';
 import { canSendNotification, isDuplicateNotification } from './scheduler';
 import { getTemplate } from './templates';
+import { trackFCMSendFailure, trackFCMInvalidTokens, trackNoActiveTokens } from '@/lib/observability/notification-tracking';
 
 /** Result of a send attempt */
 export interface SendNotificationResult {
@@ -66,6 +67,7 @@ export async function sendNotification(
   });
 
   if (tokens.length === 0) {
+    trackNoActiveTokens();
     return { success: false, reason: 'no_active_tokens' };
   }
 
@@ -108,11 +110,13 @@ export async function sendNotification(
     });
   } catch (error) {
     console.error('[Notifications] FCM send error:', error);
+    trackFCMSendFailure(error, fcmTokens.length);
     // Still log the attempt — important for debugging and rate limit tracking
   }
 
   // ── 6. Cleanup invalid tokens (non-blocking) ──
   if (invalidTokenIds.length > 0) {
+    trackFCMInvalidTokens(invalidTokenIds.length);
     db.pushToken.updateMany({
       where: { id: { in: invalidTokenIds } },
       data: { active: false },

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { getWidgetSnapshot } from '@/lib/widgets/snapshot';
 import { WIDGET_TYPES, WidgetType, WidgetResponse } from '@/lib/widgets/types';
+import { trackWidgetApiError } from '@/lib/observability/tracking';
 
 // ═══════════════════════════════════════════
 // GET /api/widgets/[type]
@@ -76,6 +77,8 @@ export async function GET(
     return response;
   } catch (error) {
     console.error('[Widgets] GET error:', error);
+    const { type } = await params;
+    trackWidgetApiError(type || 'unknown', 500, error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

@@ -3,6 +3,7 @@ export const maxDuration = 300; // 5 min timeout for batch email sending
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWeeklyRecaps } from '@/lib/weekly-recap-sender';
+import { trackCronFailure } from '@/lib/observability/server-tracking';
 
 // ═══════════════════════════════════════════
 // CRON: WEEKLY RECAP EMAILS
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('[CRON/WEEKLY-RECAP] Fatal error:', error);
+    trackCronFailure('weekly-recap', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

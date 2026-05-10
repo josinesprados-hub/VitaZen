@@ -18,6 +18,7 @@ import {
   onMessage,
 } from 'firebase/messaging';
 import type { PushPermissionState } from './types';
+import { trackPushTokenRegistrationFailure, trackPushNotSupported, trackPushPermissionDenied, trackPushVapidKeyMissing, trackSWRegistrationFailure } from '@/lib/observability/notification-tracking';
 
 let messagingInstance: ReturnType<typeof getMessaging> | null = null;
 let currentToken: string | null = null;
@@ -77,6 +78,7 @@ export async function requestPushToken(): Promise<string | null> {
     const supported = await isPushSupported();
     if (!supported) {
       console.warn('[PushClient] Push not supported in this browser');
+      trackPushNotSupported();
       return null;
     }
 
@@ -87,6 +89,7 @@ export async function requestPushToken(): Promise<string | null> {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       console.log('[PushClient] Permission not granted:', permission);
+      trackPushPermissionDenied();
       return null;
     }
 
@@ -94,6 +97,7 @@ export async function requestPushToken(): Promise<string | null> {
     const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
     if (!vapidKey) {
       console.error('[PushClient] NEXT_PUBLIC_FIREBASE_VAPID_KEY not set');
+      trackPushVapidKeyMissing();
       return null;
     }
 
@@ -110,6 +114,7 @@ export async function requestPushToken(): Promise<string | null> {
     return token;
   } catch (error) {
     console.error('[PushClient] Error requesting push token:', error);
+    trackPushTokenRegistrationFailure(error);
     return null;
   }
 }
@@ -167,12 +172,17 @@ export function onForegroundMessage(
  * We register the firebase-messaging-sw.js if no active registration exists.
  */
 async function getOrCreateSWRegistration(): Promise<ServiceWorkerRegistration> {
-  const existingReg = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
-  if (existingReg) return existingReg;
+  try {
+    const existingReg = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+    if (existingReg) return existingReg;
 
-  return navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-    scope: '/',
-  });
+    return navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    });
+  } catch (error) {
+    trackSWRegistrationFailure(error);
+    throw error;
+  }
 }
 
 /**

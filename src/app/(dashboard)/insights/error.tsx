@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { reportError } from '@/lib/observability';
 
 // ═══════════════════════════════════════════
 // Insights page error boundary
@@ -8,6 +10,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 //
 // Catches unhandled errors in the insights
 // page. Provides retry and fallback navigation.
+// Reports errors to observability system.
 
 export default function InsightsPageError({
   error,
@@ -16,6 +19,15 @@ export default function InsightsPageError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    reportError(
+      'error_boundary',
+      'error',
+      error.message || 'Insights error boundary triggered',
+      error.constructor?.name || 'Error',
+    );
+  }, [error]);
+
   const isNetworkError =
     error.message?.toLowerCase().includes('network') ||
     error.message?.toLowerCase().includes('fetch') ||

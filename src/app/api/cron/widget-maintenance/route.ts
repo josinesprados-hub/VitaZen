@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { cleanupExpiredSnapshots, batchRefreshExpiredSnapshots } from '@/lib/widgets';
 import { startCacheCleanup } from '@/lib/widgets/cache';
+import { trackCronFailure, trackBatchProcessingFailure } from '@/lib/observability/server-tracking';
 
 // ═══════════════════════════════════════════
 // CRON: Widget Maintenance
@@ -35,6 +36,11 @@ export async function GET(request: NextRequest) {
     // ── 3. Refresh stale snapshots (limited batch) ──
     const refreshResult = await batchRefreshExpiredSnapshots(50);
 
+    // Track batch processing issues
+    if (refreshResult.errors > 0) {
+      trackBatchProcessingFailure('widget_refresh', refreshResult.errors, refreshResult.processed);
+    }
+
     return NextResponse.json({
       success: true,
       cleanup: { deletedSnapshots: deletedCount },
@@ -42,6 +48,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('[WidgetCron] Maintenance error:', error);
+    trackCronFailure('widget-maintenance', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

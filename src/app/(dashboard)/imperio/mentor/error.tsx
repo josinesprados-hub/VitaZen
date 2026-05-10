@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { reportError } from '@/lib/observability';
 
 // ═══════════════════════════════════════════
 // Mentor page error boundary
@@ -9,6 +11,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 // Catches unhandled errors in the mentor
 // AI chat page. Provides retry and fallback
 // navigation.
+// Reports errors to observability system.
 
 export default function MentorPageError({
   error,
@@ -17,6 +20,15 @@ export default function MentorPageError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    reportError(
+      'error_boundary',
+      'error',
+      error.message || 'Mentor error boundary triggered',
+      error.constructor?.name || 'Error',
+    );
+  }, [error]);
+
   const isNetworkError =
     error.message?.toLowerCase().includes('network') ||
     error.message?.toLowerCase().includes('fetch') ||

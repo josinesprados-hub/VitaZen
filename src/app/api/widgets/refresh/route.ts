@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { refreshWidgetSnapshot } from '@/lib/widgets/refresh';
 import { WIDGET_TYPES, WidgetType } from '@/lib/widgets/types';
+import { trackWidgetApiError, trackWidgetRefreshRateLimit } from '@/lib/observability/tracking';
 
 // ═══════════════════════════════════════════
 // POST /api/widgets/refresh
@@ -45,11 +46,17 @@ export async function POST(request: NextRequest) {
     // ── Attempt refresh (rate-limited internally) ──
     const result = await refreshWidgetSnapshot(user.id, widgetType, user.plan);
 
+    // Track rate limit hits
+    if (!result.refreshed && result.reason) {
+      trackWidgetRefreshRateLimit(widgetType, result.reason);
+    }
+
     const status = result.refreshed ? 200 : 429;
 
     return NextResponse.json(result, { status });
   } catch (error) {
     console.error('[Widgets] Refresh error:', error);
+    trackWidgetApiError('refresh', 500, error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

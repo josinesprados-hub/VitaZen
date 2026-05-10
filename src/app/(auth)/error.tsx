@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { reportError } from '@/lib/observability';
 
 // ═══════════════════════════════════════════
 // Auth route group error boundary
@@ -9,6 +11,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 // Catches unhandled errors in any page within
 // the (auth) route group (login, register,
 // onboarding, etc). Shows calm error state.
+// Reports errors to observability system.
 
 export default function AuthError({
   error,
@@ -17,6 +20,16 @@ export default function AuthError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // Report error to observability
+  useEffect(() => {
+    reportError(
+      'error_boundary',
+      'error',
+      error.message || 'Auth error boundary triggered',
+      error.constructor?.name || 'Error',
+    );
+  }, [error]);
+
   const isNetworkError =
     error.message?.toLowerCase().includes('network') ||
     error.message?.toLowerCase().includes('fetch') ||

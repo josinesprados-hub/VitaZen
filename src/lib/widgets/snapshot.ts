@@ -56,6 +56,7 @@ import {
   shapeDailyFocusPayload,
   shapeCalmQuotePayload,
 } from './shaping';
+import { trackWidgetSnapshotFailure } from '@/lib/observability/tracking';
 
 // ─── Snapshot Computation ────────────────────
 
@@ -242,6 +243,7 @@ export async function recomputeSnapshot(
     return result;
   } catch (error) {
     console.error(`[Widgets] Failed to recompute ${widgetType} for user ${userId}:`, error);
+    trackWidgetSnapshotFailure(widgetType, error, userId);
     return null;
   }
 }

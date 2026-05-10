@@ -3,6 +3,7 @@ export const maxDuration = 300; // 5 min timeout for batch processing
 
 import { NextRequest, NextResponse } from 'next/server';
 import { processReflectionBatch } from '@/lib/notifications/reminders/reflection';
+import { trackCronFailure } from '@/lib/observability/server-tracking';
 
 // ═══════════════════════════════════════════
 // CRON: REFLECTION REMINDERS
@@ -49,6 +50,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('[CRON/REFLECTION] Fatal error:', error);
+    trackCronFailure('reflection-reminder', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 },

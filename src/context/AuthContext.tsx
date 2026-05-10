@@ -13,6 +13,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 
 interface UserData {
   id: string;
@@ -71,10 +72,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return true;
         } else {
           console.error(`[Auth] sync failed (attempt ${attempt}):`, res.status);
+          trackAuthSyncFailure(attempt, res.status);
           return false;
         }
       } catch (error) {
         console.error(`[Auth] sync error (attempt ${attempt}):`, error);
+        trackAuthSyncFailure(attempt, undefined, error);
         return false;
       }
     };
