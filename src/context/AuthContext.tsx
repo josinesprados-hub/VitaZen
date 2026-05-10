@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
 import {
   onAuthStateChanged,
   User as FirebaseUser,
@@ -54,8 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncError, setSyncError] = useState(false);
+  const syncInFlight = useRef(false);
 
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
+    // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
+    if (syncInFlight.current) return;
+    syncInFlight.current = true;
+
     const attemptSync = async (attempt: number): Promise<boolean> => {
       try {
         setSyncError(false);
@@ -84,15 +89,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // First attempt
     const firstOk = await attemptSync(1);
-    if (firstOk) return;
+    if (firstOk) {
+      syncInFlight.current = false;
+      return;
+    }
 
     // Auto-retry once after 1.5s delay for resilience on mobile/slow connections
     await new Promise((r) => setTimeout(r, 1500));
     const retryOk = await attemptSync(2);
-    if (retryOk) return;
+    if (retryOk) {
+      syncInFlight.current = false;
+      return;
+    }
 
     // Both attempts failed
     setSyncError(true);
+    syncInFlight.current = false;
   }, []);
 
   const refreshUser = useCallback(async (options?: { reloadFirebase?: boolean }) => {

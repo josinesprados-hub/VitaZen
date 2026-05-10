@@ -165,6 +165,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const sendingRef = useRef(false);
   const activeThreadRef = useRef<string | null>(null);
   const fetchIdRef = useRef(0);
+  const lastSendTime = useRef(0);
 
   const isPremium = user?.plan === 'PREMIUM';
 
@@ -193,6 +194,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     activeThreadRef.current = activeThread;
     if (activeThread) {
       setMessages([]); // Clear immediately to avoid flash of old messages
+      setLoadError(false); // Clear any previous load error when switching threads
       fetchMessages(activeThread);
       try { localStorage.setItem(STORAGE_KEY, activeThread); } catch {}
     }
@@ -225,6 +227,38 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     return () => clearTimeout(timer);
   }, [actionError]);
 
+  // Refresh data when app comes back to foreground (mobile resume)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && activeThread) {
+        // Silently refresh messages and threads when returning to the app
+        fetchMessages(activeThread);
+        fetchThreads();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [activeThread, fetchMessages, fetchThreads]);
+
+  // Network status detection for mobile resilience
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    
+    // Set initial state
+    setIsOffline(typeof navigator !== 'undefined' && !navigator.onLine);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   // ─────────────────────────────────────────
   // Data fetching
   // ─────────────────────────────────────────
@@ -242,7 +276,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setRemaining(data.remaining);
           setDailyLimit(data.limit || 15);
         }
-        if (allThreads.length > 0) {
+        // Only set active thread on initial load (when none is set)
+        if (allThreads.length > 0 && !activeThreadRef.current) {
           let savedThreadId: string | null = null;
           try { savedThreadId = localStorage.getItem(STORAGE_KEY); } catch {}
 
@@ -292,7 +327,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       } else {
         const data = await res.json();
         if (data.error?.includes('Maximum')) {
-          alert('Has alcanzado el límite de conversaciones. Elimina una para crear otra nueva.');
+          setActionError('Límite de conversaciones alcanzado');
         }
       }
     } catch (e) { console.error(e); setActionError('No se pudo crear la conversación'); }
@@ -373,6 +408,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     const content = input.trim();
     if (!content || !activeThread || sendingRef.current) return;
 
+    const now = Date.now();
+    if (now - lastSendTime.current < 1000) return; // Debounce: 1s between sends
+    lastSendTime.current = now;
+
     const sentThreadId = activeThread;
     sendingRef.current = true;
 
@@ -425,6 +464,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setThreads(threadsData.threads);
           setHistoryLimited(!!threadsData.historyLimited);
         }
+      } else if (res.status !== 403) {
+        // Non-403 error: remove optimistic message and show error
+        if (activeThreadRef.current === sentThreadId) {
+          setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+          setInput(content);
+          setActionError('Error al enviar. Inténtalo de nuevo.');
+        }
       }
     } catch (e) {
       console.error(e);
@@ -432,6 +478,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (activeThreadRef.current === sentThreadId) {
         setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         setInput(content); // Restore input so user can retry
+        setActionError('Sin conexión. Tu mensaje se ha restaurado.');
       }
     }
     finally {
@@ -505,6 +552,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   return (
     <div className="flex flex-col h-[100dvh] -m-4 lg:-m-6 overflow-hidden sm:max-w-6xl sm:mx-auto sm:h-[100dvh]">
+      {/* Offline indicator — subtle top banner */}
+      {isOffline && (
+        <div className="px-3 py-1.5 bg-[#e8a849]/10 border-b border-[#e8a849]/20 text-[#e8a849] text-xs text-center shrink-0">
+          Sin conexión — los mensajes se enviarán cuando vuelva la red
+        </div>
+      )}
       {/* Header — compact on mobile */}
       <div className="flex items-center justify-between px-3 py-2 sm:px-0 sm:py-0 sm:mb-5 shrink-0">
         <div className="flex items-center gap-2 sm:gap-4">

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
   isPushSupported,
@@ -54,12 +54,18 @@ export function useNotifications(): UseNotificationsReturn {
     data?: Record<string, string>;
   } | null>(null);
 
+  const initRef = useRef(false);
+
   // Initialize: check support, load preferences
   useEffect(() => {
     if (!firebaseUser) {
       setLoading(false);
       return;
     }
+
+    // Only initialize once per auth session
+    if (initRef.current) return;
+    initRef.current = true;
 
     const init = async () => {
       const supported = await isPushSupported();
@@ -70,7 +76,9 @@ export function useNotifications(): UseNotificationsReturn {
     };
 
     init();
-  }, [firebaseUser]);
+    
+    return () => { initRef.current = false; };
+  }, [firebaseUser, loadPreferences]);
 
   // Listen for foreground messages
   useEffect(() => {

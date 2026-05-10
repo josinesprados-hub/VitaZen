@@ -263,23 +263,28 @@ export function startRenderMeasure(componentName: string): () => void {
 
 // ─── Install All Observers ──────────────────
 
-const cleanupFns: (() => void)[] = [];
+let performanceInstalled = false;
 
 /**
  * Start all performance observers.
  * Call once on app initialization (client-side only).
+ * Idempotent — safe to call multiple times (HMR).
  */
 export function installPerformanceObservers(): () => void {
+  if (typeof window === 'undefined') return () => {};
+  if (performanceInstalled) return () => {};
+  performanceInstalled = true;
+
+  const cleanupFns: (() => void)[] = [];
   cleanupFns.push(startLongTaskObserver());
   cleanupFns.push(startPaintObserver());
   cleanupFns.push(startMemoryMonitor());
   measurePageLoad();
 
-  // Return a cleanup function for unmount
   return () => {
     for (const cleanup of cleanupFns) {
       cleanup();
     }
-    cleanupFns.length = 0;
+    performanceInstalled = false;
   };
 }

@@ -17,6 +17,7 @@
 import { db } from '@/lib/db';
 import {
   WidgetType,
+  WIDGET_TYPES,
   MIN_REFRESH_INTERVAL_MS,
   MAX_DAILY_REFRESHES,
   WidgetRefreshResult,
@@ -146,7 +147,7 @@ export async function refreshWidgetSnapshot(
 }
 
 /** Number of widget types (for daily cap calculation) */
-const WIDGET_TYPE_COUNT = 5;
+const WIDGET_TYPE_COUNT = WIDGET_TYPES.length;
 
 /**
  * Trigger-based refresh: called when user data changes.

@@ -53,7 +53,7 @@ export default function DashboardLayout({
   // ─── 1. Auth resolving (no firebaseUser yet) ───
   if (loading && !firebaseUser) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
@@ -67,7 +67,7 @@ export default function DashboardLayout({
   // ─── 2. Sync pending (firebaseUser confirmed, waiting for server) ───
   if (firebaseUser && !user) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
@@ -82,7 +82,7 @@ export default function DashboardLayout({
   // Redirect handled by useEffect above. Show loading while redirecting.
   if (!user || !user.onboardingCompleted) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
@@ -95,7 +95,7 @@ export default function DashboardLayout({
 
   // ─── 4. All checks passed — render dashboard ───
   return (
-    <div className="min-h-screen bg-[#000000]">
+    <div className="min-h-dvh bg-[#000000]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="lg:ml-64">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />

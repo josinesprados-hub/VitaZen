@@ -43,6 +43,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'threadId and content required' }, { status: 400 });
     }
 
+    // Validate content length to prevent abuse
+    if (content.length > 4000) {
+      return NextResponse.json({ error: 'Message too long (max 4000 characters)' }, { status: 400 });
+    }
+
     // Verify thread belongs to user
     const thread = await db.aIThread.findFirst({
       where: { id: threadId, userId: user.id },

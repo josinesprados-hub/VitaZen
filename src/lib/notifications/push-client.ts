@@ -150,21 +150,26 @@ export async function deactivatePushToken(): Promise<void> {
 export function onForegroundMessage(
   callback: (payload: { notification?: { title?: string; body?: string }; data?: Record<string, string> }) => void,
 ): () => void {
-  if (!messagingInstance) {
-    const app = getApp();
-    try {
-      messagingInstance = getMessaging(app);
-    } catch {
-      return () => {};
-    }
+  if (typeof window === 'undefined') {
+    return () => {};
   }
 
-  return onMessage(messagingInstance, (payload) => {
-    callback({
-      notification: payload.notification as { title?: string; body?: string } | undefined,
-      data: payload.data as Record<string, string> | undefined,
+  try {
+    if (!messagingInstance) {
+      const app = getApp();
+      messagingInstance = getMessaging(app);
+    }
+
+    return onMessage(messagingInstance, (payload) => {
+      callback({
+        notification: payload.notification as { title?: string; body?: string } | undefined,
+        data: payload.data as Record<string, string> | undefined,
+      });
     });
-  });
+  } catch {
+    // Firebase messaging not available — return no-op unsubscribe
+    return () => {};
+  }
 }
 
 /**
