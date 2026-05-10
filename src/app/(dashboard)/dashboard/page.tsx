@@ -206,43 +206,48 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* ═══ 1. Greeting + Check-in ═══ */}
-      <div className="dash-section-enter dash-section-delay-1 flex items-center justify-between">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">
+      {/* ═══ 1. Greeting ═══ */}
+      <div className="dash-section-enter dash-section-delay-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
           {getTimeGreeting()}, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
         </h1>
-        <button
-          onClick={() => setShowCheckinModal(true)}
-          className="flex items-center gap-1.5 bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-lg px-3 py-1.5 hover:border-[#c8a55a]/40 transition-all group touch-press"
-        >
-          <Sunrise size={14} className="text-[#c8a55a]" />
-          <span className="text-[11px] text-[#999] group-hover:text-white transition-colors">{todayCheckin ? 'Check-in' : 'Haz check-in'}</span>
-        </button>
       </div>
-
-      {/* Today's check-in summary (compact) */}
-      {todayCheckin && (
-        <div className="dash-section-enter dash-section-delay-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 flex items-center gap-3">
-          <span className="text-base">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
-          <p className="text-xs text-[#c8a55a] font-medium truncate flex-1">«{todayCheckin.intention}»</p>
-          <span className="text-[10px] text-[#555] shrink-0">E{todayCheckin.energy} · F{todayCheckin.focus} · S{todayCheckin.stress}</span>
-          <Link href="/checkin" className="text-[10px] text-[#555] hover:text-[#c8a55a] transition-colors shrink-0">Historial</Link>
-        </div>
-      )}
 
       {/* ═══ 2. Reflection ═══ */}
       <div className="dash-section-enter dash-section-delay-2">
         <PremiumReflection />
       </div>
 
-      {/* ═══ 3. Momentum ═══ */}
+      {/* ═══ 3. Check-in CTA ═══ */}
       <div className="dash-section-enter dash-section-delay-3">
+        {todayCheckin ? (
+          /* Today's check-in summary (compact, after check-in done) */
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 flex items-center gap-3">
+            <span className="text-base">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
+            <p className="text-xs text-[#c8a55a] font-medium truncate flex-1">«{todayCheckin.intention}»</p>
+            <span className="text-[10px] text-[#555] shrink-0">E{todayCheckin.energy} · F{todayCheckin.focus} · S{todayCheckin.stress}</span>
+            <Link href="/checkin" className="text-[10px] text-[#555] hover:text-[#c8a55a] transition-colors shrink-0">Historial</Link>
+          </div>
+        ) : (
+          /* Pre-check-in: elegant, secondary CTA */
+          <button
+            onClick={() => setShowCheckinModal(true)}
+            className="flex items-center gap-2 bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-lg px-4 py-2 hover:border-[#c8a55a]/30 transition-all group touch-press w-full sm:w-auto sm:inline-flex"
+          >
+            <Sunrise size={14} className="text-[#c8a55a]/70 group-hover:text-[#c8a55a] transition-colors" />
+            <span className="text-xs text-[#888] group-hover:text-white transition-colors">Haz check-in</span>
+          </button>
+        )}
+      </div>
+
+      {/* ═══ 4. Momentum ═══ */}
+      <div className="dash-section-enter dash-section-delay-4">
         <MomentumCard />
       </div>
 
-      {/* ═══ 4. Streak (only when active) ═══ */}
+      {/* ═══ 5. Streak (only when active) ═══ */}
       {streaks && streaks.generalStreak > 0 && (
-        <div className="dash-section-enter dash-section-delay-4 flex items-center gap-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-1.5">
+        <div className="dash-section-enter dash-section-delay-5 flex items-center gap-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-1.5">
           <span className={`streak-pulse text-sm ${[3, 7, 14, 21, 30].includes(streaks.generalStreak) ? 'streak-milestone-glow' : ''}`}>🔥</span>
           <p className="text-xs text-white font-medium">{streaks.generalStreak}d</p>
           <p className="text-[10px] text-[#999] flex-1">{streaks.streakMessage?.message}</p>
@@ -254,19 +259,19 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ═══ 5. Estado Actual ═══ */}
-      <div className="dash-section-enter dash-section-delay-5">
+      {/* ═══ 6. Estado Actual ═══ */}
+      <div className="dash-section-enter dash-section-delay-6">
         <EmotionalHero />
       </div>
 
-      {/* ═══ 6. Onboarding Recommendations ═══ */}
-      <div className="dash-section-enter dash-section-delay-6">
+      {/* ═══ 7. Onboarding Recommendations ═══ */}
+      <div className="dash-section-enter dash-section-delay-7">
         <OnboardingRecommendations />
       </div>
 
-      {/* ═══ 7. Metrics (only when activity exists) ═══ */}
+      {/* ═══ 8. Metrics (only when activity exists) ═══ */}
       {hasActivity && metrics && (
-        <div className="dash-section-enter dash-section-delay-7 grid grid-cols-4 gap-1.5 sm:gap-3">
+        <div className="dash-section-enter dash-section-delay-8 grid grid-cols-4 gap-1.5 sm:gap-3">
           {[
             { label: 'Meditación', value: metrics.meditationWeek, unit: 'sem', href: '/imperio/mente', Icon: Wind, streak: streaks?.meditationStreak },
             { label: 'Hábitos', value: metrics.habitsCompleted, unit: 'sem', href: '/imperio/disciplina', Icon: CheckCircle, streak: streaks?.habitStreak },
@@ -292,8 +297,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ═══ 8. Empire Grid (compact) ═══ */}
-      <div className="dash-section-enter dash-section-delay-7">
+      {/* ═══ 9. Empire Grid (compact) ═══ */}
+      <div className="dash-section-enter dash-section-delay-8">
         <div className="flex items-center justify-between mb-2 sm:mb-3">
           <h2 className="text-sm sm:text-base font-semibold text-white">Imperios</h2>
           <span className="text-[10px] sm:text-xs text-[#666]">Nivel {empires.reduce((sum, e) => sum + e.level, 0)}</span>
@@ -338,11 +343,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ═══ 9. Daily Challenge ═══ */}
+      {/* ═══ 10. Daily Challenge ═══ */}
       {challenge && (
         <Link
           href={getChallengeRoute(challenge.challenge.category)}
-          className="dash-section-enter dash-section-delay-8 block bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-lg p-2.5 sm:p-4 hover:border-[#c8a55a]/30 transition-all cursor-pointer group touch-press"
+          className="dash-section-enter dash-section-delay-9 block bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-lg p-2.5 sm:p-4 hover:border-[#c8a55a]/30 transition-all cursor-pointer group touch-press"
         >
           <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
             <Trophy size={14} className="text-[#c8a55a]" />
@@ -361,9 +366,9 @@ export default function DashboardPage() {
         </Link>
       )}
 
-      {/* ═══ 10. Weekly Recap (only after activity) ═══ */}
+      {/* ═══ 11. Weekly Recap (only after activity) ═══ */}
       {hasActivity && (
-        <div className="dash-section-enter dash-section-delay-9">
+        <div className="dash-section-enter dash-section-delay-10">
           <WeeklyRecap />
         </div>
       )}
