@@ -19,8 +19,10 @@
   --transition-slow: 700ms ease-out;
 }
 
-* {
-  border-color: var(--color-card-border);
+@layer base {
+  * {
+    border-color: var(--color-card-border);
+  }
 }
 
 body {
