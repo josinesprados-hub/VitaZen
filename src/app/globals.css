@@ -193,6 +193,33 @@ button, [role="button"] {
   animation: contextMenuIn 0.18s ease-out both;
 }
 
+/* Mobile drawer — slide in from left */
+@keyframes drawerSlideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.drawer-enter {
+  animation: drawerSlideIn 0.25s ease-out both;
+}
+
+/* Mentor chat — full viewport on mobile, normal flow on desktop */
+.mentor-full-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  height: 100dvh;
+  background: #000;
+}
+@media (min-width: 640px) {
+  .mentor-full-viewport {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    height: auto;
+    background: transparent;
+  }
+}
+
 /* Smooth scroll */
 html { scroll-behavior: smooth; }
 
