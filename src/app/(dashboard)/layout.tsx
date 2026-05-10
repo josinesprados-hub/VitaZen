@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
@@ -18,7 +18,40 @@ export default function DashboardLayout({
   const { user, loading, syncError, firebaseUser } = useAuth();
   const { isActive: screenshotMode } = useScreenshotMode();
   const router = useRouter();
+  const pathname = usePathname();
   const sessionTracked = useRef(false);
+
+  // ─── Route transition progress ───
+  // Shows a thin gold bar at the top during client-side navigations.
+  // The bar appears instantly when pathname changes and disappears
+  // after a short delay, giving the user immediate feedback that
+  // their navigation was received.
+  const [routeTransition, setRouteTransition] = useState(false);
+  const prevPathname = useRef(pathname);
+  const transitionTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (pathname !== prevPathname.current) {
+      prevPathname.current = pathname;
+      setRouteTransition(true);
+
+      // Clear any existing timer
+      if (transitionTimer.current) {
+        clearTimeout(transitionTimer.current);
+      }
+
+      // Keep the bar visible briefly so the user perceives the transition
+      transitionTimer.current = setTimeout(() => {
+        setRouteTransition(false);
+      }, 400);
+    }
+
+    return () => {
+      if (transitionTimer.current) {
+        clearTimeout(transitionTimer.current);
+      }
+    };
+  }, [pathname]);
 
   // Track daily session — once per mount, deduplicated server-side
   useEffect(() => {
@@ -98,6 +131,15 @@ export default function DashboardLayout({
   // ─── 4. All checks passed — render dashboard ───
   return (
     <div className="min-h-dvh bg-[#000000]">
+      {/* Route transition progress bar */}
+      <div
+        className={`fixed top-0 left-0 right-0 h-[2px] z-[60] transition-opacity duration-300 ${
+          routeTransition ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="h-full bg-[#c8a55a] route-progress-bar" />
+      </div>
+
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="lg:ml-64">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />

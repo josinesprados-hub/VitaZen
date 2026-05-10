@@ -185,6 +185,16 @@ button, [role="button"] {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+/* Route transition progress bar animation */
+@keyframes routeProgressSlide {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+.route-progress-bar {
+  animation: routeProgressSlide 0.4s ease-out forwards;
+}
+
 /* Unified entrance animation — transform only, never opacity:0 */
 .animate-in {
   animation: slideInUp 0.35s ease-out both;

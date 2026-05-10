@@ -9,16 +9,27 @@ export default function Home() {
   const { user, firebaseUser, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading) {
-      if (user || firebaseUser) {
-        // Authenticated — always go through the onboarding gate.
-        // Onboarding page redirects to /dashboard if already completed.
-        // This prevents the dashboard from ever rendering before
-        // onboardingCompleted is confirmed.
-        router.replace('/onboarding');
-      } else {
-        router.replace('/login');
-      }
+    if (loading) return;
+
+    // No auth at all → login
+    if (!user && !firebaseUser) {
+      router.replace('/login');
+      return;
+    }
+
+    // Firebase auth confirmed, but server sync pending.
+    // Do NOT redirect yet — we need `user.onboardingCompleted` to decide
+    // the correct destination. Redirecting to /onboarding before knowing
+    // causes the onboarding flash for returning users.
+    if (firebaseUser && !user) {
+      return; // wait for syncUser to complete
+    }
+
+    // Server sync complete — route based on onboarding status
+    if (user?.onboardingCompleted) {
+      router.replace('/dashboard');
+    } else {
+      router.replace('/onboarding');
     }
   }, [user, firebaseUser, loading, router]);
 
