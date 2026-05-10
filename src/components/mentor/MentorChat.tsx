@@ -173,101 +173,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   const isPremium = user?.plan === 'PREMIUM';
 
-  // Lock body scroll when any modal (delete confirm or limit modal) is open
-  useEffect(() => {
-    if (deleteConfirm || showLimitModal || drawerOpen) {
-      document.body.classList.add('scroll-locked');
-      return () => document.body.classList.remove('scroll-locked');
-    }
-  }, [deleteConfirm, showLimitModal, drawerOpen]);
-
-  // Close context menu on click outside
-  useEffect(() => {
-    const handler = () => setContextMenu(null);
-    if (contextMenu) {
-      document.addEventListener('click', handler);
-      return () => document.removeEventListener('click', handler);
-    }
-  }, [contextMenu]);
-
-  useEffect(() => {
-    fetchThreads();
-  }, []);
-
-  useEffect(() => {
-    activeThreadRef.current = activeThread;
-    if (activeThread) {
-      setMessages([]); // Clear immediately to avoid flash of old messages
-      setLoadError(false); // Clear any previous load error when switching threads
-      fetchMessages(activeThread);
-      try { localStorage.setItem(STORAGE_KEY, activeThread); } catch {}
-      // Close drawer on mobile when selecting a thread
-      setDrawerOpen(false);
-    }
-  }, [activeThread]);
-
-  useEffect(() => {
-    // Use scrollTo on the scroll container instead of scrollIntoView.
-    // scrollIntoView causes viewport jumps on iOS Safari when the
-    // virtual keyboard is open, because it tries to scroll the
-    // entire document, not just the chat container.
-    const container = scrollContainerRef.current;
-    if (container) {
-      requestAnimationFrame(() => {
-        container.scrollTop = container.scrollHeight;
-      });
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    if (editingThreadId && editInputRef.current) {
-      editInputRef.current.focus();
-      editInputRef.current.select();
-    }
-  }, [editingThreadId]);
-
-  // Auto-dismiss action errors after 3s
-  useEffect(() => {
-    if (!actionError) return;
-    const timer = setTimeout(() => setActionError(''), 3000);
-    return () => clearTimeout(timer);
-  }, [actionError]);
-
-  // Refresh data when app comes back to foreground (mobile resume)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && activeThread) {
-        // Silently refresh messages and threads when returning to the app
-        fetchMessages(activeThread);
-        fetchThreads();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [activeThread, fetchMessages, fetchThreads]);
-
-  // Network status detection for mobile resilience
-  const [isOffline, setIsOffline] = useState(false);
-
-  useEffect(() => {
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    
-    // Set initial state
-    setIsOffline(typeof navigator !== 'undefined' && !navigator.onLine);
-    
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
   // ─────────────────────────────────────────
-  // Data fetching
+  // Data fetching (MUST be defined BEFORE useEffect hooks that reference them)
   // ─────────────────────────────────────────
+  // NOTE: useCallback hooks must be defined BEFORE useEffect hooks that
+  // reference them in dependency arrays. Otherwise, the dependency array
+  // evaluates the const variable before it's initialized → TDZ crash:
+  //   "Cannot access 'eB' before initialization"
 
   const fetchThreads = useCallback(async () => {
     try {
@@ -312,6 +224,104 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       }
     } catch (e) { console.error(e); }
   }, [apiFetch]);
+
+  // ─────────────────────────────────────────
+  // Effects (defined AFTER useCallback hooks that they reference)
+  // ─────────────────────────────────────────
+
+  // Lock body scroll when any modal (delete confirm or limit modal) is open
+  useEffect(() => {
+    if (deleteConfirm || showLimitModal || drawerOpen) {
+      document.body.classList.add('scroll-locked');
+      return () => document.body.classList.remove('scroll-locked');
+    }
+  }, [deleteConfirm, showLimitModal, drawerOpen]);
+
+  // Close context menu on click outside
+  useEffect(() => {
+    const handler = () => setContextMenu(null);
+    if (contextMenu) {
+      document.addEventListener('click', handler);
+      return () => document.removeEventListener('click', handler);
+    }
+  }, [contextMenu]);
+
+  // Initial thread fetch
+  useEffect(() => {
+    fetchThreads();
+  }, [fetchThreads]);
+
+  // Fetch messages when active thread changes
+  useEffect(() => {
+    activeThreadRef.current = activeThread;
+    if (activeThread) {
+      setMessages([]); // Clear immediately to avoid flash of old messages
+      setLoadError(false); // Clear any previous load error when switching threads
+      fetchMessages(activeThread);
+      try { localStorage.setItem(STORAGE_KEY, activeThread); } catch {}
+      // Close drawer on mobile when selecting a thread
+      setDrawerOpen(false);
+    }
+  }, [activeThread, fetchMessages]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+  }, [messages]);
+
+  // Focus edit input when editing
+  useEffect(() => {
+    if (editingThreadId && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingThreadId]);
+
+  // Auto-dismiss action errors after 3s
+  useEffect(() => {
+    if (!actionError) return;
+    const timer = setTimeout(() => setActionError(''), 3000);
+    return () => clearTimeout(timer);
+  }, [actionError]);
+
+  // Network status detection for mobile resilience
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    
+    // Set initial state
+    setIsOffline(typeof navigator !== 'undefined' && !navigator.onLine);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Refresh data when app comes back to foreground (mobile resume)
+  // NOTE: This useEffect MUST come after fetchMessages/fetchThreads
+  // definitions because it references them in its dependency array.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && activeThread) {
+        // Silently refresh messages and threads when returning to the app
+        fetchMessages(activeThread);
+        fetchThreads();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [activeThread, fetchMessages, fetchThreads]);
 
   // ─────────────────────────────────────────
   // Thread actions
