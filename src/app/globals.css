@@ -641,6 +641,14 @@ html { scroll-behavior: smooth; }
 /* Insight card — border-only hover, no transform (avoids stuck :hover on mobile) */
 .insight-card {
   transition: border-color var(--transition-base);
+  /* Override global min-height:44px on <a> — card padding provides sufficient tap target */
+  min-height: 0;
+}
+/* Prevent inherited border-color from creating visible borders on insight card children.
+   The global * { border-color } + preflight border:0 solid means any child that
+   accidentally gets a non-zero border-width would show a dark #1a1a1a rectangle. */
+.insight-card > * {
+  border-width: 0;
 }
 @media (hover: hover) {
   .insight-card:hover {

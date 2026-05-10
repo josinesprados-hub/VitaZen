@@ -360,7 +360,7 @@ export default function InsightsPage() {
                 <Link
                   key={insight.id}
                   href={insightHref}
-                  className={`insight-card bg-[#0a0a0a] border rounded-xl p-4 sm:p-5 cursor-pointer group touch-press ${getInsightBorderClass(insight.type)}`}
+                  className={`insight-card block min-h-0 bg-[#0a0a0a] border rounded-xl p-4 sm:p-5 cursor-pointer group touch-press ${getInsightBorderClass(insight.type)}`}
                 >
                   <div className="flex items-center gap-3 sm:gap-4">
                     <span className="text-xl sm:text-2xl shrink-0 leading-none">{insight.icon}</span>
