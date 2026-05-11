@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Brain, Play, Pause, Clock, ChevronDown, ChevronUp, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil } from 'lucide-react';
+import { Brain, Play, Pause, Clock, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil, ArrowLeft, ChevronRight } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -17,53 +17,188 @@ interface Meditation {
   completedAt: string;
 }
 
-const BREATHING_TECHNIQUES = [
+interface BreathingPhase {
+  label: string;
+  seconds: number;
+}
+
+interface BreathingTechnique {
+  type: string;
+  label: string;
+  subtitle: string;
+  duration: number;
+  what: string;
+  steps: string[];
+  benefitsList: string[];
+  recommendation: string;
+  phases: BreathingPhase[];
+}
+
+const BREATHING_TECHNIQUES: BreathingTechnique[] = [
   {
     type: 'diaphragmatic',
     label: 'Diafragmática',
     subtitle: 'Respiración abdominal',
     duration: 5,
-    what: 'Respiración profunda que expande el abdomen en lugar del pecho, activando el diafragma.',
-    how: 'Inhala por la nariz (~4 s) expandiendo el abdomen. Pausa breve. Exhala lento (~5–6 s). El pecho se mueve poco.',
-    benefits: 'Reduce estrés y ansiedad al activar el sistema parasimpático. Disminuye cortisol y frecuencia cardíaca. Mejora la oxigenación.',
+    what: 'Respiración profunda que expande el abdomen en lugar del pecho, activando el diafragma para una oxigenación más eficiente y una respuesta de calma inmediata.',
+    steps: [
+      'Siéntate cómodamente o túmbate. Coloca una mano en el pecho y otra en el abdomen.',
+      'Inhala lentamente por la nariz (~4 s), sintiendo cómo el abdomen se expande bajo tu mano.',
+      'Haz una pausa breve al final de la inhalación.',
+      'Exhala de forma lenta y controlada (~5-6 s), vaciando el abdomen primero.',
+    ],
+    benefitsList: [
+      'Activa el sistema parasimpático',
+      'Reduce cortisol y frecuencia cardíaca',
+      'Disminuye ansiedad y estrés',
+      'Mejora la oxigenación sanguínea',
+    ],
+    recommendation: 'Ideal antes de dormir',
+    phases: [
+      { label: 'Inhala', seconds: 4 },
+      { label: 'Exhala', seconds: 6 },
+    ],
   },
   {
     type: 'coherence',
     label: 'Coherencia Cardíaca',
     subtitle: 'Respiración lenta',
     duration: 5,
-    what: 'Respiración a ritmo constante que sincroniza el sistema respiratorio con el cardiovascular.',
-    how: 'Inhala 5 s → Exhala 5 s. Ritmo constante de ~6 respiraciones por minuto.',
-    benefits: 'Aumenta la variabilidad de la frecuencia cardíaca (HRV). Mejora la regulación emocional y reduce la ansiedad. Sincroniza respiración y sistema cardiovascular.',
+    what: 'Respiración rítmica que sincroniza el sistema respiratorio con el cardiovascular, creando un estado de coherencia fisiológica óptima.',
+    steps: [
+      'Siéntate con la espalda recta y los pies apoyados en el suelo.',
+      'Inhala durante 5 segundos de forma suave y continua.',
+      'Exhala durante 5 segundos al mismo ritmo, sin pausas.',
+      'Mantén este patrón constante de ~6 respiraciones por minuto.',
+    ],
+    benefitsList: [
+      'Aumenta la variabilidad cardíaca (HRV)',
+      'Mejora la regulación emocional',
+      'Reduce la ansiedad',
+      'Sincroniza respiración y cardiovascular',
+    ],
+    recommendation: 'Perfecta para empezar el día',
+    phases: [
+      { label: 'Inhala', seconds: 5 },
+      { label: 'Exhala', seconds: 5 },
+    ],
   },
   {
     type: 'mindfulness',
     label: 'Atención Plena',
     subtitle: 'Mindfulness',
     duration: 10,
-    what: 'Observación consciente de la respiración sin modificarla, solo atender al flujo natural del aire.',
-    how: 'Respira de forma natural. Observa la sensación en la nariz, pecho o abdomen. No la modifiques, solo atiéndela.',
-    benefits: 'Reduce ansiedad, depresión y estrés. Mejora la atención y la regulación emocional.',
+    what: 'Observación consciente de la respiración sin modificarla, simplemente atendiendo al flujo natural del aire como ancla al momento presente.',
+    steps: [
+      'Cierra los ojos y respira de forma natural, sin forzar ningún ritmo.',
+      'Dirige tu atención a la sensación del aire entrando y saliendo por la nariz.',
+      'Cuando la mente divague, reconócelo suavemente y vuelve a la respiración.',
+      'No juzgues ni modifiques la respiración. Solo observa.',
+    ],
+    benefitsList: [
+      'Reduce ansiedad y depresión',
+      'Mejora la atención sostenida',
+      'Favorece la regulación emocional',
+      'Cultiva la presencia mental',
+    ],
+    recommendation: 'Ideal para pausas conscientes',
+    phases: [
+      { label: 'Natural', seconds: 0 },
+    ],
   },
   {
     type: 'nadi_shodhana',
     label: 'Nadi Shodhana',
     subtitle: 'Respiración alterna',
     duration: 5,
-    what: 'Técnica yogui de respiración alternada por las fosas nasales que equilibra los hemisferios cerebrales.',
-    how: 'Tapa una fosa nasal e inhala por la otra. Cambia y exhala por la contraria. Alterna de forma rítmica.',
-    benefits: 'Reduce estrés y frecuencia cardíaca. Mejora funciones cognitivas y la atención.',
+    what: 'Técnica yogui milenaria de respiración alternada por las fosas nasales que equilibra los canales energéticos y los hemisferios cerebrales.',
+    steps: [
+      'Usa el dedo pulgar derecho para tapar la fosa nasal derecha.',
+      'Inhala por la fosa nasal izquierda (~4 s).',
+      'Tapa la izquierda con el anular, destapa la derecha y exhala (~4 s).',
+      'Inhala por la derecha, tapa, y exhala por la izquierda. Esto es un ciclo completo.',
+    ],
+    benefitsList: [
+      'Equilibra los hemisferios cerebrales',
+      'Reduce frecuencia cardíaca y estrés',
+      'Mejora funciones cognitivas',
+      'Favorece la claridad mental',
+    ],
+    recommendation: 'Perfecta para estrés',
+    phases: [
+      { label: 'Inhala izq.', seconds: 4 },
+      { label: 'Exhala der.', seconds: 4 },
+    ],
   },
   {
     type: 'box',
     label: 'Box Breathing',
     subtitle: 'Respiración cuadrada',
     duration: 5,
-    what: 'Patrón simétrico de cuatro fases iguales que regula el sistema nervioso autónomo de forma controlada.',
-    how: 'Inhala 4 s → Mantén 4 s → Exhala 4 s → Mantén 4 s. Repite el ciclo.',
-    benefits: 'Mejora el control del estrés agudo. Aumenta la concentración y la claridad mental.',
+    what: 'Patrón simétrico de cuatro fases iguales utilizado por Navy SEALs y astronautas para regular el sistema nervioso bajo presión.',
+    steps: [
+      'Inhala lentamente por la nariz contando hasta 4.',
+      'Mantén la respiración contando hasta 4 (retención a pulmones llenos).',
+      'Exhala lentamente por la nariz contando hasta 4.',
+      'Mantén los pulmones vacíos contando hasta 4. Repite el ciclo.',
+    ],
+    benefitsList: [
+      'Control del estrés agudo',
+      'Aumenta concentración y claridad',
+      'Regula el sistema nervioso autónomo',
+      'Utilizado por élites militares',
+    ],
+    recommendation: 'Rápida para recuperar foco',
+    phases: [
+      { label: 'Inhala', seconds: 4 },
+      { label: 'Mantén', seconds: 4 },
+      { label: 'Exhala', seconds: 4 },
+      { label: 'Mantén', seconds: 4 },
+    ],
   },
 ];
+
+/* ─── Breathing Pattern Visualizer ─── */
+function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
+  const activePhases = phases.filter(p => p.seconds > 0);
+  const isNatural = activePhases.length === 0;
+
+  if (isNatural) {
+    return (
+      <div className="flex items-center justify-center gap-3 py-3">
+        <div className="w-12 h-12 rounded-full border border-[#c8a55a]/20 flex items-center justify-center">
+          <Wind size={18} className="text-[#c8a55a]/60" />
+        </div>
+        <div>
+          <p className="text-[#c8a55a] text-sm font-medium">Ritmo natural</p>
+          <p className="text-[#666] text-xs">Sin patrón fijo</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 py-3 overflow-x-auto">
+      {activePhases.map((phase, i) => (
+        <div key={i} className="flex items-center gap-1.5 shrink-0">
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 rounded-full border flex items-center justify-center ${
+              phase.label.includes('Mantén')
+                ? 'border-[#c8a55a]/25 bg-[#c8a55a]/5'
+                : 'border-[#c8a55a]/40 bg-[#c8a55a]/8'
+            }`}>
+              <span className="text-[#c8a55a] text-xs font-semibold">{phase.seconds}s</span>
+            </div>
+            <span className="text-[10px] text-[#666] mt-1.5 whitespace-nowrap">{phase.label}</span>
+          </div>
+          {i < activePhases.length - 1 && (
+            <div className="w-4 h-px bg-[#333] mb-5 shrink-0" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function MentePage() {
   const { apiFetch } = useApi();
@@ -73,7 +208,7 @@ export default function MentePage() {
   const [paused, setPaused] = useState(false);
   const [timer, setTimer] = useState(0);
   const [selectedType, setSelectedType] = useState(BREATHING_TECHNIQUES[0]);
-  const [expandedTechnique, setExpandedTechnique] = useState<string | null>(null);
+  const [viewingGuide, setViewingGuide] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [completedSession, setCompletedSession] = useState<{ duration: number; type: string } | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
@@ -125,7 +260,7 @@ export default function MentePage() {
     return () => clearInterval(interval);
   }, [meditating, paused]);
 
-  const startMeditation = (type: typeof BREATHING_TECHNIQUES[0]) => {
+  const startMeditation = (type: BreathingTechnique) => {
     setSelectedType(type);
     setTimer(0);
     setPaused(false);
@@ -157,10 +292,6 @@ export default function MentePage() {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
-  const toggleTechnique = (type: string) => {
-    setExpandedTechnique(prev => prev === type ? null : type);
   };
 
   const startEdit = (session: Meditation) => {
@@ -212,6 +343,10 @@ export default function MentePage() {
     }
   };
 
+  const guideTechnique = viewingGuide
+    ? BREATHING_TECHNIQUES.find(t => t.type === viewingGuide)
+    : null;
+
   if (loading) {
     return <EmpireSkeleton message="Preparando tu espacio de calma..." />;
   }
@@ -231,7 +366,7 @@ export default function MentePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Completion Overlay */}
+      {/* ─── Completion Overlay ─── */}
       {completedSession && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
@@ -266,7 +401,7 @@ export default function MentePage() {
         </div>
       )}
 
-      {/* Edit Session Overlay */}
+      {/* ─── Edit Session Overlay ─── */}
       {editingSession && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
@@ -326,7 +461,7 @@ export default function MentePage() {
         </div>
       )}
 
-      {/* Delete Confirmation Overlay */}
+      {/* ─── Delete Confirmation Overlay ─── */}
       {pendingDeleteId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
@@ -359,7 +494,7 @@ export default function MentePage() {
         </div>
       )}
 
-      {/* Header */}
+      {/* ─── Header ─── */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Brain size={28} className="text-[#c8a55a]" />
@@ -370,7 +505,7 @@ export default function MentePage() {
         </div>
       </div>
 
-      {/* Meditation Timer */}
+      {/* ─── Breathing Section ─── */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
         <div className="flex items-center gap-3 mb-5">
           <Wind size={20} className="text-[#c8a55a]" />
@@ -379,8 +514,9 @@ export default function MentePage() {
             <p className="text-[#666] text-xs mt-0.5">Elige una técnica y practica</p>
           </div>
         </div>
-        
-        {meditating ? (
+
+        {/* ── Active Timer ── */}
+        {meditating && (
           <div className={`text-center py-10 ${!paused ? 'breathing-ring' : ''}`}>
             <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
             <p className={`text-5xl font-bold mb-1 font-mono transition-opacity duration-300 ${paused ? 'text-[#c8a55a]/40' : 'text-[#c8a55a]'}`}>{formatTime(timer)}</p>
@@ -401,84 +537,119 @@ export default function MentePage() {
               </button>
             </div>
           </div>
-        ) : (
+        )}
+
+        {/* ── Technique Guide Detail ── */}
+        {!meditating && guideTechnique && (
+          <div>
+            {/* Back to techniques */}
+            <button
+              onClick={() => setViewingGuide(null)}
+              className="flex items-center gap-2 text-[#666] text-sm hover:text-[#c8a55a] transition-colors mb-5"
+            >
+              <ArrowLeft size={15} />
+              <span>Técnicas</span>
+            </button>
+
+            {/* Technique header */}
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-3">
+                <Wind size={24} className="text-[#c8a55a]" />
+              </div>
+              <h3 className="text-xl font-bold text-white">{guideTechnique.label}</h3>
+              <p className="text-[#666] text-sm mt-1">{guideTechnique.subtitle} · {guideTechnique.duration} min</p>
+            </div>
+
+            {/* Breathing pattern */}
+            <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 mb-5">
+              <PatternFlow phases={guideTechnique.phases} />
+            </div>
+
+            {/* Sections */}
+            <div className="space-y-5">
+              {/* Qué es */}
+              <div>
+                <p className="text-[#c8a55a] text-[10px] uppercase tracking-[2px] font-semibold mb-2">Qué es</p>
+                <p className="text-[#aaa] text-sm leading-relaxed">{guideTechnique.what}</p>
+              </div>
+
+              {/* Cómo practicarla */}
+              <div>
+                <p className="text-[#c8a55a] text-[10px] uppercase tracking-[2px] font-semibold mb-3">Cómo practicarla</p>
+                <div className="space-y-2.5">
+                  {guideTechnique.steps.map((step, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full border border-[#c8a55a]/25 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[#c8a55a] text-[10px] font-semibold">{i + 1}</span>
+                      </div>
+                      <p className="text-[#aaa] text-sm leading-relaxed">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Beneficios */}
+              <div>
+                <p className="text-[#c8a55a] text-[10px] uppercase tracking-[2px] font-semibold mb-3">Beneficios</p>
+                <div className="space-y-2">
+                  {guideTechnique.benefitsList.map((benefit, i) => (
+                    <div key={i} className="flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] shrink-0" />
+                      <p className="text-[#aaa] text-sm">{benefit}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recomendación */}
+              <div>
+                <div className="inline-flex items-center gap-2.5 bg-[#c8a55a]/5 border border-[#c8a55a]/10 rounded-lg px-3.5 py-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] shrink-0" />
+                  <p className="text-[#c8a55a] text-xs font-medium">{guideTechnique.recommendation}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Start button */}
+            <button
+              onClick={() => {
+                startMeditation(guideTechnique);
+                setViewingGuide(null);
+              }}
+              className="flex items-center justify-center gap-2 w-full bg-[#c8a55a] text-black font-semibold px-6 py-3.5 rounded-xl hover:bg-[#d4b468] transition-colors mt-6 touch-press"
+            >
+              <Play size={16} />
+              Comenzar sesión
+            </button>
+          </div>
+        )}
+
+        {/* ── Technique Card Grid ── */}
+        {!meditating && !viewingGuide && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {BREATHING_TECHNIQUES.map((tech) => (
               <button
                 key={tech.type}
-                onClick={() => startMeditation(tech)}
+                onClick={() => setViewingGuide(tech.type)}
                 className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-left hover:border-[#c8a55a]/50 transition-all group touch-press"
               >
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-1.5">
                   <p className="text-white text-sm font-medium group-hover:text-[#c8a55a] transition-colors">{tech.label}</p>
-                  <Play size={14} className="text-[#c8a55a] shrink-0" />
+                  <ChevronRight size={14} className="text-[#555] group-hover:text-[#c8a55a] transition-colors shrink-0" />
                 </div>
-                <p className="text-[#666] text-xs">{tech.subtitle} · {tech.duration} min</p>
+                <p className="text-[#666] text-xs mb-2.5">{tech.subtitle} · {tech.duration} min</p>
+                <div className="inline-flex items-center gap-1.5 bg-[#c8a55a]/5 border border-[#c8a55a]/10 rounded px-2 py-0.5">
+                  <div className="w-1 h-1 rounded-full bg-[#c8a55a]" />
+                  <p className="text-[#c8a55a] text-[10px]">{tech.recommendation}</p>
+                </div>
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Breathing Techniques Guide */}
+      {/* ─── Session History ─── */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-2">
-        <div className="flex items-center gap-3 mb-5">
-          <Wind size={20} className="text-[#c8a55a]" />
-          <div>
-            <h2 className="text-lg font-semibold text-white">Guía de Técnicas</h2>
-            <p className="text-[#666] text-xs mt-0.5">Conoce cada técnica antes de practicar</p>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {BREATHING_TECHNIQUES.map((tech) => {
-            const isExpanded = expandedTechnique === tech.type;
-            return (
-              <div
-                key={tech.type}
-                className="bg-[#000000] border border-[#1a1a1a] rounded-lg overflow-hidden transition-all"
-              >
-                {/* Collapsed header */}
-                <button
-                  onClick={() => toggleTechnique(tech.type)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-[#0a0a0a]/50 transition-colors"
-                >
-                  <div>
-                    <p className="text-white text-sm font-medium">{tech.label}</p>
-                    <p className="text-[#666] text-xs mt-0.5">{tech.subtitle}</p>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronUp size={16} className="text-[#c8a55a] shrink-0" />
-                  ) : (
-                    <ChevronDown size={16} className="text-[#666] shrink-0" />
-                  )}
-                </button>
-
-                {/* Expanded content */}
-                {isExpanded && (
-                  <div className="px-4 pb-4 space-y-3 border-t border-[#1a1a1a] pt-3">
-                    <div>
-                      <p className="text-[#c8a55a] text-xs uppercase tracking-wider font-semibold mb-1">Qué es</p>
-                      <p className="text-[#ccc] text-sm leading-relaxed">{tech.what}</p>
-                    </div>
-                    <div>
-                      <p className="text-[#c8a55a] text-xs uppercase tracking-wider font-semibold mb-1">Cómo practicarla</p>
-                      <p className="text-[#ccc] text-sm leading-relaxed">{tech.how}</p>
-                    </div>
-                    <div>
-                      <p className="text-[#c8a55a] text-xs uppercase tracking-wider font-semibold mb-1">Beneficios</p>
-                      <p className="text-[#ccc] text-sm leading-relaxed">{tech.benefits}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Session History */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <Clock size={20} className="text-[#c8a55a]" />
