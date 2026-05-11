@@ -19,19 +19,35 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://vitazen.cc'),
   title: 'VitaZen — Transforma tu vida',
   description: 'Ecosistema premium de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
   icons: {
     icon: [
-      { url: '/images/vitazen-logo.png' },
-      { url: '/images/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/images/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/vitazen-logo.png?v=2' },
+      { url: '/images/favicon-32x32.png?v=2', sizes: '32x32', type: 'image/png' },
+      { url: '/images/favicon-16x16.png?v=2', sizes: '16x16', type: 'image/png' },
     ],
     apple: [
-      { url: '/images/apple-touch-icon.png', sizes: '180x180' },
+      { url: '/images/apple-touch-icon.png?v=2', sizes: '180x180' },
     ],
   },
   manifest: '/manifest.json',
+  openGraph: {
+    title: 'VitaZen — Transforma tu vida',
+    description: 'Ecosistema premium de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
+    images: [
+      { url: '/images/v-gold-logo.png', width: 1024, height: 1024, alt: 'VitaZen' },
+    ],
+    type: 'website',
+    siteName: 'VitaZen',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'VitaZen — Transforma tu vida',
+    description: 'Ecosistema premium de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
+    images: ['/images/v-gold-logo.png'],
+  },
 };
 
 export default function RootLayout({
