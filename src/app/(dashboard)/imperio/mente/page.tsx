@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Brain, Play, Pause, Clock, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil, ArrowLeft, ChevronRight } from 'lucide-react';
@@ -218,6 +218,9 @@ export default function MentePage() {
   const [editSaving, setEditSaving] = useState(false);
   const [fetchError, setFetchError] = useState(false);
 
+  // Ref for auto-scrolling into view when meditation starts
+  const breathingSectionRef = useRef<HTMLDivElement>(null);
+
   // Lock body scroll when modal is open — save/restore scroll position
   useEffect(() => {
     if (pendingDeleteId) {
@@ -265,6 +268,11 @@ export default function MentePage() {
     setTimer(0);
     setPaused(false);
     setMeditating(true);
+    // Scroll to breathing section after render — requestAnimationFrame ensures
+    // the DOM has updated (guide unmounted, timer mounted) before scrolling
+    requestAnimationFrame(() => {
+      breathingSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
   const endMeditation = async () => {
@@ -508,7 +516,7 @@ export default function MentePage() {
       </div>
 
       {/* ─── Breathing Section ─── */}
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
+      <div ref={breathingSectionRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
         <div className="flex items-center gap-3 mb-5">
           <Wind size={20} className="text-[#c8a55a]" />
           <div>
