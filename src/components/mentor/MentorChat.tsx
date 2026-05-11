@@ -108,7 +108,8 @@ interface MentorChatProps {
 // Module-level constants & helpers
 // ─────────────────────────────────────────
 
-const STORAGE_KEY = 'vitazen_active_thread';
+const STORAGE_KEY_PREFIX = 'vitazen_active_thread';
+const VISIBILITY_DEBOUNCE_MS = 1500;
 const DATE_GROUP_ORDER = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Anterior'];
 
 function getProgressColor(rem: number, limit: number): string {
@@ -170,8 +171,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const activeThreadRef = useRef<string | null>(null);
   const fetchIdRef = useRef(0);
   const lastSendTime = useRef(0);
+  const prevUserIdRef = useRef<string | null>(null);
+  const visibilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isPremium = user?.plan === 'PREMIUM';
+
+  // User-scoped storage key: prevents cross-user thread leaks on shared devices
+  const storageKey = user?.id ? `${STORAGE_KEY_PREFIX}_${user.id}` : STORAGE_KEY_PREFIX;
 
   // ─────────────────────────────────────────
   // Data fetching (MUST be defined BEFORE useEffect hooks that reference them)
@@ -181,7 +187,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // evaluates the const variable before it's initialized → TDZ crash:
   //   "Cannot access 'eB' before initialization"
 
-  const fetchThreads = useCallback(async () => {
+  const fetchThreads = useCallback(async (isRetry = false) => {
     try {
       const res = await apiFetch('/api/ai/threads');
       if (res.ok) {
@@ -197,20 +203,53 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         // Only set active thread on initial load (when none is set)
         if (allThreads.length > 0 && !activeThreadRef.current) {
           let savedThreadId: string | null = null;
-          try { savedThreadId = localStorage.getItem(STORAGE_KEY); } catch {}
+          try { savedThreadId = localStorage.getItem(storageKey); } catch {}
 
           // Only restore if saved thread is active (not archived)
           const savedExists = savedThreadId && allThreads.some((t: Thread) => t.id === savedThreadId && !t.archived);
           const activeThreads = allThreads.filter((t: Thread) => !t.archived);
           setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
+        } else if (allThreads.length === 0 && !activeThreadRef.current) {
+          // No threads at all — clear stale localStorage
+          try { localStorage.removeItem(storageKey); } catch {}
         }
+      } else if (!isRetry) {
+        // Auto-retry once on server error (transient failures)
+        await new Promise(r => setTimeout(r, 1000));
+        return fetchThreads(true);
       }
     } catch (e) { 
       console.error(e); 
+      if (!isRetry) {
+        // Auto-retry once on network error
+        await new Promise(r => setTimeout(r, 1500));
+        try {
+          const res = await apiFetch('/api/ai/threads');
+          if (res.ok) {
+            const data = await res.json();
+            setThreads(data.threads);
+            setHistoryLimited(!!data.historyLimited);
+            if (data.remaining !== undefined && data.remaining !== null) {
+              setRemaining(data.remaining);
+              setDailyLimit(data.limit || 15);
+            }
+            if (data.threads.length > 0 && !activeThreadRef.current) {
+              let savedThreadId: string | null = null;
+              try { savedThreadId = localStorage.getItem(storageKey); } catch {}
+              const savedExists = savedThreadId && data.threads.some((t: Thread) => t.id === savedThreadId && !t.archived);
+              const activeThreads = data.threads.filter((t: Thread) => !t.archived);
+              setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
+            }
+            setLoadError(false);
+            setLoading(false);
+            return;
+          }
+        } catch {}
+      }
       setLoadError(true);
     }
     finally { setLoading(false); }
-  }, [apiFetch]);
+  }, [apiFetch, storageKey]);
 
   const fetchMessages = useCallback(async (threadId: string) => {
     const thisFetchId = ++fetchIdRef.current;
@@ -251,6 +290,19 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     fetchThreads();
   }, [fetchThreads]);
 
+  // Detect user change and clean up stale state
+  useEffect(() => {
+    if (user?.id && user.id !== prevUserIdRef.current) {
+      // User changed (login/logout/different account) — clear stale thread state
+      if (prevUserIdRef.current) {
+        setActiveThread(null);
+        setMessages([]);
+        setThreads([]);
+      }
+      prevUserIdRef.current = user.id;
+    }
+  }, [user?.id]);
+
   // Fetch messages when active thread changes
   useEffect(() => {
     activeThreadRef.current = activeThread;
@@ -258,11 +310,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       setMessages([]); // Clear immediately to avoid flash of old messages
       setLoadError(false); // Clear any previous load error when switching threads
       fetchMessages(activeThread);
-      try { localStorage.setItem(STORAGE_KEY, activeThread); } catch {}
+      try { localStorage.setItem(storageKey, activeThread); } catch {}
       // Close drawer on mobile when selecting a thread
       setDrawerOpen(false);
     }
-  }, [activeThread, fetchMessages]);
+  }, [activeThread, fetchMessages, storageKey]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -308,19 +360,29 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }, []);
 
   // Refresh data when app comes back to foreground (mobile resume)
-  // NOTE: This useEffect MUST come after fetchMessages/fetchThreads
-  // definitions because it references them in its dependency array.
+  // Debounced to prevent race conditions from rapid visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && activeThread) {
-        // Silently refresh messages and threads when returning to the app
-        fetchMessages(activeThread);
-        fetchThreads();
+        // Clear any pending refresh from previous visibility change
+        if (visibilityTimerRef.current) {
+          clearTimeout(visibilityTimerRef.current);
+        }
+        // Debounce the refresh to avoid rapid re-fetches
+        visibilityTimerRef.current = setTimeout(() => {
+          fetchMessages(activeThread);
+          fetchThreads();
+        }, VISIBILITY_DEBOUNCE_MS);
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (visibilityTimerRef.current) {
+        clearTimeout(visibilityTimerRef.current);
+      }
+    };
   }, [activeThread, fetchMessages, fetchThreads]);
 
   // ─────────────────────────────────────────
@@ -366,7 +428,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         if (activeThread === threadId) {
           setActiveThread(nextActiveId);
           setMessages([]);
-          try { localStorage.removeItem(STORAGE_KEY); } catch {}
+          try { localStorage.removeItem(storageKey); } catch {}
         }
       }
     } catch (e) { console.error(e); setActionError('No se pudo eliminar'); }

@@ -365,13 +365,17 @@ export function buildContextualSystemPrompt(
 - Varía las referencias. No repitas la misma observación en cada respuesta.
 - Si el contexto no es relevante para la pregunta, no lo fuerces. Responde directamente.
 - Construye continuidad entre sesiones. El usuario debe sentir que le recuerdas.
-- Sé sutil. La personalización se nota en lo natural que suena, no en cuántos datos mencionas.`
+- Sé sutil. La personalización se nota en lo natural que suena, no en cuántos datos mencionas.
+- USA el contexto para ser más accionable, no para alargar la respuesta. Si sabes que su estrés subió, no lo menciones si no añades algo útil sobre ello.
+- El contexto te permite responder más preciso sin necesidad de preguntas extra. Aprovéchalo.`
     : `CÓMO USAR ESTE CONTEXTO:
 - Integrar de forma invisible. Nunca digas "según tus datos". Simplemente sabes.
 - Si el usuario tiene buena racha, puedes decir: "Vienes con buena consistencia."
 - No repitas la misma referencia en cada respuesta.
 - Si el contexto no es relevante, responde directamente sin forzar.
-- Sé sutil. Menos es más.`;
+- Sé sutil. Menos es más.
+- USA el contexto para responder más preciso sin hacer preguntas extra. Si ya sabes su situación, propón directamente.
+- Recuerda: esta persona tiene mensajes limitados. El contexto te ayuda a dar respuestas más útiles sin gastar mensajes en preguntas que puedes inferir.`;
 
   return `${basePrompt}
 
