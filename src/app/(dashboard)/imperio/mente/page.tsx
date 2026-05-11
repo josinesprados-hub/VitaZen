@@ -371,10 +371,12 @@ export default function MentePage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setCompletedSession(null)}
+          style={{ animationDuration: '0s' }}
         >
           <div
             className="modal-content p-10 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
+            style={{ animationDuration: '0s' }}
           >
             <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={32} className="text-[#c8a55a]" />
