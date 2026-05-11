@@ -49,7 +49,7 @@ function emailWrapper(content: string, preheaderText: string): string {
           <!-- V Logo -->
           <tr>
             <td style="padding:0 40px 20px;text-align:center;">
-              <img src="${V_LOGO_SRC}" alt="V" width="48" height="48" style="display:inline-block;border:0;outline:none;text-decoration:none;" />
+              <img src="${V_LOGO_SRC}" alt="V" width="48" height="48" style="display:inline-block;border:0;outline:none;text-decoration:none;border-radius:10px;" />
             </td>
           </tr>
 
