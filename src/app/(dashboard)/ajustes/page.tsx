@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Switch } from '@/components/ui/switch';
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
+import { SubscriptionManager } from '@/components/settings/SubscriptionManager';
 import {
   Mail,
   Bell,
@@ -270,6 +271,12 @@ export default function AjustesPage() {
           </div>
           <ChevronRight size={16} className="text-[#555] group-hover:text-[#c8a55a] transition-colors" />
         </button>
+
+        {/* Divider */}
+        <div className="border-t border-[#1a1a1a]" />
+
+        {/* Subscription management */}
+        <SubscriptionManager />
 
         {/* Divider */}
         <div className="border-t border-[#1a1a1a]" />

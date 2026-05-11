@@ -15,6 +15,16 @@ import {
 import { auth } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 
+interface SubscriptionData {
+  id: string;
+  stripeSubscriptionId: string;
+  stripePriceId: string;
+  status: string;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+}
+
 interface UserData {
   id: string;
   firebaseUid: string;
@@ -33,6 +43,7 @@ interface UserData {
   welcomeEmailSent?: boolean;
   createdAt?: string;
   onboardingCompleted?: boolean;
+  subscription?: SubscriptionData | null;
 }
 
 interface AuthContextType {

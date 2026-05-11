@@ -23,11 +23,29 @@ export async function POST(request: NextRequest) {
     }
 
     // Search by firebaseUid first
-    let existingUser = await db.user.findUnique({ where: { firebaseUid: decodedToken.uid } });
+    let existingUser = await db.user.findUnique({
+      where: { firebaseUid: decodedToken.uid },
+      include: {
+        subscriptions: {
+          where: { status: 'active' },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
 
     // If not found by firebaseUid, search by email to avoid P2002
     if (!existingUser && decodedToken.email) {
-      existingUser = await db.user.findUnique({ where: { email: decodedToken.email } });
+      existingUser = await db.user.findUnique({
+        where: { email: decodedToken.email },
+        include: {
+          subscriptions: {
+            where: { status: 'active' },
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+      });
     }
 
     // If user exists, return it directly
@@ -90,6 +108,7 @@ export async function POST(request: NextRequest) {
           welcomeEmailSent: existingUser.welcomeEmailSent,
           createdAt: existingUser.createdAt,
           onboardingCompleted: existingUser.onboardingCompleted,
+          subscription: existingUser.subscriptions[0] || null,
         },
       });
     }
