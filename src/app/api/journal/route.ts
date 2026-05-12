@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
     const entries = await db.journalEntry.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
-      take: 50,
     });
 
     return NextResponse.json({ entries });

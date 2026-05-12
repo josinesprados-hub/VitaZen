@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock } from 'lucide-react';
+import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock, X, Check } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -17,7 +17,62 @@ interface JournalEntry {
   mood: number | null;
   gratitude: string | null;
   createdAt: string;
+  updatedAt: string;
 }
+
+// ─── Date grouping ────────────────────────────────
+
+function dateGroupLabel(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffDay = Math.floor(diffMs / 86400000);
+
+  if (diffDay === 0) return 'Hoy';
+  if (diffDay === 1) return 'Ayer';
+  if (diffDay < 7) return 'Esta semana';
+  if (diffDay < 14) return 'Hace 2 semanas';
+  return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+function groupEntriesByDate(entries: JournalEntry[]): { label: string; entries: JournalEntry[] }[] {
+  const groups: { label: string; entries: JournalEntry[] }[] = [];
+  let currentLabel = '';
+  for (const entry of entries) {
+    const label = dateGroupLabel(entry.createdAt);
+    if (label !== currentLabel) {
+      currentLabel = label;
+      groups.push({ label, entries: [entry] });
+    } else {
+      groups[groups.length - 1].entries.push(entry);
+    }
+  }
+  return groups;
+}
+
+// ─── Mood display ─────────────────────────────────
+
+function MoodDisplay({ mood }: { mood: number | null }) {
+  if (!mood) return null;
+  const hearts = Array.from({ length: 5 }, (_, i) => (
+    <Heart
+      key={i}
+      size={12}
+      className={i < mood ? 'text-[#c8a55a] fill-[#c8a55a]' : 'text-[#333]'}
+    />
+  ));
+  return <span className="flex items-center gap-0.5">{hearts}</span>;
+}
+
+// ─── Main Component ───────────────────────────────
 
 export default function CrecimientoPage() {
   const { apiFetch } = useApi();
@@ -25,16 +80,17 @@ export default function CrecimientoPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', mood: 3, gratitude: '' });
+  const [saving, setSaving] = useState(false);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
   const [editForm, setEditForm] = useState({ title: '', content: '', mood: 3, gratitude: '' });
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [fetchError, setFetchError] = useState(false);
   const [showReward, setShowReward] = useState(false);
 
-  // Lock body scroll when modal is open — save/restore scroll position
+  // Lock body scroll when modal is open
   useEffect(() => {
     if (editingEntry || pendingDeleteId) {
       const scrollY = window.scrollY;
@@ -52,22 +108,30 @@ export default function CrecimientoPage() {
     setLoading(true);
     setFetchError(false);
     try {
-      const [jRes] = await Promise.all([
-        apiFetch('/api/journal'),
-      ]);
-      if (jRes.ok) { const d = await jRes.json(); setEntries(d.entries); }
+      const res = await apiFetch('/api/journal');
+      if (res.ok) {
+        const d = await res.json();
+        setEntries(d.entries);
+      } else {
+        setFetchError(true);
+      }
     } catch (e) {
       console.error(e);
       setFetchError(true);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, [apiFetch]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  // ─── Create ──────────────────────────────────
+
   const submitEntry = async () => {
     if (!form.title.trim() || !form.content.trim()) return;
+    setSaving(true);
     try {
       const res = await apiFetch('/api/journal', {
         method: 'POST',
@@ -80,8 +144,14 @@ export default function CrecimientoPage() {
         setForm({ title: '', content: '', mood: 3, gratitude: '' });
         setShowReward(true);
       }
-    } catch (error) { console.error('Error submitting entry:', error); }
+    } catch (error) {
+      console.error('Error submitting entry:', error);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  // ─── Edit ────────────────────────────────────
 
   const startEdit = (entry: JournalEntry) => {
     setEditingEntry(entry);
@@ -104,9 +174,14 @@ export default function CrecimientoPage() {
         const errData = await res.json().catch(() => ({}));
         console.error('Journal PUT failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error updating entry:', error); }
-    finally { setEditSaving(false); }
+    } catch (error) {
+      console.error('Error updating entry:', error);
+    } finally {
+      setEditSaving(false);
+    }
   };
+
+  // ─── Delete ──────────────────────────────────
 
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
@@ -121,9 +196,14 @@ export default function CrecimientoPage() {
         const errData = await res.json().catch(() => ({}));
         console.error('Journal DELETE failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error deleting entry:', error); }
-    finally { setPendingDeleteId(null); }
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+    } finally {
+      setPendingDeleteId(null);
+    }
   };
+
+  // ─── Loading / Error states ──────────────────
 
   if (loading) {
     return <EmpireSkeleton message="Preparando tu diario..." />;
@@ -142,9 +222,12 @@ export default function CrecimientoPage() {
     );
   }
 
+  const grouped = groupEntriesByDate(entries);
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Edit Journal Entry Overlay */}
+
+      {/* ═══ Edit Journal Entry Overlay ═══ */}
       {editingEntry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingEntry(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
@@ -184,7 +267,7 @@ export default function CrecimientoPage() {
         </div>
       )}
 
-      {/* Delete Confirmation Overlay */}
+      {/* ═══ Delete Confirmation Overlay ═══ */}
       {pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
           <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
@@ -201,6 +284,7 @@ export default function CrecimientoPage() {
         </div>
       )}
 
+      {/* ═══ Page Header ═══ */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <TrendingUp size={28} className="text-[#c8a55a]" />
@@ -211,20 +295,25 @@ export default function CrecimientoPage() {
         </div>
       </div>
 
-      {/* Journal */}
+      {/* ═══ Journal Section ═══ */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
+        {/* Header + New Entry Button */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
           </h2>
-          <button onClick={() => setShowAdd(!showAdd)} className="text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press">
-            <Plus size={18} className="inline mr-1" /> Nueva entrada
+          <button
+            onClick={() => setShowAdd(!showAdd)}
+            className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
+          >
+            <Plus size={18} /> Nueva entrada
           </button>
         </div>
         <p className="text-[#666] text-xs mb-5">Escribe, reflexiona y transforma</p>
 
+        {/* ═══ New Entry Form ═══ */}
         {showAdd && (
-          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
+          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-6 space-y-3">
             <input type="text" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
             <textarea placeholder="¿Qué hay en tu mente?" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
@@ -248,49 +337,101 @@ export default function CrecimientoPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitEntry} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press">Guardar</button>
+              <button onClick={submitEntry} disabled={saving} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">
+                {saving ? 'Guardando...' : 'Guardar'}
+              </button>
               <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
             </div>
           </div>
         )}
 
+        {/* ═══ Journal History ═══ */}
         {entries.length > 0 ? (
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {entries.map((entry) => (
-              <div key={entry.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-[#c8a55a] font-medium">{entry.title}</h3>
-                  <div className="flex items-center gap-2">
-                    {entry.mood && (
-                      <span className="flex items-center gap-1 text-xs text-[#c8a55a]">
-                        <Heart size={12} /> {entry.mood}/5
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => startEdit(entry)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={15} /></button>
-                      <button onClick={() => setPendingDeleteId(entry.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={15} /></button>
+          <div className="space-y-8">
+            {grouped.map((group) => (
+              <div key={group.label}>
+                {/* Date group header */}
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-xs uppercase tracking-widest font-semibold text-[#c8a55a]/70 whitespace-nowrap">
+                    {group.label}
+                  </h3>
+                  <div className="flex-1 h-px bg-[#1a1a1a]" />
+                </div>
+
+                {/* Entries in this group */}
+                <div className="space-y-2">
+                  {group.entries.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors"
+                    >
+                      {/* Top row: title + actions */}
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <h4 className="text-[#c8a55a] font-medium text-sm leading-snug flex-1">{entry.title}</h4>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => startEdit(entry)}
+                            className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press"
+                            title="Editar"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => setPendingDeleteId(entry.id)}
+                            className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press"
+                            title="Eliminar"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Date + Time row */}
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="flex items-center gap-1 text-xs text-[#999]">
+                          <Calendar size={11} /> {formatDate(entry.createdAt)}
+                        </span>
+                        <span className="text-[#333] text-xs">·</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]">
+                          <Clock size={11} /> {formatTime(entry.createdAt)}
+                        </span>
+                        {entry.mood && (
+                          <>
+                            <span className="text-[#333] text-xs">·</span>
+                            <MoodDisplay mood={entry.mood} />
+                          </>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <p className="text-[#999] text-sm whitespace-pre-wrap leading-relaxed">
+                        {expandedEntry === entry.id
+                          ? entry.content
+                          : entry.content.slice(0, 150) + (entry.content.length > 150 ? '...' : '')}
+                      </p>
+                      {entry.content.length > 150 && (
+                        <button
+                          onClick={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
+                          className="text-[#c8a55a] text-xs mt-1 hover:underline"
+                        >
+                          {expandedEntry === entry.id ? 'Ver menos' : 'Ver más'}
+                        </button>
+                      )}
+
+                      {/* Gratitude */}
+                      {entry.gratitude && (
+                        <div className="mt-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded p-2">
+                          <p className="text-xs text-[#c8a55a]">Gratitud: <span className="text-[#999]">{entry.gratitude}</span></p>
+                        </div>
+                      )}
+
+                      {/* Edited indicator */}
+                      {entry.updatedAt && new Date(entry.updatedAt).getTime() - new Date(entry.createdAt).getTime() > 1000 && (
+                        <p className="text-[10px] text-[#444] mt-2 italic">Editado</p>
+                      )}
                     </div>
-                  </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(entry.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                  <span className="text-[#333] text-xs">·</span>
-                  <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(entry.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-                <p className="text-[#999] text-sm whitespace-pre-wrap">
-                  {expandedEntry === entry.id ? entry.content : entry.content.slice(0, 150) + (entry.content.length > 150 ? '...' : '')}
-                </p>
-                {entry.content.length > 150 && (
-                  <button onClick={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
-                    className="text-[#c8a55a] text-xs mt-1 hover:underline">
-                    {expandedEntry === entry.id ? 'Ver menos' : 'Ver más'}
-                  </button>
-                )}
-                {entry.gratitude && (
-                  <div className="mt-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded p-2">
-                    <p className="text-xs text-[#c8a55a]">Gratitud: <span className="text-[#999]">{entry.gratitude}</span></p>
-                  </div>
-                )}
               </div>
             ))}
           </div>
