@@ -33,8 +33,13 @@ export async function POST(request: NextRequest) {
 
     const { title, content, mood, gratitude } = await request.json();
 
+    // At least one field must have content
+    if (!title?.trim() && !content?.trim() && !gratitude?.trim()) {
+      return NextResponse.json({ error: 'At least one field is required' }, { status: 400 });
+    }
+
     const entry = await db.journalEntry.create({
-      data: { userId: user.id, title, content, mood, gratitude },
+      data: { userId: user.id, title: title || '', content: content || '', mood, gratitude },
     });
 
     // Award XP to crecimiento empire
@@ -70,9 +75,14 @@ export async function PUT(request: NextRequest) {
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
     if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    // At least one field must have content
+    if (!title?.trim() && !content?.trim() && !gratitude?.trim()) {
+      return NextResponse.json({ error: 'At least one field is required' }, { status: 400 });
+    }
+
     const updated = await db.journalEntry.update({
       where: { id: entryId },
-      data: { title, content, mood, gratitude },
+      data: { title: title || '', content: content || '', mood, gratitude },
     });
 
     return NextResponse.json({ entry: updated });

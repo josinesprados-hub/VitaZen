@@ -130,7 +130,7 @@ export default function CrecimientoPage() {
   // ─── Create ──────────────────────────────────
 
   const submitEntry = async () => {
-    if (!form.title.trim() || !form.content.trim()) return;
+    if (!form.title.trim() && !form.content.trim() && !form.gratitude.trim()) return;
     setSaving(true);
     try {
       const res = await apiFetch('/api/journal', {
@@ -160,6 +160,7 @@ export default function CrecimientoPage() {
 
   const saveEdit = async () => {
     if (!editingEntry) return;
+    if (!editForm.title.trim() && !editForm.content.trim() && !editForm.gratitude.trim()) return;
     setEditSaving(true);
     try {
       const res = await apiFetch('/api/journal', {
@@ -261,7 +262,7 @@ export default function CrecimientoPage() {
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => setEditingEntry(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={saveEdit} disabled={editSaving || (!editForm.title.trim() && !editForm.content.trim() && !editForm.gratitude.trim())} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -337,7 +338,7 @@ export default function CrecimientoPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitEntry} disabled={saving} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">
+              <button onClick={submitEntry} disabled={saving || (!form.title.trim() && !form.content.trim() && !form.gratitude.trim())} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">
                 {saving ? 'Guardando...' : 'Guardar'}
               </button>
               <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
@@ -367,7 +368,7 @@ export default function CrecimientoPage() {
                     >
                       {/* Top row: title + actions */}
                       <div className="flex items-start justify-between gap-3 mb-2">
-                        <h4 className="text-[#c8a55a] font-medium text-sm leading-snug flex-1">{entry.title}</h4>
+                        <h4 className="text-[#c8a55a] font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#666] italic">Sin título</span>}</h4>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <button
                             onClick={() => startEdit(entry)}
@@ -404,18 +405,22 @@ export default function CrecimientoPage() {
                       </div>
 
                       {/* Content */}
-                      <p className="text-[#999] text-sm whitespace-pre-wrap leading-relaxed">
-                        {expandedEntry === entry.id
-                          ? entry.content
-                          : entry.content.slice(0, 150) + (entry.content.length > 150 ? '...' : '')}
-                      </p>
-                      {entry.content.length > 150 && (
-                        <button
-                          onClick={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
-                          className="text-[#c8a55a] text-xs mt-1 hover:underline"
-                        >
-                          {expandedEntry === entry.id ? 'Ver menos' : 'Ver más'}
-                        </button>
+                      {entry.content && (
+                        <>
+                          <p className="text-[#999] text-sm whitespace-pre-wrap leading-relaxed">
+                            {expandedEntry === entry.id
+                              ? entry.content
+                              : entry.content.slice(0, 150) + (entry.content.length > 150 ? '...' : '')}
+                          </p>
+                          {entry.content.length > 150 && (
+                            <button
+                              onClick={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
+                              className="text-[#c8a55a] text-xs mt-1 hover:underline"
+                            >
+                              {expandedEntry === entry.id ? 'Ver menos' : 'Ver más'}
+                            </button>
+                          )}
+                        </>
                       )}
 
                       {/* Gratitude */}
