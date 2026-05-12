@@ -166,6 +166,6 @@ export function getTemplate(
     ...template,
     title,
     body,
-    icon: '/images/vitazen-logo.png',
+    icon: '/images/v-gold-logo.png',
   };
 }

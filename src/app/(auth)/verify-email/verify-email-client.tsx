@@ -141,7 +141,7 @@ export default function VerifyEmailClient() {
       <div className="w-full max-w-md text-center auth-page-enter">
         {/* Logo */}
         <div className="mb-10">
-          <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-14 h-14 mx-auto mb-4 opacity-90 rounded-[20%]" />
+          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-14 h-14 mx-auto mb-4 opacity-90 rounded-[20%]" />
           <p className="text-[#c8a55a] text-xs tracking-[8px] font-light">VITAZEN</p>
         </div>
 

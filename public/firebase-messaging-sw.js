@@ -38,7 +38,7 @@ messaging.onBackgroundMessage((payload) => {
 
   const notificationOptions = {
     body,
-    icon: '/images/vitazen-logo.png',
+    icon: '/images/v-gold-logo.png',
     badge: '/images/icon-192x192.png',
     tag: `vitazen-${type}`, // Dedup: same tag replaces previous
     renotify: false,

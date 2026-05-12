@@ -77,7 +77,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b border-[#1a1a1a]">
             <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
-              <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-10 h-10 rounded-[20%]" />
+              <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-10 h-10 rounded-[20%]" />
               <span className="text-[#c8a55a] text-xl font-bold tracking-widest">VITAZEN</span>
             </Link>
             <button onClick={onClose} className="lg:hidden text-white hover:text-[#c8a55a] close-btn">

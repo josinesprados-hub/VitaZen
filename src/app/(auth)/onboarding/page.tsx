@@ -195,7 +195,7 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-[100dvh] bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
+          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
           <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-[100dvh] bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <img src="/images/vitazen-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
+          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
           <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
         </div>
       </div>
