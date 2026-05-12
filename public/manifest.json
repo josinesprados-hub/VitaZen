@@ -4,7 +4,7 @@
   "description": "Ecosistema premium de desarrollo personal basado en 5 imperios",
   "start_url": "/onboarding",
   "display": "standalone",
-  "background_color": "#C8A55A",
+  "background_color": "#000000",
   "theme_color": "#c8a55a",
   "icons": [
     {
