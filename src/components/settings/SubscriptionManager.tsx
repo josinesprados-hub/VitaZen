@@ -6,28 +6,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { Crown, CreditCard, Loader2, ChevronRight, Sparkles } from 'lucide-react';
 
-/** Detect platform for subscription management redirect */
-function getPlatform(): 'ios' | 'android' | 'web' {
-  if (typeof window === 'undefined') return 'web';
-
-  const ua = navigator.userAgent;
-
-  // iOS detection (Safari on iPhone/iPad, not just "like Mac")
-  if (/iPhone|iPad|iPod/.test(ua) && !window.MSStream) {
-    // Check if running as native PWA or in Safari
-    const isStandalone = (window.navigator as any).standalone === true;
-    const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua);
-    if (isStandalone || isSafari) return 'ios';
-  }
-
-  // Android detection
-  if (/Android/.test(ua)) {
-    return 'android';
-  }
-
-  return 'web';
-}
-
 /** Format date to locale string */
 function formatDate(dateStr: string): string {
   try {
@@ -51,21 +29,7 @@ export function SubscriptionManager() {
   const subscription = user?.subscription;
 
   const handleManageSubscription = async () => {
-    const platform = getPlatform();
-
-    // iOS: open native subscription management
-    if (platform === 'ios') {
-      window.open('https://apps.apple.com/account/subscriptions', '_blank');
-      return;
-    }
-
-    // Android: open Google Play subscription management
-    if (platform === 'android') {
-      window.open('https://play.google.com/store/account/subscriptions', '_blank');
-      return;
-    }
-
-    // Web: open Stripe Customer Portal
+    // All platforms: open Stripe Customer Portal
     setLoading(true);
     try {
       const res = await apiFetch('/api/stripe/portal', { method: 'POST' });
