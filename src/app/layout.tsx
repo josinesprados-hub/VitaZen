@@ -29,7 +29,7 @@ export const metadata: Metadata = {
       { url: '/images/favicon-16x16.png?v=7', sizes: '16x16', type: 'image/png' },
     ],
     apple: [
-      { url: '/images/apple-touch-icon.png?v=7', sizes: '180x180' },
+      { url: '/images/apple-touch-icon.png?v=8', sizes: '180x180' },
     ],
   },
   manifest: '/manifest.json',
