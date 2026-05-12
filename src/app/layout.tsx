@@ -24,12 +24,12 @@ export const metadata: Metadata = {
   description: 'Ecosistema premium de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
   icons: {
     icon: [
-      { url: '/favicon.ico?v=6' },
-      { url: '/images/favicon-32x32.png?v=6', sizes: '32x32', type: 'image/png' },
-      { url: '/images/favicon-16x16.png?v=6', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon.ico?v=7' },
+      { url: '/images/favicon-32x32.png?v=7', sizes: '32x32', type: 'image/png' },
+      { url: '/images/favicon-16x16.png?v=7', sizes: '16x16', type: 'image/png' },
     ],
     apple: [
-      { url: '/images/apple-touch-icon.png?v=6', sizes: '180x180' },
+      { url: '/images/apple-touch-icon.png?v=7', sizes: '180x180' },
     ],
   },
   manifest: '/manifest.json',
