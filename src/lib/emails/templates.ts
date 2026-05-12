@@ -11,7 +11,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 // ─── V Logo: public URL for maximum email client compatibility ───
 // cid: attachments fail in Gmail iOS/Android; public HTTPS URL works everywhere
-const V_LOGO_SRC = 'https://vitazen.cc/images/v-gold-logo.png';
+const V_LOGO_SRC = 'https://vitazen.cc/images/icon-192x192.png';
 
 // ─── Premium dark wrapper: black bg, V logo, gold brand ───
 

@@ -166,6 +166,6 @@ export function getTemplate(
     ...template,
     title,
     body,
-    icon: '/images/v-gold-logo.png',
+    icon: '/images/icon-192x192.png',
   };
 }

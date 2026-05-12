@@ -38,8 +38,8 @@ messaging.onBackgroundMessage((payload) => {
 
   const notificationOptions = {
     body,
-    icon: '/images/v-gold-logo.png',
-    badge: '/images/icon-192x192.png',
+    icon: '/images/icon-192x192.png',
+    badge: '/images/favicon-32x32.png',
     tag: `vitazen-${type}`, // Dedup: same tag replaces previous
     renotify: false,
     silent: true, // No sound — respect user's device settings
