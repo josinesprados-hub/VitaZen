@@ -32,6 +32,11 @@ interface UserContext {
     type: string;
     completedAt: Date;
   }[];
+  recentJournals: {
+    title: string;
+    mood: number | null;
+    createdAt: Date;
+  }[];
   recentConversations: {
     title: string;
     updatedAt: Date;
@@ -49,6 +54,10 @@ interface UserContext {
     journals: number;
     checkins: number;
   };
+  consistency: {
+    activeDaysThisWeek: number;
+    trend: 'improving' | 'stable' | 'declining' | 'starting';
+  };
 }
 
 /**
@@ -62,16 +71,22 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
 
+  // Previous week window for trend comparison
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);
+
   // Run all queries in parallel for performance
   const [
     recentCheckins,
     habitStreaks,
     recentMeditations,
+    recentJournals,
     recentThreads,
     empireProgress,
     weeklyMeditations,
     weeklyJournals,
     weeklyCheckins,
+    weeklyHabitLogs,
+    prevWeekCheckins,
     user,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
@@ -88,11 +103,19 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       take: isPremium ? 8 : 4,
     }),
 
-    // Meditation sessions: FREE gets 2, PREMIUM gets 5
+    // Meditation sessions: FREE gets 1, PREMIUM gets 5
     db.meditationSession.findMany({
       where: { userId, completedAt: { gte: thirtyDaysAgo } },
       orderBy: { completedAt: 'desc' },
-      take: isPremium ? 5 : 2,
+      take: isPremium ? 5 : 1,
+    }),
+
+    // Recent journal entries: FREE gets 1, PREMIUM gets 3
+    db.journalEntry.findMany({
+      where: { userId, createdAt: { gte: thirtyDaysAgo } },
+      orderBy: { createdAt: 'desc' },
+      take: isPremium ? 3 : 1,
+      select: { title: true, mood: true, createdAt: true },
     }),
 
     // Recent conversation threads: FREE gets 1, PREMIUM gets 3
@@ -124,10 +147,18 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       ? db.journalEntry.count({ where: { userId, createdAt: { gte: sevenDaysAgo } } })
       : Promise.resolve(0),
 
-    // Weekly checkin count: PREMIUM only
-    isPremium
-      ? db.dailyCheckin.count({ where: { userId, date: { gte: sevenDaysAgo } } })
-      : Promise.resolve(0),
+    // Weekly checkin count: both tiers (for consistency)
+    db.dailyCheckin.count({ where: { userId, date: { gte: sevenDaysAgo } } }),
+
+    // Weekly habit logs with completion in last 7 days
+    db.habitLog.count({
+      where: { userId, lastCompletedAt: { gte: sevenDaysAgo } },
+    }),
+
+    // Previous week checkin count (for trend): both tiers
+    db.dailyCheckin.count({
+      where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+    }),
 
     // User data
     db.user.findUnique({
@@ -136,13 +167,24 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }),
   ]);
 
-  // Weekly habit completions (PREMIUM only)
+  // Weekly habit completions (PREMIUM only for display, but count for consistency)
   const weeklyHabits = isPremium
     ? habitStreaks.filter(h => {
         if (!h.lastCompletedAt) return false;
         return h.lastCompletedAt >= sevenDaysAgo;
       }).length
-    : 0;
+    : weeklyHabitLogs;
+
+  // Compute consistency signal
+  const activeDaysThisWeek = Math.min(weeklyCheckins + (weeklyHabitLogs > 0 ? 1 : 0) + (weeklyMeditations > 0 ? 1 : 0) + (weeklyJournals > 0 ? 1 : 0), 7);
+  let trend: 'improving' | 'stable' | 'declining' | 'starting' = 'stable';
+  if (weeklyCheckins <= 1 && prevWeekCheckins <= 1) {
+    trend = 'starting';
+  } else if (weeklyCheckins > prevWeekCheckins + 1) {
+    trend = 'improving';
+  } else if (weeklyCheckins < prevWeekCheckins - 1) {
+    trend = 'declining';
+  }
 
   return {
     userName: user?.name || null,
@@ -166,6 +208,11 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       type: m.type,
       completedAt: m.completedAt,
     })),
+    recentJournals: recentJournals.map(j => ({
+      title: j.title,
+      mood: j.mood,
+      createdAt: j.createdAt,
+    })),
     recentConversations: recentThreads.map(t => ({
       title: t.title,
       updatedAt: t.updatedAt,
@@ -182,6 +229,10 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       habits: weeklyHabits,
       journals: weeklyJournals,
       checkins: weeklyCheckins,
+    },
+    consistency: {
+      activeDaysThisWeek,
+      trend,
     },
   };
 }
@@ -214,7 +265,7 @@ function daysAgo(date: Date): number {
 }
 
 /**
- * Format context for FREE users — basic, concise summary.
+ * Format context for FREE users — concise with basic continuity signals.
  */
 function formatBasicContext(ctx: UserContext): string {
   const lines: string[] = [];
@@ -223,12 +274,12 @@ function formatBasicContext(ctx: UserContext): string {
     lines.push(`Se llama ${ctx.userName}.`);
   }
 
-  // Just the latest check-in summary
+  // Latest check-in summary
   if (ctx.recentCheckins.length > 0) {
     const latest = ctx.recentCheckins[0];
     const days = daysAgo(latest.date);
     const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
-    lines.push(`Su último check-in fue ${when}: emoción ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, energía ${latest.energy}/5.`);
+    lines.push(`Último check-in ${when}: emoción ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, energía ${latest.energy}/5.`);
   }
 
   // Brief streak summary
@@ -237,11 +288,36 @@ function formatBasicContext(ctx: UserContext): string {
     lines.push(`Hábitos con racha: ${streaks}.`);
   }
 
+  // Last meditation
+  if (ctx.recentMeditations.length > 0) {
+    const last = ctx.recentMeditations[0];
+    const days = daysAgo(last.completedAt);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    lines.push(`Meditó ${when} (${last.duration} min).`);
+  }
+
+  // Last journal entry
+  if (ctx.recentJournals.length > 0) {
+    const last = ctx.recentJournals[0];
+    const title = last.title || 'sin título';
+    const days = daysAgo(last.createdAt);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    lines.push(`Escribió en su diario ${when}: "${title}".`);
+  }
+
+  // Consistency signal
+  const c = ctx.consistency;
+  if (c.trend === 'improving') {
+    lines.push(`Viene siendo más constante esta semana.`);
+  } else if (c.trend === 'declining') {
+    lines.push(`Últimamente menos activo/a que antes.`);
+  }
+
   return lines.join('\n');
 }
 
 /**
- * Format context for PREMIUM users — full detailed context with trends and insights.
+ * Format context for PREMIUM users — full context with continuity and evolution signals.
  */
 function formatAdvancedContext(ctx: UserContext): string {
   const lines: string[] = [];
@@ -269,6 +345,8 @@ function formatAdvancedContext(ctx: UserContext): string {
       if (latest.stress - prev.stress > 0) trends.push('el estrés ha subido');
       if (latest.energy - prev.energy > 0) trends.push('la energía ha mejorado');
       if (latest.emotion - prev.emotion < 0) trends.push('el estado emocional ha bajado');
+      if (latest.emotion - prev.emotion > 0) trends.push('el estado emocional ha mejorado');
+      if (latest.focus - prev.focus > 0) trends.push('el enfoque ha mejorado');
       if (trends.length > 0) {
         lines.push(`Tendencia reciente: ${trends.join(', ')}.`);
       }
@@ -277,7 +355,7 @@ function formatAdvancedContext(ctx: UserContext): string {
 
   // Habit streaks with detail
   if (ctx.habitStreaks.length > 0) {
-    const habitParts = ctx.habitStreaks.map(h => {
+    const habitParts = ctx.habitStreaks.slice(0, 5).map(h => {
       const daysSince = h.lastCompletedAt ? daysAgo(h.lastCompletedAt) : null;
       const status = daysSince === 0 ? 'hecho hoy' : daysSince === 1 ? 'hecho ayer' : daysSince !== null ? `último hace ${daysSince} días` : '';
       return `${h.name}: racha ${h.streak} días${status ? ` (${status})` : ''}`;
@@ -290,7 +368,19 @@ function formatAdvancedContext(ctx: UserContext): string {
     const last = ctx.recentMeditations[0];
     const days = daysAgo(last.completedAt);
     const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
-    lines.push(`Última meditación: ${last.duration} min de ${last.type.replace('_', ' ')} ${when}. ${ctx.recentMeditations.length} sesiones en las últimas 2 semanas.`);
+    lines.push(`Última meditación: ${last.duration} min de ${last.type.replace('_', ' ')} ${when}. ${ctx.recentMeditations.length} sesiones recientes.`);
+  }
+
+  // Recent journal entries — what the user has been reflecting on
+  if (ctx.recentJournals.length > 0) {
+    const journalParts = ctx.recentJournals.map(j => {
+      const days = daysAgo(j.createdAt);
+      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+      const title = j.title || 'sin título';
+      const moodStr = j.mood ? ` (ánimo ${j.mood}/5)` : '';
+      return `"${title}"${moodStr} ${when}`;
+    });
+    lines.push(`Reflexiones recientes en su diario: ${journalParts.join(', ')}.`);
   }
 
   // Recent conversation topics
@@ -307,14 +397,18 @@ function formatAdvancedContext(ctx: UserContext): string {
   // Empire progress summary
   const activeEmpires = ctx.empireProgress.filter(e => e.xp > 0 || e.streak > 0);
   if (activeEmpires.length > 0) {
+    // Find the empire with most XP to signal focus area
+    const topEmpire = activeEmpires.reduce((a, b) => a.xp > b.xp ? a : b);
+    const topEmpireName = EMPIRE_NAMES[topEmpire.empire] || topEmpire.empire;
+
     const empireParts = activeEmpires.map(e => {
       const name = EMPIRE_NAMES[e.empire] || e.empire;
       return `${name}: nivel ${e.level}, ${e.xp} XP${e.streak > 0 ? `, racha ${e.streak} días` : ''}`;
     });
-    lines.push(`Progreso de imperios: ${empireParts.join('. ')}.`);
+    lines.push(`Progreso de imperios: ${empireParts.join('. ')}. Enfocado/a especialmente en ${topEmpireName}.`);
   }
 
-  // Weekly activity summary
+  // Weekly activity summary + consistency signal
   const wa = ctx.weeklyActivity;
   const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins;
   if (totalActivity > 0) {
@@ -323,8 +417,17 @@ function formatAdvancedContext(ctx: UserContext): string {
     if (wa.habits > 0) parts.push(`${wa.habits} hábito${wa.habits > 1 ? 's' : ''}`);
     if (wa.journals > 0) parts.push(`${wa.journals} entrada${wa.journals > 1 ? 's' : ''} de diario`);
     if (wa.checkins > 0) parts.push(`${wa.checkins} check-in${wa.checkins > 1 ? 's' : ''}`);
-    const assessment = totalActivity >= 14 ? 'Alta consistencia.' : totalActivity >= 7 ? 'Actividad moderada.' : totalActivity <= 2 ? 'Poca actividad reciente.' : '';
-    lines.push(`Esta semana: ${parts.join(', ')}. ${assessment}`);
+    lines.push(`Esta semana: ${parts.join(', ')}.`);
+  }
+
+  // Consistency evolution signal — compact, natural
+  const c = ctx.consistency;
+  if (c.trend === 'improving') {
+    lines.push(`Viene siendo más constante últimamente.`);
+  } else if (c.trend === 'declining') {
+    lines.push(`Últimamente menos activo/a que la semana pasada.`);
+  } else if (c.trend === 'starting' && totalActivity <= 2) {
+    lines.push(`Está empezando a usar la app.`);
   }
 
   return lines.join('\n');
@@ -360,22 +463,27 @@ export function buildContextualSystemPrompt(
   const contextRules = isPremium
     ? `CÓMO USAR ESTE CONTEXTO:
 - Integrar de forma invisible. Nunca digas "según tus datos" ni "veo en tu registro". Simplemente sabes.
-- Si el usuario tiene buena racha: "Vienes con buena consistencia." Si el estrés subió: "Últimamente el estrés ha estado más presente." Natural, sin explicarlo.
+- Si el usuario tiene buena racha o consistencia: "Vienes con buena consistencia." Si el estrés subió: "Últimamente el estrés ha estado más presente." Natural, sin explicarlo.
 - Conecta temas de conversaciones anteriores cuando encaje: "El otro día mencionaste dificultades con el enfoque..."
+- Si escribió en su diario recientemente, puedes referenciarlo: "Vi que has estado reflexionando sobre..." — solo si es relevante.
 - Varía las referencias. No repitas la misma observación en cada respuesta.
 - Si el contexto no es relevante para la pregunta, no lo fuerces. Responde directamente.
 - Construye continuidad entre sesiones. El usuario debe sentir que le recuerdas.
 - Sé sutil. La personalización se nota en lo natural que suena, no en cuántos datos mencionas.
 - USA el contexto para ser más accionable, no para alargar la respuesta. Si sabes que su estrés subió, no lo menciones si no añades algo útil sobre ello.
-- El contexto te permite responder más preciso sin necesidad de preguntas extra. Aprovéchalo.`
+- El contexto te permite responder más preciso sin necesidad de preguntas extra. Aprovéchalo.
+- Máximo UNA referencia contextual por respuesta. Si ya referenciaste algo, el resto debe ser respuesta directa.
+- Si el usuario viene mejorando, reconócelo en una frase breve y avanza. No te detengas a celebrar.`
     : `CÓMO USAR ESTE CONTEXTO:
 - Integrar de forma invisible. Nunca digas "según tus datos". Simplemente sabes.
 - Si el usuario tiene buena racha, puedes decir: "Vienes con buena consistencia."
+- Si escribió en su diario o meditó recientemente, puedes referenciarlo brevemente si es relevante.
 - No repitas la misma referencia en cada respuesta.
 - Si el contexto no es relevante, responde directamente sin forzar.
 - Sé sutil. Menos es más.
 - USA el contexto para responder más preciso sin hacer preguntas extra. Si ya sabes su situación, propón directamente.
-- Recuerda: esta persona tiene mensajes limitados. El contexto te ayuda a dar respuestas más útiles sin gastar mensajes en preguntas que puedes inferir.`;
+- Recuerda: esta persona tiene mensajes limitados. El contexto te ayuda a dar respuestas más útiles sin gastar mensajes en preguntas que puedes inferir.
+- Máximo UNA referencia contextual por respuesta. El resto debe ser respuesta útil y directa.`;
 
   return `${basePrompt}
 
