@@ -1207,6 +1207,28 @@ body.scroll-locked {
   animation: breathingRing 4s ease-in-out infinite;
 }
 
+/* Breathing completion overlay — instant, sharp, no blur */
+.breathing-complete-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.breathing-complete-content {
+  background: #0a0a0a;
+  border: 1px solid rgba(200, 165, 90, 0.2);
+  border-radius: 1rem;
+  /* No animation — instant render for crisp text */
+}
+@media (max-width: 767px) {
+  .breathing-complete-content {
+    border-radius: 1.25rem 1.25rem 0 0;
+    max-height: 92dvh;
+    margin-top: auto;
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
 /* Warm loading message — for empire page skeletons */
 .warm-loading-msg {
   color: #c8a55a;
