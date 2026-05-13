@@ -2,14 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appName"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LauncherActivity">
+        android:theme="@style/Theme.VitaZen"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="false">
 
         <meta-data
             android:name="asset_statements"
@@ -18,7 +20,10 @@
         <activity
             android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
             android:exported="true"
-            android:label="@string/appName">
+            android:label="@string/appName"
+            android:theme="@style/Theme.LauncherActivity"
+            android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true">
             <meta-data
                 android:name="android.support.customtabs.trusted.DEFAULT_URL"
                 android:value="https://vitazen.cc/onboarding" />
@@ -29,9 +34,6 @@
                 android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
                 android:resource="@color/colorPrimaryDark" />
             <meta-data
-                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
-                android:resource="@drawable/splash" />
-            <meta-data
                 android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
                 android:value="unspecified" />
             <meta-data
@@ -40,6 +42,12 @@
             <meta-data
                 android:name="android.support.customtabs.trusted.ADDITIONAL_TRUSTED_ORIGINS"
                 android:resource="@array/additional_trusted_origins" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+                android:resource="@drawable/splash" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+                android:resource="@color/backgroundColor" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,6 +62,15 @@
                       android:host="vitazen.cc" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.google.androidbrowserhelper.trusted.FocusActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
 
         <service
             android:name="com.google.androidbrowserhelper.trusted.DelegationService"
