@@ -391,12 +391,12 @@ export default function CheckinPage() {
                     </div>
                     {c.note && <p className="text-[10px] text-[#444] mt-1 truncate">{c.note}</p>}
                   </div>
-                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
-                    <button onClick={() => startEditCheckin(c)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#888] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
-                      <Pencil size={15} />
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                      <Pencil size={14} />
                     </button>
-                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar">
-                      <Trash2 size={15} />
+                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
