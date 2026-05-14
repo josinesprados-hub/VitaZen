@@ -47,7 +47,13 @@ android {
             }
         }
         debug {
-            // Use debug signing by default
+            // Diagnostic debug build: explicitly no minification for runtime diagnosis.
+            // This ensures ProGuard cannot strip or obfuscate any TWA/browser helper
+            // classes, allowing us to isolate whether the release crash is caused by
+            // ProGuard removal or by the TWA runtime flow itself.
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
         }
     }
 
