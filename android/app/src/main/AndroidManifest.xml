@@ -4,6 +4,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Critical for Android 11+: enables discovery of Chrome Custom Tabs service.
+         androidbrowserhelper:2.5.0 does NOT include this query in its own manifest,
+         so queryIntentServices(CustomTabsService) returns empty on API 30+,
+         preventing TWA/CCT provider detection and causing black screen crash. -->
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -42,12 +52,15 @@
             <meta-data
                 android:name="android.support.customtabs.trusted.ADDITIONAL_TRUSTED_ORIGINS"
                 android:resource="@array/additional_trusted_origins" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
-                android:resource="@drawable/splash" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
-                android:resource="@color/backgroundColor" />
+            <!-- SPLASH_IMAGE_DRAWABLE and SPLASH_SCREEN_BACKGROUND_COLOR removed.
+                 splash.xml is a LayerDrawable containing only a ColorDrawable,
+                 which has getIntrinsicWidth()/Height() == -1.
+                 Utils.convertDrawableToBitmap() calls Bitmap.createBitmap(-1, -1, ...)
+                 which throws IllegalArgumentException and crashes the app.
+                 Without these meta-data, androidbrowserhelper skips the splash
+                 transfer path and launches the TWA directly. The Android 12+
+                 system splash (based on app icon + windowBackground) provides
+                 the startup visual instead. -->
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
