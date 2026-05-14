@@ -12,6 +12,20 @@
         <intent>
             <action android:name="android.support.customtabs.action.CustomTabsService" />
         </intent>
+        <!-- TwaProviderPicker.pickProvider() queries browsers with http scheme.
+             The AAR only declares https, which can cause queryIntentActivities
+             to return empty on Android 11+ for the http-scheme query. Adding
+             http scheme ensures Chrome is found by pickProvider(). -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
     </queries>
 
     <application
@@ -27,8 +41,13 @@
             android:name="asset_statements"
             android:resource="@string/assetStatements" />
 
+        <!-- Using custom SafeLauncherActivity instead of the library's
+             com.google.androidbrowserhelper.trusted.LauncherActivity.
+             SafeLauncherActivity fixes: (1) QualityEnforcer crash when DAL
+             verification fails, (2) black screen when no splash drawable,
+             (3) wraps launch in try/catch for resilience. -->
         <activity
-            android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
+            android:name="com.vitazen.app.v1.SafeLauncherActivity"
             android:exported="true"
             android:label="@string/appName"
             android:theme="@style/Theme.LauncherActivity"
