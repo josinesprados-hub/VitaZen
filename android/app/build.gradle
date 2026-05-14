@@ -41,7 +41,12 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Using proguard-android.txt (NOT -optimize) because the optimization
+            // pass corrupts AIDL-generated Binder IPC classes in
+            // android.support.customtabs.** that TWA/CustomTabs depends on.
+            // Shrinking (removing unused code) and obfuscation still work.
+            // This is the standard configuration for TWA apps per Google's guidance.
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
