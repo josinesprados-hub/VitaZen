@@ -58,7 +58,7 @@
                 android:value="https://vitazen.cc" />
             <meta-data
                 android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
-                android:resource="@color/colorPrimary" />
+                android:resource="@color/backgroundColor" />
             <meta-data
                 android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
                 android:resource="@color/colorPrimaryDark" />
@@ -68,9 +68,12 @@
             <meta-data
                 android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
                 android:value="customtabs" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.ADDITIONAL_TRUSTED_ORIGINS"
-                android:resource="@array/additional_trusted_origins" />
+            <!-- ADDITIONAL_TRUSTED_ORIGINS removed. Chrome validates Digital Asset Links
+                 for ALL trusted origins — if any origin fails, the entire TWA falls back
+                 to Chrome Custom Tabs (showing the toolbar). vitazen.app was listed here
+                 but does not serve assetlinks.json, causing TWA verification to fail.
+                 Only vitazen.cc is now trusted. If vitazen.app needs TWA in the future,
+                 serve assetlinks.json there and re-add this metadata. -->
             <!-- SPLASH_IMAGE_DRAWABLE and SPLASH_SCREEN_BACKGROUND_COLOR removed.
                  splash.xml is a LayerDrawable containing only a ColorDrawable,
                  which has getIntrinsicWidth()/Height() == -1.

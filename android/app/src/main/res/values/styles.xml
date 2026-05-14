@@ -22,7 +22,10 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <!-- colorPrimary set to black (not golden) so that if Chrome Custom Tabs fallback
+             is triggered, the CCT toolbar blends with the dark UI instead of showing
+             a golden bar. In TWA mode the toolbar is hidden entirely. -->
+        <item name="colorPrimary">@color/backgroundColor</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>

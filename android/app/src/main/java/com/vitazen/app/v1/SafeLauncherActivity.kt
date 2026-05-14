@@ -28,12 +28,21 @@ class SafeLauncherActivity : LauncherActivity() {
     }
 
     /**
-     * Set a content view BEFORE the library's onCreate runs.
+     * Set a content view BEFORE the library's onCreate runs, and enable fullscreen
+     * immersive mode for a smooth, premium launch transition into the TWA.
+     *
      * The library only sets a content view if splashScreenNeeded() returns true,
      * which requires splashImageDrawableId != 0. Since we removed SPLASH_IMAGE_DRAWABLE,
      * the library never sets a content view, leaving the activity with a black window.
+     *
+     * Immersive mode hides the status bar and navigation bar during the brief
+     * moment between the launcher activity starting and the TWA/CCT opening in
+     * Chrome. This creates a seamless fullscreen-to-fullscreen transition.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Enable fullscreen immersive mode for smooth launch transition
+        enableImmersiveMode()
+
         // Set a plain view with the window background color to avoid black screen.
         // The TWA/CCT will cover this almost immediately.
         val placeholder = View(this)
@@ -44,6 +53,32 @@ class SafeLauncherActivity : LauncherActivity() {
         } catch (e: Exception) {
             Log.e(TAG, "Exception in LauncherActivity.onCreate", e)
             finish()
+        }
+    }
+
+    /**
+     * Hide system bars (status bar + navigation bar) for a fully immersive
+     * launch transition. Uses the modern WindowInsetsController API on API 30+
+     * and the legacy systemUiVisibility flags on older versions.
+     */
+    private fun enableImmersiveMode() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            window.insetsController?.let {
+                it.systemBarsBehavior =
+                    android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                it.hide(android.view.WindowInsets.Type.systemBars())
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            )
         }
     }
 
