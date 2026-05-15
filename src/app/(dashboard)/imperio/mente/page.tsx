@@ -8,7 +8,6 @@ import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
-import { MicroReward } from '@/components/ui/MicroReward';
 
 interface Meditation {
   id: string;
@@ -726,8 +725,6 @@ export default function MentePage() {
 
       {/* Tips */}
       <EmpireTipsSection empire="mente" subtitle="Técnicas para tu bienestar mental" />
-      {/* Micro-reward for meditation completion */}
-      <MicroReward trigger={completedSession !== null} message="Sesión completada" />
     </div>
   );
 }
