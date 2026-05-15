@@ -3,6 +3,7 @@
 // Premium dark/gold design, transactional-first
 // Black background, V logo, gold accents
 // Optimized for Gmail/Outlook/Apple Mail
+// Cross-client: dark mode, font fallbacks, bgcolor
 // ═══════════════════════════════════════════
 
 import type { EmailContent } from './types';
@@ -10,8 +11,48 @@ import type { EmailContent } from './types';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 // ─── V Logo: public URL for maximum email client compatibility ───
-// cid: attachments fail in Gmail iOS/Android; public HTTPS URL works everywhere
 const V_LOGO_SRC = 'https://vitazen.cc/images/icon-192x192.png';
+
+// ─── Cross-client font stack ───
+const FONT_STACK_CSS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+
+// ─── Shared dark-mode style block (same as templates.ts) ───
+const DARK_MODE_STYLES = `
+  <style type="text/css">
+    /* ====== EMAIL CLIENT RESETS ====== */
+    body,table,td,a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table,td { mso-table-lspace:0pt; mso-table-rspace:0pt; }
+    img { -ms-interpolation-mode:bicubic; border:0; outline:none; text-decoration:none; }
+
+    /* ====== GMAIL DARK MODE OVERRIDES ====== */
+    u + .email-body .email-bg { background-color:#080808 !important; }
+    u + .email-body .content-cell { background-color:#080808 !important; }
+    u + .email-body .gold-text { color:#c8a55a !important; }
+    u + .email-body .white-text { color:#ffffff !important; }
+    u + .email-body .heading-text { color:#ffffff !important; }
+    u + .email-body .body-text { color:#d4d4d4 !important; }
+    u + .email-body .secondary-text { color:#aaaaaa !important; }
+    u + .email-body .label-text { color:#777777 !important; }
+    u + .email-body .muted-text { color:#666666 !important; }
+    u + .email-body .subtle-text { color:#555555 !important; }
+    u + .email-body .cta-cell { background-color:#c8a55a !important; }
+    u + .email-body .cta-link { color:#0a0a0a !important; }
+    u + .email-body .divider-gold { background-color:#c8a55a !important; }
+    u + .email-body .divider-subtle { background-color:#333333 !important; }
+    u + .email-body .logo-img { filter:none !important; -webkit-filter:none !important; }
+
+    /* ====== DARK MODE MEDIA QUERY (Apple Mail / modern clients) ====== */
+    @media (prefers-color-scheme: dark) {
+      .email-bg { background-color:#080808 !important; }
+      .content-cell { background-color:#080808 !important; }
+    }
+  </style>
+  <!--[if mso]>
+  <style type="text/css">
+    body,table,td,p,a,h1,span { font-family:Tahoma,Verdana,Segoe,sans-serif !important; }
+  </style>
+  <![endif]-->
+`;
 
 // ─── Types ───
 
@@ -46,13 +87,13 @@ export interface WeeklyRecapEmailData {
 function metricRow(label: string, value: string): string {
   return `
     <tr>
-      <td style="padding:4px 0;color:#777;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${label}</td>
-      <td style="padding:4px 0;color:#ffffff;font-size:13px;text-align:right;font-weight:400;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${value}</td>
+      <td class="content-cell" style="padding:4px 0;color:#777;font-size:13px;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808"><span class="label-text">${label}</span></td>
+      <td class="content-cell" style="padding:4px 0;color:#ffffff;font-size:13px;text-align:right;font-weight:400;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808"><span class="white-text">${value}</span></td>
     </tr>`;
 }
 
 function sectionLabel(text: string): string {
-  return `<p style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${text}</p>`;
+  return `<p class="gold-text" style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:${FONT_STACK_CSS};">${text}</p>`;
 }
 
 // ─── Main template ───
@@ -68,7 +109,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
   const habitsHtml = hasHabits
     ? `
     <tr>
-      <td style="padding:24px 0 0;">
+      <td class="content-cell" style="padding:24px 0 0;background-color:#080808;" bgcolor="#080808">
         ${sectionLabel('HÁBITOS')}
         <table width="100%" cellpadding="0" cellspacing="0">
           ${data.topHabits.map(h => metricRow(h.name, `${h.streak} días`)).join('')}
@@ -81,10 +122,10 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
   const insightHtml = hasInsight
     ? `
     <tr>
-      <td style="padding:24px 0 0;">
+      <td class="content-cell" style="padding:24px 0 0;background-color:#080808;" bgcolor="#080808">
         ${sectionLabel('INSIGHT')}
-        <p style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.title}</p>
-        <p style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${data.mainInsight!.description}</p>
+        <p class="white-text" style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:${FONT_STACK_CSS};">${data.mainInsight!.title}</p>
+        <p class="secondary-text" style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:${FONT_STACK_CSS};">${data.mainInsight!.description}</p>
       </td>
     </tr>`
     : '';
@@ -108,60 +149,61 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     </xml>
   </noscript>
   <![endif]-->
+  ${DARK_MODE_STYLES}
 </head>
-<body style="margin:0;padding:0;background-color:#080808;-webkit-font-smoothing:antialiased;" bgcolor="#080808">
+<body class="email-body" style="margin:0;padding:0;background-color:#080808;-webkit-font-smoothing:antialiased;font-family:${FONT_STACK_CSS};" bgcolor="#080808">
   <!-- Preheader -->
-  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#080808;line-height:1px;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#080808;line-height:1px;font-family:${FONT_STACK_CSS};">
     ${preheader}&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;
   </div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#080808;" bgcolor="#080808">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-bg" style="background-color:#080808;" bgcolor="#080808">
     <tr>
-      <td align="center" style="padding:48px 16px;">
+      <td align="center" class="content-cell" style="padding:48px 16px;background-color:#080808;" bgcolor="#080808">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
 
           <!-- V Logo -->
           <tr>
-            <td style="padding:0 40px 20px;text-align:center;">
-              <img src="${V_LOGO_SRC}" alt="V" width="48" height="48" style="display:inline-block;border:0;outline:none;text-decoration:none;border-radius:10px;" />
+            <td class="content-cell" style="padding:0 40px 20px;text-align:center;background-color:#080808;" bgcolor="#080808">
+              <img class="logo-img" src="${V_LOGO_SRC}" alt="V" width="48" height="48" style="display:inline-block;border:0;outline:none;text-decoration:none;border-radius:10px;-ms-interpolation-mode:bicubic;font-size:20px;color:#c8a55a;" />
             </td>
           </tr>
 
           <!-- Brand Name -->
           <tr>
-            <td style="padding:0 40px 24px;text-align:center;">
-              <p style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
+            <td class="content-cell" style="padding:0 40px 24px;text-align:center;background-color:#080808;" bgcolor="#080808">
+              <p class="gold-text" style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
             </td>
           </tr>
 
           <!-- Gold Accent Line -->
           <tr>
-            <td style="padding:0 40px 0;">
-              <div style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;"></div>
+            <td class="content-cell" style="padding:0 40px 0;background-color:#080808;" bgcolor="#080808">
+              <div class="divider-gold" style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;font-size:1px;line-height:1px;">&nbsp;</div>
             </td>
           </tr>
 
           <!-- Header -->
           <tr>
-            <td style="padding:32px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-              <p style="color:#777;font-size:11px;letter-spacing:2px;margin:0 0 8px;">RECAP SEMANAL</p>
-              <h1 style="color:#ffffff;font-size:20px;font-weight:400;margin:0 0 4px;line-height:1.3;letter-spacing:0.3px;">Tu semana, ${data.name}.</h1>
-              <p style="color:#666;font-size:12px;margin:0;">${data.weekLabel}</p>
+            <td class="content-cell" style="padding:32px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
+              <p class="label-text" style="color:#777;font-size:11px;letter-spacing:2px;margin:0 0 8px;font-family:${FONT_STACK_CSS};">RECAP SEMANAL</p>
+              <h1 class="heading-text" style="color:#ffffff;font-size:20px;font-weight:400;margin:0 0 4px;line-height:1.3;letter-spacing:0.3px;font-family:${FONT_STACK_CSS};">Tu semana, ${data.name}.</h1>
+              <p class="muted-text" style="color:#666;font-size:12px;margin:0;font-family:${FONT_STACK_CSS};">${data.weekLabel}</p>
             </td>
           </tr>
 
           <!-- Wellness Score -->
           <tr>
-            <td style="padding:28px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td class="content-cell" style="padding:28px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('BIENESTAR')}
-              <p style="color:#ffffff;font-size:32px;font-weight:300;margin:0;line-height:1;">
-                ${data.score}<span style="color:#666;font-size:13px;font-weight:400;"> / 100 · </span><span style="color:#c8a55a;font-size:13px;font-weight:400;">${data.scoreLabel}</span>
+              <p style="color:#ffffff;font-size:32px;font-weight:300;margin:0;line-height:1;font-family:${FONT_STACK_CSS};">
+                <span class="white-text">${data.score}</span><span class="muted-text" style="color:#666;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};"> / 100 · </span><span class="gold-text" style="color:#c8a55a;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};">${data.scoreLabel}</span>
               </p>
             </td>
           </tr>
 
           <!-- Activity -->
           <tr>
-            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td class="content-cell" style="padding:24px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('ACTIVIDAD')}
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${metricRow('Check-ins', String(data.progress.checkins))}
@@ -174,7 +216,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
 
           <!-- Emotional state -->
           <tr>
-            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td class="content-cell" style="padding:24px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('ESTADO EMOCIONAL')}
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${metricRow('Estado', data.emotionalState.statusLabel)}
@@ -185,26 +227,26 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           </tr>
 
           <!-- Habits -->
-          ${hasHabits ? `<tr><td style="padding:0 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${habitsHtml}</td></tr>` : ''}
+          ${hasHabits ? `<tr><td class="content-cell" style="padding:0 40px;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">${habitsHtml}</td></tr>` : ''}
 
           <!-- Insight -->
-          ${hasInsight ? `<tr><td style="padding:0 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${insightHtml}</td></tr>` : ''}
+          ${hasInsight ? `<tr><td class="content-cell" style="padding:0 40px;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">${insightHtml}</td></tr>` : ''}
 
           <!-- Recommendation -->
           <tr>
-            <td style="padding:24px 40px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <td class="content-cell" style="padding:24px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('RECOMENDACIÓN')}
-              <p style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;">${data.mentorRecommendation}</p>
+              <p class="body-text" style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;font-family:${FONT_STACK_CSS};">${data.mentorRecommendation}</p>
             </td>
           </tr>
 
           <!-- CTA Button -->
           <tr>
-            <td style="padding:32px 40px 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;text-align:center;">
+            <td class="content-cell" style="padding:32px 40px 40px;font-family:${FONT_STACK_CSS};text-align:center;background-color:#080808;" bgcolor="#080808">
               <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                 <tr>
-                  <td style="background-color:#c8a55a;border-radius:3px;">
-                    <a href="${APP_URL}/dashboard" style="display:inline-block;padding:12px 32px;color:#0a0a0a;font-size:14px;font-weight:500;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:0.5px;">ACCEDER</a>
+                  <td class="cta-cell" style="background-color:#c8a55a;border-radius:3px;" bgcolor="#c8a55a">
+                    <a href="${APP_URL}/dashboard" class="cta-link" style="display:inline-block;padding:12px 32px;color:#0a0a0a;font-size:14px;font-weight:500;text-decoration:none;font-family:${FONT_STACK_CSS};letter-spacing:0.5px;">ACCEDER</a>
                   </td>
                 </tr>
               </table>
@@ -216,15 +258,15 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
         <!-- Footer -->
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
           <tr>
-            <td style="padding:0 40px;">
-              <div style="width:40px;height:1px;background-color:#333;margin:0 auto 20px;"></div>
+            <td class="content-cell" style="padding:0 40px;background-color:#080808;" bgcolor="#080808">
+              <div class="divider-subtle" style="width:40px;height:1px;background-color:#333;margin:0 auto 20px;font-size:1px;line-height:1px;">&nbsp;</div>
             </td>
           </tr>
           <tr>
-            <td style="padding:0 40px;text-align:center;">
-              <p style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">VITAZEN</p>
-              <p style="color:#555;font-size:11px;margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">vitazen.cc</p>
-              <p style="color:#555;font-size:11px;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;"><a href="${APP_URL}/perfil" style="color:#666;text-decoration:underline;">Desactivar resumen semanal</a></p>
+            <td class="content-cell" style="padding:0 40px;text-align:center;background-color:#080808;" bgcolor="#080808">
+              <p class="gold-text" style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
+              <p class="subtle-text" style="color:#555;font-size:11px;margin:0 0 8px;font-family:${FONT_STACK_CSS};">vitazen.cc</p>
+              <p style="color:#555;font-size:11px;margin:0;font-family:${FONT_STACK_CSS};"><a href="${APP_URL}/perfil" class="muted-text" style="color:#666;text-decoration:underline;font-family:${FONT_STACK_CSS};">Desactivar resumen semanal</a></p>
             </td>
           </tr>
         </table>
