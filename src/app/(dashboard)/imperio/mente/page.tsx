@@ -378,18 +378,18 @@ export default function MentePage() {
       {/* ─── Completion Overlay ─── */}
       {completedSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center breathing-complete-backdrop p-4"
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center breathing-complete-backdrop p-0 sm:p-4"
           onClick={() => setCompletedSession(null)}
         >
           <div
-            className="breathing-complete-content p-6 sm:p-10 max-w-md w-full"
+            className="breathing-complete-content p-6 sm:p-10 max-w-md w-full flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+            <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mb-5 shrink-0">
               <CheckCircle size={32} className="text-[#c8a55a]" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Sesión completada</h3>
-            <p className="text-[#c8a55a] text-sm font-medium capitalize mb-4">{completedSession.type.replace('_', ' ')}</p>
+            <h3 className="text-xl font-bold text-white mb-2 text-center">Sesión completada</h3>
+            <p className="text-[#c8a55a] text-sm font-medium capitalize mb-4 text-center">{completedSession.type.replace('_', ' ')}</p>
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="flex items-center gap-1.5 text-xs text-[#999]">
                 <Timer size={13} />
@@ -402,7 +402,7 @@ export default function MentePage() {
             </div>
             <button
               onClick={() => setCompletedSession(null)}
-              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors touch-press"
+              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors touch-press shrink-0"
             >
               Cerrar
             </button>

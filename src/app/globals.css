@@ -1242,15 +1242,16 @@ body.scroll-locked {
    Breathing Timer — Premium Stable Experience
    ═══════════════════════════════════════════
    Strategy: EVERYTHING stays 100% solid and stable.
-   Only the outer ring glow animates — extremely subtle.
+   Only the outer ring border animates — extremely subtle.
    Counter, buttons, text, background: all FIXED.
-   No opacity pulsing, no text-shadow breathing, no border glow.
+   NO background fill of any kind. Pure black.
    Premium = calm, stable, elegant. */
 
-/* Ring glow — the ONLY animated element. Very subtle presence. */
+/* Ring glow — the ONLY animated element. Border only, NO fill.
+   A very faint gold border that breathes. Background stays black. */
 @keyframes breathingRingGlow {
-  0%, 100% { opacity: 0.06; transform: scale(1); }
-  50% { opacity: 0.14; transform: scale(1.02); }
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.35; }
 }
 
 .breathing-ring {
@@ -1261,8 +1262,9 @@ body.scroll-locked {
   content: '';
   position: absolute;
   inset: -8px;
-  border-radius: inherit;
-  background: rgba(200, 165, 90, 1);
+  border-radius: 1rem;
+  border: 1px solid rgba(200, 165, 90, 1);
+  background: none;
   z-index: -1;
   animation: breathingRingGlow 4s ease-in-out infinite;
 }
@@ -1282,6 +1284,7 @@ body.scroll-locked {
   background: rgba(0, 0, 0, 0.85);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  z-index: 60; /* Above MicroReward z-50 */
 }
 .breathing-complete-content {
   background: #0a0a0a;
@@ -1292,11 +1295,11 @@ body.scroll-locked {
 @media (max-width: 767px) {
   .breathing-complete-content {
     border-radius: 1.25rem 1.25rem 0 0;
-    max-height: 88dvh;
+    max-height: 85dvh;
     overflow-y: auto;
     margin-top: auto;
     width: 100%;
-    padding: 1.5rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
+    padding: 1.5rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
   }
 }
 
