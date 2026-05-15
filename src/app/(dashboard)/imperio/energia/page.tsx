@@ -71,13 +71,9 @@ export default function EnergiaPage() {
   // Lock body scroll when modal is open — save/restore scroll position
   useEffect(() => {
     if (editingWellness || editingNutrition || pendingDeleteId) {
-      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      document.body.style.top = `-${scrollY}px`;
       return () => {
         document.body.classList.remove('scroll-locked');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
       };
     }
   }, [editingWellness, editingNutrition, pendingDeleteId]);

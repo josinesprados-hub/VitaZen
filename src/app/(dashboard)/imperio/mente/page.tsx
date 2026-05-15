@@ -224,13 +224,9 @@ export default function MentePage() {
   useEffect(() => {
     const anyOverlayOpen = !!(pendingDeleteId || completedSession || editingSession);
     if (anyOverlayOpen) {
-      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      document.body.style.top = `-${scrollY}px`;
       return () => {
         document.body.classList.remove('scroll-locked');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
       };
     }
   }, [pendingDeleteId, completedSession, editingSession]);

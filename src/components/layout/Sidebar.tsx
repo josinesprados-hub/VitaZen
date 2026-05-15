@@ -43,17 +43,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
 
   // Lock body scroll when sidebar is open on mobile.
-  // Save scroll position before locking (position:fixed on body resets it),
-  // then restore on cleanup.
+  // overflow:hidden prevents background scrolling without position:fixed,
+  // which breaks Android TWA/WebView compositor.
   useEffect(() => {
     if (open) {
-      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      document.body.style.top = `-${scrollY}px`;
       return () => {
         document.body.classList.remove('scroll-locked');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
       };
     }
   }, [open]);

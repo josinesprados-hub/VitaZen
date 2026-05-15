@@ -1041,20 +1041,15 @@ html { scroll-behavior: smooth; }
    ═══════════════════════════════════════════ */
 
 /* When sidebar or modal is open, lock body scroll to prevent
-   background scrolling on mobile. Applied via JS class toggle
-   or via :has() when a full-screen overlay is present. */
+   background scrolling on mobile. Applied via JS class toggle. */
 body.scroll-locked {
   overflow: hidden;
-  /* Preserve scroll position on iOS Safari.
-     JS that adds this class should set body.style.top = `-${scrollY}px`
-     and restore window.scrollTo(0, scrollY) on removal.
-     position:fixed alone resets scroll position to 0. */
-  position: fixed;
-  width: 100%;
-  /* NOTE: touch-action:none was removed — it blocked ALL touch input on
-     Android phones, causing ANR ("App Not Responding") when the cleanup
-     function failed to run. overflow:hidden + position:fixed already
-     prevent background scrolling without killing touch entirely. */
+  /* NOTE: position:fixed was removed — it caused viewport collapse and
+     touch input issues in Android TWA/WebView. When <body> gets
+     position:fixed, the entire document leaves the scroll context,
+     which breaks Chrome's compositor in TWA mode and can freeze the
+     app. overflow:hidden alone is sufficient to prevent background
+     scrolling behind modals and overlays on all platforms. */
 }
 
 /* REMOVED: CSS :has() scroll-lock mechanism.

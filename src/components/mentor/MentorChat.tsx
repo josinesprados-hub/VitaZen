@@ -271,13 +271,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // Lock body scroll when any modal (delete confirm or limit modal) is open — save/restore scroll position
   useEffect(() => {
     if (deleteConfirm || showLimitModal || drawerOpen) {
-      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      document.body.style.top = `-${scrollY}px`;
       return () => {
         document.body.classList.remove('scroll-locked');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
       };
     }
   }, [deleteConfirm, showLimitModal, drawerOpen]);

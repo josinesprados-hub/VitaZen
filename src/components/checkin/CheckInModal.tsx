@@ -118,13 +118,9 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   // Save scroll position before locking (position:fixed on body resets it),
   // then restore on cleanup.
   useEffect(() => {
-    const scrollY = window.scrollY;
     document.body.classList.add('scroll-locked');
-    document.body.style.top = `-${scrollY}px`;
     return () => {
       document.body.classList.remove('scroll-locked');
-      document.body.style.top = '';
-      window.scrollTo(0, scrollY);
     };
   }, []);
 

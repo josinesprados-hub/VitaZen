@@ -101,13 +101,9 @@ export default function CheckinPage() {
   // Lock body scroll when delete confirmation overlay is open — save/restore scroll position
   useEffect(() => {
     if (pendingDeleteId) {
-      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      document.body.style.top = `-${scrollY}px`;
       return () => {
         document.body.classList.remove('scroll-locked');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
       };
     }
   }, [pendingDeleteId]);
