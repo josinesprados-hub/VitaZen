@@ -201,20 +201,22 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
     // NOTE: saveCycleState is deferred to useEffect below to avoid
     // side effects (localStorage write) during render.
 
-    // Select FREE tips from shuffled order
+    // Select FREE tips from shuffled order (no modulo wrap — prevents showing
+    // already-seen tips when fewer than FREE_TIPS_VISIBLE remain in the cycle)
     const selectedFree: Tip[] = [];
-    for (let i = 0; i < Math.min(FREE_TIPS_VISIBLE, freeCount); i++) {
-      const idx = state.freeOrder[(state.freePosition + i) % freeCount];
+    const remaining = freeCount - state.freePosition;
+    const toShow = Math.min(FREE_TIPS_VISIBLE, remaining);
+    for (let i = 0; i < toShow; i++) {
+      const idx = state.freeOrder[state.freePosition + i];
       if (idx !== undefined && freeTipsAll[idx]) {
         selectedFree.push(freeTipsAll[idx]);
       }
     }
 
-    // Select PREMIUM tips — show all from current position onwards (or just the next one)
+    // Select PREMIUM tips — current tip in cycle (no modulo: position is always < count)
     const selectedPremium: Tip[] = [];
     if (premiumCount > 0) {
-      // Show the current premium tip(s) in the cycle
-      const startIdx = state.premiumOrder[state.premiumPosition % premiumCount];
+      const startIdx = state.premiumOrder[state.premiumPosition];
       if (startIdx !== undefined && premiumTipsAll[startIdx]) {
         selectedPremium.push(premiumTipsAll[startIdx]);
       }

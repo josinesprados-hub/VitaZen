@@ -10,7 +10,7 @@ import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 // ═══════════════════════════════════════════
 //
 // - Shows one reflection at a time
-// - Auto-rotates every ~80 seconds with fade
+// - Auto-rotates every ~180 seconds (3 min) with fade
 // - Changes when returning to dashboard
 // - Never repeats until full collection traversed
 // - Persists index in localStorage
@@ -18,7 +18,7 @@ import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 // - No external APIs, no new libraries
 
 const STORAGE_KEY = 'vitazen_reflection_state';
-const ROTATE_INTERVAL = 80000;
+const ROTATE_INTERVAL = 180000;
 const FADE_DURATION = 600;
 
 interface ReflectionState {
@@ -150,7 +150,7 @@ export default function PremiumReflection() {
     // Show immediately — no artificial delay that causes invisible content
     setVisible(true);
 
-    // Auto-rotate every ~80 seconds
+    // Auto-rotate every ~180 seconds (3 min)
     intervalRef.current = setInterval(() => advance(true), ROTATE_INTERVAL);
 
     return () => {
