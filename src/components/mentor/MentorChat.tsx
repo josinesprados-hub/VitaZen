@@ -268,11 +268,17 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // Effects (defined AFTER useCallback hooks that they reference)
   // ─────────────────────────────────────────
 
-  // Lock body scroll when any modal (delete confirm or limit modal) is open
+  // Lock body scroll when any modal (delete confirm or limit modal) is open — save/restore scroll position
   useEffect(() => {
     if (deleteConfirm || showLimitModal || drawerOpen) {
+      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      return () => document.body.classList.remove('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
     }
   }, [deleteConfirm, showLimitModal, drawerOpen]);
 
@@ -1331,8 +1337,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* ────────── Delete Confirmation Modal ────────── */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-          <div className="modal-content-destructive p-8 max-w-sm w-full text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setDeleteConfirm(null)}>
+          <div className="modal-content-destructive p-8 max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
             <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={28} className="text-red-400" />
             </div>

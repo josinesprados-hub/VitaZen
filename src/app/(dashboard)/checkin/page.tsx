@@ -98,11 +98,17 @@ export default function CheckinPage() {
   const [editingCheckin, setEditingCheckin] = useState<CheckinData | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  // Lock body scroll when delete confirmation overlay is open
+  // Lock body scroll when delete confirmation overlay is open — save/restore scroll position
   useEffect(() => {
     if (pendingDeleteId) {
+      const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
-      return () => document.body.classList.remove('scroll-locked');
+      document.body.style.top = `-${scrollY}px`;
+      return () => {
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
+      };
     }
   }, [pendingDeleteId]);
 

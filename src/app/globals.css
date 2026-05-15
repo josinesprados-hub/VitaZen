@@ -540,8 +540,8 @@ html { scroll-behavior: smooth; }
 }
 
 @keyframes premiumSkeletonShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
 /* Skeleton entrance — transform only, never opacity:0 */
@@ -1198,12 +1198,23 @@ body.scroll-locked {
   animation: successFlash 0.8s ease-out;
 }
 
-/* Breathing ring — for meditation timer, pulsing border */
+/* Breathing ring — for meditation timer, pulsing border.
+   Uses transform + opacity (GPU-composited) instead of box-shadow (paint-bound). */
 @keyframes breathingRing {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
-  50% { box-shadow: 0 0 0 8px rgba(200, 165, 90, 0.08); }
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.08; transform: scale(1.05); }
 }
 .breathing-ring {
+  position: relative;
+  animation: breathingRing 4s ease-in-out infinite;
+}
+.breathing-ring::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: rgba(200, 165, 90, 1);
+  z-index: -1;
   animation: breathingRing 4s ease-in-out infinite;
 }
 
@@ -1292,19 +1303,20 @@ body.scroll-locked {
   }
 }
 
-/* Premium overlay entrance */
+/* Premium overlay entrance — animate opacity only, apply blur instantly.
+   Animating backdrop-filter forces expensive full-screen paint on every frame. */
 @keyframes premiumOverlayIn {
   from {
     opacity: 0;
-    backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(6px);
   }
 }
 .premium-overlay-enter {
   animation: premiumOverlayIn 0.35s ease-out;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* Auth page entrance */

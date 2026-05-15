@@ -221,9 +221,10 @@ export default function MentePage() {
   // Ref for auto-scrolling into view when meditation starts
   const breathingSectionRef = useRef<HTMLDivElement>(null);
 
-  // Lock body scroll when modal is open — save/restore scroll position
+  // Lock body scroll when any modal is open — save/restore scroll position
   useEffect(() => {
-    if (pendingDeleteId) {
+    const anyOverlayOpen = !!(pendingDeleteId || completedSession || editingSession);
+    if (anyOverlayOpen) {
       const scrollY = window.scrollY;
       document.body.classList.add('scroll-locked');
       document.body.style.top = `-${scrollY}px`;
@@ -233,7 +234,7 @@ export default function MentePage() {
         window.scrollTo(0, scrollY);
       };
     }
-  }, [pendingDeleteId]);
+  }, [pendingDeleteId, completedSession, editingSession]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -377,7 +378,7 @@ export default function MentePage() {
       {/* ─── Completion Overlay ─── */}
       {completedSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center breathing-complete-backdrop p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setCompletedSession(null)}
         >
           <div
