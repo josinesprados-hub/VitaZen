@@ -166,8 +166,8 @@ function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
   if (isNatural) {
     return (
       <div className="flex items-center justify-center gap-3 py-3">
-        <div className="w-12 h-12 rounded-full border border-[#c8a55a]/20 flex items-center justify-center">
-          <Wind size={18} className="text-[#c8a55a]/60" />
+        <div className="w-12 h-12 rounded-full border border-[#c8a55a]/30 flex items-center justify-center">
+          <Wind size={18} className="text-[#c8a55a]" />
         </div>
         <div>
           <p className="text-[#c8a55a] text-sm font-medium">Ritmo natural</p>
@@ -184,8 +184,8 @@ function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
           <div className="flex flex-col items-center">
             <div className={`w-10 h-10 rounded-full border flex items-center justify-center ${
               phase.label.includes('Mantén')
-                ? 'border-[#c8a55a]/25 bg-[#c8a55a]/5'
-                : 'border-[#c8a55a]/40 bg-[#c8a55a]/8'
+                ? 'border-[#c8a55a]/35 bg-[#c8a55a]/8'
+                : 'border-[#c8a55a]/50 bg-[#c8a55a]/12'
             }`}>
               <span className="text-[#c8a55a] text-xs font-semibold">{phase.seconds}s</span>
             </div>
@@ -378,7 +378,7 @@ export default function MentePage() {
       {/* ─── Completion Overlay ─── */}
       {completedSession && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center breathing-complete-backdrop p-4"
           onClick={() => setCompletedSession(null)}
         >
           <div
@@ -588,7 +588,7 @@ export default function MentePage() {
                 <div className="space-y-2.5">
                   {guideTechnique.steps.map((step, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full border border-[#c8a55a]/25 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full border border-[#c8a55a]/40 flex items-center justify-center shrink-0 mt-0.5">
                         <span className="text-[#c8a55a] text-[10px] font-semibold">{i + 1}</span>
                       </div>
                       <p className="text-[#aaa] text-sm leading-relaxed">{step}</p>
@@ -612,7 +612,7 @@ export default function MentePage() {
 
               {/* Recomendación */}
               <div>
-                <div className="inline-flex items-center gap-2.5 bg-[#c8a55a]/5 border border-[#c8a55a]/10 rounded-lg px-3.5 py-2">
+                <div className="inline-flex items-center gap-2.5 bg-[#c8a55a]/8 border border-[#c8a55a]/20 rounded-lg px-3.5 py-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] shrink-0" />
                   <p className="text-[#c8a55a] text-xs font-medium">{guideTechnique.recommendation}</p>
                 </div>
@@ -647,7 +647,7 @@ export default function MentePage() {
                   <ChevronRight size={14} className="text-[#555] group-hover:text-[#c8a55a] transition-colors shrink-0" />
                 </div>
                 <p className="text-[#666] text-xs mb-2.5">{tech.subtitle} · {tech.duration} min</p>
-                <div className="inline-flex items-center gap-1.5 bg-[#c8a55a]/5 border border-[#c8a55a]/10 rounded px-2 py-0.5">
+                <div className="inline-flex items-center gap-1.5 bg-[#c8a55a]/8 border border-[#c8a55a]/20 rounded px-2 py-0.5">
                   <div className="w-1 h-1 rounded-full bg-[#c8a55a]" />
                   <p className="text-[#c8a55a] text-[10px]">{tech.recommendation}</p>
                 </div>
