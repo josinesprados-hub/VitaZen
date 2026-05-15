@@ -382,7 +382,7 @@ export default function MentePage() {
           onClick={() => setCompletedSession(null)}
         >
           <div
-            className="breathing-complete-content p-10 max-w-md w-full"
+            className="breathing-complete-content p-6 sm:p-10 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
