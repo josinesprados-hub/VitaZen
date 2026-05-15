@@ -1239,16 +1239,16 @@ body.scroll-locked {
 }
 
 /* Breathing ring — for meditation timer, pulsing gold glow.
-   GPU-composited: transform for scale, opacity for fade.
-   Opacity range 0.12–0.30 ensures visible gold glow on dark backgrounds,
-   including Android tablets where lower values appear washed out. */
-@keyframes breathingRing {
+   ONLY the ::after pseudo-element animates. The parent .breathing-ring
+   must NOT have opacity/animation, or all child text (counter, labels,
+   buttons) will pulse/fade, breaking premium readability on tablets. */
+@keyframes breathingRingGlow {
   0%, 100% { opacity: 0.12; transform: scale(1); }
   50% { opacity: 0.30; transform: scale(1.05); }
 }
 .breathing-ring {
   position: relative;
-  animation: breathingRing 4s ease-in-out infinite;
+  /* NO animation here — keeps text solid and readable */
 }
 .breathing-ring::after {
   content: '';
@@ -1257,7 +1257,7 @@ body.scroll-locked {
   border-radius: inherit;
   background: rgba(200, 165, 90, 1);
   z-index: -1;
-  animation: breathingRing 4s ease-in-out infinite;
+  animation: breathingRingGlow 4s ease-in-out infinite;
 }
 
 /* Breathing completion overlay — instant, sharp, no blur */
@@ -1459,7 +1459,7 @@ input, textarea, select {
 @media (prefers-reduced-motion: reduce) {
   .smooth-expand { transition: none; }
   .success-flash { animation: none; }
-  .breathing-ring { animation: none; }
+  .breathing-ring::after { animation: none; }
   .section-enter-1, .section-enter-2, .section-enter-3, .section-enter-4, .section-enter-5 {
     animation: none;
   }

@@ -528,8 +528,8 @@ export default function MentePage() {
         {meditating && (
           <div className={`text-center py-10 ${!paused ? 'breathing-ring' : ''}`}>
             <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
-            <p className={`text-5xl font-bold mb-1 font-mono transition-opacity duration-300 ${paused ? 'text-[#c8a55a]/40' : 'text-[#c8a55a]'}`}>{formatTime(timer)}</p>
-            {paused && <p className="text-[#c8a55a]/60 text-xs uppercase tracking-widest mb-1">En pausa</p>}
+            <p className="text-5xl font-bold mb-1 font-mono text-[#c8a55a]">{formatTime(timer)}</p>
+            {paused && <p className="text-[#c8a55a] text-xs uppercase tracking-widest mb-1">En pausa</p>}
             <p className="text-[#666] text-sm mb-8">Objetivo: {selectedType.duration} min</p>
             <div className="flex items-center justify-center gap-3">
               <button
