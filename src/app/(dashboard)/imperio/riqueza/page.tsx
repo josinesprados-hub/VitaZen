@@ -142,7 +142,7 @@ export default function RiquezaPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
       {/* Edit Finance Log Overlay */}
       {editingLog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingLog(null)}>
@@ -196,11 +196,11 @@ export default function RiquezaPage() {
         </div>
       )}
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Gem size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Imperio Finanzas</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Finanzas</h1>
           <p className="text-[#999] text-sm">Control financiero, ahorro y libertad económica</p>
         </div>
       </div>
@@ -265,7 +265,7 @@ export default function RiquezaPage() {
                   <div>
                     <p className="text-sm text-white">{log.category}</p>
                     {log.description && <p className="text-xs text-[#666]">{log.description}</p>}
-                    <div className="flex items-center gap-3 mt-1">
+                    <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
                       <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       <span className="text-[#333] text-xs">·</span>
                       <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>

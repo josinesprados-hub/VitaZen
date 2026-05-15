@@ -217,7 +217,7 @@ export default function DashboardPage() {
   // which is handled by the try/catch above. An empty dashboard is a valid state.
 
   return (
-    <div className="max-w-7xl mx-auto space-y-1.5 sm:space-y-5 overflow-x-contain">
+    <div className="max-w-7xl mx-auto space-y-3 sm:space-y-5 overflow-x-contain">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -294,7 +294,7 @@ export default function DashboardPage() {
 
       {/* ═══ 8. Metrics (only when activity exists) ═══ */}
       {hasActivity && metrics && (
-        <div className="dash-section-enter dash-section-delay-8 grid grid-cols-4 gap-1.5 sm:gap-3">
+        <div className="dash-section-enter dash-section-delay-8 grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-3">
           {[
             { label: 'Meditación', value: metrics.meditationWeek, unit: 'sem', href: '/imperio/mente', Icon: Wind, streak: streaks?.meditationStreak },
             { label: 'Hábitos', value: metrics.habitsCompleted, unit: 'sem', href: '/imperio/disciplina', Icon: CheckCircle, streak: streaks?.habitStreak },
@@ -326,7 +326,7 @@ export default function DashboardPage() {
           <h2 className="text-sm sm:text-base font-semibold text-white">Imperios</h2>
           <span className="text-[10px] sm:text-xs text-[#666]">Nivel {empires.reduce((sum, e) => sum + e.level, 0)}</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
           {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
             const empireData = empires.find((e) => e.empire === key);
             const level = empireData?.level || 1;

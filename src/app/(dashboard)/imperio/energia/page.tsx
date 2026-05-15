@@ -221,7 +221,7 @@ export default function EnergiaPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
       {/* Edit Wellness Overlay */}
       {editingWellness && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingWellness(null)}>
@@ -296,11 +296,11 @@ export default function EnergiaPage() {
       )}
 
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Zap size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Imperio Energía</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Energía</h1>
           <p className="text-[#999] text-sm">Cuerpo, vitalidad y bienestar físico</p>
         </div>
       </div>
@@ -332,12 +332,12 @@ export default function EnergiaPage() {
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {wellnessLogs.slice(0, 7).map((log) => (
               <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
                     <Heart size={16} className="text-[#c8a55a]" />
                   </div>
                   <div>
-                    <div className="flex gap-2 text-xs mb-1">
+                    <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
                       <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
                       <span className="text-[#c8a55a]">Energía: {log.energy}</span>
                       <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>

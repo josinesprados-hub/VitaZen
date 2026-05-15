@@ -226,7 +226,7 @@ export default function CrecimientoPage() {
   const grouped = groupEntriesByDate(entries);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
 
       {/* ═══ Edit Journal Entry Overlay ═══ */}
       {editingEntry && (
@@ -287,11 +287,11 @@ export default function CrecimientoPage() {
 
       {/* ═══ Page Header ═══ */}
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <TrendingUp size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Imperio Crecimiento</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Crecimiento</h1>
           <p className="text-[#999] text-sm">Reflexión, evolución y crecimiento personal</p>
         </div>
       </div>

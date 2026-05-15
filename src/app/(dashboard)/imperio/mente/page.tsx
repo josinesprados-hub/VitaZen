@@ -374,7 +374,7 @@ export default function MentePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
       {/* ─── Completion Overlay ─── */}
       {completedSession && (
         <div
@@ -505,11 +505,11 @@ export default function MentePage() {
 
       {/* ─── Header ─── */}
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
           <Brain size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Imperio Mente</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Mente</h1>
           <p className="text-[#999] text-sm">Calma interior, claridad mental y respiración consciente</p>
         </div>
       </div>
@@ -681,18 +681,18 @@ export default function MentePage() {
             variant="gold"
           />
         ) : (
-          <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
+          <div className="space-y-1.5 max-h-72 sm:max-h-80 overflow-y-auto pr-1">
             {sessions.map((session) => {
               const tech = BREATHING_TECHNIQUES.find(t => t.type === session.type);
               return (
                 <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
                       <Wind size={16} className="text-[#c8a55a]" />
                     </div>
                     <div>
                       <p className="text-white text-sm font-medium">{tech?.label ?? session.type.replace('_', ' ')}</p>
-                      <div className="flex items-center gap-3 mt-1">
+                      <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
                         <span className="text-[#333] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(session.completedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>

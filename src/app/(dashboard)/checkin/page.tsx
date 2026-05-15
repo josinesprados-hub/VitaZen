@@ -242,7 +242,7 @@ export default function CheckinPage() {
 
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop" onClick={() => setPendingDeleteId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
           <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
@@ -291,7 +291,7 @@ export default function CheckinPage() {
               <p className="text-[#c8a55a] text-xs font-medium italic">«{todayCheckin.intention}»</p>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {[
               { label: 'Emoción', val: todayCheckin.emotion },
               { label: 'Energía', val: todayCheckin.energy },
@@ -319,7 +319,7 @@ export default function CheckinPage() {
             <span className="text-xs text-[#666]">últimos {trends.totalDays} días</span>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
             {METRIC_CONFIG.map((metric) => {
               const Icon = metric.icon;
               const val = (trends as any)[metric.key] as number;
