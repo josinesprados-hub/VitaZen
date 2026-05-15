@@ -186,9 +186,14 @@ button, [role="button"] {
   to { opacity: 1; }
 }
 
+/* Modal entrance — transform only, never opacity:0.
+   Previous version used opacity:0 + animation-fill-mode:both which caused
+   the same WebKit/Chromium compositing bug documented in page transitions
+   and dashboard sections, where modals could stay permanently invisible
+   on low-end Android devices. Now uses transform-only like sectionStaggerIn. */
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from { transform: scale(0.95); }
+  to { transform: scale(1); }
 }
 
 @keyframes slideInUp {
@@ -196,9 +201,11 @@ button, [role="button"] {
   to { transform: translateY(0); }
 }
 
+/* Context menu entrance — transform only, never opacity:0.
+   Same compositing bug fix as scaleIn above. */
 @keyframes contextMenuIn {
-  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { transform: scale(0.95) translateY(-4px); }
+  to { transform: scale(1) translateY(0); }
 }
 
 /* Route transition progress bar animation */
@@ -329,6 +336,20 @@ html { scroll-behavior: smooth; }
     margin-top: auto;
     width: 100%;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Disable backdrop-filter on mobile to prevent GPU exhaustion.
+     On low-end Android phones, full-screen backdrop-filter:blur() combined
+     with the overlay layer creates a compositor stall that freezes the main
+     thread. The semi-transparent background alone provides sufficient visual
+     separation. Desktop and tablet retain the blur effect. */
+  .modal-backdrop {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .premium-modal-backdrop {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 
@@ -1030,21 +1051,18 @@ body.scroll-locked {
      position:fixed alone resets scroll position to 0. */
   position: fixed;
   width: 100%;
-  touch-action: none;
+  /* NOTE: touch-action:none was removed — it blocked ALL touch input on
+     Android phones, causing ANR ("App Not Responding") when the cleanup
+     function failed to run. overflow:hidden + position:fixed already
+     prevent background scrolling without killing touch entirely. */
 }
 
-/* Auto lock body scroll when a modal overlay is present on mobile — 
-   covers all imperio page modals, CheckInModal, MentorChat modals, etc.
-   Uses :has() to detect any .modal-backdrop or .premium-modal-backdrop
-   anywhere in the DOM. */
-@media (max-width: 767px) {
-  body:has(.modal-backdrop) {
-    overflow: hidden;
-  }
-  body:has(.premium-modal-backdrop) {
-    overflow: hidden;
-  }
-}
+/* REMOVED: CSS :has() scroll-lock mechanism.
+   Previously, body:has(.modal-backdrop) and body:has(.premium-modal-backdrop)
+   applied overflow:hidden on mobile, creating a DUPLICATE scroll-lock that
+   raced with the JS body.scroll-locked mechanism. This caused race conditions
+   on Android where the CSS lock persisted briefly after JS cleanup, triggering
+   reflow loops. The JS scroll-locked system is now the single source of truth. */
 
 /* ═══════════════════════════════════════════
    iPhone Safari Bottom Bar Fix
