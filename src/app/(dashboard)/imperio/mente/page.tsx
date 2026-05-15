@@ -528,13 +528,13 @@ export default function MentePage() {
         {meditating && (
           <div className={`text-center py-10 ${!paused ? 'breathing-ring' : ''}`}>
             <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
-            <p className="text-5xl font-bold mb-1 font-mono text-[#c8a55a]">{formatTime(timer)}</p>
+            <p className={`text-5xl font-bold mb-1 font-mono text-[#c8a55a] ${!paused ? 'breathing-counter' : ''}`}>{formatTime(timer)}</p>
             {paused && <p className="text-[#c8a55a] text-xs uppercase tracking-widest mb-1">En pausa</p>}
             <p className="text-[#666] text-sm mb-8">Objetivo: {selectedType.duration} min</p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setPaused(!paused)}
-                className="flex items-center gap-2 bg-[#000000] border border-[#c8a55a]/30 text-[#c8a55a] font-semibold px-6 py-3 rounded-xl hover:bg-[#c8a55a]/10 transition-colors"
+                className={`flex items-center gap-2 bg-[#000000] border text-[#c8a55a] font-semibold px-6 py-3 rounded-xl hover:bg-[#c8a55a]/10 transition-colors ${!paused ? 'breathing-btn-outline border-[#c8a55a]/30' : 'border-[#c8a55a]/30'}`}
               >
                 {paused ? <><Play size={16} /> Continuar</> : <><Pause size={16} /> Pausar</>}
               </button>
