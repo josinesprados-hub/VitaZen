@@ -3,7 +3,7 @@
 // Premium dark/gold design, transactional-first
 // Black background, V logo, gold accents
 // Optimized for Gmail/Outlook/Apple Mail
-// Cross-client: dark mode, font fallbacks, bgcolor
+// Anti-dark-mode: color-scheme light-only
 // ═══════════════════════════════════════════
 
 import type { EmailContent } from './types';
@@ -20,23 +20,32 @@ const V_LOGO_SRC = 'https://vitazen.cc/images/icon-192x192.png';
 // Roboto → Android
 // Helvetica / Arial → universal fallback
 // sans-serif → final fallback
-const FONT_STACK = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 const FONT_STACK_CSS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
-// ─── Shared dark-mode style block ───
-// Gmail dark mode uses [data-ogsc] prefix on wrapped elements
-// u + .email-body targets Gmail's auto-dark-mode inversion
-// @media (prefers-color-scheme: dark) targets Apple Mail / modern clients
-const DARK_MODE_STYLES = `
+// ─── Anti-dark-mode + Gmail compatibility styles ───
+//
+// KEY STRATEGY: Gmail Android tablet dark mode is the most aggressive.
+// It parses color-scheme meta tag and auto-inverts when it sees "light dark".
+// Since our emails are ALREADY dark-themed, declaring color-scheme: light
+// tells Gmail "I handle my own colors, don't apply your dark mode algorithm".
+// This is the #1 most effective fix per Litmus/Email on Acid testing.
+//
+// Defense layers:
+// 1. <meta color-scheme="light"> — prevents Gmail auto-dark inversion
+// 2. u + .email-body selectors — override Gmail mobile dark mode
+// 3. Inline styles everywhere — survive when <style> is stripped
+//
+const ANTI_DARK_MODE_STYLES = `
   <style type="text/css">
     /* ====== EMAIL CLIENT RESETS ====== */
     body,table,td,a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
     table,td { mso-table-lspace:0pt; mso-table-rspace:0pt; }
     img { -ms-interpolation-mode:bicubic; border:0; outline:none; text-decoration:none; }
 
-    /* ====== GMAIL DARK MODE OVERRIDES ====== */
-    /* Gmail wraps the email in <u> and adds data-ogsc, auto-inverting colors */
-    /* These selectors force the original premium dark/gold palette */
+    /* ====== GMAIL DARK MODE OVERRIDES (defense layer 2) ====== */
+    /* Gmail wraps the email in <u> and auto-inverts colors */
+    /* u + .class targets this wrapper — works on Gmail mobile, partial on tablet */
+    /* Primary defense is the color-scheme meta tag above */
     u + .email-body .email-bg { background-color:#080808 !important; }
     u + .email-body .content-cell { background-color:#080808 !important; }
     u + .email-body .gold-text { color:#c8a55a !important; }
@@ -53,11 +62,11 @@ const DARK_MODE_STYLES = `
     u + .email-body .divider-subtle { background-color:#333333 !important; }
     u + .email-body .logo-img { filter:none !important; -webkit-filter:none !important; }
 
-    /* ====== DARK MODE MEDIA QUERY (Apple Mail / modern clients) ====== */
-    @media (prefers-color-scheme: dark) {
-      .email-bg { background-color:#080808 !important; }
-      .content-cell { background-color:#080808 !important; }
-    }
+    /* ====== NO @media (prefers-color-scheme: dark) ====== */
+    /* Deliberately omitted: this email is ALREADY dark-themed. */
+    /* Adding a dark media query causes Apple Mail to double-apply */
+    /* dark mode transformations, washing out the premium palette. */
+    /* color-scheme:light prevents Gmail; inline styles handle the rest. */
   </style>
   <!--[if mso]>
   <style type="text/css">
@@ -76,8 +85,10 @@ function emailWrapper(content: string, preheaderText: string): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="color-scheme" content="light dark">
-  <meta name="supported-color-schemes" content="light dark">
+  <!-- Anti-dark-mode: declare light-only so Gmail/Android tablets skip auto-inversion -->
+  <!-- Our email is already dark-themed; we DON'T want client dark mode on top -->
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
   <title>VitaZen</title>
   <!--[if mso]>
   <noscript>
@@ -88,17 +99,19 @@ function emailWrapper(content: string, preheaderText: string): string {
     </xml>
   </noscript>
   <![endif]-->
-  ${DARK_MODE_STYLES}
+  ${ANTI_DARK_MODE_STYLES}
 </head>
 <body class="email-body" style="margin:0;padding:0;background-color:#080808;-webkit-font-smoothing:antialiased;font-family:${FONT_STACK_CSS};" bgcolor="#080808">
   <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#080808;line-height:1px;font-family:${FONT_STACK_CSS};">
     ${preheaderText}
     &zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;
   </div>
+  <!-- Outer table: explicit bgcolor on table AND td for maximum Gmail/Outlook compat -->
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-bg" style="background-color:#080808;" bgcolor="#080808">
     <tr>
       <td align="center" class="content-cell" style="padding:48px 16px;background-color:#080808;" bgcolor="#080808">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+        <!-- Inner container table: also explicit bgcolor -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#080808;" bgcolor="#080808">
 
           <!-- V Logo -->
           <tr>
@@ -131,7 +144,7 @@ function emailWrapper(content: string, preheaderText: string): string {
         </table>
 
         <!-- Footer -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#080808;" bgcolor="#080808">
           <tr>
             <td class="content-cell" style="padding:0 40px;background-color:#080808;" bgcolor="#080808">
               <div class="divider-subtle" style="width:40px;height:1px;background-color:#333;margin:0 auto 20px;font-size:1px;line-height:1px;">&nbsp;</div>
