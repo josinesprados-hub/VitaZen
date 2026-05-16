@@ -165,7 +165,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [firebaseUser]);
 
   useEffect(() => {
+    let authResolved = false;
+
+    // Defensive timeout: if onAuthStateChanged never fires (e.g. Firebase
+    // init hangs in Android TWA/WebView), force loading=false after 8s to
+    // prevent ANR / infinite spinner.
+    const timeoutId = setTimeout(() => {
+      if (!authResolved) {
+        console.warn('[Auth] onAuthStateChanged timeout — forcing loading=false');
+        setLoading(false);
+      }
+    }, 8000);
+
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      authResolved = true;
+      clearTimeout(timeoutId);
       setFirebaseUser(fbUser);
       if (fbUser) {
         // Fire-and-forget: sync user data in background.
@@ -183,7 +197,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, [syncUser]);
 
   const signIn = async (email: string, password: string) => {
