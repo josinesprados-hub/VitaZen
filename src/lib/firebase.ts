@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,5 +11,21 @@ const firebaseConfig = {
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-export const auth = getAuth(app);
+
+let _auth: Auth | undefined;
+
+/**
+ * Lazy-initialized Firebase Auth instance.
+ * getAuth(app) runs only on first call, not at module import time.
+ * This prevents startup crashes in Android TWA/WebView where
+ * IndexedDB persistence initialization can block or fail before
+ * React hydrates.
+ */
+export function getAuthInstance(): Auth {
+  if (!_auth) {
+    _auth = getAuth(app);
+  }
+  return _auth;
+}
+
 export default app;

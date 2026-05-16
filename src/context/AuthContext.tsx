@@ -12,7 +12,7 @@ import {
   fetchSignInMethodsForEmail,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuthInstance } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 
 interface SubscriptionData {
@@ -177,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }, 8000);
 
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+    const unsubscribe = onAuthStateChanged(getAuthInstance(), (fbUser) => {
       authResolved = true;
       clearTimeout(timeoutId);
       setFirebaseUser(fbUser);
@@ -204,12 +204,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [syncUser]);
 
   const signIn = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(getAuthInstance(), email, password);
     // syncUser handled by onAuthStateChanged
   };
 
   const signUp = async (email: string, password: string, name?: string) => {
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    const credential = await createUserWithEmailAndPassword(getAuthInstance(), email, password);
     // Set displayName on Firebase user so syncUser can pick it up
     if (name && credential.user) {
       try {
@@ -227,12 +227,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithPopup(getAuthInstance(), provider);
     // syncUser handled by onAuthStateChanged
   };
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
+    await firebaseSignOut(getAuthInstance());
     setUser(null);
     setFirebaseUser(null);
     setSyncError(false);
@@ -260,7 +260,7 @@ export interface ProviderMismatchResult {
 
 export async function getProviderMismatchMessage(email: string): Promise<ProviderMismatchResult> {
   try {
-    const methods = await fetchSignInMethodsForEmail(auth, email);
+    const methods = await fetchSignInMethodsForEmail(getAuthInstance(), email);
     if (methods.includes('google.com')) {
       return { message: 'Este correo ya está vinculado a Google. Inicia sesión con Google.', provider: 'google' };
     }

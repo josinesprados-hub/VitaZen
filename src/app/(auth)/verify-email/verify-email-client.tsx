@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { sendEmailVerification } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuthInstance } from '@/lib/firebase';
 import { Mail, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function VerifyEmailClient() {
@@ -29,9 +29,9 @@ export default function VerifyEmailClient() {
         await firebaseUser.reload();
 
         // Re-read the user after reload (auth.currentUser is the same object, but refreshed)
-        if (auth.currentUser?.emailVerified) {
+        if (getAuthInstance().currentUser?.emailVerified) {
           // Sync to our database
-          const idToken = await auth.currentUser.getIdToken();
+          const idToken = await getAuthInstance().currentUser!.getIdToken();
           const res = await fetch('/api/auth/verify-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -213,8 +213,8 @@ export default function VerifyEmailClient() {
                 if (!firebaseUser) return;
                 try {
                   await firebaseUser.reload();
-                  if (auth.currentUser?.emailVerified) {
-                    const idToken = await auth.currentUser.getIdToken();
+                  if (getAuthInstance().currentUser?.emailVerified) {
+                    const idToken = await getAuthInstance().currentUser!.getIdToken();
                     await fetch('/api/auth/verify-email', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
@@ -267,8 +267,8 @@ export default function VerifyEmailClient() {
                   if (!firebaseUser) return;
                   try {
                     await firebaseUser.reload();
-                    if (auth.currentUser?.emailVerified) {
-                      const idToken = await auth.currentUser.getIdToken();
+                    if (getAuthInstance().currentUser?.emailVerified) {
+                      const idToken = await getAuthInstance().currentUser!.getIdToken();
                       await fetch('/api/auth/verify-email', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
