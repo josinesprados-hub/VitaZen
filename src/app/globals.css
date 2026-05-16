@@ -237,12 +237,16 @@ button, [role="button"] {
   animation: drawerSlideIn 0.25s ease-out both;
 }
 
-/* Mentor chat — full viewport on mobile, normal flow on desktop */
+/* Mentor chat — full viewport on mobile, normal flow on desktop.
+   position:absolute avoids the fixed fullscreen layer that causes
+   compositor deadlocks in Android TWA/WebView. The parent page
+   wrapper provides position:relative + min-height:100dvh so the
+   absolute element still fills the viewport identically. */
 .mentor-full-viewport {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 30;
-  height: 100dvh;
+  height: 100%;
   background: #000;
 }
 @media (min-width: 640px) {
