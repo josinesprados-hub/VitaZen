@@ -154,7 +154,7 @@ export default function TermsPage() {
           <p className="text-gray-300 leading-relaxed">
             Si consideras que ha habido un error en el cobro o una circunstancia excepcional,
             puedes contactarnos en
-            <span className="text-white font-medium"> soportevitazen@gmail.com</span> y
+            <span className="text-white font-medium"> support@vitazen.cc</span> y
             evaluaremos cada caso de forma individual. Cualquier reembolso aprobado se
             procesará en un plazo de 5 a 10 días laborables sobre el mismo método de pago
             utilizado originalmente.
@@ -170,7 +170,7 @@ export default function TermsPage() {
             Eres responsable de mantener la confidencialidad de tus credenciales de acceso y de
             todas las actividades que se realicen bajo tu cuenta. Debes notificarnos de
             inmediato cualquier uso no autorizado de tu cuenta a través de
-            <span className="text-white font-medium"> soportevitazen@gmail.com</span>.
+            <span className="text-white font-medium"> support@vitazen.cc</span>.
           </p>
           <p className="text-gray-300 leading-relaxed mb-4">
             Te comprometes a no realizar las siguientes acciones: crear cuentas falsas o
@@ -297,7 +297,7 @@ export default function TermsPage() {
             <p className="text-white font-medium mb-2">VitaZen — Soporte</p>
             <p className="text-gray-300">
               Correo electrónico:
-              <span className="text-[#c8a55a] font-medium"> soportevitazen@gmail.com</span>
+              <span className="text-[#c8a55a] font-medium"> support@vitazen.cc</span>
             </p>
             <p className="text-gray-300 mt-1">
               Sitio web:

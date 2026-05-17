@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Política de Privacidad — VitaZen',
@@ -255,7 +256,7 @@ export default function PrivacyPolicyPage() {
           </ul>
           <p className="text-gray-300 leading-relaxed mt-4">
             Para ejercer cualquiera de estos derechos, puedes contactarnos a través de
-            <span className="text-white font-medium"> soportevitazen@gmail.com</span>. Responderemos a tu
+            <span className="text-white font-medium"> support@vitazen.cc</span>. Responderemos a tu
             solicitud en un plazo máximo de 30 días.
           </p>
         </section>
@@ -300,7 +301,7 @@ export default function PrivacyPolicyPage() {
             de un menor de 16 años sin verificación del consentimiento parental, tomaremos medidas
             para eliminar esa información de nuestros servidores de forma inmediata. Si eres padre o
             tutor y crees que tu hijo ha proporcionado datos personales en VitaZen, contacta con
-            nosotros en soportevitazen@gmail.com.
+            nosotros en support@vitazen.cc.
           </p>
         </section>
 
@@ -331,7 +332,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-white font-medium mb-2">VitaZen — Soporte</p>
             <p className="text-gray-300">
               Correo electrónico:
-              <span className="text-[#c8a55a] font-medium"> soportevitazen@gmail.com</span>
+              <span className="text-[#c8a55a] font-medium"> support@vitazen.cc</span>
             </p>
             <p className="text-gray-300 mt-1">
               Sitio web:
@@ -354,19 +355,19 @@ export default function PrivacyPolicyPage() {
             y en la aplicación Android de VitaZen.
           </p>
           <div className="flex items-center justify-center gap-4 mt-4">
-            <a
+            <Link
               href="/privacy"
               className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
             >
               Política de Privacidad
-            </a>
+            </Link>
             <span className="text-gray-600">|</span>
-            <a
+            <Link
               href="/terms"
               className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
             >
               Términos y Condiciones
-            </a>
+            </Link>
           </div>
         </footer>
       </div>
