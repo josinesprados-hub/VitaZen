@@ -14,7 +14,7 @@ export const PLANS = {
   PREMIUM: {
     name: 'Premium',
     price: 5,
-    priceId: process.env.STRIPE_PRO_PRICE_ID!,
+    priceId: process.env.STRIPE_PREMIUM_PRICE_ID!,
     aiMessagesLimit: Infinity,
   },
 } as const;
