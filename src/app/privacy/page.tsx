@@ -256,7 +256,7 @@ export default function PrivacyPolicyPage() {
           </ul>
           <p className="text-gray-300 leading-relaxed mt-4">
             Para ejercer cualquiera de estos derechos, puedes contactarnos a través de
-            <span className="text-white font-medium"> support@vitazen.cc</span>. Responderemos a tu
+            <span className="text-white font-medium"> soportevitazen@gmail.com</span>. Responderemos a tu
             solicitud en un plazo máximo de 30 días.
           </p>
         </section>
@@ -301,7 +301,7 @@ export default function PrivacyPolicyPage() {
             de un menor de 16 años sin verificación del consentimiento parental, tomaremos medidas
             para eliminar esa información de nuestros servidores de forma inmediata. Si eres padre o
             tutor y crees que tu hijo ha proporcionado datos personales en VitaZen, contacta con
-            nosotros en support@vitazen.cc.
+            nosotros en soportevitazen@gmail.com.
           </p>
         </section>
 
@@ -332,7 +332,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-white font-medium mb-2">VitaZen — Soporte</p>
             <p className="text-gray-300">
               Correo electrónico:
-              <span className="text-[#c8a55a] font-medium"> support@vitazen.cc</span>
+              <span className="text-[#c8a55a] font-medium"> soportevitazen@gmail.com</span>
             </p>
             <p className="text-gray-300 mt-1">
               Sitio web:
