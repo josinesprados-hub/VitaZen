@@ -348,6 +348,21 @@ export default function AjustesPage() {
             )}
           </div>
         </div>
+
+        {/* Legal links */}
+        <div className="border-t border-[#1a1a1a] pt-3 mt-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-[#999]">Legal</p>
+            <div className="flex items-center gap-3">
+              <a href="/privacy" className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2">
+                Privacidad
+              </a>
+              <a href="/terms" className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2">
+                Términos
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Error message */}

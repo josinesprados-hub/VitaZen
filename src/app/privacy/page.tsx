@@ -353,6 +353,21 @@ export default function PrivacyPolicyPage() {
             Esta política es vinculante y aplica a todos los servicios ofrecidos en vitazen.cc
             y en la aplicación Android de VitaZen.
           </p>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <a
+              href="/privacy"
+              className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
+            >
+              Política de Privacidad
+            </a>
+            <span className="text-gray-600">|</span>
+            <a
+              href="/terms"
+              className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
+            >
+              Términos y Condiciones
+            </a>
+          </div>
         </footer>
       </div>
     </main>
