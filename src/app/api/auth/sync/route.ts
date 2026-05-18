@@ -59,6 +59,19 @@ export async function POST(request: NextRequest) {
         existingUser.emailVerified = true;
       }
 
+      // Sync firebaseUid if it doesn't match (e.g. user registered with email/password
+      // and then signed in with Google, creating a different Firebase Auth UID).
+      // This keeps the DB in sync with the current auth method.
+      // Safe because we've already verified the Firebase ID token.
+      if (existingUser.firebaseUid !== decodedToken.uid) {
+        console.warn('[SYNC] firebaseUid mismatch — updating from', existingUser.firebaseUid, 'to', decodedToken.uid, 'for email', decodedToken.email);
+        await db.user.update({
+          where: { id: existingUser.id },
+          data: { firebaseUid: decodedToken.uid },
+        });
+        existingUser.firebaseUid = decodedToken.uid;
+      }
+
       // ─── Welcome email retry (with dedup via welcomeEmailSent) ───
       // Only attempt if: email present, email not yet sent, and user is very new.
       // Atomic check-and-set prevents duplicate sends from concurrent sync calls.

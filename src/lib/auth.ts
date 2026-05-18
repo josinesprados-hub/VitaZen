@@ -43,6 +43,18 @@ export async function getAuthUser(idToken: string) {
     });
     if (user) {
       console.log('[Auth] getAuthUser: found user by email (not firebaseUid). user.id:', user.id);
+      // Sync firebaseUid to match the current auth method.
+      // This happens when a user registered with one provider (e.g. email/password)
+      // and later authenticates with another (e.g. Google) that has a different UID.
+      // Safe because we've already verified the ID token.
+      if (user.firebaseUid !== decodedToken.uid) {
+        console.warn('[Auth] getAuthUser: updating firebaseUid from', user.firebaseUid, 'to', decodedToken.uid);
+        await db.user.update({
+          where: { id: user.id },
+          data: { firebaseUid: decodedToken.uid },
+        });
+        user.firebaseUid = decodedToken.uid;
+      }
     }
   }
 

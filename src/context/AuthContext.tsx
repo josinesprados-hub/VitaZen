@@ -258,17 +258,89 @@ export interface ProviderMismatchResult {
   provider: 'google' | 'password' | null;
 }
 
+/**
+ * Reactive check: returns a premium provider-mismatch message
+ * for display AFTER a failed auth attempt.
+ * Used in catch blocks for auth/account-exists-with-different-credential,
+ * auth/invalid-credential, and auth/email-already-in-use.
+ */
 export async function getProviderMismatchMessage(email: string): Promise<ProviderMismatchResult> {
   try {
     const methods = await fetchSignInMethodsForEmail(getAuthInstance(), email);
     if (methods.includes('google.com')) {
-      return { message: 'Este correo ya está vinculado a Google. Inicia sesión con Google.', provider: 'google' };
+      return {
+        message: 'Esta cuenta utiliza acceso con Google. Continúa usando Google para iniciar sesión.',
+        provider: 'google',
+      };
     }
     if (methods.includes('password')) {
-      return { message: 'Este correo ya está registrado con email y contraseña. Usa ese método para iniciar sesión.', provider: 'password' };
+      return {
+        message: 'Esta cuenta ya fue creada con correo y contraseña. Continúa usando ese método para acceder.',
+        provider: 'password',
+      };
     }
-    return { message: 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.', provider: null };
+    return {
+      message: 'Este correo ya está registrado. Usa el método original para acceder.',
+      provider: null,
+    };
   } catch {
-    return { message: 'Este correo ya está registrado con otro método de inicio de sesión. Usa el método original.', provider: null };
+    return {
+      message: 'Este correo ya está registrado. Usa el método original para acceder.',
+      provider: null,
+    };
+  }
+}
+
+export interface ProviderCheckResult {
+  exists: boolean;
+  provider: 'google' | 'password' | 'unknown' | null;
+  message: string | null;
+}
+
+/**
+ * Proactive check: call this on email blur to detect provider mismatches
+ * BEFORE the user submits the form. Returns a subtle hint message
+ * appropriate for inline display below the email field.
+ *
+ * Returns { exists: false, ... } if the email is not registered at all,
+ * allowing the register flow to proceed normally.
+ */
+export async function checkEmailProvider(email: string): Promise<ProviderCheckResult> {
+  try {
+    const methods = await fetchSignInMethodsForEmail(getAuthInstance(), email);
+
+    if (methods.length === 0) {
+      return { exists: false, provider: null, message: null };
+    }
+
+    // Both providers linked to same account — no conflict
+    if (methods.includes('password') && methods.includes('google.com')) {
+      return { exists: true, provider: null, message: null };
+    }
+
+    if (methods.includes('google.com') && !methods.includes('password')) {
+      return {
+        exists: true,
+        provider: 'google',
+        message: 'Esta cuenta utiliza acceso con Google.',
+      };
+    }
+
+    if (methods.includes('password') && !methods.includes('google.com')) {
+      return {
+        exists: true,
+        provider: 'password',
+        message: 'Esta cuenta ya fue creada con correo y contraseña.',
+      };
+    }
+
+    return {
+      exists: true,
+      provider: 'unknown',
+      message: 'Este correo ya está registrado.',
+    };
+  } catch {
+    // Silently fail — never block the auth flow due to a check error
+    return { exists: false, provider: null, message: null };
   }
 }
