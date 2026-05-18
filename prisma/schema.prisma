@@ -267,7 +267,7 @@ model FinanceLog {
   category    String
   amount      Float
   description String?
-  mood        String?  // calm | conscious | impulse | necessary
+  mood        String?  // tranquility | growth | necessity | enjoyment (legacy: calm|conscious|impulse|necessary)
   createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

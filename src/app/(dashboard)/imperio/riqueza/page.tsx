@@ -31,12 +31,22 @@ interface FinanceLog {
 
 type Period = 'month' | 'prev' | 'all';
 
-const MOODS = [
-  { value: 'calm', label: 'Tranquilo', color: 'text-emerald-400' },
-  { value: 'conscious', label: 'Consciente', color: 'text-[#c8a55a]' },
-  { value: 'impulse', label: 'Impulso', color: 'text-orange-400' },
-  { value: 'necessary', label: 'Necesario', color: 'text-blue-400' },
+// "Este movimiento aporta" — refined, premium consciousness labels
+// Evolved from previous mood system. Same DB field, elevated values.
+const INTENTIONS = [
+  { value: 'tranquility', label: 'Tranquilidad', color: 'text-[#c8a55a]/80' },
+  { value: 'growth', label: 'Crecimiento', color: 'text-[#c8a55a]/80' },
+  { value: 'necessity', label: 'Necesidad', color: 'text-[#c8a55a]/80' },
+  { value: 'enjoyment', label: 'Disfrute', color: 'text-[#c8a55a]/80' },
 ] as const;
+
+// Legacy mood → new intention mapping (for old records)
+const LEGACY_MOOD_MAP: Record<string, string> = {
+  calm: 'tranquility',
+  conscious: 'growth',
+  necessary: 'necessity',
+  impulse: 'enjoyment',
+};
 
 // ═══════════════════════════════════════════
 // Helpers
@@ -69,8 +79,11 @@ function formatCurrency(n: number) {
   return n.toFixed(2) + '€';
 }
 
-function getMoodLabel(mood: string | null) {
-  return MOODS.find(m => m.value === mood) || null;
+function getIntentionLabel(mood: string | null) {
+  if (!mood) return null;
+  // Map legacy values to new system
+  const resolved = LEGACY_MOOD_MAP[mood] || mood;
+  return INTENTIONS.find(i => i.value === resolved) || null;
 }
 
 function getHealthStatus(savingsRate: number, balance: number) {
@@ -88,41 +101,41 @@ function getInsight(
   hasPrevData: boolean
 ) {
   if (!hasPrevData) {
-    if (balance > 0) return 'Buen comienzo. Registrar es el primer paso hacia la libertad financiera.';
-    if (balance < 0) return 'Lo importante es ser consciente. Registrar es ya una victoria.';
-    return 'Cada registro te acerca a tomar mejores decisiones.';
+    if (balance > 0) return 'Primer mes registrado. Los datos dan claridad.';
+    if (balance < 0) return 'Primer mes registrado. Registrar ya es avanzar.';
+    return 'Cada registro añade claridad a tus decisiones.';
   }
-  if (balance > 0 && prevBalance <= 0) return 'Pasaste a positivo este mes. La disciplina se nota.';
-  if (balance < 0 && prevBalance >= 0) return 'Mes complicado. Lo importante es ser consciente y ajustar.';
-  if (savingsRate > prevSavingsRate + 5) return 'Tu ahorro mejora notablemente. Sigue así.';
-  if (savingsRate > prevSavingsRate) return 'Tu tasa de ahorro subió. Cada decisión cuenta.';
-  if (savingsRate < prevSavingsRate - 10) return 'Tus gastos subieron. Un buen momento para reflexionar.';
-  if (savingsRate < prevSavingsRate) return 'Pequeño retroceso. La consciencia es tu mayor activo.';
-  if (balance > 0) return 'Consistencia positiva. La estabilidad financiera se construye así.';
-  return 'Registrar es ya un acto de disciplina. Sigue adelante.';
+  if (balance > 0 && prevBalance <= 0) return 'Balance positivo este mes.';
+  if (balance < 0 && prevBalance >= 0) return 'Gastos por encima de ingresos este mes.';
+  if (savingsRate > prevSavingsRate + 5) return 'Tasa de ahorro en mejora clara.';
+  if (savingsRate > prevSavingsRate) return 'Tasa de ahorro superior al mes anterior.';
+  if (savingsRate < prevSavingsRate - 10) return 'Tasa de ahorro significativamente inferior.';
+  if (savingsRate < prevSavingsRate) return 'Tasa de ahorro ligeramente inferior.';
+  if (balance > 0) return 'Mes consistente en positivo.';
+  return 'Los datos se construyen con cada registro.';
 }
 
 // ═══════════════════════════════════════════
 // Subcomponents
 // ═══════════════════════════════════════════
 
-function MoodSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function IntentionSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="text-xs text-[#999] mb-2 block">Estado emocional</label>
-      <div className="flex gap-2 flex-wrap">
-        {MOODS.map(m => (
+      <label className="text-[10px] text-[#555] mb-1.5 block tracking-wide uppercase">Este movimiento aporta</label>
+      <div className="flex gap-1.5 flex-wrap">
+        {INTENTIONS.map(i => (
           <button
-            key={m.value}
+            key={i.value}
             type="button"
-            onClick={() => onChange(m.value)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-              value === m.value
-                ? 'bg-[#c8a55a]/15 border-[#c8a55a]/40 text-[#c8a55a]'
-                : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#333] hover:text-[#999]'
+            onClick={() => onChange(value === i.value ? '' : i.value)}
+            className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
+              value === i.value
+                ? 'bg-[#c8a55a]/10 border-[#c8a55a]/25 text-[#c8a55a]/90'
+                : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
             }`}
           >
-            {m.label}
+            {i.label}
           </button>
         ))}
       </div>
@@ -423,7 +436,7 @@ export default function RiquezaPage() {
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
               <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
-              <MoodSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
+              <IntentionSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
               {submitError && (
                 <p className="text-red-400 text-xs py-1">{submitError}</p>
               )}
@@ -594,7 +607,7 @@ export default function RiquezaPage() {
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
             <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-            <MoodSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+            <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
             {submitError && (
               <p className="text-red-400 text-xs py-1">{submitError}</p>
             )}
@@ -648,7 +661,7 @@ export default function RiquezaPage() {
                   {/* Day logs */}
                   <div className="space-y-1.5">
                     {dateLogs.map((log) => {
-                      const moodInfo = getMoodLabel(log.mood);
+                      const moodInfo = getIntentionLabel(log.mood);
                       return (
                         <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
                           <div className="flex items-center gap-3 min-w-0">
@@ -661,8 +674,8 @@ export default function RiquezaPage() {
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="text-sm text-white">{log.category}</span>
                                 {moodInfo && (
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded bg-[#1a1a1a] ${moodInfo.color}`}>
-                                    {moodInfo.label}
+                                  <span className="text-[10px] text-[#555] tracking-wide">
+                                    {moodInfo.label.toLowerCase()}
                                   </span>
                                 )}
                               </div>
