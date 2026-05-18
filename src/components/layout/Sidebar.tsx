@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useApi } from '@/hooks/useApi';
 import {
   Shield,
   Brain,
@@ -16,6 +17,8 @@ import {
   Trophy,
   Sunrise,
   CreditCard,
+  Crown,
+  Loader2,
   LogOut,
   X,
   Lightbulb,
@@ -41,6 +44,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const { apiFetch } = useApi();
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
 
   // Lock body scroll when sidebar is open on mobile.
   // overflow:hidden prevents background scrolling without position:fixed,
@@ -196,26 +201,6 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 </Link>
               );
             })}
-
-            {user?.plan === 'FREE' && (
-              <>
-                <div className="pt-5 pb-2">
-                  <p className="px-4 text-xs text-[#555] uppercase tracking-widest font-semibold">Suscripción</p>
-                </div>
-                <Link
-                  href="/pricing"
-                  onClick={onClose}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
-                    pathname === '/pricing'
-                      ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                      : 'text-[#c8a55a] hover:bg-[#c8a55a]/10'
-                  }`}
-                >
-                  <CreditCard size={20} />
-                  Mejorar a Premium
-                </Link>
-              </>
-            )}
           </nav>
 
           {/* User section */}
@@ -237,12 +222,76 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 <p className="text-xs text-[#c8a55a]">{user?.plan || 'FREE'}</p>
               </div>
             </Link>
+
+            {/* Contextual subscription CTA */}
+            {user?.plan === 'FREE' ? (
+              <button
+                onClick={async () => {
+                  setSubscriptionLoading(true);
+                  try {
+                    const res = await apiFetch('/api/stripe/checkout', { method: 'POST' });
+                    if (res.ok) {
+                      const data = await res.json();
+                      if (data.url) {
+                        window.location.href = data.url;
+                        return;
+                      }
+                    }
+                    router.push('/pricing');
+                  } catch {
+                    router.push('/pricing');
+                  } finally {
+                    setSubscriptionLoading(false);
+                  }
+                }}
+                disabled={subscriptionLoading}
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#c8a55a] hover:bg-[#c8a55a]/10 rounded-lg transition-colors touch-press disabled:opacity-50"
+              >
+                {subscriptionLoading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Crown size={16} />
+                )}
+                Actualizar a Premium
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  setSubscriptionLoading(true);
+                  try {
+                    const res = await apiFetch('/api/stripe/portal', { method: 'POST' });
+                    if (res.ok) {
+                      const data = await res.json();
+                      if (data.url) {
+                        window.location.href = data.url;
+                        return;
+                      }
+                    }
+                    router.push('/ajustes');
+                  } catch {
+                    router.push('/ajustes');
+                  } finally {
+                    setSubscriptionLoading(false);
+                  }
+                }}
+                disabled={subscriptionLoading}
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#999] hover:text-[#c8a55a] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press disabled:opacity-50"
+              >
+                {subscriptionLoading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <CreditCard size={16} />
+                )}
+                Gestionar Premium
+              </button>
+            )}
+
             <button
               onClick={async () => {
                 await signOut();
                 router.replace('/login');
               }}
-              className="flex items-center gap-2 w-full px-4 py-3 text-sm text-[#999] hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
+              className="flex items-center gap-2 w-full px-4 py-3 text-sm text-[#666] hover:text-[#999] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press mt-1"
             >
               <LogOut size={16} />
               Cerrar sesión
