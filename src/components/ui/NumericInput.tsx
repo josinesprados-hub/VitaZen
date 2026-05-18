@@ -5,15 +5,22 @@ import { useState, useEffect, useRef } from 'react';
 /**
  * NumericInput — premium numeric input for VitaZen.
  *
- * Solves common type="number" UX issues:
- * - Can't clear the field (forced to "0")
- * - Cursor jumps on edit
- * - Inconsistent mobile keyboard
- * - No decimal support
+ * European/Spanish format: dot = thousands separator, comma = decimal separator.
  *
- * Strategy: use type="text" + inputMode="decimal" (mobile numeric keyboard),
- * store raw string internally, parse to number on blur.
- * This lets users type naturally (empty, "0.", "3.5") without forced values.
+ * UX rules:
+ * - Permissive during typing (no blocking, no cursor jumps)
+ * - Normalize/parse only on blur
+ * - European format: "1.000" → 1000, "1,5" → 1.5, "2.500,75" → 2500.75
+ *
+ * Parsing strategy:
+ * - If comma + dot present: dots = thousands, comma = decimal
+ *   "2.500,75" → remove dots → "2500,75" → comma→dot → "2500.75" → 2500.75
+ * - If only comma: comma = decimal
+ *   "1,5" → "1.5" → 1.5
+ * - If only dot: check pattern
+ *   "1.000" matches \d{1,3}(\.\d{3})+ → thousands → 1000
+ *   "1.5" doesn't match → decimal → 1.5
+ * - If neither: plain number
  */
 
 interface NumericInputProps {
@@ -41,32 +48,23 @@ export function NumericInput({
   allowDecimal = true,
   disabled = false,
 }: NumericInputProps) {
-  const [raw, setRaw] = useState(formatValue(value, allowDecimal));
+  const [raw, setRaw] = useState(formatEuropean(value, allowDecimal));
   const isFocused = useRef(false);
 
   // Sync from external value changes (only when not actively editing)
   useEffect(() => {
     if (!isFocused.current) {
-      setRaw(formatValue(value, allowDecimal));
+      setRaw(formatEuropean(value, allowDecimal));
     }
   }, [value, allowDecimal]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
 
-    // Allow: empty, "-", digits, one dot, one comma
-    // This is permissive during typing; we normalize on blur
-    if (input === '' || input === '-' || input === '.' || input === ',') {
-      setRaw(input);
-      return;
-    }
-
-    // Allow typing "0.", "3.", etc. without forcing to "0"
-    const pattern = allowDecimal
-      ? /^-?\d*[.,]?\d*$/
-      : /^-?\d*$/;
-
-    if (pattern.test(input)) {
+    // Permissive: allow digits, dots, commas, minus
+    // Structure is not validated during typing — we parse properly on blur.
+    // This prevents blocking European input like "2.500,75" or "1.000"
+    if (input === '' || /^-?[\d.,]*$/.test(input)) {
       setRaw(input);
     }
   };
@@ -77,22 +75,19 @@ export function NumericInput({
 
   const handleBlur = () => {
     isFocused.current = false;
-    const parsed = parseRaw(raw, allowDecimal);
+    const parsed = parseEuropean(raw, allowDecimal);
 
     // Clamp to min/max
     let clamped = parsed;
     if (min !== undefined && clamped < min) clamped = min;
     if (max !== undefined && clamped > max) clamped = max;
 
-    // Update display with clean value
-    setRaw(formatValue(clamped, allowDecimal));
+    // Update display with clean European-formatted value
+    setRaw(formatEuropean(clamped, allowDecimal));
 
     // Propagate to parent if changed
     if (clamped !== value) {
       onChange(clamped);
-    } else {
-      // Even if value is same, we may need to clean display (e.g. "3." → "3")
-      setRaw(formatValue(clamped, allowDecimal));
     }
   };
 
@@ -112,26 +107,96 @@ export function NumericInput({
   );
 }
 
-/** Format a number for display */
-function formatValue(n: number, allowDecimal: boolean): string {
+// ═══════════════════════════════════════════
+// European number formatting & parsing
+// ═══════════════════════════════════════════
+
+/**
+ * Format a number for European display.
+ * - Decimal: 2500.75 → "2.500,75"
+ * - Integer: 2500 → "2.500"
+ * - Small: 1.5 → "1,5"
+ */
+function formatEuropean(n: number, allowDecimal: boolean): string {
   if (n === 0) return '0';
+
   if (allowDecimal) {
-    // Show up to 2 decimal places, strip trailing zeros
-    return parseFloat(n.toFixed(2)).toString();
+    // Format with up to 2 decimal places, strip trailing zeros
+    const fixed = n.toFixed(2);
+    const cleaned = fixed.replace(/\.?0+$/, ''); // "2500.75" or "2500"
+    const [intPart, decPart] = cleaned.split('.');
+    const formatted = addThousandsSep(intPart);
+    return decPart ? `${formatted},${decPart}` : formatted;
   }
-  return Math.round(n).toString();
+
+  // Integer: add thousands separators
+  return addThousandsSep(Math.round(n).toString());
 }
 
-/** Parse raw string input to a number */
-function parseRaw(raw: string, allowDecimal: boolean): number {
+/** Add dot as thousands separator: "2500" → "2.500", "1000000" → "1.000.000" */
+function addThousandsSep(s: string): string {
+  return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/**
+ * Parse European-formatted number string to a numeric value.
+ *
+ * Rules:
+ * 1. Comma + dot present → dots = thousands, comma = decimal
+ *    "2.500,75" → remove dots → "2500,75" → comma→dot → "2500.75" → 2500.75
+ *
+ * 2. Only comma → comma = decimal
+ *    "1,5" → "1.5" → 1.5
+ *
+ * 3. Only dot → disambiguate by pattern:
+ *    "1.000" matches \d{1,3}(\.\d{3})+ → thousands → 1000
+ *    "1.5" doesn't match → decimal → 1.5
+ *
+ * 4. Neither → plain number
+ */
+function parseEuropean(raw: string, allowDecimal: boolean): number {
   if (!raw || raw.trim() === '') return 0;
 
-  // Normalize comma to dot
-  const normalized = raw.replace(',', '.');
+  const trimmed = raw.trim();
 
-  // Remove trailing dot (e.g. "3." → "3")
-  const cleaned = normalized.replace(/\.$/, '');
+  // Handle edge cases: just separators
+  if (/^-?[.,]+$/.test(trimmed)) return 0;
 
-  const parsed = allowDecimal ? parseFloat(cleaned) : parseInt(cleaned, 10);
-  return isNaN(parsed) ? 0 : parsed;
+  const isNegative = trimmed.startsWith('-');
+  const digits = isNegative ? trimmed.slice(1) : trimmed;
+
+  const hasComma = digits.includes(',');
+  const hasDot = digits.includes('.');
+
+  let normalized: string;
+
+  if (hasComma && hasDot) {
+    // European: dots = thousands, comma = decimal
+    // "2.500,75" → remove dots → "2500,75" → replace comma → "2500.75"
+    normalized = digits.replace(/\./g, '').replace(',', '.');
+  } else if (hasComma) {
+    // Comma = decimal: "1,5" → "1.5"
+    normalized = digits.replace(',', '.');
+  } else if (hasDot) {
+    // Ambiguous: dot could be thousands or decimal
+    // Check if pattern matches European thousands: \d{1,3}(\.\d{3})+
+    if (/^\d{1,3}(\.\d{3})+$/.test(digits)) {
+      // Dots are thousands separators: "1.000" → 1000, "10.000" → 10000
+      normalized = digits.replace(/\./g, '');
+    } else {
+      // Dot is decimal: "1.5", "3.14"
+      normalized = digits;
+    }
+  } else {
+    // No separators: plain number
+    normalized = digits;
+  }
+
+  // Clean trailing dot (e.g. "3." → "3")
+  normalized = normalized.replace(/\.$/, '');
+
+  const parsed = allowDecimal ? parseFloat(normalized) : parseInt(normalized, 10);
+  const result = isNaN(parsed) ? 0 : parsed;
+
+  return isNegative ? -result : result;
 }
