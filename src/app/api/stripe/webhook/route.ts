@@ -28,6 +28,9 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
+        const customerId = session.customer as string | null;
+
+        console.log('[Webhook] checkout.session.completed — userId:', userId, 'customerId:', customerId || 'null');
 
         if (userId) {
           // Fetch line items explicitly — they are NOT included in the event object
@@ -45,14 +48,24 @@ export async function POST(request: NextRequest) {
               periodStart = new Date(subscription.current_period_start * 1000);
               periodEnd = new Date(subscription.current_period_end * 1000);
             } catch (e) {
-              console.error('Could not retrieve subscription details:', e);
+              console.error('[Webhook] Could not retrieve subscription details:', e);
             }
+          }
+
+          // Save plan + stripeCustomerId so the portal can find the customer
+          const updateData: Record<string, unknown> = { plan: 'PREMIUM' };
+          if (customerId) {
+            updateData.stripeCustomerId = customerId;
+          } else {
+            console.warn('[Webhook] checkout.session.completed — no session.customer, stripeCustomerId not updated for user:', userId);
           }
 
           await db.user.update({
             where: { id: userId },
-            data: { plan: 'PREMIUM' },
+            data: updateData,
           });
+
+          console.log('[Webhook] User updated — plan: PREMIUM, stripeCustomerId:', customerId || 'unchanged');
 
           // Track premium upgrade completion
           trackEvent({ event: 'premium_upgrade_completed', userId });
@@ -72,12 +85,15 @@ export async function POST(request: NextRequest) {
           if (user?.email) {
             await sendSubscriptionConfirmedEmail(user.email, user.name || 'Amigo', 'Premium');
           }
+        } else {
+          console.warn('[Webhook] checkout.session.completed — no userId in session metadata');
         }
         break;
       }
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
+        console.log('[Webhook] customer.subscription.updated — subId:', subscription.id, 'status:', subscription.status);
         try {
           const customer = await stripe.customers.retrieve(subscription.customer as string);
           if ('metadata' in customer) {
@@ -91,16 +107,18 @@ export async function POST(request: NextRequest) {
                   currentPeriodEnd: new Date(subscription.current_period_end * 1000),
                 },
               });
+              console.log('[Webhook] Subscription updated for user:', userId);
             }
           }
         } catch (e) {
-          console.error('Could not retrieve customer for subscription update:', e);
+          console.error('[Webhook] Could not retrieve customer for subscription update:', e);
         }
         break;
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
+        console.log('[Webhook] customer.subscription.deleted — subId:', subscription.id);
         try {
           const customer = await stripe.customers.retrieve(subscription.customer as string);
           if ('metadata' in customer) {
@@ -114,10 +132,11 @@ export async function POST(request: NextRequest) {
                 where: { stripeSubscriptionId: subscription.id },
                 data: { status: 'canceled' },
               });
+              console.log('[Webhook] Subscription canceled, user downgraded to FREE:', userId);
             }
           }
         } catch (e) {
-          console.error('Could not retrieve customer for subscription deletion:', e);
+          console.error('[Webhook] Could not retrieve customer for subscription deletion:', e);
         }
         break;
       }
