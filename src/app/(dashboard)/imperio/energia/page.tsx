@@ -8,6 +8,7 @@ import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
+import { NumericInput } from '@/components/ui/NumericInput';
 
 interface WellnessLog {
   id: string;
@@ -272,12 +273,12 @@ export default function EnergiaPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
-                  <input type="number" value={editNutritionForm.water} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, water: parseInt(e.target.value) || 0 })}
+                  <NumericInput value={editNutritionForm.water} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
                 </div>
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
-                  <input type="number" value={editNutritionForm.calories} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, calories: parseInt(e.target.value) || 0 })}
+                  <NumericInput value={editNutritionForm.calories} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
                 </div>
               </div>
@@ -402,12 +403,12 @@ export default function EnergiaPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm text-[#999] mb-1 block">Vasos de agua</label>
-                <input type="number" value={nutritionForm.water} onChange={(e) => setNutritionForm({ ...nutritionForm, water: parseInt(e.target.value) || 0 })}
+                <NumericInput value={nutritionForm.water} onChange={(v) => setNutritionForm({ ...nutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
                   className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
               </div>
               <div>
                 <label className="text-sm text-[#999] mb-1 block">Calorías</label>
-                <input type="number" value={nutritionForm.calories} onChange={(e) => setNutritionForm({ ...nutritionForm, calories: parseInt(e.target.value) || 0 })}
+                <NumericInput value={nutritionForm.calories} onChange={(v) => setNutritionForm({ ...nutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
                   className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
               </div>
             </div>

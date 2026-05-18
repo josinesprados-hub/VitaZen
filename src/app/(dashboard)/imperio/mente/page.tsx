@@ -8,6 +8,7 @@ import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
+import { NumericInput } from '@/components/ui/NumericInput';
 
 interface Meditation {
   id: string;
@@ -423,11 +424,12 @@ export default function MentePage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">Duración (min)</label>
-                <input
-                  type="number"
-                  min={1}
+                <NumericInput
                   value={editDuration}
-                  onChange={(e) => setEditDuration(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(v) => setEditDuration(Math.max(1, v))}
+                  inputMode="numeric"
+                  allowDecimal={false}
+                  min={1}
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors"
                 />
               </div>

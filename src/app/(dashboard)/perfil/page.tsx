@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { NumericInput } from '@/components/ui/NumericInput';
 import { Label } from '@/components/ui/label';
 import {
   User,
@@ -324,14 +325,15 @@ export default function PerfilPage() {
             Edad <span className="text-[#555]">(opcional)</span>
           </Label>
           {editing ? (
-            <Input
-              type="number"
-              value={form.age}
-              onChange={(e) => setForm(prev => ({ ...prev, age: e.target.value }))}
+            <NumericInput
+              value={form.age ? parseInt(form.age, 10) : 0}
+              onChange={(v) => setForm(prev => ({ ...prev, age: v > 0 ? String(v) : '' }))}
               placeholder="Ej: 28"
+              inputMode="numeric"
+              allowDecimal={false}
               min={1}
               max={150}
-              className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11 w-32"
+              className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11 w-32 rounded-md border px-3 py-2 text-sm"
             />
           ) : (
             <p className="text-white text-sm mt-1">{user?.age ? `${user.age} años` : '—'}</p>
