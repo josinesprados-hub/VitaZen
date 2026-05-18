@@ -67,6 +67,8 @@ export default function EnergiaPage() {
   const [editNutritionSaving, setEditNutritionSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<{ id: string; type: 'wellness' | 'nutrition' } | null>(null);
   const [fetchError, setFetchError] = useState(false);
+  const [submittingWellness, setSubmittingWellness] = useState(false);
+  const [submittingNutrition, setSubmittingNutrition] = useState(false);
 
   // Lock body scroll when modal is open — save/restore scroll position
   useEffect(() => {
@@ -99,6 +101,8 @@ export default function EnergiaPage() {
   }, [fetchData]);
 
   const submitWellness = async () => {
+    if (submittingWellness) return;
+    setSubmittingWellness(true);
     try {
       const res = await apiFetch('/api/wellness', {
         method: 'POST',
@@ -106,13 +110,20 @@ export default function EnergiaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setWellnessLogs(prev => [data.log, ...prev]);
+        setWellnessLogs(prev => {
+          const filtered = prev.filter(l => l.id !== data.log.id);
+          return [data.log, ...filtered];
+        });
+        setWellnessForm({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
         setShowWellness(false);
       }
     } catch (error) { console.error('Error submitting wellness:', error); }
+    finally { setSubmittingWellness(false); }
   };
 
   const submitNutrition = async () => {
+    if (submittingNutrition) return;
+    setSubmittingNutrition(true);
     try {
       const res = await apiFetch('/api/nutrition', {
         method: 'POST',
@@ -120,10 +131,15 @@ export default function EnergiaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setNutrition(prev => [data.log, ...prev]);
+        setNutrition(prev => {
+          const filtered = prev.filter(l => l.id !== data.log.id);
+          return [data.log, ...filtered];
+        });
+        setNutritionForm({ meals: '', water: 0, calories: 0, notes: '' });
         setShowNutrition(false);
       }
     } catch (error) { console.error('Error submitting nutrition:', error); }
+    finally { setSubmittingNutrition(false); }
   };
 
   const startEditWellness = (log: WellnessLog) => {
@@ -319,7 +335,7 @@ export default function EnergiaPage() {
             <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
             <div className="flex gap-2">
-              <button onClick={submitWellness} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
               <button onClick={() => setShowWellness(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
@@ -327,28 +343,33 @@ export default function EnergiaPage() {
         {wellnessLogs.length > 0 ? (
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {wellnessLogs.slice(0, 7).map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                    <Heart size={16} className="text-[#c8a55a]" />
+              <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                      <Heart size={16} className="text-[#c8a55a]" />
+                    </div>
+                    <div>
+                      <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
+                        <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
+                        <span className="text-[#c8a55a]">Energía: {log.energy}</span>
+                        <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="text-[#333] text-xs">·</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
-                      <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
-                      <span className="text-[#c8a55a]">Energía: {log.energy}</span>
-                      <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                      <span className="text-[#333] text-xs">·</span>
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => startEditWellness(log)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <button onClick={() => startEditWellness(log)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                  <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
-                </div>
+                {log.notes && (
+                  <p className="mt-2 ml-[52px] sm:ml-[60px] text-xs text-[#888] italic leading-relaxed">{log.notes}</p>
+                )}
               </div>
             ))}
           </div>
@@ -391,7 +412,7 @@ export default function EnergiaPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitNutrition} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468]">Guardar</button>
+              <button onClick={submitNutrition} disabled={submittingNutrition} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] disabled:opacity-50 disabled:cursor-not-allowed">{submittingNutrition ? 'Guardando...' : 'Guardar'}</button>
               <button onClick={() => setShowNutrition(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
@@ -399,27 +420,39 @@ export default function EnergiaPage() {
         {nutrition.length > 0 ? (
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {nutrition.slice(0, 7).map((log) => (
-              <div key={log.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                    <Apple size={16} className="text-[#c8a55a]" />
+              <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
+                      <Apple size={16} className="text-[#c8a55a]" />
+                    </div>
+                    <div>
+                      <div className="flex gap-2 text-xs mb-1">
+                        <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
+                        <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="text-[#333] text-xs">·</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex gap-2 text-xs mb-1">
-                      <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
-                      <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                      <span className="text-[#333] text-xs">·</span>
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => startEditNutrition(log)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <button onClick={() => startEditNutrition(log)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                  <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
-                </div>
+                {(log.meals || log.notes) && (
+                  <div className="mt-2 ml-[56px] space-y-0.5">
+                    {log.meals && (
+                      <p className="text-xs text-[#888] leading-relaxed">{log.meals}</p>
+                    )}
+                    {log.notes && (
+                      <p className="text-xs text-[#666] italic leading-relaxed">{log.notes}</p>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
