@@ -66,6 +66,18 @@ export function NumericInput({
     // This prevents blocking European input like "2.500,75" or "1.000"
     if (input === '' || /^-?[\d.,]*$/.test(input)) {
       setRaw(input);
+
+      // Propagate best-effort parsed value to parent during typing.
+      // This prevents race conditions where submit reads stale state
+      // because onChange was only called on blur.
+      // Does NOT rewrite the display (raw is managed internally).
+      const parsed = parseEuropean(input, allowDecimal);
+      let clamped = parsed;
+      if (min !== undefined && clamped < min) clamped = min;
+      if (max !== undefined && clamped > max) clamped = max;
+      if (clamped !== value) {
+        onChange(clamped);
+      }
     }
   };
 

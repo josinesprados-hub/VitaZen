@@ -41,9 +41,14 @@ export async function PUT(request: NextRequest) {
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    // Validate required fields
+    if (!type || (type !== 'income' && type !== 'expense')) return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
+    if (!category || !category.trim()) return NextResponse.json({ error: 'La categoría es obligatoria' }, { status: 400 });
+    if (amount === undefined || amount === null || isNaN(amount) || amount <= 0) return NextResponse.json({ error: 'La cantidad debe ser mayor que 0' }, { status: 400 });
+
     const updated = await db.financeLog.update({
       where: { id: logId },
-      data: { date: new Date(date), type, category, amount, description, mood: mood || null },
+      data: { date: new Date(date), type, category: category.trim(), amount: Number(amount), description: description?.trim() || null, mood: mood || null },
     });
 
     return NextResponse.json({ log: updated });
@@ -84,8 +89,14 @@ export async function POST(request: NextRequest) {
 
     const { date, type, category, amount, description, mood } = await request.json();
 
+    // Validate required fields
+    if (!date) return NextResponse.json({ error: 'La fecha es obligatoria' }, { status: 400 });
+    if (!type || (type !== 'income' && type !== 'expense')) return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
+    if (!category || !category.trim()) return NextResponse.json({ error: 'La categoría es obligatoria' }, { status: 400 });
+    if (amount === undefined || amount === null || isNaN(amount) || amount <= 0) return NextResponse.json({ error: 'La cantidad debe ser mayor que 0' }, { status: 400 });
+
     const log = await db.financeLog.create({
-      data: { userId: user.id, date: new Date(date), type, category, amount, description, mood: mood || null },
+      data: { userId: user.id, date: new Date(date), type, category: category.trim(), amount: Number(amount), description: description?.trim() || null, mood: mood || null },
     });
 
     // Award XP to riqueza empire

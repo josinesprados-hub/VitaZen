@@ -158,6 +158,7 @@ export default function RiquezaPage() {
   const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '' });
   const [editSaving, setEditSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
   const [period, setPeriod] = useState<Period>('month');
@@ -254,6 +255,18 @@ export default function RiquezaPage() {
 
   const submitFinance = async () => {
     if (submitting) return;
+
+    // Frontend validation — prevent silent failures
+    if (!form.category.trim()) {
+      setSubmitError('La categoría es obligatoria');
+      return;
+    }
+    if (!form.amount || form.amount <= 0) {
+      setSubmitError('La cantidad debe ser mayor que 0');
+      return;
+    }
+
+    setSubmitError(null);
     setSubmitting(true);
     try {
       const res = await apiFetch('/api/finance', {
@@ -261,9 +274,9 @@ export default function RiquezaPage() {
         body: JSON.stringify({
           date: new Date().toISOString().split('T')[0],
           type: form.type,
-          category: form.category,
+          category: form.category.trim(),
           amount: form.amount,
-          description: form.description || null,
+          description: form.description.trim() || null,
           mood: form.mood || null,
         }),
       });
@@ -272,9 +285,15 @@ export default function RiquezaPage() {
         setLogs(prev => [data.log, ...prev]);
         setShowAdd(false);
         setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '' });
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Finance POST failed:', res.status, errData);
+        setSubmitError(errData?.error || 'No se pudo guardar el movimiento');
       }
-    } catch (error) { console.error('Error submitting finance:', error); }
-    finally { setSubmitting(false); }
+    } catch (error) {
+      console.error('Error submitting finance:', error);
+      setSubmitError('Error de conexión. Inténtalo de nuevo.');
+    } finally { setSubmitting(false); }
   };
 
   const startEdit = (log: FinanceLog) => {
@@ -291,6 +310,18 @@ export default function RiquezaPage() {
 
   const saveEdit = async () => {
     if (!editingLog) return;
+
+    // Frontend validation
+    if (!editForm.category.trim()) {
+      setSubmitError('La categoría es obligatoria');
+      return;
+    }
+    if (!editForm.amount || editForm.amount <= 0) {
+      setSubmitError('La cantidad debe ser mayor que 0');
+      return;
+    }
+
+    setSubmitError(null);
     setEditSaving(true);
     try {
       const res = await apiFetch('/api/finance', {
@@ -299,9 +330,9 @@ export default function RiquezaPage() {
           logId: editingLog.id,
           date: editForm.date,
           type: editForm.type,
-          category: editForm.category,
+          category: editForm.category.trim(),
           amount: editForm.amount,
-          description: editForm.description || null,
+          description: editForm.description.trim() || null,
           mood: editForm.mood || null,
         }),
       });
@@ -312,8 +343,12 @@ export default function RiquezaPage() {
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Finance PUT failed:', res.status, errData);
+        setSubmitError(errData?.error || 'No se pudo actualizar el movimiento');
       }
-    } catch (error) { console.error('Error updating finance log:', error); }
+    } catch (error) {
+      console.error('Error updating finance log:', error);
+      setSubmitError('Error de conexión. Inténtalo de nuevo.');
+    }
     finally { setEditSaving(false); }
   };
 
@@ -389,9 +424,12 @@ export default function RiquezaPage() {
               <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
               <MoodSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
+              {submitError && (
+                <p className="text-red-400 text-xs py-1">{submitError}</p>
+              )}
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
-              <button onClick={() => setEditingLog(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
@@ -557,9 +595,12 @@ export default function RiquezaPage() {
             <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
             <MoodSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+            {submitError && (
+              <p className="text-red-400 text-xs py-1">{submitError}</p>
+            )}
             <div className="flex gap-2 pt-1">
               <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-              <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
+              <button onClick={() => { setShowAdd(false); setSubmitError(null); }} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
             </div>
           </div>
         )}
