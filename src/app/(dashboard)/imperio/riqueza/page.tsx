@@ -55,6 +55,134 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ═══════════════════════════════════════════
+// Quick Capture — Smart keyword → category mapping
+// ═══════════════════════════════════════════
+
+const KEYWORD_CATEGORIES: [RegExp, string][] = [
+  [/\b(café|cafe|desayuno|almuerzo|cena|restaurante|pizza|sushi|hamburguesa|tapas|bar|comida|merienda|croissant|sandwich|bocadillo|postre|helado|cerveza|vino|copa|brunch|snack|supermercado|mercadona|carrefour|dia|consum|lidl|aldi|panaderia|pasteleria)\b/i, 'Comida'],
+  [/\b(taxi|uber|cabify|metro|bus|autobus|gasolina|gas|parking|tren|ave|avion|vuelo|renfe|blablacar|scooter|moto|bici|peaje|estacionamiento|carburante|dgt|movilidad)\b/i, 'Transporte'],
+  [/\b(cine|pelicula|concierto|fiesta|juego|viaje|hotel|hostal|airbnb|excursion|museo|teatro|partido|entradas|ocio|libro|revista|hobby|deporte|karaoke|bowling|festival)\b/i, 'Ocio'],
+  [/\b(farmacia|medico|dentista|terapia|gimnasio|gym|optica|fisioterapeuta|psicologo|hospital|clinica|vacuna|seguro medico|sanitario|analisis|urgencia)\b/i, 'Salud'],
+  [/\b(amazon|zara|ropa|zapatos|tienda|ikea|regalo|moda|accesorio|electronico|movil|ordenador|laptop|pc component|media markt|electrodomestico)\b/i, 'Compras'],
+  [/\b(alquiler|hipoteca|luz|agua|internet|telefono|comunidad|ibi|basura|mantenimiento|reparacion|reform|pintura|fontanero|electricista|seguro hogar)\b/i, 'Vivienda'],
+  [/\b(curso|master|universidad|academia|formacion|seminario|taller|certificacion|udemy|coursera|domestika|estudio|clase|tutoria)\b/i, 'Educación'],
+  [/\b(spotify|netflix|hbo|disney|prime|youtube|icloud|dropbox|suscripcion|premium|membresia|abono)\b/i, 'Suscripción'],
+  [/\b(nomina|salario|sueldo|pago|freelance|bonus|comision|dividendo|renta|ingreso|transferencia|reembolso|devolucion)\b/i, 'Trabajo'],
+];
+
+const INCOME_KEYWORDS = /\b(nomina|salario|sueldo|pago|freelance|bonus|comision|dividendo|renta|ingreso|transferencia|reembolso|devolucion)\b/i;
+
+interface ParsedCapture {
+  description: string;
+  amount: number;
+  category: string;
+  type: 'expense' | 'income';
+}
+
+function parseQuickCapture(input: string, historyMap: Record<string, string>): ParsedCapture | null {
+  if (!input.trim()) return null;
+
+  const tokens = input.trim().split(/\s+/);
+  let amount = 0;
+  let descriptionTokens: string[] = [];
+  let amountFound = false;
+
+  // Strategy 1: Amount at the end (most common: "Café 3,50")
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    if (/^[\d.,]+$/.test(tokens[i])) {
+      const parsed = parseEuropeanQuick(tokens[i]);
+      if (parsed > 0) {
+        amount = parsed;
+        descriptionTokens = tokens.slice(0, i);
+        amountFound = true;
+        break;
+      }
+    }
+  }
+
+  // Strategy 2: Amount at the beginning ("3,50 café")
+  if (!amountFound && /^[\d.,]+$/.test(tokens[0])) {
+    const parsed = parseEuropeanQuick(tokens[0]);
+    if (parsed > 0) {
+      amount = parsed;
+      descriptionTokens = tokens.slice(1);
+      amountFound = true;
+    }
+  }
+
+  // Strategy 3: Extract with € symbol ("Café 3,50€")
+  if (!amountFound) {
+    const match = input.match(/([\d.,]+)\s*€?\s*$/);
+    if (match) {
+      const parsed = parseEuropeanQuick(match[1]);
+      if (parsed > 0) {
+        amount = parsed;
+        descriptionTokens = [input.replace(match[0], '').trim()];
+        amountFound = true;
+      }
+    }
+  }
+
+  if (!amountFound || amount <= 0) return null;
+
+  const description = descriptionTokens.join(' ').trim();
+  const textToMatch = description || input;
+
+  // Smart category: check user history first (exact description match)
+  let category = '';
+  const descLower = textToMatch.toLowerCase();
+  if (historyMap[descLower]) {
+    category = historyMap[descLower];
+  }
+
+  // Fallback: keyword mapping
+  if (!category) {
+    for (const [regex, cat] of KEYWORD_CATEGORIES) {
+      if (regex.test(textToMatch)) {
+        category = cat;
+        break;
+      }
+    }
+  }
+
+  if (!category) category = 'Otros';
+
+  // Determine type: income keywords override default 'expense'
+  const type: 'expense' | 'income' = INCOME_KEYWORDS.test(textToMatch) ? 'income' : 'expense';
+
+  return {
+    description: description || category,
+    amount,
+    category,
+    type,
+  };
+}
+
+function parseEuropeanQuick(raw: string): number {
+  const trimmed = raw.trim();
+  if (!trimmed) return 0;
+  const hasComma = trimmed.includes(',');
+  const hasDot = trimmed.includes('.');
+  let normalized: string;
+
+  if (hasComma && hasDot) {
+    normalized = trimmed.replace(/\./g, '').replace(',', '.');
+  } else if (hasComma) {
+    normalized = trimmed.replace(',', '.');
+  } else if (hasDot) {
+    normalized = /^\d{1,3}(\.\d{3})+$/.test(trimmed)
+      ? trimmed.replace(/\./g, '')
+      : trimmed;
+  } else {
+    normalized = trimmed;
+  }
+
+  normalized = normalized.replace(/\.$/, '');
+  const parsed = parseFloat(normalized);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+// ═══════════════════════════════════════════
 // Helpers
 // ═══════════════════════════════════════════
 
@@ -317,6 +445,95 @@ function SaveToast({ show, message }: { show: boolean; message: string }) {
 }
 
 // ═══════════════════════════════════════════
+// Quick Capture Component
+// ═══════════════════════════════════════════
+
+function QuickCapture({
+  onCapture,
+  onFullForm,
+  submitting,
+  historyMap,
+}: {
+  onCapture: (data: { type: string; category: string; amount: number; description: string }) => void;
+  onFullForm: () => void;
+  submitting: boolean;
+  historyMap: Record<string, string>;
+}) {
+  const [input, setInput] = useState('');
+  const parsed = useMemo(() => parseQuickCapture(input, historyMap), [input, historyMap]);
+
+  const handleSubmit = () => {
+    if (!parsed || parsed.amount <= 0 || submitting) return;
+    onCapture({
+      type: parsed.type,
+      category: parsed.category,
+      amount: parsed.amount,
+      description: parsed.description,
+    });
+    setInput('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && parsed && parsed.amount > 0) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  return (
+    <div>
+      <div className="relative">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Café 3,50 · Taxi 14 · Nómina 1250"
+          className="w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3.5 text-white text-base placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/40 transition-colors"
+          autoFocus
+          inputMode="text"
+          autoComplete="off"
+        />
+      </div>
+
+      {/* Live preview */}
+      {parsed && parsed.amount > 0 ? (
+        <div className="mt-2 flex items-center justify-between px-0.5">
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[11px] font-medium ${parsed.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400/70'}`}>
+              {parsed.type === 'income' ? 'Ingreso' : 'Gasto'}
+            </span>
+            <span className="text-[#222] text-[11px]">·</span>
+            <span className="text-[11px] text-[#666]">{parsed.category}</span>
+            <span className="text-[#222] text-[11px]">·</span>
+            <span className={`text-[11px] font-medium tabular-nums ${parsed.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400/70'}`}>
+              {parsed.type === 'income' ? '+' : '-'}{formatCurrency(parsed.amount)}
+            </span>
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="bg-[#c8a55a] text-black px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[#d4b468] active:scale-95 transition-all disabled:opacity-50"
+          >
+            {submitting ? '...' : 'OK'}
+          </button>
+        </div>
+      ) : (
+        <p className="mt-2 text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
+      )}
+
+      {/* Full form link */}
+      <button
+        onClick={onFullForm}
+        className="mt-1.5 text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
+      >
+        Formulario completo
+      </button>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
 // Main Page
 // ═══════════════════════════════════════════
 
@@ -337,6 +554,7 @@ export default function RiquezaPage() {
   const [period, setPeriod] = useState<Period>('month');
   const [viewingMonth, setViewingMonth] = useState(new Date());
   const [toast, setToast] = useState({ show: false, message: '' });
+  const [quickMode, setQuickMode] = useState(true);
   const addFormRef = useRef<HTMLDivElement>(null);
 
   // Toast helper
@@ -390,6 +608,17 @@ export default function RiquezaPage() {
       if (!merged.includes(dc)) merged.push(dc);
     }
     return merged.slice(0, 12);
+  }, [logs]);
+
+  // Quick Capture: description → category map from user's own history
+  const descriptionCategoryMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const l of logs) {
+      const desc = (l.description || '').toLowerCase().trim();
+      if (desc) map[desc] = l.category;
+      map[l.category.toLowerCase()] = l.category;
+    }
+    return map;
   }, [logs]);
 
   // ═══════════════════════════════════════════
@@ -521,6 +750,40 @@ export default function RiquezaPage() {
       }
     } catch (error) {
       console.error('Error submitting finance:', error);
+      setSubmitError('Error de conexión. Inténtalo de nuevo.');
+    } finally { setSubmitting(false); }
+  };
+
+  // Quick Capture submit — ultra-fast path
+  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string }) => {
+    if (submitting) return;
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      const res = await apiFetch('/api/finance', {
+        method: 'POST',
+        body: JSON.stringify({
+          date: new Date().toISOString().split('T')[0],
+          type: data.type,
+          category: data.category,
+          amount: data.amount,
+          description: data.description || null,
+          mood: null,
+        }),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setLogs(prev => [result.log, ...prev]);
+        setShowAdd(false);
+        setQuickMode(true);
+        showToast(data.type === 'income' ? 'Ingreso registrado' : 'Gasto registrado');
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('QuickCapture POST failed:', res.status, errData);
+        setSubmitError(errData?.error || 'No se pudo guardar');
+      }
+    } catch (error) {
+      console.error('Error quick capture:', error);
       setSubmitError('Error de conexión. Inténtalo de nuevo.');
     } finally { setSubmitting(false); }
   };
@@ -712,46 +975,65 @@ export default function RiquezaPage() {
             title="Tu vida financiera, con claridad"
             subtitle="Registra ingresos y gastos para entender tus patrones. Sin juicios, sin complejidad."
             cta="Registrar primer movimiento"
-            onCta={() => setShowAdd(true)}
+            onCta={() => { setQuickMode(true); setShowAdd(true); }}
             size="lg"
             variant="gold"
           />
 
-          {/* Add Form (inline, for empty state) */}
+          {/* Quick Capture / Full Form (inline, for empty state) */}
           {showAdd && (
-            <div ref={addFormRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 space-y-4 section-enter-1">
-              <div className="flex items-center justify-between">
+            <div ref={addFormRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-semibold text-white">Nuevo movimiento</h3>
-                <button onClick={() => { setShowAdd(false); setSubmitError(null); }} className="text-[#555] hover:text-[#999] transition-colors">
+                <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
                   <X size={18} />
                 </button>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => setForm({ ...form, type: 'income' })}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                  Ingreso
-                </button>
-                <button onClick={() => setForm({ ...form, type: 'expense' })}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                  Gasto
-                </button>
-              </div>
-              <div>
-                <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <div className="mt-2">
-                  <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+
+              {quickMode ? (
+                <QuickCapture
+                  onCapture={submitQuickCapture}
+                  onFullForm={() => setQuickMode(false)}
+                  submitting={submitting}
+                  historyMap={descriptionCategoryMap}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <button onClick={() => setForm({ ...form, type: 'income' })}
+                      className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                      Ingreso
+                    </button>
+                    <button onClick={() => setForm({ ...form, type: 'expense' })}
+                      className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                      Gasto
+                    </button>
+                  </div>
+                  <div>
+                    <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <div className="mt-2">
+                      <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+                    </div>
+                  </div>
+                  <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+                  {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+                  <div className="flex gap-2 pt-1">
+                    <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                      {submitting ? 'Guardando...' : 'Guardar'}
+                    </button>
+                    <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">
+                      Captura rápida
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-              <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-              <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
-              {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-              <button onClick={submitFinance} disabled={submitting} className="w-full bg-[#c8a55a] text-black font-semibold py-3 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                {submitting ? 'Guardando...' : 'Guardar movimiento'}
-              </button>
+              )}
+
+              {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
             </div>
           )}
 
@@ -951,47 +1233,63 @@ export default function RiquezaPage() {
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white">Movimientos</h2>
-              <button onClick={() => setShowAdd(!showAdd)} className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press transition-colors">
+              <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press transition-colors">
                 <Plus size={16} /> <span className="hidden sm:inline">Añadir</span>
               </button>
             </div>
 
-            {/* Add Form */}
+            {/* Quick Capture / Full Form */}
             {showAdd && (
-              <div ref={addFormRef} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-5 space-y-3 section-enter-1">
-                <div className="flex items-center justify-between">
+              <div ref={addFormRef} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-5 section-enter-1">
+                <div className="flex items-center justify-between mb-3">
                   <span className="text-xs text-[#555] uppercase tracking-wider">Nuevo movimiento</span>
-                  <button onClick={() => { setShowAdd(false); setSubmitError(null); }} className="text-[#555] hover:text-[#999] transition-colors">
+                  <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
                     <X size={16} />
                   </button>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setForm({ ...form, type: 'income' })}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                    Ingreso
-                  </button>
-                  <button onClick={() => setForm({ ...form, type: 'expense' })}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                    Gasto
-                  </button>
-                </div>
-                <div>
-                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                  <div className="mt-2">
-                    <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+
+                {quickMode ? (
+                  <QuickCapture
+                    onCapture={submitQuickCapture}
+                    onFullForm={() => setQuickMode(false)}
+                    submitting={submitting}
+                    historyMap={descriptionCategoryMap}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <button onClick={() => setForm({ ...form, type: 'income' })}
+                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                        Ingreso
+                      </button>
+                      <button onClick={() => setForm({ ...form, type: 'expense' })}
+                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                        Gasto
+                      </button>
+                    </div>
+                    <div>
+                      <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                        className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                      <div className="mt-2">
+                        <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+                      </div>
+                    </div>
+                    <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+                      className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+                    {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+                      <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-[#c8a55a] transition-colors">
+                        Captura rápida
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
-                {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-                <div className="flex gap-2 pt-1">
-                  <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                  <button onClick={() => { setShowAdd(false); setSubmitError(null); }} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
-                </div>
+                )}
+
+                {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
               </div>
             )}
 
@@ -1084,7 +1382,7 @@ export default function RiquezaPage() {
                 title="Sin movimientos en este período"
                 subtitle="Cambia el filtro o añade un nuevo registro."
                 cta="Añadir movimiento"
-                onCta={() => setShowAdd(true)}
+                onCta={() => { setQuickMode(true); setShowAdd(true); }}
                 size="sm"
                 variant="gold"
               />
@@ -1099,7 +1397,7 @@ export default function RiquezaPage() {
       {/* ── Floating Action Button ── */}
       {!isEmpty && !editingLog && !pendingDeleteId && (
         <button
-          onClick={() => setShowAdd(true)}
+          onClick={() => { setQuickMode(true); setShowAdd(true); }}
           className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#c8a55a] text-black rounded-2xl shadow-lg shadow-[#c8a55a]/25 flex items-center justify-center hover:bg-[#d4b468] active:scale-95 transition-all touch-press"
           title="Añadir movimiento"
         >
@@ -1107,45 +1405,64 @@ export default function RiquezaPage() {
         </button>
       )}
 
-      {/* ── FAB Add Form Overlay ── */}
+      {/* ── FAB Quick Capture / Full Form Overlay ── */}
       {!isEmpty && showAdd && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop" onClick={() => { setShowAdd(false); setSubmitError(null); }}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop" onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }}>
           <div
-            className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md space-y-3 section-enter-1"
+            className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md section-enter-1"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
-              <button onClick={() => { setShowAdd(false); setSubmitError(null); }} className="text-[#555] hover:text-[#999] transition-colors">
+              <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
                 <X size={18} />
               </button>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setForm({ ...form, type: 'income' })}
-                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>
-                Ingreso
-              </button>
-              <button onClick={() => setForm({ ...form, type: 'expense' })}
-                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>
-                Gasto
-              </button>
-            </div>
-            <div>
-              <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-              <div className="mt-2">
-                <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+
+            {quickMode ? (
+              <QuickCapture
+                onCapture={submitQuickCapture}
+                onFullForm={() => setQuickMode(false)}
+                submitting={submitting}
+                historyMap={descriptionCategoryMap}
+              />
+            ) : (
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button onClick={() => setForm({ ...form, type: 'income' })}
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>
+                    Ingreso
+                  </button>
+                  <button onClick={() => setForm({ ...form, type: 'expense' })}
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>
+                    Gasto
+                  </button>
+                </div>
+                <div>
+                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <div className="mt-2">
+                    <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+                  </div>
+                </div>
+                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+                {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+                <div className="flex gap-2 pt-1">
+                  <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {submitting ? 'Guardando...' : 'Guardar'}
+                  </button>
+                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">
+                    Captura rápida
+                  </button>
+                </div>
               </div>
-            </div>
-            <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-              className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-            <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-            <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
-            {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-            <button onClick={submitFinance} disabled={submitting} className="w-full bg-[#c8a55a] text-black font-semibold py-3 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              {submitting ? 'Guardando...' : 'Guardar movimiento'}
-            </button>
+            )}
+
+            {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
           </div>
         </div>
       )}
