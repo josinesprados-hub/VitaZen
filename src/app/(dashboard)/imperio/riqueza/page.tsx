@@ -4,11 +4,9 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import {
-  Gem, Plus, TrendingDown, TrendingUp, Pencil, Trash2, Wallet,
-  ChevronLeft, ChevronRight, ArrowUpRight, ArrowDownRight, Minus,
-  Activity, Target, Sparkles, CircleDot, CalendarDays, X, Check
+  Gem, Plus, Pencil, Trash2, Wallet,
+  ChevronLeft, ChevronRight, CalendarDays, X, Check
 } from 'lucide-react';
-import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -31,25 +29,12 @@ interface FinanceLog {
   createdAt: string;
 }
 
-type Period = 'week' | 'month' | 'prev' | 'all';
+type Period = 'month' | 'prev' | 'all';
 
 // ═══════════════════════════════════════════
 // Context tags — for future emotional pattern detection
-// Keywords that suggest emotional/social contexts behind spending
 // ═══════════════════════════════════════════
 
-const CONTEXT_TAGS: Record<string, string> = {
-  social: 'social',
-  difficult: 'difficult',
-  calm: 'calm',
-  impulsive: 'impulsive',
-  celebration: 'celebration',
-  necessity: 'necessity',
-  routine: 'routine',
-  growth: 'growth',
-};
-
-// Keywords in contexto that map to emotional patterns (for future insights)
 const CONTEXT_EMOTION_MAP: [RegExp, string][] = [
   [/\b(amigos|amiga|amigo|social|cumple|fiesta|cena con|quedada|bar|copa|grupo|compañero|pareja|familia|mamá|papa|regalo)\b/i, 'social'],
   [/\b(complicado|difícil|estrés|mal|tough|agotado|ansiedad|malo|duro|crisis|problema)\b/i, 'difficult'],
@@ -61,7 +46,6 @@ const CONTEXT_EMOTION_MAP: [RegExp, string][] = [
   [/\b(curso|aprend|libro|formación|crecimiento|inversión|futuro|mejora|desarrollo)\b/i, 'growth'],
 ];
 
-// Detect emotional context from contexto text (for future pattern analysis)
 function detectContextTags(contexto: string): string[] {
   if (!contexto?.trim()) return [];
   const tags: string[] = [];
@@ -73,7 +57,10 @@ function detectContextTags(contexto: string): string[] {
   return tags;
 }
 
-// "Este movimiento aporta" — premium consciousness labels
+// ═══════════════════════════════════════════
+// Intenciones — the soul of Finanzas
+// ═══════════════════════════════════════════
+
 const INTENTIONS = [
   { value: 'tranquility', label: 'Tranquilidad' },
   { value: 'growth', label: 'Crecimiento' },
@@ -81,7 +68,6 @@ const INTENTIONS = [
   { value: 'enjoyment', label: 'Disfrute' },
 ] as const;
 
-// Legacy mood → new intention mapping
 const LEGACY_MOOD_MAP: Record<string, string> = {
   calm: 'tranquility',
   conscious: 'growth',
@@ -89,7 +75,6 @@ const LEGACY_MOOD_MAP: Record<string, string> = {
   impulse: 'enjoyment',
 };
 
-// Default category suggestions (smart — adapts to user's history)
 const DEFAULT_CATEGORIES = [
   'Comida', 'Transporte', 'Ocio', 'Salud', 'Compras',
   'Vivienda', 'Educación', 'Suscripción', 'Trabajo', 'Otros',
@@ -128,7 +113,6 @@ function parseQuickCapture(input: string, historyMap: Record<string, string>): P
   let descriptionTokens: string[] = [];
   let amountFound = false;
 
-  // Strategy 1: Amount at the end (most common: "Café 3,50")
   for (let i = tokens.length - 1; i >= 0; i--) {
     if (/^[\d.,]+$/.test(tokens[i])) {
       const parsed = parseEuropeanQuick(tokens[i]);
@@ -141,7 +125,6 @@ function parseQuickCapture(input: string, historyMap: Record<string, string>): P
     }
   }
 
-  // Strategy 2: Amount at the beginning ("3,50 café")
   if (!amountFound && /^[\d.,]+$/.test(tokens[0])) {
     const parsed = parseEuropeanQuick(tokens[0]);
     if (parsed > 0) {
@@ -151,7 +134,6 @@ function parseQuickCapture(input: string, historyMap: Record<string, string>): P
     }
   }
 
-  // Strategy 3: Extract with € symbol ("Café 3,50€")
   if (!amountFound) {
     const match = input.match(/([\d.,]+)\s*€?\s*$/);
     if (match) {
@@ -169,14 +151,12 @@ function parseQuickCapture(input: string, historyMap: Record<string, string>): P
   const description = descriptionTokens.join(' ').trim();
   const textToMatch = description || input;
 
-  // Smart category: check user history first (exact description match)
   let category = '';
   const descLower = textToMatch.toLowerCase();
   if (historyMap[descLower]) {
     category = historyMap[descLower];
   }
 
-  // Fallback: keyword mapping
   if (!category) {
     for (const [regex, cat] of KEYWORD_CATEGORIES) {
       if (regex.test(textToMatch)) {
@@ -188,7 +168,6 @@ function parseQuickCapture(input: string, historyMap: Record<string, string>): P
 
   if (!category) category = 'Otros';
 
-  // Determine type: income keywords override default 'expense'
   const type: 'expense' | 'income' = INCOME_KEYWORDS.test(textToMatch) ? 'income' : 'expense';
 
   return {
@@ -233,18 +212,6 @@ function getMonthRange(date: Date) {
   return { start, end };
 }
 
-function getWeekRange(date: Date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
-  const start = new Date(d.setDate(diff));
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
-}
-
 function filterLogsByRange(logs: FinanceLog[], start: Date, end: Date) {
   return logs.filter(l => {
     const d = new Date(l.date);
@@ -268,69 +235,9 @@ function getIntentionLabel(mood: string | null) {
   return INTENTIONS.find(i => i.value === resolved) || null;
 }
 
-function getHealthStatus(savingsRate: number, balance: number) {
-  if (balance < 0) return { label: 'Atento', color: 'text-amber-400', dot: 'bg-amber-400' };
-  if (savingsRate >= 20) return { label: 'Estable', color: 'text-emerald-400', dot: 'bg-emerald-400' };
-  if (savingsRate >= 5) return { label: 'Consciente', color: 'text-[#c8a55a]', dot: 'bg-[#c8a55a]' };
-  return { label: 'Ajustando', color: 'text-orange-300', dot: 'bg-orange-300' };
-}
-
-function getDayOfWeekPattern(logs: FinanceLog[]) {
-  const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-  const totals = Array(7).fill(0);
-  const counts = Array(7).fill(0);
-  const expenses = logs.filter(l => l.type === 'expense');
-  for (const l of expenses) {
-    const d = new Date(l.date);
-    let idx = d.getDay() - 1; // Mon=0
-    if (idx < 0) idx = 6; // Sun=6
-    totals[idx] += l.amount;
-    counts[idx]++;
-  }
-  // Average per day-of-week (only count days with data)
-  const avgs = totals.map((t, i) => counts[i] > 0 ? t / counts[i] : 0);
-  const maxAvg = Math.max(...avgs, 1);
-  const peakIdx = avgs.indexOf(Math.max(...avgs));
-
-  return {
-    days,
-    avgs,
-    maxAvg,
-    peakDay: avgs[peakIdx] > 0 ? days[peakIdx] : null,
-    hasPattern: expenses.length >= 7,
-  };
-}
-
-function getInsight(
-  balance: number,
-  savingsRate: number,
-  prevBalance: number,
-  prevSavingsRate: number,
-  hasPrevData: boolean,
-  dayPattern: ReturnType<typeof getDayOfWeekPattern>,
-  totalLogs: number
-) {
-  // First-time user insights
-  if (totalLogs < 3) return 'Cada registro añade claridad. Empieza por lo sencillo.';
-
-  // Day-of-week pattern insight
-  if (dayPattern.hasPattern && dayPattern.peakDay) {
-    return `Tus gastos más altos suelen ser los ${dayPattern.peakDay.toLowerCase()}.`;
-  }
-
-  if (!hasPrevData) {
-    if (balance > 0) return 'Primer mes registrado. Los datos dan claridad.';
-    if (balance < 0) return 'Primer mes registrado. Registrar ya es avanzar.';
-    return 'Cada registro añade claridad a tus decisiones.';
-  }
-  if (balance > 0 && prevBalance <= 0) return 'Balance positivo este mes.';
-  if (balance < 0 && prevBalance >= 0) return 'Gastos por encima de ingresos este mes.';
-  if (savingsRate > prevSavingsRate + 5) return 'Tasa de ahorro en mejora clara.';
-  if (savingsRate > prevSavingsRate) return 'Tasa de ahorro superior al mes anterior.';
-  if (savingsRate < prevSavingsRate - 10) return 'Tasa de ahorro inferior al mes anterior.';
-  if (savingsRate < prevSavingsRate) return 'Tasa de ahorro ligeramente inferior.';
-  if (balance > 0) return 'Mes consistente en positivo.';
-  return 'Los datos se construyen con cada registro.';
+function resolveIntention(mood: string | null): string | null {
+  if (!mood) return null;
+  return LEGACY_MOOD_MAP[mood] || mood;
 }
 
 // ═══════════════════════════════════════════
@@ -382,86 +289,40 @@ function CategoryChips({ categories, value, onChange }: { categories: string[]; 
   );
 }
 
-function ChangeIndicator({ current, previous, label, invert = false }: { current: number; previous: number; label: string; invert?: boolean }) {
-  if (previous === 0) return <span className="text-[#555] text-xs">Sin datos previos</span>;
-  const change = ((current - previous) / Math.abs(previous)) * 100;
-  const isPositive = invert ? change < 0 : change > 0;
-  const Icon = change > 0 ? ArrowUpRight : change < 0 ? ArrowDownRight : Minus;
-  return (
-    <span className={`flex items-center gap-1 text-xs ${isPositive ? 'text-emerald-400' : change === 0 ? 'text-[#666]' : 'text-amber-400'}`}>
-      <Icon size={12} />
-      {Math.abs(change).toFixed(0)}% {label}
-    </span>
-  );
+// ═══════════════════════════════════════════
+// Balance de Intenciones — the home of Finanzas
+// ═══════════════════════════════════════════
+
+interface IntentionFlow {
+  intention: string;
+  label: string;
+  amount: number;
+  count: number;
 }
 
-// Weekly pulse — 7 mini bars showing daily net balance
-function WeeklyPulse({ logs }: { logs: FinanceLog[] }) {
-  const { start: weekStart } = getWeekRange(new Date());
-  const dailyBalances = Array(7).fill(0);
-  const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; totalExpense: number }) {
+  const maxAmount = Math.max(...flows.map(f => f.amount), 1);
+  const hasData = flows.some(f => f.amount > 0);
 
-  for (const l of logs) {
-    const d = new Date(l.date);
-    if (d >= weekStart) {
-      let idx = d.getDay() - 1;
-      if (idx < 0) idx = 6;
-      dailyBalances[idx] += l.type === 'income' ? l.amount : -l.amount;
-    }
-  }
-
-  const maxAbs = Math.max(...dailyBalances.map(Math.abs), 1);
-  const today = new Date();
-  let todayIdx = today.getDay() - 1;
-  if (todayIdx < 0) todayIdx = 6;
+  if (!hasData) return null;
 
   return (
-    <div className="flex items-end gap-1 h-10">
-      {dailyBalances.map((bal, i) => {
-        const h = maxAbs > 0 ? Math.max((Math.abs(bal) / maxAbs) * 100, 4) : 4;
-        const isToday = i === todayIdx;
-        const isPositive = bal >= 0;
+    <div className="space-y-4">
+      {flows.map((flow) => {
+        if (flow.amount <= 0) return null;
+        const barWidth = maxAmount > 0 ? (flow.amount / maxAmount) * 100 : 0;
         return (
-          <div key={i} className="flex flex-col items-center gap-0.5 flex-1">
-            <div
-              className={`w-full rounded-sm transition-all duration-300 ${
-                isToday
-                  ? isPositive ? 'bg-[#c8a55a]' : 'bg-amber-400'
-                  : isPositive ? 'bg-[#c8a55a]/30' : 'bg-amber-400/30'
-              }`}
-              style={{ height: `${h}%`, minHeight: '2px' }}
-            />
-            <span className={`text-[8px] ${isToday ? 'text-[#c8a55a]' : 'text-[#444]'}`}>
-              {dayLabels[i]}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// Day-of-week spending pattern — mini horizontal bars
-function DayPattern({ pattern }: { pattern: ReturnType<typeof getDayOfWeekPattern> }) {
-  if (!pattern.hasPattern) return null;
-
-  return (
-    <div className="space-y-1.5">
-      {pattern.days.map((day, i) => {
-        const pct = pattern.maxAvg > 0 ? (pattern.avgs[i] / pattern.maxAvg) * 100 : 0;
-        const isPeak = pattern.avgs[i] === Math.max(...pattern.avgs) && pattern.avgs[i] > 0;
-        return (
-          <div key={day} className="flex items-center gap-2">
-            <span className={`text-[10px] w-6 ${isPeak ? 'text-[#c8a55a]' : 'text-[#444]'}`}>{day}</span>
-            <div className="flex-1 h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
+          <div key={flow.intention} className="space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-[13px] text-[#999] tracking-wide">{flow.label}</span>
+              <span className="text-[12px] text-[#555] tabular-nums">{formatCurrency(flow.amount)}</span>
+            </div>
+            <div className="h-1.5 bg-[#111] rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  isPeak ? 'bg-[#c8a55a]' : 'bg-[#c8a55a]/25'
-                }`}
-                style={{ width: `${Math.max(pct, 0)}%` }}
+                className="h-full rounded-full bg-[#c8a55a]/30 transition-all duration-700"
+                style={{ width: `${Math.max(barWidth, 0)}%` }}
               />
             </div>
-            {isPeak && <span className="text-[9px] text-[#c8a55a]/60">pico</span>}
           </div>
         );
       })}
@@ -540,7 +401,6 @@ function QuickCapture({
         />
       </div>
 
-      {/* Live preview */}
       {parsed && parsed.amount > 0 ? (
         <div className="mt-2 flex items-center justify-between px-0.5">
           <div className="flex items-center gap-1.5">
@@ -566,7 +426,6 @@ function QuickCapture({
         <p className="mt-2 text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
       )}
 
-      {/* ¿Qué pasó? — optional personal context */}
       <div className="mt-3">
         <input
           type="text"
@@ -578,7 +437,6 @@ function QuickCapture({
         />
       </div>
 
-      {/* Full form link */}
       <button
         onClick={onFullForm}
         className="mt-2 text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
@@ -613,13 +471,11 @@ export default function RiquezaPage() {
   const [quickMode, setQuickMode] = useState(true);
   const addFormRef = useRef<HTMLDivElement>(null);
 
-  // Toast helper
   const showToast = useCallback((message: string) => {
     setToast({ show: true, message });
     setTimeout(() => setToast({ show: false, message: '' }), 2000);
   }, []);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
     if (pendingDeleteId || editingLog) {
       document.body.classList.add('scroll-locked');
@@ -627,7 +483,6 @@ export default function RiquezaPage() {
     }
   }, [pendingDeleteId, editingLog]);
 
-  // Scroll to add form when opened
   useEffect(() => {
     if (showAdd && addFormRef.current) {
       addFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -649,7 +504,7 @@ export default function RiquezaPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   // ═══════════════════════════════════════════
-  // Smart category suggestions (from user's own history)
+  // Smart category suggestions
   // ═══════════════════════════════════════════
 
   const userCategories = useMemo(() => {
@@ -658,7 +513,6 @@ export default function RiquezaPage() {
       freq[l.category] = (freq[l.category] || 0) + 1;
     }
     const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).map(([cat]) => cat);
-    // Merge with defaults, user's most-used first
     const merged = [...sorted];
     for (const dc of DEFAULT_CATEGORIES) {
       if (!merged.includes(dc)) merged.push(dc);
@@ -666,7 +520,6 @@ export default function RiquezaPage() {
     return merged.slice(0, 12);
   }, [logs]);
 
-  // Quick Capture: description → category map from user's own history
   const descriptionCategoryMap = useMemo(() => {
     const map: Record<string, string> = {};
     for (const l of logs) {
@@ -678,90 +531,94 @@ export default function RiquezaPage() {
   }, [logs]);
 
   // ═══════════════════════════════════════════
-  // Computed Metrics
+  // Computed — month ranges
   // ═══════════════════════════════════════════
 
   const [currentMonthRange, prevMonthRange] = useMemo(() => {
     return [getMonthRange(viewingMonth), getMonthRange(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))];
   }, [viewingMonth]);
 
-  const currentWeekRange = useMemo(() => getWeekRange(new Date()), []);
-
-  // Current month logs
   const currentMonthLogs = useMemo(
     () => filterLogsByRange(logs, currentMonthRange.start, currentMonthRange.end),
     [logs, currentMonthRange]
   );
 
-  // Previous month logs
   const prevMonthLogs = useMemo(
     () => filterLogsByRange(logs, prevMonthRange.start, prevMonthRange.end),
     [logs, prevMonthRange]
   );
 
-  // Current week logs
-  const weekLogs = useMemo(
-    () => filterLogsByRange(logs, currentWeekRange.start, currentWeekRange.end),
-    [logs, currentWeekRange]
-  );
-
-  // Period-filtered logs (for history display)
   const periodLogs = useMemo(() => {
     switch (period) {
-      case 'week': return weekLogs;
       case 'month': return currentMonthLogs;
       case 'prev': return prevMonthLogs;
       case 'all': return logs;
     }
-  }, [period, currentMonthLogs, prevMonthLogs, weekLogs, logs]);
+  }, [period, currentMonthLogs, prevMonthLogs, logs]);
 
-  // Current month metrics
+  // ═══════════════════════════════════════════
+  // Computed — financial overview
+  // ═══════════════════════════════════════════
+
   const cmIncome = currentMonthLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
   const cmExpense = currentMonthLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
   const cmBalance = cmIncome - cmExpense;
-  const cmSavingsRate = cmIncome > 0 ? (cmBalance / cmIncome) * 100 : 0;
 
-  // Previous month metrics
-  const pmIncome = prevMonthLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
-  const pmExpense = prevMonthLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
-  const pmBalance = pmIncome - pmExpense;
-  const pmSavingsRate = pmIncome > 0 ? (pmBalance / pmIncome) * 100 : 0;
+  // ═══════════════════════════════════════════
+  // Computed — Intention Balance (the home)
+  // ═══════════════════════════════════════════
 
-  // Week metrics
-  const weekIncome = weekLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
-  const weekExpense = weekLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
-
-  // Health status
-  const health = getHealthStatus(cmSavingsRate, cmBalance);
-
-  // Category breakdown (current month, expenses only)
-  const categoryBreakdown = useMemo(() => {
+  const intentionFlows = useMemo(() => {
     const totals: Record<string, number> = {};
-    for (const l of currentMonthLogs.filter(l => l.type === 'expense')) {
-      totals[l.category] = (totals[l.category] || 0) + l.amount;
+    const counts: Record<string, number> = {};
+    let unassigned = 0;
+
+    for (const l of currentMonthLogs) {
+      const resolved = resolveIntention(l.mood);
+      if (resolved && totals[resolved] !== undefined) {
+        totals[resolved] += l.amount;
+        counts[resolved] = (counts[resolved] || 0) + 1;
+      } else if (resolved) {
+        totals[resolved] = l.amount;
+        counts[resolved] = 1;
+      } else {
+        unassigned += l.amount;
+      }
     }
-    return Object.entries(totals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+
+    const flows: IntentionFlow[] = INTENTIONS.map(i => ({
+      intention: i.value,
+      label: i.label,
+      amount: totals[i.value] || 0,
+      count: counts[i.value] || 0,
+    }));
+
+    if (unassigned > 0) {
+      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+    }
+
+    return flows;
   }, [currentMonthLogs]);
 
-  const maxCategoryAmount = categoryBreakdown.length > 0 ? categoryBreakdown[0][1] : 0;
+  const hasIntentions = intentionFlows.some(f => f.amount > 0 && f.intention !== 'unassigned');
 
-  // Day-of-week spending pattern
-  const dayPattern = useMemo(() => getDayOfWeekPattern(logs), [logs]);
+  // Dominant intention — for observational insight
+  const dominantIntention = useMemo(() => {
+    if (!hasIntentions) return null;
+    const withIntention = intentionFlows.filter(f => f.intention !== 'unassigned' && f.amount > 0);
+    if (withIntention.length === 0) return null;
+    withIntention.sort((a, b) => b.amount - a.amount);
+    return withIntention[0];
+  }, [intentionFlows, hasIntentions]);
 
-  // Insight
-  const insight = getInsight(cmBalance, cmSavingsRate, pmBalance, pmSavingsRate, prevMonthLogs.length > 0, dayPattern, logs.length);
+  // ═══════════════════════════════════════════
+  // Computed — grouped history
+  // ═══════════════════════════════════════════
 
-  // Grouped history
   const groupedHistory = useMemo(() => groupLogsByDate(periodLogs), [periodLogs]);
 
-  // Month navigation
   const monthLabel = viewingMonth.toLocaleDateString('es', { month: 'long', year: 'numeric' });
   const isCurrentMonth = viewingMonth.getMonth() === new Date().getMonth() && viewingMonth.getFullYear() === new Date().getFullYear();
-
-  // Balance bar visual (income vs expense proportion)
-  const balanceBarWidth = cmIncome > 0 ? Math.min((cmExpense / cmIncome) * 100, 100) : 0;
 
   // ═══════════════════════════════════════════
   // Actions
@@ -769,15 +626,8 @@ export default function RiquezaPage() {
 
   const submitFinance = async () => {
     if (submitting) return;
-
-    if (!form.category.trim()) {
-      setSubmitError('La categoría es obligatoria');
-      return;
-    }
-    if (!form.amount || form.amount <= 0) {
-      setSubmitError('La cantidad debe ser mayor que 0');
-      return;
-    }
+    if (!form.category.trim()) { setSubmitError('La categoría es obligatoria'); return; }
+    if (!form.amount || form.amount <= 0) { setSubmitError('La cantidad debe ser mayor que 0'); return; }
 
     setSubmitError(null);
     setSubmitting(true);
@@ -799,19 +649,16 @@ export default function RiquezaPage() {
         setLogs(prev => [data.log, ...prev]);
         setShowAdd(false);
         setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
-        showToast(form.type === 'income' ? 'Ingreso registrado' : 'Gasto registrado');
+        showToast('Registrado');
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('Finance POST failed:', res.status, errData);
-        setSubmitError(errData?.error || 'No se pudo guardar el movimiento');
+        setSubmitError(errData?.error || 'No se pudo guardar');
       }
     } catch (error) {
-      console.error('Error submitting finance:', error);
       setSubmitError('Error de conexión. Inténtalo de nuevo.');
     } finally { setSubmitting(false); }
   };
 
-  // Quick Capture submit — ultra-fast path
   const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
     if (submitting) return;
     setSubmitError(null);
@@ -834,14 +681,12 @@ export default function RiquezaPage() {
         setLogs(prev => [result.log, ...prev]);
         setShowAdd(false);
         setQuickMode(true);
-        showToast(data.type === 'income' ? 'Ingreso registrado' : 'Gasto registrado');
+        showToast('Registrado');
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('QuickCapture POST failed:', res.status, errData);
         setSubmitError(errData?.error || 'No se pudo guardar');
       }
     } catch (error) {
-      console.error('Error quick capture:', error);
       setSubmitError('Error de conexión. Inténtalo de nuevo.');
     } finally { setSubmitting(false); }
   };
@@ -861,15 +706,8 @@ export default function RiquezaPage() {
 
   const saveEdit = async () => {
     if (!editingLog) return;
-
-    if (!editForm.category.trim()) {
-      setSubmitError('La categoría es obligatoria');
-      return;
-    }
-    if (!editForm.amount || editForm.amount <= 0) {
-      setSubmitError('La cantidad debe ser mayor que 0');
-      return;
-    }
+    if (!editForm.category.trim()) { setSubmitError('La categoría es obligatoria'); return; }
+    if (!editForm.amount || editForm.amount <= 0) { setSubmitError('La cantidad debe ser mayor que 0'); return; }
 
     setSubmitError(null);
     setEditSaving(true);
@@ -891,17 +729,14 @@ export default function RiquezaPage() {
         const data = await res.json();
         setLogs(prev => prev.map(l => l.id === editingLog.id ? data.log : l));
         setEditingLog(null);
-        showToast('Movimiento actualizado');
+        showToast('Actualizado');
       } else {
         const errData = await res.json().catch(() => ({}));
-        console.error('Finance PUT failed:', res.status, errData);
-        setSubmitError(errData?.error || 'No se pudo actualizar el movimiento');
+        setSubmitError(errData?.error || 'No se pudo actualizar');
       }
     } catch (error) {
-      console.error('Error updating finance log:', error);
       setSubmitError('Error de conexión. Inténtalo de nuevo.');
-    }
-    finally { setEditSaving(false); }
+    } finally { setEditSaving(false); }
   };
 
   const confirmDelete = async () => {
@@ -913,10 +748,7 @@ export default function RiquezaPage() {
       });
       if (res.ok) {
         setLogs(prev => prev.filter(l => l.id !== pendingDeleteId));
-        showToast('Movimiento eliminado');
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        console.error('Finance DELETE failed:', res.status, errData);
+        showToast('Eliminado');
       }
     } catch (error) { console.error('Error deleting finance log:', error); }
     finally { setPendingDeleteId(null); }
@@ -927,7 +759,7 @@ export default function RiquezaPage() {
   // ═══════════════════════════════════════════
 
   if (loading) {
-    return <EmpireSkeleton message="Cargando tus finanzas..." />;
+    return <EmpireSkeleton message="Cargando..." />;
   }
 
   if (fetchError) {
@@ -935,7 +767,7 @@ export default function RiquezaPage() {
       <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
         <PremiumErrorState
           variant="loading"
-          title="No se pudo cargar el imperio"
+          title="No se pudo cargar"
           onRetry={fetchData}
           size="md"
         />
@@ -950,8 +782,7 @@ export default function RiquezaPage() {
   const isEmpty = logs.length === 0;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-24">
-      {/* ── Save Toast ── */}
+    <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10 pb-24">
       <SaveToast show={toast.show} message={toast.message} />
 
       {/* ── Edit Overlay ── */}
@@ -987,9 +818,7 @@ export default function RiquezaPage() {
               <input type="text" placeholder="¿Qué pasó? (opcional)" value={editForm.contexto} onChange={(e) => setEditForm({ ...editForm, contexto: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#444] italic" />
               <IntentionSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
-              {submitError && (
-                <p className="text-red-400 text-xs py-1">{submitError}</p>
-              )}
+              {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
@@ -1023,26 +852,25 @@ export default function RiquezaPage() {
             <Gem size={28} className="text-[#c8a55a]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Finanzas</h1>
-            <p className="text-[#999] text-sm">Consciencia, disciplina y libertad</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Finanzas</h1>
+            <p className="text-[#666] text-sm">Cómo fluye tu dinero</p>
           </div>
         </div>
       </div>
 
-      {/* ── Empty State (full page, premium) ── */}
+      {/* ── Empty State ── */}
       {isEmpty ? (
         <div className="space-y-8">
           <PremiumEmptyState
             icon={Wallet}
-            title="Tu vida financiera, con claridad"
-            subtitle="Registra ingresos y gastos para entender tus patrones. Sin juicios, sin complejidad."
+            title="Tu dinero refleja quien eres"
+            subtitle="Registra ingresos y gastos para ver hacia donde fluye tu energía financiera."
             cta="Registrar primer movimiento"
             onCta={() => { setQuickMode(true); setShowAdd(true); }}
             size="lg"
             variant="gold"
           />
 
-          {/* Quick Capture / Full Form (inline, for empty state) */}
           {showAdd && (
             <div ref={addFormRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
               <div className="flex items-center justify-between mb-4">
@@ -1051,252 +879,103 @@ export default function RiquezaPage() {
                   <X size={18} />
                 </button>
               </div>
-
               {quickMode ? (
-                <QuickCapture
-                  onCapture={submitQuickCapture}
-                  onFullForm={() => setQuickMode(false)}
-                  submitting={submitting}
-                  historyMap={descriptionCategoryMap}
-                />
+                <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
               ) : (
                 <div className="space-y-3">
                   <div className="flex gap-2">
-                    <button onClick={() => setForm({ ...form, type: 'income' })}
-                      className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                      Ingreso
-                    </button>
-                    <button onClick={() => setForm({ ...form, type: 'expense' })}
-                      className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                      Gasto
-                    </button>
+                    <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+                    <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
                   </div>
                   <div>
-                    <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                    <div className="mt-2">
-                      <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
-                    </div>
+                    <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
                   </div>
-                  <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                  <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                  <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
+                  <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
                   <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                   {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                   <div className="flex gap-2 pt-1">
-                    <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                      {submitting ? 'Guardando...' : 'Guardar'}
-                    </button>
-                    <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">
-                      Captura rápida
-                    </button>
+                    <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+                    <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">Captura rápida</button>
                   </div>
                 </div>
               )}
-
               {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
             </div>
           )}
-
-          <EmpireTipsSection empire="riqueza" subtitle="Estrategias financieras para una base sólida" />
         </div>
       ) : (
         <>
           {/* ══════════════════════════════════
               NON-EMPTY STATE
+              New hierarchy:
+              1. Balance de Intenciones
+              2. Saldo neto
+              3. Insight (only if real)
+              4. Historial
               ══════════════════════════════════ */}
 
-          {/* ── Financial Insight ── */}
-          <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-xl p-4 sm:p-5 section-enter-1">
-            <div className="flex items-start gap-3">
-              <Sparkles size={16} className="text-[#c8a55a] mt-0.5 flex-shrink-0" />
-              <p className="text-[#c8a55a]/90 text-sm italic leading-relaxed">{insight}</p>
-            </div>
-          </div>
-
-          {/* ── Monthly Summary ── */}
-          <div className="space-y-3 sm:space-y-4 section-enter-1">
-            {/* Month Navigation */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))}
-                className="p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <div className="flex items-center gap-2">
-                <CalendarDays size={14} className="text-[#c8a55a]/60" />
-                <h2 className="text-sm font-medium text-white capitalize">{monthLabel}</h2>
-                {!isCurrentMonth && (
-                  <button
-                    onClick={() => setViewingMonth(new Date())}
-                    className="text-[10px] text-[#c8a55a]/60 hover:text-[#c8a55a] ml-1 underline underline-offset-2"
-                  >
-                    Hoy
-                  </button>
-                )}
-              </div>
-              <button
-                onClick={() => setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))}
-                className="p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-
-            {/* Balance Flow Visual */}
-            {cmIncome > 0 && (
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4 sm:p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs text-[#666]">Flujo del mes</span>
-                  <span className={`text-xs font-medium ${cmBalance >= 0 ? 'text-[#c8a55a]' : 'text-amber-400'}`}>
-                    {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-[#c8a55a]/60 w-14">Ingresos</span>
-                    <div className="flex-1 h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-[#c8a55a]/60 transition-all duration-500" style={{ width: '100%' }} />
-                    </div>
-                    <span className="text-xs text-[#c8a55a] w-20 text-right">{formatCurrency(cmIncome)}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-red-400/60 w-14">Gastos</span>
-                    <div className="flex-1 h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-red-400/40 transition-all duration-500" style={{ width: `${balanceBarWidth}%` }} />
-                    </div>
-                    <span className="text-xs text-red-400/80 w-20 text-right">{formatCurrency(cmExpense)}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Health + Savings Rate Row */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Activity size={14} className="text-[#666]" />
-                  <p className="text-xs text-[#666]">Estado</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${health.dot}`} />
-                  <span className={`text-base sm:text-lg font-bold ${health.color}`}>{health.label}</span>
-                </div>
-                {prevMonthLogs.length > 0 && (
-                  <div className="mt-2">
-                    <ChangeIndicator current={cmSavingsRate} previous={pmSavingsRate} label="ahorro" />
-                  </div>
-                )}
-              </div>
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target size={14} className="text-[#666]" />
-                  <p className="text-xs text-[#666]">Tasa de ahorro</p>
-                </div>
-                <p className={`text-base sm:text-lg font-bold ${cmSavingsRate >= 20 ? 'text-emerald-400' : cmSavingsRate >= 5 ? 'text-[#c8a55a]' : cmSavingsRate >= 0 ? 'text-orange-300' : 'text-amber-400'}`}>
-                  {cmIncome > 0 ? `${cmSavingsRate.toFixed(0)}%` : '--'}
-                </p>
-                <p className="text-xs text-[#555] mt-1 capitalize">{monthLabel}</p>
-              </div>
-            </div>
-
-            {/* Income / Expense / Balance Row */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
-                <p className="text-xs text-[#666] mb-1">Ingresos</p>
-                <p className="text-sm sm:text-lg font-bold text-[#c8a55a]">+{formatCurrency(cmIncome)}</p>
-                {prevMonthLogs.length > 0 && (
-                  <div className="mt-1.5"><ChangeIndicator current={cmIncome} previous={pmIncome} label="vs anterior" /></div>
-                )}
-              </div>
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
-                <p className="text-xs text-[#666] mb-1">Gastos</p>
-                <p className="text-sm sm:text-lg font-bold text-red-400">-{formatCurrency(cmExpense)}</p>
-                {prevMonthLogs.length > 0 && (
-                  <div className="mt-1.5"><ChangeIndicator current={cmExpense} previous={pmExpense} label="vs anterior" invert /></div>
-                )}
-              </div>
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
-                <p className="text-xs text-[#666] mb-1">Balance</p>
-                <p className={`text-sm sm:text-lg font-bold ${cmBalance >= 0 ? 'text-[#c8a55a]' : 'text-amber-400'}`}>
-                  {formatCurrency(cmBalance)}
-                </p>
-                {prevMonthLogs.length > 0 && (
-                  <div className="mt-1.5"><ChangeIndicator current={cmBalance} previous={pmBalance} label="vs anterior" /></div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Weekly Pulse ── */}
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4 sm:p-5 section-enter-2">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Activity size={14} className="text-[#c8a55a]/60" />
-                <span className="text-xs text-[#666]">Pulso semanal</span>
-              </div>
-              <span className="text-xs text-[#555]">
-                {weekIncome > 0 && <span className="text-[#c8a55a]/60">+{formatCurrency(weekIncome)}</span>}
-                {weekIncome > 0 && weekExpense > 0 && <span className="text-[#333] mx-1">/</span>}
-                {weekExpense > 0 && <span className="text-red-400/60">-{formatCurrency(weekExpense)}</span>}
-              </span>
-            </div>
-            <WeeklyPulse logs={weekLogs} />
-          </div>
-
-          {/* ── Category Breakdown + Day Pattern ── */}
-          {categoryBreakdown.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 section-enter-2">
-              {/* Category Breakdown */}
-              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <CircleDot size={14} className="text-[#c8a55a]/60" />
-                  <h2 className="text-sm font-semibold text-white">Gastos por categoría</h2>
-                </div>
-                <div className="space-y-3">
-                  {categoryBreakdown.map(([cat, amount]) => {
-                    const pct = cmExpense > 0 ? (amount / cmExpense) * 100 : 0;
-                    const barWidth = maxCategoryAmount > 0 ? (amount / maxCategoryAmount) * 100 : 0;
-                    return (
-                      <div key={cat}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-white">{cat}</span>
-                          <span className="text-xs text-[#999]">{formatCurrency(amount)} <span className="text-[#555]">({pct.toFixed(0)}%)</span></span>
-                        </div>
-                        <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-[#c8a55a]/40 to-[#c8a55a] transition-all duration-500"
-                            style={{ width: `${barWidth}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Day-of-Week Pattern */}
-              {dayPattern.hasPattern && (
-                <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CalendarDays size={14} className="text-[#c8a55a]/60" />
-                    <h2 className="text-sm font-semibold text-white">Patrón semanal</h2>
-                  </div>
-                  <p className="text-[#555] text-xs mb-3">Gasto promedio por día de la semana</p>
-                  <DayPattern pattern={dayPattern} />
-                </div>
+          {/* ── Month Navigation ── */}
+          <div className="flex items-center justify-between">
+            <button onClick={() => setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
+              <ChevronLeft size={18} />
+            </button>
+            <div className="flex items-center gap-2">
+              <CalendarDays size={14} className="text-[#c8a55a]/60" />
+              <h2 className="text-sm font-medium text-white capitalize">{monthLabel}</h2>
+              {!isCurrentMonth && (
+                <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-[#c8a55a]/60 hover:text-[#c8a55a] ml-1 underline underline-offset-2">Hoy</button>
               )}
+            </div>
+            <button onClick={() => setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {/* ── 1. Balance de Intenciones ── */}
+          {hasIntentions ? (
+            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-7 section-enter-1">
+              <p className="text-[13px] text-[#555] mb-5">Este mes tu dinero ha fluido así</p>
+              <IntentionBalance flows={intentionFlows} totalExpense={cmExpense} />
+            </div>
+          ) : currentMonthLogs.length > 0 ? (
+            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-7 section-enter-1">
+              <p className="text-[13px] text-[#555] mb-2">Este mes tu dinero ha fluido así</p>
+              <p className="text-[11px] text-[#333]">Asigna intenciones a tus movimientos para ver hacia dónde fluye tu energía.</p>
+            </div>
+          ) : null}
+
+          {/* ── 2. Saldo neto ── */}
+          {currentMonthLogs.length > 0 && (
+            <div className="section-enter-1">
+              <div className="flex items-baseline gap-3">
+                <span className={`text-2xl sm:text-3xl font-bold tabular-nums ${cmBalance >= 0 ? 'text-white' : 'text-amber-400'}`}>
+                  {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 mt-1.5">
+                {cmIncome > 0 && <span className="text-xs text-[#666]">+{formatCurrency(cmIncome)} ingresos</span>}
+                {cmIncome > 0 && cmExpense > 0 && <span className="text-[#222] text-xs">·</span>}
+                {cmExpense > 0 && <span className="text-xs text-[#666]">{formatCurrency(cmExpense)} gastos</span>}
+              </div>
             </div>
           )}
 
-          {/* ── Movements ── */}
+          {/* ── 3. Insight (only if truly meaningful) ── */}
+          {dominantIntention && currentMonthLogs.length >= 5 && (
+            <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-xl p-4 sm:p-5 section-enter-2">
+              <p className="text-[#c8a55a]/80 text-sm italic leading-relaxed">
+                La mayor parte de tu energía fue hacia {dominantIntention.label.toLowerCase()}.
+              </p>
+            </div>
+          )}
+
+          {/* ── 4. Historial ── */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Movimientos</h2>
+              <h2 className="text-base font-semibold text-white">Movimientos</h2>
               <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press transition-colors">
                 <Plus size={16} /> <span className="hidden sm:inline">Añadir</span>
               </button>
@@ -1311,50 +990,29 @@ export default function RiquezaPage() {
                     <X size={16} />
                   </button>
                 </div>
-
                 {quickMode ? (
-                  <QuickCapture
-                    onCapture={submitQuickCapture}
-                    onFullForm={() => setQuickMode(false)}
-                    submitting={submitting}
-                    historyMap={descriptionCategoryMap}
-                  />
+                  <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
                 ) : (
                   <div className="space-y-3">
                     <div className="flex gap-2">
-                      <button onClick={() => setForm({ ...form, type: 'income' })}
-                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                        Ingreso
-                      </button>
-                      <button onClick={() => setForm({ ...form, type: 'expense' })}
-                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                        Gasto
-                      </button>
+                      <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+                      <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
                     </div>
                     <div>
-                      <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                        className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                      <div className="mt-2">
-                        <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
-                      </div>
+                      <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                      <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
                     </div>
-                    <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                      className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                    <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                    <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })}
-                      className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
+                    <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
                     <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                     {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                     <div className="flex gap-2 pt-1">
                       <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                      <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-[#c8a55a] transition-colors">
-                        Captura rápida
-                      </button>
+                      <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-[#c8a55a] transition-colors">Captura rápida</button>
                     </div>
                   </div>
                 )}
-
                 {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
               </div>
             )}
@@ -1363,7 +1021,6 @@ export default function RiquezaPage() {
             {logs.length > 0 && (
               <div className="flex gap-2 mb-4 overflow-x-auto">
                 {([
-                  { key: 'week' as Period, label: 'Semana' },
                   { key: 'month' as Period, label: 'Este mes' },
                   { key: 'prev' as Period, label: 'Mes anterior' },
                   { key: 'all' as Period, label: 'Todo' },
@@ -1391,32 +1048,25 @@ export default function RiquezaPage() {
                   const dayExpense = dateLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
                   return (
                     <div key={dateLabel}>
-                      {/* Date header */}
                       <div className="flex items-center justify-between mb-2.5">
-                        <span className="text-[11px] font-medium text-[#666] uppercase tracking-wider">{dateLabel}</span>
-                        <span className="text-[11px] text-[#444]">
-                          {dayIncome > 0 && <span className="text-[#c8a55a]/50">+{formatCurrency(dayIncome)}</span>}
-                          {dayIncome > 0 && dayExpense > 0 && <span className="text-[#222] mx-1.5">·</span>}
-                          {dayExpense > 0 && <span className="text-red-400/50">-{formatCurrency(dayExpense)}</span>}
+                        <span className="text-[11px] font-medium text-[#555] uppercase tracking-wider">{dateLabel}</span>
+                        <span className="text-[11px] text-[#333]">
+                          {dayIncome > 0 && <span className="text-[#c8a55a]/40">+{formatCurrency(dayIncome)}</span>}
+                          {dayIncome > 0 && dayExpense > 0 && <span className="text-[#1a1a1a] mx-1.5">·</span>}
+                          {dayExpense > 0 && <span className="text-red-400/40">{formatCurrency(dayExpense)}</span>}
                         </span>
                       </div>
-                      {/* Day logs */}
                       <div className="space-y-2">
                         {dateLogs.map((log) => {
                           const moodInfo = getIntentionLabel(log.mood);
                           return (
                             <div key={log.id} className="flex items-center gap-3 bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
-                              {/* Type indicator */}
                               <div className={`w-1 h-8 rounded-full flex-shrink-0 ${log.type === 'income' ? 'bg-[#c8a55a]/40' : 'bg-red-400/30'}`} />
-
-                              {/* Content */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm text-white font-medium">{log.category}</span>
                                   {moodInfo && (
-                                    <span className="text-[10px] text-[#555] tracking-wide bg-[#1a1a1a] px-1.5 py-0.5 rounded">
-                                      {moodInfo.label}
-                                    </span>
+                                    <span className="text-[10px] text-[#444] tracking-wide">{moodInfo.label.toLowerCase()}</span>
                                   )}
                                 </div>
                                 {log.description && (
@@ -1426,8 +1076,6 @@ export default function RiquezaPage() {
                                   <p className="text-[11px] text-[#3a3a3a] truncate mt-0.5 italic font-light">{log.contexto}</p>
                                 )}
                               </div>
-
-                              {/* Amount + Actions */}
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400'}`}>
                                   {log.type === 'income' ? '+' : '-'}{formatCurrency(log.amount)}
@@ -1449,7 +1097,7 @@ export default function RiquezaPage() {
               <PremiumEmptyState
                 icon={Wallet}
                 title="Sin movimientos en este período"
-                subtitle="Cambia el filtro o añade un nuevo registro."
+                subtitle="Cambia el filtro o registra algo nuevo."
                 cta="Añadir movimiento"
                 onCta={() => { setQuickMode(true); setShowAdd(true); }}
                 size="sm"
@@ -1457,13 +1105,10 @@ export default function RiquezaPage() {
               />
             )}
           </div>
-
-          {/* ── Tips ── */}
-          <EmpireTipsSection empire="riqueza" subtitle="Estrategias financieras para una base sólida" />
         </>
       )}
 
-      {/* ── Floating Action Button ── */}
+      {/* ── FAB ── */}
       {!isEmpty && !editingLog && !pendingDeleteId && (
         <button
           onClick={() => { setQuickMode(true); setShowAdd(true); }}
@@ -1474,65 +1119,39 @@ export default function RiquezaPage() {
         </button>
       )}
 
-      {/* ── FAB Quick Capture / Full Form Overlay ── */}
+      {/* ── FAB Overlay ── */}
       {!isEmpty && showAdd && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop" onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }}>
-          <div
-            className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md section-enter-1"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md section-enter-1" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
               <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
                 <X size={18} />
               </button>
             </div>
-
             {quickMode ? (
-              <QuickCapture
-                onCapture={submitQuickCapture}
-                onFullForm={() => setQuickMode(false)}
-                submitting={submitting}
-                historyMap={descriptionCategoryMap}
-              />
+              <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
             ) : (
               <div className="space-y-3">
                 <div className="flex gap-2">
-                  <button onClick={() => setForm({ ...form, type: 'income' })}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>
-                    Ingreso
-                  </button>
-                  <button onClick={() => setForm({ ...form, type: 'expense' })}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>
-                    Gasto
-                  </button>
+                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+                  <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
                 </div>
                 <div>
-                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                  <div className="mt-2">
-                    <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
-                  </div>
+                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
                 </div>
-                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
+                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
                 <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                 {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                 <div className="flex gap-2 pt-1">
-                  <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    {submitting ? 'Guardando...' : 'Guardar'}
-                  </button>
-                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">
-                    Captura rápida
-                  </button>
+                  <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">Captura rápida</button>
                 </div>
               </div>
             )}
-
             {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
           </div>
         </div>
