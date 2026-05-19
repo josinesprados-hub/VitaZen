@@ -16,6 +16,7 @@ import {
   Clock,
   Trophy,
   Sunrise,
+  BookOpen,
   CreditCard,
   Crown,
   Loader2,
@@ -151,6 +152,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               <Lightbulb size={18} />
               Insights
+            </Link>
+
+            <Link
+              href="/memoria-de-vida"
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
+                pathname === '/memoria-de-vida'
+                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+              }`}
+            >
+              <BookOpen size={18} />
+              Memoria
             </Link>
 
             <Link

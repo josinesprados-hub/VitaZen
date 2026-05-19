@@ -1,0 +1,309 @@
+// ═══════════════════════════════════════════
+// Memoria de Vida — Stage Detection
+// ═══════════════════════════════════════════
+//
+// Detects soft human "stages" from accumulated data.
+// NO scores. NO diagnostics. NO clinical labels.
+// Only gentle observations: calm, growth, intensity, dispersion.
+//
+// If insufficient data: silence.
+// ═══════════════════════════════════════════
+
+import { db } from '@/lib/db';
+
+// ─── Types ───
+
+export type StageFlavor =
+  | 'calm'        // Low stress, stable energy, tranquil intentions
+  | 'growth'      // Active, growth-oriented intentions, higher activity
+  | 'intensity'   // High stress, high activity, more urgency
+  | 'dispersion'  // Variable, inconsistent, scattered activity
+  | 'exhaustion'  // Low energy, high stress, necessity-driven
+  | 'quiet'       // Very little activity, silence
+  | 'stability';  // Consistent, steady, predictable rhythm
+
+export interface LifeStage {
+  month: string;        // YYYY-MM
+  monthLabel: string;   // "Enero 2025"
+  flavor: StageFlavor;
+  observation: string;  // Human-readable, calm observation
+  dataPoints: number;   // How much data backed this (internal, never shown to user)
+}
+
+export interface StageTransition {
+  from: StageFlavor;
+  to: StageFlavor;
+  month: string;
+  monthLabel: string;
+  observation: string;  // "Tu vida parece más tranquila últimamente."
+}
+
+// ─── Stage flavors → human labels ───
+
+const STAGE_FLAVOR_LABELS: Record<StageFlavor, string> = {
+  calm: 'Un periodo de calma',
+  growth: 'Un periodo orientado al crecimiento',
+  intensity: 'Un periodo con más intensidad',
+  dispersion: 'Un periodo más disperso',
+  exhaustion: 'Un periodo de agotamiento',
+  quiet: 'Un periodo de silencio',
+  stability: 'Un periodo estable',
+};
+
+// ─── Monthly aggregation helpers ───
+
+interface MonthAggregation {
+  month: string;
+  avgStress: number;
+  avgEnergy: number;
+  avgSleep: number;
+  avgMood: number;
+  intentionBalance: { tranquility: number; growth: number; necessity: number; enjoyment: number; total: number };
+  totalActivity: number;
+  financeLogs: number;
+  checkins: number;
+  wellnessLogs: number;
+  journalEntries: number;
+}
+
+function getMonthRange(yyyyMM: string) {
+  const [year, month] = yyyyMM.split('-').map(Number);
+  const start = new Date(year, month - 1, 1);
+  const end = new Date(year, month, 1);
+  return { start, end };
+}
+
+const MONTH_NAMES: Record<number, string> = {
+  1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+  5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+  9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre',
+};
+
+function formatMonthLabel(yyyyMM: string): string {
+  const [year, month] = yyyyMM.split('-').map(Number);
+  return `${MONTH_NAMES[month] || ''} ${year}`;
+}
+
+// ─── Aggregate a single month ───
+
+async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggregation | null> {
+  const { start, end } = getMonthRange(yyyyMM);
+
+  const [wellness, checkins, finances, journals] = await Promise.all([
+    db.wellnessLog.findMany({
+      where: { userId, date: { gte: start, lt: end } },
+      select: { stress: true, energy: true, sleep: true, mood: true },
+    }),
+    db.dailyCheckin.findMany({
+      where: { userId, date: { gte: start, lt: end } },
+      select: { stress: true, energy: true, emotion: true },
+    }),
+    db.financeLog.findMany({
+      where: { userId, date: { gte: start, lt: end }, mood: { not: null } },
+      select: { mood: true },
+    }),
+    db.journalEntry.count({
+      where: { userId, createdAt: { gte: start, lt: end } },
+    }),
+  ]);
+
+  const totalLogs = wellness.length + checkins.length + finances.length;
+  if (totalLogs === 0 && journals === 0) return null;
+
+  // Average metrics from all available sources
+  const allStress = [...wellness.map(w => w.stress), ...checkins.map(c => c.stress)];
+  const allEnergy = [...wellness.map(w => w.energy), ...checkins.map(c => c.energy)];
+  const allMood = [...wellness.map(w => w.mood), ...checkins.map(c => c.emotion)];
+  const allSleep = wellness.map(w => w.sleep);
+
+  const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+
+  // Intention balance
+  const intentionBalance = { tranquility: 0, growth: 0, necessity: 0, enjoyment: 0, total: finances.length };
+  for (const f of finances) {
+    const m = f.mood?.toLowerCase();
+    if (m === 'tranquility' || m === 'calm') intentionBalance.tranquility++;
+    else if (m === 'growth' || m === 'conscious') intentionBalance.growth++;
+    else if (m === 'necessity' || m === 'necessary') intentionBalance.necessity++;
+    else if (m === 'enjoyment' || m === 'impulse') intentionBalance.enjoyment++;
+  }
+
+  return {
+    month: yyyyMM,
+    avgStress: avg(allStress),
+    avgEnergy: avg(allEnergy),
+    avgSleep: avg(allSleep),
+    avgMood: avg(allMood),
+    intentionBalance,
+    totalActivity: totalLogs + journals,
+    financeLogs: finances.length,
+    checkins: checkins.length,
+    wellnessLogs: wellness.length,
+    journalEntries: journals,
+  };
+}
+
+// ─── Classify a month into a stage flavor ───
+
+function classifyStage(agg: MonthAggregation): StageFlavor {
+  const { avgStress, avgEnergy, avgSleep, intentionBalance, totalActivity } = agg;
+
+  // Very little activity → quiet
+  if (totalActivity < 3) return 'quiet';
+
+  // High stress + low energy → exhaustion
+  if (avgStress > 3.5 && avgEnergy < 2.5) return 'exhaustion';
+
+  // High stress + high activity → intensity
+  if (avgStress > 3.2 && totalActivity > 15) return 'intensity';
+
+  // High growth intention → growth
+  const { growth, tranquility, necessity, enjoyment, total } = intentionBalance;
+  if (total > 0 && growth / total > 0.4) return 'growth';
+
+  // High tranquility + low stress → calm
+  if (total > 0 && tranquility / total > 0.4 && avgStress < 2.5) return 'calm';
+
+  // Low stress + decent energy → stability
+  if (avgStress < 2.5 && avgEnergy >= 3) return 'stability';
+
+  // Mixed signals → dispersion
+  return 'dispersion';
+}
+
+// ─── Generate a calm human observation for a stage ───
+
+function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
+  const { intentionBalance, avgStress, avgEnergy } = agg;
+  const { growth, tranquility, necessity, enjoyment, total } = intentionBalance;
+
+  switch (flavor) {
+    case 'calm':
+      if (total > 0 && tranquility / total > 0.5)
+        return 'Tus registros hablan de un periodo tranquilo, con decisiones tomadas desde la calma.';
+      return 'Un periodo donde la calma parece haber sido protagonista.';
+
+    case 'growth':
+      if (total > 0 && growth / total > 0.5)
+        return 'Tus registros reflejan un periodo orientado al crecimiento personal.';
+      return 'Un periodo donde hubo movimiento hacia adelante.';
+
+    case 'intensity':
+      return 'Un periodo con más intensidad de lo habitual. Mucho movimiento, bastante presión.';
+
+    case 'dispersion':
+      return 'Un periodo con días muy distintos entre sí. Sin un ritmo claro.';
+
+    case 'exhaustion':
+      return 'Tus registros hablan de agotamiento. Poca energía, bastante peso.';
+
+    case 'quiet':
+      return 'Un periodo de silencio. Pocos registros, mucho espacio.';
+
+    case 'stability':
+      return 'Un periodo estable. Sin grandes altibajos, con ritmo constante.';
+
+    default:
+      return '';
+  }
+}
+
+// ─── Detect stage transitions ───
+
+function detectTransitions(stages: LifeStage[]): StageTransition[] {
+  const transitions: StageTransition[] = [];
+
+  for (let i = 1; i < stages.length; i++) {
+    const prev = stages[i - 1];
+    const curr = stages[i];
+
+    if (prev.flavor === curr.flavor) continue;
+
+    const observation = generateTransitionObservation(prev.flavor, curr.flavor);
+    if (observation) {
+      transitions.push({
+        from: prev.flavor,
+        to: curr.flavor,
+        month: curr.month,
+        monthLabel: curr.monthLabel,
+        observation,
+      });
+    }
+  }
+
+  return transitions;
+}
+
+function generateTransitionObservation(from: StageFlavor, to: StageFlavor): string {
+  // Key: these are NOT "improvements" or "setbacks". Just changes.
+  const transitions: Record<string, string> = {
+    'exhaustion->calm': 'Tu vida parece más tranquila últimamente.',
+    'exhaustion->stability': 'Parece que encontraste más estabilidad.',
+    'intensity->calm': 'Después de un periodo intenso, las cosas se calmaron.',
+    'intensity->stability': 'El ritmo se volvió más constante.',
+    'dispersion->stability': 'Tu vida encontró un ritmo más claro.',
+    'dispersion->calm': 'De la dispersión a más calma.',
+    'quiet->growth': 'Después del silencio, empezó el movimiento.',
+    'quiet->stability': 'El silencio dio paso a un ritmo más constante.',
+    'calm->growth': 'De la calma al crecimiento.',
+    'calm->intensity': 'Un periodo tranquilo dio paso a más intensidad.',
+    'growth->calm': 'Después del crecimiento, llegó más calma.',
+    'growth->stability': 'El crecimiento se asentó en estabilidad.',
+    'stability->intensity': 'De la estabilidad a un ritmo más intenso.',
+    'stability->dispersion': 'Un periodo estable se volvió más disperso.',
+    'stability->exhaustion': 'La estabilidad dio paso al agotamiento.',
+    'calm->dispersion': 'La calma se fragmentó en dispersión.',
+    'growth->intensity': 'El crecimiento trajo más intensidad.',
+    'intensity->exhaustion': 'La intensidad desgastó.',
+    'exhaustion->growth': 'Del agotamiento surgieron ganas de crecer.',
+    'quiet->calm': 'El silencio se llenó de calma.',
+  };
+
+  const key = `${from}->${to}`;
+  return transitions[key] || '';
+}
+
+// ─── Main: Detect all life stages ───
+
+export async function detectLifeStages(userId: string, months: string[]): Promise<{
+  stages: LifeStage[];
+  transitions: StageTransition[];
+}> {
+  // Aggregate each month in parallel
+  const aggregations = await Promise.all(
+    months.map(m => aggregateMonth(userId, m))
+  );
+
+  // Classify each month
+  const stages: LifeStage[] = [];
+  for (let i = 0; i < months.length; i++) {
+    const agg = aggregations[i];
+    if (!agg) continue;
+
+    const flavor = classifyStage(agg);
+    stages.push({
+      month: agg.month,
+      monthLabel: formatMonthLabel(agg.month),
+      flavor,
+      observation: stageObservation(flavor, agg),
+      dataPoints: agg.totalActivity,
+    });
+  }
+
+  // Detect transitions between stages
+  const transitions = detectTransitions(stages);
+
+  return { stages, transitions };
+}
+
+// ─── Generate list of past months ───
+
+export function getPastMonths(count: number = 6): string[] {
+  const months: string[] = [];
+  const now = new Date();
+  for (let i = 1; i <= count; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+  return months.reverse(); // oldest first
+}
