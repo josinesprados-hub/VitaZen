@@ -30,7 +30,7 @@ export default function PremiumBlur({ children }: PremiumBlurProps) {
               Desbloquea con Plan Élite
             </p>
             <p className="text-[#999] text-xs mt-1">
-              Accede a contenido premium exclusivo
+              Accede a contenido exclusivo de Élite
             </p>
           </div>
 
@@ -40,7 +40,7 @@ export default function PremiumBlur({ children }: PremiumBlurProps) {
             className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-all duration-200 shadow-[0_0_20px_rgba(200,165,90,0.15)] hover:shadow-[0_0_30px_rgba(200,165,90,0.25)] active:scale-[0.97] press-subtle"
           >
             <Lock size={14} />
-            Mejorar a Premium
+            Descubrir Élite
           </Link>
         </div>
       </div>

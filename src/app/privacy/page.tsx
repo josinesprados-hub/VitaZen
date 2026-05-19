@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <span className="text-white font-medium">Datos de suscripción y pago:</span> cuando
-              adquieres una suscripción premium, procesamos la transacción a través de Stripe. No
+              adquieres el plan Élite, procesamos la transacción a través de Stripe. No
               almacenamos números de tarjeta bancaria, CVV ni datos bancarios completos en nuestros
               servidores. Stripe nos proporciona únicamente información agregada como el estado de la
               suscripción, el periodo de facturación y un identificador de cliente seguro.
@@ -348,7 +348,7 @@ export default function PrivacyPolicyPage() {
         {/* Footer */}
         <footer className="pt-8 border-t border-[#c8a55a]/20 text-center">
           <p className="text-sm text-gray-500">
-            VitaZen — Ecosistema premium de desarrollo personal
+            VitaZen — Ecosistema de desarrollo personal
           </p>
           <p className="text-xs text-gray-600 mt-2">
             Esta política es vinculante y aplica a todos los servicios ofrecidos en vitazen.cc

@@ -252,7 +252,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 ) : (
                   <Crown size={16} />
                 )}
-                Actualizar a Premium
+                Entrar en Élite
               </button>
             ) : (
               <button
@@ -282,7 +282,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 ) : (
                   <CreditCard size={16} />
                 )}
-                Gestionar Premium
+                Gestionar suscripción Élite
               </button>
             )}
 

@@ -850,7 +850,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {remaining <= 3 && remaining > 0 && (
             <p className="text-[10px] text-[#e8a849] mt-1.5 flex items-center gap-1">
               <Crown size={10} />
-              Premium sin límites
+              Élite sin límites
             </p>
           )}
           {remaining === 0 && (
@@ -969,7 +969,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               {isPremium && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                   <Crown size={10} className="shrink-0" />
-                  Premium
+                  Élite
                 </span>
               )}
             </div>
@@ -1112,7 +1112,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       {!isPremium && (
                         <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
                           <Crown size={9} className="text-[#c8a55a]/40" />
-                          Premium: memoria avanzada y contexto personalizado
+                          Élite: memoria avanzada y contexto personalizado
                         </p>
                       )}
                     </div>
@@ -1165,7 +1165,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       className="ml-auto text-[#c8a55a] hover:text-[#d4b468] flex items-center gap-1"
                     >
                       <Crown size={10} />
-                      Premium
+                      Élite
                     </button>
                   </div>
                 )}
@@ -1386,7 +1386,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 Has alcanzado el límite diario
               </h3>
               <p className="text-[#999] mb-6 text-sm leading-relaxed">
-                Tu plan Free incluye {dailyLimit} mensajes diarios con el Mentor IA. Con Premium, disfrutarás de una experiencia sin límites y mucho más personal.
+                Tu plan Free incluye {dailyLimit} mensajes diarios con el Mentor IA. Con Élite, disfrutarás de una experiencia sin límites y mucho más personal.
               </p>
 
               <div className="grid grid-cols-2 gap-3 mb-6 text-left">
@@ -1420,7 +1420,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 >
                   <span className="flex items-center justify-center gap-2">
                     <Crown size={16} />
-                    Mejorar a Premium
+                    Entrar en Élite
                   </span>
                 </Link>
                 <button

@@ -135,7 +135,7 @@ export default function PerfilPage() {
     });
   };
 
-  const planLabel = user?.plan === 'PREMIUM' ? 'Premium' : 'Free';
+  const planLabel = user?.plan === 'PREMIUM' ? 'Élite' : 'Free';
   const isPremium = user?.plan === 'PREMIUM';
 
   return (
@@ -264,7 +264,7 @@ export default function PerfilPage() {
                   {user?.plan === 'PREMIUM' ? (
                     <span className="badge-premium flex items-center gap-1">
                       <Crown size={10} />
-                      PREMIUM
+                      ÉLITE
                     </span>
                   ) : (
                     <span className="badge-free">FREE</span>

@@ -311,7 +311,7 @@ export function WeeklyRecap() {
                   {isPremium && (
                     <span className="premium-badge inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                       <Crown size={9} />
-                      Premium
+                      Élite
                     </span>
                   )}
                 </div>
@@ -322,7 +322,7 @@ export function WeeklyRecap() {
               {!isPremium && (
                 <span className="text-[10px] text-[#555] items-center gap-1 hidden sm:flex">
                   <Crown size={9} className="text-[#c8a55a]/40" />
-                  Historial completo con Premium
+                  Historial completo con Élite
                 </span>
               )}
               <Link
@@ -637,7 +637,7 @@ export function WeeklyRecap() {
                   <span
                     className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1"
                   >
-                    <Crown size={8} /> Recomendación completa con Premium
+                    <Crown size={8} /> Recomendación completa con Élite
                   </span>
                 </div>
               )}

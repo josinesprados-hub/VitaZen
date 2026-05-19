@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Términos y condiciones de uso de VitaZen. Condiciones generales, suscripciones, cancelaciones y responsabilidades.',
   openGraph: {
     title: 'Términos y Condiciones — VitaZen',
-    description: 'Condiciones generales de uso de VitaZen, suscripciones premium y responsabilidades.',
+    description: 'Condiciones generales de uso de VitaZen, suscripciones Élite y responsabilidades.',
   },
 };
 
@@ -61,7 +61,7 @@ export default function TermsPage() {
             2. Uso de VitaZen
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            VitaZen es un ecosistema premium de desarrollo personal basado en cinco imperios:
+            VitaZen es un ecosistema de desarrollo personal basado en cinco imperios:
             Disciplina, Mente, Energía, Finanzas y Crecimiento. La aplicación ofrece
             funcionalidades como mentoría con inteligencia artificial, seguimiento de hábitos,
             meditaciones guiadas, ejercicios de respiración, desafíos diarios, análisis de
@@ -80,19 +80,19 @@ export default function TermsPage() {
           </p>
         </section>
 
-        {/* 3. Suscripciones premium */}
+        {/* 3. Suscripciones Élite */}
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
-            3. Suscripciones premium
+            3. Plan Élite
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            VitaZen ofrece un plan Free con funcionalidades básicas y un plan Premium de
+            VitaZen ofrece un plan Free con funcionalidades básicas y un plan Élite de
             suscripción mensual que desbloquea acceso completo a todas las funcionalidades de
             la aplicación, incluyendo mensajes de IA ilimitados, mentor avanzado, memoria
-            contextual avanzada, consejos exclusivos y contenido premium en cada imperio.
+            contextual avanzada, consejos exclusivos y contenido de profundidad en cada imperio.
           </p>
           <p className="text-gray-300 leading-relaxed mb-4">
-            Al suscribirte al plan Premium, aceptas pagar la tarifa vigente indicada en la
+            Al suscribirte al plan Élite, aceptas pagar la tarifa vigente indicada en la
             página de precios de VitaZen. El precio actual es de 5€ al mes. Los precios
             incluyen los impuestos aplicables según tu ubicación. Nos reservamos el derecho de
             modificar los precios con un preaviso de al menos 30 días. Si no aceptas el nuevo
@@ -100,7 +100,7 @@ export default function TermsPage() {
           </p>
           <p className="text-gray-300 leading-relaxed">
             Las funcionalidades específicas incluidas en cada plan pueden variar con el tiempo.
-            Las modificaciones sustanciales en las funcionalidades del plan Premium serán
+            Las modificaciones sustanciales en las funcionalidades del plan Élite serán
             comunicadas con antelación suficiente a través de la aplicación o por correo
             electrónico.
           </p>
@@ -112,7 +112,7 @@ export default function TermsPage() {
             4. Facturación y renovaciones
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            La suscripción Premium se renueva automáticamente al final de cada periodo mensual.
+            La suscripción Élite se renueva automáticamente al final de cada periodo mensual.
             El pago se procesa a través de Stripe, nuestro proveedor de pagos seguro. No
             almacenamos datos bancarios ni números de tarjeta en nuestros servidores; toda la
             información de pago es gestionada directamente por Stripe conforme a las normativas
@@ -139,16 +139,16 @@ export default function TermsPage() {
             5. Política de cancelación
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            Puedes cancelar tu suscripción Premium en cualquier momento desde la sección de
+            Puedes cancelar tu suscripción Élite en cualquier momento desde la sección de
             ajustes de la aplicación o a través del portal de gestión de Stripe. La cancelación
             surtirá efecto al final del periodo de facturación actual, lo que significa que
-            seguirás teniendo acceso a las funcionalidades Premium hasta que expire el periodo
+            seguirás teniendo acceso a las funcionalidades Élite hasta que expire el periodo
             ya pagado.
           </p>
           <p className="text-gray-300 leading-relaxed mb-4">
             No se realizarán reembolsos parciales por periodos no utilizados dentro de un ciclo
             de facturación en curso. Por ejemplo, si cancelas a mitad de mes, conservarás el
-            acceso Premium hasta el final de ese mes, pero no recibirás un reembolso
+            acceso Élite hasta el final de ese mes, pero no recibirás un reembolso
             proporcional por los días restantes.
           </p>
           <p className="text-gray-300 leading-relaxed">
@@ -225,7 +225,7 @@ export default function TermsPage() {
             intelectual e industrial aplicables.
           </p>
           <p className="text-gray-300 leading-relaxed mb-4">
-            La suscripción Premium te otorga una licencia personal, no exclusiva,
+            La suscripción Élite te otorga una licencia personal, no exclusiva,
             intransferible y revocable para acceder y utilizar los contenidos y servicios de
             VitaZen durante el periodo de suscripción activo. Esta licencia no te permite
             reproducir, distribuir, modificar, crear obras derivadas, exhibir públicamente ni
@@ -334,7 +334,7 @@ export default function TermsPage() {
         {/* Footer */}
         <footer className="pt-8 border-t border-[#c8a55a]/20 text-center">
           <p className="text-sm text-gray-500">
-            VitaZen — Ecosistema premium de desarrollo personal
+            VitaZen — Ecosistema de desarrollo personal
           </p>
           <p className="text-xs text-gray-600 mt-2">
             Estos términos son vinculantes y aplican a todos los servicios ofrecidos en vitazen.cc

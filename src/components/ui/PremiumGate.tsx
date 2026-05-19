@@ -16,7 +16,7 @@ interface PremiumGateProps {
   intensity?: 'light' | 'medium';
   /** compact mode — smaller overlay text, for inline or small cards */
   compact?: boolean;
-  /** custom label below the crown (default: "Premium") */
+  /** custom label below the crown (default: "Élite") */
   label?: string;
   children: React.ReactNode;
 }
@@ -25,7 +25,7 @@ export default function PremiumGate({
   isPremium,
   intensity = 'medium',
   compact = false,
-  label = 'Premium',
+  label = 'Élite',
   children,
 }: PremiumGateProps) {
   if (isPremium) return <>{children}</>;
@@ -78,7 +78,7 @@ export default function PremiumGate({
 // ─────────────────────────────────────────
 // PremiumInlineBadge
 // Small inline pill that shows "FREE" limit
-// or "Premium" badge — calm and unobtrusive.
+// or "Élite" badge — calm and unobtrusive.
 // ─────────────────────────────────────────
 
 interface PremiumInlineBadgeProps {
@@ -139,7 +139,7 @@ export function PremiumHistoryGate({
             href="/pricing"
             className="text-[#c8a55a]/70 hover:text-[#c8a55a] transition-colors"
           >
-            Premium
+            Élite
           </Link>
         </span>
       </div>

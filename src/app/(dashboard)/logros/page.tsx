@@ -188,7 +188,7 @@ export default function LogrosPage() {
         </div>
         <p className="text-[10px] text-[#555] flex items-center gap-1 mt-3">
           <Crown size={9} className="text-[#c8a55a]/40" />
-          Estadísticas avanzadas con Premium
+          Estadísticas avanzadas con Élite
         </p>
       </div>
 

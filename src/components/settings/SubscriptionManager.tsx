@@ -64,7 +64,7 @@ export function SubscriptionManager() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-sm text-white font-medium">Plan Premium</p>
+              <p className="text-sm text-white font-medium">Plan Élite</p>
               <span className="badge-premium">ACTIVO</span>
             </div>
             {subscription?.cancelAtPeriodEnd ? (
@@ -138,8 +138,8 @@ export function SubscriptionManager() {
           <Crown size={14} className="text-[#c8a55a]" />
         </div>
         <div className="text-left flex-1">
-          <p className="text-sm font-medium">Mejorar a Premium</p>
-          <p className="text-xs text-[#999]">IA ilimitada, contenido exclusivo y m&aacute;s</p>
+          <p className="text-sm font-medium">Descubrir Élite</p>
+          <p className="text-xs text-[#999]">Conexiones profundas entre tus imperios</p>
         </div>
         <ChevronRight size={16} className="text-[#555] group-hover:text-[#c8a55a] transition-colors" />
       </button>

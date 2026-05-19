@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
           const user = await db.user.findUnique({ where: { id: userId } });
           if (user?.email) {
-            await sendSubscriptionConfirmedEmail(user.email, user.name || 'Amigo', 'Premium');
+            await sendSubscriptionConfirmedEmail(user.email, user.name || 'Amigo', 'Élite');
           }
         } else {
           console.warn('[Webhook] checkout.session.completed — no userId in session metadata');

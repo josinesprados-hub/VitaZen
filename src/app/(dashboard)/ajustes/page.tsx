@@ -312,7 +312,7 @@ export default function AjustesPage() {
             <p className="text-sm text-[#999]">Plan</p>
             <div className="flex items-center gap-2">
               {user?.plan === 'PREMIUM' ? (
-                <span className="badge-premium">PREMIUM</span>
+                <span className="badge-premium">ÉLITE</span>
               ) : (
                 <span className="badge-free">FREE</span>
               )}

@@ -35,7 +35,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           )}
           {user?.plan === 'PREMIUM' && (
             <span className="badge-premium">
-              PREMIUM
+              ÉLITE
             </span>
           )}
         </div>

@@ -249,7 +249,7 @@ export default function InsightsPage() {
               {isPremium && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                   <Crown size={10} />
-                  Premium
+                  Élite
                 </span>
               )}
             </div>
@@ -561,15 +561,15 @@ export default function InsightsPage() {
             <Crown size={18} className="text-[#c8a55a]/60" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white mb-0.5">Comparativas y métricas avanzadas</p>
-            <p className="text-[#666] text-xs">Desbloquea tendencias semanales, detalles de bienestar y análisis financiero.</p>
+            <p className="text-sm font-medium text-white mb-0.5">Conexiones más profundas entre tus imperios</p>
+            <p className="text-[#666] text-xs">Observaciones personales, tendencias y relaciones que solo se revelan con tiempo.</p>
           </div>
           <Link
             href="/pricing"
             className="inline-flex items-center gap-1.5 bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium px-4 py-2 rounded-xl hover:bg-[#c8a55a]/15 hover:border-[#c8a55a]/30 transition-colors text-xs shrink-0"
           >
             <Crown size={12} />
-            Premium
+            Descubrir Élite
           </Link>
         </div>
       )}

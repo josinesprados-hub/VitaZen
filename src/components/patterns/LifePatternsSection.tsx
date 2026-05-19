@@ -162,7 +162,7 @@ export default function LifePatternsSection() {
           {/* Premium badge — subtle */}
           <div className="ml-auto flex items-center gap-1">
             <Crown size={9} className="text-[#c8a55a]/40" />
-            <span className="text-[9px] text-[#c8a55a]/40 font-medium">Premium</span>
+            <span className="text-[9px] text-[#c8a55a]/40 font-medium">Élite</span>
           </div>
         </div>
         <WaitingState />
@@ -187,7 +187,7 @@ export default function LifePatternsSection() {
         {/* Premium badge — subtle */}
         <div className="ml-auto flex items-center gap-1">
           <Crown size={9} className="text-[#c8a55a]/40" />
-          <span className="text-[9px] text-[#c8a55a]/40 font-medium">Premium</span>
+          <span className="text-[9px] text-[#c8a55a]/40 font-medium">Élite</span>
         </div>
       </div>
 

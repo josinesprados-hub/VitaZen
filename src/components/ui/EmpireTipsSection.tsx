@@ -76,7 +76,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                       Desbloquea con Plan Élite
                     </p>
                     <p className="text-[#999] text-xs mt-1">
-                      Accede a consejos premium exclusivos
+                      Accede a consejos exclusivos de Élite
                     </p>
                   </div>
                   <Link
@@ -84,7 +84,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                     className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-all duration-200 shadow-[0_0_20px_rgba(200,165,90,0.15)] hover:shadow-[0_0_30px_rgba(200,165,90,0.25)]"
                   >
                     <Lock size={14} />
-                    Mejorar a Premium
+                    Descubrir Élite
                   </Link>
                 </div>
               </div>
