@@ -10,6 +10,7 @@ import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { OnboardingRecommendations } from '@/components/dashboard/OnboardingRecommendations';
 import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
+import LifePatternsSection from '@/components/patterns/LifePatternsSection';
 
 import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, CheckCircle, Wallet, Sunrise, ArrowRight } from 'lucide-react';
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
@@ -390,9 +391,16 @@ export default function DashboardPage() {
         </Link>
       )}
 
-      {/* ═══ 11. Weekly Recap (only after activity) ═══ */}
-      {hasActivity && (
+      {/* ═══ 11. Patrones de Vida (Premium — subtle presence) ═══ */}
+      {hasActivity && !screenshotMode && (
         <div className="dash-section-enter dash-section-delay-10">
+          <LifePatternsSection />
+        </div>
+      )}
+
+      {/* ═══ 12. Weekly Recap (only after activity) ═══ */}
+      {hasActivity && (
+        <div className="dash-section-enter dash-section-delay-11">
           <WeeklyRecap />
         </div>
       )}
