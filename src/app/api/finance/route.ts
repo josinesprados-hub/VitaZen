@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const body = await request.json();
-    const { logId, date, type, category, amount, description, mood } = body;
+    const { logId, date, type, category, amount, description, mood, contexto } = body;
     const log = await db.financeLog.findUnique({ where: { id: logId } });
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
 
     const updated = await db.financeLog.update({
       where: { id: logId },
-      data: { date: new Date(date), type, category: category.trim(), amount: Number(amount), description: description?.trim() || null, mood: mood || null },
+      data: { date: new Date(date), type, category: category.trim(), amount: Number(amount), description: description?.trim() || null, mood: mood || null, contexto: contexto?.trim() || null },
     });
 
     return NextResponse.json({ log: updated });
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const user = await getAuthUser(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { date, type, category, amount, description, mood } = await request.json();
+    const { date, type, category, amount, description, mood, contexto } = await request.json();
 
     // Validate required fields
     if (!date) return NextResponse.json({ error: 'La fecha es obligatoria' }, { status: 400 });
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     if (amount === undefined || amount === null || isNaN(amount) || amount <= 0) return NextResponse.json({ error: 'La cantidad debe ser mayor que 0' }, { status: 400 });
 
     const log = await db.financeLog.create({
-      data: { userId: user.id, date: new Date(date), type, category: category.trim(), amount: Number(amount), description: description?.trim() || null, mood: mood || null },
+      data: { userId: user.id, date: new Date(date), type, category: category.trim(), amount: Number(amount), description: description?.trim() || null, mood: mood || null, contexto: contexto?.trim() || null },
     });
 
     // Award XP to riqueza empire

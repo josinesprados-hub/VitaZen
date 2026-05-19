@@ -27,10 +27,51 @@ interface FinanceLog {
   amount: number;
   description: string | null;
   mood: string | null;
+  contexto: string | null;
   createdAt: string;
 }
 
 type Period = 'week' | 'month' | 'prev' | 'all';
+
+// ═══════════════════════════════════════════
+// Context tags — for future emotional pattern detection
+// Keywords that suggest emotional/social contexts behind spending
+// ═══════════════════════════════════════════
+
+const CONTEXT_TAGS: Record<string, string> = {
+  social: 'social',
+  difficult: 'difficult',
+  calm: 'calm',
+  impulsive: 'impulsive',
+  celebration: 'celebration',
+  necessity: 'necessity',
+  routine: 'routine',
+  growth: 'growth',
+};
+
+// Keywords in contexto that map to emotional patterns (for future insights)
+const CONTEXT_EMOTION_MAP: [RegExp, string][] = [
+  [/\b(amigos|amiga|amigo|social|cumple|fiesta|cena con|quedada|bar|copa|grupo|compañero|pareja|familia|mamá|papa|regalo)\b/i, 'social'],
+  [/\b(complicado|difícil|estrés|mal|tough|agotado|ansiedad|malo|duro|crisis|problema)\b/i, 'difficult'],
+  [/\b(tranquil|calma|relaj|paz|sereno|silencio|descanso|vacaciones|horas libres)\b/i, 'calm'],
+  [/\b(impulsiv|antojo|capricho|me apetecía|sin pensar|lo quería|tentación|lo vi)\b/i, 'impulsive'],
+  [/\b(celebr|logro|meta|conseguido|por fin|especial|único|merecido)\b/i, 'celebration'],
+  [/\b(necesario|básico|imprescindible|no podía evitar|obligado|fijo|receta|médico|urgente)\b/i, 'necessity'],
+  [/\b(rutina|siempre|habitual|mensual|semanal|otra vez|igual|lo de siempre)\b/i, 'routine'],
+  [/\b(curso|aprend|libro|formación|crecimiento|inversión|futuro|mejora|desarrollo)\b/i, 'growth'],
+];
+
+// Detect emotional context from contexto text (for future pattern analysis)
+function detectContextTags(contexto: string): string[] {
+  if (!contexto?.trim()) return [];
+  const tags: string[] = [];
+  for (const [regex, tag] of CONTEXT_EMOTION_MAP) {
+    if (regex.test(contexto)) {
+      tags.push(tag);
+    }
+  }
+  return tags;
+}
 
 // "Este movimiento aporta" — premium consciousness labels
 const INTENTIONS = [
@@ -454,12 +495,13 @@ function QuickCapture({
   submitting,
   historyMap,
 }: {
-  onCapture: (data: { type: string; category: string; amount: number; description: string }) => void;
+  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
   onFullForm: () => void;
   submitting: boolean;
   historyMap: Record<string, string>;
 }) {
   const [input, setInput] = useState('');
+  const [contexto, setContexto] = useState('');
   const parsed = useMemo(() => parseQuickCapture(input, historyMap), [input, historyMap]);
 
   const handleSubmit = () => {
@@ -469,8 +511,10 @@ function QuickCapture({
       category: parsed.category,
       amount: parsed.amount,
       description: parsed.description,
+      contexto: contexto.trim(),
     });
     setInput('');
+    setContexto('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -522,10 +566,22 @@ function QuickCapture({
         <p className="mt-2 text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
       )}
 
+      {/* ¿Qué pasó? — optional personal context */}
+      <div className="mt-3">
+        <input
+          type="text"
+          value={contexto}
+          onChange={(e) => setContexto(e.target.value)}
+          placeholder="¿Qué pasó? (opcional)"
+          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-[12px] text-[#888] placeholder-[#333] focus:outline-none focus:border-[#c8a55a]/25 transition-colors italic"
+          autoComplete="off"
+        />
+      </div>
+
       {/* Full form link */}
       <button
         onClick={onFullForm}
-        className="mt-1.5 text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
+        className="mt-2 text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
       >
         Formulario completo
       </button>
@@ -542,10 +598,10 @@ export default function RiquezaPage() {
   const { user } = useAuth();
   const [logs, setLogs] = useState<FinanceLog[]>([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '' });
+  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
   const [loading, setLoading] = useState(true);
   const [editingLog, setEditingLog] = useState<FinanceLog | null>(null);
-  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '' });
+  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
   const [editSaving, setEditSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -735,13 +791,14 @@ export default function RiquezaPage() {
           amount: form.amount,
           description: form.description.trim() || null,
           mood: form.mood || null,
+          contexto: form.contexto.trim() || null,
         }),
       });
       if (res.ok) {
         const data = await res.json();
         setLogs(prev => [data.log, ...prev]);
         setShowAdd(false);
-        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '' });
+        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
         showToast(form.type === 'income' ? 'Ingreso registrado' : 'Gasto registrado');
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -755,7 +812,7 @@ export default function RiquezaPage() {
   };
 
   // Quick Capture submit — ultra-fast path
-  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string }) => {
+  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
     if (submitting) return;
     setSubmitError(null);
     setSubmitting(true);
@@ -769,6 +826,7 @@ export default function RiquezaPage() {
           amount: data.amount,
           description: data.description || null,
           mood: null,
+          contexto: data.contexto || null,
         }),
       });
       if (res.ok) {
@@ -797,6 +855,7 @@ export default function RiquezaPage() {
       description: log.description || '',
       date: log.date.split('T')[0],
       mood: log.mood || '',
+      contexto: log.contexto || '',
     });
   };
 
@@ -825,6 +884,7 @@ export default function RiquezaPage() {
           amount: editForm.amount,
           description: editForm.description.trim() || null,
           mood: editForm.mood || null,
+          contexto: editForm.contexto.trim() || null,
         }),
       });
       if (res.ok) {
@@ -924,6 +984,8 @@ export default function RiquezaPage() {
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
               <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+              <input type="text" placeholder="¿Qué pasó? (opcional)" value={editForm.contexto} onChange={(e) => setEditForm({ ...editForm, contexto: e.target.value })}
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#444] italic" />
               <IntentionSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
               {submitError && (
                 <p className="text-red-400 text-xs py-1">{submitError}</p>
@@ -1020,6 +1082,8 @@ export default function RiquezaPage() {
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
                   <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })}
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
                   <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                   {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                   <div className="flex gap-2 pt-1">
@@ -1278,6 +1342,8 @@ export default function RiquezaPage() {
                       className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
                     <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
                       className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })}
+                      className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
                     <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                     {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                     <div className="flex gap-2 pt-1">
@@ -1355,6 +1421,9 @@ export default function RiquezaPage() {
                                 </div>
                                 {log.description && (
                                   <p className="text-xs text-[#555] truncate mt-0.5">{log.description}</p>
+                                )}
+                                {log.contexto && (
+                                  <p className="text-[11px] text-[#3a3a3a] truncate mt-0.5 italic font-light">{log.contexto}</p>
                                 )}
                               </div>
 
@@ -1449,6 +1518,8 @@ export default function RiquezaPage() {
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
                 <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })}
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
                 <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                 {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                 <div className="flex gap-2 pt-1">
