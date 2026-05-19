@@ -10,6 +10,7 @@ import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
+import { formatCurrency } from '@/lib/utils';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import {
   SCREENSHOT_INSIGHTS_SUMMARY,
@@ -520,7 +521,7 @@ export default function InsightsPage() {
                 <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
               </div>
               <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
-                {summary.finance.balance >= 0 ? '+' : ''}{summary.finance.balance.toFixed(0)}€
+                {summary.finance.balance >= 0 ? '+' : ''}{formatCurrency(Math.abs(summary.finance.balance))}
               </p>
               <p className="text-[10px] text-[#555] mt-1">balance semanal</p>
             </Link>

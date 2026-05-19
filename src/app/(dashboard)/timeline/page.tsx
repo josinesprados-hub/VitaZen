@@ -9,6 +9,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import Link from 'next/link';
+import { formatCurrency } from '@/lib/utils';
 import {
   Wind,
   BookOpen,
@@ -309,7 +310,7 @@ export default function TimelinePage() {
                                     item.meta.financeType === 'income' ? 'text-green-400' : 'text-red-400'
                                   }`}
                                 >
-                                  {item.meta.financeType === 'income' ? '+' : '-'}{Number(item.meta.amount).toFixed(2)}€
+                                  {item.meta.financeType === 'income' ? '+' : '-'}{formatCurrency(Number(item.meta.amount))}
                                 </span>
                               )}
                             </div>

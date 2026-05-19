@@ -13,6 +13,7 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
+import { formatCurrency } from '@/lib/utils';
 
 // ═══════════════════════════════════════════
 // Types
@@ -90,15 +91,6 @@ function groupLogsByDate(logs: FinanceLog[]) {
     groups[key].push(log);
   }
   return groups;
-}
-
-function formatCurrency(n: number) {
-  return n.toFixed(2) + '\u00A0€';
-}
-
-function formatCurrencyShort(n: number) {
-  if (Math.abs(n) >= 1000) return (n / 1000).toFixed(1) + 'k\u00A0€';
-  return n.toFixed(0) + '\u00A0€';
 }
 
 function getIntentionLabel(mood: string | null) {
@@ -902,9 +894,9 @@ export default function RiquezaPage() {
                 <span className="text-xs text-[#666]">Pulso semanal</span>
               </div>
               <span className="text-xs text-[#555]">
-                {weekIncome > 0 && <span className="text-[#c8a55a]/60">+{formatCurrencyShort(weekIncome)}</span>}
+                {weekIncome > 0 && <span className="text-[#c8a55a]/60">+{formatCurrency(weekIncome)}</span>}
                 {weekIncome > 0 && weekExpense > 0 && <span className="text-[#333] mx-1">/</span>}
-                {weekExpense > 0 && <span className="text-red-400/60">-{formatCurrencyShort(weekExpense)}</span>}
+                {weekExpense > 0 && <span className="text-red-400/60">-{formatCurrency(weekExpense)}</span>}
               </span>
             </div>
             <WeeklyPulse logs={weekLogs} />
@@ -1039,9 +1031,9 @@ export default function RiquezaPage() {
                       <div className="flex items-center justify-between mb-2.5">
                         <span className="text-[11px] font-medium text-[#666] uppercase tracking-wider">{dateLabel}</span>
                         <span className="text-[11px] text-[#444]">
-                          {dayIncome > 0 && <span className="text-[#c8a55a]/50">+{formatCurrencyShort(dayIncome)}</span>}
+                          {dayIncome > 0 && <span className="text-[#c8a55a]/50">+{formatCurrency(dayIncome)}</span>}
                           {dayIncome > 0 && dayExpense > 0 && <span className="text-[#222] mx-1.5">·</span>}
-                          {dayExpense > 0 && <span className="text-red-400/50">-{formatCurrencyShort(dayExpense)}</span>}
+                          {dayExpense > 0 && <span className="text-red-400/50">-{formatCurrency(dayExpense)}</span>}
                         </span>
                       </div>
                       {/* Day logs */}

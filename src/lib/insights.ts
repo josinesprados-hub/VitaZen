@@ -1,4 +1,5 @@
 import { db } from './db';
+import { formatCurrency } from './utils';
 
 // ═══════════════════════════════════════════
 // WEEKLY INSIGHTS ENGINE
@@ -553,8 +554,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '💰',
       title: 'Balance positivo',
       description: isPremium
-        ? `Tus ingresos superan los gastos esta semana (+${summary.finance.balance.toFixed(0)}€). Buen momento para ahorrar o invertir.`
-        : `Balance positivo de +${summary.finance.balance.toFixed(0)}€ esta semana.`,
+        ? `Tus ingresos superan los gastos esta semana (+${formatCurrency(summary.finance.balance)}). Buen momento para ahorrar o invertir.`
+        : `Balance positivo de +${formatCurrency(summary.finance.balance)} esta semana.`,
     });
   } else if (summary.finance.balance < 0) {
     insights.push({
@@ -564,7 +565,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '💳',
       title: 'Gastos por encima de ingresos',
       description: isPremium
-        ? `Tus gastos superan los ingresos en ${Math.abs(summary.finance.balance).toFixed(0)}€. Revisa categorías donde puedas optimizar.`
+        ? `Tus gastos superan los ingresos en ${formatCurrency(Math.abs(summary.finance.balance))}. Revisa categorías donde puedas optimizar.`
         : `Gastos por encima de ingresos esta semana. Revisa tus gastos.`,
     });
   }

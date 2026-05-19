@@ -15,6 +15,7 @@ import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, Che
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
 import { MicroReward } from '@/components/ui/MicroReward';
 import PremiumReflection from '@/components/ui/PremiumReflection';
+import { formatCurrency } from '@/lib/utils';
 import {
   SCREENSHOT_EMPIRES,
   SCREENSHOT_CHALLENGE,
@@ -299,7 +300,7 @@ export default function DashboardPage() {
             { label: 'Meditación', value: metrics.meditationWeek, unit: 'sem', href: '/imperio/mente', Icon: Wind, streak: streaks?.meditationStreak },
             { label: 'Hábitos', value: metrics.habitsCompleted, unit: 'sem', href: '/imperio/disciplina', Icon: CheckCircle, streak: streaks?.habitStreak },
             { label: 'Diario', value: metrics.journalWeek, unit: 'sem', href: '/imperio/crecimiento', Icon: BookOpen, streak: streaks?.journalStreak },
-            { label: 'Finanzas', value: `${metrics.balance >= 0 ? '+' : ''}${metrics.balance.toFixed(0)}€`, unit: '30d', href: '/imperio/riqueza', Icon: Wallet, streak: null, isFinance: true },
+            { label: 'Finanzas', value: `${metrics.balance >= 0 ? '+' : ''}${formatCurrency(Math.abs(metrics.balance))}`, unit: '30d', href: '/imperio/riqueza', Icon: Wallet, streak: null, isFinance: true },
           ].map(({ label, value, unit, href, Icon, streak: metricStreak, isFinance }) => (
             <Link key={label} href={href} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-4 hover:border-[#c8a55a]/20 hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 cursor-pointer group touch-press">
               <div className="flex items-center gap-1 mb-1 sm:mb-2">

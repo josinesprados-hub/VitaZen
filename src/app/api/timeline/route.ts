@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { formatCurrency } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');
@@ -161,7 +162,7 @@ export async function GET(request: NextRequest) {
             id: l.id,
             type: 'finance',
             title: `${isIncome ? 'Ingreso' : 'Gasto'} · ${l.category}`,
-            description: `${isIncome ? '+' : '-'}${l.amount.toFixed(2)}€${l.description ? ' · ' + l.description : ''}`,
+            description: `${isIncome ? '+' : '-'}${formatCurrency(l.amount)}${l.description ? ' · ' + l.description : ''}`,
             date: l.date,
             meta: { amount: l.amount, financeType: l.type, category: l.category },
           });
