@@ -12,7 +12,7 @@ import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import LifePatternsSection from '@/components/patterns/LifePatternsSection';
 
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, CheckCircle, Wallet, Sunrise, ArrowRight } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, CheckCircle, Wallet, Sunrise, ArrowRight, Calendar } from 'lucide-react';
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
 import { MicroReward } from '@/components/ui/MicroReward';
 import PremiumReflection from '@/components/ui/PremiumReflection';
@@ -83,6 +83,67 @@ function getChallengeCTALabel(category: string): string {
     'salud': 'Haz Check-in',
   };
   return map[category.toLowerCase()] || 'Ir al imperio';
+}
+
+// ─── Monthly Closure Prompt ───
+// Appears subtly on the first days of a new month.
+// No urgency. No badges. No "completa tu review".
+// Just: "Cuando quieras, hay un momento esperándote."
+
+function MonthlyClosurePrompt() {
+  const { user } = useAuth();
+  const { apiFetch } = useApi();
+  const [show, setShow] = useState(false);
+  const [message, setMessage] = useState('');
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!user || dismissed) return;
+
+    const checkClosure = async () => {
+      try {
+        // Only check in first 7 days of month
+        const now = new Date();
+        if (now.getDate() > 7) return;
+
+        const res = await apiFetch('/api/monthly-closure');
+        if (res.ok) {
+          const data = await res.json();
+          // Show only if: closure period AND user hasn't reflected yet
+          if (data.isClosurePeriod && !data.closure?.reflectedAt) {
+            const { getEntryPrompt } = await import('@/lib/monthly-closure/copy');
+            setMessage(getEntryPrompt(data.month));
+            setShow(true);
+          }
+        }
+      } catch {
+        // Silent — never push
+      }
+    };
+
+    checkClosure();
+  }, [user, dismissed, apiFetch]);
+
+  if (!show || dismissed) return null;
+
+  return (
+    <div className="dash-section-enter dash-section-delay-1.5">
+      <Link
+        href="/cierre-mensual"
+        className="block bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-4 hover:border-[#c8a55a]/20 transition-all group touch-press"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
+            <Calendar size={14} className="text-[#c8a55a]/40 group-hover:text-[#c8a55a]/60 transition-colors" />
+          </div>
+          <p className="text-[#888] text-sm group-hover:text-[#999] transition-colors flex-1">
+            {message}
+          </p>
+          <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0" />
+        </div>
+      </Link>
+    </div>
+  );
 }
 
 export default function DashboardPage() {
@@ -235,6 +296,9 @@ export default function DashboardPage() {
           {getTimeGreeting()}, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
         </h1>
       </div>
+
+      {/* ═══ 1b. Monthly Closure Prompt — subtle, no urgency ═══ */}
+      <MonthlyClosurePrompt />
 
       {/* ═══ 2. Reflection ═══ */}
       <div className="dash-section-enter dash-section-delay-2">

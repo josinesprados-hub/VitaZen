@@ -51,6 +51,7 @@ model User {
   notificationPreference NotificationPreference?
   notificationLog   NotificationLog[]
   widgetSnapshots   WidgetSnapshot[]
+  monthlyClosures   MonthlyClosure[]
 }
 
 // ═══════════════════════════════════════════
@@ -418,6 +419,29 @@ model NotificationLog {
 // Snapshots are computed on data change, not on read.
 // This means widget reads are O(1) — no heavy DB queries on every refresh.
 // ═══════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+// MONTHLY CLOSURE — Cierre Mensual
+// The second core Élite feature.
+// Reflection first, then data. Always.
+// The reflection is PRIVATE — never sent to AI, never scored.
+// ═══════════════════════════════════════════
+
+model MonthlyClosure {
+  id              String   @id @default(cuid())
+  userId          String
+  month           String   // YYYY-MM format (e.g. "2025-04")
+  reflection      String?  // Private, intimate — never analyzed by AI
+  reflectedAt     DateTime? // When the user wrote their reflection
+  summaryViewedAt DateTime? // When the user saw the monthly summary
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month])
+  @@index([userId])
+}
 
 model WidgetSnapshot {
   id          String   @id @default(cuid())
