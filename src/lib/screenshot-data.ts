@@ -57,7 +57,7 @@ export const SCREENSHOT_STREAKS = {
   checkinStreak: 9,
   generalStreak: 9,
   streakMessage: {
-    message: '9 días consecutivos. Tu consistencia está creando hábitos reales.',
+    message: '9 días. Ya es costumbre.',
     tone: 'positive',
   },
 };
@@ -80,7 +80,7 @@ export const SCREENSHOT_TODAY_CHECKIN = {
 export const SCREENSHOT_MOMENTUM = {
   score: 74,
   level: 'fuerte',
-  description: 'Tu consistencia está por encima de la media. Sigue así.',
+  description: 'Buen ritmo esta semana.',
   trend: 'up' as const,
   currentStreak: 9,
 };
@@ -89,9 +89,9 @@ export const SCREENSHOT_MOMENTUM = {
 
 export const SCREENSHOT_EMOTIONAL_STATE: EmotionalState = {
   status: 'enfocado',
-  statusDescription: 'Tu energía y enfoque están alineados. Es un buen momento para tareas que requieran concentración profunda.',
-  summary: 'Tu disciplina y claridad mental están en sintonía hoy.',
-  recommendation: 'Aprovecha este estado para avanzar en tu objetivo principal del día.',
+  statusDescription: 'Energía y enfoque alineados.',
+  summary: 'Disciplina y claridad hoy.',
+  recommendation: 'Buena claridad. Lo que hagas con ella es tuyo.',
   plan: 'PREMIUM',
   metrics: {
     energy: {
@@ -256,8 +256,8 @@ export const SCREENSHOT_HABITS = [
 
 // ─── Premium Reflection (for screenshots) ─
 
-export const SCREENSHOT_REFLECTION = 'La disciplina no grita. La disciplina simplemente aparece cada día y hace lo que tiene que hacer.';
+export const SCREENSHOT_REFLECTION = 'No confundas movimiento con progreso.';
 
 // ─── User name (for greeting) ─────────────
 
-export const SCREENSHOT_USER_NAME = 'Guerrero';
+export const SCREENSHOT_USER_NAME = 'VitaZen';

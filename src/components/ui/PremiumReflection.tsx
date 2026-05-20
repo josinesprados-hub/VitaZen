@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { REFLECTIONS } from '@/lib/reflections';
+import { useEffect, useState, useRef } from 'react';
+import { REFLECTIONS, selectWeightedReflection, isDeepReflection } from '@/lib/reflections';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 
@@ -16,49 +16,23 @@ import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 // - NO auto-rotation — the reflection stays until the user leaves
 //   and comes back. A reflection doesn't rotate like a feed.
 // - Never repeats until full collection traversed
-// - After completing a cycle, reshuffles but avoids
-//   the last N shown to prevent close repetition
+// - Deep reflections stay for 2 visits (not 1)
+// - Weighted selection: light 50%, relevant 35%, deep 15%
 // - Persists state in localStorage
 // - Avoids hydration mismatch (client-only init)
 
 const STORAGE_KEY = 'vitazen_reflection_state';
 const FADE_DURATION = 600;
-// How many recent reflections to avoid after reshuffling
-const AVOID_RECENT_COUNT = 5;
 
 interface ReflectionState {
-  /** Index within the shuffled order */
-  position: number;
-  /** Shuffled indices — guarantees no repeat until full cycle */
-  order: number[];
-  /** Last N indices shown — to avoid close repetition after reshuffle */
+  /** Current reflection index in REFLECTIONS array */
+  currentIndex: number;
+  /** Visit count for current reflection (deep ones stay 2 visits) */
+  visitCount: number;
+  /** Already-shown indices — no repeat until full cycle */
+  shown: number[];
+  /** Last N indices — avoid close repetition after cycle reset */
   recent: number[];
-}
-
-/**
- * Fisher-Yates shuffle.
- * Returns a new array of indices 0..n-1 in random order.
- */
-function shuffledOrder(n: number): number[] {
-  const arr = Array.from({ length: n }, (_, i) => i);
-  for (let i = n - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-/**
- * Shuffle that avoids placing recent items at the start.
- * The recent items get pushed towards the end of the shuffle.
- */
-function shuffledOrderAvoiding(n: number, recent: number[]): number[] {
-  const order = shuffledOrder(n);
-  // Move recent items to the end so they won't appear first
-  const recentSet = new Set(recent);
-  const notRecent = order.filter(i => !recentSet.has(i));
-  const isRecent = order.filter(i => recentSet.has(i));
-  return [...notRecent, ...isRecent];
 }
 
 /**
@@ -69,8 +43,13 @@ function loadState(): ReflectionState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as ReflectionState;
-      // Validate: order must match current collection length
-      if (parsed.order && parsed.order.length === REFLECTIONS.length && parsed.position < parsed.order.length) {
+      // Validate: must have valid index
+      if (
+        typeof parsed.currentIndex === 'number' &&
+        parsed.currentIndex >= 0 &&
+        parsed.currentIndex < REFLECTIONS.length &&
+        Array.isArray(parsed.shown)
+      ) {
         return parsed;
       }
     }
@@ -81,10 +60,13 @@ function loadState(): ReflectionState {
 }
 
 function freshState(): ReflectionState {
+  // First reflection: weighted selection
+  const index = selectWeightedReflection([]);
   return {
-    position: 0,
-    order: shuffledOrder(REFLECTIONS.length),
-    recent: [],
+    currentIndex: index,
+    visitCount: 0,
+    shown: [index],
+    recent: [index],
   };
 }
 
@@ -100,8 +82,8 @@ export default function PremiumReflection() {
   const { isActive: screenshotMode } = useScreenshotMode();
   const [visible, setVisible] = useState(false);
   const [reflection, setReflection] = useState('');
+  const [isDeep, setIsDeep] = useState(false);
   const stateRef = useRef<ReflectionState | null>(null);
-  const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initialize on mount (client-only, avoids hydration mismatch)
   useEffect(() => {
@@ -114,36 +96,52 @@ export default function PremiumReflection() {
 
     const state = loadState();
 
-    // Advance on every visit (change when returning to dashboard)
-    // If position is 0 from a fresh state, show the first one without advancing
-    const isFirstVisit = !localStorage.getItem(STORAGE_KEY);
-    if (!isFirstVisit) {
-      const nextPos = state.position + 1;
-      if (nextPos >= state.order.length) {
-        // Completed cycle — reshuffle, avoiding recent
-        state.order = shuffledOrderAvoiding(REFLECTIONS.length, state.recent);
-        state.position = 0;
-        state.recent = [];
-      } else {
-        state.position = nextPos;
-      }
+    // Advance on every visit
+    // If visitCount < required visits, keep the same reflection
+    const currentIsDeep = isDeepReflection(state.currentIndex);
+    const requiredVisits = currentIsDeep ? 2 : 1;
+
+    if (state.visitCount < requiredVisits - 1) {
+      // Stay on current reflection for one more visit
+      state.visitCount++;
+      stateRef.current = state;
+      saveState(state);
+      setReflection(REFLECTIONS[state.currentIndex].text);
+      setIsDeep(currentIsDeep);
+      setVisible(true);
+      return;
     }
 
-    // Track recent reflections to avoid close repetition
-    const currentIdx = state.order[state.position];
-    state.recent = [...state.recent, currentIdx].slice(-AVOID_RECENT_COUNT);
+    // Time to advance to a new reflection
+    const isFirstVisit = !localStorage.getItem(STORAGE_KEY);
+    if (isFirstVisit) {
+      // Fresh state: show first reflection without advancing
+      state.visitCount = 0;
+    } else {
+      // Select next reflection using weighted system, avoiding recently shown
+      const excludeIndices = state.recent;
+      const newIndex = selectWeightedReflection(excludeIndices);
+
+      state.currentIndex = newIndex;
+      state.visitCount = 0;
+      state.shown = [...state.shown, newIndex];
+
+      // Track recent (last 10 to avoid close repetition)
+      state.recent = [...state.recent, newIndex].slice(-10);
+
+      // Check if we've shown most reflections — reset cycle
+      if (state.shown.length >= REFLECTIONS.length - 5) {
+        state.shown = state.recent.slice(-5);
+      }
+    }
 
     stateRef.current = state;
     saveState(state);
 
-    setReflection(REFLECTIONS[currentIdx]);
-
-    // Show immediately — no artificial delay
+    const newIsDeep = isDeepReflection(state.currentIndex);
+    setReflection(REFLECTIONS[state.currentIndex].text);
+    setIsDeep(newIsDeep);
     setVisible(true);
-
-    return () => {
-      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
-    };
   }, [screenshotMode]);
 
   if (!reflection) {

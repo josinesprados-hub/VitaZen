@@ -209,7 +209,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'enfocado',
       label: 'Enfocado',
-      description: 'Tu mente y energía están alineadas.',
+      description: 'Claridad y energía alineadas.',
     };
   }
 
@@ -218,7 +218,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'Estrés alto, energía baja.',
+      description: 'Mucho peso, poca energía.',
     };
   }
 
@@ -227,7 +227,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'El estrés está pesando.',
+      description: 'El estrés pesa.',
     };
   }
 
@@ -240,7 +240,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
       return {
         status: 'en_progreso',
         label: 'En progreso',
-        description: 'Tus hábitos se van asentando.',
+        description: 'Los hábitos se van asentando.',
       };
     }
   }
@@ -250,7 +250,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'estable',
       label: 'Estable',
-      description: 'Equilibrio razonable.',
+      description: 'Ritmo razonable.',
     };
   }
 
@@ -288,9 +288,9 @@ function generateRecommendation(
   // Stress-based
   if (stress <= 30) {
     if (energy <= 35) {
-      return 'Reducir el ritmo hoy puede ayudar.';
+      return 'Día para ir despacio.';
     }
-    return 'Una respiración consciente antes de seguir.';
+    return 'Un momento quieto antes de seguir.';
   }
 
   // Energy-based
@@ -300,17 +300,17 @@ function generateRecommendation(
 
   // Focus-based
   if (focus >= 70 && energy >= 60) {
-    return 'Buen momento para lo importante.';
+    return 'Buena claridad hoy.';
   }
 
   // Consistency-based
   if (consistency >= 70) {
-    return 'Consistencia notable esta semana.';
+    return 'Buen ritmo esta semana.';
   }
 
   // Status-specific
   if (status === 'enfocado') {
-    return 'Canaliza esta claridad.';
+    return 'Claridad. Lo que hagas con ella es tuyo.';
   }
 
   if (status === 'en_progreso') {
@@ -347,35 +347,35 @@ function generateSummary(
 
   // Specific patterns
   if (consistencyUp && isPremium) {
-    return 'Tu consistencia mejoró esta semana.';
+    return 'Más consistencia esta semana.';
   }
 
   if (energyUp && isPremium) {
-    return 'Tu energía mejoró respecto a la semana pasada.';
+    return 'Más energía que la semana pasada.';
   }
 
   if (stressDown && isPremium) {
-    return 'Has reducido el estrés.';
+    return 'Menos estrés últimamente.';
   }
 
   if (consistency >= 70) {
-    return 'Buena estabilidad estos días.';
+    return 'Ritmo estable estos días.';
   }
 
   if (status === 'sobrecargado') {
-    return 'Tu cuerpo y mente piden una pausa.';
+    return 'El cuerpo pide pausa.';
   }
 
   if (status === 'enfocado') {
-    return 'Claridad y determinación.';
+    return 'Claridad.';
   }
 
   if (progress >= 60) {
-    return 'Buena actividad esta semana.';
+    return 'Semana activa.';
   }
 
   if (progress >= 30) {
-    return 'Avanzas a tu ritmo.';
+    return 'A tu ritmo.';
   }
 
   // No data

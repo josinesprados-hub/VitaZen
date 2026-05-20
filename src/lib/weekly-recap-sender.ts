@@ -134,22 +134,22 @@ function generateEmailRecommendation(
   plan: string
 ): string {
   if (energy <= 35) {
-    return 'Tu energía ha estado baja esta semana. Revisa tu descanso.';
+    return 'La energía ha estado baja. El descanso es parte del proceso.';
   }
 
   if (consistency >= 65) {
-    return 'Tu consistencia esta semana es notable.';
+    return 'Buena consistencia esta semana.';
   }
 
   if (score >= 60) {
-    return 'Vas por buen camino.';
+    return 'Buen ritmo.';
   }
 
   if (score >= 30) {
-    return 'Cada paso cuenta.';
+    return 'Poco a poco.';
   }
 
-  return 'Semana tranquila. Cuando estés listo, un pequeño paso basta.';
+  return 'Semana tranquila.';
 }
 
 // ─────────────────────────────────────────

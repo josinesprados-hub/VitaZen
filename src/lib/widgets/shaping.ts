@@ -58,7 +58,7 @@ export async function shapeReflectionPayload(
 ): Promise<ReflectionWidgetPayload> {
   const dateKey = getTodayDateKey();
   const index = getDailyIndex(dateKey + userId, REFLECTIONS.length);
-  const text = REFLECTIONS[index];
+  const text = REFLECTIONS[index].text;
   const categoryIndex = getDailyIndex(dateKey, REFLECTION_CATEGORIES.length);
 
   const payload: ReflectionWidgetPayload = {
@@ -265,6 +265,8 @@ const CHECKIN_NUDGES = [
   'Un momento para ti',
   'Tu espacio',
   'Respira',
+  'Cuando quieras',
+  'Sin prisa',
 ] as const;
 
 export async function shapeCheckinPayload(
@@ -396,7 +398,7 @@ export async function shapeCalmQuotePayload(
     quoteIndex = (quoteIndex + 1) % REFLECTIONS.length;
   }
 
-  const quote = REFLECTIONS[quoteIndex];
+  const quote = REFLECTIONS[quoteIndex].text;
   const categoryIndex = getDailyIndex(dateKey + '_cat', QUOTE_CATEGORIES.length);
 
   return {

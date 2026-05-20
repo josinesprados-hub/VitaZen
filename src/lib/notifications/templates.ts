@@ -1,20 +1,21 @@
 // ═══════════════════════════════════════════
 // NOTIFICATION TEMPLATES — VitaZen
+// ═══════════════════════════════════════════
+//
 // Calm, human, premium messaging.
 // The user should feel: "la app me acompaña"
 // NOT: "la app me persigue"
-// ═══════════════════════════════════════════
+//
+// Expanded with more variety.
+// Every message validated for:
+//  - No guilt-tripping language ("deberías", "tienes que")
+//  - No urgency ("¡ya!", "¡ahora!")
+//  - No anxiety ("no pierdas tu racha")
+//  - No coaching
+//  - No wellness startup tone
+//  - Calm, inviting, human, varied
 
 import { NotificationType, NotificationTemplate } from './types';
-
-/** Rotating message sets per type.
- *  Each send picks one at random to avoid repetition fatigue.
- *  Every message is validated for:
- *   - No guilt-tripping language ("deberías", "tienes que")
- *   - No urgency ("¡ya!", "¡ahora!")
- *   - No anxiety ("no pierdas tu racha")
- *   - Calm, inviting, human tone
- */
 
 const CHECKIN_TEMPLATES: NotificationTemplate[] = [
   {
@@ -32,6 +33,16 @@ const CHECKIN_TEMPLATES: NotificationTemplate[] = [
     body: 'Un momento para ti, si quieres.',
     url: '/checkin',
   },
+  {
+    title: 'El día empieza',
+    body: 'Sin prisa.',
+    url: '/checkin',
+  },
+  {
+    title: 'Cuando quieras',
+    body: 'Tu espacio está ahí.',
+    url: '/checkin',
+  },
 ];
 
 const STREAK_TEMPLATES: NotificationTemplate[] = [
@@ -45,12 +56,22 @@ const STREAK_TEMPLATES: NotificationTemplate[] = [
     body: 'Sigues aquí.',
     url: '/dashboard',
   },
+  {
+    title: '{streak} días seguidos',
+    body: 'Poco a poco.',
+    url: '/dashboard',
+  },
 ];
 
 const WEEKLY_RECAP_TEMPLATES: NotificationTemplate[] = [
   {
     title: 'Tu semana',
     body: 'Un resumen tranquilo, cuando quieras.',
+    url: '/insights',
+  },
+  {
+    title: 'La semana',
+    body: 'Un momento para mirar atrás.',
     url: '/insights',
   },
 ];
@@ -64,6 +85,16 @@ const COMEBACK_TEMPLATES: NotificationTemplate[] = [
   {
     title: 'Bienvenido',
     body: 'Sin prisa. Cuando tú decidas.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Otra vez',
+    body: 'Tu espacio no se movió.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Hola',
+    body: 'Lo importante es que estás aquí.',
     url: '/dashboard',
   },
 ];
@@ -86,7 +117,17 @@ const REFLECTION_TEMPLATES: NotificationTemplate[] = [
   },
   {
     title: 'La noche llega',
-    body: 'No tienes que escribir nada largo. Solo sentir.',
+    body: 'No tienes que escribir nada largo.',
+    url: '/timeline',
+  },
+  {
+    title: 'El día se cierra',
+    body: 'Si hay algo que quieras notar.',
+    url: '/timeline',
+  },
+  {
+    title: 'Un momento quieto',
+    body: 'Antes de que el día se vaya.',
     url: '/timeline',
   },
 ];

@@ -15,10 +15,11 @@ import { useEffect, useState } from 'react';
 
 function getReturnMessage(daysSince: number): string {
   if (daysSince <= 0) return '';
-  if (daysSince === 1) return 'Mantienes el ritmo.';
-  if (daysSince <= 3) return 'Hace unos días que no aparecías.';
-  if (daysSince <= 7) return 'Bueno verte de nuevo.';
-  return 'Aquí estás. Eso es lo que importa.';
+  if (daysSince === 1) return 'De nuevo por aquí.';
+  if (daysSince <= 3) return 'Hace unos días.';
+  if (daysSince <= 7) return 'Bueno verte.';
+  if (daysSince <= 14) return 'Tiempo sin pasar.';
+  return 'Aquí estás.';
 }
 
 export function ReturnTrigger() {

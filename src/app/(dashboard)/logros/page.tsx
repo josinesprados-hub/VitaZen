@@ -189,7 +189,7 @@ export default function LogrosPage() {
         </div>
         <p className="text-[10px] text-[#555] flex items-center gap-1 mt-3">
           <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
-          Más profundidad con el tiempo
+          Más con el tiempo
         </p>
       </div>
 

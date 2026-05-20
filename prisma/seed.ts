@@ -91,35 +91,35 @@ async function main() {
   // ═══════════════════════════════════════════
 
   const tips = [
-    // DISCIPLINA
-    { empire: 'disciplina', title: 'La regla de los 2 días', content: 'Nunca te saltes un hábito dos días seguidos. Un día perdido es un accidente; dos es el inicio de una nueva costumbre.', plan: 'FREE' },
-    { empire: 'disciplina', title: 'Stacking de hábitos', content: 'Ancla cada nuevo hábito a uno que ya haces automáticamente. "Después de [hábito existente], haré [nuevo hábito]".', plan: 'FREE' },
-    { empire: 'disciplina', title: 'El poder del compromiso público', content: 'Declara tu meta ante alguien que te importa. El compromiso social aumenta la probabilidad de éxito en un 65%.', plan: 'PREMIUM' },
-    { empire: 'disciplina', title: 'Diseña tu entorno', content: 'Modifica tu entorno para que el buen comportamiento sea fácil y el malo difícil. Pon el libro en la mesa de noche y el teléfono en otra habitación.', plan: 'PREMIUM' },
+    // DISCIPLINA — observaciones, no instrucciones
+    { empire: 'disciplina', title: 'Dos días', content: 'Un día sin hábito es un accidente. Dos días ya es costumbre nueva.', plan: 'FREE' },
+    { empire: 'disciplina', title: 'Anclaje', content: 'Conecta lo nuevo con lo que ya haces sin pensar. Lo que empieza unido al ritmo existente tiene más probabilidad de quedarse.', plan: 'FREE' },
+    { empire: 'disciplina', title: 'Lo que dices en voz alta', content: 'Decirle a alguien lo que quieres cambiar le da peso. No por presión — porque lo saca del pensamiento y lo pone en el mundo.', plan: 'PREMIUM' },
+    { empire: 'disciplina', title: 'El entorno decide', content: 'Lo que rodea un hábito importa más que la voluntad. Si el libro está en la mesa de noche, se lee. Si el teléfono está en otra habitación, no se mira.', plan: 'PREMIUM' },
 
-    // MENTE
-    { empire: 'mente', title: 'Respiración 4-7-8', content: 'Inhala 4 segundos, retén 7, exhala 8. Esta técnica activa el sistema nervioso parasimpático y reduce la ansiedad en minutos.', plan: 'FREE' },
-    { empire: 'mente', title: 'Micro-meditación', content: 'No necesitas 30 minutos. 3 minutos de atención plena consciente, 3 veces al día, transforman tu relación con el estrés.', plan: 'FREE' },
-    { empire: 'mente', title: 'Journaling de sombra', content: 'Escribe sobre los pensamientos que juzgas en ti. La integración de tu sombra es la puerta a la auténtica transformación personal.', plan: 'PREMIUM' },
-    { empire: 'mente', title: 'Reprogramación de creencias', content: 'Identifica una creencia limitante, escribe su origen, cuestiona su veracidad y reemplázala con una creencia potenciadora respaldada por evidencia.', plan: 'PREMIUM' },
+    // MENTE — calma, no técnicas
+    { empire: 'mente', title: 'Respirar antes de seguir', content: 'Inhala despacio. Retén. Exhala más lento. No es meditación. Es volver al cuerpo antes de que la mente siga corriendo.', plan: 'FREE' },
+    { empire: 'mente', title: 'Tres minutos', content: 'No hacen falta treinta minutos. Tres minutos de atención plena, tres veces al día, ya cambian la relación con el ruido.', plan: 'FREE' },
+    { empire: 'mente', title: 'Lo que no quieres ver', content: 'Escribir lo que juzgas en ti no es terapia. Es observación sin filtro. A veces, solo nombrarlo cambia algo.', plan: 'PREMIUM' },
+    { empire: 'mente', title: 'De dónde viene eso', content: 'Cada creencia tiene un origen. Si la encuentras, puedes decidir si sigue siendo tuya o la heredaste sin darte cuenta.', plan: 'PREMIUM' },
 
-    // ENERGÍA
-    { empire: 'energia', title: 'Hidratación estratégica', content: 'Bebe 500ml de agua al despertar. Tu cuerpo pierde 1 litro durante la noche. La deshidratación reduce tu energía un 25%.', plan: 'FREE' },
-    { empire: 'energia', title: 'Movimiento cada 60 minutos', content: 'Levántate y muévete durante 5 minutos cada hora. El sedentarismo prolongado reduce la producción de energía celular.', plan: 'FREE' },
-    { empire: 'energia', title: 'Nutrición para rendimiento', content: 'Prioriza proteína en el desayuno (30g mínimo). Estabiliza la glucosa y elimina los picos de energía seguidos de caídas.', plan: 'PREMIUM' },
-    { empire: 'energia', title: 'Optimización del sueño', content: 'Mantén tu habitación a 18-20°C, completamente oscura, y sin pantallas 90 minutos antes de dormir. El sueño es el pilar de la energía.', plan: 'PREMIUM' },
+    // ENERGÍA — sensaciones, no optimización
+    { empire: 'energia', title: 'Lo primero del día', content: 'El cuerpo pierde un litro de agua por la noche. Empezar con medio litro no es optimización — es sentido común.', plan: 'FREE' },
+    { empire: 'energia', title: 'Cada hora, muévete', content: 'Cinco minutos de movimiento cada hora. No es ejercicio. Es recordar que tienes cuerpo.', plan: 'FREE' },
+    { empire: 'energia', title: 'Proteína por la mañana', content: 'Lo que comes al despertar marca el ritmo del día. Proteína en el desayuno estabiliza la energía sin picos.', plan: 'PREMIUM' },
+    { empire: 'energia', title: 'Lo que pasa antes de dormir', content: 'La habitación fresca y oscura. Sin pantallas antes de acostarse. El sueño es la base de todo lo demás.', plan: 'PREMIUM' },
 
-    // RIQUEZA
-    { empire: 'riqueza', title: 'La regla del pago a ti mismo', content: 'Destina al menos el 10% de cada ingreso a ahorro o inversión antes de cualquier otro gasto. Págate primero.', plan: 'FREE' },
-    { empire: 'riqueza', title: 'Auditoría de suscripciones', content: 'Revisa todas tus suscripciones mensuales. Elimina las que no usas activamente. El dinero ahorrado es dinero invertido.', plan: 'FREE' },
-    { empire: 'riqueza', title: 'El presupuesto 50/30/20', content: '50% necesidades, 30% deseos, 20% ahorro/inversión. Esta simple regla transforma tu relación con el dinero sin sentir privación.', plan: 'PREMIUM' },
-    { empire: 'riqueza', title: 'Fondo de emergencia primero', content: 'Antes de invertir, acumula 3-6 meses de gastos en un fondo de emergencia. La seguridad financiera es la base de la libertad.', plan: 'PREMIUM' },
+    // RIQUEZA — tranquilidad, no rentabilidad
+    { empire: 'riqueza', title: 'Págate primero', content: 'Antes de cualquier gasto, destina algo a ahorro. No es una regla financiera — es una forma de priorizarte.', plan: 'FREE' },
+    { empire: 'riqueza', title: 'Lo que pagas sin usar', content: 'Revisa las suscripciones. Lo que no usas activamente es dinero que se fue sin que lo notaras.', plan: 'FREE' },
+    { empire: 'riqueza', title: '50, 30, 20', content: 'La mitad a lo necesario. Un tercio a lo que quieres. El resto, al futuro. Simple, no perfecto.', plan: 'PREMIUM' },
+    { empire: 'riqueza', title: 'La seguridad primero', content: 'Antes de invertir, tener tres a seis meses de gastos guardados. La tranquilidad de saber que puedes parar cambia las decisiones.', plan: 'PREMIUM' },
 
-    // CRECIMIENTO
-    { empire: 'crecimiento', title: 'Reflexión semanal', content: 'Dedica 30 minutos cada domingo a revisar la semana: qué aprendiste, qué mejorarías, qué celebras. La reflexión convierte experiencia en sabiduría.', plan: 'FREE' },
-    { empire: 'crecimiento', title: 'La pregunta poderosa', content: 'Cada mañana pregúntate: "Si hoy fuera el único día que importara, ¿qué haría diferente?" La respuesta revela tus verdaderas prioridades.', plan: 'FREE' },
-    { empire: 'crecimiento', title: 'Mapa de identidad', content: 'Define quién quieres ser, no solo qué quieres lograr. Las metas sin identidad son deseos. La identidad sin metas es fantasía.', plan: 'PREMIUM' },
-    { empire: 'crecimiento', title: 'Sistema de mentores', content: 'Identifica 3 personas que ya están donde tú quieres estar. Estudia sus patrones, decisiones y mentalidad. Modela lo que funciona.', plan: 'PREMIUM' },
+    // CRECIMIENTO — reflexión, no productividad
+    { empire: 'crecimiento', title: 'Mirar la semana', content: 'Un momento cada siete días: qué aprendiste, qué cambiarías, qué te quedas. No es evaluación — es reconocimiento.', plan: 'FREE' },
+    { empire: 'crecimiento', title: 'Una pregunta', content: 'Si hoy fuera el único día que importara, ¿qué harías diferente? La respuesta dice más sobre las prioridades que cualquier plan.', plan: 'FREE' },
+    { empire: 'crecimiento', title: 'Quién, no qué', content: 'Las metas sin identidad son deseos. La identidad sin metas es fantasía. Primero: quién quieres ser. Luego: qué haría esa persona.', plan: 'PREMIUM' },
+    { empire: 'crecimiento', title: 'Los que ya están ahí', content: 'Tres personas que ya viven lo que buscas. No necesitas hablar con ellas — observar sus patrones ya enseña.', plan: 'PREMIUM' },
   ];
 
   for (const tip of tips) {

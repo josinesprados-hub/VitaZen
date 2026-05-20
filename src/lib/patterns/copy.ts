@@ -4,11 +4,10 @@
 //
 // Tone: observación calmada.
 //
-// Fourth filter added:
+// Filters:
 // ¿Esto parece una reflexión humana sobria
 //   o una app intentando sonar inteligente?
 //
-// Fifth filter added:
 // ¿Esto suena a UX writer diseñando frases
 //   o a alguien que simplemente observó algo?
 //
@@ -23,33 +22,36 @@
 // - Short > long
 // - Quiet > loud
 // - Simple > clever
-// ═══════════════════════════════════════════
+// - 3 variations per connection — enough variety without noise
 
 import type { EmpireConnection } from './types';
 
 // ─── Observation Templates ───
-// 2 per connection. No more.
-// Direct. Specific. Not designed-sounding.
+// 3 per connection. Direct. Specific. Not designed-sounding.
 
 const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
   'finanzas-energia': [
     'Las semanas con menos descanso tienen más disfrute.',
     'Menos descanso, más disfrute.',
+    'Cuando descansas menos, gastas más en ti.',
   ],
 
   'finanzas-mente': [
     'Semanas con más práctica mental, más tranquilidad.',
     'Cuando hay sesiones de mente, tranquilidad también está.',
+    'Más mente, más calma en los números.',
   ],
 
   'finanzas-estres': [
     'Semanas con más presión, más necesidad en tus gastos.',
     'Cuando hay presión, necesidad aparece más.',
+    'Estrés y necesidad van juntos.',
   ],
 
   'finanzas-sueno': [
     'Semanas con peor descanso, más necesidad.',
     'Menos sueño, más necesidad.',
+    'No dormir bien cambia lo que necesitas.',
   ],
 };
 

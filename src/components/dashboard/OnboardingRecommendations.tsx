@@ -24,25 +24,25 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
     name: 'Mente',
     icon: Brain,
     href: '/imperio/mente',
-    tip: 'Tu foco está en la calma mental.',
+    tip: 'Calma mental.',
   },
   disciplina: {
     name: 'Disciplina',
     icon: Shield,
     href: '/imperio/disciplina',
-    tip: 'Tu prioridad es la constancia.',
+    tip: 'Constancia.',
   },
   energia: {
     name: 'Energía',
     icon: Zap,
     href: '/imperio/energia',
-    tip: 'Tu energía importa.',
+    tip: 'Energía.',
   },
   riqueza: {
     name: 'Finanzas',
     icon: Gem,
     href: '/imperio/riqueza',
-    tip: 'Tu foco financiero.',
+    tip: 'Finanzas.',
   },
 };
 
@@ -91,13 +91,13 @@ export function OnboardingRecommendations() {
   const tips: string[] = [focusConfig.tip];
 
   if (onboarding.data.stressLevel >= 4) {
-    tips.push('Tu estrés está alto.');
+    tips.push('Estrés alto últimamente.');
   }
   if (onboarding.data.energyLevel <= 2) {
-    tips.push('Tu energía está baja.');
+    tips.push('Poca energía estos días.');
   }
   if (onboarding.data.focusLevel <= 2) {
-    tips.push('El enfoque se entrena.');
+    tips.push('El enfoque va a su ritmo.');
   }
 
   return (

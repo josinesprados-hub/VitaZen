@@ -40,18 +40,18 @@ function calcStreak(dates: Date[]): number {
 // Get a human, non-toxic message for streak state
 function getStreakMessage(streak: number, wasActiveYesterday: boolean): { message: string; tone: 'active' | 'warm' | 'gentle' } {
   if (streak >= 7) {
-    return { message: `${streak} días consecutivos. Tu constancia inspira.`, tone: 'active' };
+    return { message: `${streak} días. Ya es costumbre.`, tone: 'active' };
   }
   if (streak >= 3) {
-    return { message: `${streak} días seguidos. Sigue así.`, tone: 'active' };
+    return { message: `${streak} días seguidos. Poco a poco.`, tone: 'active' };
   }
   if (streak >= 1) {
-    return { message: `${streak} día${streak > 1 ? 's' : ''}. Cada paso cuenta.`, tone: 'warm' };
+    return { message: `${streak} día${streak > 1 ? 's' : ''}.`, tone: 'warm' };
   }
   if (wasActiveYesterday) {
-    return { message: 'Hoy es un buen día para retomar.', tone: 'warm' };
+    return { message: 'Hoy es un nuevo día.', tone: 'warm' };
   }
-  return { message: 'Cada día es una oportunidad para avanzar.', tone: 'gentle' };
+  return { message: '', tone: 'gentle' };
 }
 
 export async function GET(request: NextRequest) {
