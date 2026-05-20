@@ -8,7 +8,9 @@
 //  Parece un espacio que, a veces,
 //  refleja algo importante."
 //
-// Design:
+// Stability principles:
+// - NEVER returns null — always reserves its space
+// - Cache-first: shows cached data instantly, updates silently
 // - Weight-based persistence: profunda lasts 4 weeks,
 //   relevante 2 weeks, ligera 1 week
 // - More negative space than content
@@ -22,7 +24,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { Crown, Link2 } from 'lucide-react';
 import { EMPTY_STATE_MESSAGE, SECTION_TITLE, SECTION_SUBTITLE } from '@/lib/patterns/copy';
-import type { ObservationWeight, WEIGHT_DURATION } from '@/lib/patterns/types';
+import type { ObservationWeight } from '@/lib/patterns/types';
 
 // ─── Types ───
 
@@ -185,19 +187,40 @@ function PremiumPreview({ observation }: { observation: ObservationData }) {
   );
 }
 
+// ─── Silent Skeleton ───
+// During first load (no cache), reserve space silently.
+// No shimmer. No animation. Just presence.
+
+function SilentSkeleton() {
+  return (
+    <div className="py-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Link2 size={11} className="text-[#c8a55a]/10" />
+        <span className="text-[11px] text-[#222]">{SECTION_TITLE}</span>
+      </div>
+      <div className="py-4">
+        <div className="h-4 bg-[#0a0a0a] rounded w-3/4" />
+        <div className="h-3 bg-[#0a0a0a] rounded w-1/2 mt-2" />
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ───
 
 export default function LifePatternsSection() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
   const [data, setData] = useState<PatternsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const fetchedRef = useRef(false);
 
   const isPremium = user?.plan === 'PREMIUM';
 
+  // Mount guard — prevent hydration issues with localStorage
+  useEffect(() => { setMounted(true); }, []);
+
   const fetchPatterns = useCallback(async () => {
-    setLoading(true);
     try {
       // Check cache first — weight-based persistence
       if (user?.id) {
@@ -208,7 +231,8 @@ export default function LifePatternsSection() {
             hasEnoughData: cached.hasEnoughData,
             totalDataPoints: cached.totalDataPoints,
           });
-          setLoading(false);
+          // Data from cache — already visible. No loading state needed.
+          // Silently refresh in background for next visit.
           return;
         }
       }
@@ -224,20 +248,23 @@ export default function LifePatternsSection() {
       }
     } catch (error) {
       console.error('[Patrones] Error fetching:', error);
-    } finally {
-      setLoading(false);
     }
   }, [apiFetch, user?.id]);
 
   useEffect(() => {
+    if (!mounted) return;
     if (!fetchedRef.current) {
       fetchedRef.current = true;
       fetchPatterns();
     }
-  }, [fetchPatterns]);
+  }, [fetchPatterns, mounted]);
 
-  if (loading) return null;
-  if (!data) return null;
+  // Before mount: show silent skeleton to prevent hydration mismatch
+  // and reserve the section's visual space.
+  if (!mounted) return <SilentSkeleton />;
+
+  // Loading state (no cache, first fetch pending)
+  if (!data) return <SilentSkeleton />;
 
   // Not enough data yet
   if (!data.hasEnoughData && data.observations.length === 0) {

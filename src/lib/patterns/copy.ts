@@ -39,12 +39,12 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
 
   'finanzas-mente': [
     'Semanas con más práctica mental, más tranquilidad.',
-    'Cuando hay sesiones de mente, tranquilidad sube.',
+    'Cuando hay sesiones de mente, tranquilidad también está.',
   ],
 
   'finanzas-estres': [
     'Semanas con más presión, más necesidad en tus gastos.',
-    'Cuando sube el estrés, necesidad gana peso.',
+    'Cuando hay presión, necesidad aparece más.',
   ],
 
   'finanzas-sueno': [
@@ -84,4 +84,4 @@ export const EMPTY_STATE_MESSAGE =
 // ─── Section Titles ───
 
 export const SECTION_TITLE = 'Patrones de Vida';
-export const SECTION_SUBTITLE = 'Conexiones que emergen con el tiempo';
+export const SECTION_SUBTITLE = 'Con el tiempo';

@@ -734,6 +734,104 @@ export function EmpireSkeleton({ message }: { message: string }) {
   );
 }
 
+/** Finanzas (riqueza) page skeleton — mirrors the EXACT layout of the non-empty Finanzas page.
+ *  No layout shift between skeleton → content. Same structure. Same space.
+ *  Contemplative: no flashy shimmer, just quiet reserved space. */
+export function FinanzasSkeleton() {
+  return (
+    <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10 pb-24 skeleton-entrance">
+      {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/5" />
+          <div className="space-y-2">
+            <SkeletonLine width="100px" className="h-6 sm:h-7" />
+            <SkeletonLine width="140px" className="h-3" />
+          </div>
+        </div>
+      </div>
+
+      {/* Month Navigation — matches the ← month → row */}
+      <div className="flex items-center justify-between">
+        <div className="w-8 h-8" />
+        <div className="flex items-center gap-2">
+          <SkeletonLine width="120px" className="h-4" />
+        </div>
+        <div className="w-8 h-8" />
+      </div>
+
+      {/* Balance de Intenciones — matches the card with bars */}
+      <SkeletonCard className="p-5 sm:p-7">
+        <SkeletonLine width="200px" className="h-3 mb-5" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <SkeletonLine width={`${55 + i * 10}%`} className="h-3" />
+                <SkeletonLine width="60px" className="h-2.5" />
+              </div>
+              <div className="h-1.5 bg-[#111] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#c8a55a]/10"
+                  style={{ width: `${30 + i * 20}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </SkeletonCard>
+
+      {/* Saldo neto — matches the big number area */}
+      <div>
+        <SkeletonLine width="140px" className="h-8 sm:h-9" />
+        <div className="flex items-center gap-3 mt-1.5">
+          <SkeletonLine width="100px" className="h-3" />
+        </div>
+      </div>
+
+      {/* Insight — reserved, quiet */}
+      <div className="bg-[#c8a55a]/3 border border-[#c8a55a]/10 rounded-xl p-4 sm:p-5">
+        <SkeletonLine width="80%" className="h-4" />
+      </div>
+
+      {/* Historial — matches Movimientos card */}
+      <SkeletonCard className="p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <SkeletonLine width="110px" className="h-5" />
+          <SkeletonLine width="60px" className="h-4" />
+        </div>
+        <div className="flex gap-2 mb-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonBlock key={i} className="h-7 w-20 rounded-lg" />
+          ))}
+        </div>
+        <div className="space-y-5">
+          {[1, 2].map((group) => (
+            <div key={group}>
+              <div className="flex items-center justify-between mb-2.5">
+                <SkeletonLine width="120px" className="h-2.5" />
+                <SkeletonLine width="80px" className="h-2" />
+              </div>
+              <div className="space-y-2">
+                {[1, 2].map((item) => (
+                  <div key={item} className="flex items-center gap-3 bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4">
+                    <div className="w-1 h-8 rounded-full bg-[#1a1a1a]" />
+                    <div className="flex-1 space-y-1.5">
+                      <SkeletonLine width="40%" className="h-3.5" />
+                      <SkeletonLine width="60%" className="h-2.5" />
+                    </div>
+                    <SkeletonLine width="60px" className="h-3.5" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </SkeletonCard>
+    </div>
+  );
+}
+
 /** Weekly Recap skeleton — replaces inline skeleton in WeeklyRecap component */
 export function WeeklyRecapSkeleton() {
   return (
