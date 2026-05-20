@@ -2,28 +2,31 @@
 // Patrones de Vida — Type Definitions
 // ═══════════════════════════════════════════
 //
-// Architecture designed to grow.
-// Separation: detection → rendering → copy → connection types
+// Refined. Stripped down. Only connections that
+// can be properly validated with real data.
 //
-// Philosophy:
-// - Never judge. Never score. Never advise.
-// - Only observe. Only reflect. Only show.
-// - If not enough data: silence.
+// Removed: finanzas-habitos, finanzas-social
+// Reason: These connections cannot be validated
+// with weekly correlation. Without proper
+// validation, they produce false positives
+// and trivially obvious observations.
+//
+// Silence over mediocrity.
 // ═══════════════════════════════════════════
 
 // ─── Connection Types ───
-// Which empires are connected in a pattern
+// Only connections that support weekly correlation
+// between two empires with sufficient data density.
 
 export type EmpireConnection =
   | 'finanzas-energia'
   | 'finanzas-mente'
-  | 'finanzas-habitos'
   | 'finanzas-estres'
-  | 'finanzas-sueno'
-  | 'finanzas-social';
+  | 'finanzas-sueno';
 
 // ─── Pattern Signal ───
-// What the data is telling us — raw signal before human copy
+// What the data is telling us — raw signal before human copy.
+// Now includes validation metadata.
 
 export interface PatternSignal {
   /** Unique identifier for this pattern type */
@@ -36,11 +39,15 @@ export interface PatternSignal {
   minimumDataPoints: number;
   /** Actual data points found */
   dataPointsFound: number;
+  /** What fraction of clean weeks follow the pattern direction */
+  consistencyScore: number;
+  /** How many anomalous weeks were excluded */
+  anomaliesExcluded: number;
 }
 
 // ─── Life Observation ───
-// The final human-readable observation
-// This is what the user sees — calm, intimate, non-judgmental
+// The final human-readable observation.
+// This is what the user sees — calm, intimate, non-judgmental.
 
 export interface LifeObservation {
   /** Unique ID */
@@ -85,7 +92,7 @@ export interface CrossEmpireData {
     completedAt: string;
   }[];
 
-  // Hábitos (HabitLog)
+  // Hábitos (HabitLog) — kept for future validation
   habitLogs: {
     name: string;
     streak: number;
@@ -113,7 +120,7 @@ export interface CrossEmpireData {
 // What the pattern detector returns
 
 export interface PatternDetectionResult {
-  /** Observations that meet the threshold */
+  /** Observations that meet the threshold AND pass all validation */
   observations: LifeObservation[];
   /** Whether there's enough data to even attempt detection */
   hasEnoughData: boolean;

@@ -3,10 +3,13 @@
 // ═══════════════════════════════════════════
 //
 // Gathers data from all empires for the current user
-// and runs the pattern detector. No AI. No external APIs.
-// Only real data + sober logic.
+// and runs the refined pattern detector.
 //
-// Returns observations only when there's enough data.
+// No AI. No external APIs. Only real data + sober logic.
+// Stricter than before. Less output. More weight.
+//
+// Returns observations only when there's enough data
+// AND the observations pass all validation.
 // Otherwise: silence.
 // ═══════════════════════════════════════════
 
@@ -156,8 +159,8 @@ export async function GET(request: NextRequest) {
     const result = detectPatterns(crossEmpireData);
 
     // ── Return results ──
-    // Never expose confidence scores, internal metrics, or raw data
-    // Only the human observations
+    // Never expose confidence scores, consistency, anomalies,
+    // or any internal metrics. Only the human observations.
     return NextResponse.json({
       observations: result.observations.map(o => ({
         id: o.id,
