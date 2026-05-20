@@ -1071,9 +1071,9 @@ export default function RiquezaPage() {
                             <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400'}`}>
                               {log.type === 'income' ? '+' : '-'}{formatCurrency(log.amount)}
                             </p>
-                            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => startEdit(log)} className="p-1.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#555] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={12} /></button>
-                              <button onClick={() => setPendingDeleteId(log.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#555] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={12} /></button>
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <button onClick={() => startEdit(log)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                              <button onClick={() => setPendingDeleteId(log.id)} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                             </div>
                           </div>
                         </div>
