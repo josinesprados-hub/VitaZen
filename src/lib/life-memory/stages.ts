@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════
-// Memoria de Vida — Stage Detection
+// Etapas — Stage Detection
 // ═══════════════════════════════════════════
 //
 // Detects soft human "stages" from accumulated data.

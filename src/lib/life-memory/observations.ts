@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════
-// Memoria de Vida — Observations
+// Etapas — Observations
 // ═══════════════════════════════════════════
 //
 // Generates calm human observations from accumulated data.

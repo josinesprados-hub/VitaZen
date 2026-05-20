@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════
-// Memoria de Vida — Copy
+// Etapas — Copy
 // ═══════════════════════════════════════════
 //
-// All user-facing text for the Life Memory feature.
+// All user-facing text for the Etapas feature.
 // Separated from logic so copy can be reviewed
 // and tuned independently.
 //
@@ -12,12 +12,12 @@
 
 // ─── Page ───
 
-export const PAGE_TITLE = 'Memoria de Vida';
+export const PAGE_TITLE = 'Etapas';
 export const PAGE_SUBTITLE = 'Cómo ha ido cambiando tu vida';
 
 // ─── Section titles ───
 
-export const STAGES_TITLE = 'Etapas';
+export const STAGES_TITLE = 'Periodos';
 export const STAGES_SUBTITLE = 'El ritmo de tu vida';
 
 export const MEMORIES_TITLE = 'Momentos';
@@ -31,10 +31,10 @@ export const PATTERNS_SUBTITLE = 'Relaciones entre partes de tu vida';
 
 // ─── Empty states ───
 
-export const NO_DATA_TITLE = 'Tu memoria se construye con el tiempo';
+export const NO_DATA_TITLE = 'Las etapas se revelan con el tiempo';
 export const NO_DATA_SUBTITLE = 'No hay prisa.';
 
-export const LITTLE_DATA_TITLE = 'Tu memoria está empezando a formarse';
+export const LITTLE_DATA_TITLE = 'Tu vida está empezando a tomar forma';
 export const LITTLE_DATA_SUBTITLE = 'Con el tiempo.';
 
 // ─── FREE vs ÉLITE ───

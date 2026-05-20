@@ -16,7 +16,7 @@ import {
   Clock,
   Trophy,
   Sunrise,
-  BookOpen,
+  Layers,
   CreditCard,
   Crown,
   Loader2,
@@ -163,8 +163,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
               }`}
             >
-              <BookOpen size={18} />
-              Memoria
+              <Layers size={18} />
+              Etapas
             </Link>
 
             <Link
