@@ -1,6 +1,6 @@
 'use client';
 
-import { Lightbulb, Lock, Crown } from 'lucide-react';
+import { Lightbulb, Circle } from 'lucide-react';
 import Link from 'next/link';
 import { useEmpireTips, type Tip } from '@/hooks/useEmpireTips';
 
@@ -9,9 +9,10 @@ import { useEmpireTips, type Tip } from '@/hooks/useEmpireTips';
 // ═══════════════════════════════════════════
 //
 // - Shows 2 FREE tips clearly
-// - Shows PREMIUM tips with SINGLE CTA (not per-tip)
+// - Shows PREMIUM tips with depth indicator
 // - Premium users see all tips unblurred
-// - Clean, minimal, premium feel
+// - No Crown, no Lock, no aggressive CTA
+// - Calm, contemplative, "deeper layers await"
 
 interface EmpireTipsSectionProps {
   empire: string;
@@ -48,7 +49,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
           <TipCard key={tip.id} tip={tip} />
         ))}
 
-        {/* PREMIUM tips — single CTA for all, not per-tip */}
+        {/* PREMIUM tips — depth indicator for free users */}
         {premiumTips.length > 0 && (
           isPremium ? (
             // Premium user: show tips clearly
@@ -56,35 +57,27 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
               <TipCard key={tip.id} tip={tip} />
             ))
           ) : (
-            // Free user: single blur overlay for all premium tips
+            // Free user: gentle dim + depth whisper
             <div className="relative">
-              {/* Blurred preview of premium tips */}
-              <div className="blur-[6px] select-none pointer-events-none saturate-50 space-y-3">
+              {/* Dimmed preview — no blur */}
+              <div className="opacity-30 select-none pointer-events-none space-y-3">
                 {premiumTips.map((tip) => (
                   <TipCard key={tip.id} tip={tip} />
                 ))}
               </div>
 
-              {/* Single CTA overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg backdrop-blur-[2px]">
-                <div className="flex flex-col items-center gap-3 px-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-[#c8a55a]/15 flex items-center justify-center border border-[#c8a55a]/30">
-                    <Crown size={22} className="text-[#c8a55a]" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium text-sm tracking-wide">
-                      Más capas
-                    </p>
-                    <p className="text-[#999] text-xs mt-1">
-                      Con Élite
-                    </p>
-                  </div>
+              {/* Depth overlay — gradient fade */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg depth-gate-overlay">
+                <div className="flex flex-col items-center gap-2 px-6 text-center">
+                  <Circle size={5} className="text-[#c8a55a]/40" fill="currentColor" />
+                  <p className="text-[#888] text-xs leading-relaxed">
+                    Hay notas que solo aparecen cuando miras más despacio
+                  </p>
                   <Link
                     href="/pricing"
-                    className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-all duration-200 shadow-[0_0_20px_rgba(200,165,90,0.15)] hover:shadow-[0_0_30px_rgba(200,165,90,0.25)]"
+                    className="text-[#c8a55a]/40 hover:text-[#c8a55a]/70 transition-colors text-[10px]"
                   >
-                    <Lock size={14} />
-                    Descubrir
+                    Ver profundidad
                   </Link>
                 </div>
               </div>

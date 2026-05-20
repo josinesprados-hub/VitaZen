@@ -37,13 +37,13 @@ export const NO_DATA_SUBTITLE = 'No hay prisa.';
 export const LITTLE_DATA_TITLE = 'Tu vida está empezando a tomar forma';
 export const LITTLE_DATA_SUBTITLE = 'Con el tiempo.';
 
-// ─── FREE vs ÉLITE ───
+// ─── FREE vs Profundidad ───
 
 export const ELITE_STAGES = 'Etapas de vida';
 export const ELITE_TRANSITIONS = 'Transiciones personales';
 export const ELITE_CONNECTIONS = 'Conexiones históricas';
 export const ELITE_EVOLUTION = 'Evolución personal';
-export const ELITE_BADGE = 'Élite';
+export const ELITE_BADGE = 'Profundidad';
 
 export const FREE_LIMIT_MESSAGE = 'Las etapas de vida se revelan con el tiempo';
 

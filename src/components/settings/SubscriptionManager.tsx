@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Crown, CreditCard, Loader2, ChevronRight, Sparkles } from 'lucide-react';
+import { Circle, CreditCard, Loader2, ChevronRight, Eye } from 'lucide-react';
 
 /** Format date to locale string */
 function formatDate(dateStr: string): string {
@@ -29,7 +29,6 @@ export function SubscriptionManager() {
   const subscription = user?.subscription;
 
   const handleManageSubscription = async () => {
-    // All platforms: open Stripe Customer Portal
     setLoading(true);
     try {
       const res = await apiFetch('/api/stripe/portal', { method: 'POST' });
@@ -40,7 +39,6 @@ export function SubscriptionManager() {
           return;
         }
       }
-      // Fallback to pricing page if portal fails
       router.push('/pricing');
     } catch {
       router.push('/pricing');
@@ -57,15 +55,15 @@ export function SubscriptionManager() {
   if (isPremium) {
     return (
       <div className="space-y-4">
-        {/* Premium status card */}
+        {/* Depth status card */}
         <div className="flex items-center gap-3">
           <div className="icon-sm">
-            <Crown size={14} className="text-[#c8a55a]" />
+            <Circle size={5} fill="currentColor" className="text-[#c8a55a]/50" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-sm text-white font-medium">Plan Élite</p>
-              <span className="badge-premium">ACTIVO</span>
+              <p className="text-sm text-white font-medium">Profundizar</p>
+              <span className="text-[9px] font-medium text-[#c8a55a]/40 bg-[#c8a55a]/5 border border-[#c8a55a]/10 px-2 py-0.5 rounded-full">Activo</span>
             </div>
             {subscription?.cancelAtPeriodEnd ? (
               <p className="text-xs text-[#e8a040] mt-0.5">
@@ -77,7 +75,7 @@ export function SubscriptionManager() {
               </p>
             ) : (
               <p className="text-xs text-[#999] mt-0.5">
-                Acceso completo a todas las funciones
+                Acceso a capas más profundas
               </p>
             )}
           </div>
@@ -91,7 +89,7 @@ export function SubscriptionManager() {
         >
           <div className="flex items-center gap-3">
             <div className="icon-sm">
-              <CreditCard size={14} className="text-[#c8a55a]" />
+              <CreditCard size={14} className="text-[#c8a55a]/50" />
             </div>
             <div className="text-left">
               <p className="text-sm text-white font-medium">Gestionar suscripci&oacute;n</p>
@@ -116,32 +114,32 @@ export function SubscriptionManager() {
       {/* Free status */}
       <div className="flex items-center gap-3">
         <div className="icon-sm">
-          <Sparkles size={14} className="text-[#666]" />
+          <Eye size={14} className="text-[#555]" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-sm text-white font-medium">Plan Free</p>
-            <span className="badge-free">FREE</span>
+            <p className="text-sm text-white font-medium">Observar</p>
+            <span className="text-[9px] font-medium text-[#555] px-2 py-0.5">Gratis</span>
           </div>
           <p className="text-xs text-[#999] mt-0.5">
-            Mensajes IA limitados y funciones b&aacute;sicas
+            Registro y observaci&oacute;n b&aacute;sica
           </p>
         </div>
       </div>
 
-      {/* Upgrade CTA */}
+      {/* Depth invitation — not upgrade CTA */}
       <button
         onClick={handleUpgrade}
-        className="flex items-center gap-3 w-full py-3 text-[#c8a55a] hover:text-[#d4b468] transition-colors touch-press"
+        className="flex items-center gap-3 w-full py-3 text-[#c8a55a]/60 hover:text-[#c8a55a] transition-colors touch-press"
       >
         <div className="icon-sm">
-          <Crown size={14} className="text-[#c8a55a]" />
+          <Circle size={5} fill="currentColor" className="text-[#c8a55a]/40" />
         </div>
         <div className="text-left flex-1">
-          <p className="text-sm font-medium">Descubrir Élite</p>
-          <p className="text-xs text-[#999]">Conexiones profundas entre tus imperios</p>
+          <p className="text-sm font-medium">Explorar profundidad</p>
+          <p className="text-xs text-[#777]">Conexiones entre partes de tu vida</p>
         </div>
-        <ChevronRight size={16} className="text-[#555] group-hover:text-[#c8a55a] transition-colors" />
+        <ChevronRight size={16} className="text-[#444] group-hover:text-[#c8a55a] transition-colors" />
       </button>
     </div>
   );

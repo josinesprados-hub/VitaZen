@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (!limitCheck.allowed) {
       return NextResponse.json(
         {
-          error: 'Daily message limit reached. Con Élite, mensajes ilimitados.',
+          error: 'Daily message limit reached. Con Profundidad, mensajes ilimitados.',
           remaining: 0,
           limit: dailyLimit,
           plan: user.plan,

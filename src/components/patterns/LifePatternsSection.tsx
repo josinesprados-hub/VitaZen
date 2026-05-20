@@ -22,7 +22,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Crown, Link2 } from 'lucide-react';
+import { Circle, Link2 } from 'lucide-react';
 import { EMPTY_STATE_MESSAGE, SECTION_TITLE, SECTION_SUBTITLE } from '@/lib/patterns/copy';
 import type { ObservationWeight } from '@/lib/patterns/types';
 
@@ -174,13 +174,13 @@ function WaitingState() {
 function PremiumPreview({ observation }: { observation: ObservationData }) {
   return (
     <div className="relative">
-      <div className="blur-[6px] select-none pointer-events-none saturate-40 opacity-50">
+      <div className="opacity-35 select-none pointer-events-none">
         <ObservationCard observation={observation} />
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex items-center gap-1.5">
-          <Crown size={9} className="text-[#c8a55a]/30" />
-          <span className="text-[10px] text-[#444]">Élite</span>
+          <Circle size={3} className="text-[#c8a55a]/25" fill="currentColor" />
+          <span className="text-[10px] text-[#444]">Más capas con el tiempo</span>
         </div>
       </div>
     </div>
@@ -289,7 +289,7 @@ export default function LifePatternsSection() {
       <div className="flex items-center gap-2 mb-3">
         <Link2 size={10} className="text-[#c8a55a]/15" />
         <span className="text-[10px] sm:text-[11px] text-[#333]">{SECTION_TITLE}</span>
-        <Crown size={6} className="text-[#c8a55a]/15 ml-auto" />
+        <Circle size={3} className="text-[#c8a55a]/15 ml-auto" fill="currentColor" />
       </div>
 
       {/* Observations */}

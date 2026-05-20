@@ -18,7 +18,7 @@ import {
   Sunrise,
   Layers,
   CreditCard,
-  Crown,
+  Circle,
   Loader2,
   LogOut,
   X,
@@ -233,7 +233,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{user?.name || 'Usuario'}</p>
-                <p className="text-xs text-[#c8a55a]">{user?.plan || 'FREE'}</p>
+                <p className="text-xs text-[#c8a55a]/50">{user?.plan === 'PREMIUM' ? 'Profundidad' : 'Observar'}</p>
               </div>
             </Link>
 
@@ -264,7 +264,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 {subscriptionLoading ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  <Crown size={16} />
+                  <Circle size={4} fill="currentColor" className="text-[#c8a55a]/40" />
                 )}
                 Profundizar
               </button>
@@ -296,7 +296,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 ) : (
                   <CreditCard size={16} />
                 )}
-                Tu espacio Élite
+                Tu espacio profundo
               </button>
             )}
 

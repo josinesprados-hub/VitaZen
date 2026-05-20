@@ -90,7 +90,7 @@ export const RHYTHM_STEADY = 'Ritmo constante';
 export const NO_DATA_TITLE = 'Aún no hay datos de este mes';
 export const NO_DATA_SUBTITLE = 'No hay prisa.';
 
-// ─── FREE vs ÉLITE ───
+// ─── FREE vs Profundidad ───
 
 export const ELITE_DEEPER = 'Las conexiones entre tus imperios se revelan con el tiempo';
 export const ELITE_EVOLUTION = 'Evolución acumulativa';

@@ -11,7 +11,7 @@ import {
   MapPin,
   Calendar,
   Mail,
-  Crown,
+  Circle,
   Camera,
   Save,
   Check,
@@ -135,7 +135,7 @@ export default function PerfilPage() {
     });
   };
 
-  const planLabel = user?.plan === 'PREMIUM' ? 'Élite' : 'Free';
+  const planLabel = user?.plan === 'PREMIUM' ? 'Profundidad' : 'Observar';
   const isPremium = user?.plan === 'PREMIUM';
 
   return (
@@ -262,12 +262,12 @@ export default function PerfilPage() {
                 <h2 className="text-lg font-semibold text-white">{user?.name || 'Sin nombre'}</h2>
                 <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
                   {user?.plan === 'PREMIUM' ? (
-                    <span className="badge-premium flex items-center gap-1">
-                      <Crown size={10} />
-                      ÉLITE
+                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
+                      <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                      Profundidad
                     </span>
                   ) : (
-                    <span className="badge-free">FREE</span>
+                    <span className="text-[9px] font-medium text-[#555]">Observar</span>
                   )}
                 </div>
               </>
@@ -379,7 +379,7 @@ export default function PerfilPage() {
           <div className="flex items-center gap-3">
             <div className="icon-sm">
               {isPremium ? (
-                <Crown size={14} className="text-[#c8a55a]" />
+                <Circle size={5} fill="currentColor" className="text-[#c8a55a]/50" />
               ) : (
                 <User size={14} className="text-[#c8a55a]" />
               )}
@@ -389,7 +389,7 @@ export default function PerfilPage() {
               <div className="flex items-center gap-2">
                 <p className="text-white text-sm">{planLabel}</p>
                 {user?.plan === 'PREMIUM' && (
-                  <span className="badge-premium text-[8px]">ACTIVO</span>
+                  <span className="text-[8px] font-medium text-[#c8a55a]/40">Activo</span>
                 )}
               </div>
             </div>

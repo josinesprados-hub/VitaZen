@@ -1,8 +1,18 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Crown } from 'lucide-react';
 import Link from 'next/link';
+import { Circle } from 'lucide-react';
+
+// ─────────────────────────────────────────
+// DepthBlur (formerly PremiumBlur)
+//
+// Reimagined: no aggressive blur, no Crown,
+// no "Descubrir" button, no Lock icon.
+//
+// A gentle dim + a contemplative whisper.
+// The user feels curiosity, not frustration.
+// ─────────────────────────────────────────
 
 interface PremiumBlurProps {
   children: ReactNode;
@@ -11,36 +21,30 @@ interface PremiumBlurProps {
 export default function PremiumBlur({ children }: PremiumBlurProps) {
   return (
     <div className="relative group">
-      {/* Blurred content */}
-      <div className="blur-[6px] select-none pointer-events-none saturate-50">
+      {/* Dimmed content — visible, not blurred */}
+      <div className="opacity-35 select-none pointer-events-none">
         {children}
       </div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg backdrop-blur-[2px] premium-overlay-enter">
+      {/* Depth overlay — gradient fade, not hard wall */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg depth-gate-overlay">
         <div className="flex flex-col items-center gap-3 px-6 text-center">
-          {/* Crown icon */}
-          <div className="w-12 h-12 rounded-full bg-[#c8a55a]/15 flex items-center justify-center border border-[#c8a55a]/30">
-            <Crown size={22} className="text-[#c8a55a]" />
-          </div>
+          {/* Small gold dot — presence, not royalty */}
+          <Circle size={5} className="text-[#c8a55a]/40" fill="currentColor" />
 
-          {/* Message */}
+          {/* Whisper — not a sales pitch */}
           <div>
-            <p className="text-white font-medium text-sm tracking-wide">
-              Más capas aquí
-            </p>
-            <p className="text-[#777] text-xs mt-1">
-              Élite accede a mayor profundidad
+            <p className="text-[#999] text-xs leading-relaxed">
+              Algunas conexiones solo aparecen con el tiempo
             </p>
           </div>
 
-          {/* Depth button — not "upgrade", discover */}
+          {/* Quiet link — not a button */}
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 bg-[#c8a55a]/10 border border-[#c8a55a]/25 text-[#c8a55a] font-medium text-sm px-5 py-2.5 rounded-lg hover:bg-[#c8a55a]/15 hover:border-[#c8a55a]/35 transition-all duration-300"
+            className="text-[#c8a55a]/40 hover:text-[#c8a55a]/70 transition-colors text-[10px]"
           >
-            <Crown size={14} />
-            Descubrir
+            Ver profundidad
           </Link>
         </div>
       </div>

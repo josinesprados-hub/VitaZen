@@ -21,7 +21,7 @@ import {
   Sparkles,
   ArrowLeft,
   ArrowRight,
-  Crown,
+  Circle,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -247,9 +247,9 @@ export default function InsightsPage() {
             <div className="flex items-center gap-2">
               <h1 className="title-page">Observaciones</h1>
               {isPremium && (
-                <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
-                  <Crown size={10} />
-                  Élite
+                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
+                  <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                  Profundidad
                 </span>
               )}
             </div>
@@ -555,21 +555,14 @@ export default function InsightsPage() {
 
       {/* Subtle Premium CTA for FREE users — hidden in screenshot mode */}
       {!isPremium && !screenshotMode && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
-          <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/8 flex items-center justify-center shrink-0">
-            <Crown size={18} className="text-[#c8a55a]/60" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white mb-0.5">Hay capas más profundas</p>
-            <p className="text-[#666] text-xs">Observaciones que solo aparecen con tiempo.</p>
-          </div>
-          <Link
-            href="/pricing"
-            className="inline-flex items-center gap-1.5 bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium px-4 py-2 rounded-xl hover:bg-[#c8a55a]/15 hover:border-[#c8a55a]/30 transition-colors text-xs shrink-0"
-          >
-            <Crown size={12} />
-            Descubrir
-          </Link>
+        <div className="flex items-center justify-center gap-2 py-6 mt-2">
+          <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
+          <p className="text-[11px] text-[#555]">
+            Algunas observaciones solo aparecen con el tiempo —{' '}
+            <Link href="/pricing" className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors">
+              ver más
+            </Link>
+          </p>
         </div>
       )}
     </div>

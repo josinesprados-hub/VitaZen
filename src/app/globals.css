@@ -370,50 +370,52 @@ html { scroll-behavior: smooth; }
   animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
-/* Premium modal backdrop — deeper blur */
+/* Premium modal backdrop — calm, not aggressive.
+   Uses same depth as regular modal, no extra blur. */
 .premium-modal-backdrop {
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Premium modal entrance */
+/* Premium modal entrance — same as regular modal */
 .premium-modal {
-  animation: scaleIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
 /* ═══════════════════════════════════════════
    Unified Badge/Pill System
    ═══════════════════════════════════════════ */
 
-/* Premium badge — consistent across TopBar, Mentor, Insights */
+/* Depth badge — quiet presence for premium plan indicator.
+   Not a badge. Not promotional. Just a quiet label. */
 .badge-premium {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #c8a55a;
-  background: rgba(200, 165, 90, 0.1);
-  border: 1px solid rgba(200, 165, 90, 0.2);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: rgba(200, 165, 90, 0.5);
+  background: transparent;
+  border: none;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
 }
 
-/* FREE plan badge */
+/* FREE plan indicator — same quiet treatment */
 .badge-free {
   display: inline-flex;
   align-items: center;
   font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #c8a55a;
-  background: rgba(200, 165, 90, 0.1);
-  border: 1px solid rgba(200, 165, 90, 0.2);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: #555;
+  background: transparent;
+  border: none;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
 }
@@ -529,19 +531,17 @@ html { scroll-behavior: smooth; }
 }
 
 /* ═══════════════════════════════════════════
-   Premium Shimmer & Pulse
+   Depth Indicators — calm, not promotional
    ═══════════════════════════════════════════ */
 
-/* Premium badge subtle shimmer */
-.premium-badge {
-  animation: premiumShimmer 3s ease-in-out infinite;
-}
-@keyframes premiumShimmer {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 1; }
+/* Depth indicator — quiet presence, no shimmer, no pulse */
+.depth-indicator {
+  animation: none;
 }
 
-/* Premium skeleton shimmer — gold-tinted sweep on dark surface */
+/* Premium skeleton shimmer — gold-tinted sweep on dark surface.
+   KEPT for loading states only, not for badges.
+   Very subtle — barely perceptible sweep. */
 .premium-shimmer {
   background: linear-gradient(
     110deg,

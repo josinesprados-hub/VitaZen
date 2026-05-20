@@ -28,14 +28,10 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          {user?.plan === 'FREE' && (
-            <span className="text-[9px] font-medium text-[#555] tracking-wider uppercase">
-              Free
-            </span>
-          )}
+          {/* Quiet plan indicator — no badge, no crown, just a whisper */}
           {user?.plan === 'PREMIUM' && (
-            <span className="badge-premium">
-              ÉLITE
+            <span className="text-[9px] font-medium text-[#c8a55a]/40 tracking-wider">
+              Profundidad
             </span>
           )}
         </div>

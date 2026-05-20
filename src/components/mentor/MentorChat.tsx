@@ -26,7 +26,7 @@ import {
   Inbox,
   MessageSquareOff,
   BrainCircuit,
-  Crown,
+  Circle,
   Zap,
   Infinity as InfinityIcon,
   ShieldCheck,
@@ -849,8 +849,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </div>
           {remaining <= 3 && remaining > 0 && (
             <p className="text-[10px] text-[#e8a849] mt-1.5 flex items-center gap-1">
-              <Crown size={10} />
-              Élite sin límites
+              <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+              Más profundidad disponible
             </p>
           )}
           {remaining === 0 && (
@@ -858,8 +858,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               onClick={() => setShowLimitModal(true)}
               className="w-full mt-2 text-[10px] text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-lg py-1.5 hover:bg-[#c8a55a]/15 transition-colors flex items-center justify-center gap-1"
             >
-              <Crown size={10} />
-              Descubrir mensajes ilimitados
+              <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+              Conversaciones sin límite
             </button>
           )}
         </div>
@@ -870,7 +870,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         <div className="p-3 border-t border-[#1a1a1a]">
           <div className="flex items-center gap-2 text-[10px] text-[#c8a55a]/70">
             <BrainCircuit size={12} className="shrink-0" />
-            <span>Memoria contextual avanzada</span>
+            <span>Memoria contextual profunda</span>
           </div>
         </div>
       )}
@@ -967,15 +967,15 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-white">Mentor IA</h1>
               {isPremium && (
-                <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
-                  <Crown size={10} className="shrink-0" />
-                  Élite
+                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50 px-2 py-0.5">
+                  <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                  Profundidad
                 </span>
               )}
             </div>
             <p className="text-[#999] text-sm">
               {isPremium
-                ? 'Tu mentor experto con memoria avanzada'
+                ? 'Tu mentor con memoria profunda'
                 : 'Tu guía de desarrollo personal'}
             </p>
           </div>
@@ -1061,7 +1061,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     >
                       <BrainCircuit size={12} className="shrink-0" />
                       <span>
-                        {isPremium ? 'Contexto avanzado' : 'Contextual activo'}
+                        {isPremium ? 'Memoria contextual' : 'Contexto activo'}
                       </span>
                     </button>
                     {showContextTooltip && (
@@ -1088,7 +1088,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
                       <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
                         {isPremium
-                          ? 'Tu mentor experto con memoria avanzada. Pregúntame lo que necesites.'
+                          ? 'Tu mentor con memoria profunda. Pregúntame lo que necesites.'
                           : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
                       </p>
                       <div className="flex flex-wrap justify-center gap-2 mt-4">
@@ -1111,8 +1111,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       </div>
                       {!isPremium && (
                         <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
-                          <Crown size={9} className="text-[#c8a55a]/40" />
-                          Élite: memoria avanzada y contexto personalizado
+                          <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
+                          El mentor recuerda más cuando profundizas
                         </p>
                       )}
                     </div>
@@ -1164,8 +1164,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       onClick={() => setShowLimitModal(true)}
                       className="ml-auto text-[#c8a55a] hover:text-[#d4b468] flex items-center gap-1"
                     >
-                      <Crown size={10} />
-                      Élite
+                      <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                      Profundizar
                     </button>
                   </div>
                 )}
@@ -1372,62 +1372,47 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* ────────── Premium Limit Modal ────────── */}
       {showLimitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 premium-modal-backdrop">
-          <div className="premium-modal bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
-            {/* Gradient top accent */}
-            <div className="h-1 bg-gradient-to-r from-[#c8a55a]/0 via-[#c8a55a] to-[#c8a55a]/0" />
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+          <div className="modal-content bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
             <div className="p-8 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 border border-[#c8a55a]/20 flex items-center justify-center mx-auto mb-5">
-                <Crown size={28} className="text-[#c8a55a]" />
+              <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/8 flex items-center justify-center mx-auto mb-5">
+                <Circle size={5} fill="currentColor" className="text-[#c8a55a]/40" />
               </div>
 
               <h3 className="text-xl font-bold text-white mb-2">
-                Has alcanzado el límite diario
+                Tu ritmo de hoy se ha completado
               </h3>
               <p className="text-[#999] mb-6 text-sm leading-relaxed">
-                Tu plan Free incluye {dailyLimit} mensajes diarios con el Mentor IA. Con Élite, disfrutarás de una experiencia sin límites y mucho más personal.
+                Has conversado lo que corresponde a hoy. Si quieres seguir profundizando, hay un camino.
               </p>
 
-              <div className="grid grid-cols-2 gap-3 mb-6 text-left">
+              <div className="space-y-3 mb-6 text-left">
                 <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
-                  <MessageCircle size={16} className="text-[#c8a55a] mb-2" />
-                  <p className="text-xs text-white font-medium mb-0.5">Mensajes ilimitados</p>
-                  <p className="text-[10px] text-[#666]">Conversaciones sin límite diario</p>
+                  <p className="text-xs text-[#999] font-medium mb-0.5">Conversaciones sin límite diario</p>
+                  <p className="text-[10px] text-[#555]">El mentor está cuando lo necesitas</p>
                 </div>
                 <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
-                  <BrainCircuit size={16} className="text-[#c8a55a] mb-2" />
-                  <p className="text-xs text-white font-medium mb-0.5">Memoria avanzada</p>
-                  <p className="text-[10px] text-[#666]">Mentor que recuerda tu progreso</p>
-                </div>
-                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
-                  <BookOpen size={16} className="text-[#c8a55a] mb-2" />
-                  <p className="text-xs text-white font-medium mb-0.5">Historial completo</p>
-                  <p className="text-[10px] text-[#666]">Acceso a todas tus conversaciones</p>
-                </div>
-                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
-                  <Lightbulb size={16} className="text-[#c8a55a] mb-2" />
-                  <p className="text-xs text-white font-medium mb-0.5">Insights inteligentes</p>
-                  <p className="text-[10px] text-[#666]">Respuestas más profundas y útiles</p>
+                  <p className="text-xs text-[#999] font-medium mb-0.5">Memoria que acumula contexto</p>
+                  <p className="text-[10px] text-[#555]">Cada conversación profundiza la anterior</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <Link
                   href="/pricing"
-                  className="block w-full bg-[#c8a55a] text-black font-semibold py-3.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm text-center"
+                  className="block w-full bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium py-3 rounded-xl hover:bg-[#c8a55a]/15 transition-colors text-sm text-center"
                   onClick={() => setShowLimitModal(false)}
                 >
                   <span className="flex items-center justify-center gap-2">
-                    <Crown size={16} />
-                    Entrar en Élite
+                    <Circle size={4} fill="currentColor" />
+                    Explorar profundidad
                   </span>
                 </Link>
                 <button
                   onClick={() => setShowLimitModal(false)}
                   className="w-full text-[#666] py-2.5 hover:text-[#999] transition-colors text-sm"
                 >
-                  Continuar con el plan Free
+                  Volver mañana
                 </button>
               </div>
             </div>

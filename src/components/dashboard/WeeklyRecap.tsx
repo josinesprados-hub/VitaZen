@@ -22,7 +22,7 @@ import {
   Zap,
   ArrowRight,
   Mail,
-  Crown,
+  Circle,
 } from 'lucide-react';
 import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 
@@ -309,9 +309,9 @@ export function WeeklyRecap() {
                 <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-semibold text-white">Tu semana</h2>
                   {isPremium && (
-                    <span className="premium-badge inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
-                      <Crown size={9} />
-                      Élite
+                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
+                      <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                      Profundidad
                     </span>
                   )}
                 </div>
@@ -321,8 +321,8 @@ export function WeeklyRecap() {
             <div className="flex items-center gap-2 sm:gap-3">
               {!isPremium && (
                 <span className="text-[10px] text-[#555] items-center gap-1 hidden sm:flex">
-                  <Crown size={9} className="text-[#c8a55a]/40" />
-                  Historial completo con Élite
+                  <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
+                  Hay más capas con el tiempo
                 </span>
               )}
               <Link
@@ -634,7 +634,7 @@ export function WeeklyRecap() {
               {!isPremium && data.mentorRecommendation.length > 100 && (
                 <div className="mt-2 flex items-center gap-1.5">
                   <span className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1">
-                    <Crown size={8} /> Más profundidad con Élite
+                    <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" /> Algunas conexiones solo aparecen con el tiempo
                   </span>
                 </div>
               )}

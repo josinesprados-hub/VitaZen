@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Crown, ArrowLeft } from 'lucide-react';
+import { Circle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
 import {
@@ -330,7 +330,7 @@ export default function CierreMensualPage() {
       {!isPremium && (
         <div className="mt-8 text-center">
           <p className="text-[9px] text-[#333] flex items-center justify-center gap-1">
-            <Crown size={7} className="text-[#c8a55a]/25" />
+            <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
             {ELITE_DEEPER}
           </p>
         </div>
