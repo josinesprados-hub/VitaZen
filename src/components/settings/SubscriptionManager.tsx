@@ -48,7 +48,7 @@ export function SubscriptionManager() {
   };
 
   const handleUpgrade = () => {
-    router.push('/pricing');
+    router.push('/elite');
   };
 
   // ─── PREMIUM user view ───
@@ -62,7 +62,7 @@ export function SubscriptionManager() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-sm text-white font-medium">Profundizar</p>
+              <p className="text-sm text-white font-medium">Élite</p>
               <span className="text-[9px] font-medium text-[#c8a55a]/40 bg-[#c8a55a]/5 border border-[#c8a55a]/10 px-2 py-0.5 rounded-full">Activo</span>
             </div>
             {subscription?.cancelAtPeriodEnd ? (
@@ -136,7 +136,7 @@ export function SubscriptionManager() {
           <Circle size={5} fill="currentColor" className="text-[#c8a55a]/40" />
         </div>
         <div className="text-left flex-1">
-          <p className="text-sm font-medium">Explorar profundidad</p>
+          <p className="text-sm font-medium">Más perspectiva con Élite</p>
           <p className="text-xs text-[#777]">Conexiones entre partes de tu vida</p>
         </div>
         <ChevronRight size={16} className="text-[#444] group-hover:text-[#c8a55a] transition-colors" />

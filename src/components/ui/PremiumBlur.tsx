@@ -41,10 +41,10 @@ export default function PremiumBlur({ children }: PremiumBlurProps) {
 
           {/* Quiet link — not a button */}
           <Link
-            href="/pricing"
+            href="/elite"
             className="text-[#c8a55a]/40 hover:text-[#c8a55a]/70 transition-colors text-[10px]"
           >
-            Ver profundidad
+            Conocer Élite
           </Link>
         </div>
       </div>

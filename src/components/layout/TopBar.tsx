@@ -31,7 +31,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           {/* Quiet plan indicator — no badge, no crown, just a whisper */}
           {user?.plan === 'PREMIUM' && (
             <span className="text-[9px] font-medium text-[#c8a55a]/40 tracking-wider">
-              Profundidad
+              Élite
             </span>
           )}
         </div>

@@ -43,7 +43,7 @@ export const ELITE_STAGES = 'Etapas de vida';
 export const ELITE_TRANSITIONS = 'Transiciones personales';
 export const ELITE_CONNECTIONS = 'Conexiones históricas';
 export const ELITE_EVOLUTION = 'Evolución personal';
-export const ELITE_BADGE = 'Profundidad';
+export const ELITE_BADGE = 'Élite';
 
 export const FREE_LIMIT_MESSAGE = 'Las etapas de vida se revelan con el tiempo';
 

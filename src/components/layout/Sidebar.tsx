@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { useApi } from '@/hooks/useApi';
 import {
   Shield,
   Brain,
@@ -17,9 +16,7 @@ import {
   Trophy,
   Sunrise,
   Layers,
-  CreditCard,
   Circle,
-  Loader2,
   LogOut,
   X,
   Lightbulb,
@@ -45,8 +42,6 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const { apiFetch } = useApi();
-  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
 
   // Lock body scroll when sidebar is open on mobile.
   // overflow:hidden prevents background scrolling without position:fixed,
@@ -233,70 +228,32 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{user?.name || 'Usuario'}</p>
-                <p className="text-xs text-[#c8a55a]/50">{user?.plan === 'PREMIUM' ? 'Profundidad' : 'Observar'}</p>
+                <p className="text-xs text-[#c8a55a]/50">{user?.plan === 'PREMIUM' ? 'Élite' : 'Observar'}</p>
               </div>
             </Link>
 
-            {/* Contextual subscription CTA */}
+            {/* Élite entry — navigates to Élite page, not Stripe direct */}
             {user?.plan === 'FREE' ? (
               <button
-                onClick={async () => {
-                  setSubscriptionLoading(true);
-                  try {
-                    const res = await apiFetch('/api/stripe/checkout', { method: 'POST' });
-                    if (res.ok) {
-                      const data = await res.json();
-                      if (data.url) {
-                        window.location.href = data.url;
-                        return;
-                      }
-                    }
-                    router.push('/pricing');
-                  } catch {
-                    router.push('/pricing');
-                  } finally {
-                    setSubscriptionLoading(false);
-                  }
+                onClick={() => {
+                  onClose();
+                  router.push('/elite');
                 }}
-                disabled={subscriptionLoading}
-                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#c8a55a] hover:bg-[#c8a55a]/10 rounded-lg transition-colors touch-press disabled:opacity-50"
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#c8a55a] hover:bg-[#c8a55a]/10 rounded-lg transition-colors touch-press"
               >
-                {subscriptionLoading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Circle size={4} fill="currentColor" className="text-[#c8a55a]/40" />
-                )}
-                Profundizar
+                <Circle size={4} fill="currentColor" className="text-[#c8a55a]/40" />
+                Élite
               </button>
             ) : (
               <button
-                onClick={async () => {
-                  setSubscriptionLoading(true);
-                  try {
-                    const res = await apiFetch('/api/stripe/portal', { method: 'POST' });
-                    if (res.ok) {
-                      const data = await res.json();
-                      if (data.url) {
-                        window.location.href = data.url;
-                        return;
-                      }
-                    }
-                    router.push('/ajustes');
-                  } catch {
-                    router.push('/ajustes');
-                  } finally {
-                    setSubscriptionLoading(false);
-                  }
+                onClick={() => {
+                  onClose();
+                  router.push('/elite');
                 }}
-                disabled={subscriptionLoading}
-                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#999] hover:text-[#c8a55a] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press disabled:opacity-50"
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#999] hover:text-[#c8a55a] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
               >
-                {subscriptionLoading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <CreditCard size={16} />
-                )}
-                Tu espacio profundo
+                <Circle size={4} fill="currentColor" className="text-[#c8a55a]/30" />
+                Tu espacio Élite
               </button>
             )}
 

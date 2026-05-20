@@ -6,15 +6,10 @@ import { useApi } from '@/hooks/useApi';
 import { Check, Loader2, Link2, Circle, Eye } from 'lucide-react';
 
 // ═══════════════════════════════════════════
-// Pricing Page — Reimagined as Depth
+// Pricing Page — Élite identity, contemplative tone
 // ═══════════════════════════════════════════
 //
-// This is NOT a pricing page.
-// This is an invitation to go deeper into your own life.
-//
-// No: "premium", "pro", "upgrade", "unlock"
-// Yes: "depth", "perspective", "time", "connections"
-//
+// Élite is the brand. Profundidad is the emotional language.
 // The user should feel:
 // "There's something more human and deeper here."
 // NOT: "I need to pay to unlock features."
@@ -71,7 +66,7 @@ export default function PricingPage() {
       <div className="text-center mb-12 sm:mb-16">
         <div className="flex items-center justify-center gap-2 mb-5">
           <Circle size={4} fill="currentColor" className="text-[#c8a55a]/40" />
-          <p className="text-[#c8a55a]/50 text-[10px] uppercase tracking-[0.25em] font-medium">Profundidad</p>
+          <p className="text-[#c8a55a]/50 text-[10px] uppercase tracking-[0.25em] font-medium">Élite</p>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
           Mirar la vida más despacio
@@ -125,14 +120,14 @@ export default function PricingPage() {
           </button>
         </div>
 
-        {/* Profundizar — deeper experience */}
+        {/* Élite — deeper experience */}
         <div className="bg-[#0a0a0a] border border-[#c8a55a]/12 rounded-2xl p-7 sm:p-8 relative">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/8 flex items-center justify-center">
               <Circle size={6} fill="currentColor" className="text-[#c8a55a]/50" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Profundizar</h2>
+              <h2 className="text-lg font-semibold text-white">Élite</h2>
               <p className="text-[#c8a55a]/50 text-xs">Entender y conectar</p>
             </div>
           </div>
@@ -167,7 +162,7 @@ export default function PricingPage() {
               disabled={loading}
               className="w-full bg-[#c8a55a]/8 border border-[#c8a55a]/15 text-[#c8a55a]/70 font-medium py-3 rounded-xl hover:bg-[#c8a55a]/12 transition-colors disabled:opacity-50 text-sm"
             >
-              {loading ? <Loader2 size={16} className="animate-spin inline" /> : 'Gestionar profundidad'}
+              {loading ? <Loader2 size={16} className="animate-spin inline" /> : 'Gestionar suscripción'}
             </button>
           ) : (
             <button
@@ -175,7 +170,7 @@ export default function PricingPage() {
               disabled={loading}
               className="w-full bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium py-3 rounded-xl hover:bg-[#c8a55a]/15 transition-colors disabled:opacity-50 text-sm"
             >
-              {loading ? <Loader2 size={16} className="animate-spin inline" /> : 'Explorar profundidad'}
+              {loading ? <Loader2 size={16} className="animate-spin inline" /> : 'Explorar Élite'}
             </button>
           )}
         </div>
@@ -219,7 +214,7 @@ export default function PricingPage() {
       <div className="text-center mt-6 mb-2">
         <div className="max-w-md mx-auto">
           <p className="text-[#555] text-sm leading-relaxed">
-            Observar te ayuda. Profundizar empieza a conectarte.
+            Observar te ayuda. Élite amplía la profundidad de VitaZen.
           </p>
           <p className="text-[#333] text-xs mt-3">
             Sin compromiso. Cancela cuando quieras.

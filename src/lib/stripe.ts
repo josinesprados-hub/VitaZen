@@ -12,7 +12,7 @@ export const PLANS = {
     aiMessagesLimit: 10,
   },
   PREMIUM: {
-    name: 'Profundidad',
+    name: 'Élite',
     price: 5,
     priceId: process.env.STRIPE_PREMIUM_PRICE_ID!,
     aiMessagesLimit: Infinity,

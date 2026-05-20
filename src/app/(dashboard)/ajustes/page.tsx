@@ -312,7 +312,7 @@ export default function AjustesPage() {
             <p className="text-sm text-[#999]">Plan</p>
             <div className="flex items-center gap-2">
               {user?.plan === 'PREMIUM' ? (
-                <span className="text-[9px] font-medium text-[#c8a55a]/50">Profundidad</span>
+                <span className="text-[9px] font-medium text-[#c8a55a]/50">Élite</span>
               ) : (
                 <span className="text-[9px] font-medium text-[#555]">Observar</span>
               )}

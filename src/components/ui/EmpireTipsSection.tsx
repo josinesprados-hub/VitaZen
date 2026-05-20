@@ -74,10 +74,10 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                     Hay notas que solo aparecen cuando miras más despacio
                   </p>
                   <Link
-                    href="/pricing"
+                    href="/elite"
                     className="text-[#c8a55a]/40 hover:text-[#c8a55a]/70 transition-colors text-[10px]"
                   >
-                    Ver profundidad
+                    Conocer Élite
                   </Link>
                 </div>
               </div>

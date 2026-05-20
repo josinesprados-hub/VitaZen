@@ -249,7 +249,7 @@ export default function InsightsPage() {
               {isPremium && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
                   <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
-                  Profundidad
+                  Élite
                 </span>
               )}
             </div>
@@ -559,8 +559,8 @@ export default function InsightsPage() {
           <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
           <p className="text-[11px] text-[#555]">
             Algunas observaciones solo aparecen con el tiempo —{' '}
-            <Link href="/pricing" className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors">
-              ver más
+            <Link href="/elite" className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors">
+              conocer Élite
             </Link>
           </p>
         </div>

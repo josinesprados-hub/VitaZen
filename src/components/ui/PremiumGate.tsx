@@ -61,12 +61,12 @@ export default function PremiumGate({
             fill="currentColor"
           />
           <Link
-            href="/pricing"
+            href="/elite"
             className={`text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors text-center leading-snug ${
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}
           >
-            Algunas capas solo aparecen con el tiempo
+            Algunas capas solo aparecen con el tiempo · Élite
           </Link>
         </div>
       </div>
@@ -134,10 +134,10 @@ export function PremiumHistoryGate({
         <span>
           Hay más capas aquí —{' '}
           <Link
-            href="/pricing"
+            href="/elite"
             className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors"
           >
-            ver profundidad
+            conocer Élite
           </Link>
         </span>
       </div>

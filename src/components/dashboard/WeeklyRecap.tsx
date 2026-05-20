@@ -311,7 +311,7 @@ export function WeeklyRecap() {
                   {isPremium && (
                     <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
                       <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
-                      Profundidad
+                      Élite
                     </span>
                   )}
                 </div>

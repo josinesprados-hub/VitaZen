@@ -850,7 +850,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {remaining <= 3 && remaining > 0 && (
             <p className="text-[10px] text-[#e8a849] mt-1.5 flex items-center gap-1">
               <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
-              Más profundidad disponible
+              Más perspectiva con Élite
             </p>
           )}
           {remaining === 0 && (
@@ -969,7 +969,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               {isPremium && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50 px-2 py-0.5">
                   <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
-                  Profundidad
+                  Élite
                 </span>
               )}
             </div>
@@ -1165,7 +1165,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       className="ml-auto text-[#c8a55a] hover:text-[#d4b468] flex items-center gap-1"
                     >
                       <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
-                      Profundizar
+                      Conocer Élite
                     </button>
                   </div>
                 )}
@@ -1399,13 +1399,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
               <div className="space-y-3">
                 <Link
-                  href="/pricing"
+                  href="/elite"
                   className="block w-full bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium py-3 rounded-xl hover:bg-[#c8a55a]/15 transition-colors text-sm text-center"
                   onClick={() => setShowLimitModal(false)}
                 >
                   <span className="flex items-center justify-center gap-2">
                     <Circle size={4} fill="currentColor" />
-                    Explorar profundidad
+                    Conocer Élite
                   </span>
                 </Link>
                 <button
