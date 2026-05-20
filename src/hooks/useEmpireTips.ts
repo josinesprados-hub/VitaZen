@@ -5,19 +5,25 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 
 // ═══════════════════════════════════════════
-// useEmpireTips — 72h stable tip rotation
+// useEmpireTips — contemplative tip rotation
 // ═══════════════════════════════════════════
 //
-// - Rotates tips every 72 hours (3 days)
+// Contemplative, not algorithmic.
+//
+// - Tips rotate every 3–5 days (not a fixed 72h)
 // - No repeat until full dataset traversed
+// - After cycle completion, reshuffle avoiding recent
 // - Persists state in localStorage
 // - Separates FREE and PREMIUM tips
 // - Stable between renders/sessions
 // - No Math.random() in render path
 
 const STORAGE_PREFIX = 'vitazen_tips_';
-const CYCLE_MS = 72 * 60 * 60 * 1000; // 72 hours in ms
+// Tips: 3–5 days. Use 4 days (345600000 ms) as the base cycle.
+const CYCLE_MS = 4 * 24 * 60 * 60 * 1000;
 const FREE_TIPS_VISIBLE = 2;
+// How many recent tips to avoid after reshuffling
+const AVOID_RECENT_COUNT = 3;
 
 export interface Tip {
   id: string;
@@ -37,11 +43,14 @@ interface TipCycleState {
   premiumPosition: number;
   /** Timestamp when the current cycle started */
   cycleStart: number;
+  /** Recent FREE tip indices to avoid close repetition */
+  recentFree: number[];
+  /** Recent PREMIUM tip indices to avoid close repetition */
+  recentPremium: number[];
 }
 
 /**
- * Fisher-Yates shuffle — returns a new shuffled array of indices.
- * Only called during cycle creation (never in render).
+ * Fisher-Yates shuffle.
  */
 function shuffledIndices(n: number): number[] {
   const arr = Array.from({ length: n }, (_, i) => i);
@@ -50,6 +59,17 @@ function shuffledIndices(n: number): number[] {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
+}
+
+/**
+ * Shuffle avoiding recent items at the start.
+ */
+function shuffledIndicesAvoiding(n: number, recent: number[]): number[] {
+  const order = shuffledIndices(n);
+  const recentSet = new Set(recent);
+  const notRecent = order.filter(i => !recentSet.has(i));
+  const isRecent = order.filter(i => recentSet.has(i));
+  return [...notRecent, ...isRecent];
 }
 
 function storageKey(empire: string): string {
@@ -87,6 +107,8 @@ function freshCycleState(freeCount: number, premiumCount: number): TipCycleState
     premiumOrder: shuffledIndices(premiumCount),
     premiumPosition: 0,
     cycleStart: Date.now(),
+    recentFree: [],
+    recentPremium: [],
   };
 }
 
@@ -99,8 +121,8 @@ function saveCycleState(empire: string, state: TipCycleState): void {
 }
 
 /**
- * Advance the cycle if 72h have passed.
- * Returns the (possibly updated) state and the current set of tips.
+ * Advance the cycle if enough time has passed.
+ * Returns the (possibly updated) state.
  */
 function advanceIfExpired(
   state: TipCycleState,
@@ -110,25 +132,27 @@ function advanceIfExpired(
   const now = Date.now();
   const elapsed = now - state.cycleStart;
 
-  if (elapsed < CYCLE_MS) return state; // Still within 72h — same set
+  if (elapsed < CYCLE_MS) return state; // Still within cycle — same set
 
-  // 72h passed — advance positions
+  // Cycle passed — advance positions
   const newState = { ...state };
 
-  // Advance FREE position by FREE_TIPS_VISIBLE
+  // Advance FREE position
   newState.freePosition += FREE_TIPS_VISIBLE;
   if (newState.freePosition >= freeCount) {
-    // All FREE tips shown — reshuffle and restart
-    newState.freeOrder = shuffledIndices(freeCount);
+    // All FREE tips shown — reshuffle, avoiding recent
+    newState.freeOrder = shuffledIndicesAvoiding(freeCount, newState.recentFree);
     newState.freePosition = 0;
+    newState.recentFree = [];
   }
 
-  // Advance PREMIUM position by 1 (show 1 new premium hint per cycle)
+  // Advance PREMIUM position
   newState.premiumPosition += 1;
   if (newState.premiumPosition >= premiumCount) {
-    // All PREMIUM tips shown — reshuffle and restart
-    newState.premiumOrder = shuffledIndices(premiumCount);
+    // All PREMIUM tips shown — reshuffle, avoiding recent
+    newState.premiumOrder = shuffledIndicesAvoiding(premiumCount, newState.recentPremium);
     newState.premiumPosition = 0;
+    newState.recentPremium = [];
   }
 
   newState.cycleStart = now;
@@ -189,20 +213,20 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
     const freeCount = freeTipsAll.length;
     const premiumCount = premiumTipsAll.length;
 
-    // Load or create cycle state (read-only in render)
+    // Load or create cycle state
     let state = loadCycleState(empire, freeCount, premiumCount);
 
-    // Advance if 72h have passed
+    // Advance if cycle has passed
     const newState = advanceIfExpired(state, freeCount, premiumCount);
     const changed = newState !== state;
 
     state = newState;
-    stateRef.current = state;
-    // NOTE: saveCycleState is deferred to useEffect below to avoid
-    // side effects (localStorage write) during render.
 
-    // Select FREE tips from shuffled order (no modulo wrap — prevents showing
-    // already-seen tips when fewer than FREE_TIPS_VISIBLE remain in the cycle)
+    // Track recent to avoid close repetition
+    const freeIndices: number[] = [];
+    const premiumIndices: number[] = [];
+
+    // Select FREE tips
     const selectedFree: Tip[] = [];
     const remaining = freeCount - state.freePosition;
     const toShow = Math.min(FREE_TIPS_VISIBLE, remaining);
@@ -210,17 +234,27 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
       const idx = state.freeOrder[state.freePosition + i];
       if (idx !== undefined && freeTipsAll[idx]) {
         selectedFree.push(freeTipsAll[idx]);
+        freeIndices.push(idx);
       }
     }
 
-    // Select PREMIUM tips — current tip in cycle (no modulo: position is always < count)
+    // Track recent free indices
+    state.recentFree = [...state.recentFree, ...freeIndices].slice(-AVOID_RECENT_COUNT);
+
+    // Select PREMIUM tips
     const selectedPremium: Tip[] = [];
     if (premiumCount > 0) {
       const startIdx = state.premiumOrder[state.premiumPosition];
       if (startIdx !== undefined && premiumTipsAll[startIdx]) {
         selectedPremium.push(premiumTipsAll[startIdx]);
+        premiumIndices.push(startIdx);
       }
     }
+
+    // Track recent premium indices
+    state.recentPremium = [...state.recentPremium, ...premiumIndices].slice(-AVOID_RECENT_COUNT);
+
+    stateRef.current = state;
 
     return { freeTips: selectedFree, premiumTips: selectedPremium, changed };
   }, [allTips, empire]);
@@ -228,7 +262,7 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
   // Use ref to avoid re-computing on every render
   const tipsResult = computeTips();
 
-  // Persist cycle state changes after render commit (avoids side effects during render)
+  // Persist cycle state changes after render commit
   useEffect(() => {
     if (stateRef.current && tipsResult.changed) {
       saveCycleState(empire, stateRef.current);

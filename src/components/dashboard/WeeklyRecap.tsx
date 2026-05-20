@@ -260,7 +260,7 @@ export function WeeklyRecap() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu semana</h2>
-              <p className="fallback-warm">Tu resumen aparecerá con más actividad</p>
+              <p className="fallback-warm">Con más actividad aparecerá</p>
             </div>
           </div>
         </div>
@@ -516,8 +516,8 @@ export function WeeklyRecap() {
               ) : (
                 <div className="text-center py-4 sm:py-6">
                   <CheckCircle size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
-                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin hábitos activos aún</p>
-                  <p className="text-[9px] sm:text-[10px] text-[#444]">Empieza con uno pequeño</p>
+                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin hábitos activos</p>
+                  <p className="text-[9px] sm:text-[10px] text-[#444]"></p>
                 </div>
               )}
             </div>
@@ -580,7 +580,7 @@ export function WeeklyRecap() {
             >
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
                 <Sparkles size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Lo que destaca esta semana</p>
+                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Lo que destaca</p>
               </div>
               {data.mainInsight ? (
                 <div
@@ -603,7 +603,7 @@ export function WeeklyRecap() {
               ) : (
                 <div className="text-center py-4 sm:py-6">
                   <Sparkles size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
-                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin insights esta semana</p>
+                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin insights</p>
                 </div>
               )}
             </Link>
@@ -619,7 +619,7 @@ export function WeeklyRecap() {
             <div className="relative z-10">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                 <Lightbulb size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                <p className="text-xs sm:text-sm font-semibold text-white">Recomendación del mentor</p>
+                <p className="text-xs sm:text-sm font-semibold text-white">Observación</p>
                 <PremiumInlineBadge
                   isPremium={isPremium}
                   freeLabel="Resumido"
@@ -633,10 +633,8 @@ export function WeeklyRecap() {
               </p>
               {!isPremium && data.mentorRecommendation.length > 100 && (
                 <div className="mt-2 flex items-center gap-1.5">
-                  <span
-                    className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1"
-                  >
-                    <Crown size={8} /> Recomendación completa con Élite
+                  <span className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1">
+                    <Crown size={8} /> Más profundidad con Élite
                   </span>
                 </div>
               )}
@@ -651,7 +649,7 @@ export function WeeklyRecap() {
               className="hidden sm:flex items-center gap-2 text-[11px] text-[#555] hover:text-[#c8a55a] transition-colors duration-300 group cursor-default"
             >
               <Mail size={12} className={`transition-colors duration-300 ${emailHover ? 'text-[#c8a55a]' : 'text-[#444]'}`} />
-              <span>Recibir resumen semanal por email próximamente</span>
+              <span>Resumen semanal por email próximamente</span>
             </button>
           </div>
         </div>

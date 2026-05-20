@@ -24,25 +24,25 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
     name: 'Mente',
     icon: Brain,
     href: '/imperio/mente',
-    tip: 'Tu foco está en la calma mental. Empieza con una meditación breve.',
+    tip: 'Tu foco está en la calma mental.',
   },
   disciplina: {
     name: 'Disciplina',
     icon: Shield,
     href: '/imperio/disciplina',
-    tip: 'Tu prioridad es la constancia. Completa tu check-in hoy.',
+    tip: 'Tu prioridad es la constancia.',
   },
   energia: {
     name: 'Energía',
     icon: Zap,
     href: '/imperio/energia',
-    tip: 'Tu energía importa. Registra tu descanso y actividad.',
+    tip: 'Tu energía importa.',
   },
   riqueza: {
     name: 'Finanzas',
     icon: Gem,
     href: '/imperio/riqueza',
-    tip: 'Tu foco financiero. Empieza registrando tus gastos de hoy.',
+    tip: 'Tu foco financiero.',
   },
 };
 
@@ -91,13 +91,13 @@ export function OnboardingRecommendations() {
   const tips: string[] = [focusConfig.tip];
 
   if (onboarding.data.stressLevel >= 4) {
-    tips.push('Tu estrés está alto. Prueba la respiración consciente antes de dormir.');
+    tips.push('Tu estrés está alto.');
   }
   if (onboarding.data.energyLevel <= 2) {
-    tips.push('Tu energía está baja. Prioriza el descanso esta semana.');
+    tips.push('Tu energía está baja.');
   }
   if (onboarding.data.focusLevel <= 2) {
-    tips.push('El enfoque se entrena. Empieza con bloques de 25 minutos.');
+    tips.push('El enfoque se entrena.');
   }
 
   return (
@@ -117,8 +117,8 @@ export function OnboardingRecommendations() {
                 <Sparkles size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-white">Recomendaciones para ti</h3>
-                <p className="text-[10px] sm:text-[11px] text-[#666]">Basadas en tu configuración</p>
+                <h3 className="text-xs sm:text-sm font-semibold text-white">Para ti</h3>
+                <p className="text-[10px] sm:text-[11px] text-[#666]">Tu configuración</p>
               </div>
             </div>
             <button

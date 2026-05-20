@@ -209,7 +209,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'enfocado',
       label: 'Enfocado',
-      description: 'Tu mente y energía están alineadas. Buen momento para profundizar en tus objetivos.',
+      description: 'Tu mente y energía están alineadas.',
     };
   }
 
@@ -218,7 +218,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'Tu estrés está alto y la energía baja. Prioriza descansar y reducir compromisos.',
+      description: 'Estrés alto, energía baja.',
     };
   }
 
@@ -227,7 +227,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'El estrés está dominando tu estado. Date permiso para pausar.',
+      description: 'El estrés está pesando.',
     };
   }
 
@@ -240,7 +240,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
       return {
         status: 'en_progreso',
         label: 'En progreso',
-        description: 'Estás avanzando. Tus hábitos se están consolidando paso a paso.',
+        description: 'Tus hábitos se van asentando.',
       };
     }
   }
@@ -250,7 +250,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'estable',
       label: 'Estable',
-      description: 'Mantienes un equilibrio razonable. Sigue construyendo sobre esta base.',
+      description: 'Equilibrio razonable.',
     };
   }
 
@@ -259,7 +259,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'en_progreso',
       label: 'En progreso',
-      description: 'Estás construyendo momentum. Cada acción cuenta.',
+      description: 'Va tomando forma.',
     };
   }
 
@@ -267,7 +267,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
   return {
     status: 'estable',
     label: 'Estable',
-    description: 'Sin datos suficientes para una lectura detallada. Registra tu check-in para obtener insights.',
+    description: '',
   };
 }
 
@@ -285,45 +285,45 @@ function generateRecommendation(
   const stress = metrics.stress.value;
   const consistency = metrics.consistency.value;
 
-  // Stress-based recommendations (highest priority)
+  // Stress-based
   if (stress <= 30) {
     if (energy <= 35) {
-      return 'Hoy puede ayudarte reducir el ritmo. Descansar también es avanzar.';
+      return 'Reducir el ritmo hoy puede ayudar.';
     }
-    return 'Tu estrés está elevado. Prueba una respiración consciente antes de seguir.';
+    return 'Una respiración consciente antes de seguir.';
   }
 
-  // Energy-based recommendations
+  // Energy-based
   if (energy <= 35) {
-    return 'Tu energía está baja. Revisa tu descanso y prioriza lo esencial.';
+    return 'Descanso y lo esencial.';
   }
 
-  // Focus-based recommendations
+  // Focus-based
   if (focus >= 70 && energy >= 60) {
-    return 'Buen enfoque y energía. Aprovecha este estado para tareas importantes.';
+    return 'Buen momento para lo importante.';
   }
 
   // Consistency-based
   if (consistency >= 70) {
-    return 'Tu consistencia esta semana está siendo notable. Mantén este ritmo.';
+    return 'Consistencia notable esta semana.';
   }
 
   // Status-specific
   if (status === 'enfocado') {
-    return 'Estás en un estado de enfoque. Canaliza esta energía con intención.';
+    return 'Canaliza esta claridad.';
   }
 
   if (status === 'en_progreso') {
-    return 'Vas avanzando. Un hábito más hoy suma al momentum.';
+    return 'Va tomando forma.';
   }
 
   // Low activity
   if (data.thisWeekCheckins.length === 0) {
-    return 'Empieza el día con un check-in. Te ayudará a tomar perspectiva.';
+    return '';
   }
 
-  // Default calm recommendation
-  return 'Avanza a tu ritmo. Lo importante es la dirección, no la velocidad.';
+  // Default
+  return '';
 }
 
 // ─────────────────────────────────────────
@@ -347,43 +347,43 @@ function generateSummary(
 
   // Specific patterns
   if (consistencyUp && isPremium) {
-    return 'Tu consistencia esta semana está mejorando respecto a la anterior.';
+    return 'Tu consistencia mejoró esta semana.';
   }
 
   if (energyUp && isPremium) {
-    return 'Tu energía ha mejorado comparada con la semana pasada.';
+    return 'Tu energía mejoró respecto a la semana pasada.';
   }
 
   if (stressDown && isPremium) {
-    return 'Has reducido tu nivel de estrés. Buen trabajo.';
+    return 'Has reducido el estrés.';
   }
 
   if (consistency >= 70) {
-    return 'Has mantenido buena estabilidad estos días.';
+    return 'Buena estabilidad estos días.';
   }
 
   if (status === 'sobrecargado') {
-    return 'Tu cuerpo y mente están pidiendo una pausa. Escúchalos.';
+    return 'Tu cuerpo y mente piden una pausa.';
   }
 
   if (status === 'enfocado') {
-    return 'Estás en un buen momento de claridad y determinación.';
+    return 'Claridad y determinación.';
   }
 
   if (progress >= 60) {
-    return 'Buena actividad esta semana. Sigues construyendo impulso.';
+    return 'Buena actividad esta semana.';
   }
 
   if (progress >= 30) {
-    return 'Vas avanzando a tu ritmo. Cada paso suma.';
+    return 'Avanzas a tu ritmo.';
   }
 
   // No data
   if (data.thisWeekCheckins.length === 0 && data.thisWeekMeditations.length === 0) {
-    return 'Registra tu primer check-in para empezar a ver tu estado emocional.';
+    return '';
   }
 
-  return 'Sigue registrando tu actividad para obtener una lectura más precisa.';
+  return '';
 }
 
 // ─────────────────────────────────────────

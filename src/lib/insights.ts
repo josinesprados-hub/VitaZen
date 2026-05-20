@@ -343,10 +343,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
         type: 'positive',
         category: 'emociones',
         icon: '😊',
-        title: 'Estado emocional positivo',
+        title: 'Emociones por encima de 4',
         description: isPremium
-          ? `Tu bienestar emocional promedio es ${summary.checkins.avgEmotion}/5 esta semana. ${comparison && comparison.emotionTrend > 0 ? 'Ha mejorado respecto a la semana anterior.' : 'Sigues manteniendo un buen nivel.'}`
-          : `Tu bienestar emocional promedio es ${summary.checkins.avgEmotion}/5 esta semana. Buen trabajo.`,
+          ? `Promedio ${summary.checkins.avgEmotion}/5 esta semana. ${comparison && comparison.emotionTrend > 0 ? 'Mejoró respecto a la anterior.' : ''}`
+          : `Promedio ${summary.checkins.avgEmotion}/5 esta semana.`,
       });
     } else if (summary.checkins.avgEmotion <= 2.5) {
       insights.push({
@@ -354,10 +354,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
         type: 'warning',
         category: 'emociones',
         icon: '💭',
-        title: 'Estado emocional bajo',
+        title: 'Emociones por debajo de 2.5',
         description: isPremium
-          ? `Tu emocion promedio ha sido ${summary.checkins.avgEmotion}/5. ${comparison && comparison.emotionTrend < 0 ? 'Ha bajado respecto a la semana pasada.' : ''} Considera dedicar más tiempo a actividades que te reconforten.`
-          : `Tu emocion promedio ha sido ${summary.checkins.avgEmotion}/5. Cuida tu bienestar emocional.`,
+          ? `Promedio ${summary.checkins.avgEmotion}/5. ${comparison && comparison.emotionTrend < 0 ? 'Bajó respecto a la semana pasada.' : ''}`
+          : `Promedio ${summary.checkins.avgEmotion}/5.`,
       });
     }
   }
@@ -369,10 +369,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'energía',
       icon: '⚡',
-      title: 'Energía en aumento',
+      title: 'Energía alta',
       description: isPremium
-        ? `Tu energía promedio es ${summary.checkins.avgEnergy}/5. ${comparison && comparison.energyTrend > 0 ? 'Viene en mejora desde la semana pasada.' : 'Mantén este nivel con buenos hábitos de descanso.'}`
-        : `Tu energía promedio es ${summary.checkins.avgEnergy}/5. Sigue así.`,
+        ? `Promedio ${summary.checkins.avgEnergy}/5. ${comparison && comparison.energyTrend > 0 ? 'Mejoró desde la semana pasada.' : ''}`
+        : `Promedio ${summary.checkins.avgEnergy}/5.`,
     });
   } else if (summary.checkins.avgEnergy <= 2.5 && summary.checkins.count > 0) {
     insights.push({
@@ -382,8 +382,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '🔋',
       title: 'Energía baja',
       description: isPremium
-        ? `Tu energía promedio es ${summary.checkins.avgEnergy}/5. Revisa tu sueño, nutrición y movimiento. Pequeños cambios pueden tener gran impacto.`
-        : `Tu energía promedio es ${summary.checkins.avgEnergy}/5. Revisa tus hábitos de descanso.`,
+        ? `Promedio ${summary.checkins.avgEnergy}/5. Sueño, nutrición y movimiento.`
+        : `Promedio ${summary.checkins.avgEnergy}/5.`,
     });
   }
 
@@ -396,8 +396,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '🧘',
       title: 'Estrés elevado',
       description: isPremium
-        ? `Tu nivel de estrés promedio es ${summary.checkins.avgStress}/5. ${comparison && comparison.stressTrend < 0 ? 'Ha aumentado respecto a la semana pasada.' : ''} La meditación y la respiración consciente pueden ayudarte.`
-        : `Tu nivel de estrés promedio es ${summary.checkins.avgStress}/5. Prueba meditación o respiración consciente.`,
+        ? `Promedio ${summary.checkins.avgStress}/5. ${comparison && comparison.stressTrend < 0 ? 'Subió respecto a la semana pasada.' : ''}`
+        : `Promedio ${summary.checkins.avgStress}/5.`,
     });
   } else if (summary.checkins.avgStress <= 2 && summary.checkins.count > 0) {
     insights.push({
@@ -405,8 +405,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'estrés',
       icon: '🌿',
-      title: 'Estrés bajo control',
-      description: `Tu estrés promedio es ${summary.checkins.avgStress}/5. Estás gestionando bien la presión.`,
+      title: 'Poca presión',
+      description: `Promedio ${summary.checkins.avgStress}/5.`,
     });
   }
 
@@ -417,10 +417,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'hábitos',
       icon: '🔥',
-      title: 'Consistencia destacada',
+      title: `${summary.habits.topStreak} días seguidos`,
       description: isPremium
-        ? `"${summary.habits.topHabit}" lleva ${summary.habits.topStreak} días seguidos. La consistencia es la clave del cambio real. Mantén este momentum.`
-        : `Tu mejor racha es de ${summary.habits.topStreak} días. La consistencia crea resultados.`,
+        ? `"${summary.habits.topHabit}" lleva ${summary.habits.topStreak} días.`
+        : `Tu mejor racha: ${summary.habits.topStreak} días.`,
     });
   } else if (summary.habits.completed === 0 && summary.habits.topStreak === 0) {
     insights.push({
@@ -428,8 +428,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'neutral',
       category: 'hábitos',
       icon: '📝',
-      title: 'Hábitos por activar',
-      description: 'No tienes hábitos activos esta semana. Empezar con uno pequeño puede marcar la diferencia.',
+      title: 'Sin hábitos activos',
+      description: '',
     });
   }
 
@@ -440,10 +440,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'meditación',
       icon: '🧠',
-      title: 'Práctica meditativa sólida',
+      title: `${summary.meditation.sessions} sesiones`,
       description: isPremium
-        ? `${summary.meditation.sessions} sesiones esta semana (${summary.meditation.totalMinutes} min). ${comparison && comparison.meditationTrend > 0 ? 'Has meditado más que la semana pasada.' : 'Mantén esta frecuencia para beneficios duraderos.'}`
-        : `${summary.meditation.sessions} sesiones esta semana. Tu práctica es constante.`,
+        ? `${summary.meditation.sessions} sesiones (${summary.meditation.totalMinutes} min). ${comparison && comparison.meditationTrend > 0 ? 'Más que la semana pasada.' : ''}`
+        : `${summary.meditation.sessions} sesiones esta semana.`,
     });
   } else if (summary.meditation.sessions === 0) {
     insights.push({
@@ -451,10 +451,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'neutral',
       category: 'meditación',
       icon: '🍃',
-      title: 'Meditación pendiente',
-      description: isPremium
-        ? 'No has meditado esta semana. Incluso 5 minutos diarios pueden reducir el estrés y mejorar tu claridad mental.'
-        : 'No has meditado esta semana. Prueba una sesión corta.',
+      title: 'Sin meditación',
+      description: '',
     });
   }
 
@@ -465,8 +463,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'warning',
       category: 'actividad',
       icon: '📉',
-      title: 'Caída de actividad',
-      description: `Tu actividad esta semana ha sido menor que la anterior (${Math.abs(comparison.activityTrend)} acciones menos). No es culpa — solo información. Retoma cuando estés listo.`,
+      title: 'Menos actividad',
+      description: `${Math.abs(comparison.activityTrend)} acciones menos que la semana anterior.`,
     });
   }
 
@@ -477,10 +475,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'consistencia',
       icon: '🏆',
-      title: 'Alta consistencia semanal',
+      title: `${summary.totalActivities} actividades`,
       description: isPremium
-        ? `${summary.totalActivities} actividades esta semana. Tu compromiso está por encima de la media. ${comparison && comparison.activityTrend > 0 ? 'Incluso más que la semana pasada.' : ''}`
-        : `${summary.totalActivities} actividades esta semana. Gran nivel de compromiso.`,
+        ? `${summary.totalActivities} acciones esta semana. ${comparison && comparison.activityTrend > 0 ? 'Más que la semana pasada.' : ''}`
+        : `${summary.totalActivities} acciones esta semana.`,
     });
   }
 
@@ -491,8 +489,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'diario',
       icon: '✍️',
-      title: 'Reflexión constante',
-      description: `${summary.journal.entries} entradas en tu diario esta semana. Escribir te ayuda a procesar y crecer.`,
+      title: `${summary.journal.entries} entradas`,
+      description: `${summary.journal.entries} entradas en tu diario esta semana.`,
     });
   }
 
@@ -503,10 +501,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'bienestar',
       icon: '⭐',
-      title: 'Semana positiva',
+      title: 'Buena semana',
       description: isPremium
-        ? `Tu puntuación de bienestar es ${summary.score}/100. Estás en un buen momento. Aprovecha la inercia para consolidar hábitos.`
-        : `Tu bienestar semanal es ${summary.score}/100. Buen trabajo.`,
+        ? `${summary.score}/100. ${comparison && comparison.activityTrend > 0 ? 'Mejoró respecto a la anterior.' : ''}`
+        : `${summary.score}/100.`,
     });
   } else if (summary.score <= 30 && summary.totalActivities > 0) {
     insights.push({
@@ -514,10 +512,10 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'neutral',
       category: 'bienestar',
       icon: '🌱',
-      title: 'Espacio para crecer',
+      title: 'Semana tranquila',
       description: isPremium
-        ? `Tu puntuación es ${summary.score}/100. No es un juicio — es un punto de partida. Enfócate en un área esta semana y construye desde ahí.`
-        : `Tu bienestar es ${summary.score}/100. Enfócate en un área para mejorar.`,
+        ? `${summary.score}/100. Punto de partida. Un área, un paso.`
+        : `${summary.score}/100.`,
     });
   }
 
@@ -528,8 +526,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'nutrición',
       icon: '💧',
-      title: 'Hidratación excelente',
-      description: `Promedio de ${summary.nutrition.avgWater} vasos de agua diarios. Una hidratación adecuada mejora energía y enfoque.`,
+      title: 'Buena hidratación',
+      description: `Promedio de ${summary.nutrition.avgWater} vasos diarios.`,
     });
   }
 
@@ -540,8 +538,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'imperios',
       icon: '⚔️',
-      title: `Racha en ${summary.streaks.bestEmpireName}`,
-      description: `${summary.streaks.bestEmpireStreak} días seguidos en ${summary.streaks.bestEmpireName}. Tu imperio crece con consistencia.`,
+      title: `${summary.streaks.bestEmpireStreak} días en ${summary.streaks.bestEmpireName}`,
+      description: `${summary.streaks.bestEmpireStreak} días seguidos.`,
     });
   }
 
@@ -554,8 +552,8 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '💰',
       title: 'Balance positivo',
       description: isPremium
-        ? `Tus ingresos superan los gastos esta semana (+${formatCurrency(summary.finance.balance)}). Buen momento para ahorrar o invertir.`
-        : `Balance positivo de +${formatCurrency(summary.finance.balance)} esta semana.`,
+        ? `Ingresos por encima de gastos (+${formatCurrency(summary.finance.balance)}).`
+        : `+${formatCurrency(summary.finance.balance)} esta semana.`,
     });
   } else if (summary.finance.balance < 0) {
     insights.push({
@@ -565,31 +563,31 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '💳',
       title: 'Gastos por encima de ingresos',
       description: isPremium
-        ? `Tus gastos superan los ingresos en ${formatCurrency(Math.abs(summary.finance.balance))}. Revisa categorías donde puedas optimizar.`
-        : `Gastos por encima de ingresos esta semana. Revisa tus gastos.`,
+        ? `Gastos superan ingresos en ${formatCurrency(Math.abs(summary.finance.balance))}.`
+        : `Gastos por encima de ingresos esta semana.`,
     });
   }
 
-  // PREMIUM: Week-over-week recommendation
+  // PREMIUM: Week-over-week trends (not recommendations)
   if (isPremium && comparison) {
     if (comparison.stressTrend < -0.5) {
       insights.push({
         id: `insight-${id++}`,
         type: 'trend',
-        category: 'recomendación',
+        category: 'tendencia',
         icon: '🎯',
-        title: 'Recomendación: reducir estrés',
-        description: 'Tu estrés ha subido esta semana. Intenta añadir una sesión de meditación antes de dormir y reduce la exposición a pantallas la última hora.',
+        title: 'Estrés en subida',
+        description: 'Tu estrés subió esta semana.',
       });
     }
     if (comparison.energyTrend > 0.5) {
       insights.push({
         id: `insight-${id++}`,
         type: 'trend',
-        category: 'recomendación',
+        category: 'tendencia',
         icon: '🎯',
-        title: 'Recomendación: mantener energía',
-        description: 'Tu energía está mejorando. Mantén tus rutinas de sueño y ejercicio — están funcionando. Consolida este hábito antes de añadir nuevos.',
+        title: 'Energía mejorando',
+        description: 'Tu energía está mejorando.',
       });
     }
   }

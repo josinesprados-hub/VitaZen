@@ -41,7 +41,7 @@ export function formatMonthLabel(yyyyMM: string): string {
 export function getEntryPrompt(yyyyMM: string): string {
   const [year, month] = yyyyMM.split('-');
   const name = getMonthName(parseInt(month));
-  return `${name} ha terminado. Cuando quieras, hay un momento esperándote.`;
+  return `${name}. Cuando quieras, hay un momento esperándote.`;
 }
 
 // ─── Reflection screen ───
@@ -68,8 +68,8 @@ export const INTENTION_BALANCE_EMPTY = 'Sin registros de intenciones este mes';
 export const EVOLUTION_TITLE = 'Evolución suave';
 export const EVOLUTION_NO_PREVIOUS = 'Es tu primer mes con datos';
 export const EVOLUTION_SAME = 'Tu mes fue parecido al anterior';
-export const EVOLUTION_QUIETER = 'Un mes más tranquilo que el anterior';
-export const EVOLUTION_MORE_ACTIVE = 'Un mes con más movimiento que el anterior';
+export const EVOLUTION_QUIETER = 'Más tranquilo';
+export const EVOLUTION_MORE_ACTIVE = 'Más movimiento';
 
 export const PATTERNS_TITLE = 'Conexiones';
 export const PATTERNS_NONE = '';
@@ -80,10 +80,10 @@ export const FINANCIAL_BALANCE_TITLE = 'Tu mes financiero';
 export const FINANCIAL_NO_DATA = 'Sin movimientos registrados este mes';
 
 export const RHYTHM_TITLE = 'Ritmo del mes';
-export const RHYTHM_QUIET = 'Un mes de pausa y calma';
-export const RHYTHM_ACTIVE = 'Un mes con bastante actividad';
-export const RHYTHM_VARIABLE = 'Un mes con días muy distintos entre sí';
-export const RHYTHM_STEADY = 'Un mes con ritmo constante';
+export const RHYTHM_QUIET = 'Pausa y calma';
+export const RHYTHM_ACTIVE = 'Bastante actividad';
+export const RHYTHM_VARIABLE = 'Días muy distintos';
+export const RHYTHM_STEADY = 'Ritmo constante';
 
 // ─── Empty states ───
 

@@ -270,7 +270,7 @@ export function EmotionalHero() {
           <div className="hidden sm:block mt-2 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
             <div className="flex items-center justify-between">
               <p className="text-[9px] sm:text-[10px] text-[#444] label-discrete">
-                Basado en tu actividad real
+                Tu actividad real
               </p>
               {state.plan === 'PREMIUM' && (
                 <span className="text-[9px] text-[#c8a55a]/50 uppercase tracking-wider hidden sm:inline">

@@ -134,22 +134,22 @@ function generateEmailRecommendation(
   plan: string
 ): string {
   if (energy <= 35) {
-    return 'Tu energía ha estado baja esta semana. Revisa tu descanso y prioriza lo esencial. A veces, hacer menos pero mejor recarga más.';
+    return 'Tu energía ha estado baja esta semana. Revisa tu descanso.';
   }
 
   if (consistency >= 65) {
-    return 'Tu consistencia esta semana es notable. Aprovecha este momentum para consolidar un hábito más antes de que baje.';
+    return 'Tu consistencia esta semana es notable.';
   }
 
   if (score >= 60) {
-    return 'Vas por buen camino. La clave no es la perfección, sino la dirección. Sigue sumando acciones pequeñas y consistentes.';
+    return 'Vas por buen camino.';
   }
 
   if (score >= 30) {
-    return 'Cada paso cuenta. Empieza por lo más simple: un check-in, un hábito, 5 minutos de meditación. El momentum se construye desde lo pequeño.';
+    return 'Cada paso cuenta.';
   }
 
-  return 'Esta semana ha sido tranquila. Cuando estés listo, un pequeño paso es suficiente para retomar el ritmo.';
+  return 'Semana tranquila. Cuando estés listo, un pequeño paso basta.';
 }
 
 // ─────────────────────────────────────────

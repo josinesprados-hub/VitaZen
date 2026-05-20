@@ -82,9 +82,9 @@ export async function shapeReflectionPayload(
 // No breakdown, no detailed scores — just the headline.
 
 function getMomentumLevel(score: number): { level: string; description: string } {
-  if (score >= 61) return { level: 'fuerte', description: 'Tu consistencia es notable.' };
-  if (score >= 31) return { level: 'estable', description: 'Vas con buen ritmo.' };
-  return { level: 'bajo', description: 'Tu impulso está despertando.' };
+  if (score >= 61) return { level: 'fuerte', description: 'Consistencia notable.' };
+  if (score >= 31) return { level: 'estable', description: 'Buen ritmo.' };
+  return { level: 'bajo', description: '' };
 }
 
 export async function shapeMomentumPayload(
@@ -263,10 +263,8 @@ export async function shapeMomentumPayload(
 
 const CHECKIN_NUDGES = [
   'Un momento para ti',
-  '¿Cómo te sientes hoy?',
-  'Tu espacio de calma',
-  'Respira un instante',
-  'Tu check-in te espera sin prisa',
+  'Tu espacio',
+  'Respira',
 ] as const;
 
 export async function shapeCheckinPayload(
@@ -347,11 +345,11 @@ export async function shapeDailyFocusPayload(
 
   // Calm fallback tips per empire (no DB dependency)
   const FALLBACK_TIPS: Record<string, { title: string; content: string }> = {
-    disciplina: { title: 'Rutina calmada', content: 'Un pequeño acto de disciplina hoy es una semilla que el futuro agradece.' },
-    mente: { title: 'Claridad mental', content: 'La claridad no llega pensando más. Llega eliminando lo innecesario.' },
-    energia: { title: 'Energía consciente', content: 'Tu cuerpo es el vehículo de todo lo que quieres lograr. No lo ignores.' },
-    riqueza: { title: 'Libertad financiera', content: 'La libertad financiera empieza con un hábito, no con un salario.' },
-    crecimiento: { title: 'Evolución personal', content: 'No creces en la zona cómoda. Creces eligiendo lo difícil con amabilidad.' },
+    disciplina: { title: 'Disciplina', content: 'La disciplina no grita. Simplemente aparece cada día.' },
+    mente: { title: 'Claridad', content: 'La claridad llega eliminando lo innecesario.' },
+    energia: { title: 'Energía', content: 'La energía se gestiona, no se busca.' },
+    riqueza: { title: 'Finanzas', content: 'El dinero no es la meta. La tranquilidad sí.' },
+    crecimiento: { title: 'Crecimiento', content: 'Creces eligiendo lo difícil con amabilidad.' },
   };
 
   const fallback = FALLBACK_TIPS[empire] || FALLBACK_TIPS.mente;
@@ -388,9 +386,17 @@ export async function shapeCalmQuotePayload(
 ): Promise<CalmQuoteWidgetPayload> {
   const dateKey = getTodayDateKey();
 
-  // Use a different index than reflection to show variety
-  const index = getDailyIndex(dateKey + userId + '_quote', REFLECTIONS.length);
-  const quote = REFLECTIONS[index];
+  // Use a different seed AND offset from the reflection index
+  // to ensure the quote and reflection are different each day
+  const reflectionIndex = getDailyIndex(dateKey + userId, REFLECTIONS.length);
+  let quoteIndex = getDailyIndex(dateKey + userId + '_quote', REFLECTIONS.length);
+
+  // Avoid showing the same reflection as the quote
+  if (quoteIndex === reflectionIndex && REFLECTIONS.length > 1) {
+    quoteIndex = (quoteIndex + 1) % REFLECTIONS.length;
+  }
+
+  const quote = REFLECTIONS[quoteIndex];
   const categoryIndex = getDailyIndex(dateKey + '_cat', QUOTE_CATEGORIES.length);
 
   return {

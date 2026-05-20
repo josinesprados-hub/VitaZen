@@ -27,7 +27,7 @@ export default function PremiumBlur({ children }: PremiumBlurProps) {
           {/* Message */}
           <div>
             <p className="text-white font-medium text-sm tracking-wide">
-              Hay más capas aquí
+              Más capas aquí
             </p>
             <p className="text-[#777] text-xs mt-1">
               Élite accede a mayor profundidad

@@ -6,30 +6,37 @@ import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 
 // ═══════════════════════════════════════════
-// PremiumReflection — rotating reflections
+// PremiumReflection — contemplative rotation
 // ═══════════════════════════════════════════
 //
+// Contemplative, not algorithmic.
+//
 // - Shows one reflection at a time
-// - Auto-rotates every ~180 seconds (3 min) with fade
-// - Changes when returning to dashboard
+// - Changes when returning to dashboard (visit-based)
+// - NO auto-rotation — the reflection stays until the user leaves
+//   and comes back. A reflection doesn't rotate like a feed.
 // - Never repeats until full collection traversed
-// - Persists index in localStorage
+// - After completing a cycle, reshuffles but avoids
+//   the last N shown to prevent close repetition
+// - Persists state in localStorage
 // - Avoids hydration mismatch (client-only init)
-// - No external APIs, no new libraries
 
 const STORAGE_KEY = 'vitazen_reflection_state';
-const ROTATE_INTERVAL = 180000;
 const FADE_DURATION = 600;
+// How many recent reflections to avoid after reshuffling
+const AVOID_RECENT_COUNT = 5;
 
 interface ReflectionState {
   /** Index within the shuffled order */
   position: number;
   /** Shuffled indices — guarantees no repeat until full cycle */
   order: number[];
+  /** Last N indices shown — to avoid close repetition after reshuffle */
+  recent: number[];
 }
 
 /**
- * Fisher-Yates shuffle (deterministic given a seed).
+ * Fisher-Yates shuffle.
  * Returns a new array of indices 0..n-1 in random order.
  */
 function shuffledOrder(n: number): number[] {
@@ -39,6 +46,19 @@ function shuffledOrder(n: number): number[] {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
+}
+
+/**
+ * Shuffle that avoids placing recent items at the start.
+ * The recent items get pushed towards the end of the shuffle.
+ */
+function shuffledOrderAvoiding(n: number, recent: number[]): number[] {
+  const order = shuffledOrder(n);
+  // Move recent items to the end so they won't appear first
+  const recentSet = new Set(recent);
+  const notRecent = order.filter(i => !recentSet.has(i));
+  const isRecent = order.filter(i => recentSet.has(i));
+  return [...notRecent, ...isRecent];
 }
 
 /**
@@ -64,6 +84,7 @@ function freshState(): ReflectionState {
   return {
     position: 0,
     order: shuffledOrder(REFLECTIONS.length),
+    recent: [],
   };
 }
 
@@ -80,42 +101,7 @@ export default function PremiumReflection() {
   const [visible, setVisible] = useState(false);
   const [reflection, setReflection] = useState('');
   const stateRef = useRef<ReflectionState | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const advance = useCallback((withFade = true) => {
-    if (!stateRef.current) return;
-
-    const state = stateRef.current;
-    const nextPos = state.position + 1;
-
-    // Cycle: if we've shown all, reshuffle
-    if (nextPos >= state.order.length) {
-      state.order = shuffledOrder(REFLECTIONS.length);
-      state.position = 0;
-    } else {
-      state.position = nextPos;
-    }
-
-    saveState(state);
-
-    const nextIdx = state.order[state.position];
-    const nextText = REFLECTIONS[nextIdx];
-
-    if (withFade) {
-      // Clear any pending fade timeout to prevent stale updates
-      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
-      setVisible(false);
-      fadeTimeoutRef.current = setTimeout(() => {
-        setReflection(nextText);
-        setVisible(true);
-        fadeTimeoutRef.current = null;
-      }, FADE_DURATION);
-    } else {
-      setReflection(nextText);
-      setVisible(true);
-    }
-  }, []);
 
   // Initialize on mount (client-only, avoids hydration mismatch)
   useEffect(() => {
@@ -134,33 +120,34 @@ export default function PremiumReflection() {
     if (!isFirstVisit) {
       const nextPos = state.position + 1;
       if (nextPos >= state.order.length) {
-        state.order = shuffledOrder(REFLECTIONS.length);
+        // Completed cycle — reshuffle, avoiding recent
+        state.order = shuffledOrderAvoiding(REFLECTIONS.length, state.recent);
         state.position = 0;
+        state.recent = [];
       } else {
         state.position = nextPos;
       }
     }
 
+    // Track recent reflections to avoid close repetition
+    const currentIdx = state.order[state.position];
+    state.recent = [...state.recent, currentIdx].slice(-AVOID_RECENT_COUNT);
+
     stateRef.current = state;
     saveState(state);
 
-    const idx = state.order[state.position];
-    setReflection(REFLECTIONS[idx]);
+    setReflection(REFLECTIONS[currentIdx]);
 
-    // Show immediately — no artificial delay that causes invisible content
+    // Show immediately — no artificial delay
     setVisible(true);
 
-    // Auto-rotate every ~180 seconds (3 min)
-    intervalRef.current = setInterval(() => advance(true), ROTATE_INTERVAL);
-
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
       if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
     };
-  }, [advance]);
+  }, [screenshotMode]);
 
   if (!reflection) {
-    // Return a minimal placeholder with gentle pulse to avoid feeling "dead"
+    // Minimal placeholder — silence, not a loading state
     return <div className="py-2 sm:py-6 h-8 sm:h-12 flex items-center justify-center"><div className="h-2 w-16 rounded-full bg-[#c8a55a]/10 gentle-pulse" /></div>;
   }
 

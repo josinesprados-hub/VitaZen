@@ -41,13 +41,13 @@ export interface StageTransition {
 // ─── Stage flavors → human labels ───
 
 const STAGE_FLAVOR_LABELS: Record<StageFlavor, string> = {
-  calm: 'Un periodo de calma',
-  growth: 'Un periodo orientado al crecimiento',
-  intensity: 'Un periodo con más intensidad',
-  dispersion: 'Un periodo más disperso',
-  exhaustion: 'Un periodo de agotamiento',
-  quiet: 'Un periodo de silencio',
-  stability: 'Un periodo estable',
+  calm: 'Calma',
+  growth: 'Crecimiento',
+  intensity: 'Intensidad',
+  dispersion: 'Dispersión',
+  exhaustion: 'Agotamiento',
+  quiet: 'Silencio',
+  stability: 'Estabilidad',
 };
 
 // ─── Monthly aggregation helpers ───
@@ -180,28 +180,28 @@ function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        return 'Un periodo tranquilo. Decisiones desde la calma.';
-      return 'Un periodo con bastante calma.';
+        return 'Calma. Decisiones desde la quietud.';
+      return 'Un periodo con calma.';
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        return 'Un periodo orientado al crecimiento.';
-      return 'Un periodo con movimiento hacia adelante.';
+        return 'Crecimiento. Movimiento hacia adelante.';
+      return 'Movimiento.';
 
     case 'intensity':
-      return 'Un periodo intenso. Mucho movimiento.';
+      return 'Intensidad. Mucho movimiento.';
 
     case 'dispersion':
-      return 'Un periodo con días muy distintos entre sí.';
+      return 'Días muy distintos entre sí.';
 
     case 'exhaustion':
-      return 'Un periodo de agotamiento. Poca energía.';
+      return 'Agotamiento. Poca energía.';
 
     case 'quiet':
-      return 'Un periodo de silencio.';
+      return 'Silencio.';
 
     case 'stability':
-      return 'Un periodo estable.';
+      return 'Estabilidad.';
 
     default:
       return '';
@@ -235,27 +235,27 @@ function detectTransitions(stages: LifeStage[]): StageTransition[] {
 }
 
 function generateTransitionObservation(from: StageFlavor, to: StageFlavor): string {
-  // Key: these are NOT "improvements" or "setbacks". Just changes.
+  // Just changes. Not improvements or setbacks.
   const transitions: Record<string, string> = {
-    'exhaustion->calm': 'Más tranquilidad después del agotamiento.',
-    'exhaustion->stability': 'Más estabilidad después del agotamiento.',
+    'exhaustion->calm': 'Más tranquilidad.',
+    'exhaustion->stability': 'Más estabilidad.',
     'intensity->calm': 'Después de la intensidad, calma.',
-    'intensity->stability': 'El ritmo se volvió más constante.',
-    'dispersion->stability': 'Más ritmo, menos dispersión.',
-    'dispersion->calm': 'De la dispersión a más calma.',
+    'intensity->stability': 'Ritmo más constante.',
+    'dispersion->stability': 'Menos dispersión.',
+    'dispersion->calm': 'Menos dispersión, más calma.',
     'quiet->growth': 'Después del silencio, movimiento.',
-    'quiet->stability': 'Del silencio a un ritmo más constante.',
+    'quiet->stability': 'Del silencio al ritmo.',
     'calm->growth': 'De la calma al crecimiento.',
-    'calm->intensity': 'De la calma a más intensidad.',
-    'growth->calm': 'Después del crecimiento, más calma.',
+    'calm->intensity': 'Más intensidad.',
+    'growth->calm': 'Más calma.',
     'growth->stability': 'El crecimiento se asentó.',
-    'stability->intensity': 'De la estabilidad a más intensidad.',
-    'stability->dispersion': 'De la estabilidad a más dispersión.',
-    'stability->exhaustion': 'De la estabilidad al agotamiento.',
-    'calm->dispersion': 'La calma se fragmentó.',
+    'stability->intensity': 'Más intensidad.',
+    'stability->dispersion': 'Más dispersión.',
+    'stability->exhaustion': 'Agotamiento.',
+    'calm->dispersion': 'Más dispersión.',
     'growth->intensity': 'El crecimiento trajo intensidad.',
     'intensity->exhaustion': 'La intensidad desgastó.',
-    'exhaustion->growth': 'Del agotamiento, ganas de crecer.',
+    'exhaustion->growth': 'Del agotamiento, movimiento.',
     'quiet->calm': 'Del silencio a la calma.',
   };
 

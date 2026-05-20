@@ -38,7 +38,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
     <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
       <div className="flex items-center gap-3 mb-4">
         <Lightbulb size={20} className="text-[#c8a55a]" />
-        <h2 className="text-lg font-semibold text-white">Notas para tu crecimiento</h2>
+        <h2 className="text-lg font-semibold text-white">Notas</h2>
       </div>
       <p className="text-[#666] text-xs mb-5">{subtitle}</p>
 
@@ -72,11 +72,11 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                     <Crown size={22} className="text-[#c8a55a]" />
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm tracking-wide">
-                      Profundiza con Élite
+                    <p className="text-white font-medium text-sm tracking-wide">
+                      Más capas
                     </p>
                     <p className="text-[#999] text-xs mt-1">
-                      Contenido exclusivo de Élite
+                      Con Élite
                     </p>
                   </div>
                   <Link
@@ -84,7 +84,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                     className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#d4b468] transition-all duration-200 shadow-[0_0_20px_rgba(200,165,90,0.15)] hover:shadow-[0_0_30px_rgba(200,165,90,0.25)]"
                   >
                     <Lock size={14} />
-                    Descubrir Élite
+                    Descubrir
                   </Link>
                 </div>
               </div>
