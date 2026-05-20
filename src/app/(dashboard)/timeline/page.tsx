@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
-import ContextualHelp from '@/components/ui/ContextualHelp';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import {
@@ -17,9 +16,11 @@ import {
   CheckCircle,
   Utensils,
   Wallet,
-  Filter,
   Clock,
-  Crown,
+  Brain,
+  Flame,
+  Target,
+  Gem,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -27,77 +28,124 @@ import {
 interface TimelineItem {
   id: string;
   type: string;
+  imperio: string;
   title: string;
   description: string;
   date: string;
   meta: Record<string, any>;
 }
 
-// ─── Category Config ─────────────────────────────────────
-
-const CATEGORIES = [
-  { key: 'all', label: 'Todo', icon: Filter },
-  { key: 'meditation', label: 'Meditación', icon: Wind },
-  { key: 'journal', label: 'Diario', icon: BookOpen },
-  { key: 'wellness', label: 'Bienestar', icon: Heart },
-  { key: 'habits', label: 'Hábitos', icon: CheckCircle },
-  { key: 'nutrition', label: 'Nutrición', icon: Utensils },
-  { key: 'finance', label: 'Finanzas', icon: Wallet },
-] as const;
-
-const TYPE_CONFIG: Record<string, { icon: any; accent: string; bg: string; border: string }> = {
-  meditation: { icon: Wind, accent: 'text-[#c8a55a]', bg: 'bg-[#c8a55a]/10', border: 'border-[#c8a55a]/20' },
-  journal:    { icon: BookOpen, accent: 'text-[#c8a55a]', bg: 'bg-[#c8a55a]/10', border: 'border-[#c8a55a]/20' },
-  wellness:   { icon: Heart, accent: 'text-[#c8a55a]', bg: 'bg-[#c8a55a]/10', border: 'border-[#c8a55a]/20' },
-  habits:     { icon: CheckCircle, accent: 'text-[#c8a55a]', bg: 'bg-[#c8a55a]/10', border: 'border-[#c8a55a]/20' },
-  nutrition:  { icon: Utensils, accent: 'text-[#c8a55a]', bg: 'bg-[#c8a55a]/10', border: 'border-[#c8a55a]/20' },
-  finance:    { icon: Wallet, accent: 'text-[#c8a55a]', bg: 'bg-[#c8a55a]/10', border: 'border-[#c8a55a]/20' },
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  meditation: 'Meditación',
-  journal: 'Diario',
-  wellness: 'Bienestar',
-  habits: 'Hábitos',
-  nutrition: 'Nutrición',
-  finance: 'Finanzas',
-};
-
-// ─── Relative Date ───────────────────────────────────────
-
-function relativeDate(dateStr: string): string {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffH = Math.floor(diffMs / 3600000);
-  const diffDay = Math.floor(diffMs / 86400000);
-
-  if (diffMin < 1) return 'Ahora mismo';
-  if (diffMin < 60) return `Hace ${diffMin}min`;
-  if (diffH < 24) return `Hace ${diffH}h`;
-  if (diffDay === 1) return 'Ayer';
-  if (diffDay < 7) return `Hace ${diffDay} días`;
-  if (diffDay < 30) {
-    const weeks = Math.floor(diffDay / 7);
-    return weeks === 1 ? 'Hace 1 semana' : `Hace ${weeks} semanas`;
-  }
-  return new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+interface DayGroup {
+  key: string;
+  label: string;
+  sublabel?: string;
+  items: TimelineItem[];
 }
 
-// ─── Date Separator ──────────────────────────────────────
+// ─── Imperio Config ──────────────────────────────────────
+// Each imperio has its own subtle accent — not loud, just present
+// So the user feels which dimension of life is speaking
 
-function dateGroup(dateStr: string): string {
+const IMPERIO_CONFIG: Record<string, {
+  icon: any;
+  accent: string;
+  accentSubtle: string;
+  dot: string;
+  label: string;
+}> = {
+  mente: {
+    icon: Brain,
+    accent: 'text-[#8ba7c7]',
+    accentSubtle: 'text-[#8ba7c7]/60',
+    dot: 'bg-[#8ba7c7]/25 border-[#8ba7c7]/50',
+    label: 'Mente',
+  },
+  energia: {
+    icon: Flame,
+    accent: 'text-[#8bc78b]',
+    accentSubtle: 'text-[#8bc78b]/60',
+    dot: 'bg-[#8bc78b]/25 border-[#8bc78b]/50',
+    label: 'Energía',
+  },
+  disciplina: {
+    icon: Target,
+    accent: 'text-[#c7a98b]',
+    accentSubtle: 'text-[#c7a98b]/60',
+    dot: 'bg-[#c7a98b]/25 border-[#c7a98b]/50',
+    label: 'Disciplina',
+  },
+  riqueza: {
+    icon: Gem,
+    accent: 'text-[#c8a55a]',
+    accentSubtle: 'text-[#c8a55a]/60',
+    dot: 'bg-[#c8a55a]/25 border-[#c8a55a]/50',
+    label: 'Riqueza',
+  },
+};
+
+// Activity type → imperio fallback (in case API doesn't send imperio)
+const TYPE_IMPERIO: Record<string, string> = {
+  meditation: 'mente',
+  journal: 'mente',
+  wellness: 'energia',
+  nutrition: 'energia',
+  habits: 'disciplina',
+  finance: 'riqueza',
+};
+
+const TYPE_ICON: Record<string, any> = {
+  meditation: Wind,
+  journal: BookOpen,
+  wellness: Heart,
+  habits: CheckCircle,
+  nutrition: Utensils,
+  finance: Wallet,
+};
+
+// ─── Filter Config ───────────────────────────────────────
+// Grouped by imperio, not by activity type — feels more human
+
+const FILTERS = [
+  { key: 'all', label: 'Todo', icon: Clock },
+  { key: 'mente', label: 'Mente', icon: Brain },
+  { key: 'energia', label: 'Energía', icon: Flame },
+  { key: 'disciplina', label: 'Disciplina', icon: Target },
+  { key: 'riqueza', label: 'Riqueza', icon: Gem },
+] as const;
+
+// ─── Date Grouping ───────────────────────────────────────
+
+function dayKey(dateStr: string): string {
+  return new Date(dateStr).toISOString().slice(0, 10);
+}
+
+function dayLabel(dateStr: string): { label: string; sublabel?: string } {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
   const diffDay = Math.floor(diffMs / 86400000);
 
-  if (diffDay === 0) return 'Hoy';
-  if (diffDay === 1) return 'Ayer';
-  if (diffDay < 7) return 'Esta semana';
-  if (diffDay < 14) return 'Hace 2 semanas';
-  return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  if (diffDay === 0) return { label: 'Hoy' };
+  if (diffDay === 1) return { label: 'Ayer' };
+
+  const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
+  const dateStr2 = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+
+  if (diffDay < 7) return { label: dateStr2, sublabel: dayName };
+  return { label: dateStr2 };
+}
+
+// ─── Week rhythm detection ───────────────────────────────
+// Detects which imperios were active in a given day,
+// so we can show a subtle rhythm indicator
+
+function dayImperios(items: TimelineItem[]): string[] {
+  const seen = new Set<string>();
+  for (const item of items) {
+    const imp = item.imperio || TYPE_IMPERIO[item.type] || 'mente';
+    seen.add(imp);
+  }
+  return Array.from(seen);
 }
 
 // ─── Component ───────────────────────────────────────────
@@ -140,24 +188,44 @@ export default function TimelinePage() {
 
   const handleFilter = (key: string) => {
     setActiveFilter(key);
-    fetchTimeline(key === 'all' ? undefined : key);
+    // Map imperio filters to their activity types for the API
+    const imperioToTypes: Record<string, string> = {
+      mente: 'meditation',
+      energia: 'wellness',
+      disciplina: 'habits',
+      riqueza: 'finance',
+    };
+    fetchTimeline(imperioToTypes[key] || undefined);
   };
 
-  // Group items by date
-  const allGrouped: { label: string; items: TimelineItem[] }[] = [];
-  let currentLabel = '';
-  for (const item of items) {
-    const label = dateGroup(item.date);
-    if (label !== currentLabel) {
-      currentLabel = label;
-      allGrouped.push({ label, items: [item] });
-    } else {
-      allGrouped[allGrouped.length - 1].items.push(item);
+  // Filter items client-side for imperios that span multiple activity types
+  const filteredItems = useMemo(() => {
+    if (activeFilter === 'all') return items;
+    return items.filter((item) => {
+      const imp = item.imperio || TYPE_IMPERIO[item.type] || 'mente';
+      return imp === activeFilter;
+    });
+  }, [items, activeFilter]);
+
+  // Group by day — each day is a breath, a fragment
+  const allGrouped: DayGroup[] = useMemo(() => {
+    const groups: DayGroup[] = [];
+    let currentKey = '';
+    for (const item of filteredItems) {
+      const key = dayKey(item.date);
+      if (key !== currentKey) {
+        currentKey = key;
+        const { label, sublabel } = dayLabel(item.date);
+        groups.push({ key, label, sublabel, items: [item] });
+      } else {
+        groups[groups.length - 1].items.push(item);
+      }
     }
-  }
+    return groups;
+  }, [filteredItems]);
 
   // FREE users: show only recent groups (up to ~7 days), gate the rest
-  const FREE_VISIBLE_GROUPS = 3; // Hoy, Ayer, Esta semana
+  const FREE_VISIBLE_GROUPS = 3;
   const grouped = isPremium
     ? allGrouped
     : allGrouped.slice(0, FREE_VISIBLE_GROUPS);
@@ -165,40 +233,37 @@ export default function TimelinePage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Contextual Help */}
-      <ContextualHelp
-        storageKey="vitazen_help_timeline"
-        title="Timeline"
-        text="Aquí se recoge toda tu actividad: meditaciones, hábitos, diario, bienestar, nutrición y finanzas. Filtra por categoría para ver lo que te interese."
-      />
-
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-3 mb-1.5">
-          <Clock size={22} className="text-[#c8a55a]" />
-          <h1 className="text-lg sm:text-2xl font-bold text-white">Timeline</h1>
+      {/* Header — quiet, no icon, just presence */}
+      <div className="mb-10 sm:mb-14">
+        <h1 className="text-lg sm:text-2xl font-bold text-white mb-1.5">
+          Memoria
+        </h1>
+        <p className="subtitle-silent">Tu vida, vista desde aquí</p>
+        <div className="mt-3">
           <PremiumInlineBadge
             isPremium={isPremium}
             freeLabel="7 días"
             premiumLabel="Historial completo"
           />
         </div>
-        <p className="subtitle-silent">Tu historia, día a día</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-pills">
-        {CATEGORIES.map((cat) => {
+      {/* Filters — by imperio, not by activity type */}
+      <div className="flex gap-2 mb-10 sm:mb-14 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-pills">
+        {FILTERS.map((cat) => {
           const isActive = activeFilter === cat.key;
           const Icon = cat.icon;
+          const impConfig = cat.key !== 'all' ? IMPERIO_CONFIG[cat.key] : null;
           return (
             <button
               key={cat.key}
               onClick={() => handleFilter(cat.key)}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 touch-press-sm ${
                 isActive
-                  ? 'bg-[#c8a55a] text-[#000000]'
-                  : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-[#c8a55a]/30 hover:text-[#c8a55a]'
+                  ? impConfig
+                    ? `${impConfig.accent} bg-white/[0.06]`
+                    : 'bg-[#c8a55a] text-[#000000]'
+                  : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-[#333] hover:text-[#bbb]'
               }`}
             >
               <Icon size={14} />
@@ -208,130 +273,172 @@ export default function TimelinePage() {
         })}
       </div>
 
-      {/* Timeline */}
+      {/* Timeline — memory, not feed */}
       {loading ? (
         <TimelineSkeleton />
       ) : fetchError ? (
         <PremiumErrorState
           variant="loading"
-          title="No se pudo cargar el timeline"
+          title="No se pudo cargar"
           onRetry={() => fetchTimeline(activeFilter === 'all' ? undefined : activeFilter)}
           size="md"
         />
-      ) : items.length === 0 ? (
+      ) : filteredItems.length === 0 ? (
         <PremiumEmptyState
           icon={Clock}
-          title="Aquí irá tu historia"
+          title="Tu memoria empieza aquí"
           size="lg"
           variant="gold"
         />
       ) : (
-        <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-[19px] top-2 bottom-2 w-px bg-[#1a1a1a] hidden sm:block" />
+        <div className="space-y-16 sm:space-y-20">
+          {grouped.map((group) => {
+            const imperios = dayImperios(group.items);
 
-          <div className="space-y-10">
-            {grouped.map((group) => (
-              <div key={group.label} className="animate-in">
-                {/* Group label */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-[39px] flex justify-center hidden sm:flex">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#c8a55a]/30 border border-[#c8a55a]" />
-                  </div>
-                  <h2 className="text-xs uppercase tracking-widest font-semibold text-[#c8a55a]">
+            return (
+              <div key={group.key} className="animate-in">
+                {/* Day header — breath, pause, presence */}
+                <div className="mb-6 sm:mb-8">
+                  <h2 className="text-sm sm:text-base font-medium text-white/80">
                     {group.label}
                   </h2>
-                  <div className="flex-1 h-px bg-[#1a1a1a]" />
+                  {group.sublabel && (
+                    <p className="text-xs text-[#555] mt-0.5 capitalize">{group.sublabel}</p>
+                  )}
+                  {/* Imperio rhythm dots — which dimensions were present this day */}
+                  {imperios.length > 1 && (
+                    <div className="flex items-center gap-2 mt-2.5">
+                      {imperios.map((imp) => {
+                        const cfg = IMPERIO_CONFIG[imp];
+                        if (!cfg) return null;
+                        const ImpIcon = cfg.icon;
+                        return (
+                          <div
+                            key={imp}
+                            className={`w-5 h-5 rounded-full border flex items-center justify-center ${cfg.dot}`}
+                            title={cfg.label}
+                          >
+                            <ImpIcon size={9} className={cfg.accent} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
+                {/* Day items — fragments, not cards */}
+                <div className="space-y-3 sm:space-y-4 pl-2 sm:pl-3 border-l border-[#1a1a1a] ml-1">
+                  {group.items.map((item) => {
+                    const imperio = item.imperio || TYPE_IMPERIO[item.type] || 'mente';
+                    const impConfig = IMPERIO_CONFIG[imperio] || IMPERIO_CONFIG.mente;
+                    const ImpIcon = impConfig.icon;
+                    const TypeIcon = TYPE_ICON[item.type] || Heart;
 
-                {/* Items */}
-                <div className="space-y-3">
-                  {group.items.map((item, index) => {
-                    const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.wellness;
-                    const Icon = config.icon;
-                    const label = TYPE_LABELS[item.type] || item.type;
+                    // Determine emotional weight — some moments carry more presence
+                    const isSubstantial =
+                      item.type === 'journal' ||
+                      (item.type === 'wellness' && item.meta.notes) ||
+                      (item.type === 'finance' && Number(item.meta.amount) >= 50);
 
                     return (
                       <div
                         key={item.id}
-                        className="relative flex gap-4 group animate-in"
-                        style={{ animationDelay: `${index * 50}ms` }}
+                        className={`relative group ${isSubstantial ? 'py-2' : ''}`}
                       >
-                        {/* Timeline dot + line */}
-                        <div className="flex-shrink-0 w-[39px] flex flex-col items-center hidden sm:flex">
-                          <div
-                            className={`w-[39px] h-[39px] rounded-xl ${config.bg} border ${config.border} flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:border-[#c8a55a]/40`}
-                          >
-                            <Icon size={16} className={config.accent} />
-                          </div>
-                        </div>
+                        {/* Imperio dot on the left line */}
+                        <div className={`absolute -left-[5px] sm:-left-[9px] top-2.5 w-1.5 h-1.5 rounded-full border ${impConfig.dot}`} />
 
-                        {/* Card */}
-                        <div className="flex-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3.5 sm:p-5 hover:border-[#c8a55a]/20 transition-all duration-300 group-hover:bg-[#0d0d0d] touch-press">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-[10px] uppercase tracking-widest font-semibold text-[#c8a55a]/60">
-                                  {label}
-                                </span>
-                              </div>
-                              <h3 className="text-white font-medium text-sm truncate">
+                        {/* Fragment content */}
+                        <div className={`${isSubstantial ? 'pl-5 sm:pl-6' : 'pl-5 sm:pl-6'}`}>
+                          {/* Light items — just a line */}
+                          {!isSubstantial && (
+                            <div className="flex items-baseline gap-2.5">
+                              <span className={`text-xs ${impConfig.accentSubtle}`}>
+                                <TypeIcon size={11} className="inline -mt-0.5 mr-1" />
                                 {item.title}
-                              </h3>
-                              <p className="text-[#777] text-xs mt-1 line-clamp-2 leading-relaxed">
-                                {item.description}
-                              </p>
-
-                              {/* Extra meta for specific types */}
-                              {item.type === 'wellness' && item.meta.mood && (
-                                <div className="flex gap-3 mt-2.5">
-                                  {['Ánimo', 'Energía', 'Sueño', 'Estrés'].map((label, i) => {
-                                    const val = [item.meta.mood, item.meta.energy, item.meta.sleep, item.meta.stress][i];
-                                    return (
-                                      <span key={label} className="text-[10px] text-[#555]">
-                                        {label} <span className="text-[#c8a55a]/80">{val}/5</span>
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              )}
-
-                              {item.type === 'habits' && item.meta.streak > 0 && (
-                                <span className="inline-flex items-center gap-1 mt-2 text-[10px] text-[#c8a55a]/70">
-                                  Racha de {item.meta.streak} días
+                              </span>
+                              {item.description && (
+                                <span className="text-[11px] text-[#555] truncate">
+                                  {item.description}
                                 </span>
                               )}
-
                               {item.type === 'finance' && (
-                                <span
-                                  className={`inline-flex items-center mt-2 text-xs font-semibold ${
-                                    item.meta.financeType === 'income' ? 'text-green-400' : 'text-red-400'
-                                  }`}
-                                >
+                                <span className={`text-[11px] font-medium ${
+                                  item.meta.financeType === 'income' ? 'text-[#8bc78b]/70' : 'text-red-400/70'
+                                }`}>
                                   {item.meta.financeType === 'income' ? '+' : '-'}{formatCurrency(Number(item.meta.amount))}
                                 </span>
                               )}
+                              {item.type === 'habits' && item.meta.streak > 0 && (
+                                <span className="text-[10px] text-[#c7a98b]/50">
+                                  {item.meta.streak}d
+                                </span>
+                              )}
                             </div>
+                          )}
 
-                            <span className="text-[10px] text-[#555] whitespace-nowrap flex-shrink-0 pt-0.5">
-                              {relativeDate(item.date)}
-                            </span>
-                          </div>
+                          {/* Substantial items — more presence, more air */}
+                          {isSubstantial && (
+                            <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl px-4 py-3.5 sm:px-5 sm:py-4 hover:border-[#222] transition-colors duration-300">
+                              {/* Imperio label */}
+                              <div className="flex items-center gap-1.5 mb-2">
+                                <ImpIcon size={11} className={impConfig.accentSubtle} />
+                                <span className={`text-[10px] uppercase tracking-widest font-medium ${impConfig.accentSubtle}`}>
+                                  {impConfig.label}
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-white/90 font-medium text-sm leading-snug">
+                                {item.title}
+                              </h3>
+
+                              {/* Description */}
+                              {item.description && (
+                                <p className="text-[#666] text-xs mt-1.5 leading-relaxed line-clamp-3">
+                                  {item.description}
+                                </p>
+                              )}
+
+                              {/* Finance amount */}
+                              {item.type === 'finance' && (
+                                <span className={`inline-flex items-center mt-2 text-xs font-medium ${
+                                  item.meta.financeType === 'income' ? 'text-[#8bc78b]/80' : 'text-red-400/80'
+                                }`}>
+                                  {item.meta.financeType === 'income' ? '+' : '-'}{formatCurrency(Number(item.meta.amount))}
+                                </span>
+                              )}
+
+                              {/* Wellness scores — quiet, not clinical */}
+                              {item.type === 'wellness' && item.meta.mood && (
+                                <div className="flex gap-3 mt-2.5">
+                                  {[
+                                    { label: 'Ánimo', val: item.meta.mood },
+                                    { label: 'Energía', val: item.meta.energy },
+                                    { label: 'Sueño', val: item.meta.sleep },
+                                    { label: 'Estrés', val: item.meta.stress },
+                                  ].map(({ label, val }) => (
+                                    <span key={label} className="text-[10px] text-[#444]">
+                                      {label} <span className="text-[#666]">{val}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
 
           {/* Premium history gate */}
           {hasHiddenHistory && (
             <div className="mt-6">
               <PremiumGate isPremium={false} intensity="medium" label="Historial completo">
-                {/* Dummy blurred items to suggest more content */}
                 <div className="space-y-3">
                   <div className="h-16 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl" />
                   <div className="h-16 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl" />

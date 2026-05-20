@@ -400,61 +400,53 @@ export function TimelineSkeleton() {
   return (
     <div className="max-w-3xl mx-auto skeleton-entrance">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <SkeletonIcon size="md" />
-          <SkeletonLine width="120px" className="h-7" />
-        </div>
-        <SkeletonLine width="220px" className="h-4 mt-2" />
+      <div className="mb-10 sm:mb-14">
+        <SkeletonLine width="100px" className="h-7" />
+        <SkeletonLine width="180px" className="h-4 mt-2" />
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-8">
-        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+      <div className="flex gap-2 mb-10 sm:mb-14">
+        {[1, 2, 3, 4, 5].map((i) => (
           <SkeletonBlock key={i} className="h-9 w-20 rounded-full shrink-0" />
         ))}
       </div>
 
-      {/* Timeline items */}
-      <div className="relative">
-        {/* Vertical line */}
-        <div className="absolute left-[19px] top-2 bottom-2 w-px bg-[#1a1a1a] hidden sm:block" />
+      {/* Memory fragments */}
+      <div className="space-y-16 sm:space-y-20">
+        {[1, 2].map((group) => (
+          <div key={group}>
+            {/* Day label */}
+            <div className="mb-6 sm:mb-8">
+              <SkeletonLine width="120px" className="h-4" />
+              <SkeletonLine width="60px" className="h-2.5 mt-1.5" />
+            </div>
 
-        <div className="space-y-10">
-          {[1, 2].map((group) => (
-            <div key={group}>
-              {/* Group label */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-[39px] flex justify-center hidden sm:flex">
-                  <SkeletonCircle size={10} />
-                </div>
-                <SkeletonLine width="80px" className="h-3" />
-                <div className="flex-1 h-px bg-[#1a1a1a]" />
-              </div>
-
-              {/* Items */}
-              <div className="space-y-3">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="relative flex gap-4">
-                    <div className="flex-shrink-0 w-[39px] hidden sm:flex justify-center">
-                      <SkeletonBlock className="w-[39px] h-[39px] rounded-xl" />
-                    </div>
-                    <SkeletonCard className="flex-1 p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 space-y-2">
-                          <SkeletonLine width="40%" className="h-2.5" />
-                          <SkeletonLine width="65%" className="h-4" />
-                          <SkeletonLine width="90%" className="h-3" />
-                        </div>
-                        <SkeletonLine width="50px" className="h-3 shrink-0" />
+            {/* Items */}
+            <div className="space-y-3 sm:space-y-4 pl-2 sm:pl-3 border-l border-[#1a1a1a] ml-1">
+              {[1, 2].map((item) => (
+                <div key={item} className="pl-5 sm:pl-6">
+                  {item === 1 ? (
+                    /* Substantial fragment */
+                    <SkeletonCard className="px-4 py-3.5 sm:px-5 sm:py-4">
+                      <div className="space-y-2.5">
+                        <SkeletonLine width="30%" className="h-2" />
+                        <SkeletonLine width="60%" className="h-3.5" />
+                        <SkeletonLine width="85%" className="h-2.5" />
                       </div>
                     </SkeletonCard>
-                  </div>
-                ))}
-              </div>
+                  ) : (
+                    /* Light fragment */
+                    <div className="flex items-baseline gap-2.5">
+                      <SkeletonLine width="90px" className="h-3" />
+                      <SkeletonLine width="50px" className="h-2.5" />
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -112,7 +112,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               }`}
             >
               <Clock size={18} />
-              Timeline
+              Memoria
             </Link>
 
             <Link

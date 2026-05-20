@@ -4,6 +4,24 @@ import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { formatCurrency } from '@/lib/utils';
 
+// Imperio mapping — each activity belongs to a vital dimension
+const TYPE_IMPERIO: Record<string, string> = {
+  meditation: 'mente',
+  journal: 'mente',
+  wellness: 'energia',
+  nutrition: 'energia',
+  habits: 'disciplina',
+  finance: 'riqueza',
+};
+
+// Imperio labels — calm, human, not technical
+const IMPERIO_LABEL: Record<string, string> = {
+  mente: 'Mente',
+  energia: 'Energía',
+  disciplina: 'Disciplina',
+  riqueza: 'Riqueza',
+};
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
@@ -16,12 +34,13 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const category = searchParams.get('category'); // meditation | journal | wellness | habits | nutrition | finance
+  const category = searchParams.get('category');
   const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
   interface TimelineItem {
     id: string;
     type: string;
+    imperio: string;
     title: string;
     description: string;
     date: Date;
@@ -47,12 +66,13 @@ export async function GET(request: NextRequest) {
         take: limit,
       }).then((sessions) => {
         for (const s of sessions) {
-          const typeLabel = s.type === 'guided' ? 'Guiada' : s.type === 'breathing' ? 'Respiración' : s.type === 'body_scan' ? 'Body Scan' : 'Mindfulness';
+          const typeLabel = s.type === 'guided' ? 'guiada' : s.type === 'breathing' ? 'respiración' : s.type === 'body_scan' ? 'body scan' : 'mindfulness';
           items.push({
             id: s.id,
             type: 'meditation',
+            imperio: 'mente',
             title: `Meditación ${typeLabel}`,
-            description: `${s.duration} minutos de práctica consciente`,
+            description: `${s.duration} minutos`,
             date: s.completedAt,
             meta: { duration: s.duration, meditationType: s.type },
           });
@@ -72,8 +92,9 @@ export async function GET(request: NextRequest) {
           items.push({
             id: e.id,
             type: 'journal',
-            title: e.title || 'Entrada de diario',
-            description: e.content.length > 120 ? e.content.substring(0, 120) + '...' : e.content,
+            imperio: 'mente',
+            title: e.title || 'Reflexión',
+            description: e.content.length > 100 ? e.content.substring(0, 100) + '…' : e.content,
             date: e.createdAt,
             meta: { mood: e.mood, gratitude: e.gratitude },
           });
@@ -90,14 +111,14 @@ export async function GET(request: NextRequest) {
         take: limit,
       }).then((logs) => {
         for (const l of logs) {
-          const avgScore = Math.round((l.mood + l.energy + l.sleep + l.stress) / 4);
           items.push({
             id: l.id,
             type: 'wellness',
-            title: 'Registro de bienestar',
-            description: `Ánimo: ${l.mood}/5 · Energía: ${l.energy}/5 · Sueño: ${l.sleep}/5 · Estrés: ${l.stress}/5`,
+            imperio: 'energia',
+            title: l.notes || 'Estado del día',
+            description: `Ánimo ${l.mood}/5 · Energía ${l.energy}/5`,
             date: l.date,
-            meta: { mood: l.mood, energy: l.energy, sleep: l.sleep, stress: l.stress, notes: l.notes, avgScore },
+            meta: { mood: l.mood, energy: l.energy, sleep: l.sleep, stress: l.stress, notes: l.notes },
           });
         }
       })
@@ -115,8 +136,9 @@ export async function GET(request: NextRequest) {
           items.push({
             id: h.id,
             type: 'habits',
+            imperio: 'disciplina',
             title: h.name,
-            description: h.description || `Racha de ${h.streak} días consecutivos`,
+            description: h.description || (h.streak > 0 ? `${h.streak} días` : undefined),
             date: h.lastCompletedAt || h.createdAt,
             meta: { streak: h.streak, frequency: h.frequency },
           });
@@ -135,12 +157,12 @@ export async function GET(request: NextRequest) {
         for (const l of logs) {
           const parts: string[] = [];
           if (l.water > 0) parts.push(`${l.water} vasos de agua`);
-          if (l.calories) parts.push(`${l.calories} kcal`);
           items.push({
             id: l.id,
             type: 'nutrition',
-            title: 'Registro nutricional',
-            description: parts.length > 0 ? parts.join(' · ') : 'Registro alimenticio del día',
+            imperio: 'energia',
+            title: 'Nutrición',
+            description: parts.length > 0 ? parts.join(' · ') : (l.notes || undefined),
             date: l.date,
             meta: { water: l.water, calories: l.calories, notes: l.notes },
           });
@@ -161,8 +183,9 @@ export async function GET(request: NextRequest) {
           items.push({
             id: l.id,
             type: 'finance',
-            title: `${isIncome ? 'Ingreso' : 'Gasto'} · ${l.category}`,
-            description: `${isIncome ? '+' : '-'}${formatCurrency(l.amount)}${l.description ? ' · ' + l.description : ''}`,
+            imperio: 'riqueza',
+            title: l.category,
+            description: l.description || `${isIncome ? '+' : '-'}${formatCurrency(l.amount)}`,
             date: l.date,
             meta: { amount: l.amount, financeType: l.type, category: l.category },
           });

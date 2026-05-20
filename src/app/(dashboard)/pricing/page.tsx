@@ -91,7 +91,7 @@ export default function PricingPage() {
               'Acceso a los 5 imperios',
               'Consejos básicos de cada imperio',
               'Check-in y seguimiento emocional',
-              'Timeline de tu actividad',
+              'Memoria de tu vida',
             ].map((feature) => (
               <div key={feature} className="flex items-start gap-3">
                 <Check size={14} className="text-[#444] shrink-0 mt-0.5" />
