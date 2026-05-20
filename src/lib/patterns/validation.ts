@@ -109,12 +109,12 @@ export function computeWeight(
   overlapWeeks: number
 ): ObservationWeight {
   // profunda: high confidence, high consistency, sustained over time
-  if (confidence >= 0.80 && consistencyScore >= 0.70 && overlapWeeks >= 5) {
+  if (confidence >= 0.75 && consistencyScore >= 0.65 && overlapWeeks >= 4) {
     return 'profunda';
   }
 
   // relevante: solid confidence and consistency
-  if (confidence >= 0.70 && consistencyScore >= 0.60) {
+  if (confidence >= 0.60 && consistencyScore >= 0.50) {
     return 'relevante';
   }
 
@@ -269,7 +269,7 @@ export function validateSignal(
   const cleanB = cleanIndices.map((i) => valuesB[i]);
   const consistencyScore = computeConsistency(cleanA, cleanB, direction);
 
-  if (consistencyScore < 0.55) {
+  if (consistencyScore < 0.50) {
     return {
       isValid: false,
       consistencyScore,

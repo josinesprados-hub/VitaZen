@@ -739,38 +739,38 @@ export function EmpireSkeleton({ message }: { message: string }) {
  *  Contemplative: no flashy shimmer, just quiet reserved space. */
 export function FinanzasSkeleton() {
   return (
-    <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10 pb-24 skeleton-entrance">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-24 skeleton-entrance">
       {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/5" />
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#c8a55a]/5" />
           <div className="space-y-2">
-            <SkeletonLine width="100px" className="h-6 sm:h-7" />
-            <SkeletonLine width="140px" className="h-3" />
+            <SkeletonLine width="110px" className="h-7 sm:h-8" />
+            <SkeletonLine width="160px" className="h-3 sm:h-3.5" />
           </div>
         </div>
       </div>
 
       {/* Month Navigation — matches the ← month → row */}
       <div className="flex items-center justify-between">
-        <div className="w-8 h-8" />
+        <div className="w-9 h-9" />
         <div className="flex items-center gap-2">
-          <SkeletonLine width="120px" className="h-4" />
+          <SkeletonLine width="130px" className="h-4 sm:h-4.5" />
         </div>
-        <div className="w-8 h-8" />
+        <div className="w-9 h-9" />
       </div>
 
       {/* Balance de Intenciones — matches the card with bars */}
-      <SkeletonCard className="p-5 sm:p-7">
-        <SkeletonLine width="200px" className="h-3 mb-5" />
-        <div className="space-y-4">
+      <SkeletonCard className="p-6 sm:p-8 lg:p-10 rounded-2xl">
+        <SkeletonLine width="220px" className="h-3.5 sm:h-4 mb-6 sm:mb-8" />
+        <div className="space-y-5 sm:space-y-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-1.5">
+            <div key={i} className="space-y-2">
               <div className="flex items-center justify-between">
-                <SkeletonLine width={`${55 + i * 10}%`} className="h-3" />
-                <SkeletonLine width="60px" className="h-2.5" />
+                <SkeletonLine width={`${55 + i * 10}%`} className="h-3 sm:h-3.5" />
+                <SkeletonLine width="65px" className="h-2.5 sm:h-3" />
               </div>
-              <div className="h-1.5 bg-[#111] rounded-full overflow-hidden">
+              <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full bg-[#c8a55a]/10"
                   style={{ width: `${30 + i * 20}%` }}
@@ -782,23 +782,23 @@ export function FinanzasSkeleton() {
       </SkeletonCard>
 
       {/* Saldo neto — matches the big number area */}
-      <div>
-        <SkeletonLine width="140px" className="h-8 sm:h-9" />
-        <div className="flex items-center gap-3 mt-1.5">
-          <SkeletonLine width="100px" className="h-3" />
+      <div className="py-1">
+        <SkeletonLine width="160px" className="h-9 sm:h-10 lg:h-12" />
+        <div className="flex items-center gap-3 mt-2">
+          <SkeletonLine width="110px" className="h-3 sm:h-3.5" />
         </div>
       </div>
 
       {/* Insight — reserved, quiet */}
-      <div className="bg-[#c8a55a]/3 border border-[#c8a55a]/10 rounded-xl p-4 sm:p-5">
-        <SkeletonLine width="80%" className="h-4" />
+      <div className="bg-[#c8a55a]/3 border border-[#c8a55a]/10 rounded-2xl p-5 sm:p-6 lg:p-7">
+        <SkeletonLine width="80%" className="h-4 sm:h-4.5" />
       </div>
 
       {/* Historial — matches Movimientos card */}
-      <SkeletonCard className="p-5 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <SkeletonLine width="110px" className="h-5" />
-          <SkeletonLine width="60px" className="h-4" />
+      <SkeletonCard className="p-5 sm:p-6 lg:p-8 rounded-2xl">
+        <div className="flex items-center justify-between mb-5 sm:mb-6">
+          <SkeletonLine width="120px" className="h-5 sm:h-5.5" />
+          <SkeletonLine width="65px" className="h-4" />
         </div>
         <div className="flex gap-2 mb-4">
           {[1, 2, 3].map((i) => (

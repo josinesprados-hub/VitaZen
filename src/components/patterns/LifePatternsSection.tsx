@@ -138,15 +138,15 @@ function setCachedObservations(userId: string, data: PatternsResponse): void {
 
 function ObservationCard({ observation }: { observation: ObservationData }) {
   return (
-    <div className="py-4">
-      <p className="text-[#c8a55a]/70 text-sm sm:text-base italic leading-relaxed">
+    <div className="py-5 sm:py-6">
+      <p className="text-[#c8a55a]/70 text-base sm:text-lg italic leading-relaxed">
         {observation.text}
       </p>
 
       {observation.empires.length > 1 && (
-        <div className="flex items-center gap-1.5 mt-3">
+        <div className="flex items-center gap-1.5 mt-3 sm:mt-4">
           {observation.empires.map((empire, i) => (
-            <span key={i} className="text-[9px] text-[#2a2a2a] tracking-wide">
+            <span key={i} className="text-[9px] sm:text-[10px] text-[#2a2a2a] tracking-wide">
               {i > 0 && <span className="text-[#1a1a1a] mr-1.5">·</span>}
               {empire}
             </span>
@@ -161,8 +161,8 @@ function ObservationCard({ observation }: { observation: ObservationData }) {
 
 function WaitingState() {
   return (
-    <div className="text-center py-8">
-      <p className="text-[11px] text-[#333] leading-relaxed max-w-xs mx-auto">
+    <div className="text-center py-8 sm:py-10">
+      <p className="text-xs sm:text-sm text-[#333] leading-relaxed max-w-xs mx-auto">
         {EMPTY_STATE_MESSAGE}
       </p>
     </div>
@@ -193,14 +193,14 @@ function PremiumPreview({ observation }: { observation: ObservationData }) {
 
 function SilentSkeleton() {
   return (
-    <div className="py-6">
+    <div className="py-6 sm:py-8">
       <div className="flex items-center gap-2 mb-4">
         <Link2 size={11} className="text-[#c8a55a]/10" />
         <span className="text-[11px] text-[#222]">{SECTION_TITLE}</span>
       </div>
-      <div className="py-4">
-        <div className="h-4 bg-[#0a0a0a] rounded w-3/4" />
-        <div className="h-3 bg-[#0a0a0a] rounded w-1/2 mt-2" />
+      <div className="py-4 sm:py-5">
+        <div className="h-4 bg-[#0a0a0a] rounded w-3/4 sm:w-2/3" />
+        <div className="h-3 bg-[#0a0a0a] rounded w-1/2 sm:w-2/5 mt-2" />
       </div>
     </div>
   );
@@ -233,6 +233,16 @@ export default function LifePatternsSection() {
           });
           // Data from cache — already visible. No loading state needed.
           // Silently refresh in background for next visit.
+          try {
+            const res = await apiFetch('/api/patterns');
+            if (res.ok) {
+              const result = await res.json();
+              setData(result);
+              setCachedObservations(user.id, result);
+            }
+          } catch {
+            // Background refresh failed — cached data still showing, this is fine
+          }
           return;
         }
       }
@@ -269,10 +279,10 @@ export default function LifePatternsSection() {
   // Not enough data yet
   if (!data.hasEnoughData && data.observations.length === 0) {
     return (
-      <div className="py-6">
+      <div className="py-6 sm:py-8">
         <div className="flex items-center gap-2 mb-4">
           <Link2 size={11} className="text-[#c8a55a]/20" />
-          <span className="text-[11px] text-[#333]">{SECTION_TITLE}</span>
+          <span className="text-[11px] sm:text-xs text-[#333]">{SECTION_TITLE}</span>
           <Crown size={7} className="text-[#c8a55a]/20 ml-auto" />
         </div>
         <WaitingState />
@@ -283,11 +293,11 @@ export default function LifePatternsSection() {
   const observations = data.observations;
 
   return (
-    <div className="py-6">
+    <div className="py-6 sm:py-8">
       {/* Header — whisper, not announcement */}
       <div className="flex items-center gap-2 mb-2">
         <Link2 size={11} className="text-[#c8a55a]/20" />
-        <span className="text-[11px] text-[#333]">{SECTION_TITLE}</span>
+        <span className="text-[11px] sm:text-xs text-[#333]">{SECTION_TITLE}</span>
         <span className="text-[9px] text-[#222] ml-1">{SECTION_SUBTITLE}</span>
         <Crown size={7} className="text-[#c8a55a]/20 ml-auto" />
       </div>

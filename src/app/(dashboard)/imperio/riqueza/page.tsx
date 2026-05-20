@@ -319,19 +319,19 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
   if (!hasData) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 sm:space-y-6">
       {flows.map((flow) => {
         if (flow.amount <= 0) return null;
         const barWidth = maxAmount > 0 ? (flow.amount / maxAmount) * 100 : 0;
         return (
-          <div key={flow.intention} className="space-y-1.5">
+          <div key={flow.intention} className="space-y-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-[13px] text-[#999] tracking-wide">{flow.label}</span>
-              <span className="text-[12px] text-[#555] tabular-nums">{formatCurrency(flow.amount)}</span>
+              <span className="text-sm sm:text-base text-[#aaa] tracking-wide">{flow.label}</span>
+              <span className="text-xs sm:text-sm text-[#666] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
             </div>
-            <div className="h-1.5 bg-[#111] rounded-full overflow-hidden">
+            <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#c8a55a]/30 transition-all duration-700"
+                className="h-full rounded-full bg-[#c8a55a]/25 transition-all duration-700"
                 style={{ width: `${Math.max(barWidth, 0)}%` }}
               />
             </div>
@@ -791,7 +791,7 @@ export default function RiquezaPage() {
 
   if (fetchError) {
     return (
-      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[50vh] flex items-center justify-center">
         <PremiumErrorState
           variant="loading"
           title="No se pudo cargar"
@@ -809,7 +809,7 @@ export default function RiquezaPage() {
   const isEmpty = logs.length === 0;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10 pb-24">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-24">
       <SaveToast show={toast.show} message={toast.message} />
 
       {/* ── Edit Overlay ── */}
@@ -874,13 +874,13 @@ export default function RiquezaPage() {
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <Gem size={28} className="text-[#c8a55a]" />
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
+            <Gem size={30} className="text-[#c8a55a] sm:w-[34px] sm:h-[34px]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white">Finanzas</h1>
-            <p className="text-[#666] text-sm">Cómo fluye tu dinero</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+            <p className="text-[#777] text-sm sm:text-base mt-0.5">Cómo fluye tu dinero</p>
           </div>
         </div>
       </div>
@@ -898,22 +898,22 @@ export default function RiquezaPage() {
 
       {/* ── Month Navigation — always present ── */}
       <div className="flex items-center justify-between">
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-2">
-          <CalendarDays size={14} className="text-[#c8a55a]/60" />
-          <h2 className="text-sm font-medium text-white capitalize">{monthLabel}</h2>
+          <CalendarDays size={15} className="text-[#c8a55a]/60" />
+          <h2 className="text-sm sm:text-base font-medium text-white capitalize tracking-wide">{monthLabel}</h2>
           {!isCurrentMonth && (
             <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-[#c8a55a]/60 hover:text-[#c8a55a] ml-1 underline underline-offset-2">Hoy</button>
           )}
         </div>
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
           <ChevronRight size={18} />
         </button>
       </div>
 
-      {/* ── 1. Balance de Intenciones — container always present ── */}
+      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
       {isEmpty ? (
         <PremiumEmptyState
           icon={Wallet}
@@ -925,38 +925,38 @@ export default function RiquezaPage() {
           variant="gold"
         />
       ) : (
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-7">
-          <p className="text-[13px] text-[#555] mb-5">Este mes tu dinero ha fluido así</p>
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-8 lg:p-10">
+          <p className="text-sm sm:text-base text-[#666] mb-6 sm:mb-8 tracking-wide">Este mes tu dinero ha fluido así</p>
           {hasIntentions ? (
             <IntentionBalance flows={intentionFlows} totalExpense={cmExpense} />
           ) : currentMonthLogs.length > 0 ? (
-            <p className="text-[11px] text-[#333]">Asigna intenciones a tus movimientos para ver hacia dónde fluye tu energía.</p>
+            <p className="text-xs sm:text-sm text-[#444] leading-relaxed">Asigna intenciones a tus movimientos para ver hacia dónde fluye tu energía.</p>
           ) : (
-            <p className="text-[11px] text-[#333]">Sin movimientos este mes.</p>
+            <p className="text-xs sm:text-sm text-[#444]">Sin movimientos este mes.</p>
           )}
         </div>
       )}
 
       {/* ── 2. Saldo neto — reserved space, invisible when empty ── */}
       {!isEmpty && currentMonthLogs.length > 0 && (
-        <div>
+        <div className="py-1">
           <div className="flex items-baseline gap-3">
-            <span className={`text-2xl sm:text-3xl font-bold tabular-nums ${cmBalance >= 0 ? 'text-white' : 'text-amber-400'}`}>
+            <span className={`text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums tracking-tight ${cmBalance >= 0 ? 'text-white' : 'text-amber-400'}`}>
               {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
             </span>
           </div>
-          <div className="flex items-center gap-3 mt-1.5">
-            {cmIncome > 0 && <span className="text-xs text-[#666]">+{formatCurrency(cmIncome)} ingresos</span>}
+          <div className="flex items-center gap-3 mt-2">
+            {cmIncome > 0 && <span className="text-xs sm:text-sm text-[#777]">+{formatCurrency(cmIncome)} ingresos</span>}
             {cmIncome > 0 && cmExpense > 0 && <span className="text-[#222] text-xs">·</span>}
-            {cmExpense > 0 && <span className="text-xs text-[#666]">{formatCurrency(cmExpense)} gastos</span>}
+            {cmExpense > 0 && <span className="text-xs sm:text-sm text-[#777]">{formatCurrency(cmExpense)} gastos</span>}
           </div>
         </div>
       )}
 
       {/* ── 3. Insight — reserved space, only visible when meaningful ── */}
       {!isEmpty && dominantIntention && currentMonthLogs.length >= 5 && (
-        <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-xl p-4 sm:p-5">
-          <p className="text-[#c8a55a]/80 text-sm italic leading-relaxed">
+        <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-2xl p-5 sm:p-6 lg:p-7">
+          <p className="text-[#c8a55a]/80 text-sm sm:text-base italic leading-relaxed">
             La mayor parte de tu energía fue hacia {dominantIntention.label.toLowerCase()}.
           </p>
         </div>
@@ -964,9 +964,9 @@ export default function RiquezaPage() {
 
       {/* ── 4. Historial — always present when has data ── */}
       {!isEmpty && (
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-white">Movimientos</h2>
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-5 sm:p-6 lg:p-8">
+        <div className="flex items-center justify-between mb-5 sm:mb-6">
+          <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">Movimientos</h2>
           <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press transition-colors">
             <Plus size={16} /> <span className="hidden sm:inline">Añadir</span>
           </button>

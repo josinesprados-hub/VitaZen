@@ -30,9 +30,9 @@ import {
 
 // ─── Configuration ───
 
-const MIN_CONFIDENCE = 0.65;
-const MIN_WEEKS_OVERLAP = 3;
-const MIN_DATA_POINTS_PER_EMPIRE = 5;
+const MIN_CONFIDENCE = 0.55;
+const MIN_WEEKS_OVERLAP = 2;
+const MIN_DATA_POINTS_PER_EMPIRE = 4;
 const MAX_OBSERVATIONS = 2;
 
 // ─── Intention Resolution ───
@@ -444,7 +444,7 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
     if (s7) signals.push(s7);
   }
 
-  if (data.meditationSessions.length >= 5) {
+  if (data.meditationSessions.length >= MIN_DATA_POINTS_PER_EMPIRE) {
     const s2 = detectMentalPracticeFinancialStability(financeWeeks, meditationWeeks);
     if (s2) signals.push(s2);
   }
