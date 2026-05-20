@@ -266,7 +266,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 ) : (
                   <Crown size={16} />
                 )}
-                Entrar en Élite
+                Profundizar
               </button>
             ) : (
               <button
@@ -296,7 +296,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 ) : (
                   <CreditCard size={16} />
                 )}
-                Gestionar suscripción Élite
+                Tu espacio Élite
               </button>
             )}
 

@@ -62,12 +62,12 @@ export default function PremiumGate({
           </div>
           <Link
             href="/pricing"
-            className={`text-[#c8a55a]/80 hover:text-[#c8a55a] transition-colors flex items-center gap-1 ${
+            className={`text-[#c8a55a]/60 hover:text-[#c8a55a]/90 transition-colors flex items-center gap-1 ${
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}
           >
             <Crown size={compact ? 8 : 9} />
-            {label}
+            Más allá
           </Link>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function PremiumInlineBadge({
   }
 
   return (
-    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#555] bg-[#111] border border-[#1a1a1a] px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#555] px-2 py-0.5">
       {freeLabel}
     </span>
   );
@@ -134,7 +134,7 @@ export function PremiumHistoryGate({
       <div className="flex items-center gap-1.5 text-[10px] text-[#555]">
         <Crown size={10} className="text-[#c8a55a]/40" />
         <span>
-          {label} con{' '}
+          Más profundidad con{' '}
           <Link
             href="/pricing"
             className="text-[#c8a55a]/70 hover:text-[#c8a55a] transition-colors"

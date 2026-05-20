@@ -859,7 +859,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               className="w-full mt-2 text-[10px] text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-lg py-1.5 hover:bg-[#c8a55a]/15 transition-colors flex items-center justify-center gap-1"
             >
               <Crown size={10} />
-              Desbloquear mensajes ilimitados
+              Descubrir mensajes ilimitados
             </button>
           )}
         </div>

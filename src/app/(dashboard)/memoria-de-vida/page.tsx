@@ -118,8 +118,8 @@ export default function MemoriaDeVidaPage() {
 
       {/* Header */}
       <div className="mb-12">
-        <h1 className="text-lg sm:text-xl font-light text-white mb-1">{PAGE_TITLE}</h1>
-        <p className="text-[#555] text-sm">{PAGE_SUBTITLE}</p>
+        <h1 className="title-page mb-1">{PAGE_TITLE}</h1>
+        <p className="subtitle-silent">{PAGE_SUBTITLE}</p>
 
         {data.oldestMonth && data.newestMonth && (
           <p className="text-[10px] text-[#2a2a2a] mt-2 tracking-wide">

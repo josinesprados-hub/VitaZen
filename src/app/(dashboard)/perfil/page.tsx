@@ -154,7 +154,7 @@ export default function PerfilPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white">Mi Perfil</h1>
-          <p className="text-sm text-[#999] mt-1">Personaliza tu experiencia en VitaZen</p>
+          <p className="subtitle-silent mt-1">Tu espacio, tu ritmo</p>
         </div>
         {!editing ? (
           <button

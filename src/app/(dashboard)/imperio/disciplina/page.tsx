@@ -250,8 +250,8 @@ export default function DisciplinaPage() {
           <Shield size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Disciplina</h1>
-          <p className="text-[#999] text-sm">Hábitos, desafíos y consistencia diaria</p>
+          <h1 className="title-page">Disciplina</h1>
+          <p className="subtitle-silent mt-1">Hábitos y consistencia</p>
         </div>
       </div>
 
@@ -289,7 +289,6 @@ export default function DisciplinaPage() {
             <Plus size={18} /> Añadir hábito
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-5">La consistencia transforma acciones en resultados</p>
 
         {showAddHabit && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
@@ -374,7 +373,7 @@ export default function DisciplinaPage() {
 
       {/* Tips — hidden in screenshot mode */}
       {!screenshotMode && (
-        <EmpireTipsSection empire="disciplina" subtitle="Estrategias para fortalecer tu disciplina" />
+        <EmpireTipsSection empire="disciplina" subtitle="Ideas para tu disciplina" />
       )}
       {/* Micro-reward for habit completion */}
       <MicroReward trigger={showReward} message="Hábito completado" onComplete={() => setShowReward(false)} />

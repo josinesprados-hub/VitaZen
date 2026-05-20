@@ -233,7 +233,7 @@ export default function InsightsPage() {
         <ContextualHelp
           storageKey="vitazen_help_insights"
           title="Insights Semanales"
-          text="Cada semana se analizan tus datos y se generan insights automáticos. Revisa tu puntuación de bienestar y los patrones detectados."
+          text="Cada semana se observan tus datos y se generan notas automáticas. Tendencias y patrones, cuando aparecen."
         />
       )}
 
@@ -245,7 +245,7 @@ export default function InsightsPage() {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-white">Insights Semanales</h1>
+              <h1 className="title-page">Observaciones</h1>
               {isPremium && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                   <Crown size={10} />
@@ -263,7 +263,7 @@ export default function InsightsPage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Activity size={22} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Puntuación de bienestar</h2>
+            <h2 className="title-section group-hover:text-[#c8a55a] transition-colors">Cómo te sientes</h2>
           </div>
           <div className="text-right flex items-center gap-2">
             <div>
@@ -316,7 +316,7 @@ export default function InsightsPage() {
         <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-5">
             <Lightbulb size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Comparativa semanal</h2>
+            <h2 className="title-section">Semana a semana</h2>
             <span className="text-[10px] text-[#c8a55a]/60">vs. semana anterior</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -353,8 +353,7 @@ export default function InsightsPage() {
         <div>
           <div className="flex items-center gap-3 mb-5">
             <Sparkles size={20} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Insights automáticos</h2>
-            <span className="text-xs text-[#666]">{insights.length} detectados</span>
+            <h2 className="title-section">Lo que se ve</h2>
           </div>
           <div className="space-y-3">
             {insights.map((insight) => {
@@ -397,7 +396,7 @@ export default function InsightsPage() {
       <div className="card-enter">
         <div className="flex items-center gap-3 mb-5">
           <Target size={20} className="text-[#c8a55a]" />
-          <h2 className="text-lg font-semibold text-white">Desglose semanal</h2>
+          <h2 className="title-section">Tu semana en detalle</h2>
           <PremiumInlineBadge
             isPremium={isPremium}
             freeLabel="Básico"
@@ -475,11 +474,11 @@ export default function InsightsPage() {
           </Link>
 
           {/* Wellness — PREMIUM details */}
-          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle bienestar">
+          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle emocional">
             <Link href="/imperio/energia" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-[#c8a55a]/20 transition-colors cursor-pointer group touch-press">
               <div className="flex items-center gap-2 mb-3">
                 <Brain size={16} className="text-[#c8a55a]" />
-                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Bienestar</span>
+                <span className="label-discrete">Cómo te sientes</span>
               </div>
               <p className="text-2xl font-bold text-white">{summary.wellness.logs}</p>
               <p className="text-[10px] text-[#555] mt-1">registros</p>
@@ -561,15 +560,15 @@ export default function InsightsPage() {
             <Crown size={18} className="text-[#c8a55a]/60" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white mb-0.5">Conexiones más profundas entre tus imperios</p>
-            <p className="text-[#666] text-xs">Observaciones personales, tendencias y relaciones que solo se revelan con tiempo.</p>
+            <p className="text-sm font-medium text-white mb-0.5">Hay capas más profundas</p>
+            <p className="text-[#666] text-xs">Observaciones que solo aparecen con tiempo.</p>
           </div>
           <Link
             href="/pricing"
             className="inline-flex items-center gap-1.5 bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium px-4 py-2 rounded-xl hover:bg-[#c8a55a]/15 hover:border-[#c8a55a]/30 transition-colors text-xs shrink-0"
           >
             <Crown size={12} />
-            Descubrir Élite
+            Descubrir
           </Link>
         </div>
       )}

@@ -35,7 +35,7 @@ export const NO_DATA_TITLE = 'Tu memoria se construye con el tiempo';
 export const NO_DATA_SUBTITLE = 'No hay prisa.';
 
 export const LITTLE_DATA_TITLE = 'Tu memoria está empezando a formarse';
-export const LITTLE_DATA_SUBTITLE = 'Con más semanas aparecerán más observaciones.';
+export const LITTLE_DATA_SUBTITLE = 'Con el tiempo.';
 
 // ─── FREE vs ÉLITE ───
 

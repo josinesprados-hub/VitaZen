@@ -38,7 +38,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
     <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
       <div className="flex items-center gap-3 mb-4">
         <Lightbulb size={20} className="text-[#c8a55a]" />
-        <h2 className="text-lg font-semibold text-white">Consejos de Expertos</h2>
+        <h2 className="text-lg font-semibold text-white">Notas para tu crecimiento</h2>
       </div>
       <p className="text-[#666] text-xs mb-5">{subtitle}</p>
 
@@ -73,10 +73,10 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                   </div>
                   <div>
                     <p className="text-white font-semibold text-sm tracking-wide">
-                      Desbloquea con Plan Élite
+                      Profundiza con Élite
                     </p>
                     <p className="text-[#999] text-xs mt-1">
-                      Accede a consejos exclusivos de Élite
+                      Contenido exclusivo de Élite
                     </p>
                   </div>
                   <Link

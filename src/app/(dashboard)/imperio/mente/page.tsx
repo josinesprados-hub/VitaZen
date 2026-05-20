@@ -506,8 +506,8 @@ export default function MentePage() {
           <Brain size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Mente</h1>
-          <p className="text-[#999] text-sm">Calma interior, claridad mental y respiración consciente</p>
+          <h1 className="title-page">Mente</h1>
+          <p className="subtitle-silent mt-1">Calma y respiración consciente</p>
         </div>
       </div>
 
@@ -722,7 +722,7 @@ export default function MentePage() {
       </div>
 
       {/* Tips */}
-      <EmpireTipsSection empire="mente" subtitle="Técnicas para tu bienestar mental" />
+      <EmpireTipsSection empire="mente" subtitle="Reflexiones para tu mente" />
     </div>
   );
 }

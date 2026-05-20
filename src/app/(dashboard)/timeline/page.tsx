@@ -183,7 +183,7 @@ export default function TimelinePage() {
             premiumLabel="Historial completo"
           />
         </div>
-        <p className="text-[#999] text-sm">Tu historial completo de actividad</p>
+        <p className="subtitle-silent">Tu historia, día a día</p>
       </div>
 
       {/* Filters */}
@@ -221,8 +221,7 @@ export default function TimelinePage() {
       ) : items.length === 0 ? (
         <PremiumEmptyState
           icon={Clock}
-          title="Tu historia comenzará aquí"
-          subtitle="Cada acción que registres aparecerá en tu línea del tiempo."
+          title="Aquí irá tu historia"
           size="lg"
           variant="gold"
         />

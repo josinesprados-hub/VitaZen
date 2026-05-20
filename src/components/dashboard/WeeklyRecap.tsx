@@ -259,7 +259,7 @@ export function WeeklyRecap() {
               <CalendarRange size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-medium text-[#666]">Resumen semanal</h2>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu semana</h2>
               <p className="fallback-warm">Tu resumen aparecerá con más actividad</p>
             </div>
           </div>
@@ -307,7 +307,7 @@ export function WeeklyRecap() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-semibold text-white">Resumen semanal</h2>
+                  <h2 className="text-base sm:text-lg font-semibold text-white">Tu semana</h2>
                   {isPremium && (
                     <span className="premium-badge inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 px-2 py-0.5 rounded-full">
                       <Crown size={9} />
@@ -396,7 +396,7 @@ export function WeeklyRecap() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-[#c8a55a] transition-colors">Puntuación semanal</p>
+                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-[#c8a55a] transition-colors">Tu semana</p>
                 <p className="text-[11px] sm:text-[13px] mb-1.5 sm:mb-3" style={{ color: scoreColor }}>
                   {data.scoreLabel}
                 </p>
@@ -457,7 +457,7 @@ export function WeeklyRecap() {
             <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
                 <Flame size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                <p className="text-xs sm:text-sm font-semibold text-white">Progreso semanal</p>
+                <p className="text-xs sm:text-sm font-semibold text-white">Tu actividad</p>
               </div>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {progressItems.map((item) => {
@@ -470,7 +470,7 @@ export function WeeklyRecap() {
                     >
                       <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                         <Icon size={10} className="text-[#c8a55a] sm:w-[12px] sm:h-[12px]" />
-                        <span className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider">{item.label}</span>
+                  <p className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider label-discrete">{item.label}</p>
                       </div>
                       <p className="text-lg sm:text-xl font-bold text-white">{item.value}</p>
                       <p className="text-[8px] sm:text-[9px] text-[#555]">{item.unit}</p>
@@ -580,7 +580,7 @@ export function WeeklyRecap() {
             >
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
                 <Sparkles size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Principal insight de la semana</p>
+                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Lo que destaca esta semana</p>
               </div>
               {data.mainInsight ? (
                 <div
@@ -604,7 +604,6 @@ export function WeeklyRecap() {
                 <div className="text-center py-4 sm:py-6">
                   <Sparkles size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
                   <p className="text-[10px] sm:text-[12px] text-[#555]">Sin insights esta semana</p>
-                  <p className="text-[9px] sm:text-[10px] text-[#444]">Registra más actividad para generar insights</p>
                 </div>
               )}
             </Link>

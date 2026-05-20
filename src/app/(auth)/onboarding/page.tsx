@@ -577,8 +577,8 @@ function LevelsStep({
   return (
     <div>
       <div className="mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tu estado actual</h2>
-        <p className="text-[#999] text-sm">Nos ayuda a adaptar tu experiencia desde el inicio.</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Cómo estás ahora</h2>
+        <p className="subtitle-silent">Para que tu experiencia se adapte desde el inicio.</p>
       </div>
 
       <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">

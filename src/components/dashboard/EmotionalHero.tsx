@@ -135,7 +135,7 @@ function MetricRing({ metric, metricKey }: { metric: EmotionalMetric; metricKey:
         <Icon size={13} style={{ color }} className="relative z-10 sm:w-[16px] sm:h-[16px]" />
       </div>
       <div className="text-center">
-        <p className="text-[9px] sm:text-[11px] text-[#999] leading-tight group-hover:text-[#c8a55a]/70 transition-colors">{metric.label}</p>
+        <p className="text-[9px] sm:text-[11px] text-[#999] leading-tight group-hover:text-[#c8a55a]/70 transition-colors label-discrete">{metric.label}</p>
         <div className="flex items-center justify-center gap-0.5 mt-0.5">
           <span className="text-[10px] sm:text-xs font-semibold text-white">{metric.value}</span>
           <TrendIndicator trend={metric.trend} />
@@ -201,7 +201,7 @@ export function EmotionalHero() {
               <Sparkles size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-medium text-[#666]">Estado actual</h2>
+              <h2 className="text-sm sm:text-base font-medium text-[#666]">Cómo estás</h2>
               <p className="fallback-warm">Aparecerá con tu primer check-in</p>
             </div>
           </div>
@@ -232,7 +232,7 @@ export function EmotionalHero() {
               </div>
               <div>
                 <div className="flex items-center gap-2 sm:gap-2.5 mb-0.5 sm:mb-1">
-                  <h2 className="text-base sm:text-lg font-semibold text-white">Estado actual</h2>
+                  <h2 className="text-base sm:text-lg font-semibold text-white">Cómo estás</h2>
                   <span className="text-[10px] sm:text-[11px] font-medium px-2 sm:px-2.5 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
                     {config.label}
                   </span>
@@ -269,7 +269,7 @@ export function EmotionalHero() {
           {/* Subtle bottom line — hidden on mobile */}
           <div className="hidden sm:block mt-2 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
             <div className="flex items-center justify-between">
-              <p className="text-[9px] sm:text-[10px] text-[#444] uppercase tracking-widest font-medium">
+              <p className="text-[9px] sm:text-[10px] text-[#444] label-discrete">
                 Basado en tu actividad real
               </p>
               {state.plan === 'PREMIUM' && (

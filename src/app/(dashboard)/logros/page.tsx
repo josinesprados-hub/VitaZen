@@ -163,7 +163,7 @@ export default function LogrosPage() {
           <Trophy size={24} className="text-[#c8a55a]" />
           <h1 className="text-2xl font-bold text-white">Logros</h1>
         </div>
-        <p className="text-[#999] text-sm">Tu recorrido de excelencia, cada hito cuenta</p>
+        <p className="subtitle-silent">Cada paso que has dado</p>
       </div>
 
       {/* Stats Bar */}
@@ -175,7 +175,7 @@ export default function LogrosPage() {
             </div>
             <div>
               <p className="text-white font-semibold">Progreso General</p>
-              <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} logros desbloqueados</p>
+              <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} logros descubiertos</p>
             </div>
           </div>
           <span className="text-2xl font-bold text-[#c8a55a]">{data.stats.percent}%</span>
@@ -219,7 +219,7 @@ export default function LogrosPage() {
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-5">
             <Crown size={16} className="text-[#c8a55a]" />
-            <h2 className="text-sm uppercase tracking-widest font-semibold text-[#c8a55a]">Desbloqueados</h2>
+            <h2 className="label-discrete" style={{ color: '#c8a55a' }}>Descubiertos</h2>
             <span className="text-xs text-[#666] ml-1">({unlockedList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -235,7 +235,7 @@ export default function LogrosPage() {
         <div>
           <div className="flex items-center gap-2 mb-5">
             <Lock size={16} className="text-[#555]" />
-            <h2 className="text-sm uppercase tracking-widest font-semibold text-[#555]">Por Desbloquear</h2>
+            <h2 className="label-discrete" style={{ color: '#555' }}>Por descubrir</h2>
             <span className="text-xs text-[#444] ml-1">({lockedList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -250,7 +250,7 @@ export default function LogrosPage() {
         <PremiumEmptyState
           icon={Trophy}
           title="No hay logros en esta categoría"
-          subtitle="Explora otras categorías para ver tus logros"
+          subtitle="Hay más en otras categorías"
           size="md"
         />
       )}
@@ -277,7 +277,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
       {isUnlocked && (
         <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden rounded-tr-xl">
           <div className="absolute top-3 -right-6 bg-[#c8a55a] text-[#000000] text-[9px] font-bold px-8 py-1 rotate-45 uppercase tracking-wider">
-            Gold
+            Hecho
           </div>
         </div>
       )}
@@ -302,7 +302,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[9px] uppercase tracking-widest font-semibold text-[#555]">
+            <span className="label-discrete">
               {CATEGORY_LABELS[achievement.category] || achievement.category}
             </span>
           </div>
@@ -344,7 +344,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
           {/* Unlocked date */}
           {isUnlocked && achievement.unlockedAt && (
             <p className="text-[9px] text-[#555] mt-2">
-              Desbloqueado {new Date(achievement.unlockedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+              Descubierto {new Date(achievement.unlockedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           )}
         </div>

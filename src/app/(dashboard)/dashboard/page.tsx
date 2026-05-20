@@ -12,7 +12,7 @@ import { WeeklyRecap } from '@/components/dashboard/WeeklyRecap';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import LifePatternsSection from '@/components/patterns/LifePatternsSection';
 
-import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Flame, Wind, BookOpen, CheckCircle, Wallet, Sunrise, ArrowRight, Calendar } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Trophy, Sunrise, ArrowRight, Calendar } from 'lucide-react';
 import { MomentumCard } from '@/components/dashboard/MomentumCard';
 import { MicroReward } from '@/components/ui/MicroReward';
 import PremiumReflection from '@/components/ui/PremiumReflection';
@@ -280,7 +280,7 @@ export default function DashboardPage() {
   // which is handled by the try/catch above. An empty dashboard is a valid state.
 
   return (
-    <div className="max-w-7xl mx-auto space-y-3 sm:space-y-5 overflow-x-contain">
+    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-8 overflow-x-contain">
       {/* Check-in Modal */}
       {showCheckinModal && (
         <CheckInModal
@@ -292,8 +292,8 @@ export default function DashboardPage() {
 
       {/* ═══ 1. Greeting ═══ */}
       <div className="dash-section-enter dash-section-delay-1">
-        <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
-          {getTimeGreeting()}, <span className="text-[#c8a55a]">{user?.name || 'Guerrero'}</span>
+        <h1 className="title-page">
+          {getTimeGreeting()}, <span className="text-[#c8a55a]">{user?.name || ''}</span>
         </h1>
       </div>
 
@@ -311,8 +311,7 @@ export default function DashboardPage() {
           /* Today's check-in summary (compact, after check-in done) */
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-2 flex items-center gap-3">
             <span className="text-base">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
-            <p className="text-xs text-[#c8a55a] font-medium truncate flex-1">«{todayCheckin.intention}»</p>
-            <span className="text-[10px] text-[#555] shrink-0">E{todayCheckin.energy} · F{todayCheckin.focus} · S{todayCheckin.stress}</span>
+            <p className="text-xs text-[#999] truncate flex-1">«{todayCheckin.intention}»</p>
             <Link href="/checkin" className="text-[10px] text-[#555] hover:text-[#c8a55a] transition-colors shrink-0">Historial</Link>
           </div>
         ) : (
@@ -335,7 +334,7 @@ export default function DashboardPage() {
       {/* ═══ 5. Streak (only when active) ═══ */}
       {streaks && streaks.generalStreak > 0 && (
         <div className="dash-section-enter dash-section-delay-5 flex items-center gap-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-3 py-1.5">
-          <span className={`streak-pulse text-sm ${[3, 7, 14, 21, 30].includes(streaks.generalStreak) ? 'streak-milestone-glow' : ''}`}>🔥</span>
+          <span className={`text-sm text-[#c8a55a] ${[3, 7, 14, 21, 30].includes(streaks.generalStreak) ? 'streak-milestone-glow' : ''}`}>●</span>
           <p className="text-xs text-white font-medium">{streaks.generalStreak}d</p>
           <p className="text-[10px] text-[#999] flex-1">{streaks.streakMessage?.message}</p>
           {streaks.checkinStreak > 0 && (
@@ -360,43 +359,33 @@ export default function DashboardPage() {
 
       {/* ═══ 8. Metrics (only when activity exists) ═══ */}
       {hasActivity && metrics && (
-        <div className="dash-section-enter dash-section-delay-8 grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-3">
-          {[
-            { label: 'Meditación', value: metrics.meditationWeek, unit: 'sem', href: '/imperio/mente', Icon: Wind, streak: streaks?.meditationStreak },
-            { label: 'Hábitos', value: metrics.habitsCompleted, unit: 'sem', href: '/imperio/disciplina', Icon: CheckCircle, streak: streaks?.habitStreak },
-            { label: 'Diario', value: metrics.journalWeek, unit: 'sem', href: '/imperio/crecimiento', Icon: BookOpen, streak: streaks?.journalStreak },
-            { label: 'Finanzas', value: `${metrics.balance >= 0 ? '+' : ''}${formatCurrency(Math.abs(metrics.balance))}`, unit: '30d', href: '/imperio/riqueza', Icon: Wallet, streak: null, isFinance: true },
-          ].map(({ label, value, unit, href, Icon, streak: metricStreak, isFinance }) => (
-            <Link key={label} href={href} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-4 hover:border-[#c8a55a]/20 hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 cursor-pointer group touch-press">
-              <div className="flex items-center gap-1 mb-1 sm:mb-2">
-                <Icon size={12} className="text-[#c8a55a] sm:w-[14px] sm:h-[14px]" />
-                <span className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider font-medium">{label}</span>
-              </div>
-              <p className={`text-base sm:text-xl font-bold ${isFinance && metrics.balance < 0 ? 'text-red-400' : isFinance ? 'text-[#c8a55a]' : 'text-white'}`}>{value}</p>
-              <div className="flex items-center justify-between">
-                <p className="text-[9px] text-[#555]">{unit}</p>
-                {metricStreak && metricStreak > 0 && (
-                  <span className="text-[9px] text-[#c8a55a] flex items-center gap-0.5">
-                    <span className="streak-pulse">🔥</span>{metricStreak}d
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
+        <div className="dash-section-enter dash-section-delay-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              { label: 'Meditación', value: metrics.meditationWeek, unit: 'sem', href: '/imperio/mente', streak: streaks?.meditationStreak },
+              { label: 'Hábitos', value: metrics.habitsCompleted, unit: 'sem', href: '/imperio/disciplina', streak: streaks?.habitStreak },
+              { label: 'Diario', value: metrics.journalWeek, unit: 'sem', href: '/imperio/crecimiento', streak: streaks?.journalStreak },
+              { label: 'Finanzas', value: `${metrics.balance >= 0 ? '+' : ''}${formatCurrency(Math.abs(metrics.balance))}`, unit: '30d', href: '/imperio/riqueza', streak: null, isFinance: true },
+            ].map(({ label, value, unit, href, streak: metricStreak, isFinance }) => (
+              <Link key={label} href={href} className="group touch-press py-2">
+                <span className="label-discrete block mb-1.5">{label}</span>
+                <p className={`number-emotional ${isFinance && metrics.balance < 0 ? 'text-amber-400' : isFinance ? 'text-[#c8a55a]' : 'text-white'}`}>{value}</p>
+                <p className="text-whisper mt-1">{unit}{metricStreak && metricStreak > 0 ? ` · ${metricStreak}d` : ''}</p>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
       {/* ═══ 9. Empire Grid (compact) ═══ */}
       <div className="dash-section-enter dash-section-delay-8">
-        <div className="flex items-center justify-between mb-2 sm:mb-3">
-          <h2 className="text-sm sm:text-base font-semibold text-white">Imperios</h2>
-          <span className="text-[10px] sm:text-xs text-[#666]">Nivel {empires.reduce((sum, e) => sum + e.level, 0)}</span>
+        <div className="mb-3 sm:mb-4">
+          <h2 className="subtitle-silent">Tus imperios</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
           {Object.entries(EMPIRE_CONFIG).map(([key, config]) => {
             const empireData = empires.find((e) => e.empire === key);
             const level = empireData?.level || 1;
-            const empireProgress = empireData?.progress || 0;
             const streak = empireData?.streak || 0;
             const Icon = config.icon;
 
@@ -404,27 +393,16 @@ export default function DashboardPage() {
               <Link
                 key={key}
                 href={`/imperio/${key}`}
-                className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3.5 hover:border-[#c8a55a]/25 hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 group touch-press"
+                className="rounded-lg p-3 sm:p-4 hover:bg-[#0a0a0a] transition-all duration-300 group touch-press"
               >
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md bg-[#c8a55a]/10 flex items-center justify-center">
-                    <Icon size={12} className="text-[#c8a55a] sm:w-[16px] sm:h-[16px]" />
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/8 flex items-center justify-center">
+                    <Icon size={16} className="text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[11px] sm:text-sm font-medium text-white group-hover:text-[#c8a55a] transition-colors truncate">{config.name}</h3>
-                    <p className="text-[9px] sm:text-[10px] text-[#666]">Nv {level}</p>
+                    <h3 className="text-sm font-medium text-[#ccc] group-hover:text-white transition-colors truncate">{config.name}</h3>
+                    <p className="text-whisper mt-0.5">Nivel {level}{streak > 0 ? ` · ${streak}d` : ''}</p>
                   </div>
-                  {streak > 0 && (
-                    <span className="text-[9px] sm:text-[10px] text-[#c8a55a] flex items-center gap-0.5">
-                      <Flame size={9} /> {streak}d
-                    </span>
-                  )}
-                </div>
-                <div className="w-full bg-[#1a1a1a] rounded-full h-1 sm:h-1.5">
-                  <div
-                    className="bg-[#c8a55a] h-1 sm:h-1.5 rounded-full transition-all duration-700 ease-out"
-                    style={{ width: `${empireProgress}%` }}
-                  />
                 </div>
               </Link>
             );
@@ -442,7 +420,7 @@ export default function DashboardPage() {
             <Trophy size={14} className="text-[#c8a55a]" />
             <h2 className="text-xs sm:text-sm font-semibold text-white">Desafío Diario</h2>
             {challenge.completed && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium">Completado</span>
+              <span className="text-[9px] text-[#c8a55a]/60 font-medium">Hecho</span>
             )}
             <ArrowRight size={12} className="text-[#333] group-hover:text-[#c8a55a]/60 transition-colors ml-auto" />
           </div>
@@ -470,7 +448,7 @@ export default function DashboardPage() {
       )}
 
       {/* Micro-reward for actions */}
-      <MicroReward trigger={challengeJustCompleted} message="Desafío completado" />
+      <MicroReward trigger={challengeJustCompleted} message="Hecho" />
     </div>
   );
 }

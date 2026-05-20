@@ -83,5 +83,5 @@ export const EMPTY_STATE_MESSAGE =
 
 // ─── Section Titles ───
 
-export const SECTION_TITLE = 'Patrones de Vida';
+export const SECTION_TITLE = 'Lo que se repite';
 export const SECTION_SUBTITLE = 'Con el tiempo';

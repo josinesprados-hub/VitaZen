@@ -278,7 +278,7 @@ html { scroll-behavior: smooth; }
   transition: border-color var(--transition-base);
 }
 .card-primary:hover {
-  border-color: rgba(200, 165, 90, 0.2);
+  border-color: rgba(200, 165, 90, 0.08);
 }
 
 /* Gold-accent card — challenge, check-in */
@@ -895,6 +895,207 @@ html { scroll-behavior: smooth; }
 }
 
 /* ═══════════════════════════════════════════
+   Editorial Typography System
+   ═══════════════════════════════════════════ */
+
+/* Page title — emotional presence */
+.title-page {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #FFFFFF;
+}
+@media (min-width: 640px) {
+  .title-page {
+    font-size: 1.875rem;
+  }
+}
+
+/* Section title — quiet authority */
+.title-section {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: #FFFFFF;
+}
+@media (min-width: 640px) {
+  .title-section {
+    font-size: 1.25rem;
+  }
+}
+
+/* Subtitle — silent accompaniment */
+.subtitle-silent {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #777;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+@media (min-width: 640px) {
+  .subtitle-silent {
+    font-size: 0.875rem;
+  }
+}
+
+/* Label — discrete, uppercase */
+.label-discrete {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555;
+}
+
+/* Number with emotional weight */
+.number-emotional {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 640px) {
+  .number-emotional {
+    font-size: 2rem;
+  }
+}
+
+/* Observation — human, with space */
+.text-observation {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #888;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+
+/* Contextual hint — the quietest text */
+.text-whisper {
+  font-size: 0.6875rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════
+   Editorial Spacing System — breathe, rhythm
+   ═══════════════════════════════════════════ */
+
+/* Vertical rhythm between sections */
+.rhythm-section {
+  margin-top: 2.5rem;
+}
+@media (min-width: 640px) {
+  .rhythm-section {
+    margin-top: 3.5rem;
+  }
+}
+
+/* Vertical rhythm between elements within a section */
+.rhythm-element {
+  margin-top: 1.25rem;
+}
+@media (min-width: 640px) {
+  .rhythm-element {
+    margin-top: 1.5rem;
+  }
+}
+
+/* Breathing space — intentional emptiness */
+.space-breathe {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+@media (min-width: 640px) {
+  .space-breathe {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+/* Unified page container — consistent max-width */
+.page-container {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Wide page container — for data-heavy pages like Finanzas */
+.page-container-wide {
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ═══════════════════════════════════════════
+   Borderless Surface System — less boxes, more air
+   ═══════════════════════════════════════════ */
+
+/* Surface — replaces card when you want section
+   separation without visible borders */
+.surface {
+  background: #0a0a0a;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+@media (min-width: 640px) {
+  .surface {
+    padding: 2rem;
+  }
+}
+
+/* Surface with subtle border — for sections that need
+   minimal visual containment */
+.surface-bordered {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+@media (min-width: 640px) {
+  .surface-bordered {
+    padding: 2rem;
+  }
+}
+
+/* Surface with gold accent — for premium/emphasis sections */
+.surface-accent {
+  background: #0a0a0a;
+  border: 1px solid rgba(200, 165, 90, 0.12);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+@media (min-width: 640px) {
+  .surface-accent {
+    padding: 2rem;
+  }
+}
+
+/* Divider — editorial, not UI */
+.divider-editorial {
+  border: none;
+  height: 1px;
+  background: #1a1a1a;
+  margin: 2rem 0;
+}
+
+/* ═══════════════════════════════════════════
+   Depth Overlay — not paywall, depth
+   ═══════════════════════════════════════════ */
+
+/* Depth gate — replaces "paywall" feeling with "deeper layers" */
+.depth-gate-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.6) 30%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+}
+
+/* ═══════════════════════════════════════════
    Mobile Responsive Helpers
    ═══════════════════════════════════════════ */
 
@@ -1092,12 +1293,12 @@ body.scroll-locked {
     transform: translateY(0);
   }
 }
-.stagger-1 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.03s; }
-.stagger-2 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.06s; }
-.stagger-3 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.09s; }
-.stagger-4 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.12s; }
-.stagger-5 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.15s; }
-.stagger-6 { animation: staggerIn 0.3s ease-out forwards; animation-delay: 0.18s; }
+.stagger-1 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.05s; }
+.stagger-2 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.10s; }
+.stagger-3 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.15s; }
+.stagger-4 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.20s; }
+.stagger-5 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.25s; }
+.stagger-6 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.30s; }
 
 /* Micro-celebration — brief scale pop for completed actions.
    Applied via JS class toggle for 0.4s then removed. */

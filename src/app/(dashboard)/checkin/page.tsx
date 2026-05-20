@@ -256,8 +256,8 @@ export default function CheckinPage() {
       {/* Contextual Help */}
       <ContextualHelp
         storageKey="vitazen_help_checkin"
-        title="Check-in Diario"
-        text="Registra cómo te sientes cada día. Valora tu emoción, energía, enfoque y estrés para descubrir patrones y mejorar tu bienestar."
+        title="Check-in"
+        text="Cómo te sientes hoy. Emoción, energía, enfoque, estrés."
       />
 
       {/* Header */}
@@ -267,7 +267,7 @@ export default function CheckinPage() {
             <Sunrise size={20} className="text-[#c8a55a] sm:w-6 sm:h-6" />
             <h1 className="text-lg sm:text-2xl font-bold text-white">Check-in Diario</h1>
           </div>
-          <p className="text-[#999] text-sm">Conecta contigo cada día</p>
+          <p className="subtitle-silent">Conecta contigo cada día</p>
         </div>
         <button
           onClick={() => { setEditingCheckin(null); setShowModal(true); }}
@@ -326,7 +326,7 @@ export default function CheckinPage() {
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <Icon size={14} className="text-[#c8a55a]" />
-                    <span className="text-[10px] text-[#666] uppercase tracking-wider font-medium">{metric.label}</span>
+                    <span className="label-discrete">{metric.label}</span>
                   </div>
                   <p className="text-xl font-bold text-white mb-1">{val.toFixed(1)}<span className="text-xs text-[#555]">/5</span></p>
                   <MiniBarChart data={trends.daily} metricKey={metric.key} />
@@ -352,8 +352,8 @@ export default function CheckinPage() {
         {checkins.length === 0 ? (
         <PremiumEmptyState
           icon={Sunrise}
-          title="Aún no tienes check-ins registrados"
-          subtitle="Comienza con tu primer check-in diario"
+          title="Aún no hay check-ins"
+          subtitle="Cuando quieras"
           cta="Hacer check-in"
           onCta={() => { setEditingCheckin(null); setShowModal(true); }}
           size="md"

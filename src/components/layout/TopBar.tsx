@@ -22,15 +22,15 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         </button>
 
         <div className="hidden lg:block">
-          <p className="text-sm text-[#999]">
-            Bienvenido, <span className="text-[#c8a55a]">{user?.name || 'Usuario'}</span>
+          <p className="text-sm text-[#666]">
+            <span className="text-[#999]">{user?.name || ''}</span>
           </p>
         </div>
 
         <div className="flex items-center gap-4">
           {user?.plan === 'FREE' && (
-            <span className="badge-free">
-              FREE
+            <span className="text-[9px] font-medium text-[#555] tracking-wider uppercase">
+              Free
             </span>
           )}
           {user?.plan === 'PREMIUM' && (

@@ -71,8 +71,8 @@ export function MomentumCard() {
             <Activity size={14} className="text-[#c8a55a]/30 sm:w-[18px] sm:h-[18px]" />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-medium text-[#666]">Momentum</h2>
-            <p className="fallback-warm">Calculando tu consistencia</p>
+            <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu ritmo</h2>
+            <p className="fallback-warm">Aparecerá con tu actividad</p>
           </div>
         </div>
       </div>
@@ -90,8 +90,8 @@ export function MomentumCard() {
             <Activity size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-semibold text-white">Momentum</h2>
-            <p className="text-[9px] sm:text-[10px] text-[#555] uppercase tracking-wider">Consistencia reciente</p>
+            <h2 className="text-sm sm:text-base font-semibold text-white">Tu ritmo</h2>
+            <p className="label-discrete">Consistencia reciente</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -123,7 +123,7 @@ export function MomentumCard() {
         <p className="text-[10px] sm:text-xs text-[#999]">{data.description}</p>
         {data.currentStreak > 0 && (
           <span className="text-[10px] sm:text-xs text-[#c8a55a] flex items-center gap-1">
-            <span className="streak-pulse">🔥</span> {data.currentStreak}d
+            {data.currentStreak}d
           </span>
         )}
       </div>

@@ -147,8 +147,8 @@ export default function AjustesPage() {
     <div className="max-w-2xl mx-auto space-y-6 page-transition">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Ajustes</h1>
-        <p className="text-sm text-[#999] mt-1">Configura tu experiencia en VitaZen</p>
+        <h1 className="title-page">Ajustes</h1>
+        <p className="subtitle-silent mt-1">Tu espacio personal</p>
       </div>
 
       {/* Email Notifications Section */}
@@ -167,7 +167,7 @@ export default function AjustesPage() {
             <div>
               <p className="text-sm text-white font-medium">Resumen semanal</p>
               <p className="text-xs text-[#999] mt-0.5">
-                Recibe un resumen de tu progreso cada semana por email
+                Un resumen de tu semana, por email
               </p>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function AjustesPage() {
             <div>
               <p className="text-sm text-white font-medium">Recordatorios diarios</p>
               <p className="text-xs text-[#999] mt-0.5">
-                Recordatorios para completar tus habitos y check-in diario
+                Un aviso para tu check-in y hábitos
               </p>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function AjustesPage() {
             <div>
               <p className="text-sm text-white font-medium">Mostrar estadisticas</p>
               <p className="text-xs text-[#999] mt-0.5">
-                Permite que tus estadisticas y progreso sean visibles en comparaciones
+                Tus estadísticas visibles en comparaciones
               </p>
             </div>
           </div>

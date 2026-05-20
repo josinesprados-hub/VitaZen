@@ -287,8 +287,8 @@ export default function CrecimientoPage() {
           <TrendingUp size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Crecimiento</h1>
-          <p className="text-[#999] text-sm">Reflexión, evolución y crecimiento personal</p>
+          <h1 className="title-page">Crecimiento</h1>
+          <p className="subtitle-silent mt-1">Reflexión y evolución</p>
         </div>
       </div>
 
@@ -306,7 +306,7 @@ export default function CrecimientoPage() {
             <Plus size={18} /> Nueva entrada
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-5">Escribe, reflexiona y transforma</p>
+
 
         {/* ═══ New Entry Form ═══ */}
         {showAdd && (
@@ -450,7 +450,7 @@ export default function CrecimientoPage() {
       </div>
 
       {/* Tips */}
-      <EmpireTipsSection empire="crecimiento" subtitle="Herramientas para acelerar tu evolución" />
+      <EmpireTipsSection empire="crecimiento" subtitle="Apuntes para tu crecimiento" />
       {/* Micro-reward for journal entry */}
       <MicroReward trigger={showReward} message="Entrada guardada" onComplete={() => setShowReward(false)} />
     </div>

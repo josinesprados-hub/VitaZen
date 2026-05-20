@@ -313,8 +313,8 @@ export default function EnergiaPage() {
           <Zap size={28} className="text-[#c8a55a]" />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Imperio Energía</h1>
-          <p className="text-[#999] text-sm">Cuerpo, vitalidad y bienestar físico</p>
+          <h1 className="title-page">Energía</h1>
+          <p className="subtitle-silent mt-1">Cuerpo y vitalidad</p>
         </div>
       </div>
 
@@ -326,7 +326,7 @@ export default function EnergiaPage() {
             + Registrar hoy
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-5">Monitoriza tu estado físico y emocional</p>
+
         {showWellness && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
             <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
@@ -377,7 +377,7 @@ export default function EnergiaPage() {
         ) : (
           <PremiumEmptyState
             icon={Heart}
-            title="Tu bienestar merece atención"
+            title="Cómo te sientes merece atención"
             subtitle="Un simple registro diario te ayuda a conocerte mejor."
             cta="Registrar hoy"
             onCta={() => setShowWellness(true)}
@@ -395,7 +395,7 @@ export default function EnergiaPage() {
             + Registrar hoy
           </button>
         </div>
-        <p className="text-[#666] text-xs mb-5">Tu alimentación es la base de tu rendimiento</p>
+
         {showNutrition && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
             <textarea placeholder="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
@@ -471,7 +471,7 @@ export default function EnergiaPage() {
       </div>
 
       {/* Tips */}
-      <EmpireTipsSection empire="energia" subtitle="Estrategias para maximizar tu energía" />
+      <EmpireTipsSection empire="energia" subtitle="Notas sobre tu energía" />
     </div>
   );
 }
