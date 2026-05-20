@@ -12,28 +12,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Crown, Link2, Feather, ArrowLeft } from 'lucide-react';
+import { Crown, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
 import {
   PAGE_TITLE,
   PAGE_SUBTITLE,
   STAGES_TITLE,
-  STAGES_SUBTITLE,
   MEMORIES_TITLE,
-  MEMORIES_SUBTITLE,
   TRANSITIONS_TITLE,
-  TRANSITIONS_SUBTITLE,
   PATTERNS_TITLE,
-  PATTERNS_SUBTITLE,
   NO_DATA_TITLE,
   NO_DATA_SUBTITLE,
   LITTLE_DATA_TITLE,
   LITTLE_DATA_SUBTITLE,
-  ELITE_STAGES,
   ELITE_TRANSITIONS,
   ELITE_CONNECTIONS,
-  ELITE_BADGE,
   FREE_LIMIT_MESSAGE,
   getTimeRangeLabel,
 } from '@/lib/life-memory/copy';
@@ -122,67 +116,46 @@ export default function MemoriaDeVidaPage() {
         Volver
       </Link>
 
-      {/* Header — calm, contemplative */}
-      <div className="mb-10">
-        <div className="flex items-center gap-2 mb-2">
-          <h1 className="text-xl sm:text-2xl font-light text-white">{PAGE_TITLE}</h1>
-          {isPremium && (
-            <span className="text-[9px] text-[#c8a55a]/40 font-medium">{ELITE_BADGE}</span>
-          )}
-        </div>
-        <p className="text-[#666] text-sm leading-relaxed">{PAGE_SUBTITLE}</p>
+      {/* Header */}
+      <div className="mb-12">
+        <h1 className="text-lg sm:text-xl font-light text-white mb-1">{PAGE_TITLE}</h1>
+        <p className="text-[#555] text-sm">{PAGE_SUBTITLE}</p>
 
-        {/* Time range */}
         {data.oldestMonth && data.newestMonth && (
-          <p className="text-[10px] text-[#333] mt-3 tracking-wide">
+          <p className="text-[10px] text-[#2a2a2a] mt-2 tracking-wide">
             {getTimeRangeLabel(data.oldestMonth, data.newestMonth)}
           </p>
         )}
       </div>
 
-      {/* ── No data state ── */}
+      {/* No data state */}
       {!hasContent && (
-        <div className="text-center py-16">
-          <div className="w-12 h-12 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
-            <Feather size={18} className="text-[#c8a55a]/25" />
-          </div>
+        <div className="text-center py-20">
           <p className="text-[#555] text-sm">{NO_DATA_TITLE}</p>
-          <p className="text-[#333] text-xs mt-2 max-w-xs mx-auto leading-relaxed">{NO_DATA_SUBTITLE}</p>
+          <p className="text-[#333] text-xs mt-2">{NO_DATA_SUBTITLE}</p>
         </div>
       )}
 
-      {/* ── Little data state ── */}
+      {/* Little data state */}
       {hasContent && !data.hasEnoughData && (
-        <div className="text-center py-8 mb-6">
-          <p className="text-[#555] text-xs">{LITTLE_DATA_TITLE}</p>
-          <p className="text-[#333] text-[10px] mt-1 max-w-xs mx-auto">{LITTLE_DATA_SUBTITLE}</p>
+        <div className="text-center py-6 mb-8">
+          <p className="text-[#444] text-xs">{LITTLE_DATA_TITLE}</p>
+          <p className="text-[#333] text-[10px] mt-1">{LITTLE_DATA_SUBTITLE}</p>
         </div>
       )}
 
-      {/* ═══ STAGES — The Core Timeline ═══ */}
+      {/* STAGES */}
       {stages.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-md bg-[#c8a55a]/5 flex items-center justify-center">
-              <Feather size={11} className="text-[#c8a55a]/40" />
-            </div>
-            <h2 className="text-sm font-medium text-white">{STAGES_TITLE}</h2>
-          </div>
-          <p className="text-[10px] text-[#444] mb-5 ml-8">{STAGES_SUBTITLE}</p>
+        <div className="mb-14">
+          <h2 className="text-[11px] text-[#444] mb-6 tracking-wide">{STAGES_TITLE}</h2>
 
-          <div className="ml-4 border-l border-[#1a1a1a] pl-6 space-y-6">
+          <div className="ml-2 border-l border-[#151515] pl-5 space-y-8">
             {stages.map((stage) => (
-              <div key={stage.id} className="relative">
-                {/* Dot on timeline */}
-                <div className="absolute -left-[31px] top-2 w-2 h-2 rounded-full bg-[#1a1a1a] border border-[#333]" />
-
-                {/* Month label */}
+              <div key={stage.id}>
                 {stage.monthLabel && (
-                  <p className="text-[10px] text-[#444] mb-1 tracking-wide">{stage.monthLabel}</p>
+                  <p className="text-[9px] text-[#333] mb-1 tracking-wide">{stage.monthLabel}</p>
                 )}
-
-                {/* Observation — calm, italic, intimate */}
-                <p className="text-[#c8a55a]/70 text-sm italic leading-relaxed">
+                <p className="text-[#c8a55a]/60 text-sm italic leading-relaxed">
                   {stage.text}
                 </p>
               </div>
@@ -191,24 +164,17 @@ export default function MemoriaDeVidaPage() {
         </div>
       )}
 
-      {/* ═══ TRANSITIONS (Élite only) ═══ */}
+      {/* TRANSITIONS */}
       {isPremium && transitions.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-md bg-[#c8a55a]/5 flex items-center justify-center">
-              <Link2 size={11} className="text-[#c8a55a]/40" />
-            </div>
-            <h2 className="text-sm font-medium text-white">{TRANSITIONS_TITLE}</h2>
-            <span className="text-[9px] text-[#c8a55a]/40 font-medium ml-auto">{ELITE_BADGE}</span>
-          </div>
-          <p className="text-[10px] text-[#444] mb-5 ml-8">{TRANSITIONS_SUBTITLE}</p>
+        <div className="mb-14">
+          <h2 className="text-[11px] text-[#444] mb-6 tracking-wide">{TRANSITIONS_TITLE}</h2>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {transitions.map((t) => (
-              <div key={t.id} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4">
-                <p className="text-[#999] text-sm italic leading-relaxed">{t.text}</p>
+              <div key={t.id}>
+                <p className="text-[#888] text-sm italic leading-relaxed">{t.text}</p>
                 {t.monthLabel && (
-                  <p className="text-[10px] text-[#333] mt-2">{t.monthLabel}</p>
+                  <p className="text-[9px] text-[#2a2a2a] mt-1">{t.monthLabel}</p>
                 )}
               </div>
             ))}
@@ -225,24 +191,17 @@ export default function MemoriaDeVidaPage() {
         </div>
       )}
 
-      {/* ═══ MEMORIES (Élite only) ═══ */}
+      {/* MEMORIES */}
       {isPremium && data.memories.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-md bg-[#c8a55a]/5 flex items-center justify-center">
-              <Feather size={11} className="text-[#c8a55a]/40" />
-            </div>
-            <h2 className="text-sm font-medium text-white">{MEMORIES_TITLE}</h2>
-            <span className="text-[9px] text-[#c8a55a]/40 font-medium ml-auto">{ELITE_BADGE}</span>
-          </div>
-          <p className="text-[10px] text-[#444] mb-5 ml-8">{MEMORIES_SUBTITLE}</p>
+        <div className="mb-14">
+          <h2 className="text-[11px] text-[#444] mb-6 tracking-wide">{MEMORIES_TITLE}</h2>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {data.memories.map((memory, i) => (
-              <div key={i} className="border-l-2 border-[#1a1a1a] pl-4 py-1">
-                <p className="text-[#888] text-xs italic leading-relaxed">{memory.text}</p>
-                <p className="text-[10px] text-[#333] mt-1.5">
-                  {memory.empire} · {new Date(memory.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+              <div key={i} className="border-l border-[#151515] pl-4">
+                <p className="text-[#777] text-xs italic leading-relaxed">{memory.text}</p>
+                <p className="text-[9px] text-[#2a2a2a] mt-1">
+                  {memory.empire} · {new Date(memory.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                 </p>
               </div>
             ))}
@@ -259,33 +218,23 @@ export default function MemoriaDeVidaPage() {
         </div>
       )}
 
-      {/* ═══ PATTERNS (Élite only) ═══ */}
+      {/* PATTERNS */}
       {isPremium && patterns.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-md bg-[#c8a55a]/5 flex items-center justify-center">
-              <Link2 size={11} className="text-[#c8a55a]/40" />
-            </div>
-            <h2 className="text-sm font-medium text-white">{PATTERNS_TITLE}</h2>
-            <span className="text-[9px] text-[#c8a55a]/40 font-medium ml-auto">{ELITE_BADGE}</span>
-          </div>
-          <p className="text-[10px] text-[#444] mb-5 ml-8">{PATTERNS_SUBTITLE}</p>
+        <div className="mb-14">
+          <h2 className="text-[11px] text-[#444] mb-6 tracking-wide">{PATTERNS_TITLE}</h2>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {patterns.map((p) => (
-              <div key={p.id} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-4">
-                <p className="text-[#c8a55a]/70 text-sm italic leading-relaxed">{p.text}</p>
+              <div key={p.id}>
+                <p className="text-[#c8a55a]/60 text-sm italic leading-relaxed">{p.text}</p>
                 {p.empires && p.empires.length > 1 && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <Link2 size={9} className="text-[#333]" />
-                    <div className="flex items-center gap-1.5">
-                      {p.empires.map((empire, i) => (
-                        <span key={i} className="text-[10px] text-[#444]">
-                          {i > 0 && <span className="text-[#222] mr-1.5">·</span>}
-                          {empire}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {p.empires.map((empire, i) => (
+                      <span key={i} className="text-[9px] text-[#2a2a2a]">
+                        {i > 0 && <span className="text-[#1a1a1a] mr-1">·</span>}
+                        {empire}
+                      </span>
+                    ))}
                   </div>
                 )}
               </div>
@@ -303,17 +252,17 @@ export default function MemoriaDeVidaPage() {
         </div>
       )}
 
-      {/* ── FREE subtle hint ── */}
+      {/* FREE subtle hint */}
       {!isPremium && hasContent && (
-        <div className="text-center mt-6">
-          <p className="text-[10px] text-[#444] flex items-center justify-center gap-1.5">
-            <Crown size={9} className="text-[#c8a55a]/40" />
+        <div className="text-center mt-8">
+          <p className="text-[9px] text-[#333] flex items-center justify-center gap-1">
+            <Crown size={7} className="text-[#c8a55a]/25" />
             {FREE_LIMIT_MESSAGE}
           </p>
         </div>
       )}
 
-      <div className="h-12" />
+      <div className="h-16" />
     </div>
   );
 }

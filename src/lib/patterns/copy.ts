@@ -2,63 +2,58 @@
 // Patrones de Vida — Human Observation Copy
 // ═══════════════════════════════════════════
 //
-// Every word here must pass the three filters:
-// 1. ¿Esto añade consciencia o ruido?
-// 2. ¿Esto muestra o juzga?
-// 3. ¿Esto podría existir en cualquier app financiera?
+// Tone: observación calmada.
 //
-// Plus the fourth filter:
+// Fourth filter added:
 // ¿Esto parece una reflexión humana sobria
 //   o una app intentando sonar inteligente?
 //
-// Tone: observación calmada.
-// Not: coaching, therapy, analytics, AI, fortune cookie.
+// Fifth filter added:
+// ¿Esto suena a UX writer diseñando frases
+//   o a alguien que simplemente observó algo?
 //
-// Rules for every observation:
-// - Name the specific domains (descanso, estrés, disfrute, necesidad...)
+// Rules:
+// - Name the specific domains (disfrute, necesidad, tranquilidad)
 // - No "suele coincidir", "tiende a", "parece que"
-// - No evaluative words (mejor, peor, más claro, estabilizarse)
-// - No coaching (deberías, prueba, te conviene)
-// - Not obvious (spending more when you go out)
+// - No evaluative words (mejor, peor, estabilizarse)
+// - No coaching
 // - Not vague ("fluye de otra manera", "patrones distintos")
-// - Short is better than long
-// - Quiet is better than loud
-// - If the observation could be said by a human friend
-//   who actually looked at your data: keep it.
-//   If it sounds like an algorithm trying to sound deep: cut it.
+// - Not too perfect — human observation is slightly imperfect
+// - Not too designed — natural, simple, direct
+// - Short > long
+// - Quiet > loud
+// - Simple > clever
 // ═══════════════════════════════════════════
 
 import type { EmpireConnection } from './types';
 
 // ─── Observation Templates ───
-// 2 templates per connection type. No more.
-// Each names the specific variables involved.
-// No wrapping in vague formulas.
+// 2 per connection. No more.
+// Direct. Specific. Not designed-sounding.
 
 const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
   'finanzas-energia': [
-    'Tus semanas de menos energía tienen más peso en disfrute.',
-    'Cuando el descanso baja, disfrute sube en tus registros.',
+    'Las semanas con menos descanso tienen más disfrute.',
+    'Menos descanso, más disfrute.',
   ],
 
   'finanzas-mente': [
-    'Las semanas con más práctica mental registran más tranquilidad.',
-    'En semanas con sesiones de mente, necesidad pierde peso en tus movimientos.',
+    'Semanas con más práctica mental, más tranquilidad.',
+    'Cuando hay sesiones de mente, tranquilidad sube.',
   ],
 
   'finanzas-estres': [
-    'En las semanas de más presión, necesidad gana peso en tus gastos.',
-    'Cuando el estrés sube, la intención de tus gastos cambia.',
+    'Semanas con más presión, más necesidad en tus gastos.',
+    'Cuando sube el estrés, necesidad gana peso.',
   ],
 
   'finanzas-sueno': [
-    'Las semanas con peor descanso tienen más gastos por necesidad.',
-    'Menos sueño, más necesidad en tus registros.',
+    'Semanas con peor descanso, más necesidad.',
+    'Menos sueño, más necesidad.',
   ],
 };
 
 // ─── Empire Labels ───
-// For subtle empire indicators in the UI
 
 export const EMPIRE_LABELS: Record<string, string> = {
   finanzas: 'Finanzas',
@@ -69,8 +64,6 @@ export const EMPIRE_LABELS: Record<string, string> = {
 };
 
 // ─── Get Observation Text ───
-// Returns a varied observation for the given connection type.
-// Uses the signal index to avoid showing the same text every time.
 
 export function getObservationText(
   connection: EmpireConnection,
@@ -83,11 +76,10 @@ export function getObservationText(
 }
 
 // ─── Empty State Message ───
-// When there's not enough data to show anything.
-// Short. Silent. No promises.
+// Short. No promises. No marketing.
 
 export const EMPTY_STATE_MESSAGE =
-  'Con el tiempo, pueden aparecer conexiones.';
+  'Con el tiempo pueden aparecer conexiones.';
 
 // ─── Section Titles ───
 

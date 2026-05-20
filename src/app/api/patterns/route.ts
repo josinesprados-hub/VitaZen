@@ -2,15 +2,9 @@
 // Patrones de Vida — API Route
 // ═══════════════════════════════════════════
 //
-// Gathers data from all empires for the current user
-// and runs the refined pattern detector.
-//
-// No AI. No external APIs. Only real data + sober logic.
-// Stricter than before. Less output. More weight.
-//
-// Returns observations only when there's enough data
-// AND the observations pass all validation.
-// Otherwise: silence.
+// Weight-aware. Persistence-aware.
+// Never exposes internal metrics to the client.
+// Only observations + weight (for cache duration).
 // ═══════════════════════════════════════════
 
 export const dynamic = 'force-dynamic';
@@ -33,9 +27,6 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = user.id;
-
-    // ── Fetch data from all empires ──
-    // Last 90 days for relevant, current patterns
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
@@ -50,122 +41,72 @@ export async function GET(request: NextRequest) {
       db.financeLog.findMany({
         where: { userId, date: { gte: ninetyDaysAgo } },
         select: {
-          date: true,
-          type: true,
-          category: true,
-          amount: true,
-          mood: true,
-          contexto: true,
+          date: true, type: true, category: true, amount: true,
+          mood: true, contexto: true,
         },
         orderBy: { date: 'desc' },
       }),
-
       db.wellnessLog.findMany({
         where: { userId, date: { gte: ninetyDaysAgo } },
-        select: {
-          date: true,
-          mood: true,
-          energy: true,
-          sleep: true,
-          stress: true,
-        },
+        select: { date: true, mood: true, energy: true, sleep: true, stress: true },
         orderBy: { date: 'desc' },
       }),
-
       db.meditationSession.findMany({
         where: { userId, completedAt: { gte: ninetyDaysAgo } },
-        select: {
-          duration: true,
-          type: true,
-          completedAt: true,
-        },
+        select: { duration: true, type: true, completedAt: true },
         orderBy: { completedAt: 'desc' },
       }),
-
       db.habitLog.findMany({
         where: { userId },
-        select: {
-          name: true,
-          streak: true,
-          lastCompletedAt: true,
-        },
+        select: { name: true, streak: true, lastCompletedAt: true },
       }),
-
       db.dailyCheckin.findMany({
         where: { userId, date: { gte: ninetyDaysAgo } },
-        select: {
-          date: true,
-          emotion: true,
-          energy: true,
-          focus: true,
-          stress: true,
-        },
+        select: { date: true, emotion: true, energy: true, focus: true, stress: true },
         orderBy: { date: 'desc' },
       }),
-
       db.journalEntry.findMany({
         where: { userId, createdAt: { gte: ninetyDaysAgo } },
-        select: {
-          content: true,
-          mood: true,
-          createdAt: true,
-        },
+        select: { content: true, mood: true, createdAt: true },
         orderBy: { createdAt: 'desc' },
       }),
     ]);
 
-    // ── Transform to CrossEmpireData format ──
     const crossEmpireData: CrossEmpireData = {
       financeLogs: financeLogs.map(l => ({
-        date: l.date.toISOString(),
-        type: l.type,
-        category: l.category,
-        amount: l.amount,
-        mood: l.mood,
-        contexto: l.contexto,
+        date: l.date.toISOString(), type: l.type, category: l.category,
+        amount: l.amount, mood: l.mood, contexto: l.contexto,
       })),
       wellnessLogs: wellnessLogs.map(l => ({
-        date: l.date.toISOString(),
-        mood: l.mood,
-        energy: l.energy,
-        sleep: l.sleep,
-        stress: l.stress,
+        date: l.date.toISOString(), mood: l.mood, energy: l.energy,
+        sleep: l.sleep, stress: l.stress,
       })),
       meditationSessions: meditationSessions.map(s => ({
-        duration: s.duration,
-        type: s.type,
-        completedAt: s.completedAt.toISOString(),
+        duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
       })),
       habitLogs: habitLogs.map(h => ({
-        name: h.name,
-        streak: h.streak,
+        name: h.name, streak: h.streak,
         lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
       })),
       checkins: checkins.map(c => ({
-        date: c.date.toISOString(),
-        emotion: c.emotion,
-        energy: c.energy,
-        focus: c.focus,
-        stress: c.stress,
+        date: c.date.toISOString(), emotion: c.emotion, energy: c.energy,
+        focus: c.focus, stress: c.stress,
       })),
       journalEntries: journalEntries.map(j => ({
-        content: j.content,
-        mood: j.mood,
-        createdAt: j.createdAt.toISOString(),
+        content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString(),
       })),
     };
 
-    // ── Run pattern detection ──
     const result = detectPatterns(crossEmpireData);
 
-    // ── Return results ──
-    // Never expose confidence scores, consistency, anomalies,
-    // or any internal metrics. Only the human observations.
+    // Return: observations + weight (for cache duration on client)
+    // NEVER expose confidence, consistency, anomaly count
     return NextResponse.json({
       observations: result.observations.map(o => ({
         id: o.id,
         text: o.text,
         empires: o.empires,
+        weight: o.weight,
       })),
       hasEnoughData: result.hasEnoughData,
       totalDataPoints: result.totalDataPoints,

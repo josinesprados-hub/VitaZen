@@ -13,18 +13,18 @@
 // ─── Page ───
 
 export const PAGE_TITLE = 'Memoria de Vida';
-export const PAGE_SUBTITLE = 'Una memoria silenciosa de cómo ha ido cambiando tu vida';
+export const PAGE_SUBTITLE = 'Cómo ha ido cambiando tu vida';
 
 // ─── Section titles ───
 
 export const STAGES_TITLE = 'Etapas';
-export const STAGES_SUBTITLE = 'Cómo ha ido cambiando el ritmo de tu vida';
+export const STAGES_SUBTITLE = 'El ritmo de tu vida';
 
 export const MEMORIES_TITLE = 'Momentos';
-export const MEMORIES_SUBTITLE = 'Pequeños fragmentos de tu vida registrados';
+export const MEMORIES_SUBTITLE = 'Fragmentos de tu vida';
 
 export const TRANSITIONS_TITLE = 'Transiciones';
-export const TRANSITIONS_SUBTITLE = 'Cambios suaves en tu forma de vivir';
+export const TRANSITIONS_SUBTITLE = 'Cambios entre etapas';
 
 export const PATTERNS_TITLE = 'Conexiones';
 export const PATTERNS_SUBTITLE = 'Relaciones entre partes de tu vida';
@@ -32,10 +32,10 @@ export const PATTERNS_SUBTITLE = 'Relaciones entre partes de tu vida';
 // ─── Empty states ───
 
 export const NO_DATA_TITLE = 'Tu memoria se construye con el tiempo';
-export const NO_DATA_SUBTITLE = 'Cuando registres tu vida en VitaZen, aquí aparecerá una observación calmada de cómo ha ido cambiando. No hay prisa.';
+export const NO_DATA_SUBTITLE = 'No hay prisa.';
 
 export const LITTLE_DATA_TITLE = 'Tu memoria está empezando a formarse';
-export const LITTLE_DATA_SUBTITLE = 'Con más semanas de registro, aparecerán etapas, transiciones y conexiones entre partes de tu vida.';
+export const LITTLE_DATA_SUBTITLE = 'Con más semanas aparecerán más observaciones.';
 
 // ─── FREE vs ÉLITE ───
 
@@ -45,7 +45,7 @@ export const ELITE_CONNECTIONS = 'Conexiones históricas';
 export const ELITE_EVOLUTION = 'Evolución personal';
 export const ELITE_BADGE = 'Élite';
 
-export const FREE_LIMIT_MESSAGE = 'La memoria acumulativa y las etapas de vida se revelan con el tiempo';
+export const FREE_LIMIT_MESSAGE = 'Las etapas de vida se revelan con el tiempo';
 
 // ─── Time labels ───
 

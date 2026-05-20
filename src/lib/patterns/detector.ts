@@ -3,21 +3,13 @@
 // ═══════════════════════════════════════════
 //
 // Pure logic. No AI. No external APIs. No randomness.
-// Only sober, intelligent pattern detection from real data.
 //
-// Refined principles:
-// - If not enough data → return nothing. Never invent.
-// - Minimum 3 weeks of overlap (raised from 2)
-// - Minimum confidence 0.65 (raised from 0.55)
-// - No backdoors (removed 0.35 + 4-week shortcut)
-// - Anomaly weeks excluded before correlation
-// - Consistency check: pattern must hold in 55%+ of clean weeks
-// - Semantic overlap: related connections reduced to strongest
-// - Philosophical filter: every observation text passes before showing
-// - Max 2 observations (reduced from 3)
-// - Removed: finanzas-habitos (can't validate weekly)
-// - Removed: finanzas-social (trivially obvious)
+// Emotional weight system:
+// - ligera:   appears briefly, replaced easily
+// - relevante: stays 2 weeks, replaced only by igual or stronger
+// - profunda:  stays 4 weeks, replaced only by another profunda
 //
+// Stability over novelty.
 // "Si hay duda: NO mostrar nada."
 // ═══════════════════════════════════════════
 
@@ -33,18 +25,17 @@ import {
   validateSignal,
   filterSemanticOverlap,
   passesPhilosophicalFilter,
+  computeWeight,
 } from './validation';
 
 // ─── Configuration ───
-// Raised thresholds. No shortcuts.
 
-const MIN_CONFIDENCE = 0.65; // Was 0.55 — too many false positives
-const MIN_WEEKS_OVERLAP = 3; // Was 2 — need more temporal evidence
+const MIN_CONFIDENCE = 0.65;
+const MIN_WEEKS_OVERLAP = 3;
 const MIN_DATA_POINTS_PER_EMPIRE = 5;
-const MAX_OBSERVATIONS = 2; // Was 3 — less is more
+const MAX_OBSERVATIONS = 2;
 
 // ─── Intention Resolution ───
-// Same as Finanzas page — keep in sync
 
 const LEGACY_MOOD_MAP: Record<string, string> = {
   calm: 'tranquility',
@@ -64,16 +55,9 @@ const SOCIAL_KEYWORDS = /\b(amigos|amiga|amigo|social|cumple|fiesta|cena con|que
 
 // ─── Week Helpers ───
 
-interface WeekBucket {
-  weekKey: string; // YYYY-WNN
-  startDate: Date;
-  endDate: Date;
-}
-
 function getWeekKey(date: Date): string {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
-  // Thursday in current week decides the year
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
   const week1 = new Date(d.getFullYear(), 0, 4);
   return `${d.getFullYear()}-W${1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)}`;
@@ -89,8 +73,8 @@ interface WeeklyFinance {
   weekKey: string;
   totalExpense: number;
   totalIncome: number;
-  intentionDistribution: Record<string, number>; // intention → amount
-  impulsiveRatio: number; // enjoyment amount / total expense (0-1)
+  intentionDistribution: Record<string, number>;
+  impulsiveRatio: number;
   socialCount: number;
   categoryCount: number;
 }
@@ -147,7 +131,6 @@ function aggregateFinanceWeekly(data: CrossEmpireData): Map<string, WeeklyFinanc
     w.categoryCount = categories.size;
   }
 
-  // Compute impulsive ratio
   for (const w of weeks.values()) {
     const enjoymentAmount = w.intentionDistribution['enjoyment'] || 0;
     w.impulsiveRatio = w.totalExpense > 0 ? enjoymentAmount / w.totalExpense : 0;
@@ -201,7 +184,6 @@ function aggregateMeditationWeekly(data: CrossEmpireData): Map<string, WeeklyMed
 }
 
 // ─── Correlation Helper ───
-// Pearson correlation coefficient
 
 function simpleCorrelation(valuesA: number[], valuesB: number[]): number {
   if (valuesA.length < 3 || valuesB.length < 3) return 0;
@@ -227,14 +209,11 @@ function simpleCorrelation(valuesA: number[], valuesB: number[]): number {
 }
 
 // ─── Pattern Detectors ───
-// Each returns a PatternSignal if the pattern is detected, null otherwise.
-// Now includes validation: anomaly exclusion + consistency check.
 
 function detectLowEnergyImpulsiveSpending(
   financeWeeks: Map<string, WeeklyFinance>,
   wellnessWeeks: Map<string, WeeklyWellness>
 ): PatternSignal | null {
-  // Find overlapping weeks
   const overlapWeeks = [...financeWeeks.keys()].filter(k => wellnessWeeks.has(k));
   if (overlapWeeks.length < MIN_WEEKS_OVERLAP) return null;
 
@@ -248,24 +227,24 @@ function detectLowEnergyImpulsiveSpending(
     impulsiveValues.push(f.impulsiveRatio);
   }
 
-  // Negative correlation: low sleep → high impulsive
   const corr = simpleCorrelation(sleepValues, impulsiveValues);
-
-  // Strict threshold — no backdoors
   if (corr >= -MIN_CONFIDENCE) return null;
 
-  // Validate: anomaly exclusion + consistency
   const validation = validateSignal(sleepValues, impulsiveValues, corr, 'negative');
   if (!validation.isValid) return null;
+
+  const confidence = Math.min(Math.abs(corr), 1);
+  const weight = computeWeight(confidence, validation.consistencyScore, overlapWeeks.length);
 
   return {
     id: 'low-energy-impulsive',
     connection: 'finanzas-energia',
-    confidence: Math.min(Math.abs(corr), 1),
+    confidence,
     minimumDataPoints: MIN_DATA_POINTS_PER_EMPIRE * 2,
     dataPointsFound: overlapWeeks.length * 2,
     consistencyScore: validation.consistencyScore,
     anomaliesExcluded: validation.anomaliesExcluded,
+    weight,
   };
 }
 
@@ -283,27 +262,27 @@ function detectMentalPracticeFinancialStability(
     const m = meditationWeeks.get(weekKey)!;
     const f = financeWeeks.get(weekKey)!;
     sessionCounts.push(m.sessionCount);
-    // Stability = less impulsive ratio (inverse)
     balanceStability.push(1 - f.impulsiveRatio);
   }
 
   const corr = simpleCorrelation(sessionCounts, balanceStability);
-
-  // Strict threshold
   if (corr <= MIN_CONFIDENCE) return null;
 
-  // Validate
   const validation = validateSignal(sessionCounts, balanceStability, corr, 'positive');
   if (!validation.isValid) return null;
+
+  const confidence = Math.min(Math.abs(corr), 1);
+  const weight = computeWeight(confidence, validation.consistencyScore, overlapWeeks.length);
 
   return {
     id: 'mental-practice-stability',
     connection: 'finanzas-mente',
-    confidence: Math.min(Math.abs(corr), 1),
+    confidence,
     minimumDataPoints: MIN_DATA_POINTS_PER_EMPIRE * 2,
     dataPointsFound: overlapWeeks.length * 2,
     consistencyScore: validation.consistencyScore,
     anomaliesExcluded: validation.anomaliesExcluded,
+    weight,
   };
 }
 
@@ -325,23 +304,24 @@ function detectStressFinancialChange(
   }
 
   const corr = simpleCorrelation(stressValues, expenseValues);
-
-  // Strict threshold — accept both positive and negative correlation
   if (Math.abs(corr) <= MIN_CONFIDENCE) return null;
 
-  // Validate
   const direction = corr > 0 ? 'positive' : 'negative';
   const validation = validateSignal(stressValues, expenseValues, corr, direction);
   if (!validation.isValid) return null;
 
+  const confidence = Math.min(Math.abs(corr), 1);
+  const weight = computeWeight(confidence, validation.consistencyScore, overlapWeeks.length);
+
   return {
     id: 'stress-financial-change',
     connection: 'finanzas-estres',
-    confidence: Math.min(Math.abs(corr), 1),
+    confidence,
     minimumDataPoints: MIN_DATA_POINTS_PER_EMPIRE * 2,
     dataPointsFound: overlapWeeks.length * 2,
     consistencyScore: validation.consistencyScore,
     anomaliesExcluded: validation.anomaliesExcluded,
+    weight,
   };
 }
 
@@ -363,22 +343,23 @@ function detectSleepFinanceConnection(
   }
 
   const corr = simpleCorrelation(sleepValues, totalExpenseValues);
-
-  // Strict threshold — negative correlation: low sleep → high spending
   if (corr >= -MIN_CONFIDENCE) return null;
 
-  // Validate
   const validation = validateSignal(sleepValues, totalExpenseValues, corr, 'negative');
   if (!validation.isValid) return null;
+
+  const confidence = Math.min(Math.abs(corr), 1);
+  const weight = computeWeight(confidence, validation.consistencyScore, overlapWeeks.length);
 
   return {
     id: 'sleep-finance',
     connection: 'finanzas-sueno',
-    confidence: Math.min(Math.abs(corr), 1),
+    confidence,
     minimumDataPoints: MIN_DATA_POINTS_PER_EMPIRE * 2,
     dataPointsFound: overlapWeeks.length * 2,
     consistencyScore: validation.consistencyScore,
     anomaliesExcluded: validation.anomaliesExcluded,
+    weight,
   };
 }
 
@@ -396,33 +377,33 @@ function detectGrowthStability(
     const f = financeWeeks.get(weekKey)!;
     const w = wellnessWeeks.get(weekKey)!;
     growthValues.push(f.intentionDistribution['growth'] || 0);
-    calmValues.push(5 - w.avgStress); // Invert stress → calm
+    calmValues.push(5 - w.avgStress);
   }
 
   const corr = simpleCorrelation(growthValues, calmValues);
-
-  // Strict threshold
   if (corr <= MIN_CONFIDENCE) return null;
 
-  // Validate
   const validation = validateSignal(growthValues, calmValues, corr, 'positive');
   if (!validation.isValid) return null;
+
+  const confidence = Math.min(Math.abs(corr), 1);
+  const weight = computeWeight(confidence, validation.consistencyScore, overlapWeeks.length);
 
   return {
     id: 'growth-stability',
     connection: 'finanzas-energia',
-    confidence: Math.min(Math.abs(corr), 1),
+    confidence,
     minimumDataPoints: MIN_DATA_POINTS_PER_EMPIRE * 2,
     dataPointsFound: overlapWeeks.length * 2,
     consistencyScore: validation.consistencyScore,
     anomaliesExcluded: validation.anomaliesExcluded,
+    weight,
   };
 }
 
 // ─── Main Detection Function ───
 
 export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
-  // Count total data points
   const totalDataPoints =
     data.financeLogs.length +
     data.wellnessLogs.length +
@@ -431,34 +412,22 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
     data.checkins.length +
     data.journalEntries.length;
 
-  // Need absolute minimum to even try
   if (data.financeLogs.length < MIN_DATA_POINTS_PER_EMPIRE) {
-    return {
-      observations: [],
-      hasEnoughData: false,
-      totalDataPoints,
-    };
+    return { observations: [], hasEnoughData: false, totalDataPoints };
   }
 
-  // Need at least one other empire with sufficient data
   const otherEmpiresHaveData =
     data.wellnessLogs.length >= 5 ||
     data.meditationSessions.length >= 5;
 
   if (!otherEmpiresHaveData) {
-    return {
-      observations: [],
-      hasEnoughData: false,
-      totalDataPoints,
-    };
+    return { observations: [], hasEnoughData: false, totalDataPoints };
   }
 
-  // Aggregate weekly data
   const financeWeeks = aggregateFinanceWeekly(data);
   const wellnessWeeks = aggregateWellnessWeekly(data);
   const meditationWeeks = aggregateMeditationWeekly(data);
 
-  // Run detectors — only with sufficient data
   const signals: PatternSignal[] = [];
 
   if (data.wellnessLogs.length >= MIN_DATA_POINTS_PER_EMPIRE) {
@@ -480,9 +449,8 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
     if (s2) signals.push(s2);
   }
 
-  // ── Semantic overlap filter ──
-  // If multiple connections point to the same theme,
-  // keep only the strongest one from each group.
+  // ── Semantic overlap: keep strongest from each group ──
+  // Stability: only replace if new is equal or stronger weight
   const filteredSignals = filterSemanticOverlap(signals);
 
   // ── Convert signals to observations ──
@@ -490,18 +458,11 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
 
   for (let i = 0; i < filteredSignals.length; i++) {
     const signal = filteredSignals[i];
-
-    // Get the observation text
     const text = getObservationText(signal.connection, i);
 
-    // ── Philosophical filter ──
-    // Every observation text must pass before being shown
     const filterResult = passesPhilosophicalFilter(text);
     if (!filterResult.passes) {
-      // Log internally for debugging — never show to user
-      console.log(
-        `[Patrones] Observation filtered: "${text}" — reason: ${filterResult.reason}`
-      );
+      console.log(`[Patrones] Filtered: "${text}" — ${filterResult.reason}`);
       continue;
     }
 
@@ -511,13 +472,19 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
       text,
       empires: getEmpireLabels(signal.connection),
       confidence: signal.confidence,
+      weight: signal.weight,
     });
   }
 
-  // Sort by confidence (highest first)
-  observations.sort((a, b) => b.confidence - a.confidence);
+  // Sort: profunda first, then relevante, then ligera
+  // Within same weight: higher confidence first
+  const weightOrder = { profunda: 2, relevante: 1, ligera: 0 };
+  observations.sort((a, b) => {
+    const wDiff = weightOrder[b.weight] - weightOrder[a.weight];
+    if (wDiff !== 0) return wDiff;
+    return b.confidence - a.confidence;
+  });
 
-  // Limit to MAX_OBSERVATIONS — silence is part of design
   const finalObservations = observations.slice(0, MAX_OBSERVATIONS);
 
   return {
@@ -527,7 +494,7 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
   };
 }
 
-// ─── Helper: Get empire labels from connection ───
+// ─── Helper ───
 
 function getEmpireLabels(connection: EmpireConnection): string[] {
   const map: Record<EmpireConnection, string[]> = {

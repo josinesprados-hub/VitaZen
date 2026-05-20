@@ -6,21 +6,24 @@
 // false positives, trivial observations, and AI-sounding
 // conclusions.
 //
+// Now includes emotional weight calculation.
+// Weight is NEVER shown to the user.
+// It silently controls how long an observation persists
+// and how easily it can be replaced.
+//
 // Philosophy:
 // - If in doubt: don't show anything.
 // - Silence has priority over a mediocre observation.
-// - One honest observation > three suspicious ones.
-// - A single false observation destroys all trust.
-//
-// This module does NOT detect patterns.
-// It validates whether a detected pattern deserves
-// to be shown to a human being.
+// - Stability over novelty.
+// - An observation that stays is more trustworthy
+//   than one that keeps changing.
 // ═══════════════════════════════════════════
+
+import type { ObservationWeight } from './types';
 
 // ─── Anomaly Detection ───
 // Exclude weeks where values are extreme outliers
 // (>2 standard deviations from the mean).
-// A single anomalous week can create a false correlation.
 
 export interface AnomalyResult {
   cleanIndices: number[];
@@ -30,7 +33,6 @@ export interface AnomalyResult {
 
 export function detectAnomalies(values: number[]): AnomalyResult {
   if (values.length < 4) {
-    // Not enough data to reliably detect anomalies
     return {
       cleanIndices: values.map((_, i) => i),
       anomalyCount: 0,
@@ -44,7 +46,6 @@ export function detectAnomalies(values: number[]): AnomalyResult {
   );
 
   if (stdDev === 0) {
-    // All values identical — no variance, no anomalies
     return {
       cleanIndices: values.map((_, i) => i),
       anomalyCount: 0,
@@ -68,10 +69,8 @@ export function detectAnomalies(values: number[]): AnomalyResult {
 }
 
 // ─── Consistency Check ───
-// A correlation is not enough. The relationship must be
-// present in the majority of individual weeks.
-// "Direction" means: when A goes up, does B go up (positive)
-// or down (negative)?
+// The relationship must be present in the majority
+// of individual clean weeks.
 
 export function computeConsistency(
   valuesA: number[],
@@ -99,17 +98,34 @@ export function computeConsistency(
   return valuesA.length > 0 ? consistentWeeks / valuesA.length : 0;
 }
 
+// ─── Emotional Weight Calculation ───
+// Combines confidence + consistency + temporal depth
+// into a silent internal weight.
+// NEVER shown to user. Controls persistence only.
+
+export function computeWeight(
+  confidence: number,
+  consistencyScore: number,
+  overlapWeeks: number
+): ObservationWeight {
+  // profunda: high confidence, high consistency, sustained over time
+  if (confidence >= 0.80 && consistencyScore >= 0.70 && overlapWeeks >= 5) {
+    return 'profunda';
+  }
+
+  // relevante: solid confidence and consistency
+  if (confidence >= 0.70 && consistencyScore >= 0.60) {
+    return 'relevante';
+  }
+
+  // ligera: meets minimum threshold but not especially strong
+  return 'ligera';
+}
+
 // ─── Semantic Overlap Groups ───
-// Multiple connection types can point to the same underlying
-// theme. When overlap exists, keep only the strongest
-// observation from each group. Otherwise the user sees
-// 3 variations of the same insight, which feels like
-// generated content.
 
 export const SEMANTIC_GROUPS: string[][] = [
-  // "Low wellness → different spending"
   ['finanzas-energia', 'finanzas-sueno', 'finanzas-estres'],
-  // "Mental practice → financial intentionality"
   ['finanzas-mente'],
 ];
 
@@ -117,7 +133,7 @@ export function findSemanticGroup(connection: string): number {
   return SEMANTIC_GROUPS.findIndex((group) => group.includes(connection));
 }
 
-export function filterSemanticOverlap<T extends { connection: string; confidence: number }>(
+export function filterSemanticOverlap<T extends { connection: string; confidence: number; weight: ObservationWeight }>(
   observations: T[]
 ): T[] {
   const groupMap = new Map<number, T>();
@@ -125,13 +141,23 @@ export function filterSemanticOverlap<T extends { connection: string; confidence
   for (const obs of observations) {
     const groupIdx = findSemanticGroup(obs.connection);
     if (groupIdx === -1) {
-      // No group — always keep
-      groupMap.set(-obs.connection.length, obs); // unique key
+      groupMap.set(-obs.connection.length, obs);
       continue;
     }
 
     const existing = groupMap.get(groupIdx);
-    if (!existing || obs.confidence > existing.confidence) {
+    if (!existing) {
+      groupMap.set(groupIdx, obs);
+      continue;
+    }
+
+    // Replace only if new observation has equal or higher weight
+    // AND higher confidence. Stability over novelty.
+    const weightOrder: Record<ObservationWeight, number> = { ligera: 0, relevante: 1, profunda: 2 };
+    const currentWeight = weightOrder[obs.weight];
+    const existingWeight = weightOrder[existing.weight];
+
+    if (currentWeight > existingWeight || (currentWeight === existingWeight && obs.confidence > existing.confidence)) {
       groupMap.set(groupIdx, obs);
     }
   }
@@ -140,9 +166,6 @@ export function filterSemanticOverlap<T extends { connection: string; confidence
 }
 
 // ─── Philosophical Filter ───
-// Every observation text must pass this before being shown.
-// The three product questions, plus anti-AI, anti-coaching,
-// anti-obvious checks.
 
 const COACHING_WORDS = [
   'deberías', 'prueba', 'intenta', 'mejora', 'cambia', 'evita',
@@ -183,28 +206,24 @@ export function passesPhilosophicalFilter(text: string): {
 } {
   const lowerText = text.toLowerCase();
 
-  // Coaching words — never acceptable
   for (const word of COACHING_WORDS) {
     if (lowerText.includes(word)) {
       return { passes: false, reason: `coaching: "${word}"` };
     }
   }
 
-  // Evaluative words — these judge the user's behavior
   for (const word of EVALUATIVE_WORDS) {
     if (lowerText.includes(word)) {
       return { passes: false, reason: `evaluative: "${word}"` };
     }
   }
 
-  // AI-sounding patterns — the mark of generated content
   for (const pattern of AI_SOUNDING_PATTERNS) {
     if (pattern.test(text)) {
       return { passes: false, reason: `AI-sounding: ${pattern.source}` };
     }
   }
 
-  // Obvious patterns — trivially true statements
   for (const pattern of OBVIOUS_PATTERNS) {
     if (pattern.test(text)) {
       return { passes: false, reason: `obvious: ${pattern.source}` };
@@ -215,7 +234,6 @@ export function passesPhilosophicalFilter(text: string): {
 }
 
 // ─── Full Signal Validation ───
-// Combines all checks into one validation result.
 
 export interface SignalValidation {
   isValid: boolean;
@@ -231,16 +249,13 @@ export function validateSignal(
   direction: 'positive' | 'negative',
   minConsistentWeeks: number = 3
 ): SignalValidation {
-  // 1. Anomaly detection on both series
   const anomalyA = detectAnomalies(valuesA);
   const anomalyB = detectAnomalies(valuesB);
 
-  // Intersection of clean indices from both series
   const cleanSetA = new Set(anomalyA.cleanIndices);
   const cleanSetB = new Set(anomalyB.cleanIndices);
   const cleanIndices = anomalyA.cleanIndices.filter((i) => cleanSetB.has(i));
 
-  // Need enough clean weeks after anomaly exclusion
   if (cleanIndices.length < minConsistentWeeks) {
     return {
       isValid: false,
@@ -250,12 +265,10 @@ export function validateSignal(
     };
   }
 
-  // 2. Compute consistency on clean data
   const cleanA = cleanIndices.map((i) => valuesA[i]);
   const cleanB = cleanIndices.map((i) => valuesB[i]);
   const consistencyScore = computeConsistency(cleanA, cleanB, direction);
 
-  // Must be consistent in at least 55% of clean weeks
   if (consistencyScore < 0.55) {
     return {
       isValid: false,
@@ -265,7 +278,6 @@ export function validateSignal(
     };
   }
 
-  // 3. If too many anomalies were excluded, data is unstable
   const totalAnomalies = anomalyA.anomalyCount + anomalyB.anomalyCount;
   const totalData = anomalyA.totalCount + anomalyB.totalCount;
   if (totalData > 0 && totalAnomalies / totalData > 0.3) {

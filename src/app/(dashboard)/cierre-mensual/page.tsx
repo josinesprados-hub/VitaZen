@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-import { Crown, Link2, Feather, Calendar, TrendingUp, ArrowLeft } from 'lucide-react';
+import { Crown, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
 import {
@@ -221,53 +221,42 @@ export default function CierreMensualPage() {
       </Link>
 
       {/* Summary title */}
-      <h1 className="text-xl sm:text-2xl font-light text-white mb-2 text-center">
+      <h1 className="text-lg sm:text-xl font-light text-white mb-1 text-center">
         {SUMMARY_TITLE_FACTORY(monthLabel)}
       </h1>
 
-      {/* Reflection display (if written) */}
+      {/* Reflection display */}
       {closure?.reflection && (
-        <div className="mt-6 mb-8 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Feather size={12} className="text-[#c8a55a]/40" />
-            <span className="text-[10px] text-[#555] uppercase tracking-wider">Tu reflexión</span>
+        <div className="mt-8 mb-10">
+          <div className="border-l border-[#151515] pl-4">
+            <span className="text-[9px] text-[#333] uppercase tracking-wider">Tu reflexión</span>
+            <p className="text-[#888] text-sm italic leading-relaxed mt-2">
+              {closure.reflection}
+            </p>
           </div>
-          <p className="text-[#999] text-sm italic leading-relaxed">
-            {closure.reflection}
-          </p>
         </div>
       )}
 
       {/* No data state */}
       {!digest.hasData && digest.noDataMessage && (
-        <div className="text-center py-16">
-          <div className="w-12 h-12 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
-            <Calendar size={18} className="text-[#c8a55a]/25" />
-          </div>
+        <div className="text-center py-20">
           <p className="text-[#555] text-sm">{digest.noDataMessage.title}</p>
-          <p className="text-[#333] text-xs mt-2 max-w-xs mx-auto">{digest.noDataMessage.subtitle}</p>
+          <p className="text-[#333] text-xs mt-2">{digest.noDataMessage.subtitle}</p>
         </div>
       )}
 
-      {/* ── 1. Intention Balance ── */}
+      {/* Intention Balance */}
       {digest.intentionBalance && digest.intentionBalance.total > 0 && (
-        <div className="mt-6 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp size={14} className="text-[#c8a55a]/40" />
-            <h2 className="text-sm font-medium text-white">{INTENTION_BALANCE_TITLE}</h2>
-          </div>
+        <div className="mt-8">
+          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{INTENTION_BALANCE_TITLE}</h2>
           <IntentionBar balance={digest.intentionBalance} />
         </div>
       )}
 
-      {/* ── 2. Evolution (Élite only) ── */}
+      {/* Evolution */}
       {isPremium && digest.evolution && (
-        <div className="mt-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp size={14} className="text-[#c8a55a]/40" />
-            <h2 className="text-sm font-medium text-white">{ELITE_EVOLUTION}</h2>
-            <span className="ml-auto text-[9px] text-[#c8a55a]/40 font-medium">Élite</span>
-          </div>
+        <div className="mt-6">
+          <h2 className="text-[11px] text-[#444] mb-2 tracking-wide">{ELITE_EVOLUTION}</h2>
           <p className="text-[#888] text-sm italic">{digest.evolution.label}</p>
         </div>
       )}
@@ -281,19 +270,15 @@ export default function CierreMensualPage() {
         </div>
       )}
 
-      {/* ── 3. Memories (Élite only) ── */}
+      {/* Memories */}
       {isPremium && digest.memories.length > 0 && (
-        <div className="mt-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Feather size={14} className="text-[#c8a55a]/40" />
-            <h2 className="text-sm font-medium text-white">{MEMORIES_TITLE}</h2>
-            <span className="ml-auto text-[9px] text-[#c8a55a]/40 font-medium">Élite</span>
-          </div>
+        <div className="mt-8">
+          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{MEMORIES_TITLE}</h2>
           <div className="space-y-3">
             {digest.memories.map((memory, i) => (
-              <div key={i} className="border-l-2 border-[#1a1a1a] pl-3">
-                <p className="text-[#888] text-xs italic leading-relaxed">{memory.text}</p>
-                <p className="text-[#333] text-[10px] mt-1">
+              <div key={i} className="border-l border-[#151515] pl-3">
+                <p className="text-[#777] text-xs italic leading-relaxed">{memory.text}</p>
+                <p className="text-[9px] text-[#2a2a2a] mt-1">
                   {memory.empire} · {new Date(memory.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                 </p>
               </div>
@@ -311,54 +296,47 @@ export default function CierreMensualPage() {
         </div>
       )}
 
-      {/* ── 4. Financial Balance ── */}
+      {/* Financial Balance */}
       {digest.financial && (
-        <div className="mt-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar size={14} className="text-[#c8a55a]/40" />
-            <h2 className="text-sm font-medium text-white">{FINANCIAL_BALANCE_TITLE}</h2>
-          </div>
+        <div className="mt-8">
+          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{FINANCIAL_BALANCE_TITLE}</h2>
           <FinancialDisplay financial={digest.financial} />
         </div>
       )}
 
-      {/* ── 5. Rhythm ── */}
+      {/* Rhythm */}
       {digest.rhythm && (
-        <div className="mt-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp size={14} className="text-[#c8a55a]/40" />
-            <h2 className="text-sm font-medium text-white">{RHYTHM_TITLE}</h2>
-          </div>
+        <div className="mt-6">
+          <h2 className="text-[11px] text-[#444] mb-2 tracking-wide">{RHYTHM_TITLE}</h2>
           <p className="text-[#888] text-sm italic">{digest.rhythm.rhythmLabel}</p>
-          <div className="flex flex-wrap gap-3 mt-3">
+          <div className="flex flex-wrap gap-3 mt-2">
             {digest.rhythm.checkinDays > 0 && (
-              <span className="text-[10px] text-[#555]">{digest.rhythm.checkinDays} check-ins</span>
+              <span className="text-[9px] text-[#444]">{digest.rhythm.checkinDays} check-ins</span>
             )}
             {digest.rhythm.financeLogs > 0 && (
-              <span className="text-[10px] text-[#555]">{digest.rhythm.financeLogs} registros financieros</span>
+              <span className="text-[9px] text-[#444]">{digest.rhythm.financeLogs} registros financieros</span>
             )}
             {digest.rhythm.journalEntries > 0 && (
-              <span className="text-[10px] text-[#555]">{digest.rhythm.journalEntries} entradas de journal</span>
+              <span className="text-[9px] text-[#444]">{digest.rhythm.journalEntries} entradas</span>
             )}
             {digest.rhythm.meditationSessions > 0 && (
-              <span className="text-[10px] text-[#555]">{digest.rhythm.meditationSessions} meditaciones</span>
+              <span className="text-[9px] text-[#444]">{digest.rhythm.meditationSessions} meditaciones</span>
             )}
           </div>
         </div>
       )}
 
-      {/* ── Élite deeper connections hint ── */}
+      {/* FREE hint */}
       {!isPremium && (
-        <div className="mt-6 text-center">
-          <p className="text-[10px] text-[#444] flex items-center justify-center gap-1.5">
-            <Crown size={9} className="text-[#c8a55a]/40" />
+        <div className="mt-8 text-center">
+          <p className="text-[9px] text-[#333] flex items-center justify-center gap-1">
+            <Crown size={7} className="text-[#c8a55a]/25" />
             {ELITE_DEEPER}
           </p>
         </div>
       )}
 
-      {/* Bottom spacing */}
-      <div className="h-12" />
+      <div className="h-16" />
     </div>
   );
 }

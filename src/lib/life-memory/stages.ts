@@ -174,34 +174,34 @@ function classifyStage(agg: MonthAggregation): StageFlavor {
 // ─── Generate a calm human observation for a stage ───
 
 function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
-  const { intentionBalance, avgStress, avgEnergy } = agg;
-  const { growth, tranquility, necessity, enjoyment, total } = intentionBalance;
+  const { intentionBalance } = agg;
+  const { growth, tranquility, total } = intentionBalance;
 
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        return 'Tus registros hablan de un periodo tranquilo, con decisiones tomadas desde la calma.';
-      return 'Un periodo donde la calma parece haber sido protagonista.';
+        return 'Un periodo tranquilo. Decisiones desde la calma.';
+      return 'Un periodo con bastante calma.';
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        return 'Tus registros reflejan un periodo orientado al crecimiento personal.';
-      return 'Un periodo donde hubo movimiento hacia adelante.';
+        return 'Un periodo orientado al crecimiento.';
+      return 'Un periodo con movimiento hacia adelante.';
 
     case 'intensity':
-      return 'Un periodo con más intensidad de lo habitual. Mucho movimiento, bastante presión.';
+      return 'Un periodo intenso. Mucho movimiento.';
 
     case 'dispersion':
-      return 'Un periodo con días muy distintos entre sí. Sin un ritmo claro.';
+      return 'Un periodo con días muy distintos entre sí.';
 
     case 'exhaustion':
-      return 'Tus registros hablan de agotamiento. Poca energía, bastante peso.';
+      return 'Un periodo de agotamiento. Poca energía.';
 
     case 'quiet':
-      return 'Un periodo de silencio. Pocos registros, mucho espacio.';
+      return 'Un periodo de silencio.';
 
     case 'stability':
-      return 'Un periodo estable. Sin grandes altibajos, con ritmo constante.';
+      return 'Un periodo estable.';
 
     default:
       return '';
@@ -237,26 +237,26 @@ function detectTransitions(stages: LifeStage[]): StageTransition[] {
 function generateTransitionObservation(from: StageFlavor, to: StageFlavor): string {
   // Key: these are NOT "improvements" or "setbacks". Just changes.
   const transitions: Record<string, string> = {
-    'exhaustion->calm': 'Tu vida parece más tranquila últimamente.',
-    'exhaustion->stability': 'Parece que encontraste más estabilidad.',
-    'intensity->calm': 'Después de un periodo intenso, las cosas se calmaron.',
+    'exhaustion->calm': 'Más tranquilidad después del agotamiento.',
+    'exhaustion->stability': 'Más estabilidad después del agotamiento.',
+    'intensity->calm': 'Después de la intensidad, calma.',
     'intensity->stability': 'El ritmo se volvió más constante.',
-    'dispersion->stability': 'Tu vida encontró un ritmo más claro.',
+    'dispersion->stability': 'Más ritmo, menos dispersión.',
     'dispersion->calm': 'De la dispersión a más calma.',
-    'quiet->growth': 'Después del silencio, empezó el movimiento.',
-    'quiet->stability': 'El silencio dio paso a un ritmo más constante.',
+    'quiet->growth': 'Después del silencio, movimiento.',
+    'quiet->stability': 'Del silencio a un ritmo más constante.',
     'calm->growth': 'De la calma al crecimiento.',
-    'calm->intensity': 'Un periodo tranquilo dio paso a más intensidad.',
-    'growth->calm': 'Después del crecimiento, llegó más calma.',
-    'growth->stability': 'El crecimiento se asentó en estabilidad.',
-    'stability->intensity': 'De la estabilidad a un ritmo más intenso.',
-    'stability->dispersion': 'Un periodo estable se volvió más disperso.',
-    'stability->exhaustion': 'La estabilidad dio paso al agotamiento.',
-    'calm->dispersion': 'La calma se fragmentó en dispersión.',
-    'growth->intensity': 'El crecimiento trajo más intensidad.',
+    'calm->intensity': 'De la calma a más intensidad.',
+    'growth->calm': 'Después del crecimiento, más calma.',
+    'growth->stability': 'El crecimiento se asentó.',
+    'stability->intensity': 'De la estabilidad a más intensidad.',
+    'stability->dispersion': 'De la estabilidad a más dispersión.',
+    'stability->exhaustion': 'De la estabilidad al agotamiento.',
+    'calm->dispersion': 'La calma se fragmentó.',
+    'growth->intensity': 'El crecimiento trajo intensidad.',
     'intensity->exhaustion': 'La intensidad desgastó.',
-    'exhaustion->growth': 'Del agotamiento surgieron ganas de crecer.',
-    'quiet->calm': 'El silencio se llenó de calma.',
+    'exhaustion->growth': 'Del agotamiento, ganas de crecer.',
+    'quiet->calm': 'Del silencio a la calma.',
   };
 
   const key = `${from}->${to}`;

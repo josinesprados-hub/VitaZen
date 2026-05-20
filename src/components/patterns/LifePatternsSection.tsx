@@ -4,22 +4,17 @@
 // Patrones de Vida — Life Patterns Section
 // ═══════════════════════════════════════════
 //
-// The first real Premium feature of VitaZen.
+// "No parece una app intentando analizarme.
+//  Parece un espacio que, a veces,
+//  refleja algo importante."
 //
-// Refined design principles:
-// - Intimate, calm, premium, contemplative
-// - NOT a dashboard. NOT analytics. NOT fintech.
-// - Silence is part of design — don't fill empty spaces
-// - Each observation is a gentle mirror, not a diagnosis
-// - Rare is better than frequent
-// - 1 honest observation > 3 suspicious ones
-// - FREE users see one subtle blurred preview
-// - ÉLITE users see all detected observations
-//
-// Every word, every pixel, every space must pass:
-// 1. ¿Esto añade consciencia o ruido?
-// 2. ¿Esto muestra o juzga?
-// 3. ¿Esto podría existir en cualquier app financiera?
+// Design:
+// - Weight-based persistence: profunda lasts 4 weeks,
+//   relevante 2 weeks, ligera 1 week
+// - More negative space than content
+// - Minimal visual elements
+// - Calm, slow, contemplative rhythm
+// - No visual noise. No density.
 // ═══════════════════════════════════════════
 
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -27,6 +22,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { Crown, Link2 } from 'lucide-react';
 import { EMPTY_STATE_MESSAGE, SECTION_TITLE, SECTION_SUBTITLE } from '@/lib/patterns/copy';
+import type { ObservationWeight, WEIGHT_DURATION } from '@/lib/patterns/types';
 
 // ─── Types ───
 
@@ -34,6 +30,7 @@ interface ObservationData {
   id: string;
   text: string;
   empires: string[];
+  weight: ObservationWeight;
 }
 
 interface PatternsResponse {
@@ -42,72 +39,116 @@ interface PatternsResponse {
   totalDataPoints: number;
 }
 
-// ─── Cache key for week-based persistence ───
-// Observations are cached per week in localStorage.
-// This prevents them from changing on every page load.
-// They only refresh when the week changes.
+// ─── Week helper ───
 
 function getISOWeekKey(): string {
-  const now = new Date();
-  const d = new Date(now);
+  const d = new Date();
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
   const week1 = new Date(d.getFullYear(), 0, 4);
   return `${d.getFullYear()}-W${1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)}`;
 }
 
+// ─── Weight-based cache ───
+// Observations persist for different durations depending on weight.
+// profunda: 4 weeks, relevante: 2 weeks, ligera: 1 week.
+// A cached observation is valid if its age < its weight's duration.
+
+const WEIGHT_WEEKS: Record<ObservationWeight, number> = {
+  ligera: 1,
+  relevante: 2,
+  profunda: 4,
+};
+
 const CACHE_KEY_PREFIX = 'vz_patterns_';
 
-interface CachedPatterns {
-  week: string;
-  data: PatternsResponse;
+interface CachedObservation {
+  id: string;
+  text: string;
+  empires: string[];
+  weight: ObservationWeight;
+  cachedWeek: string; // ISO week when this was cached
 }
 
-function getCachedPatterns(userId: string): CachedPatterns | null {
+interface CachedPatterns {
+  observations: CachedObservation[];
+  hasEnoughData: boolean;
+  totalDataPoints: number;
+}
+
+function weekDiff(a: string, b: string): number {
+  // Simple week difference for YYYY-WNN format
+  const parseWeek = (w: string) => {
+    const [y, wn] = w.split('-W').map(Number);
+    return y * 52 + wn;
+  };
+  return parseWeek(b) - parseWeek(a);
+}
+
+function getValidCachedObservations(userId: string): CachedPatterns | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY_PREFIX + userId);
     if (!raw) return null;
     const cached: CachedPatterns = JSON.parse(raw);
-    if (cached.week !== getISOWeekKey()) return null;
-    return cached;
+
+    const currentWeek = getISOWeekKey();
+
+    // Filter: keep observations that haven't exceeded their weight duration
+    const valid = cached.observations.filter(obs => {
+      const age = weekDiff(obs.cachedWeek, currentWeek);
+      return age < WEIGHT_WEEKS[obs.weight];
+    });
+
+    if (valid.length === 0 && cached.observations.length > 0) {
+      // All expired — clear cache to trigger fresh fetch
+      localStorage.removeItem(CACHE_KEY_PREFIX + userId);
+      return null;
+    }
+
+    return {
+      ...cached,
+      observations: valid,
+    };
   } catch {
     return null;
   }
 }
 
-function setCachedPatterns(userId: string, data: PatternsResponse): void {
+function setCachedObservations(userId: string, data: PatternsResponse): void {
   try {
-    const cached: CachedPatterns = { week: getISOWeekKey(), data };
+    const currentWeek = getISOWeekKey();
+    const cached: CachedPatterns = {
+      observations: data.observations.map(obs => ({
+        ...obs,
+        cachedWeek: currentWeek,
+      })),
+      hasEnoughData: data.hasEnoughData,
+      totalDataPoints: data.totalDataPoints,
+    };
     localStorage.setItem(CACHE_KEY_PREFIX + userId, JSON.stringify(cached));
   } catch {
-    // localStorage not available (TWA, private mode) — graceful degradation
+    // localStorage unavailable — graceful
   }
 }
 
-// ─── Single Observation Card ───
-// The soul of this feature — one human observation.
-// Calm. Quiet. No visual noise.
+// ─── Single Observation ───
+// Maximum calm. Minimum visual. Just the text and a whisper.
 
 function ObservationCard({ observation }: { observation: ObservationData }) {
   return (
-    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 observation-enter">
-      {/* The observation — calm, italic, intimate */}
-      <p className="text-[#c8a55a]/80 text-sm sm:text-base italic leading-relaxed">
+    <div className="py-4">
+      <p className="text-[#c8a55a]/70 text-sm sm:text-base italic leading-relaxed">
         {observation.text}
       </p>
 
-      {/* Subtle empire connection — barely visible, just a hint */}
       {observation.empires.length > 1 && (
-        <div className="flex items-center gap-2 mt-4">
-          <Link2 size={10} className="text-[#2a2a2a]" />
-          <div className="flex items-center gap-1.5">
-            {observation.empires.map((empire, i) => (
-              <span key={i} className="text-[10px] text-[#333] tracking-wide">
-                {i > 0 && <span className="text-[#1a1a1a] mr-1.5">·</span>}
-                {empire}
-              </span>
-            ))}
-          </div>
+        <div className="flex items-center gap-1.5 mt-3">
+          {observation.empires.map((empire, i) => (
+            <span key={i} className="text-[9px] text-[#2a2a2a] tracking-wide">
+              {i > 0 && <span className="text-[#1a1a1a] mr-1.5">·</span>}
+              {empire}
+            </span>
+          ))}
         </div>
       )}
     </div>
@@ -115,42 +156,29 @@ function ObservationCard({ observation }: { observation: ObservationData }) {
 }
 
 // ─── Empty / Waiting State ───
-// When there's not enough data yet — clean, calm silence.
 
 function WaitingState() {
   return (
-    <div className="text-center py-10 sm:py-14">
-      <div className="w-10 h-10 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/8 flex items-center justify-center mx-auto mb-4">
-        <Link2 size={14} className="text-[#c8a55a]/20" />
-      </div>
-      <p className="text-[12px] text-[#383838] leading-relaxed max-w-xs mx-auto">
+    <div className="text-center py-8">
+      <p className="text-[11px] text-[#333] leading-relaxed max-w-xs mx-auto">
         {EMPTY_STATE_MESSAGE}
       </p>
     </div>
   );
 }
 
-// ─── Premium Preview for FREE Users ───
-// One observation blurred + subtle gold crown hint.
-// Elegant, not aggressive.
+// ─── Premium Preview ───
 
 function PremiumPreview({ observation }: { observation: ObservationData }) {
   return (
     <div className="relative">
-      {/* The blurred observation — gives sense of depth */}
-      <div className="blur-[5px] select-none pointer-events-none saturate-50 opacity-60">
+      <div className="blur-[6px] select-none pointer-events-none saturate-40 opacity-50">
         <ObservationCard observation={observation} />
       </div>
-
-      {/* Overlay — subtle, quiet */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]/30 rounded-xl">
-        <div className="flex flex-col items-center gap-2 px-6 text-center">
-          <div className="w-8 h-8 rounded-full bg-[#c8a55a]/8 border border-[#c8a55a]/15 flex items-center justify-center">
-            <Crown size={12} className="text-[#c8a55a]/50" />
-          </div>
-          <p className="text-[11px] text-[#555]">
-            Las conexiones entre tu vida se revelan con el tiempo
-          </p>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex items-center gap-1.5">
+          <Crown size={9} className="text-[#c8a55a]/30" />
+          <span className="text-[10px] text-[#444]">Élite</span>
         </div>
       </div>
     </div>
@@ -171,11 +199,15 @@ export default function LifePatternsSection() {
   const fetchPatterns = useCallback(async () => {
     setLoading(true);
     try {
-      // Check localStorage cache first
+      // Check cache first — weight-based persistence
       if (user?.id) {
-        const cached = getCachedPatterns(user.id);
-        if (cached) {
-          setData(cached.data);
+        const cached = getValidCachedObservations(user.id);
+        if (cached && cached.observations.length > 0) {
+          setData({
+            observations: cached.observations,
+            hasEnoughData: cached.hasEnoughData,
+            totalDataPoints: cached.totalDataPoints,
+          });
           setLoading(false);
           return;
         }
@@ -186,9 +218,8 @@ export default function LifePatternsSection() {
         const result = await res.json();
         setData(result);
 
-        // Cache for the current week
         if (user?.id) {
-          setCachedPatterns(user.id, result);
+          setCachedObservations(user.id, result);
         }
       }
     } catch (error) {
@@ -199,80 +230,53 @@ export default function LifePatternsSection() {
   }, [apiFetch, user?.id]);
 
   useEffect(() => {
-    // Only fetch once per mount
     if (!fetchedRef.current) {
       fetchedRef.current = true;
       fetchPatterns();
     }
   }, [fetchPatterns]);
 
-  // ── Don't show anything while loading ──
   if (loading) return null;
-
-  // ── No data at all — clean silence ──
   if (!data) return null;
 
-  // ── Not enough data yet — show waiting state ──
+  // Not enough data yet
   if (!data.hasEnoughData && data.observations.length === 0) {
     return (
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-7 h-7 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
-            <Link2 size={13} className="text-[#c8a55a]/30" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-[13px] font-medium text-white/80">{SECTION_TITLE}</h2>
-            <p className="text-[10px] text-[#444]">{SECTION_SUBTITLE}</p>
-          </div>
-          {/* Élite badge — barely visible */}
-          <div className="flex items-center gap-1 shrink-0">
-            <Crown size={8} className="text-[#c8a55a]/30" />
-            <span className="text-[8px] text-[#c8a55a]/30 font-medium tracking-wider">ÉLITE</span>
-          </div>
+      <div className="py-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Link2 size={11} className="text-[#c8a55a]/20" />
+          <span className="text-[11px] text-[#333]">{SECTION_TITLE}</span>
+          <Crown size={7} className="text-[#c8a55a]/20 ml-auto" />
         </div>
         <WaitingState />
       </div>
     );
   }
 
-  // ── Has observations ──
   const observations = data.observations;
 
   return (
-    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-      {/* Section Header — quiet, contemplative */}
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-7 h-7 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
-          <Link2 size={13} className="text-[#c8a55a]/30" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-[13px] font-medium text-white/80">{SECTION_TITLE}</h2>
-          <p className="text-[10px] text-[#444]">{SECTION_SUBTITLE}</p>
-        </div>
-        {/* Élite badge — barely visible, not promotional */}
-        <div className="flex items-center gap-1 shrink-0">
-          <Crown size={8} className="text-[#c8a55a]/30" />
-          <span className="text-[8px] text-[#c8a55a]/30 font-medium tracking-wider">ÉLITE</span>
-        </div>
+    <div className="py-6">
+      {/* Header — whisper, not announcement */}
+      <div className="flex items-center gap-2 mb-2">
+        <Link2 size={11} className="text-[#c8a55a]/20" />
+        <span className="text-[11px] text-[#333]">{SECTION_TITLE}</span>
+        <span className="text-[9px] text-[#222] ml-1">{SECTION_SUBTITLE}</span>
+        <Crown size={7} className="text-[#c8a55a]/20 ml-auto" />
       </div>
 
       {/* Observations */}
       {observations.length > 0 ? (
-        <div className="space-y-3">
+        <div className="divide-y divide-[#111]">
           {isPremium ? (
-            // ── ÉLITE: Show all observations ──
             observations.map((obs) => (
               <ObservationCard key={obs.id} observation={obs} />
             ))
           ) : (
-            // ── FREE: One blurred preview + subtle depth hint ──
-            <>
-              <PremiumPreview observation={observations[0]} />
-            </>
+            <PremiumPreview observation={observations[0]} />
           )}
         </div>
       ) : (
-        // ── Enough data but no patterns detected — respectful silence ──
         <WaitingState />
       )}
     </div>

@@ -2,16 +2,9 @@
 // Patrones de Vida — Type Definitions
 // ═══════════════════════════════════════════
 //
-// Refined. Stripped down. Only connections that
-// can be properly validated with real data.
-//
-// Removed: finanzas-habitos, finanzas-social
-// Reason: These connections cannot be validated
-// with weekly correlation. Without proper
-// validation, they produce false positives
-// and trivially obvious observations.
-//
 // Silence over mediocrity.
+// Weight over quantity.
+// Stability over novelty.
 // ═══════════════════════════════════════════
 
 // ─── Connection Types ───
@@ -24,9 +17,30 @@ export type EmpireConnection =
   | 'finanzas-estres'
   | 'finanzas-sueno';
 
+// ─── Observation Weight ───
+// Internal. NEVER shown to user.
+// Controls how long an observation persists and how
+// frequently it can appear.
+//
+// ligera:   low confidence, brief appearance, easy to replace
+// relevante: solid confidence, stays longer, not easily replaced
+// profunda:  high confidence + high consistency, stays weeks,
+//            only replaced by something equally strong
+
+export type ObservationWeight = 'ligera' | 'relevante' | 'profunda';
+
+// ─── Weight Configuration ───
+// How long each weight level persists in the cache.
+// In ISO weeks.
+
+export const WEIGHT_DURATION: Record<ObservationWeight, number> = {
+  ligera: 1,    // 1 week — appears and goes
+  relevante: 2, // 2 weeks — stays a bit
+  profunda: 4,  // 4 weeks — stays, only replaced by equal or stronger
+};
+
 // ─── Pattern Signal ───
 // What the data is telling us — raw signal before human copy.
-// Now includes validation metadata.
 
 export interface PatternSignal {
   /** Unique identifier for this pattern type */
@@ -43,11 +57,12 @@ export interface PatternSignal {
   consistencyScore: number;
   /** How many anomalous weeks were excluded */
   anomaliesExcluded: number;
+  /** Computed emotional weight */
+  weight: ObservationWeight;
 }
 
 // ─── Life Observation ───
 // The final human-readable observation.
-// This is what the user sees — calm, intimate, non-judgmental.
 
 export interface LifeObservation {
   /** Unique ID */
@@ -60,6 +75,8 @@ export interface LifeObservation {
   empires: string[];
   /** Internal confidence — NEVER exposed to user */
   confidence: number;
+  /** Internal weight — controls persistence duration */
+  weight: ObservationWeight;
 }
 
 // ─── Cross-Empire Data ───
@@ -92,7 +109,7 @@ export interface CrossEmpireData {
     completedAt: string;
   }[];
 
-  // Hábitos (HabitLog) — kept for future validation
+  // Hábitos (HabitLog)
   habitLogs: {
     name: string;
     streak: number;

@@ -74,7 +74,7 @@ export const EVOLUTION_MORE_ACTIVE = 'Un mes con más movimiento que el anterior
 export const PATTERNS_TITLE = 'Conexiones';
 export const PATTERNS_NONE = '';
 
-export const MEMORIES_TITLE = 'Momentos que registraste';
+export const MEMORIES_TITLE = 'Momentos';
 
 export const FINANCIAL_BALANCE_TITLE = 'Tu mes financiero';
 export const FINANCIAL_NO_DATA = 'Sin movimientos registrados este mes';
@@ -88,7 +88,7 @@ export const RHYTHM_STEADY = 'Un mes con ritmo constante';
 // ─── Empty states ───
 
 export const NO_DATA_TITLE = 'Aún no hay datos de este mes';
-export const NO_DATA_SUBTITLE = 'Cuando registres tu vida en VitaZen, aquí aparecerá una observación calmada de cómo fue el mes.';
+export const NO_DATA_SUBTITLE = 'No hay prisa.';
 
 // ─── FREE vs ÉLITE ───
 
