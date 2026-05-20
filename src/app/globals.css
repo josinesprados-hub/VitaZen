@@ -1921,3 +1921,88 @@ input, textarea, select {
     padding-bottom: 2rem;
   }
 }
+
+/* ═══════════════════════════════════════════
+   Vital Dashboard — Contemplative Composition
+   ═══════════════════════════════════════════
+   
+   The dashboard is NOT a panel. It's a vital state.
+   More air. Less modules. More meaning.
+   
+   Desktop: two-column editorial layout
+   Mobile: vertical rhythm with generous spacing
+   ═══════════════════════════════════════════ */
+
+/* Empire list item — quiet companion, not widget */
+.empire-list-item {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.empire-list-item:hover {
+  background-color: #0a0a0a;
+}
+
+/* Vital state observation — the core emotional text */
+.vital-observation {
+  font-size: 1.125rem;
+  font-weight: 300;
+  color: #bbb;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+}
+@media (min-width: 640px) {
+  .vital-observation {
+    font-size: 1.25rem;
+    line-height: 1.65;
+  }
+}
+
+/* Status dot — breathing indicator of current state */
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.status-dot-stable { background-color: rgba(200, 165, 90, 0.5); }
+.status-dot-progress { background-color: rgba(200, 165, 90, 0.7); }
+.status-dot-overloaded { background-color: rgba(139, 111, 58, 0.6); }
+.status-dot-focused { background-color: rgba(200, 165, 90, 0.9); }
+
+/* Empire progress whisper — almost invisible, just presence */
+.progress-whisper {
+  height: 1px;
+  background: #1a1a1a;
+  overflow: hidden;
+  border-radius: 9999px;
+}
+.progress-whisper-fill {
+  background: rgba(200, 165, 90, 0.12);
+  border-radius: 9999px;
+  transition: width 0.7s ease-out;
+}
+
+/* Check-in invitation — calm, not commanding */
+.checkin-invitation {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+.checkin-invitation:hover {
+  color: #888;
+}
+
+/* Desktop column breathing — more generous spacing on larger screens */
+@media (min-width: 1024px) {
+  .lg\:col-span-7 {
+    padding-right: 1rem;
+  }
+  .lg\:col-span-5 {
+    padding-left: 1rem;
+  }
+}
+@media (min-width: 1280px) {
+  .xl\:col-span-8 {
+    padding-right: 2rem;
+  }
+  .xl\:col-span-4 {
+    padding-left: 2rem;
+  }
+}

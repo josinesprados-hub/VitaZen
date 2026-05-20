@@ -276,30 +276,20 @@ export default function LifePatternsSection() {
   // Loading state (no cache, first fetch pending)
   if (!data) return <SilentSkeleton />;
 
-  // Not enough data yet
+  // Not enough data yet — silence, not a skeleton
   if (!data.hasEnoughData && data.observations.length === 0) {
-    return (
-      <div className="py-6 sm:py-8">
-        <div className="flex items-center gap-2 mb-4">
-          <Link2 size={11} className="text-[#c8a55a]/20" />
-          <span className="text-[11px] sm:text-xs text-[#333]">{SECTION_TITLE}</span>
-          <Crown size={7} className="text-[#c8a55a]/20 ml-auto" />
-        </div>
-        <WaitingState />
-      </div>
-    );
+    return null;
   }
 
   const observations = data.observations;
 
   return (
-    <div className="py-6 sm:py-8">
+    <div className="py-2 sm:py-4">
       {/* Header — whisper, not announcement */}
-      <div className="flex items-center gap-2 mb-2">
-        <Link2 size={11} className="text-[#c8a55a]/20" />
-        <span className="text-[11px] sm:text-xs text-[#333]">{SECTION_TITLE}</span>
-        <span className="text-[9px] text-[#222] ml-1">{SECTION_SUBTITLE}</span>
-        <Crown size={7} className="text-[#c8a55a]/20 ml-auto" />
+      <div className="flex items-center gap-2 mb-3">
+        <Link2 size={10} className="text-[#c8a55a]/15" />
+        <span className="text-[10px] sm:text-[11px] text-[#333]">{SECTION_TITLE}</span>
+        <Crown size={6} className="text-[#c8a55a]/15 ml-auto" />
       </div>
 
       {/* Observations */}

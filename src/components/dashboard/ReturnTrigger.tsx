@@ -3,23 +3,18 @@
 import { useEffect, useState } from 'react';
 
 // ═══════════════════════════════════════════
-// Daily Return Trigger — Dynamic welcome back
+// Return Trigger — quiet welcome back
 // ═══════════════════════════════════════════
 //
+// A whisper, not a banner.
 // Detects time since last session and shows
 // a human, calm message. Never manipulative.
 //
-// Storage: localStorage 'vitazen_last_seen'
-//
-// Messages by gap:
-//   Same day    → "Bienvenido de nuevo."
-//   1 day       → "Mantienes el ritmo."
-//   2-3 days    → "Hace unos días que no aparecías."
-//   4-7 days    → "Bueno verte de nuevo."
-//   7+ days     → "Aquí estás. Eso es lo que importa."
+// The message appears under the greeting,
+// like a quiet note. Not a card. Not a widget.
 
 function getReturnMessage(daysSince: number): string {
-  if (daysSince <= 0) return 'Bienvenido de nuevo.';
+  if (daysSince <= 0) return '';
   if (daysSince === 1) return 'Mantienes el ritmo.';
   if (daysSince <= 3) return 'Hace unos días que no aparecías.';
   if (daysSince <= 7) return 'Bueno verte de nuevo.';
@@ -53,9 +48,6 @@ export function ReturnTrigger() {
   if (!message) return null;
 
   return (
-    <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 sm:gap-3 card-enter">
-      <div className="w-1 h-6 sm:h-8 rounded-full bg-[#c8a55a]/20 shrink-0" />
-      <p className="text-xs sm:text-sm text-[#999] italic">{message}</p>
-    </div>
+    <p className="text-sm text-[#555] mt-1 card-enter">{message}</p>
   );
 }

@@ -152,9 +152,9 @@ export default function PremiumReflection() {
   }
 
   return (
-    <div className="flex justify-center py-2 sm:py-6">
+    <div className="flex justify-center py-3 sm:py-8">
       <p
-        className={`text-center text-[#c8a55a]/90 text-sm sm:text-lg font-light italic tracking-wide max-w-2xl transition-opacity duration-500 px-4 select-none ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`text-center text-[#c8a55a]/70 text-sm sm:text-lg font-light italic tracking-wide max-w-xl transition-opacity duration-700 px-4 select-none leading-relaxed ${visible ? 'opacity-100' : 'opacity-0'}`}
       >
         «{reflection}»
       </p>
