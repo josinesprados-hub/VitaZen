@@ -12,11 +12,15 @@
   --color-destructive: #ef4444;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Unified transition timings */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-smooth: 300ms ease-out;
-  --transition-slow: 700ms ease-out;
+  /* Unified transition timings — calm, deliberate, premium.
+     Fast: micro-feedback (focus, active states)
+     Base: standard transitions (borders, colors, visibility)
+     Smooth: content changes (modals, sections, data updates)
+     Slow: structural changes (progress bars, ring animations) */
+  --transition-fast: 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-base: 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-smooth: 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 @layer base {
@@ -62,11 +66,12 @@ html, body {
   background: #c8a55a;
 }
 
-/* Custom focus styles */
+/* Custom focus styles — calm, present, not flashy */
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #c8a55a;
-  box-shadow: 0 0 0 1px #c8a55a;
+  box-shadow: 0 0 0 1px rgba(200, 165, 90, 0.3);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 /* Error state borders must not be overridden by focus gold */
 input.border-red-500:focus, textarea.border-red-500:focus, select.border-red-500:focus {
@@ -192,19 +197,19 @@ button, [role="button"] {
    and dashboard sections, where modals could stay permanently invisible
    on low-end Android devices. Now uses transform-only like sectionStaggerIn. */
 @keyframes scaleIn {
-  from { transform: scale(0.95); }
+  from { transform: scale(0.97); }
   to { transform: scale(1); }
 }
 
 @keyframes slideInUp {
-  from { transform: translateY(10px); }
+  from { transform: translateY(4px); }
   to { transform: translateY(0); }
 }
 
 /* Context menu entrance — transform only, never opacity:0.
    Same compositing bug fix as scaleIn above. */
 @keyframes contextMenuIn {
-  from { transform: scale(0.95) translateY(-4px); }
+  from { transform: scale(0.97) translateY(-2px); }
   to { transform: scale(1) translateY(0); }
 }
 
@@ -215,17 +220,17 @@ button, [role="button"] {
   100% { width: 100%; }
 }
 .route-progress-bar {
-  animation: routeProgressSlide 0.4s ease-out forwards;
+  animation: routeProgressSlide 0.5s ease-out forwards;
 }
 
-/* Unified entrance animation — transform only, never opacity:0 */
+/* Unified entrance animation — slow, deliberate, barely perceptible */
 .animate-in {
-  animation: slideInUp 0.35s ease-out both;
+  animation: slideInUp 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
-/* Context menu animation */
+/* Context menu animation — measured, not snappy */
 .context-menu {
-  animation: contextMenuIn 0.18s ease-out both;
+  animation: contextMenuIn 0.22s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
 /* Mobile drawer — slide in from left */
@@ -234,7 +239,7 @@ button, [role="button"] {
   to { transform: translateX(0); }
 }
 .drawer-enter {
-  animation: drawerSlideIn 0.25s ease-out both;
+  animation: drawerSlideIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
 /* Mentor chat — full viewport on mobile, normal flow on desktop.
@@ -275,10 +280,10 @@ html { scroll-behavior: smooth; }
   background: #0a0a0a;
   border: 1px solid #1a1a1a;
   border-radius: 0.75rem;
-  transition: border-color var(--transition-base);
+  transition: border-color var(--transition-smooth);
 }
 .card-primary:hover {
-  border-color: rgba(200, 165, 90, 0.08);
+  border-color: rgba(200, 165, 90, 0.06);
 }
 
 /* Gold-accent card — challenge, check-in */
@@ -289,8 +294,8 @@ html { scroll-behavior: smooth; }
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 .card-accent:hover {
-  border-color: rgba(200, 165, 90, 0.35);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-color: rgba(200, 165, 90, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* Inner card — list items, sub-sections */
@@ -301,7 +306,7 @@ html { scroll-behavior: smooth; }
   transition: border-color var(--transition-base);
 }
 .card-inner:hover {
-  border-color: rgba(200, 165, 90, 0.12);
+  border-color: rgba(200, 165, 90, 0.08);
 }
 
 /* ═══════════════════════════════════════════
@@ -313,7 +318,7 @@ html { scroll-behavior: smooth; }
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 /* Modal content — consistent entrance */
@@ -321,7 +326,7 @@ html { scroll-behavior: smooth; }
   background: #0a0a0a;
   border: 1px solid rgba(200, 165, 90, 0.2);
   border-radius: 1rem;
-  animation: scaleIn 0.25s ease-out both;
+  animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
 /* Mobile: bottom-sheet style modal for small screens */
@@ -362,20 +367,20 @@ html { scroll-behavior: smooth; }
   background: #0a0a0a;
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 1rem;
-  animation: scaleIn 0.25s ease-out both;
+  animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
 /* Premium modal backdrop — deeper blur */
 .premium-modal-backdrop {
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  animation: fadeIn 0.25s ease-out;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Premium modal entrance */
 .premium-modal {
-  animation: scaleIn 0.3s ease-out both;
+  animation: scaleIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
 /* ═══════════════════════════════════════════
@@ -424,8 +429,8 @@ html { scroll-behavior: smooth; }
   transition: all var(--transition-base);
 }
 .pill:active {
-  transform: scale(0.95);
-  transition: transform 0.08s ease;
+  transform: scale(0.97);
+  transition: transform 0.12s ease;
 }
 
 /* ═══════════════════════════════════════════
@@ -492,15 +497,15 @@ html { scroll-behavior: smooth; }
   padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  transition: background-color var(--transition-base), transform 0.1s ease, box-shadow 0.2s ease;
+  transition: background-color var(--transition-base), box-shadow var(--transition-smooth);
 }
 .btn-primary:hover {
   background: #d4b468;
-  box-shadow: 0 2px 12px rgba(200, 165, 90, 0.15);
+  box-shadow: 0 2px 12px rgba(200, 165, 90, 0.12);
 }
 .btn-primary:active:not(:disabled) {
-  transform: scale(0.97);
-  transition: transform 0.08s ease, background-color 0.15s ease;
+  transform: scale(0.98);
+  transition: transform 0.12s ease, background-color 0.2s ease;
 }
 .btn-primary:disabled {
   opacity: 0.5;
@@ -542,12 +547,12 @@ html { scroll-behavior: smooth; }
     110deg,
     #111111 0%,
     #111111 40%,
-    #1a1a1a 50%,
+    #141414 50%,
     #111111 60%,
     #111111 100%
   );
   background-size: 300% 100%;
-  animation: premiumSkeletonShimmer 2s ease-in-out infinite;
+  animation: premiumSkeletonShimmer 3s ease-in-out infinite;
 }
 
 /* Subtle gold-tinted shimmer variant for accent elements */
@@ -556,12 +561,12 @@ html { scroll-behavior: smooth; }
     110deg,
     #111111 0%,
     #111111 40%,
-    #1c1810 50%,
+    #161410 50%,
     #111111 60%,
     #111111 100%
   );
   background-size: 300% 100%;
-  animation: premiumSkeletonShimmer 2s ease-in-out infinite;
+  animation: premiumSkeletonShimmer 3s ease-in-out infinite;
 }
 
 @keyframes premiumSkeletonShimmer {
@@ -571,11 +576,11 @@ html { scroll-behavior: smooth; }
 
 /* Skeleton entrance — transform only, never opacity:0 */
 .skeleton-entrance {
-  animation: skeletonEntrance 0.3s ease-out forwards;
+  animation: skeletonEntrance 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 @keyframes skeletonEntrance {
   from {
-    transform: translateY(4px);
+    transform: translateY(2px);
   }
   to {
     transform: translateY(0);
@@ -589,14 +594,14 @@ html { scroll-behavior: smooth; }
 /* Gentle entrance for empty states — transform only, never opacity:0 */
 @keyframes emptyStateEnter {
   from {
-    transform: translateY(6px);
+    transform: translateY(3px);
   }
   to {
     transform: translateY(0);
   }
 }
 .empty-state-enter {
-  animation: emptyStateEnter 0.4s ease-out forwards;
+  animation: emptyStateEnter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* ═══════════════════════════════════════════
@@ -606,14 +611,14 @@ html { scroll-behavior: smooth; }
 /* Gentle entrance for error states — transform only, never opacity:0 */
 @keyframes errorStateEnter {
   from {
-    transform: translateY(8px);
+    transform: translateY(3px);
   }
   to {
     transform: translateY(0);
   }
 }
 .error-state-enter {
-  animation: errorStateEnter 0.4s ease-out forwards;
+  animation: errorStateEnter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* Subtle pulse for error icon — calm breathing, not urgent */
@@ -673,7 +678,7 @@ html { scroll-behavior: smooth; }
    ═══════════════════════════════════════════ */
 
 .sidebar-transition {
-  transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transition: width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* ═══════════════════════════════════════════
@@ -754,14 +759,14 @@ html { scroll-behavior: smooth; }
 /* Hero entrance — transform only, never opacity:0 */
 @keyframes heroFadeIn {
   from {
-    transform: translateY(8px);
+    transform: translateY(3px);
   }
   to {
     transform: translateY(0);
   }
 }
 .hero-fade-in {
-  animation: heroFadeIn 0.45s ease-out forwards;
+  animation: heroFadeIn 0.55s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* Subtle gold pulse for status icon */
@@ -874,14 +879,14 @@ html { scroll-behavior: smooth; }
 /* Recap entrance — transform only, never opacity:0, no delay */
 @keyframes recapFadeIn {
   from {
-    transform: translateY(8px);
+    transform: translateY(3px);
   }
   to {
     transform: translateY(0);
   }
 }
 .recap-fade-in {
-  animation: recapFadeIn 0.4s ease-out forwards;
+  animation: recapFadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* Ring transition for recap score circle */
@@ -1167,12 +1172,12 @@ html { scroll-behavior: smooth; }
 /* Active press state for touch feedback — subtle scale-down */
 @media (hover: none) and (pointer: coarse) {
   .touch-press:active {
-    transform: scale(0.97);
-    transition: transform 0.1s ease;
+    transform: scale(0.98);
+    transition: transform 0.12s ease;
   }
   .touch-press-sm:active {
-    transform: scale(0.95);
-    transition: transform 0.1s ease;
+    transform: scale(0.96);
+    transition: transform 0.12s ease;
   }
 }
 
@@ -1287,63 +1292,63 @@ body.scroll-locked {
    Reduced delays to prevent compositing stalls. */
 @keyframes staggerIn {
   from {
-    transform: translateY(6px);
+    transform: translateY(3px);
   }
   to {
     transform: translateY(0);
   }
 }
-.stagger-1 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.05s; }
-.stagger-2 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.10s; }
-.stagger-3 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.15s; }
-.stagger-4 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.20s; }
-.stagger-5 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.25s; }
-.stagger-6 { animation: staggerIn 0.35s ease-out forwards; animation-delay: 0.30s; }
+.stagger-1 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.03s; }
+.stagger-2 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.06s; }
+.stagger-3 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.09s; }
+.stagger-4 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.12s; }
+.stagger-5 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.15s; }
+.stagger-6 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.18s; }
 
 /* Micro-celebration — brief scale pop for completed actions.
    Applied via JS class toggle for 0.4s then removed. */
 @keyframes microCelebrate {
   0% { transform: scale(1); }
-  40% { transform: scale(1.06); }
+  50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
 .micro-celebrate {
-  animation: microCelebrate 0.4s ease-out;
+  animation: microCelebrate 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* Streak pulse — gentle breathing glow for streak indicators (🔥) */
 @keyframes streakPulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.08); }
+  50% { opacity: 0.9; transform: scale(1.04); }
 }
 .streak-pulse {
-  animation: streakPulse 2.5s ease-in-out infinite;
+  animation: streakPulse 3.5s ease-in-out infinite;
   display: inline-block;
 }
 
 /* Gentle card entrance — transform only, never opacity:0 */
 @keyframes cardEnter {
   from {
-    transform: translateY(6px);
+    transform: translateY(3px);
   }
   to {
     transform: translateY(0);
   }
 }
 .card-enter {
-  animation: cardEnter 0.35s ease-out forwards;
+  animation: cardEnter 0.45s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* Button active press feedback — stronger than touch-press, for primary actions */
 .btn-primary:active:not(:disabled) {
-  transform: scale(0.97);
-  transition: transform 0.08s ease, background-color 0.15s ease;
+  transform: scale(0.98);
+  transition: transform 0.12s ease, background-color 0.2s ease;
 }
 
 /* Value slider button active feedback */
 .value-btn:active {
-  transform: scale(0.92);
-  transition: transform 0.08s ease;
+  transform: scale(0.95);
+  transition: transform 0.12s ease;
 }
 
 /* Link tap feedback — subtle opacity shift on mobile.
@@ -1362,7 +1367,7 @@ body.scroll-locked {
   50% { opacity: 0.8; }
 }
 .gentle-pulse {
-  animation: gentlePulse 2s ease-in-out infinite;
+  animation: gentlePulse 3s ease-in-out infinite;
 }
 
 /* Check mark celebration — small pop when a check appears */
