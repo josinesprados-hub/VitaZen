@@ -61,10 +61,10 @@ async function getEligibleUsers(): Promise<EligibleUser[]> {
 // ─────────────────────────────────────────
 
 function getScoreLabel(score: number): string {
-  if (score >= 80) return 'Excelente';
-  if (score >= 60) return 'Bueno';
-  if (score >= 40) return 'Mejorable';
-  return 'En desarrollo';
+  if (score >= 80) return 'Muy activo';
+  if (score >= 60) return 'Actividad moderada';
+  if (score >= 40) return 'Semana tranquila';
+  return 'Poca actividad';
 }
 
 async function generateRecapData(userId: string, plan: string): Promise<WeeklyRecapEmailData | null> {
@@ -134,19 +134,15 @@ function generateEmailRecommendation(
   plan: string
 ): string {
   if (energy <= 35) {
-    return 'La energía ha estado baja. El descanso es parte del proceso.';
+    return 'Poca energía.';
   }
 
   if (consistency >= 65) {
-    return 'Buena consistencia esta semana.';
-  }
-
-  if (score >= 60) {
     return 'Buen ritmo.';
   }
 
-  if (score >= 30) {
-    return 'Poco a poco.';
+  if (score >= 60) {
+    return 'Semana razonable.';
   }
 
   return 'Semana tranquila.';

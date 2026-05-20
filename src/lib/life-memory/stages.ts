@@ -180,28 +180,28 @@ function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        return 'Calma. Decisiones desde la quietud.';
+        return 'Calma. Las decisiones desde la quietud.';
       return 'Un periodo con calma.';
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        return 'Crecimiento. Movimiento hacia adelante.';
+        return 'Crecimiento. Cosas en movimiento.';
       return 'Movimiento.';
 
     case 'intensity':
-      return 'Intensidad. Mucho movimiento.';
+      return 'Intensidad. Mucho pasó.';
 
     case 'dispersion':
       return 'Días muy distintos entre sí.';
 
     case 'exhaustion':
-      return 'Agotamiento. Poca energía.';
+      return 'Agotamiento. Poco en el tanque.';
 
     case 'quiet':
       return 'Silencio.';
 
     case 'stability':
-      return 'Estabilidad.';
+      return 'Estabilidad. Ritmo constante.';
 
     default:
       return '';
@@ -245,15 +245,15 @@ function generateTransitionObservation(from: StageFlavor, to: StageFlavor): stri
     'dispersion->calm': 'Menos dispersión, más calma.',
     'quiet->growth': 'Después del silencio, movimiento.',
     'quiet->stability': 'Del silencio al ritmo.',
-    'calm->growth': 'De la calma al crecimiento.',
+    'calm->growth': 'De la calma al movimiento.',
     'calm->intensity': 'Más intensidad.',
     'growth->calm': 'Más calma.',
-    'growth->stability': 'El crecimiento se asentó.',
+    'growth->stability': 'El movimiento se asentó.',
     'stability->intensity': 'Más intensidad.',
     'stability->dispersion': 'Más dispersión.',
     'stability->exhaustion': 'Agotamiento.',
     'calm->dispersion': 'Más dispersión.',
-    'growth->intensity': 'El crecimiento trajo intensidad.',
+    'growth->intensity': 'El movimiento trajo intensidad.',
     'intensity->exhaustion': 'La intensidad desgastó.',
     'exhaustion->growth': 'Del agotamiento, movimiento.',
     'quiet->calm': 'Del silencio a la calma.',

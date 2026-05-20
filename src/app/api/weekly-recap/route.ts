@@ -67,10 +67,10 @@ export interface WeeklyRecapData {
 }
 
 function getScoreLabel(score: number): string {
-  if (score >= 80) return 'Excelente';
-  if (score >= 60) return 'Bueno';
-  if (score >= 40) return 'Mejorable';
-  return 'En desarrollo';
+  if (score >= 80) return 'Muy activo';
+  if (score >= 60) return 'Actividad moderada';
+  if (score >= 40) return 'Semana tranquila';
+  return 'Poca actividad';
 }
 
 function generateMentorRecommendation(
@@ -79,45 +79,45 @@ function generateMentorRecommendation(
   comparison: WeeklyComparison | null,
   isPremium: boolean
 ): string {
-  // Priority: stress > energy > consistency > general progress
+  // Observation, not advice. The app notices. It doesn't tell you what to do.
 
   // High stress
   if (emotional.metrics.stress.value <= 35) {
     if (isPremium && comparison && comparison.stressTrend < -0.3) {
-      return 'Tu estrés ha aumentado esta semana. Te sugiero añadir una sesión de respiración consciente antes de dormir y reducir estímulos la última hora del día.';
+      return 'La presión subió esta semana.';
     }
-    return 'Tu estrés está elevado. Prueba una respiración consciente de 5 minutos antes de las comidas — puede marcar la diferencia.';
+    return 'Semana con peso.';
   }
 
   // Low energy
   if (emotional.metrics.energy.value <= 35) {
-    return 'Tu energía está baja. Revisa tu descanso y prioriza lo esencial. A veces, hacer menos pero mejor recarga más.';
+    return 'Poca energía.';
   }
 
   // Good consistency
   if (emotional.metrics.consistency.value >= 65) {
-    return 'Tu consistencia es notable. Aprovecha este momento para consolidar un hábito nuevo antes de que el momentum baje.';
+    return 'Buen ritmo.';
   }
 
   // Improving
   if (isPremium && comparison) {
     if (comparison.energyTrend > 0.5 && comparison.emotionTrend > 0) {
-      return 'Tu energía y emociones están mejorando. Mantén lo que estás haciendo — está funcionando. Ahora es buen momento para añadir un reto pequeño.';
+      return 'La energía y el ánimo mejoraron.';
     }
     if (comparison.activityTrend > 3) {
-      return 'Tu actividad ha crecido esta semana. Buen impulso. Sigue así y recuerda que la calidad importa más que la cantidad.';
+      return 'Más actividad esta semana.';
     }
     if (comparison.activityTrend <= -5) {
-      return 'Tu actividad ha bajado esta semana. No es un problema — solo información. Retoma cuando estés listo, sin presión.';
+      return 'Menos actividad esta semana.';
     }
   }
 
-  // General encouraging
+  // Moderate activity
   if (summary.score >= 50) {
-    return 'Vas por buen camino. La clave no es la perfección, sino la dirección. Sigue sumando acciones pequeñas y consistentes.';
+    return 'Semana razonable.';
   }
 
-  return 'Cada paso cuenta. Empieza por lo más simple hoy: un check-in, un hábito, 5 minutos de meditación. El momentum se construye desde lo pequeño.';
+  return '';
 }
 
 export async function GET(request: NextRequest) {

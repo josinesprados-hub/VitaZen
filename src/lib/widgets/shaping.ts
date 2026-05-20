@@ -48,8 +48,8 @@ function getTodayDateKey(): string {
 // PREMIUM users get category info for themed rendering.
 
 const REFLECTION_CATEGORIES = [
-  'disciplina', 'claridad', 'presencia', 'enfoque',
-  'propósito', 'crecimiento', 'bienestar', 'mente',
+  'ritmo', 'claridad', 'presencia', 'atención',
+  'dirección', 'movimiento', 'energía', 'silencio',
 ] as const;
 
 export async function shapeReflectionPayload(
@@ -82,8 +82,8 @@ export async function shapeReflectionPayload(
 // No breakdown, no detailed scores — just the headline.
 
 function getMomentumLevel(score: number): { level: string; description: string } {
-  if (score >= 61) return { level: 'fuerte', description: 'Consistencia notable.' };
-  if (score >= 31) return { level: 'estable', description: 'Buen ritmo.' };
+  if (score >= 61) return { level: 'fuerte', description: 'Ritmo constante.' };
+  if (score >= 31) return { level: 'estable', description: 'Ritmo estable.' };
   return { level: 'bajo', description: '' };
 }
 
@@ -347,11 +347,11 @@ export async function shapeDailyFocusPayload(
 
   // Calm fallback tips per empire (no DB dependency)
   const FALLBACK_TIPS: Record<string, { title: string; content: string }> = {
-    disciplina: { title: 'Disciplina', content: 'La disciplina no grita. Simplemente aparece cada día.' },
-    mente: { title: 'Claridad', content: 'La claridad llega eliminando lo innecesario.' },
-    energia: { title: 'Energía', content: 'La energía se gestiona, no se busca.' },
-    riqueza: { title: 'Finanzas', content: 'El dinero no es la meta. La tranquilidad sí.' },
-    crecimiento: { title: 'Crecimiento', content: 'Creces eligiendo lo difícil con amabilidad.' },
+    disciplina: { title: 'Disciplina', content: 'Días que se repiten.' },
+    mente: { title: 'Calma', content: 'La calma se nota cuando llega.' },
+    energia: { title: 'Energía', content: 'El cuerpo sabe antes que la cabeza.' },
+    riqueza: { title: 'Finanzas', content: 'El dinero refleja decisiones.' },
+    crecimiento: { title: 'Crecimiento', content: 'Algunas cosas cambian sin hacer ruido.' },
   };
 
   const fallback = FALLBACK_TIPS[empire] || FALLBACK_TIPS.mente;
@@ -370,16 +370,16 @@ export async function shapeDailyFocusPayload(
 // Uses the same REFLECTIONS collection but framed as a quote widget.
 
 const QUOTE_CATEGORIES = [
-  'Disciplina silenciosa',
-  'Claridad mental',
-  'Presencia y calma',
-  'Enfoque',
-  'Propósito',
-  'Crecimiento personal',
-  'Bienestar y energía',
-  'Mente y meditación',
-  'Gratitud',
-  'Soltar y simplicidad',
+  'Ritmo',
+  'Claridad',
+  'Calma',
+  'Atención',
+  'Dirección',
+  'Movimiento',
+  'Energía',
+  'Silencio',
+  'Presencia',
+  'Soltar',
 ] as const;
 
 export async function shapeCalmQuotePayload(

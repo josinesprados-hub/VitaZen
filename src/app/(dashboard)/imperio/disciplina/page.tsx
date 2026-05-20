@@ -316,9 +316,9 @@ export default function DisciplinaPage() {
         {habits.length === 0 ? (
           <PremiumEmptyState
             icon={Check}
-            title="Tu espacio de hábitos está listo"
-            subtitle="Empieza con uno pequeño. La consistencia hace el resto."
-            cta="Crear primer hábito"
+            title="Aún sin hábitos"
+            subtitle="Cuando quieras."
+            cta="Crear hábito"
             onCta={() => setShowAddHabit(true)}
             size="sm"
             variant="gold"

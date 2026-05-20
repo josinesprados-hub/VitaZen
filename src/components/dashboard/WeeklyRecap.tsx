@@ -192,12 +192,12 @@ export function WeeklyRecap() {
         emotionalState: {
           status: 'enfocado',
           statusLabel: 'Enfocado',
-          statusDescription: 'Tu energía y enfoque están alineados. Es un buen momento para tareas que requieran concentración profunda.',
+          statusDescription: 'Claridad y energía alineadas.',
           energy: 75,
           focus: 82,
           calm: 65,
           consistency: 71,
-          recommendation: 'Aprovecha este estado para avanzar en tu objetivo principal del día.',
+          recommendation: 'Claridad. Lo que hagas con ella es tuyo.',
         },
         evolution: {
           emotionTrend: 0.3,
@@ -213,9 +213,9 @@ export function WeeklyRecap() {
           category: 'hábitos',
           icon: '✅',
           title: 'Racha de 7 días en hábitos',
-          description: 'Tu constancia en Disciplina es notable. Estás en el percentil superior de consistencia esta semana.',
+          description: '7 días seguidos en Disciplina.',
         },
-        mentorRecommendation: 'Tu disciplina está dando frutos. La racha de 7 días en hábitos refleja una intención clara. Recomiendo mantener el ritmo y añadir una meditación breve antes de dormir para consolidar el progreso emocional.',
+        mentorRecommendation: 'Buen ritmo esta semana. La disciplina se nota.',
         plan: 'PREMIUM',
       });
       setLoading(false);

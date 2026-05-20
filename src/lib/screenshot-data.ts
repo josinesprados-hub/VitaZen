@@ -70,8 +70,8 @@ export const SCREENSHOT_TODAY_CHECKIN = {
   energy: 4,
   focus: 3,
   stress: 2,
-  intention: 'Hoy elijo avanzar con calma y propósito',
-  gratitude: 'Agradezco la energía para empezar el día',
+  intention: 'Un día a la vez',
+  gratitude: 'Cosas pequeñas',
   createdAt: new Date().toISOString(),
 };
 
@@ -80,7 +80,7 @@ export const SCREENSHOT_TODAY_CHECKIN = {
 export const SCREENSHOT_MOMENTUM = {
   score: 74,
   level: 'fuerte',
-  description: 'Buen ritmo esta semana.',
+  description: 'Ritmo estable.',
   trend: 'up' as const,
   currentStreak: 9,
 };
@@ -152,7 +152,7 @@ export const SCREENSHOT_INSIGHTS_LIST = [
     category: 'hábitos',
     icon: '✅',
     title: 'Racha de 7 días en hábitos',
-    description: 'Tu constancia en Disciplina es notable. Estás en el percentil superior de consistencia esta semana.',
+    description: '7 días seguidos en Disciplina.',
     value: '7 días',
   },
   {

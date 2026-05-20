@@ -267,7 +267,7 @@ export default function CheckinPage() {
             <Sunrise size={20} className="text-[#c8a55a] sm:w-6 sm:h-6" />
             <h1 className="text-lg sm:text-2xl font-bold text-white">Check-in Diario</h1>
           </div>
-          <p className="subtitle-silent">Conecta contigo cada día</p>
+          <p className="subtitle-silent">Check-in</p>
         </div>
         <button
           onClick={() => { setEditingCheckin(null); setShowModal(true); }}

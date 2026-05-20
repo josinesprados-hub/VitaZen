@@ -19,7 +19,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://vitazen.cc'),
-  title: 'VitaZen — Transforma tu vida',
+  title: 'VitaZen',
   description: 'Ecosistema de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
   icons: {
     icon: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
   },
   openGraph: {
-    title: 'VitaZen — Transforma tu vida',
+    title: 'VitaZen',
     description: 'Ecosistema de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
     images: [
       { url: '/images/og-share-preview.png', width: 1200, height: 630, alt: 'VitaZen' },
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VitaZen — Transforma tu vida',
+    title: 'VitaZen',
     description: 'Ecosistema de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
     images: ['/images/og-share-preview.png'],
   },

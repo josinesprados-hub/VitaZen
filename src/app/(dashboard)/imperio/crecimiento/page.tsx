@@ -329,7 +329,7 @@ export default function CrecimientoPage() {
               </div>
               <div>
                 <label className="text-sm text-[#999] mb-1 block">Gratitud</label>
-                <input type="text" placeholder="¿Por qué estás agradecido hoy?" value={form.gratitude} onChange={(e) => setForm({ ...form, gratitude: e.target.value })}
+                <input type="text" placeholder="Algo que agradecer..." value={form.gratitude} onChange={(e) => setForm({ ...form, gratitude: e.target.value })}
                   className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
               </div>
             </div>

@@ -382,7 +382,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '🔋',
       title: 'Energía baja',
       description: isPremium
-        ? `Promedio ${summary.checkins.avgEnergy}/5. Sueño, nutrición y movimiento.`
+        ? `Promedio ${summary.checkins.avgEnergy}/5.`
         : `Promedio ${summary.checkins.avgEnergy}/5.`,
     });
   }
@@ -514,7 +514,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '🌱',
       title: 'Semana tranquila',
       description: isPremium
-        ? `${summary.score}/100. Punto de partida. Un área, un paso.`
+        ? `${summary.score}/100.`
         : `${summary.score}/100.`,
     });
   }

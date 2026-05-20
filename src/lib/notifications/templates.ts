@@ -43,6 +43,16 @@ const CHECKIN_TEMPLATES: NotificationTemplate[] = [
     body: 'Tu espacio está ahí.',
     url: '/checkin',
   },
+  {
+    title: 'Buen inicio',
+    body: 'Si tienes un momento.',
+    url: '/checkin',
+  },
+  {
+    title: 'El día',
+    body: 'Tiene un rato para ti.',
+    url: '/checkin',
+  },
 ];
 
 const STREAK_TEMPLATES: NotificationTemplate[] = [
@@ -72,6 +82,11 @@ const WEEKLY_RECAP_TEMPLATES: NotificationTemplate[] = [
   {
     title: 'La semana',
     body: 'Un momento para mirar atrás.',
+    url: '/insights',
+  },
+  {
+    title: 'Esta semana',
+    body: 'Si quieres mirar atrás.',
     url: '/insights',
   },
 ];
@@ -128,6 +143,16 @@ const REFLECTION_TEMPLATES: NotificationTemplate[] = [
   {
     title: 'Un momento quieto',
     body: 'Antes de que el día se vaya.',
+    url: '/timeline',
+  },
+  {
+    title: 'La noche',
+    body: 'Un momento antes de descansar.',
+    url: '/timeline',
+  },
+  {
+    title: 'Quietud',
+    body: 'Si hay algo que quieras notar.',
     url: '/timeline',
   },
 ];

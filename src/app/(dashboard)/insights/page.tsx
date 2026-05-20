@@ -94,10 +94,10 @@ function getScoreColor(score: number): string {
 }
 
 function getScoreLabel(score: number): string {
-  if (score >= 80) return 'Excelente';
-  if (score >= 60) return 'Bueno';
-  if (score >= 40) return 'Mejorable';
-  return 'En desarrollo';
+  if (score >= 80) return 'Muy activo';
+  if (score >= 60) return 'Actividad moderada';
+  if (score >= 40) return 'Semana tranquila';
+  return 'Poca actividad';
 }
 
 function getCategoryHref(category: string): string {
@@ -385,8 +385,8 @@ export default function InsightsPage() {
       ) : (
         <PremiumEmptyState
           icon={Sparkles}
-          title="Los insights llegarán con tu actividad"
-          subtitle="Registra hábitos, meditaciones o check-ins y los patrones aparecerán solos."
+          title="Las observaciones llegarán con el tiempo"
+          subtitle="Con el tiempo."
           size="md"
           variant="gold"
         />

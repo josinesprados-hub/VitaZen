@@ -117,8 +117,8 @@ export function OnboardingRecommendations() {
                 <Sparkles size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-white">Para ti</h3>
-                <p className="text-[10px] sm:text-[11px] text-[#666]">Tu configuración</p>
+                <h3 className="text-xs sm:text-sm font-semibold text-white">Tu ritmo</h3>
+                <p className="text-[10px] sm:text-[11px] text-[#666]">Lo que elegiste</p>
               </div>
             </div>
             <button
@@ -139,7 +139,7 @@ export function OnboardingRecommendations() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-medium text-white group-hover:text-[#c8a55a] transition-colors">
-                Tu imperio: {focusConfig.name}
+                {focusConfig.name}
               </p>
               <p className="text-[10px] sm:text-[11px] text-[#666] line-clamp-1">{focusConfig.tip}</p>
             </div>
@@ -162,7 +162,7 @@ export function OnboardingRecommendations() {
           {habitCount > 0 && (
             <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-[#1a1a1a]/60">
               <p className="text-[9px] sm:text-[10px] text-[#555]">
-                {habitCount} hábito{habitCount > 1 ? 's' : ''} inicial{habitCount > 1 ? 'es' : ''} para ti
+                {habitCount} hábito{habitCount > 1 ? 's' : ''}
               </p>
             </div>
           )}

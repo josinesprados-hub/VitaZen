@@ -8,6 +8,7 @@ import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { ReturnTrigger } from '@/components/dashboard/ReturnTrigger';
+import { SilentMemory } from '@/components/ui/SilentMemory';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import LifePatternsSection from '@/components/patterns/LifePatternsSection';
 import PremiumReflection from '@/components/ui/PremiumReflection';
@@ -135,6 +136,7 @@ export default function DashboardPage() {
               {timeGreeting}, <span className="text-[#c8a55a]">{user?.name || ''}</span>
             </h1>
             <ReturnTrigger />
+            <SilentMemory />
           </div>
 
           {/* 2. Emotional State — "how does life feel right now" */}

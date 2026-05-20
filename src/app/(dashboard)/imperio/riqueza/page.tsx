@@ -917,9 +917,9 @@ export default function RiquezaPage() {
       {isEmpty ? (
         <PremiumEmptyState
           icon={Wallet}
-          title="Tu dinero refleja quien eres"
-          subtitle="Registra ingresos y gastos para ver hacia dónde fluye tu energía."
-          cta="Registrar primer movimiento"
+          title="Sin movimientos este mes"
+          subtitle="Cuando quieras."
+          cta="Registrar"
           onCta={() => { setQuickMode(true); setShowAdd(true); }}
           size="lg"
           variant="gold"

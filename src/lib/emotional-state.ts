@@ -285,30 +285,28 @@ function generateRecommendation(
   const stress = metrics.stress.value;
   const consistency = metrics.consistency.value;
 
-  // Stress-based
+  // Observation, not advice.
+  // The app notices. It doesn't tell you what to do.
+
   if (stress <= 30) {
     if (energy <= 35) {
-      return 'Día para ir despacio.';
+      return 'Poca energía, mucho peso.';
     }
-    return 'Un momento quieto antes de seguir.';
+    return 'Día con tensión.';
   }
 
-  // Energy-based
   if (energy <= 35) {
-    return 'Descanso y lo esencial.';
+    return 'Cansancio.';
   }
 
-  // Focus-based
   if (focus >= 70 && energy >= 60) {
-    return 'Buena claridad hoy.';
+    return 'Claridad.';
   }
 
-  // Consistency-based
   if (consistency >= 70) {
-    return 'Buen ritmo esta semana.';
+    return 'Buen ritmo.';
   }
 
-  // Status-specific
   if (status === 'enfocado') {
     return 'Claridad. Lo que hagas con ella es tuyo.';
   }
@@ -445,13 +443,13 @@ export async function getEmotionalState(userId: string, plan: string): Promise<E
       ...(isPremium ? { trend: getTrend(rawMetrics.consistency.value, rawMetrics.consistency.prevValue) } : {}),
     },
     progress: {
-      label: 'Progreso semanal',
+      label: 'Ritmo semanal',
       value: rawMetrics.progress.value,
       level: toLevel(rawMetrics.progress.value),
       ...(isPremium ? { trend: getTrend(rawMetrics.progress.value, rawMetrics.progress.prevValue) } : {}),
     },
     activity: {
-      label: 'Actividad reciente',
+      label: 'Presencia',
       value: rawMetrics.activity.value,
       level: toLevel(rawMetrics.activity.value),
       ...(isPremium ? { trend: getTrend(rawMetrics.activity.value, rawMetrics.activity.prevValue) } : {}),

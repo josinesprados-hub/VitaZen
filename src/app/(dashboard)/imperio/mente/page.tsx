@@ -672,8 +672,8 @@ export default function MentePage() {
         {sessions.length === 0 ? (
           <PremiumEmptyState
             icon={Wind}
-            title="Tu espacio de calma te espera"
-            subtitle="Una sola respiración consciente marca la diferencia."
+            title="Aún sin sesiones"
+            subtitle="Cuando quieras."
             size="sm"
             variant="gold"
           />

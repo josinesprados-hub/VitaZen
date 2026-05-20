@@ -167,7 +167,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Check-in Diario</h2>
             <p className="text-sm text-[#999] leading-relaxed mb-8">
-              Toma un momento para conectar contigo. Tu estado emocional define la calidad de tu día.
+              Un momento para notar cómo estás.
             </p>
             <button
               onClick={() => setStep(1)}
@@ -189,7 +189,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
           <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[75dvh] overflow-y-auto scroll-contain safe-bottom">
             <div className="text-center mb-2">
               <h3 className="text-lg font-bold text-white">¿Cómo estás hoy?</h3>
-              <p className="text-xs text-[#666]">Sé honesto, sin juicio</p>
+              <p className="text-xs text-[#666]">Sin juicio</p>
             </div>
 
             <ValueSlider label="Estado emocional" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} />
