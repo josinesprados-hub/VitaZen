@@ -28,7 +28,7 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string }> 
   disciplina: { name: 'Disciplina', icon: Shield, color: '#c8a55a' },
   mente: { name: 'Mente', icon: Brain, color: '#c8a55a' },
   energia: { name: 'Energía', icon: Zap, color: '#c8a55a' },
-  riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a' },
+  riqueza: { name: 'Riqueza', icon: Gem, color: '#c8a55a' },
   crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a' },
 };
 
@@ -127,7 +127,7 @@ export default function DashboardPage() {
       <div className="lg:grid lg:grid-cols-12 lg:gap-12 xl:gap-16">
 
         {/* ─── Left Column: Vital State ─── */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-6 sm:space-y-10 lg:space-y-12">
+        <div className="lg:col-span-7 xl:col-span-8 space-y-5 sm:space-y-8 lg:space-y-10">
 
           {/* 1. Greeting — human, not UI */}
           <div className="dash-section-enter dash-section-delay-1 pt-2 sm:pt-4">
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                 <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/8 flex items-center justify-center group-hover:bg-[#c8a55a]/15 transition-colors">
                   <Sunrise size={15} className="text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors" />
                 </div>
-                <span className="text-sm text-[#555] group-hover:text-[#888] transition-colors">Un momento para ti</span>
+                <span className="text-sm text-[#555] group-hover:text-[#888] transition-colors">Check-in</span>
               </button>
             )}
           </div>
@@ -173,7 +173,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ─── Right Column: Quiet Presence ─── */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-6 sm:space-y-10 lg:space-y-12 mt-8 lg:mt-0 lg:pt-2 sm:lg:pt-4">
+        <div className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-8 lg:space-y-10 mt-6 lg:mt-0 lg:pt-2 sm:lg:pt-4">
 
           {/* 6. Empire Grid — quiet companions, not widgets */}
           <div className="dash-section-enter dash-section-delay-5">

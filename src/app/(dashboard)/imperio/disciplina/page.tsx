@@ -357,10 +357,10 @@ export default function DisciplinaPage() {
                     </span>
                   )}
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEdit(habit)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                    <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
                       <Pencil size={14} />
                     </button>
-                    <button onClick={() => deleteHabit(habit.id)} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                    <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
                       <Trash2 size={14} />
                     </button>
                   </div>

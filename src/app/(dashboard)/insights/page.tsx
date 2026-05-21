@@ -400,7 +400,7 @@ export default function InsightsPage() {
           <PremiumInlineBadge
             isPremium={isPremium}
             freeLabel="Básico"
-            premiumLabel="Tendencias profundas"
+            premiumLabel="Más detalle"
           />
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
@@ -558,7 +558,7 @@ export default function InsightsPage() {
         <div className="flex items-center justify-center gap-2 py-6 mt-2">
           <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
           <p className="text-[11px] text-[#555]">
-            Algunas observaciones solo aparecen con el tiempo —{' '}
+            Más detalle con el tiempo —{' '}
             <Link href="/elite" className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors">
               conocer Élite
             </Link>

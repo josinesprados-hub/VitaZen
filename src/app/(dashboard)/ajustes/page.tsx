@@ -230,9 +230,9 @@ export default function AjustesPage() {
               <Eye size={14} className="text-[#c8a55a]" />
             </div>
             <div>
-              <p className="text-sm text-white font-medium">Mostrar estadisticas</p>
+              <p className="text-sm text-white font-medium">Mostrar estadísticas</p>
               <p className="text-xs text-[#999] mt-0.5">
-                Tus estadísticas visibles en comparaciones
+                Tus datos visibles en comparaciones
               </p>
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function AjustesPage() {
             </div>
             <div className="text-left">
               <p className="text-sm text-white font-medium">Editar perfil</p>
-              <p className="text-xs text-[#999]">Nombre, foto, ubicacion y bio</p>
+              <p className="text-xs text-[#999]">Nombre, foto, ubicación y bio</p>
             </div>
           </div>
           <ChevronRight size={16} className="text-[#555] group-hover:text-[#c8a55a] transition-colors" />
@@ -290,7 +290,7 @@ export default function AjustesPage() {
             <LogOut size={14} className="text-red-400/60" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-medium">Cerrar sesion</p>
+            <p className="text-sm font-medium">Cerrar sesión</p>
             <p className="text-xs text-[#666]">Salir de tu cuenta</p>
           </div>
         </button>
@@ -300,12 +300,12 @@ export default function AjustesPage() {
       <div className="card-primary p-6 sm:p-8 space-y-4">
         <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
           <Info size={14} />
-          Informacion
+          Información
         </h3>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-[#999]">Version de la app</p>
+            <p className="text-sm text-[#999]">Versión de la app</p>
             <p className="text-sm text-white font-mono">{APP_VERSION}</p>
           </div>
           <div className="flex items-center justify-between">

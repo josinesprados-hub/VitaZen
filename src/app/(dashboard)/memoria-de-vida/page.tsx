@@ -110,18 +110,18 @@ export default function EtapasPage() {
   const hasContent = data.observations.length > 0 || data.memories.length > 0;
 
   return (
-    <div className="max-w-3xl mx-auto px-6 sm:px-8 py-8 sm:py-16">
+    <div className="max-w-3xl mx-auto px-6 sm:px-8 py-6 sm:py-12">
       {/* Back */}
       <Link
         href="/dashboard"
-        className="flex items-center gap-2 text-[#555] hover:text-[#c8a55a] transition-colors text-xs mb-10 sm:mb-14"
+        className="flex items-center gap-2 text-[#555] hover:text-[#c8a55a] transition-colors text-xs mb-8 sm:mb-10"
       >
         <ArrowLeft size={14} />
         Volver
       </Link>
 
       {/* Header — editorial, spacious, typographic presence */}
-      <div className="mb-16 sm:mb-24">
+      <div className="mb-12 sm:mb-16">
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">
           {PAGE_TITLE}
         </h1>
@@ -152,7 +152,7 @@ export default function EtapasPage() {
 
       {/* STAGES / PERIODOS */}
       {stages.length > 0 && (
-        <div className="mb-20 sm:mb-28">
+        <div className="mb-14 sm:mb-20">
           <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{STAGES_TITLE}</h2>
 
           <div className="ml-1 sm:ml-2 border-l border-[#151515] pl-6 sm:pl-10 space-y-10 sm:space-y-14">
@@ -172,7 +172,7 @@ export default function EtapasPage() {
 
       {/* TRANSITIONS */}
       {isPremium && transitions.length > 0 && (
-        <div className="mb-20 sm:mb-28">
+        <div className="mb-14 sm:mb-20">
           <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{TRANSITIONS_TITLE}</h2>
 
           <div className="space-y-8 sm:space-y-10">
@@ -199,7 +199,7 @@ export default function EtapasPage() {
 
       {/* MEMORIES / MOMENTOS */}
       {isPremium && data.memories.length > 0 && (
-        <div className="mb-20 sm:mb-28">
+        <div className="mb-14 sm:mb-20">
           <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{MEMORIES_TITLE}</h2>
 
           <div className="space-y-6 sm:space-y-8">
@@ -226,7 +226,7 @@ export default function EtapasPage() {
 
       {/* PATTERNS / CONEXIONES */}
       {isPremium && patterns.length > 0 && (
-        <div className="mb-20 sm:mb-28">
+        <div className="mb-14 sm:mb-20">
           <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{PATTERNS_TITLE}</h2>
 
           <div className="space-y-6 sm:space-y-8">

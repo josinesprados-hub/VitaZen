@@ -10,7 +10,6 @@ import {
   Zap,
   Gem,
   TrendingUp,
-  Sparkles,
   LayoutDashboard,
   Clock,
   Trophy,
@@ -25,12 +24,11 @@ import {
 } from 'lucide-react';
 
 const EMPIRES = [
-  { name: 'Disciplina', href: '/imperio/disciplina', icon: Shield, emoji: '⚔️' },
-  { name: 'Mente', href: '/imperio/mente', icon: Brain, emoji: '🧠' },
-  { name: 'Energía', href: '/imperio/energia', icon: Zap, emoji: '⚡' },
-  { name: 'Finanzas', href: '/imperio/riqueza', icon: Gem, emoji: '💎' },
-  { name: 'Crecimiento', href: '/imperio/crecimiento', icon: TrendingUp, emoji: '📈' },
-  { name: 'Mentor', href: '/imperio/mentor', icon: Sparkles, emoji: '✨' },
+  { name: 'Disciplina', href: '/imperio/disciplina', icon: Shield },
+  { name: 'Mente', href: '/imperio/mente', icon: Brain },
+  { name: 'Energía', href: '/imperio/energia', icon: Zap },
+  { name: 'Riqueza', href: '/imperio/riqueza', icon: Gem },
+  { name: 'Crecimiento', href: '/imperio/crecimiento', icon: TrendingUp },
 ];
 
 interface SidebarProps {
@@ -253,7 +251,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#999] hover:text-[#c8a55a] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
               >
                 <Circle size={4} fill="currentColor" className="text-[#c8a55a]/30" />
-                Tu espacio Élite
+                Élite
               </button>
             )}
 

@@ -112,7 +112,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [note, setNote] = useState(initialData?.note || '');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const [step, setStep] = useState(0); // 0: intro, 1: form, 2: done
+  const [step, setStep] = useState(1); // Skip intro — go directly to form
 
   // Lock body scroll when modal is open.
   // Save scroll position before locking (position:fixed on body resets it),
@@ -158,31 +158,6 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
         >
           <X size={16} />
         </button>
-
-        {step === 0 && (
-          /* Intro Step */
-          <div className="p-6 sm:p-8 text-center safe-top">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Sunrise size={28} className="text-[#c8a55a]" />
-            </div>
-            <h2 className="text-xl font-bold text-white mb-2">Un momento</h2>
-            <p className="text-sm text-[#999] leading-relaxed mb-8">
-              Un momento para notar cómo estás.
-            </p>
-            <button
-              onClick={() => setStep(1)}
-              className="w-full btn-primary py-3 rounded-xl text-sm"
-            >
-              Vale
-            </button>
-            <button
-              onClick={onClose}
-              className="w-full text-[#555] text-xs mt-3 hover:text-[#999] transition-colors"
-            >
-              Más tarde
-            </button>
-          </div>
-        )}
 
         {step === 1 && (
           /* Form Step */
@@ -233,6 +208,12 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               className="w-full btn-primary py-3 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {saving ? 'Guardando...' : 'Listo'}
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full text-[#555] text-xs mt-2 hover:text-[#999] transition-colors"
+            >
+              Más tarde
             </button>
             {saveError && (
               <p className="text-center text-xs text-red-400 mt-2">

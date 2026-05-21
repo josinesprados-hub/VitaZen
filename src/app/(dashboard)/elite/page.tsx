@@ -139,7 +139,7 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
-                  Conexiones que no ves desde un solo imperio
+                  Conexiones entre tus imperios
                 </h3>
                 <p className="text-[#888] text-sm leading-relaxed">
                   Tu mente afecta tu energía. Tu disciplina cambia tu relación con el dinero.
@@ -159,12 +159,11 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
-                  Un mentor que recuerda quién eres
+                  Mentor con más memoria
                 </h3>
                 <p className="text-[#888] text-sm leading-relaxed">
-                  Sin límite diario. Con más contexto en cada respuesta.
-                  El mentor de VitaZen, con Élite, no solo responde — recuerda.
-                  Acumula lo que has vivido, lo que has reflexionado, lo que te importa.
+                  Sin límite diario. Más contexto en cada respuesta.
+                  Con Élite, el mentor acumula lo que has vivido y reflexionado.
                   Cada conversación entiende más que la anterior.
                 </p>
               </div>
@@ -179,13 +178,12 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
-                  El ritmo de tu vida, con más contexto
+                  Más contexto cada semana
                 </h3>
                 <p className="text-[#888] text-sm leading-relaxed">
                   Observaciones semanales con más detalle. Evolución acumulativa.
-                  Cierres mensuales que conectan tus intenciones con tus acciones.
-                  Con Élite, VitaZen no solo registra — entiende el ritmo
-                  de lo que estás viviendo, y te lo muestra sin prisa.
+                  Cierres mensuales que conectan intenciones con acciones.
+                  Con Élite, VitaZen entiende el ritmo de lo que estás viviendo.
                 </p>
               </div>
             </div>
@@ -198,7 +196,7 @@ export default function ElitePage() {
         <div className="flex items-center justify-center gap-2 mb-8">
           <Sparkles size={12} className="text-[#c8a55a]/25" />
           <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
-            Así se ve
+            Ejemplos
           </p>
         </div>
 
@@ -235,7 +233,7 @@ export default function ElitePage() {
         <div className="flex items-center justify-center gap-2 mb-8">
           <Eye size={12} className="text-[#c8a55a]/25" />
           <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
-            Dos formas de mirar
+            Dos planes
           </p>
         </div>
 

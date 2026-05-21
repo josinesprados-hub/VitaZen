@@ -15,7 +15,6 @@ import {
   Zap,
   Target,
   AlertTriangle,
-  Clock,
   Pencil,
   Trash2,
 } from 'lucide-react';
@@ -376,9 +375,9 @@ export default function CheckinPage() {
                     </div>
                     <div className="flex gap-4 mt-1">
                       {[
-                        { label: 'Emoc.', val: c.emotion },
-                        { label: 'Energ.', val: c.energy },
-                        { label: 'Enfoq.', val: c.focus },
+                        { label: 'Emoción', val: c.emotion },
+                        { label: 'Energía', val: c.energy },
+                        { label: 'Enfoque', val: c.focus },
                         { label: 'Estrés', val: c.stress },
                       ].map((item) => (
                         <span key={item.label} className="text-[10px] text-[#555]">
@@ -386,18 +385,13 @@ export default function CheckinPage() {
                         </span>
                       ))}
                     </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(c.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                      <span className="text-[#333] text-xs">·</span>
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(c.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
                     {c.note && <p className="text-[10px] text-[#444] mt-1 truncate">{c.note}</p>}
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                    <button onClick={() => startEditCheckin(c)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
                       <Pencil size={14} />
                     </button>
-                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
                       <Trash2 size={14} />
                     </button>
                   </div>

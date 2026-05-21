@@ -234,7 +234,7 @@ export default function TimelinePage() {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Header — quiet, no icon, just presence */}
-      <div className="mb-10 sm:mb-14">
+      <div className="mb-8 sm:mb-12">
         <h1 className="text-lg sm:text-2xl font-bold text-white mb-1.5">
           Memoria
         </h1>
@@ -249,7 +249,7 @@ export default function TimelinePage() {
       </div>
 
       {/* Filters — by imperio, not by activity type */}
-      <div className="flex gap-2 mb-10 sm:mb-14 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-pills">
+      <div className="flex gap-2 mb-8 sm:mb-12 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-pills">
         {FILTERS.map((cat) => {
           const isActive = activeFilter === cat.key;
           const Icon = cat.icon;
@@ -291,7 +291,7 @@ export default function TimelinePage() {
           variant="gold"
         />
       ) : (
-        <div className="space-y-16 sm:space-y-20">
+        <div className="space-y-10 sm:space-y-14">
           {grouped.map((group) => {
             const imperios = dayImperios(group.items);
 
