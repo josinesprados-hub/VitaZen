@@ -165,7 +165,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
               <Sunrise size={28} className="text-[#c8a55a]" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Check-in Diario</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Un momento</h2>
             <p className="text-sm text-[#999] leading-relaxed mb-8">
               Un momento para notar cómo estás.
             </p>
@@ -173,7 +173,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               onClick={() => setStep(1)}
               className="w-full btn-primary py-3 rounded-xl text-sm"
             >
-              Comenzar
+              Vale
             </button>
             <button
               onClick={onClose}
@@ -232,7 +232,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               disabled={saving || !intention.trim()}
               className="w-full btn-primary py-3 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {saving ? 'Guardando...' : 'Confirmar check-in'}
+              {saving ? 'Guardando...' : 'Listo'}
             </button>
             {saveError && (
               <p className="text-center text-xs text-red-400 mt-2">
@@ -248,7 +248,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/15 flex items-center justify-center mx-auto mb-5 micro-celebrate">
               <span className="text-3xl">✓</span>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Check-in completado</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Anotado</h2>
             <p className="text-sm text-[#999] leading-relaxed mb-2">
               Tu intención para hoy:
             </p>

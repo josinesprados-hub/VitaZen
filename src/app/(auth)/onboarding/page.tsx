@@ -12,7 +12,6 @@ import {
   Sparkles,
   ArrowRight,
   Check,
-  Circle,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════
@@ -41,7 +40,7 @@ const FOCUS_OPTIONS = [
   { key: 'mente', label: 'Mente', description: 'Claridad, calma y bienestar emocional', icon: Brain, emoji: '🧠' },
   { key: 'disciplina', label: 'Disciplina', description: 'Hábitos sólidos y consistencia diaria', icon: Shield, emoji: '⚔️' },
   { key: 'energia', label: 'Energía', description: 'Vitalidad física y descanso reparador', icon: Zap, emoji: '⚡' },
-  { key: 'riqueza', label: 'Finanzas', description: 'Control económico y libertad financiera', icon: Gem, emoji: '💎' },
+  { key: 'riqueza', label: 'Finanzas', description: 'Consciencia y claridad económica', icon: Gem, emoji: '💎' },
 ];
 
 const GOAL_OPTIONS = [
@@ -55,20 +54,7 @@ const GOAL_OPTIONS = [
   'Escribir un diario',
 ];
 
-const HABIT_OPTIONS = [
-  { name: 'Meditación', emoji: '🧘' },
-  { name: 'Ejercicio', emoji: '💪' },
-  { name: 'Lectura', emoji: '📖' },
-  { name: 'Diario', emoji: '📝' },
-  { name: 'Hidratación', emoji: '💧' },
-  { name: 'Descanso temprano', emoji: '🌙' },
-  { name: 'Caminar', emoji: '🚶' },
-  { name: 'Respiración consciente', emoji: '🌬️' },
-  { name: 'Planificación del día', emoji: '📋' },
-  { name: 'Agradecimiento', emoji: '🙏' },
-];
-
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 3;
 
 // ═══════════════════════════════════════════
 // Main Page
@@ -85,37 +71,24 @@ export default function OnboardingPage() {
   const [error, setError] = useState('');
 
   // ─── Refs to prevent premature redirect during active onboarding ───
-  // Once the user starts answering questions, auth state changes
-  // (e.g. syncUser responses, token refresh) must NOT redirect away.
-  // Only redirect if we're certain the user shouldn't be here.
   const completingRef = useRef(false);
   const mountedRef = useRef(false);
   const retriedSync = useRef(false);
 
   // Auth guard: redirect if not logged in or already completed onboarding.
-  // CRITICAL: Only redirect when we have CONFIRMED user data from the server.
-  // Never redirect based on assumptions or partial state.
   useEffect(() => {
-    // Skip all redirect logic while actively completing onboarding
     if (completingRef.current) return;
 
     if (!loading) {
       if (!user && !firebaseUser) {
-        // No Firebase auth at all — redirect to login
         router.replace('/login');
       } else if (user?.onboardingCompleted && !saving) {
-        // Server CONFIRMED onboarding complete (user data available)
-        // AND we're not in the middle of saving — safe to redirect
         router.replace('/dashboard');
       }
-      // If firebaseUser exists but user is null (sync pending), WAIT.
-      // Do NOT redirect — we don't know onboarding status yet.
     }
   }, [user, firebaseUser, loading, saving, router]);
 
-  // When sync fails (syncError=true, user=null), retry sync once.
-  // The onboarding API needs the user to exist in the DB before saving data.
-  // If sync never created the user, the onboarding POST will return 404.
+  // When sync fails, retry once.
   useEffect(() => {
     if (syncError && firebaseUser && !user && !retriedSync.current) {
       retriedSync.current = true;
@@ -130,8 +103,6 @@ export default function OnboardingPage() {
   }, []);
 
   const goToStep = useCallback((nextStep: number) => {
-    // Once the user starts the onboarding (step 0 → 1), lock out redirects.
-    // Auth state changes mid-flow should NOT pull the user out.
     if (nextStep >= 1) {
       completingRef.current = true;
     }
@@ -143,7 +114,6 @@ export default function OnboardingPage() {
   }, []);
 
   const handleComplete = async () => {
-    // Lock: prevent any redirect while saving onboarding data
     completingRef.current = true;
     setSaving(true);
     setError('');
@@ -156,13 +126,9 @@ export default function OnboardingPage() {
         }),
       });
 
-      // If user not found in DB (404), the initial sync may have failed.
-      // Force a sync via refreshUser (which falls back to /api/auth/sync),
-      // then retry the onboarding POST once.
       if (res.status === 404 && firebaseUser) {
         console.log('[ONBOARDING] User not found in DB, forcing sync retry');
         await refreshUser();
-        // Small delay to ensure state updates propagate
         await new Promise(r => setTimeout(r, 500));
         res = await apiFetch('/api/onboarding', {
           method: 'POST',
@@ -190,66 +156,44 @@ export default function OnboardingPage() {
   };
 
   // ─── Loading states ───
-  // 1. Initial Firebase auth resolution (no firebaseUser yet)
+  // Silence. Just the logo pulsing. No text.
   if (loading && !firebaseUser) {
     return (
       <div className="min-h-[100dvh] bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
-          <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
-        </div>
+        <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
       </div>
     );
   }
 
-  // 2. Firebase auth confirmed but server sync pending.
-  //    Show loading instead of onboarding UI to prevent the flash
-  //    for returning users. Once sync completes:
-  //      - onboardingCompleted: true → useEffect redirects to /dashboard
-  //      - onboardingCompleted: false → onboarding UI renders below
-  //    Exception: if syncError is true, sync failed and user might be new.
-  //    In that case, render onboarding so they can proceed (the submit
-  //    handler retries sync on 404).
   if (firebaseUser && !user && !syncError) {
     return (
       <div className="min-h-[100dvh] bg-[#000000] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
-          <p className="text-[#c8a55a] text-sm">Preparando tu experiencia...</p>
-        </div>
+        <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-12 h-12 animate-pulse rounded-[20%]" />
       </div>
     );
   }
 
-  // 3. Not ready yet (redirecting, or no auth at all)
   if (!firebaseUser) {
     return null;
   }
-  // 4. Server confirmed onboarding already complete — redirect in progress
   if (user?.onboardingCompleted) {
     return null;
   }
 
-  const progressPercent = ((step + 1) / TOTAL_STEPS) * 100;
-
   return (
     <div className="min-h-[100dvh] bg-[#000000] flex flex-col items-center justify-center px-5 py-8">
-      {/* Progress Bar */}
-      <div className="w-full max-w-lg mb-6 sm:mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] text-[#555] uppercase tracking-widest font-medium">
-            Paso {step + 1} de {TOTAL_STEPS}
-          </span>
-          <span className="text-[10px] text-[#c8a55a] font-medium">
-            {Math.round(progressPercent)}%
-          </span>
-        </div>
-        <div className="w-full bg-[#1a1a1a] rounded-full h-1 overflow-hidden">
+      {/* Subtle Dot Indicator */}
+      <div className="flex items-center justify-center gap-2.5 mb-8 sm:mb-10">
+        {[0, 1, 2].map((i) => (
           <div
-            className="bg-[#c8a55a] h-1 rounded-full onboarding-progress-fill"
-            style={{ width: `${progressPercent}%` }}
+            key={i}
+            className={`rounded-full transition-all duration-500 ${
+              i === step
+                ? 'w-2 h-2 bg-[#c8a55a]'
+                : 'w-1.5 h-1.5 bg-[#1a1a1a]'
+            }`}
           />
-        </div>
+        ))}
       </div>
 
       {/* Step Content */}
@@ -281,38 +225,10 @@ export default function OnboardingPage() {
             onSelect={(focus) => {
               setData((prev) => ({ ...prev, primaryFocus: focus }));
             }}
-            onNext={() => goToStep(3)}
-            onBack={() => goToStep(1)}
-          />
-        )}
-        {step === 3 && (
-          <LevelsStep
-            stressLevel={data.stressLevel}
-            energyLevel={data.energyLevel}
-            focusLevel={data.focusLevel}
-            onChange={(field, value) => {
-              setData((prev) => ({ ...prev, [field]: value }));
-            }}
-            onNext={() => goToStep(4)}
-            onBack={() => goToStep(2)}
-          />
-        )}
-        {step === 4 && (
-          <HabitsStep
-            selected={data.initialHabits}
-            onToggle={(habit) => {
-              setData((prev) => ({
-                ...prev,
-                initialHabits: prev.initialHabits.includes(habit)
-                  ? prev.initialHabits.filter((h) => h !== habit)
-                  : [...prev.initialHabits, habit],
-              }));
-            }}
             onComplete={handleComplete}
-            onBack={() => goToStep(3)}
+            onBack={() => goToStep(1)}
             saving={saving}
             error={error}
-            primaryFocus={data.primaryFocus}
           />
         )}
       </div>
@@ -334,22 +250,18 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
       </div>
 
       <h1 className="text-3xl font-bold text-white mb-3">
-        Bienvenido{userName ? `, ${userName}` : ''}
+        Hola{userName ? `, ${userName}` : ''}
       </h1>
-      <p className="text-[#999] text-base mb-2">Tu viaje con VitaZen comienza ahora.</p>
+      <p className="text-[#999] text-base mb-2">Esto no va a ser largo.</p>
       <p className="text-[#666] text-sm mb-10 max-w-sm mx-auto leading-relaxed">
-        Unas breves preguntas para personalizar tu experiencia.
-      </p>
-      <p className="text-[10px] text-[#555] flex items-center justify-center gap-1 -mt-6 mb-8">
-        <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
-        Recomendaciones personalizadas incluidas
+        Unos minutos. Nada más.
       </p>
 
       <button
         onClick={onNext}
         className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
       >
-        Comenzar
+        Vale
         <ArrowRight size={16} />
       </button>
     </div>
@@ -357,7 +269,7 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
 }
 
 // ═══════════════════════════════════════════
-// Step 1: Personal Goals
+// Step 1: Resonance (was "Goals")
 // ═══════════════════════════════════════════
 
 function GoalsStep({
@@ -374,8 +286,8 @@ function GoalsStep({
   return (
     <div>
       <div className="mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">¿Qué quieres lograr?</h2>
-        <p className="text-[#999] text-sm">Selecciona los objetivos que más resuenen contigo.</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">¿Qué resuena contigo?</h2>
+        <p className="text-[#999] text-sm">Toca lo que te diga algo. No hace falta pensar mucho.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-6 sm:mb-8">
@@ -433,25 +345,29 @@ function GoalsStep({
 }
 
 // ═══════════════════════════════════════════
-// Step 2: Primary Focus
+// Step 2: What matters now (was "Focus") — final step
 // ═══════════════════════════════════════════
 
 function FocusStep({
   selected,
   onSelect,
-  onNext,
+  onComplete,
   onBack,
+  saving,
+  error,
 }: {
   selected: string;
   onSelect: (focus: string) => void;
-  onNext: () => void;
+  onComplete: () => void;
   onBack: () => void;
+  saving: boolean;
+  error: string;
 }) {
   return (
     <div>
       <div className="mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tu foco principal</h2>
-        <p className="text-[#999] text-sm">Elige el área donde quieres concentrar tu energía ahora.</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">¿Qué importa ahora?</h2>
+        <p className="text-[#999] text-sm">Si tuvieras que elegir una, ¿cuál sería?</p>
       </div>
 
       <div className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
@@ -502,206 +418,6 @@ function FocusStep({
         })}
       </div>
 
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="text-[#666] text-sm hover:text-white transition-colors"
-        >
-          Atrás
-        </button>
-        <button
-          onClick={onNext}
-          disabled={!selected}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Continuar
-          <ArrowRight size={16} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════
-// Step 3: Levels (Stress, Energy, Focus)
-// ═══════════════════════════════════════════
-
-function LevelsStep({
-  stressLevel,
-  energyLevel,
-  focusLevel,
-  onChange,
-  onNext,
-  onBack,
-}: {
-  stressLevel: number;
-  energyLevel: number;
-  focusLevel: number;
-  onChange: (field: string, value: number) => void;
-  onNext: () => void;
-  onBack: () => void;
-}) {
-  const levels = [
-    {
-      key: 'stressLevel',
-      label: 'Nivel de estrés',
-      description: '¿Cómo percibes tu estrés últimamente?',
-      value: stressLevel,
-      lowLabel: 'Muy bajo',
-      highLabel: 'Muy alto',
-      lowEmoji: '😌',
-      highEmoji: '😰',
-    },
-    {
-      key: 'energyLevel',
-      label: 'Nivel de energía',
-      description: '¿Cómo está tu vitalidad general?',
-      value: energyLevel,
-      lowLabel: 'Muy baja',
-      highLabel: 'Muy alta',
-      lowEmoji: '😴',
-      highEmoji: '⚡',
-    },
-    {
-      key: 'focusLevel',
-      label: 'Nivel de enfoque',
-      description: '¿Capacidad de concentrarte en lo importante?',
-      value: focusLevel,
-      lowLabel: 'Muy bajo',
-      highLabel: 'Muy alto',
-      lowEmoji: '🌫️',
-      highEmoji: '🎯',
-    },
-  ];
-
-  return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Cómo estás ahora</h2>
-        <p className="subtitle-silent">Para que tu experiencia se adapte desde el inicio.</p>
-      </div>
-
-      <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
-        {levels.map((item) => (
-          <div
-            key={item.key}
-            className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h3 className="text-sm font-semibold text-white">{item.label}</h3>
-                <p className="text-[11px] text-[#666] mt-0.5">{item.description}</p>
-              </div>
-              <span className="text-xl font-bold text-[#c8a55a]">{item.value}</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-sm shrink-0">{item.lowEmoji}</span>
-              <span className="text-[10px] text-[#555] shrink-0 w-14">{item.lowLabel}</span>
-              <div className="flex-1 flex items-center gap-1.5">
-                {[1, 2, 3, 4, 5].map((val) => (
-                  <button
-                    key={val}
-                    onClick={() => onChange(item.key, val)}
-                    className={`flex-1 h-2.5 rounded-full transition-all duration-200 ${
-                      val <= item.value
-                        ? 'bg-[#c8a55a]'
-                        : 'bg-[#1a1a1a] hover:bg-[#2a2a2a]'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-[10px] text-[#555] shrink-0 w-14 text-right">{item.highLabel}</span>
-              <span className="text-sm shrink-0">{item.highEmoji}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="text-[#666] text-sm hover:text-white transition-colors"
-        >
-          Atrás
-        </button>
-        <button
-          onClick={onNext}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
-        >
-          Continuar
-          <ArrowRight size={16} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════
-// Step 4: Initial Habits
-// ═══════════════════════════════════════════
-
-function HabitsStep({
-  selected,
-  onToggle,
-  onComplete,
-  onBack,
-  saving,
-  error,
-  primaryFocus,
-}: {
-  selected: string[];
-  onToggle: (habit: string) => void;
-  onComplete: () => void;
-  onBack: () => void;
-  saving: boolean;
-  error: string;
-  primaryFocus: string;
-}) {
-  const focusLabel = FOCUS_OPTIONS.find((f) => f.key === primaryFocus)?.label || '';
-
-  return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tus primeros hábitos</h2>
-        <p className="text-[#999] text-sm">
-          Elige hábitos para empezar. Los crearemos por ti.
-        </p>
-        {primaryFocus && (
-          <p className="text-[11px] text-[#c8a55a] mt-1.5">
-            Enfocado en <span className="font-semibold">{focusLabel}</span> — se priorizará este imperio.
-          </p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-6 sm:mb-8">
-        {HABIT_OPTIONS.map((habit) => {
-          const isSelected = selected.includes(habit.name);
-          return (
-            <button
-              key={habit.name}
-              onClick={() => onToggle(habit.name)}
-              className={`text-left p-4 rounded-xl border transition-all duration-200 ${
-                isSelected
-                  ? 'bg-[#c8a55a]/10 border-[#c8a55a]/40 onboarding-option-pop'
-                  : 'bg-[#0a0a0a] border-[#1a1a1a] hover:border-[#c8a55a]/20'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <span className="text-lg">{habit.emoji}</span>
-                <span
-                  className={`text-sm font-medium ${
-                    isSelected ? 'text-[#c8a55a]' : 'text-[#999]'
-                  }`}
-                >
-                  {habit.name}
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
       {error && (
         <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg p-3 mb-4 error-state-enter">
           <p className="text-[#c8a55a]/80 text-sm">{error}</p>
@@ -718,7 +434,7 @@ function HabitsStep({
         </button>
         <button
           onClick={onComplete}
-          disabled={saving || selected.length === 0}
+          disabled={saving || !selected}
           className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {saving ? (
@@ -728,8 +444,8 @@ function HabitsStep({
             </>
           ) : (
             <>
-              Comenzar mi viaje
-              <Sparkles size={16} />
+              Entrar
+              <ArrowRight size={16} />
             </>
           )}
         </button>
