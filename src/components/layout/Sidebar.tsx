@@ -228,7 +228,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{user?.name || 'Usuario'}</p>
-                <p className="text-xs text-[#c8a55a]/50">{user?.plan === 'PREMIUM' ? 'Élite' : 'Observar'}</p>
+                <p className="text-xs text-[#c8a55a]/50">{user?.plan === 'PREMIUM' ? 'Élite' : 'Free'}</p>
               </div>
             </Link>
 

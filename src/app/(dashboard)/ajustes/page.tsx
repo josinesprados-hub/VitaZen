@@ -314,7 +314,7 @@ export default function AjustesPage() {
               {user?.plan === 'PREMIUM' ? (
                 <span className="text-[9px] font-medium text-[#c8a55a]/50">Élite</span>
               ) : (
-                <span className="text-[9px] font-medium text-[#555]">Observar</span>
+                <span className="text-[9px] font-medium text-[#555]">Free</span>
               )}
             </div>
           </div>

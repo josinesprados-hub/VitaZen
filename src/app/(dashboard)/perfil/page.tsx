@@ -135,7 +135,7 @@ export default function PerfilPage() {
     });
   };
 
-  const planLabel = user?.plan === 'PREMIUM' ? 'Élite' : 'Observar';
+  const planLabel = user?.plan === 'PREMIUM' ? 'Élite' : 'Free';
   const isPremium = user?.plan === 'PREMIUM';
 
   return (
@@ -267,7 +267,7 @@ export default function PerfilPage() {
                       Élite
                     </span>
                   ) : (
-                    <span className="text-[9px] font-medium text-[#555]">Observar</span>
+                    <span className="text-[9px] font-medium text-[#555]">Free</span>
                   )}
                 </div>
               </>

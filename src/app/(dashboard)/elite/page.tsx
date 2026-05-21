@@ -242,22 +242,22 @@ export default function ElitePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Observar — Free */}
+          {/* Free — Free */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-7">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 rounded-xl bg-[#1a1a1a] flex items-center justify-center">
                 <Eye size={16} className="text-[#555]" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Observar</h3>
-                <p className="text-[#444] text-[10px]">Registrar y ver</p>
+                <h3 className="text-white font-semibold">Free</h3>
+                <p className="text-[#444] text-[10px]">0€/mes</p>
               </div>
             </div>
 
             <p className="text-[#777] text-sm leading-relaxed mb-5">
               Un espacio completo para registrar tu vida con cuidado.
               Hábitos, estados, notas, el mentor, los 5 imperios.
-              Observar ya es suficiente para empezar a entenderse.
+              Free ya es suficiente para empezar a entenderse.
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
@@ -293,7 +293,7 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold">Élite</h3>
-                <p className="text-[#c8a55a]/40 text-[10px]">Entender y conectar</p>
+                <p className="text-[#c8a55a]/40 text-[10px]">5€/mes</p>
               </div>
             </div>
 
@@ -333,7 +333,7 @@ export default function ElitePage() {
       <div className="text-center mb-10 sm:mb-14">
         <div className="max-w-md mx-auto">
           <p className="text-[#555] text-sm leading-relaxed">
-            Observar te ayuda. Élite te conecta con la profundidad de tu propia vida.
+            Free te ayuda. Élite te conecta con la profundidad de tu propia vida.
           </p>
           <p className="text-[#333] text-xs mt-3">
             Sin compromiso. Cancela cuando quieras.

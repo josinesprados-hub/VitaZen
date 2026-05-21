@@ -118,11 +118,11 @@ export function SubscriptionManager() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-sm text-white font-medium">Observar</p>
-            <span className="text-[9px] font-medium text-[#555] px-2 py-0.5">Gratis</span>
+            <p className="text-sm text-white font-medium">Free</p>
+            <span className="text-[9px] font-medium text-[#555] px-2 py-0.5">0€/mes</span>
           </div>
           <p className="text-xs text-[#999] mt-0.5">
-            Registro y observaci&oacute;n b&aacute;sica
+            Registro, observaci&oacute;n y los 5 imperios
           </p>
         </div>
       </div>
