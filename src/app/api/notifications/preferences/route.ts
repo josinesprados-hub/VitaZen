@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
     const response: NotificationPreferencesResponse = {
       pushEnabled: prefs.pushEnabled,
       checkinReminders: prefs.checkinReminders,
-      streakReminders: prefs.streakReminders,
       weeklyRecap: prefs.weeklyRecap,
       comebackReminders: prefs.comebackReminders,
       reflectionReminders: prefs.reflectionReminders,
@@ -82,7 +81,7 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof body.pushEnabled === 'boolean') data.pushEnabled = body.pushEnabled;
     if (typeof body.checkinReminders === 'boolean') data.checkinReminders = body.checkinReminders;
-    if (typeof body.streakReminders === 'boolean') data.streakReminders = body.streakReminders;
+    // streakReminders: kept in DB for backward compat, no longer set from API
     if (typeof body.weeklyRecap === 'boolean') data.weeklyRecap = body.weeklyRecap;
     if (typeof body.comebackReminders === 'boolean') data.comebackReminders = body.comebackReminders;
     if (typeof body.reflectionReminders === 'boolean') data.reflectionReminders = body.reflectionReminders;
@@ -108,7 +107,7 @@ export async function PATCH(request: NextRequest) {
 
     // Validate daily cap range
     if (typeof body.maxDailyNotifications === 'number') {
-      const cap = Math.min(Math.max(body.maxDailyNotifications, 1), 5);
+      const cap = Math.min(Math.max(body.maxDailyNotifications, 1), 2);
       data.maxDailyNotifications = cap;
     }
 
@@ -137,7 +136,6 @@ export async function PATCH(request: NextRequest) {
     const response: NotificationPreferencesResponse = {
       pushEnabled: prefs.pushEnabled,
       checkinReminders: prefs.checkinReminders,
-      streakReminders: prefs.streakReminders,
       weeklyRecap: prefs.weeklyRecap,
       comebackReminders: prefs.comebackReminders,
       reflectionReminders: prefs.reflectionReminders,

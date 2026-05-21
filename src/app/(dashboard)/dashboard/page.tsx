@@ -7,7 +7,6 @@ import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
-import { ReturnTrigger } from '@/components/dashboard/ReturnTrigger';
 import { SilentMemory } from '@/components/ui/SilentMemory';
 import { DashboardSkeleton } from '@/components/ui/PremiumSkeleton';
 import LifePatternsSection from '@/components/patterns/LifePatternsSection';
@@ -135,7 +134,6 @@ export default function DashboardPage() {
             <h1 className="title-page">
               {timeGreeting}, <span className="text-[#c8a55a]">{user?.name || ''}</span>
             </h1>
-            <ReturnTrigger />
             <SilentMemory />
           </div>
 

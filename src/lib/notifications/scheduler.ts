@@ -40,7 +40,6 @@ export async function canSendNotification(
   // ── 2. Type-specific toggle ──
   const typeToggleMap: Record<NotificationType, boolean> = {
     checkin:        prefs.checkinReminders,
-    streak:         prefs.streakReminders,
     weekly_recap:   prefs.weeklyRecap,
     comeback:       prefs.comebackReminders,
     reflection:     prefs.reflectionReminders,

@@ -66,7 +66,7 @@ export default function PremiumGate({
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}
           >
-            Algunas capas solo aparecen con el tiempo · Élite
+            Hay más profundidad aquí · Élite
           </Link>
         </div>
       </div>

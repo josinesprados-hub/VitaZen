@@ -71,6 +71,10 @@ export interface SilentMemoryData {
  * Return after silence.
  * When someone comes back after being away for a while.
  * NOT a nudge to return. Just noticing they're here.
+ *
+ * Each message was chosen to be distinct from the
+ * ReturnTrigger that was removed. No overlap with
+ * any other emotional voice in the app.
  */
 export function observeReturn(daysSince: number): SilentMemory | null {
   if (daysSince < 5) return null;
@@ -79,7 +83,7 @@ export function observeReturn(daysSince: number): SilentMemory | null {
     return { observation: 'Hacía unos días.', type: 'return', rarity: 'rare' };
   }
   if (daysSince <= 14) {
-    return { observation: 'Tiempo sin pasar.', type: 'return', rarity: 'rare' };
+    return { observation: 'Vuelves después de un tiempo.', type: 'return', rarity: 'rare' };
   }
   if (daysSince <= 30) {
     return { observation: 'Aquí estás de nuevo.', type: 'return', rarity: 'very_rare' };
@@ -144,20 +148,18 @@ export function observeShift(
  * Presence observation.
  * When someone has been consistently present for a while.
  * NOT "¡Buen trabajo!" — just a quiet recognition.
+ *
+ * Only two milestones: 30 days and 365 days.
+ * 21 and 60 days felt like streak markers.
+ * Real presence isn't measured in weeks — it's measured
+ * in months and years. Two observations are enough.
  */
 export function observePresence(consistencyDays: number): SilentMemory | null {
-  // Only at meaningful thresholds. Not every streak.
-  if (consistencyDays === 21) {
-    return { observation: 'Tres semanas.', type: 'presence', rarity: 'very_rare' };
-  }
   if (consistencyDays === 30) {
     return { observation: 'Un mes así.', type: 'presence', rarity: 'very_rare' };
   }
-  if (consistencyDays === 60) {
-    return { observation: 'Llevas tiempo así.', type: 'presence', rarity: 'very_rare' };
-  }
-  if (consistencyDays === 100) {
-    return { observation: 'Ya es costumbre.', type: 'presence', rarity: 'very_rare' };
+  if (consistencyDays === 365) {
+    return { observation: 'Un año así.', type: 'presence', rarity: 'very_rare' };
   }
   return null;
 }

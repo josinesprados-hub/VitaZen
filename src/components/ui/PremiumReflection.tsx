@@ -18,11 +18,20 @@ import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 // - Never repeats until full collection traversed
 // - Deep reflections stay for 2 visits (not 1)
 // - Weighted selection: light 50%, relevant 35%, deep 15%
+// - SILENCE PROBABILITY: ~35% of visits show NO reflection.
+//   Silence protects the emotional impact of each reflection.
+//   When everything speaks, nothing matters.
 // - Persists state in localStorage
 // - Avoids hydration mismatch (client-only init)
 
 const STORAGE_KEY = 'vitazen_reflection_state';
+const SILENCE_KEY = 'vitazen_reflection_silence';
 const FADE_DURATION = 600;
+
+// How often silence appears. ~35% of visits.
+// Not random — determined by visit count so it feels
+// rhythmic, not arbitrary. Pattern: show 2, rest 1.
+const SILENCE_PATTERN = [false, false, true];
 
 interface ReflectionState {
   /** Current reflection index in REFLECTIONS array */
@@ -33,6 +42,8 @@ interface ReflectionState {
   shown: number[];
   /** Last N indices — avoid close repetition after cycle reset */
   recent: number[];
+  /** Total visits since last silence — for rhythm pattern */
+  visitTotal: number;
 }
 
 /**
@@ -67,6 +78,7 @@ function freshState(): ReflectionState {
     visitCount: 0,
     shown: [index],
     recent: [index],
+    visitTotal: 0,
   };
 }
 
@@ -78,11 +90,22 @@ function saveState(state: ReflectionState): void {
   }
 }
 
+/**
+ * Should this visit be silent?
+ * Uses a rhythmic pattern, not random chance.
+ * This makes silence feel like breathing, not absence.
+ */
+function shouldSilence(visitTotal: number): boolean {
+  const patternIndex = visitTotal % SILENCE_PATTERN.length;
+  return SILENCE_PATTERN[patternIndex];
+}
+
 export default function PremiumReflection() {
   const { isActive: screenshotMode } = useScreenshotMode();
   const [visible, setVisible] = useState(false);
   const [reflection, setReflection] = useState('');
   const [isDeep, setIsDeep] = useState(false);
+  const [isSilent, setIsSilent] = useState(false);
   const stateRef = useRef<ReflectionState | null>(null);
 
   // Initialize on mount (client-only, avoids hydration mismatch)
@@ -95,6 +118,20 @@ export default function PremiumReflection() {
     }
 
     const state = loadState();
+
+    // Increment total visits for silence rhythm
+    state.visitTotal = (state.visitTotal || 0) + 1;
+
+    // ── Silence check ──
+    // Skip silence for the very first visit — the user
+    // should see that this space exists before it goes quiet.
+    if (state.visitTotal > 2 && shouldSilence(state.visitTotal)) {
+      // This visit is silent. Still advance the reflection
+      // for next time, but don't show anything.
+      saveState(state);
+      setIsSilent(true);
+      return;
+    }
 
     // Advance on every visit
     // If visitCount < required visits, keep the same reflection
@@ -143,6 +180,12 @@ export default function PremiumReflection() {
     setIsDeep(newIsDeep);
     setVisible(true);
   }, [screenshotMode]);
+
+  // Silent visit — the reflection space breathes empty.
+  // Not a bug. Not a missing feature. Intentional silence.
+  if (isSilent) {
+    return <div className="py-3 sm:py-8" />;
+  }
 
   if (!reflection) {
     // Minimal placeholder — silence, not a loading state

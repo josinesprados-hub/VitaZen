@@ -31,11 +31,11 @@ export const PATTERNS_SUBTITLE = 'Relaciones entre partes de tu vida';
 
 // ─── Empty states ───
 
-export const NO_DATA_TITLE = 'Las etapas se revelan con el tiempo';
-export const NO_DATA_SUBTITLE = 'No hay prisa.';
+export const NO_DATA_TITLE = 'Se revela con el tiempo';
+export const NO_DATA_SUBTITLE = 'Cada día suma.';
 
-export const LITTLE_DATA_TITLE = 'Tu vida está empezando a tomar forma';
-export const LITTLE_DATA_SUBTITLE = 'Con el tiempo.';
+export const LITTLE_DATA_TITLE = 'Tu vida está tomando forma';
+export const LITTLE_DATA_SUBTITLE = 'Poco a poco.';
 
 // ─── FREE vs Profundidad ───
 

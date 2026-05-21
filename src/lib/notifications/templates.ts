@@ -6,7 +6,14 @@
 // The user should feel: "la app me acompaña"
 // NOT: "la app me persigue"
 //
-// Expanded with more variety.
+// Streak notifications removed.
+// "Llevas X días" is gamification, not observation.
+// Consistency is noticed through Silent Memories,
+// not through push notifications that count days.
+//
+// Reduced frequency caps across all types.
+// Less is more. Silence is part of the design.
+//
 // Every message validated for:
 //  - No guilt-tripping language ("deberías", "tienes que")
 //  - No urgency ("¡ya!", "¡ahora!")
@@ -52,24 +59,6 @@ const CHECKIN_TEMPLATES: NotificationTemplate[] = [
     title: 'El día',
     body: 'Tiene un rato para ti.',
     url: '/checkin',
-  },
-];
-
-const STREAK_TEMPLATES: NotificationTemplate[] = [
-  {
-    title: 'Llevas {streak} días',
-    body: 'Un día más.',
-    url: '/dashboard',
-  },
-  {
-    title: '{streak} días',
-    body: 'Sigues aquí.',
-    url: '/dashboard',
-  },
-  {
-    title: '{streak} días seguidos',
-    body: 'Poco a poco.',
-    url: '/dashboard',
   },
 ];
 
@@ -159,7 +148,6 @@ const REFLECTION_TEMPLATES: NotificationTemplate[] = [
 
 const TEMPLATE_MAP: Record<NotificationType, NotificationTemplate[]> = {
   checkin:      CHECKIN_TEMPLATES,
-  streak:       STREAK_TEMPLATES,
   weekly_recap: WEEKLY_RECAP_TEMPLATES,
   comeback:     COMEBACK_TEMPLATES,
   reflection:   REFLECTION_TEMPLATES,
@@ -171,7 +159,7 @@ const TEMPLATE_MAP: Record<NotificationType, NotificationTemplate[]> = {
  * "always seeing the same one" problem that random selection
  * creates with small template sets.
  *
- * Optionally interpolate variables like {streak} from `vars`.
+ * Optionally interpolate variables from `vars`.
  */
 export function getTemplate(
   type: NotificationType,

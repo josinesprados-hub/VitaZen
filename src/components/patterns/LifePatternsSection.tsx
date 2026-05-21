@@ -180,7 +180,7 @@ function PremiumPreview({ observation }: { observation: ObservationData }) {
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex items-center gap-1.5">
           <Circle size={3} className="text-[#c8a55a]/25" fill="currentColor" />
-          <span className="text-[10px] text-[#444]">Más capas con el tiempo</span>
+          <span className="text-[10px] text-[#444]">Más conexiones con el tiempo</span>
         </div>
       </div>
     </div>

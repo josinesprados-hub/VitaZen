@@ -34,24 +34,28 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
     'Las semanas con menos descanso tienen más disfrute.',
     'Menos descanso, más disfrute.',
     'Cuando descansas menos, gastas más en ti.',
+    'El descanso y el gasto personal van de la mano.',
   ],
 
   'finanzas-mente': [
     'Semanas con más práctica mental, más tranquilidad.',
     'Cuando hay sesiones de mente, tranquilidad también está.',
     'Más mente, más calma en los números.',
+    'La práctica mental se nota en las decisiones.',
   ],
 
   'finanzas-estres': [
     'Semanas con más presión, más necesidad en tus gastos.',
     'Cuando hay presión, necesidad aparece más.',
     'Estrés y necesidad van juntos.',
+    'La presión cambia lo que necesitas.',
   ],
 
   'finanzas-sueno': [
     'Semanas con peor descanso, más necesidad.',
     'Menos sueño, más necesidad.',
     'No dormir bien cambia lo que necesitas.',
+    'El descanso afecta tus prioridades.',
   ],
 };
 
@@ -81,7 +85,7 @@ export function getObservationText(
 // Short. No promises. No marketing.
 
 export const EMPTY_STATE_MESSAGE =
-  'Con el tiempo pueden aparecer conexiones.';
+  'Las conexiones necesitan tiempo.';
 
 // ─── Section Titles ───
 

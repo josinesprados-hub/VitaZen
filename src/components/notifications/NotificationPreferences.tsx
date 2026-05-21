@@ -10,7 +10,6 @@ import {
   Moon,
   Sunrise,
   Heart,
-  Flame,
   BarChart3,
   RotateCcw,
   Brain,
@@ -167,7 +166,7 @@ export function NotificationPreferences() {
           <div className="text-xs text-[#666] space-y-1.5">
             <p className="flex items-center gap-2">
               <Check size={12} className="text-[#c8a55a]" />
-              Máximo 3 notificaciones al día
+              Máximo 2 notificaciones al día
             </p>
             <p className="flex items-center gap-2">
               <Moon size={12} className="text-[#c8a55a]" />
@@ -256,17 +255,6 @@ export function NotificationPreferences() {
           saving={savingKey === 'checkinReminders'}
           saved={savedKeys.has('checkinReminders')}
           onChange={(v) => handleToggle('checkinReminders', v)}
-        />
-
-        {/* Streak reminders */}
-        <ToggleRow
-          icon={<Flame size={14} className="text-[#c8a55a]" />}
-          title="Rachas"
-          description="Te acompañamos cuando llevas días consecutivos"
-          checked={preferences.streakReminders}
-          saving={savingKey === 'streakReminders'}
-          saved={savedKeys.has('streakReminders')}
-          onChange={(v) => handleToggle('streakReminders', v)}
         />
 
         {/* Weekly recap */}
@@ -392,7 +380,7 @@ export function NotificationPreferences() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {[1, 2, 3, 4, 5].map((n) => (
+            {[1, 2].map((n) => (
               <button
                 key={n}
                 onClick={() => handleToggle('maxDailyNotifications', n)}

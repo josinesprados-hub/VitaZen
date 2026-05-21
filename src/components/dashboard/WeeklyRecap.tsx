@@ -322,7 +322,7 @@ export function WeeklyRecap() {
               {!isPremium && (
                 <span className="text-[10px] text-[#555] items-center gap-1 hidden sm:flex">
                   <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
-                  Hay más capas con el tiempo
+                  Hay más aquí con el tiempo
                 </span>
               )}
               <Link
@@ -634,7 +634,7 @@ export function WeeklyRecap() {
               {!isPremium && data.mentorRecommendation.length > 100 && (
                 <div className="mt-2 flex items-center gap-1.5">
                   <span className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1">
-                    <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" /> Algunas conexiones solo aparecen con el tiempo
+                    <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" /> Las conexiones se revelan con el tiempo
                   </span>
                 </div>
               )}
