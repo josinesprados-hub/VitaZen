@@ -65,7 +65,7 @@ export const SUMMARY_TITLE_FACTORY = (monthLabel: string) =>
 export const INTENTION_BALANCE_TITLE = 'Tus intenciones';
 export const INTENTION_BALANCE_EMPTY = 'Sin registros de intenciones este mes';
 
-export const EVOLUTION_TITLE = 'Evolución suave';
+export const EVOLUTION_TITLE = 'Cómo ha cambiado';
 export const EVOLUTION_NO_PREVIOUS = 'Es tu primer mes con datos';
 export const EVOLUTION_SAME = 'Tu mes fue parecido al anterior';
 export const EVOLUTION_QUIETER = 'Más tranquilo';
@@ -92,6 +92,6 @@ export const NO_DATA_SUBTITLE = 'No hay prisa.';
 
 // ─── FREE vs Profundidad ───
 
-export const ELITE_DEEPER = 'Las conexiones entre tus imperios se revelan con el tiempo';
-export const ELITE_EVOLUTION = 'Evolución acumulativa';
+export const ELITE_DEEPER = 'Las conexiones entre tus imperios aparecen con el tiempo';
+export const ELITE_EVOLUTION = 'Cómo va cambiando';
 export const ELITE_MEMORIES = 'Memoria mensual';

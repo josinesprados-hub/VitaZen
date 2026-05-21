@@ -7,7 +7,7 @@ import { Circle } from 'lucide-react';
 // DepthGate (formerly PremiumGate)
 //
 // Not a paywall. Not a lock.
-// A quiet suggestion that there are deeper layers.
+// A quiet suggestion that there's more here.
 //
 // Philosophy:
 // - No blur. Blur says "I'm hiding something from you."
@@ -15,7 +15,7 @@ import { Circle } from 'lucide-react';
 // - No aggressive overlay. Overlays say "you can't have this."
 //
 // Instead: a gentle fade, a whisper, an invitation.
-// The user should feel: "There's something deeper here."
+// The user should feel: "There's more here."
 // NOT: "They're blocking this from me."
 // ─────────────────────────────────────────
 
@@ -66,7 +66,7 @@ export default function PremiumGate({
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}
           >
-            Hay más profundidad aquí · Élite
+            Hay más aquí · Élite
           </Link>
         </div>
       </div>
@@ -132,7 +132,7 @@ export function PremiumHistoryGate({
       <div className="flex items-center gap-1.5 text-[10px] text-[#444]">
         <Circle size={3} className="text-[#c8a55a]/25" fill="currentColor" />
         <span>
-          Hay más capas aquí —{' '}
+          Hay más aquí —{' '}
           <Link
             href="/elite"
             className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors"

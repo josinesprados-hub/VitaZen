@@ -850,7 +850,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {remaining <= 3 && remaining > 0 && (
             <p className="text-[10px] text-[#e8a849] mt-1.5 flex items-center gap-1">
               <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
-              Más perspectiva con Élite
+              Más conexiones con Élite
             </p>
           )}
           {remaining === 0 && (

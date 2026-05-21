@@ -71,7 +71,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                 <div className="flex flex-col items-center gap-2 px-6 text-center">
                   <Circle size={5} className="text-[#c8a55a]/40" fill="currentColor" />
                   <p className="text-[#888] text-xs leading-relaxed">
-                    Hay notas que solo aparecen cuando miras más despacio
+                    Hay notas que solo aparecen con el tiempo
                   </p>
                   <Link
                     href="/elite"

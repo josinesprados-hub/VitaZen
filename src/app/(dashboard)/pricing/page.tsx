@@ -9,9 +9,9 @@ import { Check, Loader2, Link2, Circle, Eye } from 'lucide-react';
 // Pricing Page — Élite identity, contemplative tone
 // ═══════════════════════════════════════════
 //
-// Élite is the brand. Profundidad is the emotional language.
+// Élite is the brand. Conexión is the emotional language.
 // The user should feel:
-// "There's something more human and deeper here."
+// "There's something more connected here."
 // NOT: "I need to pay to unlock features."
 
 export default function PricingPage() {
@@ -72,7 +72,7 @@ export default function PricingPage() {
           Mirar la vida más despacio
         </h1>
         <p className="text-[#777] text-base max-w-md mx-auto leading-relaxed">
-          No necesitas más herramientas. Necesitas más perspectiva.
+          No necesitas más herramientas. Necesitas más conexión.
         </p>
       </div>
 
@@ -138,16 +138,16 @@ export default function PricingPage() {
           </div>
 
           <div className="space-y-3 mb-6">
-            <p className="text-[#c8a55a]/30 text-[10px] uppercase tracking-wider font-medium">Todo lo anterior, y capas más profundas</p>
+            <p className="text-[#c8a55a]/30 text-[10px] uppercase tracking-wider font-medium">Todo lo anterior, y más conexiones</p>
             {[
               'Conexiones entre tus imperios',
               'Patrones de vida: lo que se repite',
               'Mentor IA sin límite diario',
               'Memoria que acumula contexto',
               'Historial completo de conversaciones',
-              'Notas más profundas de cada imperio',
+              'Notas con más detalle de cada imperio',
               'Recomendaciones del mentor completas',
-              'Observaciones semanales en profundidad',
+              'Observaciones semanales con más detalle',
             ].map((feature) => (
               <div key={feature} className="flex items-start gap-3">
                 <Check size={14} className="text-[#c8a55a]/50 shrink-0 mt-0.5" />
@@ -180,7 +180,7 @@ export default function PricingPage() {
       <div className="mt-12 sm:mt-16 mb-8">
         <div className="flex items-center gap-2 mb-6 justify-center">
           <Link2 size={12} className="text-[#c8a55a]/30" />
-          <p className="text-[#c8a55a]/30 text-[10px] uppercase tracking-[0.2em] font-medium">Así se siente la profundidad</p>
+          <p className="text-[#c8a55a]/30 text-[10px] uppercase tracking-[0.2em] font-medium">Así se ve</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
@@ -214,7 +214,7 @@ export default function PricingPage() {
       <div className="text-center mt-6 mb-2">
         <div className="max-w-md mx-auto">
           <p className="text-[#555] text-sm leading-relaxed">
-            Free te ayuda. Élite amplía la profundidad de VitaZen.
+            Todo lo esencial ya está en Free. Élite conecta más cosas con el tiempo.
           </p>
           <p className="text-[#333] text-xs mt-3">
             Sin compromiso. Cancela cuando quieras.

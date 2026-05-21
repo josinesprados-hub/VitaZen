@@ -75,7 +75,7 @@ export function SubscriptionManager() {
               </p>
             ) : (
               <p className="text-xs text-[#999] mt-0.5">
-                Acceso a capas más profundas
+                Acceso completo
               </p>
             )}
           </div>
@@ -136,8 +136,8 @@ export function SubscriptionManager() {
           <Circle size={5} fill="currentColor" className="text-[#c8a55a]/40" />
         </div>
         <div className="text-left flex-1">
-          <p className="text-sm font-medium">Más perspectiva con Élite</p>
-          <p className="text-xs text-[#777]">Conexiones entre partes de tu vida</p>
+          <p className="text-sm font-medium">Más conexiones con Élite</p>
+          <p className="text-xs text-[#777]">Más contexto entre lo que vives</p>
         </div>
         <ChevronRight size={16} className="text-[#444] group-hover:text-[#c8a55a] transition-colors" />
       </button>

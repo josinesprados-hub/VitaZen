@@ -156,7 +156,7 @@ export const REFLECTIONS: readonly CuratedReflection[] = [
   { text: 'Hay una diferencia entre estar quieto y estar parado.', weight: 'deep' },
   { text: 'Lo que parece estancamiento a veces es pausa.', weight: 'deep' },
   { text: 'Hay dolores que no duelen hasta que los nombras.', weight: 'deep' },
-  { text: 'No busques profundidad. Deja de huir y aparece.', weight: 'deep' },
+  { text: 'Lo que importa no se busca. Aparece.', weight: 'deep' },
   { text: 'Algunas verdades solo se dicen en voz baja.', weight: 'deep' },
   { text: 'No siempre es posible saber si algo está cambiando.', weight: 'deep' },
   { text: 'Lo que más importa casi nunca hace ruido.', weight: 'deep' },

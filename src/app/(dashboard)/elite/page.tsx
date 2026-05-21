@@ -23,7 +23,7 @@ import {
 // No es una página de pricing.
 // No es un funnel de ventas.
 // Es un espacio para entender qué cambia
-// cuando entras más profundamente en tu propia vida.
+// cuando te conectas más con el tiempo.
 //
 // El usuario debe:
 // 1. Entender qué es Élite
@@ -94,12 +94,11 @@ export default function ElitePage() {
         </div>
 
         <h1 className="text-2xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-          Entrar más profundamente<br className="hidden sm:block" /> en tu propia vida
+          Un espacio más conectado<br className="hidden sm:block" /> con el tiempo
         </h1>
 
         <p className="text-[#777] text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
-          No más herramientas. Más perspectiva. Más conexión.
-          Más sensibilidad al paso del tiempo.
+          Más conexiones. Más tiempo. Más claridad.
         </p>
       </div>
 
@@ -125,9 +124,8 @@ export default function ElitePage() {
                 </h3>
                 <p className="text-[#888] text-sm leading-relaxed">
                   VitaZen guarda tus conversaciones, tus reflexiones, tus patrones.
-                  Con Élite, la memoria se vuelve acumulativa: cada semana conecta con la anterior,
-                  cada mes revela algo que no podías ver solo con días sueltos.
-                  Tu vida empieza a contar una historia.
+                  Con Élite, la memoria se acumula: cada semana conecta con la anterior,
+                  cada mes muestra algo que no podías ver con días sueltos.
                 </p>
               </div>
             </div>
@@ -147,7 +145,7 @@ export default function ElitePage() {
                   Tu mente afecta tu energía. Tu disciplina cambia tu relación con el dinero.
                   Tus hábitos de descanso influyen en tus decisiones financieras.
                   Élite te muestra estas conexiones entre imperios — relaciones que solo aparecen
-                  cuando miras tu vida como un todo, no como partes separadas.
+                  cuando miras todo junto, no por separado.
                 </p>
               </div>
             </div>
@@ -164,10 +162,10 @@ export default function ElitePage() {
                   Un mentor que recuerda quién eres
                 </h3>
                 <p className="text-[#888] text-sm leading-relaxed">
-                  Sin límite diario. Con más contexto. Con más profundidad en cada respuesta.
+                  Sin límite diario. Con más contexto en cada respuesta.
                   El mentor de VitaZen, con Élite, no solo responde — recuerda.
                   Acumula lo que has vivido, lo que has reflexionado, lo que te importa.
-                  Cada conversación es más profunda que la anterior.
+                  Cada conversación entiende más que la anterior.
                 </p>
               </div>
             </div>
@@ -181,13 +179,13 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
-                  El ritmo de tu vida, visto en perspectiva
+                  El ritmo de tu vida, con más contexto
                 </h3>
                 <p className="text-[#888] text-sm leading-relaxed">
-                  Observaciones semanales en profundidad. Evolución acumulativa.
+                  Observaciones semanales con más detalle. Evolución acumulativa.
                   Cierres mensuales que conectan tus intenciones con tus acciones.
-                  Con Élite, VitaZen no solo registra — comprende el ritmo
-                  de quién estás siendo, y te lo muestra con cuidado.
+                  Con Élite, VitaZen no solo registra — entiende el ritmo
+                  de lo que estás viviendo, y te lo muestra sin prisa.
                 </p>
               </div>
             </div>
@@ -200,7 +198,7 @@ export default function ElitePage() {
         <div className="flex items-center justify-center gap-2 mb-8">
           <Sparkles size={12} className="text-[#c8a55a]/25" />
           <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
-            Así se siente la profundidad
+            Así se ve
           </p>
         </div>
 
@@ -255,9 +253,9 @@ export default function ElitePage() {
             </div>
 
             <p className="text-[#777] text-sm leading-relaxed mb-5">
-              Un espacio completo para registrar tu vida con cuidado.
+              Todo lo esencial ya está aquí.
               Hábitos, estados, notas, el mentor, los 5 imperios.
-              Free ya es suficiente para empezar a entenderse.
+              Lo necesario para empezar a entenderse.
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
@@ -298,14 +296,13 @@ export default function ElitePage() {
             </div>
 
             <p className="text-[#999] text-sm leading-relaxed mb-5">
-              Más perspectiva. Más tiempo. Más conexiones.
-              Élite no añade herramientas — añade profundidad a lo que ya estás viviendo.
-              Tu vida se vuelve más legible, más conectada, más consciente.
+              Élite conecta más cosas con el tiempo.
+              Más contexto, más memoria, más conexiones entre lo que vives.
             </p>
 
             <div className="border-t border-[#c8a55a]/8 pt-4">
               <p className="text-[#c8a55a]/25 text-[10px] uppercase tracking-wider font-medium mb-3">
-                Capas más profundas
+                Lo que cambia con Élite
               </p>
               <ul className="space-y-2">
                 {[
@@ -314,8 +311,8 @@ export default function ElitePage() {
                   'Mentor sin límite diario, con más contexto',
                   'Memoria que acumula y conecta',
                   'Historial completo de conversaciones',
-                  'Notas más profundas de cada imperio',
-                  'Observaciones semanales en profundidad',
+                  'Notas con más detalle de cada imperio',
+                  'Observaciones semanales con más detalle',
                   'Cierres mensuales con evolución',
                 ].map((item) => (
                   <li key={item} className="text-[#aaa] text-xs flex items-start gap-2">
@@ -333,7 +330,7 @@ export default function ElitePage() {
       <div className="text-center mb-10 sm:mb-14">
         <div className="max-w-md mx-auto">
           <p className="text-[#555] text-sm leading-relaxed">
-            Free te ayuda. Élite te conecta con la profundidad de tu propia vida.
+            Todo lo esencial ya está en Free. Élite conecta más cosas con el tiempo.
           </p>
           <p className="text-[#333] text-xs mt-3">
             Sin compromiso. Cancela cuando quieras.

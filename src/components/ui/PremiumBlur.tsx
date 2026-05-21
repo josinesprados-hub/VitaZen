@@ -10,7 +10,7 @@ import { Circle } from 'lucide-react';
 // Reimagined: no aggressive blur, no Crown,
 // no "Descubrir" button, no Lock icon.
 //
-// A gentle dim + a contemplative whisper.
+// A gentle dim + a quiet whisper.
 // The user feels curiosity, not frustration.
 // ─────────────────────────────────────────
 

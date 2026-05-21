@@ -89,7 +89,7 @@ export default function TermsPage() {
             VitaZen ofrece un plan Free con funcionalidades básicas y un plan Élite de
             suscripción mensual que desbloquea acceso completo a todas las funcionalidades de
             la aplicación, incluyendo mensajes de IA ilimitados, mentor avanzado, memoria
-            contextual avanzada, consejos exclusivos y contenido de profundidad en cada imperio.
+            contextual avanzada, consejos exclusivos y contenido con más detalle en cada imperio.
           </p>
           <p className="text-gray-300 leading-relaxed mb-4">
             Al suscribirte al plan Élite, aceptas pagar la tarifa vigente indicada en la

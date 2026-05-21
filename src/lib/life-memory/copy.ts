@@ -45,7 +45,7 @@ export const ELITE_CONNECTIONS = 'Conexiones históricas';
 export const ELITE_EVOLUTION = 'Evolución personal';
 export const ELITE_BADGE = 'Élite';
 
-export const FREE_LIMIT_MESSAGE = 'Las etapas de vida se revelan con el tiempo';
+export const FREE_LIMIT_MESSAGE = 'Las etapas de vida aparecen con el tiempo';
 
 // ─── Time labels ───
 
