@@ -52,6 +52,19 @@ export async function POST(request: NextRequest) {
             }
           }
 
+          // Prevent duplicate active subscriptions (race condition protection)
+          const existingActive = await db.subscription.findFirst({
+            where: { userId, status: 'active' },
+          });
+
+          if (existingActive) {
+            console.warn('[Webhook] User already has active subscription — marking old as superseded:', existingActive.id);
+            await db.subscription.update({
+              where: { id: existingActive.id },
+              data: { status: 'superseded' },
+            });
+          }
+
           // Save plan + stripeCustomerId so the portal can find the customer
           const updateData: Record<string, unknown> = { plan: 'PREMIUM' };
           if (customerId) {
@@ -107,6 +120,41 @@ export async function POST(request: NextRequest) {
                   currentPeriodEnd: new Date(subscription.current_period_end * 1000),
                 },
               });
+
+              // Sync user.plan with subscription status
+              // If subscription is no longer active (past_due, incomplete, unpaid),
+              // downgrade the user to FREE to prevent free premium access
+              const activeStatuses = ['active', 'trialing'];
+              if (!activeStatuses.includes(subscription.status)) {
+                // Check if user has any other active subscription before downgrading
+                const otherActive = await db.subscription.findFirst({
+                  where: {
+                    userId,
+                    status: 'active',
+                    stripeSubscriptionId: { not: subscription.id },
+                  },
+                });
+                if (!otherActive) {
+                  await db.user.update({
+                    where: { id: userId },
+                    data: { plan: 'FREE' },
+                  });
+                  console.log('[Webhook] Subscription not active — user downgraded to FREE:', userId, 'status:', subscription.status);
+                } else {
+                  console.log('[Webhook] Subscription not active but another active sub exists — keeping PREMIUM:', userId);
+                }
+              } else if (subscription.status === 'active') {
+                // Ensure user is marked PREMIUM if subscription is active
+                const user = await db.user.findUnique({ where: { id: userId } });
+                if (user && user.plan !== 'PREMIUM') {
+                  await db.user.update({
+                    where: { id: userId },
+                    data: { plan: 'PREMIUM' },
+                  });
+                  console.log('[Webhook] Subscription active — user restored to PREMIUM:', userId);
+                }
+              }
+
               console.log('[Webhook] Subscription updated for user:', userId);
             }
           }
@@ -124,15 +172,29 @@ export async function POST(request: NextRequest) {
           if ('metadata' in customer) {
             const userId = customer.metadata.userId;
             if (userId) {
-              await db.user.update({
-                where: { id: userId },
-                data: { plan: 'FREE' },
+              // Check if user has any other active subscription before downgrading
+              const otherActive = await db.subscription.findFirst({
+                where: {
+                  userId,
+                  status: 'active',
+                  stripeSubscriptionId: { not: subscription.id },
+                },
               });
+
+              if (!otherActive) {
+                await db.user.update({
+                  where: { id: userId },
+                  data: { plan: 'FREE' },
+                });
+                console.log('[Webhook] Subscription canceled, user downgraded to FREE:', userId);
+              } else {
+                console.log('[Webhook] Subscription canceled but another active sub exists — keeping PREMIUM:', userId);
+              }
+
               await db.subscription.updateMany({
                 where: { stripeSubscriptionId: subscription.id },
                 data: { status: 'canceled' },
               });
-              console.log('[Webhook] Subscription canceled, user downgraded to FREE:', userId);
             }
           }
         } catch (e) {

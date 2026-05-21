@@ -21,7 +21,7 @@ export async function getAuthUser(idToken: string) {
     include: {
       aiUsage: true,
       subscriptions: {
-        where: { status: 'active' },
+        where: { status: { in: ['active', 'trialing'] } },
         orderBy: { createdAt: 'desc' },
         take: 1,
       },
@@ -35,7 +35,7 @@ export async function getAuthUser(idToken: string) {
       include: {
         aiUsage: true,
         subscriptions: {
-          where: { status: 'active' },
+          where: { status: { in: ['active', 'trialing'] } },
           orderBy: { createdAt: 'desc' },
           take: 1,
         },

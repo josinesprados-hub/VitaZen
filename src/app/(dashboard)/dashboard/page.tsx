@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
@@ -33,8 +34,10 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string }> 
 };
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { apiFetch } = useApi();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { isActive: screenshotMode } = useScreenshotMode();
   const [empires, setEmpires] = useState<EmpireData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +45,16 @@ export default function DashboardPage() {
   const [showCheckinModal, setShowCheckinModal] = useState(false);
 
   const onboardingConfirmed = user?.onboardingCompleted === true;
+
+  // Handle post-Stripe redirect: refresh user plan state and clean URL
+  useEffect(() => {
+    if (searchParams.get('upgraded') === 'true') {
+      // Stripe webhook may not have processed yet — refresh user to get updated plan
+      refreshUser();
+      // Clean URL without full reload to avoid re-triggering
+      router.replace('/dashboard');
+    }
+  }, [searchParams, refreshUser, router]);
 
   useEffect(() => {
     if (!user || !onboardingConfirmed) return;

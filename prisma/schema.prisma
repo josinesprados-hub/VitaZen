@@ -104,7 +104,7 @@ model Subscription {
   userId               String
   stripeSubscriptionId String   @unique
   stripePriceId        String
-  status               String   @default("active") // active | canceled | past_due | incomplete
+  status               String   @default("active") // active | canceled | past_due | incomplete | trialing | superseded | unpaid
   currentPeriodStart   DateTime
   currentPeriodEnd     DateTime
   cancelAtPeriodEnd    Boolean  @default(false)

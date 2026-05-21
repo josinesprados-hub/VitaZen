@@ -311,7 +311,6 @@ function buildComparison(data: RawData): WeeklyComparison {
 
   const prevActivity =
     data.prevWeekCheckins.length +
-    data.prevWeekJournals.length + // prevWeekHabits not fetched, approximate
     data.prevWeekMeditations.length +
     data.prevWeekJournals.length +
     data.prevWeekWellness.length;
@@ -322,7 +321,7 @@ function buildComparison(data: RawData): WeeklyComparison {
     stressTrend: Math.round((prevStress - thisStress) * 10) / 10, // positive = stress reduced = good
     activityTrend: thisActivity - prevActivity,
     meditationTrend: data.thisWeekMeditations.length - data.prevWeekMeditations.length,
-    habitTrend: data.thisWeekHabits.length - data.prevWeekJournals.length, // approximate
+    habitTrend: 0, // prevWeekHabits not fetched — neutral trend until data available
   };
 }
 

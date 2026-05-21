@@ -9,7 +9,7 @@ export const PLANS = {
   FREE: {
     name: 'Free',
     price: 0,
-    aiMessagesLimit: 10,
+    aiMessagesLimit: 15, // Must match FREE_DAILY_LIMIT in @/lib/limits.ts
   },
   PREMIUM: {
     name: 'Élite',

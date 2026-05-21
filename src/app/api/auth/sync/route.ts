@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       where: { firebaseUid: decodedToken.uid },
       include: {
         subscriptions: {
-          where: { status: 'active' },
+          where: { status: { in: ['active', 'trialing'] } },
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         where: { email: decodedToken.email },
         include: {
           subscriptions: {
-            where: { status: 'active' },
+            where: { status: { in: ['active', 'trialing'] } },
             orderBy: { createdAt: 'desc' },
             take: 1,
           },
@@ -201,6 +201,7 @@ export async function POST(request: NextRequest) {
         welcomeEmailSent: user.welcomeEmailSent,
         createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
+        subscription: null, // New users have no subscription
       },
     });
   } catch (error) {
