@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { getDeterministicTips } from '@/lib/server/emotional-dashboard-state';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,8 +18,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'empire parameter required' }, { status: 400 });
     }
 
-    // Return all tips (FREE + PREMIUM) so frontend can show premium as blurred
-    const tips = await db.empireTip.findMany({
+    // Fetch all tips from DB
+    const allTips = await db.empireTip.findMany({
       where: { empire },
       orderBy: [
         { plan: 'asc' },   // FREE tips first
@@ -27,7 +28,10 @@ export async function GET(request: NextRequest) {
       take: 10,
     });
 
-    return NextResponse.json({ tips });
+    // Use server-side deterministic rotation instead of client-side Math.random
+    const { freeTips, premiumTips } = await getDeterministicTips(user.id, empire, allTips);
+
+    return NextResponse.json({ tips: allTips, rotatedFreeTips: freeTips, rotatedPremiumTips: premiumTips });
   } catch (error) {
     console.error('Empire tips GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

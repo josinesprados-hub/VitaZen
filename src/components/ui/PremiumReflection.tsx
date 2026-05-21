@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { REFLECTIONS, selectWeightedReflection, isDeepReflection } from '@/lib/reflections';
+import { useEffect, useState } from 'react';
+import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 
@@ -9,177 +9,65 @@ import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 // PremiumReflection — contemplative rotation
 // ═══════════════════════════════════════════
 //
-// Contemplative, not algorithmic.
+// Single source of truth: the server.
+// No Math.random(). No localStorage.
+// The server decides the reflection, all devices
+// show the same one.
 //
-// - Shows one reflection at a time
-// - Changes when returning to dashboard (visit-based)
-// - NO auto-rotation — the reflection stays until the user leaves
-//   and comes back. A reflection doesn't rotate like a feed.
-// - Never repeats until full collection traversed
-// - Deep reflections stay for 2 visits (not 1)
-// - Weighted selection: light 50%, relevant 35%, deep 15%
-// - SILENCE PROBABILITY: ~35% of visits show NO reflection.
-//   Silence protects the emotional impact of each reflection.
-//   When everything speaks, nothing matters.
-// - Persists state in localStorage
-// - Avoids hydration mismatch (client-only init)
+// Silence is still preserved — it's computed
+// server-side with the same visit-based rhythm.
 
-const STORAGE_KEY = 'vitazen_reflection_state';
-const SILENCE_KEY = 'vitazen_reflection_silence';
-const FADE_DURATION = 600;
-
-// How often silence appears. ~35% of visits.
-// Not random — determined by visit count so it feels
-// rhythmic, not arbitrary. Pattern: show 2, rest 1.
-const SILENCE_PATTERN = [false, false, true];
-
-interface ReflectionState {
-  /** Current reflection index in REFLECTIONS array */
-  currentIndex: number;
-  /** Visit count for current reflection (deep ones stay 2 visits) */
-  visitCount: number;
-  /** Already-shown indices — no repeat until full cycle */
-  shown: number[];
-  /** Last N indices — avoid close repetition after cycle reset */
-  recent: number[];
-  /** Total visits since last silence — for rhythm pattern */
-  visitTotal: number;
-}
-
-/**
- * Load persisted state or create a fresh one.
- */
-function loadState(): ReflectionState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as ReflectionState;
-      // Validate: must have valid index
-      if (
-        typeof parsed.currentIndex === 'number' &&
-        parsed.currentIndex >= 0 &&
-        parsed.currentIndex < REFLECTIONS.length &&
-        Array.isArray(parsed.shown)
-      ) {
-        return parsed;
-      }
-    }
-  } catch {
-    // localStorage unavailable or corrupt — start fresh
-  }
-  return freshState();
-}
-
-function freshState(): ReflectionState {
-  // First reflection: weighted selection
-  const index = selectWeightedReflection([]);
-  return {
-    currentIndex: index,
-    visitCount: 0,
-    shown: [index],
-    recent: [index],
-    visitTotal: 0,
-  };
-}
-
-function saveState(state: ReflectionState): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // ignore
-  }
-}
-
-/**
- * Should this visit be silent?
- * Uses a rhythmic pattern, not random chance.
- * This makes silence feel like breathing, not absence.
- */
-function shouldSilence(visitTotal: number): boolean {
-  const patternIndex = visitTotal % SILENCE_PATTERN.length;
-  return SILENCE_PATTERN[patternIndex];
+interface ReflectionSnapshot {
+  text: string;
+  isDeep: boolean;
+  isSilent: boolean;
 }
 
 export default function PremiumReflection() {
+  const { apiFetch } = useApi();
   const { isActive: screenshotMode } = useScreenshotMode();
   const [visible, setVisible] = useState(false);
   const [reflection, setReflection] = useState('');
   const [isDeep, setIsDeep] = useState(false);
   const [isSilent, setIsSilent] = useState(false);
-  const stateRef = useRef<ReflectionState | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
-  // Initialize on mount (client-only, avoids hydration mismatch)
   useEffect(() => {
-    // ── Screenshot mode: use fixed premium reflection ──
     if (screenshotMode) {
       setReflection(SCREENSHOT_REFLECTION);
       setVisible(true);
+      setLoaded(true);
       return;
     }
 
-    const state = loadState();
+    let cancelled = false;
 
-    // Increment total visits for silence rhythm
-    state.visitTotal = (state.visitTotal || 0) + 1;
+    async function fetchReflection() {
+      try {
+        const res = await apiFetch('/api/emotional-snapshot');
+        if (!res.ok || cancelled) return;
 
-    // ── Silence check ──
-    // Skip silence for the very first visit — the user
-    // should see that this space exists before it goes quiet.
-    if (state.visitTotal > 2 && shouldSilence(state.visitTotal)) {
-      // This visit is silent. Still advance the reflection
-      // for next time, but don't show anything.
-      saveState(state);
-      setIsSilent(true);
-      return;
-    }
+        const data = await res.json();
+        if (cancelled) return;
 
-    // Advance on every visit
-    // If visitCount < required visits, keep the same reflection
-    const currentIsDeep = isDeepReflection(state.currentIndex);
-    const requiredVisits = currentIsDeep ? 2 : 1;
-
-    if (state.visitCount < requiredVisits - 1) {
-      // Stay on current reflection for one more visit
-      state.visitCount++;
-      stateRef.current = state;
-      saveState(state);
-      setReflection(REFLECTIONS[state.currentIndex].text);
-      setIsDeep(currentIsDeep);
-      setVisible(true);
-      return;
-    }
-
-    // Time to advance to a new reflection
-    const isFirstVisit = !localStorage.getItem(STORAGE_KEY);
-    if (isFirstVisit) {
-      // Fresh state: show first reflection without advancing
-      state.visitCount = 0;
-    } else {
-      // Select next reflection using weighted system, avoiding recently shown
-      const excludeIndices = state.recent;
-      const newIndex = selectWeightedReflection(excludeIndices);
-
-      state.currentIndex = newIndex;
-      state.visitCount = 0;
-      state.shown = [...state.shown, newIndex];
-
-      // Track recent (last 10 to avoid close repetition)
-      state.recent = [...state.recent, newIndex].slice(-10);
-
-      // Check if we've shown most reflections — reset cycle
-      if (state.shown.length >= REFLECTIONS.length - 5) {
-        state.shown = state.recent.slice(-5);
+        if (data.reflection && !data.reflection.isSilent) {
+          setReflection(data.reflection.text);
+          setIsDeep(data.reflection.isDeep);
+          setVisible(true);
+        } else {
+          // Silent visit — the reflection space breathes empty
+          setIsSilent(true);
+        }
+      } catch {
+        // Network error — silence is fine
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
     }
 
-    stateRef.current = state;
-    saveState(state);
-
-    const newIsDeep = isDeepReflection(state.currentIndex);
-    setReflection(REFLECTIONS[state.currentIndex].text);
-    setIsDeep(newIsDeep);
-    setVisible(true);
-  }, [screenshotMode]);
+    fetchReflection();
+    return () => { cancelled = true; };
+  }, [apiFetch, screenshotMode]);
 
   // Silent visit — the reflection space breathes empty.
   // Not a bug. Not a missing feature. Intentional silence.
@@ -187,7 +75,7 @@ export default function PremiumReflection() {
     return <div className="py-3 sm:py-8" />;
   }
 
-  if (!reflection) {
+  if (!loaded || !reflection) {
     // Minimal placeholder — silence, not a loading state
     return <div className="py-2 sm:py-6 h-8 sm:h-12 flex items-center justify-center"><div className="h-2 w-16 rounded-full bg-[#c8a55a]/10 gentle-pulse" /></div>;
   }

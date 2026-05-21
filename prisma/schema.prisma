@@ -50,8 +50,9 @@ model User {
   pushTokens        PushToken[]
   notificationPreference NotificationPreference?
   notificationLog   NotificationLog[]
-  widgetSnapshots   WidgetSnapshot[]
-  monthlyClosures   MonthlyClosure[]
+  widgetSnapshots        WidgetSnapshot[]
+  monthlyClosures        MonthlyClosure[]
+  emotionalDashboardState EmotionalDashboardState?
 }
 
 // ═══════════════════════════════════════════
@@ -457,4 +458,40 @@ model WidgetSnapshot {
   @@unique([userId, widgetType])
   @@index([userId, widgetType, expiresAt])
   @@map("widget_snapshots")
+}
+
+// ═══════════════════════════════════════════
+// EMOTIONAL DASHBOARD STATE
+// Single source of truth for emotional content.
+// Shared across all devices. Persistent. Coherent.
+// ═══════════════════════════════════════════
+
+model EmotionalDashboardState {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+
+  // Reflection rotation state (JSON)
+  // { currentIndex, visitCount, shown[], recent[], visitTotal }
+  reflectionState String   @default("{}")
+
+  // Tips rotation state per empire (JSON)
+  // { [empire]: { freeOrder[], freePosition, premiumOrder[], premiumPosition, cycleStart, recentFree[], recentPremium[] } }
+  tipsState       String   @default("{}")
+
+  // Silent memory rarity state (JSON)
+  // { lastShown: { [type]: ISO date }, shown: string[] }
+  memoryState     String   @default("{}")
+
+  // Last dashboard visit — for cross-device visit tracking
+  lastVisitAt     DateTime @default(now())
+
+  // Daily stability — which day this state was computed for
+  dateKey         String   @default("") // YYYY-MM-DD
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
