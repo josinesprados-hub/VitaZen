@@ -529,16 +529,29 @@ export async function getDeterministicTips(
     empireState.cycleStart = now;
   }
 
+  // ─── Defensive clamping ───
+  // Guard against corrupted state where position exceeds count.
+  // This can happen if tips were removed from the DB between runs,
+  // or if a previous write failed after advancing the position.
+  if (freeCount > 0 && empireState.freePosition >= freeCount) {
+    empireState.freePosition = 0;
+  }
+  if (premiumCount > 0 && empireState.premiumPosition >= premiumCount) {
+    empireState.premiumPosition = 0;
+  }
+
   // Select FREE tips
   const selectedFree: typeof allTips = [];
   const freeIndices: number[] = [];
-  const remaining = freeCount - empireState.freePosition;
-  const toShow = Math.min(FREE_TIPS_VISIBLE, remaining);
-  for (let i = 0; i < toShow; i++) {
-    const idx = empireState.freeOrder[empireState.freePosition + i];
-    if (idx !== undefined && freeTipsAll[idx]) {
-      selectedFree.push(freeTipsAll[idx]);
-      freeIndices.push(idx);
+  if (freeCount > 0) {
+    const remaining = freeCount - empireState.freePosition;
+    const toShow = Math.min(FREE_TIPS_VISIBLE, Math.max(0, remaining));
+    for (let i = 0; i < toShow; i++) {
+      const idx = empireState.freeOrder[empireState.freePosition + i];
+      if (idx !== undefined && freeTipsAll[idx]) {
+        selectedFree.push(freeTipsAll[idx]);
+        freeIndices.push(idx);
+      }
     }
   }
 
@@ -558,19 +571,26 @@ export async function getDeterministicTips(
 
   empireState.recentPremium = [...empireState.recentPremium, ...premiumIndices].slice(-AVOID_RECENT_COUNT);
 
-  // Persist updated tips state
+  // Persist updated tips state — wrap in try/catch so tips are still
+  // returned even if the DB write fails (e.g. connection issue, race).
+  // A failed write means the next request recomputes from stale state,
+  // which is acceptable — tips still render.
   tipsState[empire] = empireState;
-  await db.emotionalDashboardState.upsert({
-    where: { userId },
-    update: {
-      tipsState: JSON.stringify(tipsState),
-    },
-    create: {
-      userId,
-      tipsState: JSON.stringify(tipsState),
-      dateKey: getTodayDateKey(),
-    },
-  });
+  try {
+    await db.emotionalDashboardState.upsert({
+      where: { userId },
+      update: {
+        tipsState: JSON.stringify(tipsState),
+      },
+      create: {
+        userId,
+        tipsState: JSON.stringify(tipsState),
+        dateKey: getTodayDateKey(),
+      },
+    });
+  } catch (persistError) {
+    console.error('[Tips] Failed to persist tip cycle state — tips will still be returned:', persistError);
+  }
 
   return { freeTips: selectedFree, premiumTips: selectedPremium };
 }

@@ -1,11 +1,14 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import disciplinaTips from './disciplina-tips.json';
 import menteTips from './mente-tips.json';
 import energiaTips from './energia-tips.json';
 import riquezaTips from './riqueza-tips.json';
 import crecimientoTips from './crecimiento-tips.json';
 
-const prisma = new PrismaClient();
+// Use the same PrismaPg adapter as the app for consistency
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Seeding database...');
@@ -130,6 +133,20 @@ async function main() {
   }
 
   console.log(`Created ${tips.length} empire tips`);
+
+  // ─── Verification ───
+  const totalTips = await prisma.empireTip.count();
+  const freeTipsCount = await prisma.empireTip.count({ where: { plan: 'FREE' } });
+  const premiumTipsCount = await prisma.empireTip.count({ where: { plan: 'PREMIUM' } });
+  console.log(`Verification: ${totalTips} total tips (FREE: ${freeTipsCount}, PREMIUM: ${premiumTipsCount})`);
+
+  for (const empire of ['disciplina', 'mente', 'energia', 'riqueza', 'crecimiento']) {
+    const empireTotal = await prisma.empireTip.count({ where: { empire } });
+    const empireFree = await prisma.empireTip.count({ where: { empire, plan: 'FREE' } });
+    const empirePremium = await prisma.empireTip.count({ where: { empire, plan: 'PREMIUM' } });
+    console.log(`  ${empire}: ${empireTotal} total (FREE: ${empireFree}, PREMIUM: ${empirePremium})`);
+  }
+
   console.log('Seeding complete!');
 }
 

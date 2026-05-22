@@ -49,12 +49,18 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
       if (res.ok) {
         const data = await res.json();
 
-        // Use server-side rotated tips if available
-        if (data.rotatedFreeTips && data.rotatedPremiumTips) {
-          setFreeTips(data.rotatedFreeTips);
-          setPremiumTips(data.rotatedPremiumTips);
+        // Use server-side rotated tips when available AND non-empty.
+        // NOTE: JavaScript empty arrays [] are truthy, so we must
+        // explicitly check for Array.isArray + length to avoid setting
+        // empty arrays when the fallback (data.tips) has real data.
+        const hasRotatedFree = Array.isArray(data.rotatedFreeTips) && data.rotatedFreeTips.length > 0;
+        const hasRotatedPremium = Array.isArray(data.rotatedPremiumTips) && data.rotatedPremiumTips.length > 0;
+
+        if (hasRotatedFree || hasRotatedPremium) {
+          setFreeTips(hasRotatedFree ? data.rotatedFreeTips : []);
+          setPremiumTips(hasRotatedPremium ? data.rotatedPremiumTips : []);
         } else {
-          // Fallback: use raw tips (backwards compatibility)
+          // Fallback: use raw tips (backwards compatibility / empty rotation)
           const allTips: Tip[] = data.tips || [];
           setFreeTips(allTips.filter(t => t.plan !== 'PREMIUM').slice(0, 2));
           setPremiumTips(allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1));
