@@ -32,28 +32,8 @@ function TipCard({ tip }: { tip: Tip }) {
 }
 
 export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectionProps) {
-  const { freeTips, premiumTips, isPremium, loading } = useEmpireTips(empire);
+  const { freeTips, premiumTips, isPremium, loading, error } = useEmpireTips(empire);
 
-  // Tips ALWAYS render. Loading shows a subtle skeleton.
-  // No null returns. No disappearance. No silence.
-  if (loading) {
-    return (
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-3">
-        <div className="flex items-center gap-3 mb-4">
-          <Lightbulb size={20} className="text-[#c8a55a]" />
-          <h2 className="text-lg font-semibold text-white">Notas</h2>
-        </div>
-        <p className="text-[#666] text-xs mb-5">{subtitle}</p>
-        <div className="space-y-3">
-          <div className="h-16 bg-[#111] border border-[#1a1a1a] rounded-lg animate-pulse" />
-          <div className="h-16 bg-[#111] border border-[#1a1a1a] rounded-lg animate-pulse" />
-        </div>
-      </div>
-    );
-  }
-
-  // Even if tips come back empty (API error, DB issue), show the section
-  // so the user knows the feature exists. Empty state = gentle whisper.
   const hasTips = freeTips.length > 0 || premiumTips.length > 0;
 
   return (
@@ -65,7 +45,13 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
       <p className="text-[#666] text-xs mb-5">{subtitle}</p>
 
       <div className="space-y-3">
-        {hasTips ? (
+        {loading ? (
+          // Loading skeleton — brief, always resolves
+          <>
+            <div className="h-16 bg-[#111] border border-[#1a1a1a] rounded-lg animate-pulse" />
+            <div className="h-16 bg-[#111] border border-[#1a1a1a] rounded-lg animate-pulse" />
+          </>
+        ) : hasTips ? (
           <>
             {/* FREE tips — always visible, always exactly 2 */}
             {freeTips.map((tip) => (
@@ -108,10 +94,15 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
               )
             )}
           </>
+        ) : error ? (
+          // API failed — gentle error state
+          <p className="text-[#555] text-sm py-4 text-center">
+            No se pudieron cargar las notas
+          </p>
         ) : (
-          // Graceful empty state — feature is present, content will return
+          // No tips available (DB empty or not seeded)
           <p className="text-[#444] text-sm py-4 text-center">
-            Cargando notas...
+            Sin notas disponibles
           </p>
         )}
       </div>

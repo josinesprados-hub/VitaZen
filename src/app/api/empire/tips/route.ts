@@ -27,15 +27,27 @@ export async function GET(request: NextRequest) {
       ],
     });
 
-    // Server-side deterministic rotation — returns { freeTips, premiumTips }
-    // already separated by plan. FREE tips come exclusively from FREE battery.
-    // PREMIUM tips come exclusively from PREMIUM battery. No cross-contamination.
-    const { freeTips, premiumTips } = await getDeterministicTips(user.id, empire, allTips);
+    // Try server-side deterministic rotation. If it fails (e.g. DB error in
+    // emotional dashboard state), fall back to returning raw tips so the
+    // client can still display something. NEVER return empty if tips exist.
+    let rotatedFreeTips: typeof allTips = [];
+    let rotatedPremiumTips: typeof allTips = [];
+
+    try {
+      const result = await getDeterministicTips(user.id, empire, allTips);
+      rotatedFreeTips = result.freeTips;
+      rotatedPremiumTips = result.premiumTips;
+    } catch (rotationError) {
+      console.error('[Tips] Deterministic rotation failed — using raw fallback:', rotationError);
+      // Fallback: return first 2 FREE and first 1 PREMIUM from raw tips
+      rotatedFreeTips = allTips.filter(t => t.plan !== 'PREMIUM').slice(0, 2);
+      rotatedPremiumTips = allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1);
+    }
 
     return NextResponse.json({
       tips: allTips,
-      rotatedFreeTips: freeTips,
-      rotatedPremiumTips: premiumTips,
+      rotatedFreeTips,
+      rotatedPremiumTips,
     });
   } catch (error) {
     console.error('Empire tips GET error:', error);
