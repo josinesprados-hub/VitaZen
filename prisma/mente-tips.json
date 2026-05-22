@@ -1,113 +1,662 @@
 [
-  {"empire":"mente","title":"Un solo estímulo","content":"La atención consciente procesa un estímulo significativo a la vez. Lo que llamamos multitarea es cambiar rápido entre tareas, no hacer varias a la vez.","plan":"FREE"},
-  {"empire":"mente","title":"El foco se agota","content":"La atención sostenida se degrada tras 20-25 minutos. Pausas breves la restauran parcialmente; ignorar el agotamiento no lo elimina.","plan":"FREE"},
-  {"empire":"mente","title":"El entorno dirige","content":"Lo que está visible en tu espacio compite por tu atención más de lo que crees. Cambiar el entorno cuesta menos que cambiar la voluntad.","plan":"FREE"},
-  {"empire":"mente","title":"Notificaciones fragmentan","content":"Cada interrupción, aunque sea breve, genera un costo de re-enganchaje que se acumula a lo largo del día.","plan":"FREE"},
-  {"empire":"mente","title":"La novedad captura","content":"El cerebro prioriza estímulos nuevos por diseño evolutivo. Por eso cuesta tanto ignorar lo imprevisible.","plan":"FREE"},
-  {"empire":"mente","title":"Escribir aclara","content":"Externalizar ideas en papel reduce la carga de mantenerlas en la cabeza. Lo escrito se ve distinto de lo pensado.","plan":"FREE"},
-  {"empire":"mente","title":"Música con letra","content":"Procesar lenguaje y producir lenguaje compiten por los mismos recursos cognitivos. Escuchar canciones con letra mientras escribes suele empeorar el resultado.","plan":"FREE"},
-  {"empire":"mente","title":"El teléfono visible","content":"Solo tener el teléfono en la mesa reduce la capacidad cognitiva disponible, aunque no lo uses ni lo mires.","plan":"FREE"},
-  {"empire":"mente","title":"Nombrar reduce","content":"Poner palabra a lo que sientes disminuye la activación de la amígdala. Esto se llama etiquetado afectivo y está documentado en neurociencia.","plan":"FREE"},
-  {"empire":"mente","title":"Distancia psicológica","content":"Hablarte en segunda persona o imaginar que le hablas a un amigo crea distancia emocional y mejora la regulación.","plan":"FREE"},
-  {"empire":"mente","title":"Suprimir empeora","content":"Intentar no sentir algo suele intensificarlo y consume recursos cognitivos que podrías usar para otra cosa.","plan":"FREE"},
-  {"empire":"mente","title":"Emociones como datos","content":"Las emociones no son órdenes ni verdades absolutas. Son señales rápidas con información limitada sobre tu entorno.","plan":"FREE"},
-  {"empire":"mente","title":"El cuerpo primero","content":"Los cambios físicos — ritmo cardíaco, tensión muscular, temperatura — suelen preceder a la consciencia de la emoción.","plan":"FREE"},
-  {"empire":"mente","title":"Reinterpretar funciona","content":"Cambiar la interpretación de una situación cambia la respuesta emocional, más efectivamente que cambiar la situación misma.","plan":"FREE"},
-  {"empire":"mente","title":"Ventilar no cura","content":"Expresar rabia repetidamente puede reforzarla en vez de aliviarla. La descarga emocional no siempre equivale a regulación.","plan":"FREE"},
-  {"empire":"mente","title":"Confirmas lo creído","content":"Buscas y valoras más la información que coincide con lo que ya piensas. Es un sesgo automático, no una elección.","plan":"FREE"},
-  {"empire":"mente","title":"El primer número ancla","content":"La primera cifra que escuchas influye en tu estimación posterior, incluso si es irrelevante para lo que estás decidiendo.","plan":"FREE"},
-  {"empire":"mente","title":"Lo reciente pesa más","content":"Lo que pasó últimamente parece más frecuente o importante de lo que realmente es. La memoria no es una encuesta objetiva.","plan":"FREE"},
-  {"empire":"mente","title":"Costo hundido","content":"Seguir invirtiendo en algo que no funciona solo porque ya invertiste es un sesgo documentado. Lo invertido no se recupera por insistir.","plan":"FREE"},
-  {"empire":"mente","title":"El default gana","content":"Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Cambiar el default cambia el comportamiento más que la información.","plan":"FREE"},
-  {"empire":"mente","title":"Sobreestimas tu control","content":"Tendemos a creer que tenemos más influencia sobre los resultados de la que realmente tenemos, especialmente en situaciones inciertas.","plan":"FREE"},
-  {"empire":"mente","title":"El efecto halo","content":"Una cualidad positiva — como la simpatía — hace que juzgues todo lo demás de esa persona más positivo de lo que es.","plan":"FREE"},
-  {"empire":"mente","title":"Atención al presente","content":"La mente divaga aproximadamente la mitad del tiempo. Volver al presente es la práctica, no la falla.","plan":"FREE"},
-  {"empire":"mente","title":"Pausa antes de reaccionar","content":"El espacio entre un estímulo y tu respuesta es donde puedes elegir algo distinto. Ampliar ese espacio, aunque sea un segundo, cambia la respuesta.","plan":"FREE"},
-  {"empire":"mente","title":"Observar sin juzgar","content":"Notar un pensamiento sin etiquetarlo como bueno o malo reduce su poder sobre tu comportamiento.","plan":"FREE"},
-  {"empire":"mente","title":"La respiración como ancla","content":"La respiración es un punto de atención accesible siempre para volver al momento actual. No necesita ser profunda; solo notada.","plan":"FREE"},
-  {"empire":"mente","title":"Divagar no es falla","content":"La mente que divaga también planifica y crea. El problema no es divagar; es no notar que divagaste.","plan":"FREE"},
-  {"empire":"mente","title":"Repetir espaciado","content":"Repasar información en intervalos crecientes la retiene mejor que repasar todo de una vez. El tiempo entre repaso y repaso es parte del aprendizaje.","plan":"FREE"},
-  {"empire":"mente","title":"Recordar fortalece","content":"Intentar recordar algo de memoria consolida más que volver a leer el material. El esfuerzo de recuperar la información es lo que fija.","plan":"FREE"},
-  {"empire":"mente","title":"Explicar consolida","content":"Explicar un concepto en tus propias palabras revela los vacíos y refuerza lo que sí entiendes. Si no puedes explicarlo, aún no lo dominas.","plan":"FREE"},
-  {"empire":"mente","title":"El contexto importa","content":"Lo que aprendes en un contexto se recuerda mejor en contextos similares. Estudiar siempre en el mismo sitio puede limitar la recuperación.","plan":"FREE"},
-  {"empire":"mente","title":"El sueño fija","content":"Dormir después de aprender consolida memorias. Sin sueño suficiente, la retención cae significativamente, aunque hayas estudiado más.","plan":"FREE"},
-  {"empire":"mente","title":"Práctica intercalada","content":"Mezclar temas distintos en una sesión de estudio mejora la retención a largo plazo más que practicar un solo tema hasta dominarlo.","plan":"FREE"},
-  {"empire":"mente","title":"Escribir a mano","content":"Tomar notas a mano activa más procesamiento cognitivo que teclear, y eso mejora la retención de lo escrito.","plan":"FREE"},
-  {"empire":"mente","title":"Las decisiones agotan","content":"Cada decisión que tomas consume un poco de tu capacidad para decidir bien después. Se llama fatiga decisional y se acumula.","plan":"FREE"},
-  {"empire":"mente","title":"Suficiente bueno","content":"Buscar la opción óptima en todo gasta más energía sin necesariamente mejor resultado. Lo suficientemente bueno suele ser suficiente.","plan":"FREE"},
-  {"empire":"mente","title":"Las opciones paralizan","content":"Más de cuatro o cinco opciones similares hacen que decidas peor o no decidas. Menos opciones facilitan la acción.","plan":"FREE"},
-  {"empire":"mente","title":"Lo importante primero","content":"Usa tu energía cognitiva temprano para las decisiones que más importan. Al final del día, la capacidad de decidir bien está disminuida.","plan":"FREE"},
-  {"empire":"mente","title":"Cansancio sesga","content":"Con fatiga decisional, tiendes a elegir la opción más conservadora o la que evita pérdida. No es cobardía; es cerebro cansado.","plan":"FREE"},
-  {"empire":"mente","title":"Decidir por adelantado","content":"Elegir antes del momento de tentación elimina la decisión en caliente. Lo que ya decidiste no requiere fuerza de voluntad.","plan":"FREE"},
-  {"empire":"mente","title":"Estrés agudo vs crónico","content":"Una respuesta de estrés corta te prepara para actuar. El problema no es el estrés en sí; es el estrés que no se apaga.","plan":"FREE"},
-  {"empire":"mente","title":"Cortisol y memoria","content":"El cortisol crónico dificulta formar nuevos recuerdos y acceder a los existentes. No es que olvidas; es que el cerebro no puede consolidar.","plan":"FREE"},
-  {"empire":"mente","title":"Cambia de perspectiva","content":"Preguntarte cómo vería esto alguien distinto activa un pensamiento más flexible que seguir dentro de la misma narrativa.","plan":"FREE"},
-  {"empire":"mente","title":"La pregunta cambia todo","content":"La forma en que formulaste el problema limita las soluciones que puedes ver. Reformular la pregunta a veces resuelve lo que la respuesta no podía.","plan":"FREE"},
-  {"empire":"mente","title":"Pensar al revés","content":"En vez de buscar cómo tener éxito, pregunta qué causaría fracaso y evita eso. A veces es más fácil ver lo que no funciona.","plan":"FREE"},
-  {"empire":"mente","title":"Puntos ciegos","content":"Hay brechas entre cómo te percibes y cómo te perciben los demás. Pedir feedback específico revela lo que tu introspección no alcanza.","plan":"FREE"},
-  {"empire":"mente","title":"Todo parece urgente","content":"Bajo estrés, todo adquiere un peso de urgencia. Preguntar qué pasa si esto no se hace hoy suele revelar que la mayoría no es urgente.","plan":"FREE"},
-  {"empire":"mente","title":"La rutina libera","content":"Automatizar decisiones repetitivas — ropa, comida, horarios — deja recursos cognitivos para lo que realmente importa.","plan":"FREE"},
-  {"empire":"mente","title":"Lo obvio no es universal","content":"Lo que te parece evidente por tu experiencia no lo es para otros. Explicarlo como si fuera la primera vez revela tus supuestos ocultos.","plan":"FREE"},
-  {"empire":"mente","title":"El pre-mortem prevé","content":"Imaginar que algo ya falló antes de empezar te ayuda a identificar riesgos que la optimismo del momento te hace ignorar.","plan":"FREE"},
-
-  {"empire":"mente","title":"Red por defecto","content":"Cuando no haces nada dirigido, tu cerebro activa una red de actividad espontánea. No es descanso; es otro modo de procesar que conecta ideas distantes.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Atención abierta y focal","content":"Hay dos modos: focalizar en un punto o abrirse al entorno completo. Ambos son útiles en momentos distintos; no puedes estar en los dos a la vez.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El umbral de distracción","content":"Tu capacidad de ignorar distracciones depende de tu carga cognitiva actual, no solo de tu voluntad. Un cerebro cargado se distrae más fácil.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La ilusión de profundidad","content":"Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. Familiaridad no es comprensión.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El flujo tiene condiciones","content":"El estado de flujo ocurre cuando el desafío coincide con tu habilidad. Si es demasiado fácil, aburre; si es demasiado difícil, ansía. El balance es específico.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El priming inconsciente","content":"Lo que encuentras justo antes de una tarea influye en cómo la abordas, sin que lo notes. El contexto reciente sesga tu pensamiento de forma invisible.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La habituación visual","content":"Tu cerebro deja de registrar estímulos constantes. Por eso no ves el desorden después de un rato en la habitación. Lo constante desaparece de la atención.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Fondo y figura","content":"No puedes atender el detalle y el contexto al mismo tiempo. Cambiar entre ambos requiere un costo cognitivo real que se acumula con cada cambio.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La emoción dura poco","content":"Una emoción sin alimentación se disipa en unos 90 segundos. Lo que dura más es la rumiación que la mantiene activa, no la emoción misma.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Reevaluación tardía","content":"Reinterpretar un evento emocional incluso horas después sigue reduciendo su carga emocional. No tiene que ser instantáneo para funcionar.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Emociones mezcladas","content":"Sentir alegría y tristeza simultáneamente no es conflicto; es la experiencia emocional completa de eventos complejos. La ambivalencia es normal.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La gratitud reencuadra","content":"Practicar gratitud no es positividad forzada; es un reencuadre sistemático que altera qué recuerdos se consolidan y cuáles se desvanecen.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Vulnerabilidad compartida","content":"Expresar vulnerabilidad de forma específica reduce la intensidad emocional. Ventilar vagamente no siempre lo hace; nombrar con precisión sí.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El rechazo duele literal","content":"La experiencia de rechazo social activa las mismas áreas cerebrales que el dolor físico. Por eso duele de forma que parece excesiva para lo que pasó.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La regulación se entrena","content":"La capacidad de regular emociones no es fija; se fortalece con práctica consistente. No partimos del mismo punto, pero todos podemos mejorar.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Sesgo del superviviente","content":"Solo ves los casos de éxito. Los fracasos que no ves sesgan tu estimación de probabilidad. La muestra visible nunca es la muestra completa.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Correlación no es causa","content":"Tu cerebro busca patrones causales automáticamente. Ver que dos cosas ocurren juntas no implica que una cause la otra.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El efecto Dunning-Kruger","content":"Menos competencia genera más confianza; más competencia genera más duda. Saber poco se siente como saber suficiente, y eso es parte del problema.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Retrospección engaña","content":"Después de que algo pasa, parece que era obvio que iba a pasar. No lo era. El sesgo de retrospectiva distorsiona tu evaluación del pasado.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Aversión a la pérdida","content":"Duele más perder que lo que gusta ganar lo equivalente. Esto sesga tus decisiones hacia la conservación, incluso cuando arriesgar tendría ventajas.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Mera exposición","content":"Preferimos cosas solo por ser familiares, no porque sean mejores. Lo conocido se siente seguro, y el cerebro confunde seguridad con calidad.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Sesgo de status quo","content":"Preferimos que las cosas sigan como están, incluso cuando cambiar tiene ventajas objetivas. La inercia no es decisión; es default.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La atención se entrena","content":"La atención sostenida mejora con práctica consistente, como un músculo. No es un rasgo fijo que tienes o no tienes.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El cuerpo como señal","content":"Las sensaciones físicas — tensión, peso, temperatura — son datos sobre tu estado interno antes de que la mente lo nombre. Aprender a leerlas es información gratuita.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Observar al observador","content":"Notar que estás notando tus pensamientos añade una capa de distancia que reduce la identificación con ellos. No eres lo que observas.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Presencia no es vacío","content":"Estar presente no significa mente en blanco. Significa notar lo que ocurre sin engancharse automáticamente con ello.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Lo sensorial interrumpe","content":"La rumiación se alimenta de pensamiento abstracto. Volver a lo sensorial — texturas, sonidos, temperatura — la interrumpe de forma directa.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Aceptar no es resignarse","content":"Aceptar una emoción no es rendirse a ella. Es dejar de luchar contra ella para poder responder en vez de reaccionar.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La práctica mental","content":"Imaginar la ejecución de una habilidad activa circuitos neuronales similares a practicarla físicamente. No reemplaza la práctica real, pero la complementa.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Dificultad deseable","content":"Aprender se consolida mejor cuando cuesta un poco. Lo demasiado fácil no genera huella profunda; la comodidad y el aprendizaje no siempre van juntos.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El olvido es útil","content":"Olvidar no es fallo del sistema; es el cerebro priorizando lo que usas y debilitando lo que no. El olvido selectivo es parte de la memoria funcional.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Memoria reconstructiva","content":"Cada vez que recuerdas algo, lo reconstruyes. No es una grabación fiel; es una reconstrucción editable que puede cambiar sin que lo notes.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Sueño REM y creatividad","content":"Durante el sueño REM el cerebro conecta información remota entre sí. Por eso a veces despiertas con una idea que no tenías la noche anterior.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El contexto emocional fija","content":"Lo que aprendes con activación emocional moderada se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción es un adhesivo para la memoria.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La intuición reconoce","content":"Lo que llamamos intuición es a menudo reconocimiento de patrones acumulado por experiencia. No es magia; es velocidad no consciente.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Paradoja de la elección","content":"La satisfacción con una decisión disminuye cuantas más opciones descartaste. Saber que había alternativas mejores hipotéticas pesa después de elegir.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Maximizar agota","content":"Los maximizadores invierten más tiempo y energía decidiendo y terminan menos satisfechos que quienes buscan lo suficientemente bueno. El estilo de decisión afecta el bienestar.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Decisiones reversibles","content":"Si una decisión se puede deshacer, decídela rápido. Si no, dale más tiempo y análisis. No toda decisión merece el mismo peso.","plan":"PREMIUM"},
-  {"empire":"mente","title":"No decidir es decidir","content":"Quedarte con la opción por defecto ya es una decisión. Ser consciente de esto te devuelve la agencia sobre lo que dejas pasar.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Emoción decide primero","content":"La emoción precede a la razón en la decisión. La justificación racional suele venir después, como narrativa, no como causa.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El marco cambia todo","content":"La misma decisión presentada como ganancia o como pérdida produce elecciones distintas, aunque el resultado sea idéntico. Cómo se enmarca importa tanto como qué se elige.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Estrés y memoria emocional","content":"El estrés modifica qué recuerdos se consolidan: los eventos con carga emocional se graban más, pero los detalles neutros se pierden. Por eso recuerdas cómo te sentiste, no lo que pasó.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Recuperar es rendir","content":"El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Sin recuperación, el rendimiento se degrada inevitablemente.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Rumiación prolonga el estrés","content":"Revisar mentalmente un evento estresante una y otra vez mantiene activa la respuesta fisiológica mucho después de que el evento terminó.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Cortisol encoge el hipocampo","content":"La exposición prolongada a cortisol reduce el volumen del hipocampo, afectando memoria y regulación emocional. No es metáfora; es estructura cerebral.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Estrés crónico amenaza","content":"Bajo estrés crónico, el cerebro interpreta estímulos neutros como amenazas. No es que el mundo sea más peligroso; es que el umbral de alarma está más bajo.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Convergente y divergente","content":"Hay momentos para buscar la respuesta correcta y momentos para generar muchas respuestas. Confundir estos modos bloquea tanto el rigor como la creatividad.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La analogía transfiere","content":"Entender algo nuevo a través de algo familiar no es simplificar; es cómo el cerebro construye conocimiento nuevo sobre viejo. La analogía es una herramienta cognitiva real.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El reposo incubado","content":"Dejar un problema y volver después no es evitación. El cerebro sigue procesando en segundo plano, y a veces la solución aparece cuando dejas de forzarla.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Perspectiva temporal","content":"Preguntar si esto importará en cinco años no siempre calma, pero sí revela la escala real del problema. Lo que parece inmenso hoy a menudo no lo es.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Pensamiento lateral","content":"Si solo llegas a las mismas soluciones, prueba cambiar la pregunta en vez de buscar más respuestas. La pregunta define el espacio de lo posible.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Los incentivos dirigen","content":"Las personas responden a los incentivos que tienen, no a los que deberían tener. Entender los incentivos reales explica mucho comportamiento aparentemente irracional.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Primeros principios","content":"Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo dado por sentado no es rebelión; es método.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Mapa no es territorio","content":"Tu modelo mental de la realidad no es la realidad. Es una representación útil pero incompleta. Confundir el mapa con el territorio genera errores de escala.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Efectos de segundo orden","content":"Las consecuencias directas de una acción son predecibles. Las consecuencias de esas consecuencias suelen sorprender, y son las que más importan a largo plazo.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La navaja de Ockham","content":"Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia, sino porque menos supuestos significan menos puntos de fallo.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La introspección tiene límites","content":"Pensar mucho sobre ti no siempre te conoce mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas.","plan":"PREMIUM"},
-  {"empire":"mente","title":"Otros ven tu patrón","content":"Tú ves tus intenciones; los demás ven tu comportamiento repetido. Preguntar qué patrón perciben en ti puede revelar lo que la introspección no alcanza.","plan":"PREMIUM"},
-  {"empire":"mente","title":"El sesgo del actor","content":"Explicas tus errores por la situación, pero los de otros por su carácter. No es hipocresía consciente; es un sesgo automático y universal.","plan":"PREMIUM"},
-  {"empire":"mente","title":"La profecía se cumple","content":"Creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice; puede causar.","plan":"PREMIUM"}
+  {
+    "empire": "mente",
+    "title": "Un solo estímulo",
+    "content": "La atención real solo procesa una cosa a la vez. Lo que llamamos multitarea es cambiar rápido entre tareas, no hacer varias a la vez.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El foco se agota",
+    "content": "La atención sostenida se degrada tras 20-25 minutos. Pausas breves la restauran parcialmente; ignorar el agotamiento no lo elimina.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El entorno dirige",
+    "content": "Lo que está visible en tu espacio compite por tu atención más de lo que crees. Cambiar el entorno cuesta menos que cambiar la voluntad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Notificaciones fragmentan",
+    "content": "Cada interrupción, aunque sea breve, te saca y cuesta volver. Ese costo se acumula a lo largo del día.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "La novedad captura",
+    "content": "El cerebro reacciona a lo nuevo por instinto. Por eso cuesta tanto ignorar lo imprevisible.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Escribir aclara",
+    "content": "Externalizar ideas en papel reduce la carga de mantenerlas en la cabeza. Lo escrito se ve distinto de lo pensado.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Música con letra",
+    "content": "Escuchar canciones con letra mientras escribes suele empeorar el resultado. El cerebro no procesa bien lenguaje y escritura al mismo tiempo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El teléfono visible",
+    "content": "Solo tener el teléfono en la mesa reduce tu capacidad de concentrarte, aunque no lo uses ni lo mires.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Nombrar reduce",
+    "content": "Ponerle palabra a lo que sientes reduce su intensidad. No es terapia — es algo que el cerebro hace cuando nombra lo que pasa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Distancia psicológica",
+    "content": "Hablarte en segunda persona o imaginar que le hablas a un amigo crea distancia y ayuda a pensar con más claridad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Suprimir empeora",
+    "content": "Intentar no sentir algo suele intensificarlo y consume capacidad que podrías usar para otra cosa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Emociones como datos",
+    "content": "Las emociones no son órdenes ni verdades absolutas. Son señales rápidas con información limitada sobre lo que pasa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El cuerpo primero",
+    "content": "Los cambios físicos — tensión, calor, ritmo — suelen aparecer antes de que seas consciente de la emoción.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Reinterpretar funciona",
+    "content": "Cambiar cómo interpretas una situación cambia cómo te sientes, más que cambiar la situación misma.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Ventilar no cura",
+    "content": "Expresar rabia repetidamente puede hacerla crecer en vez de aliviarla. Descargarse no siempre equivale a sentirse mejor.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Confirmas lo creído",
+    "content": "Buscas y valoras más la información que coincide con lo que ya piensas. Es un sesgo automático, no una elección.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El primer número ancla",
+    "content": "La primera cifra que escuchas influye en tu estimación posterior, incluso si es irrelevante para lo que estás decidiendo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo reciente pesa más",
+    "content": "Lo que pasó últimamente parece más frecuente o importante de lo que realmente es. La memoria no es una encuesta objetiva.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Costo hundido",
+    "content": "Seguir invirtiendo en algo que no funciona solo porque ya invertiste es un sesgo conocido. Lo invertido no se recupera por insistir.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El default gana",
+    "content": "Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Cambiar el default cambia el comportamiento más que la información.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Sobreestimas tu control",
+    "content": "Tendemos a creer que tenemos más control sobre los resultados del que realmente tenemos, especialmente en situaciones inciertas.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "La primera impresión tiñe",
+    "content": "Una cualidad positiva — como la simpatía — hace que juzgues todo lo demás de esa persona mejor de lo que es.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Atención al presente",
+    "content": "La mente se va la mitad del tiempo. Volver al presente es la práctica, no la falla.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Pausa antes de reaccionar",
+    "content": "El espacio entre un estímulo y tu respuesta es donde puedes elegir algo distinto. Ampliar ese espacio, aunque sea un segundo, cambia la respuesta.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Observar sin juzgar",
+    "content": "Notar un pensamiento sin etiquetarlo como bueno o malo reduce su poder sobre tu comportamiento.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "La respiración como ancla",
+    "content": "La respiración es un punto de atención accesible siempre para volver al momento actual. No necesita ser profunda; solo notada.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Divagar no es falla",
+    "content": "La mente que divaga también planifica y crea. El problema no es divagar; es no notar que divagaste.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Repetir espaciado",
+    "content": "Repasar información en intervalos crecientes la retiene mejor que repasar todo de una vez. El tiempo entre repaso y repaso es parte del aprendizaje.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Recordar fortalece",
+    "content": "Intentar recordar algo de memoria consolida más que volver a leer el material. El esfuerzo de recuperar la información es lo que fija.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Explicar consolida",
+    "content": "Explicar un concepto en tus propias palabras revela los vacíos y refuerza lo que sí entiendes. Si no puedes explicarlo, aún no lo dominas.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El contexto importa",
+    "content": "Lo que aprendes en un contexto se recuerda mejor en contextos similares. Estudiar siempre en el mismo sitio puede limitar la recuperación.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El sueño fija",
+    "content": "Dormir después de aprender fija lo que aprendiste. Sin sueño suficiente, se pierde más de lo que crees, aunque hayas estudiado más.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Mezclar ayuda",
+    "content": "Mezclar temas distintos en una sesión de estudio mejora la retención a largo plazo más que practicar uno solo hasta dominarlo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Escribir a mano",
+    "content": "Tomar notas a mano hace que proceses más que si tecleas, y eso ayuda a retener lo que escribes.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Las decisiones agotan",
+    "content": "Cada decisión que tomas consume un poco de tu capacidad para decidir bien después. Se llama fatiga de decidir y se acumula.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Suficiente bueno",
+    "content": "Buscar la opción óptima en todo gasta más energía sin necesariamente mejor resultado. Lo suficientemente bueno suele ser suficiente.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Las opciones paralizan",
+    "content": "Más de cuatro o cinco opciones similares hacen que decidas peor o no decidas. Menos opciones facilitan la acción.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo importante primero",
+    "content": "Usa tu mejor energía temprano para las decisiones que más importan. Al final del día, decidir bien cuesta más.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Cansancio sesga",
+    "content": "Cuando estás cansado de decidir, tiendes a elegir lo más conservador o lo que evita pérdida. No es cobardía — es cerebro agotado.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Decidir por adelantado",
+    "content": "Elegir antes del momento de tentación elimina la decisión en caliente. Lo que ya decidiste no requiere fuerza de voluntad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Estrés agudo vs crónico",
+    "content": "Una respuesta de estrés corta te prepara para actuar. El problema no es el estrés en sí; es el estrés que no se apaga.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Estrés y memoria",
+    "content": "El estrés prolongado dificulta formar nuevos recuerdos y acceder a los que tienes. No es que olvidas — es que el cerebro no puede consolidar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Cambia de perspectiva",
+    "content": "Preguntarte cómo vería esto alguien distinto activa un pensamiento más flexible que seguir dentro de la misma narrativa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "La pregunta cambia todo",
+    "content": "La forma en que formulaste el problema limita las soluciones que puedes ver. Reformular la pregunta a veces resuelve lo que la respuesta no podía.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Pensar al revés",
+    "content": "En vez de buscar cómo tener éxito, pregunta qué causaría fracaso y evita eso. A veces es más fácil ver lo que no funciona.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Puntos ciegos",
+    "content": "Hay brechas entre cómo te percibes y cómo te perciben los demás. Pedir feedback específico revela lo que tu introspección no alcanza.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Todo parece urgente",
+    "content": "Bajo estrés, todo adquiere un peso de urgencia. Preguntar qué pasa si esto no se hace hoy suele revelar que la mayoría no es urgente.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "La rutina libera",
+    "content": "Automatizar decisiones repetitivas — ropa, comida, horarios — deja energía mental para lo que realmente importa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo obvio no es universal",
+    "content": "Lo que te parece evidente por tu experiencia no lo es para otros. Explicarlo como si fuera la primera vez revela tus supuestos ocultos.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El pre-mortem prevé",
+    "content": "Imaginar que algo ya falló antes de empezar te ayuda a identificar riesgos que la optimismo del momento te hace ignorar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Cuando no haces nada",
+    "content": "Cuando no haces nada dirigido, tu mente no para — conecta ideas que parecían lejanas. No es descanso; es otro modo de pensar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Dos modos de atender",
+    "content": "Hay dos modos: concentrarte en un punto o abrirte a todo lo que te rodea. Ambos son útiles en momentos distintos; no puedes estar en los dos a la vez.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Cuando estás cargado",
+    "content": "Tu capacidad de ignorar distracciones depende de cuánto tienes ya en la cabeza, no solo de tu voluntad. Una mente ocupada se distrae más fácil.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La ilusión de profundidad",
+    "content": "Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. Familiaridad no es comprensión.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El flujo tiene condiciones",
+    "content": "El estado de flujo ocurre cuando el desafío coincide con tu habilidad. Si es demasiado fácil, aburre; si es demasiado difícil, ansía. El balance es específico.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo que encontraste antes",
+    "content": "Lo que encuentras justo antes de una tarea influye en cómo la abordas, sin que lo notes. El contexto reciente sesga tu pensamiento de forma invisible.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Dejas de ver lo constante",
+    "content": "Tu cerebro deja de registrar lo que siempre está ahí. Por eso no ves el desorden después de un rato. Lo constante desaparece de la atención.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Detalle y contexto",
+    "content": "No puedes atender el detalle y el contexto al mismo tiempo. Cambiar entre ambos cuesta, y ese costo se acumula.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La emoción dura poco",
+    "content": "Una emoción sin alimentación se disipa en unos 90 segundos. Lo que dura más es la rumiación que la mantiene activa, no la emoción misma.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Reevaluación tardía",
+    "content": "Reinterpretar un evento emocional incluso horas después sigue reduciendo su carga emocional. No tiene que ser instantáneo para funcionar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Emociones mezcladas",
+    "content": "Sentir alegría y tristeza simultáneamente no es conflicto; es la experiencia emocional completa de eventos complejos. La ambivalencia es normal.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La gratitud cambia qué recuerdas",
+    "content": "Practicar la gratitud no es ser positivo por obligación — es cambiar qué recuerdas y qué dejas ir. Eso altera lo que se fija y lo que se desvanece.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Vulnerabilidad compartida",
+    "content": "Expresar vulnerabilidad de forma específica reduce la intensidad emocional. Ventilar vagamente no siempre lo hace; nombrar con precisión sí.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El rechazo duele literal",
+    "content": "Que te rechacen duele de una forma que parece excesiva para lo que pasó. No es exageración — el cerebro lo procesa parecido al dolor físico.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La regulación se entrena",
+    "content": "La capacidad de regular emociones no es fija; se fortalece con práctica consistente. No partimos del mismo punto, pero todos podemos mejorar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Solo ves lo que funciona",
+    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. La muestra visible nunca es la completa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Juntos no es causa",
+    "content": "Tu cerebro busca causas automáticamente. Ver que dos cosas ocurren juntas no significa que una cause la otra.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Confianza sin base",
+    "content": "Menos competencia genera más confianza; más competencia genera más duda. Saber poco se siente como saber suficiente, y eso es parte del problema.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Parecía obvio después",
+    "content": "Después de que algo pasa, parece que era obvio que iba a pasar. No lo era. Mirar atrás distorsiona lo que realmente sabías.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Perder pesa más",
+    "content": "Duele más perder que lo que alegra ganar lo mismo. Esto te inclina a conservar, incluso cuando arriesgar tendría ventajas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo conocido se siente bien",
+    "content": "Preferimos cosas solo por ser familiares, no porque sean mejores. Lo conocido se siente seguro, y el cerebro confunde seguridad con calidad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Quedarse es fácil",
+    "content": "Preferimos que las cosas sigan como están, incluso cuando cambiar tiene ventajas. La inercia no es decisión — es dejar pasar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La atención se entrena",
+    "content": "La atención sostenida mejora con práctica consistente, como un músculo. No es un rasgo fijo que tienes o no tienes.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El cuerpo como señal",
+    "content": "Las sensaciones físicas — tensión, peso, temperatura — te dicen cosas sobre tu estado antes de que la mente lo nombre. Aprender a leerlas es información gratuita.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Observar al observador",
+    "content": "Notar que estás notando tus pensamientos añade una capa de distancia que reduce la identificación con ellos. No eres lo que observas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Presencia no es vacío",
+    "content": "Estar presente no significa mente en blanco. Significa notar lo que ocurre sin engancharse automáticamente con ello.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo sensorial interrumpe",
+    "content": "La rumiación se alimenta de pensamiento abstracto. Volver a lo sensorial — texturas, sonidos, temperatura — la interrumpe de forma directa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Aceptar no es resignarse",
+    "content": "Aceptar una emoción no es rendirse a ella. Es dejar de luchar contra ella para poder responder en vez de reaccionar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Imaginar ayuda",
+    "content": "Imaginar que haces algo activa el cerebro de forma parecida a hacerlo. No reemplaza la práctica real, pero la complementa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo que cuesta se fija",
+    "content": "Aprender se consolida mejor cuando cuesta un poco. Lo demasiado fácil no genera huella; la comodidad y el aprendizaje no siempre van juntos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El olvido es útil",
+    "content": "Olvidar no es fallo del sistema; es el cerebro priorizando lo que usas y debilitando lo que no. El olvido selectivo es parte de la memoria funcional.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Recordar es reconstruir",
+    "content": "Cada vez que recuerdas algo, lo reconstruyes. No es una grabación fiel — es algo que puede cambiar sin que lo notes.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El sueño que conecta",
+    "content": "Mientras duermes, el cerebro conecta ideas que parecían no tener relación. Por eso a veces despiertas con una idea que no tenías la noche anterior.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La emoción fija",
+    "content": "Lo que aprendes cuando sientes algo se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción ayuda a que se fije.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La intuición reconoce",
+    "content": "Lo que llamamos intuición es a menudo reconocimiento de patrones acumulado por experiencia. No es magia; es velocidad no consciente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Elegir entre muchos cansa",
+    "content": "La satisfacción con una decisión disminuye cuantas más opciones descartaste. Saber que había alternativas mejores hipotéticas pesa después de elegir.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo mejor es enemigo",
+    "content": "Quien busca la mejor opción en todo invierte más tiempo y energía decidiendo, y termina menos satisfecho que quien se conforma con lo suficiente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Decisiones reversibles",
+    "content": "Si una decisión se puede deshacer, decídela rápido. Si no, dale más tiempo y análisis. No toda decisión merece el mismo peso.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "No decidir es decidir",
+    "content": "Quedarte con la opción por defecto ya es una decisión. Ser consciente de esto te devuelve la agencia sobre lo que dejas pasar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La emoción va primero",
+    "content": "La emoción precede a la razón en las decisiones. La justificación racional suele venir después, como narrativa, no como causa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Cómo se presenta importa",
+    "content": "La misma decisión presentada como ganancia o como pérdida produce elecciones distintas, aunque el resultado sea idéntico. Cómo se cuenta cambia lo que eliges.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Estrés y lo que recuerdas",
+    "content": "El estrés hace que recuerdes cómo te sentiste, pero no lo que pasó. Los detalles neutros se pierden; la emoción se queda.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Recuperar es rendir",
+    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Sin recuperación, el rendimiento se degrada inevitablemente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Dar vueltas mantiene el estrés",
+    "content": "Revisar mentalmente un evento estresante una y otra vez mantiene activo el cuerpo mucho después de que el evento terminó.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El estrés cambia el cerebro",
+    "content": "El estrés prolongado no solo se siente — cambia físicamente cómo funciona el cerebro, especialmente la memoria y la regulación emocional.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Estrés crónico amenaza",
+    "content": "Bajo estrés crónico, el cerebro interpreta cosas inocentes como amenazas. No es que el mundo sea más peligroso — es que la alarma está más sensible.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Dos modos de pensar",
+    "content": "Hay momentos para buscar la respuesta correcta y momentos para generar muchas respuestas. Confundir estos modos bloquea tanto el rigor como la creatividad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo conocido explica lo nuevo",
+    "content": "Entender algo nuevo a través de algo familiar no es simplificar — es cómo el cerebro construye conocimiento. La analogía es una herramienta real.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Dejar y volver",
+    "content": "Dejar un problema y volver después no es evitación. El cerebro sigue procesando en segundo plano, y a veces la solución aparece cuando dejas de forzarla.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Perspectiva temporal",
+    "content": "Preguntar si esto importará en cinco años no siempre calma, pero sí revela la escala real del problema. Lo que parece inmenso hoy a menudo no lo es.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Pensamiento lateral",
+    "content": "Si solo llegas a las mismas soluciones, prueba cambiar la pregunta en vez de buscar más respuestas. La pregunta define el espacio de lo posible.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Los incentivos dirigen",
+    "content": "Las personas responden a los incentivos que tienen, no a los que deberían tener. Entender los incentivos reales explica mucho comportamiento aparentemente irracional.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Cuestionar lo dado",
+    "content": "Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo dado por sentado no es rebelión — es método.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "El mapa no es el lugar",
+    "content": "Tu idea de la realidad no es la realidad. Es una representación útil pero incompleta. Confundir lo que piensas con lo que pasa genera errores de escala.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Lo que viene después",
+    "content": "Las consecuencias directas de una acción son predecibles. Las consecuencias de esas consecuencias suelen sorprender, y son las que más importan a largo plazo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La explicación simple",
+    "content": "Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia — sino porque menos supuestos significan menos puntos donde fallar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Pensar mucho no siempre aclara",
+    "content": "Pensar mucho sobre ti no siempre te conoce mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Otros ven tu patrón",
+    "content": "Tú ves tus intenciones; los demás ven tu comportamiento repetido. Preguntar qué patrón perciben en ti puede revelar lo que la introspección no alcanza.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Tú es la situación, ellos son así",
+    "content": "Explicas tus errores por la situación, pero los de otros por su carácter. No es hipocresía consciente — es algo automático y universal.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "La profecía se cumple",
+    "content": "Creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice — puede causar.",
+    "plan": "PREMIUM"
+  }
 ]

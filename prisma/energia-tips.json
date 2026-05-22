@@ -14,13 +14,13 @@
   {
     "empire": "energia",
     "title": "Luz temprana",
-    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. No es tendencia — es biología.",
+    "content": "Quince minutos de luz natural por la mañana ajustan cómo tu cuerpo marca el ritmo. No es tendencia — es biología.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "Después de comer",
-    "content": "Diez minutos de caminata después de comer reducen el pico de glucosa. El cuerpo procesa mejor con movimiento.",
+    "content": "Diez minutos de caminata después de comer ayudan a que el cuerpo procese mejor. La energía sube menos y te sientes mejor.",
     "plan": "FREE"
   },
   {
@@ -32,7 +32,7 @@
   {
     "empire": "energia",
     "title": "La siesta corta",
-    "content": "Una siesta de veinte minutos restaura la alerta sin entrar en sueño profundo. Más de treinta suele empeorar.",
+    "content": "Una siesta de veinte minutos te reanima sin llegar al sueño profundo. Más de treinta suele dejar más cansado.",
     "plan": "FREE"
   },
   {
@@ -56,19 +56,19 @@
   {
     "empire": "energia",
     "title": "La ventana del café",
-    "content": "La cafeína funciona mejor noventa minutos después de despertar. Si llega antes, interrumpe la limpieza de adenosina.",
+    "content": "La cafeína funciona mejor un rato después de despertar. Si llega antes, el cuerpo aún está limpiando el cansancio de la noche y el café lo posterga, no lo resuelve.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "Caminar piensa",
-    "content": "Caminar mejora el flujo sanguíneo cerebral. Muchas ideas buenas aparecen caminando porque el cerebro funciona mejor en movimiento.",
+    "content": "Caminar mejora cómo funciona el cerebro. Muchas ideas buenas aparecen caminando porque la mente trabaja mejor cuando el cuerpo se mueve.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "La caída de las tres",
-    "content": "La bajada de energía a media tarde es real y tiene base circadiana. Una pausa breve funciona mejor que otro café.",
+    "content": "La bajada de energía a media tarde es real y tiene que ver con el ritmo del cuerpo. Una pausa breve funciona mejor que otro café.",
     "plan": "FREE"
   },
   {
@@ -80,7 +80,7 @@
   {
     "empire": "energia",
     "title": "Respirar pausa",
-    "content": "Tres respiraciones profundas entre tareas no es meditación. Es darle al sistema nervioso un momento antes de la siguiente demanda.",
+    "content": "Tres respiraciones profundas entre tareas no es meditación. Es darle al cuerpo un momento antes de la siguiente demanda.",
     "plan": "FREE"
   },
   {
@@ -98,7 +98,7 @@
   {
     "empire": "energia",
     "title": "El último café",
-    "content": "La cafeína tiene una vida media de cinco a seis horas. Tomar café después de las dos de la tarde interrumpe el sueño nocturno.",
+    "content": "La cafeína se queda en el cuerpo más de lo que sientes. Tomar café después de las dos de la tarde puede dificultar el sueño de esa noche.",
     "plan": "FREE"
   },
   {
@@ -122,7 +122,7 @@
   {
     "empire": "energia",
     "title": "La temperatura del agua",
-    "content": "Una ducha fría de treinta segundos al final activa el sistema nervioso. No es extremo — es estimulación simple.",
+    "content": "Una ducha fría de treinta segundos al final te despierta. No es extremo — es estimulación simple.",
     "plan": "FREE"
   },
   {
@@ -170,7 +170,7 @@
   {
     "empire": "energia",
     "title": "Sol y ánimo",
-    "content": "La exposición a luz natural no solo regula el sueño. También afecta la producción de serotonina y el estado de ánimo.",
+    "content": "La luz natural no solo te ayuda a dormir mejor. También cambia cómo te sientes durante el día. La luz de la mañana hace más de lo que parece.",
     "plan": "FREE"
   },
   {
@@ -236,19 +236,19 @@
   {
     "empire": "energia",
     "title": "La máquina camina",
-    "content": "Caminar treinta minutos al día reduce el riesgo cardiovascular y mejora el sueño. No necesitas correr — caminar ya cuenta.",
+    "content": "Caminar treinta minutos al día protege el corazón y mejora el sueño. No necesitas correr — caminar ya cuenta.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "Orden del plato",
-    "content": "Comer primero la verdura, luego la proteína y al final los carbohidratos reduce el pico de glucosa tras la comida.",
+    "content": "Comer primero la verdura, luego la proteína y al final los carbohidratos hace que la energía suba más despacio después de comer.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "La postura respira",
-    "content": "Estar encorvado reduce la capacidad pulmonar. Sentarse derecho no es estética — es que tus pulmones tienen más espacio.",
+    "content": "Estar encorvado reduce el espacio para respirar. Sentarse derecho no es estética — es que respiras mejor.",
     "plan": "FREE"
   },
   {
@@ -260,7 +260,7 @@
   {
     "empire": "energia",
     "title": "El fin de semana cuenta",
-    "content": "Cambiar el horario del sueño los fines de semana genera un jetlag social que el lunes te cobra. La consistencia no toma vacaciones.",
+    "content": "Cambiar el horario del sueño los fines de semana te desajusta como si viajaras de huso horario. El lunes te cobra la inconsistencia.",
     "plan": "FREE"
   },
   {
@@ -289,8 +289,8 @@
   },
   {
     "empire": "energia",
-    "title": "Adenosina y café",
-    "content": "La adenosina se acumula mientras estás despierto. La cafeína no la elimina — la enmascara. Cuando se acaba el café, la adenosina sigue ahí.",
+    "title": "El café posterga",
+    "content": "La cafeína no elimina el cansancio — lo esconde. Cuando pasa el efecto, lo que postergaste sigue ahí.",
     "plan": "PREMIUM"
   },
   {
@@ -301,14 +301,14 @@
   },
   {
     "empire": "energia",
-    "title": "Cortisol al amanecer",
-    "content": "El cortisol sube naturalmente justo antes de despertar para darte energía. Si te despiertas agotado, puede que el ciclo de cortisol esté desalineado.",
+    "title": "Despertar agotado",
+    "content": "El cuerpo te da energía natural al despertar. Si te levantas agotado a pesar de haber dormido, algo en tu ritmo está desalineado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El gen del café",
-    "content": "El gen CYP1A2 determina si metabolizas la cafeína rápido o lento. Si eres lento, ese café de las tres te afecta más de lo que crees.",
+    "title": "Cafeína y cuerpo",
+    "content": "Algunas personas notan la cafeína durante muchas más horas de lo que parece. Un café a las tres puede afectar el sueño incluso si no lo sientes.",
     "plan": "PREMIUM"
   },
   {
@@ -319,68 +319,68 @@
   },
   {
     "empire": "energia",
-    "title": "NEAT: lo invisible",
-    "content": "La mayor parte de la energía diaria que quemas no es ejercicio — es movimiento espontáneo. Caminar, gesticular, moverte. Se llama NEAT y varía hasta quinientas calorías entre personas.",
+    "title": "Lo que quemas sin pensar",
+    "content": "La mayor parte de la energía que gastas al día no es ejercicio — es moverte sin pensar. Gesticular, caminar, levantarte. Ese movimiento invisible suma mucho.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Zona 2",
-    "content": "El ejercicio en zona 2 —donde puedes hablar pero no cantar— construye la base aeróbica. No es sexy, pero es lo que sostiene todo lo demás.",
+    "title": "El ritmo que sostiene",
+    "content": "El ejercicio donde puedes hablar pero no cantar construye la base de todo lo demás. No es vistoso, pero es lo que más dura.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "HRV como señal",
-    "content": "La variabilidad de la frecuencia cardíaca refleja la capacidad de recuperación. Si baja, el cuerpo está pidiendo descanso, no más esfuerzo.",
+    "title": "El cuerpo pide descanso",
+    "content": "Hay señales que indican que necesitas descansar, no esforzarte más. Ignorarlas no las hace desaparecer.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Reloj periférico",
-    "content": "Además del reloj central en el cerebro, cada órgano tiene su propio ritmo. La hora a la que comes sincroniza los relojes periféricos digestivos.",
+    "title": "Más de un reloj",
+    "content": "El cerebro marca el ritmo, pero el cuerpo también tiene los suyos. La hora a la que comes afecta cómo digieres, independientemente de lo que comas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Secuencia de comida",
-    "content": "El orden en que comes los nutrientes afecta la respuesta de insulina. Verdura primero, proteína después, carbohidratos al final reduce el pico glucémico hasta un setenta por ciento.",
+    "title": "El orden en el plato",
+    "content": "El orden en que comes cambia más de lo que parece. Empezar por la verdura, luego la proteína y al final los carbohidratos hace que la energía suba más despacio.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Sueño profundo",
-    "content": "El sueño profundo se concentra en la primera mitad de la noche. Acostarte tarde no solo reduce la cantidad — reduce específicamente la fase más reparadora.",
+    "title": "Las primeras horas",
+    "content": "La parte más reparadora del sueño ocurre en las primeras horas. Acostarte tarde no solo reduce la cantidad — reduce específicamente lo que más necesitas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "REM y emoción",
-    "content": "El sueño REM procesa experiencias emocionales del día. Si lo reduces, las emociones del día siguiente se sienten más intensas y menos manejables.",
+    "title": "El sueño que procesa",
+    "content": "Hay una fase del sueño que procesa las emociones del día. Si la reduces, al día siguiente todo se siente más intenso y menos manejable.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El ritmo del intestino",
-    "content": "El intestino tiene su propio reloj circadiano. Comer a horas irregulares altera la microbiota y la digestión, independientemente de lo que comas.",
+    "title": "El intestino tiene ritmo",
+    "content": "Tu digestión tiene ritmo propio. Comer a horas irregulares la altera, independientemente de lo que comas. Los horarios importan más de lo que parece.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Fase lunar del cuerpo",
-    "content": "El ciclo menstrual afecta la energía, el sueño y la tolerancia al esfuerzo. Entrenar igual todo el mes ignora cómo funciona la fisiología.",
+    "title": "El ciclo cambia todo",
+    "content": "El ciclo menstrual cambia la energía, el sueño y lo que puedes exigirte. Entrenar igual todo el mes ignora cómo funciona tu cuerpo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Recuperación activa",
-    "content": "La recuperación activa —movimiento suave tras esfuerzo intenso— elimina lactato más rápido que el reposo completo. El cuerpo se repara en movimiento, no parado.",
+    "title": "Moverse para recuperarse",
+    "content": "Después de un esfuerzo intenso, el movimiento suave ayuda más que quedarte quieto. El cuerpo se repara mejor en movimiento ligero que parado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Glicación y sueño",
-    "content": "La privación de sueño aumenta los marcadores de glicación —el mismo proceso que el exceso de azúcar. Dormir mal envejece células.",
+    "title": "Dormir mal envejece",
+    "content": "Dormir mal hace en el cuerpo algo parecido a comer demasiado azúcar. No se ve, pero el efecto es real y se acumula.",
     "plan": "PREMIUM"
   },
   {
@@ -391,26 +391,26 @@
   },
   {
     "empire": "energia",
-    "title": "Microbiota y energía",
-    "content": "La composición de tu microbiota influye en cuánta energía extraes de los alimentos. Dos personas comen lo mismo y absorben distinto.",
+    "title": "No todos absorben igual",
+    "content": "Dos personas pueden comer lo mismo y obtener distinta energía de ello. Lo que vive en tu intestino influye más de lo que imaginas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Termorregulación y sueño",
-    "content": "El cuerpo necesita bajar un grado para dormir. Una ducha caliente antes de acostarse ayuda porque la evaporación posterior enfría el cuerpo.",
+    "title": "Caliente para enfriar",
+    "content": "El cuerpo necesita enfriarse para dormir. Una ducha caliente antes de acostarse ayuda porque al secarte, el cuerpo se enfría.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El costo del alcohol",
-    "content": "El alcohol puede ayudar a dormir más rápido, pero destruye la arquitectura del sueño. El sueño bajo alcohol es menos reparador, aunque no lo sientas.",
+    "content": "El alcohol puede ayudar a dormir más rápido, pero el sueño que produce es menos reparador. Aunque no lo sientas, la calidad baja.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Fibra muscular",
-    "content": "Las fibras musculares de contracción lenta se entrenan con esfuerzo sostenido moderado. Las rápidas, con esfuerzo breve e intenso. Ambas necesitan estímulo distinto.",
+    "title": "Dos tipos de esfuerzo",
+    "content": "El esfuerzo moderado y sostenido construye resistencia. El esfuerzo breve e intenso construye potencia. Ambos importan y son distintos.",
     "plan": "PREMIUM"
   },
   {
@@ -421,86 +421,86 @@
   },
   {
     "empire": "energia",
-    "title": "Proteína y saciedad",
-    "content": "La proteína genera más saciedad por caloría que carbohidratos o grasa. No es una dieta — es cómo funciona la señal de lleno.",
+    "title": "Lo que te llena",
+    "content": "La proteína llena más que la grasa o los carbohidratos con las mismas calorías. No es una dieta — es cómo funciona la señal de saciedad.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Glucógeno y voluntad",
-    "content": "El cerebro usa glucosa. Cuando el glucógeno está bajo, la función ejecutiva se degrada. No es falta de carácter — es falta de combustible.",
+    "title": "Cerebro sin combustible",
+    "content": "El cerebro necesita energía para decidir bien. Cuando llevas horas sin comer, decidir se vuelve más difícil. No es debilidad — es falta de combustible.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Ventana de alimentación",
-    "content": "Comer dentro de una ventana de ocho a diez horas mejora marcadores metabólicos independientemente de las calorías. No es ayuno — es timing.",
+    "title": "Cuándo comes importa",
+    "content": "No solo importa qué comes — cuándo comes también cuenta. Concentrar las comidas en un período de unas diez horas mejora cómo el cuerpo procesa todo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Luz artificial de noche",
-    "content": "La luz artificial por la noche suprime melatonina hasta en cantidades moderadas. Una lámpara cálida de mesa es mejor que el techo entero encendido.",
+    "title": "Luz de noche",
+    "content": "La luz por la noche engaña al cuerpo y le cuesta preparar el sueño. Una lámpara cálida de mesa es mejor que todo el techo encendido.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El deload necesario",
-    "content": "Cada cuatro a seis semanas de entrenamiento progresivo, una semana más ligera permite al cuerpo asimilar el estímulo. Sin deload, el progreso se estanca.",
+    "title": "La semana suave",
+    "content": "Después de semanas esforzándote, el cuerpo necesita una semana más ligera para asimilar el trabajo. Sin ella, el progreso se estanca.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Circadiano y medicación",
-    "content": "La eficacia de muchos medicamentos varía según la hora del día. El cuerpo no procesa igual a las ocho de la mañana que a las ocho de la noche.",
+    "title": "La hora de la pastilla",
+    "content": "El cuerpo no procesa igual un medicamento por la mañana que por la noche. La hora a la que lo tomas puede cambiar su efecto.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Electrolitos y rendimiento",
-    "content": "La fatiga muscular durante ejercicio prolongado suele ser de electrolitos, no solo de carbohidratos. Sodio, potasio y magnesio importan.",
+    "title": "No siempre es hambre",
+    "content": "La fatiga durante el ejercicio prolongado no siempre es falta de energía. A veces son minerales — sodio, potasio, magnesio — que se pierden con el sudor.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Magnesio y sueño",
-    "content": "El magnesio participa en la regulación del sistema nervioso y la calidad del sueño. Los déficits son comunes y silenciosos.",
+    "title": "Magnesio silencioso",
+    "content": "El magnesio ayuda al sistema nervioso y al sueño. Mucha gente tiene poco sin saberlo, y se nota en la calidad del descanso.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "VO2max como predictor",
-    "content": "El VO2max es uno de los mejores predictores de longevidad. No necesitas ser atleta — pero sí necesitas desafiar tu sistema cardiovascular regularmente.",
+    "title": "Corazón y duración",
+    "content": "La capacidad de tu corazón y pulmones para trabajar se relaciona con cuánto duras. No necesitas ser atleta — sí necesitas desafiar tu cuerpo regularmente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Linfático y movimiento",
-    "content": "El sistema linfático no tiene bomba como el corazón. El movimiento es lo que hace circular la linfa. Sin movimiento, la recuperación se ralentiza.",
+    "title": "Mover te limpia",
+    "content": "Hay sistemas del cuerpo que no se mueven solos — necesitan que tú te muevas. Sin movimiento, la recuperación se ralentiza.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Siesta y memoria",
-    "content": "Una siesta corta tras aprender algo nuevo mejora la consolidación de memoria. No es pereza — es procesamiento.",
+    "content": "Una siesta corta tras aprender algo nuevo ayuda a que se fije. No es pereza — es procesamiento.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Carga alostática",
-    "content": "La carga alostática es el desgaste acumulado del estrés crónico. No se siente hasta que se siente. Dormir bien y moverse son las dos cosas que más la reducen.",
+    "title": "El desgaste silencioso",
+    "content": "El estrés crónico desgasta sin que lo notes hasta que el cuerpo dice basta. Dormir bien y moverse son las dos cosas que más lo reducen.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "La proteína antes de dormir",
-    "content": "Una pequeña cantidad de proteína antes de dormir mejora la síntesis muscular nocturna. El cuerpo se repara mientras descansa, si tiene material.",
+    "content": "Un poco de proteína antes de dormir ayuda a que el cuerpo se repare durante la noche. Descansa, pero si tiene material, también reconstruye.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Cetosis y cerebro",
-    "content": "El cerebro puede usar cetonas como combustible alternativo. Algunas personas reportan claridad mental en cetosis leve, pero no es universal.",
+    "title": "El cerebro y la energía alternativa",
+    "content": "El cerebro puede usar otros combustibles además del azúcar. Algunas personas notan más claridad mental con ciertos cambios de alimentación, pero no funciona igual para todos.",
     "plan": "PREMIUM"
   },
   {
@@ -511,56 +511,56 @@
   },
   {
     "empire": "energia",
-    "title": "Sincronizadores circadianos",
-    "content": "Los tres sincronizadores principales del reloj interno son: luz, comida y movimiento. Alinear los tres es más poderoso que optimizar solo uno.",
+    "title": "Tres señales, un ritmo",
+    "content": "El reloj interno se ajusta con tres cosas: luz, comida y movimiento. Alinear las tres funciona mejor que intentar optimizar solo una.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "La proteína mínima",
-    "content": "La cantidad mínima de proteína para mantener masa muscular es un gramo por kilo al día. Menos que eso y el cuerpo empieza a recurrir al músculo.",
+    "title": "La proteína justa",
+    "content": "El cuerpo necesita un mínimo de proteína para no perder músculo. Menos de un gramo por kilo al día y empieza a recurrir al músculo como reserva.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Índice glucémico en contexto",
-    "content": "El índice glucémico de un alimento cambia cuando se come con otros. La proteína y la fibra reducen el impacto del carbohidrato que los acompaña.",
+    "title": "Lo que acompaña importa",
+    "content": "Un mismo alimento sube la energía de forma distinta según qué lo acompañe. La proteína y la fibra hacen que los carbohidratos suban más despacio.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Circadiano y metabolismo",
-    "content": "La misma comida se metaboliza distinto a las ocho de la mañana que a las ocho de la noche. La sensibilidad a insulina es mayor por la mañana.",
+    "title": "La mañana procesa mejor",
+    "content": "El mismo plato se procesa distinto por la mañana que por la noche. El cuerpo aprovecha mejor lo que comes temprano.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El overreaching",
-    "content": "Hay un punto donde entrenar más no produce más — produce menos. Se llama overreaching y la única solución es descansar, no insistir.",
+    "title": "Más no siempre es más",
+    "content": "Hay un punto donde esforzarte más no te hace mejor — te hace peor. Cuando el cuerpo no progresa, suele necesitar descanso, no más esfuerzo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Omega-3 y inflamación",
-    "content": "Los ácidos grasos omega-3 modulan la inflamación sistémica. No es antiinflamatorio como una pastilla — es regulador como parte de la dieta.",
+    "title": "Grasa que calma",
+    "content": "El pescado azul, las nueces y ciertas semillas aportan grasas que ayudan al cuerpo a gestionar la inflamación. No es una pastilla — es parte de comer bien.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Respiración y pH",
-    "content": "La respiración no solo aporta oxígeno — regula el pH de la sangre. Respirar rápido y superficial acidifica. Respirar lento y profundo equilibra.",
+    "title": "Respirar te equilibra",
+    "content": "Respirar rápido y superficial te desestabiliza. Respirar lento y profundo te calma. No es solo aire — es cómo tu cuerpo se regula.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El descenso de la tarde",
-    "content": "La caída de energía a media tarde no es solo digestión — es un punto bajo circadiano real. La siesta corta o el movimiento suave lo manejan mejor que la cafeína.",
+    "title": "La bajada real",
+    "content": "La caída de energía a media tarde no es solo la comida — es un ritmo natural del cuerpo. Una siesta corta o caminar un rato funciona mejor que otro café.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Masa muscular y longevidad",
-    "content": "La masa muscular es un tejido metabólicamente activo que protege contra enfermedades metabólicas. No es estética — es reserva de salud.",
+    "title": "Músculo que protege",
+    "content": "El músculo no es estética — es reserva de salud. Mantiene activo el metabolismo y protege contra varias enfermedades. Cuanto más tienes, más respaldo tienes.",
     "plan": "PREMIUM"
   },
   {
@@ -571,44 +571,44 @@
   },
   {
     "empire": "energia",
-    "title": "Vitamina C y cortisol",
-    "content": "La vitamina C en cantidades moderadas ayuda a regular los niveles de cortisol tras el estrés agudo. No es calmante — es modulador.",
+    "title": "Vitamina C y estrés",
+    "content": "La vitamina C ayuda al cuerpo a gestionar el estrés. No es un calmante — es un apoyo real cuando las demandas son altas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El sueño del atleta",
-    "content": "Los atletas de élite duermen entre nueve y diez horas. No porque puedan — porque necesitan. El rendimiento alto exige recuperación alta.",
+    "content": "Quien más rinde, más duerme. No es lujo — es necesidad. El rendimiento alto exige recuperación alta.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El costo de la pantalla",
-    "content": "La luz azul de las pantallas retrasa la melatonina hasta dos horas. No es solo insomnio — es sueño de peor calidad que no se siente hasta el día siguiente.",
+    "content": "La luz de las pantallas por la noche dificulta que el cuerpo prepare el sueño. No es solo insomnio — es sueño de peor calidad que no se siente hasta el día siguiente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Adaptación térmica",
-    "content": "El cuerpo se adapta al calor y al frío con exposición repetida. No necesitas extremos — consistencia moderada ya genera adaptación.",
+    "title": "El cuerpo se adapta",
+    "content": "El cuerpo se acostumbra al calor y al frío si lo expones con regularidad. No necesitas extremos — consistencia moderada ya genera adaptación.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El ritmo del hambre",
-    "content": "El hambre sigue un ritmo circadiano. Si comes a horas fijas, el hambre aparece antes de comer — no como emergencia, como expectativa.",
+    "content": "El hambre tiene su propio ritmo. Si comes a horas fijas, el hambre aparece antes de comer — no como emergencia, sino como expectativa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Supercompensación",
-    "content": "Tras un esfuerzo y la recuperación adecuada, el cuerpo no vuelve al nivel anterior — sube un poco más. Se llama supercompensación y es la base del progreso.",
+    "title": "Mejorar descansando",
+    "content": "Cuando te esfuerzas y descansas bien, el cuerpo no vuelve al nivel anterior — sube un poco más. Es así como funciona el progreso.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "La vitamina del sol",
-    "content": "La vitamina D se sintetiza con exposición solar. Un déficit afecta huesos, músculos, ánimo y sistema inmune. No es opcional — es infraestructura.",
+    "content": "La vitamina D se forma con el sol. Si te falta, se resienten los huesos, los músculos, el ánimo y las defensas. No es opcional — es infraestructura.",
     "plan": "PREMIUM"
   },
   {
@@ -638,25 +638,25 @@
   {
     "empire": "energia",
     "title": "El músculo que quema",
-    "content": "El músculo en reposo consume más calorías que la grasa. No mucho más, pero suficiente para que importe a largo plazo.",
+    "content": "El músculo en reposo gasta más que la grasa. No mucho más, pero suficiente para que importe a largo plazo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Cortisol y luz azul",
-    "content": "La luz azul de las pantallas por la noche no solo retrasa la melatonina — también puede elevar el cortisol. Doble impacto en la recuperación.",
+    "title": "Pantallas de noche",
+    "content": "Las pantallas por la noche no solo dificultan dormir — también pueden mantenerte alerta cuando tu cuerpo debería relajarse. Doble impacto en la recuperación.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Hidratación y rendimiento",
-    "content": "Una deshidratación del dos por ciento ya reduce el rendimiento físico y cognitivo. No necesitas sentir sed para estar deshidratado.",
+    "title": "Sed que no se siente",
+    "content": "Perder muy poco agua ya afecta cómo rindes física y mentalmente. No necesitas sentir sed para estar menos hidratado de lo conveniente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "La temperatura del sueño",
-    "content": "La temperatura corporal central baja durante el sueño. Una habitación a 18-20 grados facilita este descenso. Más calor cuesta más conciliar.",
+    "content": "El cuerpo se enfría al dormir. Una habitación a 18-20 grados le facilita ese descenso. Cuanto más cálida, más cuesta conciliar.",
     "plan": "PREMIUM"
   }
 ]

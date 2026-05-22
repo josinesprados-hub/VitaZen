@@ -53,3 +53,30 @@ Stage Summary:
 - Seed is now idempotent (upsert instead of create)
 - Free→2 tips, Élite→3 tips confirmed (server-side deterministic rotation)
 - Cross-device coherence maintained (server-side rotation via getDeterministicTips)
+
+---
+Task ID: 1
+Agent: main
+Task: Reconstruir biblioteca de tips prácticos de imperios — de 40 a 550 tips curados
+
+Work Log:
+- Leí documento de principios (/docs/vitazen-finanzas-principios.md)
+- Audité sistema completo: useEmpireTips hook, EmpireTipsSection, seed.ts, emotional-dashboard-state.ts, API route
+- Encontré que los tips NO fueron eliminados — siempre estuvieron en el sistema, pero con solo 40 tips (8 por imperio) se repetían demasiado rápido
+- Creé 5 baterías JSON independientes en prisma/ con 110 tips cada una (50 FREE + 60 PREMIUM)
+- Total: 550 tips curados basados en evidencia real
+- Cambié rotación de 4→3 días (CYCLE_MS)
+- Aumenté AVOID_RECENT_COUNT de 3→6 para evitar repetición tras reshuffle
+- Eliminé take:10 en API route — ahora carga batería completa
+- Cambié subtítulo Mente de "Reflexiones" → "Notas" (más práctico)
+- Eliminé término "biohacking" — reemplazado por "extremo"
+- Build exitoso, commit limpio, push a GitHub
+
+Stage Summary:
+- 550 tips curados: 5 imperios × (50 FREE + 60 PREMIUM)
+- FREE: observaciones prácticas inmediatamente útiles
+- PREMIUM: más profundidad, rareza, contexto, refinamiento
+- Rotación: 3 días, determinista, server-side, cross-device
+- FREE cycle: 75 días antes de reshuffle (25 ciclos × 3 días)
+- PREMIUM cycle: 180 días antes de reshuffle (60 ciclos × 3 días)
+- Commit: b6e88dd — pushed to main

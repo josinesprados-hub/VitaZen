@@ -1,113 +1,662 @@
 [
-  {"empire": "riqueza", "title": "Págate primero", "content": "Antes de cualquier gasto, destina algo a ahorro. No es una regla financiera — es una forma de priorizarte.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Suscripciones fantasma", "content": "Lo que no usas activamente es dinero que se fue sin que lo notaras. Revisa cada tres meses.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Veinticuatro horas", "content": "Esperar un día antes de comprar algo no planificado suele resolver la mitad de las compras impulsivas.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Automatizar el ahorro", "content": "Lo que no depende de la voluntad del momento tiene más probabilidad de cumplirse.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Efectivo duele más", "content": "Pagar con billetes genera una sensación de pérdida que la tarjeta amortigua. Por eso se gasta más con plástico.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "El primer precio", "content": "El primer número que ves influye lo que parece justo después. Una oferta parece mejor junto a un precio inflado.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Descuento no es ahorro", "content": "Gastar menos de lo esperado sigue siendo gastar. Ahorrar es no gastar.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo caro parece mejor", "content": "El cerebro asocia precio con calidad. A veces se paga más por la percepción que por el producto.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo que ya tienes", "content": "Sobrevaloramos lo que poseemos solo por poseerlo. Por eso cuesta tanto soltar cosas que ya no usamos.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Compras con emoción", "content": "El estado de ánimo al comprar afecta más el gasto que el precio mismo. Tristeza y aburrimiento gastan distinto que calma.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Gratis es irresistible", "content": "La palabra \"gratis\" activa una parte del cerebro que ignora el costo oculto. Si es gratis, tú eres el producto.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Poner fricción", "content": "Dificultar una compra — eliminar tarjeta guardada, cerrar la app — reduce el gasto sin reducir la satisfacción.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "El pago mínimo", "content": "Pagar solo el mínimo de la tarjeta es un préstamo con el interés más alto que probablemente tienes.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Precio por uso", "content": "El costo real de algo es lo que pagaste dividido entre las veces que lo usas. Lo barato que no usas es caro.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Cerca vence a lejos", "content": "El presente siempre pesa más que el futuro en las decisiones financieras. Lo que está cerca se siente real; lo lejano parece negociable.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Precio por unidad", "content": "El paquete más grande no siempre es más barato por unidad. Comparar el precio por litro, kilo o unidad revela la trampa.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Cada tres meses", "content": "Revisar suscripciones y gastos recurrentes cuatro veces al año suele recuperar dinero que se fue en piloto automático.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "El colchón", "content": "Tener un fondo de emergencia no es planificación financiera — es poder tomar decisiones sin pánico.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Come silencioso", "content": "La inflación reduce el poder de compra sin que lo notes. Lo que costaba cien hace diez años no cuesta cien ahora.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "¿Qué más podría?", "content": "Cada gasto tiene un costo de oportunidad: en qué más podrías haber puesto ese dinero. La pregunta no es cuánto cuesta, sino qué deja de ser.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Diversificar siempre", "content": "No poner todo en un solo lugar no es miedo — es reconocimiento de que nadie sabe qué va a pasar.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Tiempo sobre cantidad", "content": "El interés compuesto necesita años, no montos grandes. Empezar con poco hoy supera empezar con mucho mañana.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Deuda con propósito", "content": "Hay deuda que compra algo que crece — como educación — y deuda que compra algo que pierde valor. No son lo mismo.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Presupuestar es elegir", "content": "Un presupuesto no es una cárcel. Es decidir antes dónde quieres que vaya tu dinero en lugar de descubrirlo después.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo invisible no duele", "content": "El dinero que se ahorra automáticamente no se extraña porque nunca estuvo disponible para gastar.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Las cantidades pequeñas", "content": "Veinte pesos diarios son seiscientos al mes. Lo que parece insignificante diario se vuelve significativo anual.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Ver el saldo", "content": "Las personas que revisan su cuenta regularmente gastan menos. No por ansiedad — por consciencia.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Ya tengo algo parecido", "content": "Antes de comprar, preguntar si ya tienes algo que cumple la misma función evita la mitad de las compras innecesarias.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Experiencias rinden más", "content": "Las cosas se adaptan. Las experiencias se recuerdan. El dinero invertido en vivencias devuelve más con el tiempo.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "El método del sobre", "content": "Separar el dinero en sobres por categoría — lo que hay, hay. Cuando se acaba, no se rellena. Simple y efectivo.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Preguntar siempre", "content": "Pedir un descuento o una condición mejor funciona más veces de lo que parece. Lo peor que puede pasar es que digan no.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Intereses silenciosos", "content": "Los intereses de la tarjeta de crédito no se ven, no se sienten y no avisan. Pero están ahí, cada mes.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo que ya invertiste", "content": "Seguir gastando en algo solo porque ya invertiste es tirar dinero bueno tras malo. Lo invertido ya se fue.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo que otros compran", "content": "Ver a alguien más comprar algo hace que parezca más valioso. La mayoría no siempre tiene razón — pero influye.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "La opción trampa", "content": "Cuando aparece una tercera opción que nadie elige, las otras dos parecen mejores de lo que son. No siempre lo son.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Cómo se presenta", "content": "Lo mismo presentado como \"ahorro del 20%\" suena mejor que \"pagas el 80%\". El marco cambia la decisión.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "La conveniencia cobra", "content": "Lo cómodo tiene un sobreprecio. Delivery, servicio express, compra en un clic — la conveniencia es un gasto invisible que se normaliza rápido.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Ahorrar sin sentirlo", "content": "Redondear cada compra y guardar la diferencia es ahorrar sin tomar decisiones. Lo pequeño y automático suma.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "El fondo indexado", "content": "Un fondo que replica el mercado no necesita adivinar qué empresa ganará. A largo plazo, la mayoría de gestores no le ganan al índice.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Invertir no es apostar", "content": "Invertir es poner dinero a trabajar durante años. Apostar es esperar un resultado rápido. Se parecen solo en la superficie.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Tiempo dentro vs momento", "content": "Estar invertido mucho tiempo importa más que entrar en el momento perfecto. El timing perfecto es una ilusión.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Más opciones, peor elección", "content": "Tener demasiadas opciones financieras puede paralizar. A veces, limitar las alternativas aclara la decisión.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "La marca cobra extra", "content": "El mismo producto con un logo distinto puede costar el doble. El sobreprecio de marca es un impuesto por identidad, no por calidad.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Plan fijo, gasto fijo", "content": "Elegir un plan ilimitado por la paz mental suele costar más que pagar por uso. La mayoría usa menos de lo que paga en planes \"unlimited\".", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Comparar con calma", "content": "Tomarse dos minutos para buscar el mismo producto en otro sitio suele encontrarlo más barato. La prisa es enemiga del precio.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Dinero fácil, gasto fácil", "content": "El dinero que llega sin esfuerzo — un bono, un regalo — se gasta con menos cuidado que el que costó ganar.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo que usas realmente", "content": "La mitad de lo que compras se usa menos de tres veces. Lo que no usas activamente es dinero que se fue.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Las reseñas de cinco", "content": "Las reseñas perfectas suelen ser pocas o compradas. Busca las de tres y cuatro estrellas: suelen ser más honestas.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Lo usado vale", "content": "Comprar algo que ya tuvo dueño no es falta de recursos — es inteligencia con el dinero. El valor no depende de que sea nuevo.", "plan": "FREE"},
-  {"empire": "riqueza", "title": "Gasta lo que importa", "content": "Lo que realmente valoras merece presupuesto. Lo demás solo ocupa espacio. La alineación entre gasto y valores genera satisfacción.", "plan": "FREE"},
-
-  {"empire": "riqueza", "title": "La pérdida pesa doble", "content": "La investigación muestra que perder algo duele aproximadamente el doble que lo que alegra ganarlo. Esto hace que vendamos lo que sube y mantengamos lo que baja.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Contabilidad mental", "content": "El cerebro trata distinto el dinero del salario, el del bono y el del ahorro. Pero un peso es un peso. La cuenta de la que viene no debería cambiar lo que decides con él.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El túnel de escasez", "content": "La escasez no solo limita recursos — reduce la capacidad de ver opciones. La mente se enfoca en lo urgente y excluye lo importante, incluso cuando la solución está ahí.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El ancla persistente", "content": "El anclaje funciona incluso cuando sabes que existe. Saber que el primer precio era alto no evita que influya lo que consideras justo.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Dolor por método", "content": "El pago en efectivo duele más que el débito, y el débito duele más que el crédito. Mientras menos se siente, más se gasta. Elegir cómo pagar cambia cuánto.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "No vendes lo innecesario", "content": "El efecto dotación hace que valoremos más lo que ya tenemos, aunque nunca lo usemos. Vender o regalar lo innecesario requiere superar una ilusión de valor.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Exponencial, no lineal", "content": "El interés compuesto crece como una curva que se acelera: los primeros años parecen poco, los últimos parecen magia. Pero es solo matemática.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "La tarjeta como impuesto", "content": "El crédito no solo cobra intereses — cambia cuánto gastas. Los estudios muestran que se gasta más con crédito que con efectivo, incluso pagando lo mismo. El impuesto es doble.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Guiones del dinero", "content": "Las creencias sobre el dinero se forman en la infancia y operan en piloto automático. \"El dinero es peligroso\", \"no hay suficiente\", \"merezco esto\" — guían sin que lo sepas.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Presupuesto de cero", "content": "En lugar de ajustar el gasto al ingreso, justificar cada peso desde cero obliga a preguntar: ¿esto sigue siendo necesario? Lo heredado sin revisar suele ser lo más caro.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Avalancha o bola", "content": "Pagar la deuda más pequeña primero da victorias rápidas. Pagar la más cara primero cuesta más psicológicamente pero menos financieramente. La diferencia es entre lo que sientes y lo que cuesta.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Adaptación hedónica", "content": "Las cosas nuevas dejan de emocionar en semanas. El cerebro se adapta a lo que tienes y vuelve al nivel base de satisfacción. Comprar para ser feliz es una carrera que no termina.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El default como negocio", "content": "Las suscripciones funcionan porque cancelar requiere acción y la inercia favorece el status quo. El modelo de negocio no es que lo uses — es que no lo canceles.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "La ilusión del crédito", "content": "El límite de la tarjeta no es dinero tuyo — es dinero prestado que parece tuyo. El crédito distorsiona la percepción de cuánto puedes gastar.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Inercia costosa", "content": "Mantener el mismo plan de teléfono, seguro o servicio por años sin revisar suele significar pagar de más. El negocio cuenta con que no vas a cambiar.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El marco del gasto", "content": "Presentar un gasto mensual como \"solo dos pesos al día\" lo hace parecer pequeño. La misma cantidad presentada como costo anual revela su tamaño real.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Costo que no ves", "content": "El costo de oportunidad no aparece en ningún estado de cuenta. Pero es el costo real de cada decisión: todo lo que ese dinero dejó de hacer.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Negociar sin culpa", "content": "La investigación muestra que pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación — es respeto por tu propio dinero.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Colchón como libertad", "content": "Un fondo de emergencia no es solo dinero guardado — es la capacidad de decir no sin pánico. La tranquilidad financiera cambia la calidad de las decisiones.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El impuesto invisible", "content": "La inflación es un costo que se cobra a quien no invierte. El dinero que parece seguro en la cuenta pierde poder de compra en silencio. No protegerse tiene un precio real.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Varianza, no retorno", "content": "Diversificar no reduce lo que ganas — reduce la probabilidad de perder mucho en un solo evento. Es un seguro, no una limitación.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Recencia engaña", "content": "Comprar lo que más subió recientemente es seguir al rebaño. Lo que subió rápido no garantiza que siga subiendo — a menudo hace lo contrario.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Escasez y cognición", "content": "Mullainathan y Shafir demostraron que la escasez reduce la capacidad cognitiva equivalente a trece puntos de IQ. No es falta de inteligencia — es falta de margen.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Posesión parcial", "content": "Cuando una inversión sube y la posees, se activa el efecto dotación: te cuesta vender aunque la razón diga que deberías. Es más fuerte con inversiones que con objetos.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Recurrente y peligroso", "content": "Un gasto de veinte pesos al mes son doscientos cuarenta al año. Lo que se repite es más peligroso que lo que se compra una vez, porque se normaliza.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Primero tú", "content": "\"Págate primero\" no es una regla financiera — es un marco psicológico. Cambia el default de \"ahorro es lo que sobra\" a \"gasto es lo que queda después de ahorrar\".", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Deuda que compra tiempo", "content": "Una deuda para educación o un negocio puede generar más valor de lo que cuesta. El criterio no es si hay deuda — es si compra algo que crece.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Costo hundido en suscripciones", "content": "Seguir pagando algo que no usas porque \"ya pagué este mes\" es el sesgo de costo hundido. El dinero ya se fue. La pregunta es si sigues yendo.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Ilusión de control", "content": "Creer que puedes predecir el mercado da una falsa sensación de competencia. Los datos muestran que incluso los profesionales no superan consistentemente al azar.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Redes y comparación", "content": "Ver los gastos de otros en redes sociales activa la comparación social. Lo que no ves es que muchos de esos gastos se pagaron con crédito.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Confirmación financiera", "content": "Buscar información que confirme lo que ya crees sobre una inversión es natural — y peligroso. El sesgo de confirmación te hace ignorar señales contrarias.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Inercia invertida", "content": "Automatizar el ahorro no es disciplina — es diseño. Cambiar el default de \"gastar y ahorrar lo que sobra\" a \"ahorrar y gastar lo que queda\" invierte la inercia.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Treinta días", "content": "Para compras grandes, esperar un mes separa lo que necesitas de lo que querías en un momento. Si después de treinta días sigues pensando en ello, probablemente valga la pena.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El ancla en tienda", "content": "El primer precio que ves en una tienda ancla tu referencia. Por eso los negocios muestran primero lo más caro — hace que lo demás parezca razonable.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El dinero inesperado", "content": "Los bonos, regalos o devoluciones se gastan distinto porque el cerebro los clasifica como \"dinero extra\". Pero un peso extra tiene el mismo valor que un peso ganado.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El costo de cambiar", "content": "Cambiar de banco, seguro o proveedor requiere tiempo y esfuerzo. Pero quedarse por inercia suele costar más que el esfuerzo de cambiar. El status quo tiene precio.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El índice como mediana", "content": "Un fondo indexado no busca ganarle a nadie — busca ser la mediana del mercado. Y los datos muestran que la mayoría de estrategias activas quedan por debajo.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Sueño y dinero", "content": "La investigación muestra que dormir mal deteriora las decisiones financieras tanto como el alcohol. Menos horas de sueño equivale a más riesgo y más errores.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Los tres minutos", "content": "El impulso de compra tiene una ventana crítica de unos minutos. Si la pasas — respirando, caminando, bebiendo agua — la urgencia suele desaparecer.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Tu precio interno", "content": "Cada persona tiene un precio de referencia interno para las cosas. Se forma con lo que pagaste la primera vez y es difícil de actualizar, incluso cuando los precios cambiaron.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Esperar fortalece", "content": "La capacidad de esperar por algo mejor se correlaciona con mejores resultados financieros a largo plazo. No es paciencia: es práctica.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Dinero de la casa", "content": "El dinero ganado en una inversión se gasta con menos cuidado que el invertido original. El cerebro lo clasifica como \"ganancia\", no como capital.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Tiempo subestimado", "content": "En inversión, el tiempo es el factor más subestimado. No porque sea obvio — sino porque la paciencia real es más rara que el capital.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Palabras que gastan", "content": "Decir \"ahorro del 30%\" activa una respuesta distinta a decir \"paga el 70%\". El cerebro procesa el mismo dato de forma diferente según el marco.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Escasez artificial", "content": "Reducir la escasez artificial — suscripciones innecesarias, deudas acumuladas, cosas sin usar — crea margen mental sin necesitar más ingresos.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Presupuesto por valores", "content": "Alinear el gasto con lo que realmente valoras — no con lo que la cultura dice que deberías valorar — genera más satisfacción por cada peso gastado.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "No negociar el salario", "content": "Aceptar la primera oferta salarial sin negociar puede costar cientos de miles a lo largo de una carrera. La mayoría de los empleadores esperan que negocies.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Deuda emocional", "content": "Algunas compras compensan algo que no es financiero — soledad, frustración, cansancio. Identificar la emoción detrás del gasto es más útil que cualquier presupuesto.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Paciencia premia", "content": "El mercado recompensa la consistencia y el tiempo, no la frecuencia y la acción. Los inversores que operan menos suelen ganar más.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Ambiente que gasta", "content": "La música lenta en las tiendas hace que camines más despacio y gastes más. La luz cálida, los olores, la distribución — todo está diseñado para que compres.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Apalancamiento amplifica", "content": "La deuda amplifica tanto las ganancias como las pérdidas. No crea valor — lo multiplica, en ambas direcciones.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Liquidez invisible", "content": "Tener dinero accesible tiene un valor real que pocas veces se calcula. La liquidez es la opción de actuar cuando aparece una oportunidad — o una emergencia.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Imitación social", "content": "El gasto por imitación sigue una curva: se acelera cuando los cercanos gastan y se frena cuando uno queda fuera del grupo. La referencia no es el precio — es la tribu.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Edad y riesgo", "content": "La tolerancia al riesgo debería disminuir con el tiempo, no porque seas menos capaz — sino porque tienes menos tiempo para recuperar.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Fatiga de decisión", "content": "Cada decisión financiera del día agota la capacidad de la siguiente. Ahorrar la voluntad para las decisiones importantes — delegar las rutinarias — no es pereza, es estrategia.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Inflación percibida", "content": "Las personas suelen sentir que la inflación es más alta de lo que es. Se recuerdan mejor los precios que subieron y se olvidan los que bajaron o se mantuvieron.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "El efecto avestruz", "content": "Evitar mirar el saldo cuando las cosas van mal es una reacción natural. Pero la información que se ignora no desaparece — se agrava.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Herramienta, no identidad", "content": "El dinero es una herramienta, no una identidad. Ser \"alguien que ahorra\" funciona. Ser \"mi valor es mi saldo\" no.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Efecto segunda orden", "content": "Cada decisión financiera tiene un efecto directo y otro indirecto. Comprar barato puede costar más si se rompe pronto. Ahorrar demasiado puede costar experiencias que no se repiten.", "plan": "PREMIUM"},
-  {"empire": "riqueza", "title": "Lo que no miden", "content": "El bienestar financiero no aparece en el saldo. Es la ausencia de preocupación constante, la capacidad de absorber un golpe y la alineación entre gasto y valores.", "plan": "PREMIUM"}
+  {
+    "empire": "riqueza",
+    "title": "Págate primero",
+    "content": "Antes de cualquier gasto, destina algo a ahorro. No es una regla financiera — es una forma de priorizarte.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Suscripciones fantasma",
+    "content": "Lo que no usas activamente es dinero que se fue sin que lo notaras. Revisa cada tres meses.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Veinticuatro horas",
+    "content": "Esperar un día antes de comprar algo no planificado suele resolver la mitad de las compras impulsivas.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Automatizar el ahorro",
+    "content": "Lo que no depende de la voluntad del momento tiene más probabilidad de cumplirse.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Efectivo duele más",
+    "content": "Pagar con billetes genera una sensación de pérdida que la tarjeta amortigua. Por eso se gasta más con plástico.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El primer precio",
+    "content": "El primer número que ves influye lo que parece justo después. Una oferta parece mejor junto a un precio inflado.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Descuento no es ahorro",
+    "content": "Gastar menos de lo esperado sigue siendo gastar. Ahorrar es no gastar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo caro parece mejor",
+    "content": "El cerebro asocia precio con calidad. A veces se paga más por la percepción que por el producto.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que ya tienes",
+    "content": "Sobrevaloramos lo que poseemos solo por poseerlo. Por eso cuesta tanto soltar cosas que ya no usamos.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Compras con emoción",
+    "content": "El estado de ánimo al comprar afecta más el gasto que el precio mismo. Tristeza y aburrimiento gastan distinto que calma.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Gratis es irresistible",
+    "content": "La palabra \"gratis\" activa una parte del cerebro que ignora el costo oculto. Si es gratis, tú eres el producto.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Poner fricción",
+    "content": "Dificultar una compra — eliminar tarjeta guardada, cerrar la app — reduce el gasto sin reducir la satisfacción.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El pago mínimo",
+    "content": "Pagar solo el mínimo de la tarjeta es un préstamo con el interés más alto que probablemente tienes.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Precio por uso",
+    "content": "El costo real de algo es lo que pagaste dividido entre las veces que lo usas. Lo barato que no usas es caro.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Cerca vence a lejos",
+    "content": "El presente siempre pesa más que el futuro en las decisiones financieras. Lo que está cerca se siente real; lo lejano parece negociable.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Precio por unidad",
+    "content": "El paquete más grande no siempre es más barato por unidad. Comparar el precio por litro, kilo o unidad revela la trampa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Cada tres meses",
+    "content": "Revisar suscripciones y gastos recurrentes cuatro veces al año suele recuperar dinero que se fue en piloto automático.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El colchón",
+    "content": "Tener un fondo de emergencia no es planificación financiera — es poder tomar decisiones sin pánico.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Come silencioso",
+    "content": "La inflación reduce el poder de compra sin que lo notes. Lo que costaba cien hace diez años no cuesta cien ahora.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "¿Qué más podría?",
+    "content": "Cada gasto tiene un costo de oportunidad: en qué más podrías haber puesto ese dinero. La pregunta no es cuánto cuesta, sino qué deja de ser.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Diversificar siempre",
+    "content": "No poner todo en un solo lugar no es miedo — es reconocimiento de que nadie sabe qué va a pasar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Tiempo sobre cantidad",
+    "content": "El interés compuesto necesita años, no montos grandes. Empezar con poco hoy supera empezar con mucho mañana.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Deuda con propósito",
+    "content": "Hay deuda que compra algo que crece — como educación — y deuda que compra algo que pierde valor. No son lo mismo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Presupuestar es elegir",
+    "content": "Un presupuesto no es una cárcel. Es decidir antes dónde quieres que vaya tu dinero en lugar de descubrirlo después.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo invisible no duele",
+    "content": "El dinero que se ahorra automáticamente no se extraña porque nunca estuvo disponible para gastar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Las cantidades pequeñas",
+    "content": "Veinte pesos diarios son seiscientos al mes. Lo que parece insignificante diario se vuelve significativo anual.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Ver el saldo",
+    "content": "Las personas que revisan su cuenta regularmente gastan menos. No por ansiedad — por consciencia.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Ya tengo algo parecido",
+    "content": "Antes de comprar, preguntar si ya tienes algo que cumple la misma función evita la mitad de las compras innecesarias.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Experiencias rinden más",
+    "content": "Las cosas se adaptan. Las experiencias se recuerdan. El dinero invertido en vivencias devuelve más con el tiempo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El método del sobre",
+    "content": "Separar el dinero en sobres por categoría — lo que hay, hay. Cuando se acaba, no se rellena. Simple y efectivo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Preguntar siempre",
+    "content": "Pedir un descuento o una condición mejor funciona más veces de lo que parece. Lo peor que puede pasar es que digan no.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Intereses silenciosos",
+    "content": "Los intereses de la tarjeta de crédito no se ven, no se sienten y no avisan. Pero están ahí, cada mes.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que ya invertiste",
+    "content": "Seguir gastando en algo solo porque ya invertiste es tirar dinero bueno tras malo. Lo invertido ya se fue.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que otros compran",
+    "content": "Ver a alguien más comprar algo hace que parezca más valioso. La mayoría no siempre tiene razón — pero influye.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La opción trampa",
+    "content": "Cuando aparece una tercera opción que nadie elige, las otras dos parecen mejores de lo que son. No siempre lo son.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Cómo se presenta",
+    "content": "Lo mismo presentado como \"ahorro del 20%\" suena mejor que \"pagas el 80%\". El marco cambia la decisión.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La conveniencia cobra",
+    "content": "Lo cómodo tiene un sobreprecio. Delivery, servicio express, compra en un clic — la conveniencia es un gasto invisible que se normaliza rápido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Ahorrar sin sentirlo",
+    "content": "Redondear cada compra y guardar la diferencia es ahorrar sin tomar decisiones. Lo pequeño y automático suma.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El fondo indexado",
+    "content": "Un fondo que replica el mercado no necesita adivinar qué empresa ganará. A largo plazo, la mayoría de gestores no le ganan al índice.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Invertir no es apostar",
+    "content": "Invertir es poner dinero a trabajar durante años. Apostar es esperar un resultado rápido. Se parecen solo en la superficie.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Tiempo dentro vs momento",
+    "content": "Estar invertido mucho tiempo importa más que entrar en el momento perfecto. El timing perfecto es una ilusión.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Más opciones, peor elección",
+    "content": "Tener demasiadas opciones financieras puede paralizar. A veces, limitar las alternativas aclara la decisión.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La marca cobra extra",
+    "content": "El mismo producto con un logo distinto puede costar el doble. El sobreprecio de marca es un impuesto por identidad, no por calidad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Plan fijo, gasto fijo",
+    "content": "Elegir un plan ilimitado por la paz mental suele costar más que pagar por uso. La mayoría usa menos de lo que paga en planes \"unlimited\".",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Comparar con calma",
+    "content": "Tomarse dos minutos para buscar el mismo producto en otro sitio suele encontrarlo más barato. La prisa es enemiga del precio.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Dinero fácil, gasto fácil",
+    "content": "El dinero que llega sin esfuerzo — un bono, un regalo — se gasta con menos cuidado que el que costó ganar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que usas realmente",
+    "content": "La mitad de lo que compras se usa menos de tres veces. Lo que no usas activamente es dinero que se fue.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Las reseñas de cinco",
+    "content": "Las reseñas perfectas suelen ser pocas o compradas. Busca las de tres y cuatro estrellas: suelen ser más honestas.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo usado vale",
+    "content": "Comprar algo que ya tuvo dueño no es falta de recursos — es inteligencia con el dinero. El valor no depende de que sea nuevo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Gasta lo que importa",
+    "content": "Lo que realmente valoras merece presupuesto. Lo demás solo ocupa espacio. La alineación entre gasto y valores genera satisfacción.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La pérdida pesa doble",
+    "content": "Perder algo duele aproximadamente el doble de lo que alegra ganar lo mismo. Esto hace que vendas lo que sube y mantengas lo que baja.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El cerebro clasifica el dinero",
+    "content": "El cerebro trata distinto el dinero del salario, el del bono y el del ahorro. Pero un peso es un peso. La cuenta de la que viene no debería cambiar lo que decides con él.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La escasez ciega",
+    "content": "La escasez no solo limita recursos — reduce la capacidad de ver opciones. La mente se enfoca en lo urgente y excluye lo importante, incluso cuando la solución está ahí.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El ancla persistente",
+    "content": "El anclaje funciona incluso cuando sabes que existe. Saber que el primer precio era alto no evita que influya lo que consideras justo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Dolor por método",
+    "content": "El pago en efectivo duele más que el débito, y el débito duele más que el crédito. Mientras menos se siente, más se gasta. Elegir cómo pagar cambia cuánto.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "No vendes lo innecesario",
+    "content": "Valoramos más lo que ya tenemos, aunque nunca lo usemos. Vender o regalar lo innecesario requiere superar esa ilusión de valor.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Exponencial, no lineal",
+    "content": "El interés compuesto crece como una curva que se acelera: los primeros años parecen poco, los últimos parecen magia. Pero es solo matemática.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La tarjeta como impuesto",
+    "content": "El crédito no solo cobra intereses — cambia cuánto gastas. Los estudios muestran que se gasta más con crédito que con efectivo, incluso pagando lo mismo. El impuesto es doble.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que aprendiste del dinero",
+    "content": "Las creencias sobre el dinero se forman en la infancia y operan en piloto automático. \"El dinero es peligroso\", \"no hay suficiente\", \"merezco esto\" — guían sin que lo sepas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Presupuesto de cero",
+    "content": "En lugar de ajustar el gasto al ingreso, justificar cada peso desde cero obliga a preguntar: ¿esto sigue siendo necesario? Lo heredado sin revisar suele ser lo más caro.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Dos formas de pagar deudas",
+    "content": "Pagar la deuda más pequeña primero da victorias rápidas. Pagar la más cara primero cuesta más psicológicamente pero menos en total. La diferencia es entre lo que sientes y lo que pagas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo nuevo se acostumbra",
+    "content": "Las cosas nuevas dejan de emocionar en semanas. El cerebro se adapta y vuelve al nivel base de satisfacción. Comprar para ser feliz es una carrera que no termina.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El default como negocio",
+    "content": "Las suscripciones funcionan porque cancelar requiere acción y la inercia favorece el status quo. El modelo de negocio no es que lo uses — es que no lo canceles.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La ilusión del crédito",
+    "content": "El límite de la tarjeta no es dinero tuyo — es dinero prestado que parece tuyo. El crédito distorsiona la percepción de cuánto puedes gastar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Inercia costosa",
+    "content": "Mantener el mismo plan de teléfono, seguro o servicio por años sin revisar suele significar pagar de más. El negocio cuenta con que no vas a cambiar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El marco del gasto",
+    "content": "Presentar un gasto mensual como \"solo dos pesos al día\" lo hace parecer pequeño. La misma cantidad presentada como costo anual revela su tamaño real.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Costo que no ves",
+    "content": "El costo de oportunidad no aparece en ningún estado de cuenta. Pero es el costo real de cada decisión: todo lo que ese dinero dejó de hacer.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Negociar sin culpa",
+    "content": "La investigación muestra que pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación — es respeto por tu propio dinero.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Colchón como libertad",
+    "content": "Un fondo de emergencia no es solo dinero guardado — es la capacidad de decir no sin pánico. La tranquilidad financiera cambia la calidad de las decisiones.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El impuesto invisible",
+    "content": "La inflación es un costo que se cobra a quien no invierte. El dinero que parece seguro en la cuenta pierde poder de compra en silencio. No protegerse tiene un precio real.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Diversificar protege",
+    "content": "Diversificar no reduce lo que ganas — reduce la probabilidad de perder mucho de golpe. Es un seguro, no una limitación.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Recencia engaña",
+    "content": "Comprar lo que más subió recientemente es seguir al rebaño. Lo que subió rápido no garantiza que siga subiendo — a menudo hace lo contrario.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Escasez y cabeza",
+    "content": "La escasez no solo limita el dinero — reduce la capacidad de pensar con claridad. No es falta de inteligencia — es falta de margen.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que sube cuesta venderlo",
+    "content": "Cuando una inversión sube y la tienes, te cuesta vender aunque la razón diga que deberías. El sentimiento de posesión es más fuerte con inversiones que con objetos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Recurrente y peligroso",
+    "content": "Un gasto de veinte pesos al mes son doscientos cuarenta al año. Lo que se repite es más peligroso que lo que se compra una vez, porque se normaliza.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Primero tú",
+    "content": "\"Págate primero\" no es una regla financiera — es un marco psicológico. Cambia el default de \"ahorro es lo que sobra\" a \"gasto es lo que queda después de ahorrar\".",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Deuda que compra tiempo",
+    "content": "Una deuda para educación o un negocio puede generar más valor de lo que cuesta. El criterio no es si hay deuda — es si compra algo que crece.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Costo hundido en suscripciones",
+    "content": "Seguir pagando algo que no usas porque \"ya pagué este mes\" es el sesgo de costo hundido. El dinero ya se fue. La pregunta es si sigues yendo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Ilusión de control",
+    "content": "Creer que puedes predecir el mercado da una falsa sensación de competencia. Los datos muestran que incluso los profesionales no superan consistentemente al azar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Redes y comparación",
+    "content": "Ver los gastos de otros en redes sociales activa la comparación social. Lo que no ves es que muchos de esos gastos se pagaron con crédito.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Confirmación financiera",
+    "content": "Buscar información que confirme lo que ya crees sobre una inversión es natural — y peligroso. El sesgo de confirmación te hace ignorar señales contrarias.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Inercia invertida",
+    "content": "Automatizar el ahorro no es disciplina — es diseño. Cambiar el default de \"gastar y ahorrar lo que sobra\" a \"ahorrar y gastar lo que queda\" invierte la inercia.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Treinta días",
+    "content": "Para compras grandes, esperar un mes separa lo que necesitas de lo que querías en un momento. Si después de treinta días sigues pensando en ello, probablemente valga la pena.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El ancla en tienda",
+    "content": "El primer precio que ves en una tienda ancla tu referencia. Por eso los negocios muestran primero lo más caro — hace que lo demás parezca razonable.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El dinero inesperado",
+    "content": "Los bonos, regalos o devoluciones se gastan distinto porque el cerebro los clasifica como \"dinero extra\". Pero un peso extra tiene el mismo valor que un peso ganado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El costo de cambiar",
+    "content": "Cambiar de banco, seguro o proveedor requiere tiempo y esfuerzo. Pero quedarse por inercia suele costar más que el esfuerzo de cambiar. El status quo tiene precio.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "El índice como mediana",
+    "content": "Un fondo indexado no busca ganarle a nadie — busca ser la mediana del mercado. Y los datos muestran que la mayoría de estrategias activas quedan por debajo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Sueño y dinero",
+    "content": "La investigación muestra que dormir mal deteriora las decisiones financieras tanto como el alcohol. Menos horas de sueño equivale a más riesgo y más errores.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Los tres minutos",
+    "content": "El impulso de compra tiene una ventana crítica de unos minutos. Si la pasas — respirando, caminando, bebiendo agua — la urgencia suele desaparecer.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Tu precio interno",
+    "content": "Cada persona tiene un precio de referencia interno para las cosas. Se forma con lo que pagaste la primera vez y es difícil de actualizar, incluso cuando los precios cambiaron.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Esperar fortalece",
+    "content": "La capacidad de esperar por algo mejor se correlaciona con mejores resultados financieros a largo plazo. No es paciencia: es práctica.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Dinero de la casa",
+    "content": "El dinero ganado en una inversión se gasta con menos cuidado que el invertido original. El cerebro lo clasifica como \"ganancia\", no como capital.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Tiempo subestimado",
+    "content": "En inversión, el tiempo es el factor más subestimado. No porque sea obvio — sino porque la paciencia real es más rara que el capital.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Palabras que gastan",
+    "content": "Decir \"ahorro del 30%\" activa una respuesta distinta a decir \"paga el 70%\". El cerebro procesa el mismo dato de forma diferente según el marco.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Escasez artificial",
+    "content": "Reducir la escasez artificial — suscripciones innecesarias, deudas acumuladas, cosas sin usar — crea margen mental sin necesitar más ingresos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Presupuesto por valores",
+    "content": "Alinear el gasto con lo que realmente valoras — no con lo que la cultura dice que deberías valorar — genera más satisfacción por cada peso gastado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "No negociar el salario",
+    "content": "Aceptar la primera oferta salarial sin negociar puede costar cientos de miles a lo largo de una carrera. La mayoría de los empleadores esperan que negocies.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Deuda emocional",
+    "content": "Algunas compras compensan algo que no es financiero — soledad, frustración, cansancio. Identificar la emoción detrás del gasto es más útil que cualquier presupuesto.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Paciencia premia",
+    "content": "El mercado recompensa la consistencia y el tiempo, no la frecuencia y la acción. Los inversores que operan menos suelen ganar más.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Ambiente que gasta",
+    "content": "La música lenta en las tiendas hace que camines más despacio y gastes más. La luz cálida, los olores, la distribución — todo está diseñado para que compres.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "La deuda multiplica",
+    "content": "La deuda amplifica tanto las ganancias como las pérdidas. No crea valor — lo multiplica, en ambas direcciones.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Dinero disponible",
+    "content": "Tener dinero accesible tiene un valor real que pocas veces se calcula. Es la opción de actuar cuando aparece una oportunidad — o una emergencia.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Imitación social",
+    "content": "El gasto por imitación sigue una curva: se acelera cuando los cercanos gastan y se frena cuando uno queda fuera del grupo. La referencia no es el precio — es la tribu.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Edad y riesgo",
+    "content": "La tolerancia al riesgo debería disminuir con el tiempo, no porque seas menos capaz — sino porque tienes menos tiempo para recuperar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Fatiga de decisión",
+    "content": "Cada decisión financiera del día agota la capacidad de la siguiente. Ahorrar la voluntad para las decisiones importantes — delegar las rutinarias — no es pereza, es estrategia.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Inflación percibida",
+    "content": "Las personas suelen sentir que la inflación es más alta de lo que es. Se recuerdan mejor los precios que subieron y se olvidan los que bajaron o se mantuvieron.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "No mirar no ayuda",
+    "content": "Evitar mirar el saldo cuando las cosas van mal es natural. Pero la información que se ignora no desaparece — se agrava.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Herramienta, no identidad",
+    "content": "El dinero es una herramienta, no una identidad. Ser \"alguien que ahorra\" funciona. Ser \"mi valor es mi saldo\" no.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que viene después",
+    "content": "Cada decisión financiera tiene un efecto directo y otro indirecto. Comprar barato puede costar más si se rompe pronto. Ahorrar demasiado puede costar experiencias que no se repiten.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "riqueza",
+    "title": "Lo que no miden",
+    "content": "El bienestar financiero no aparece en el saldo. Es la ausencia de preocupación constante, la capacidad de absorber un golpe y la alineación entre gasto y valores.",
+    "plan": "PREMIUM"
+  }
 ]

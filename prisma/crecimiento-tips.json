@@ -301,7 +301,7 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El efecto Dunning-Kruger",
+    "title": "Confianza sin base",
     "content": "Los principiantes sobreestiman su competencia. Los expertos la subestiman. La confianza sin base es la señal de que aún falta mucho por aprender.",
     "plan": "PREMIUM"
   },
@@ -313,14 +313,14 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Representaciones mentales",
-    "content": "Un experto no solo sabe más — tiene representaciones mentales más ricas. Ve patrones donde el novato ve detalles aislados. Eso toma tiempo y práctica deliberada.",
+    "title": "El experto ve patrones",
+    "content": "Un experto no solo sabe más — ve patrones donde el novato ve detalles aislados. Eso toma tiempo y práctica, no solo estudio.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Fijeza funcional",
-    "content": "Cuanto más experiencia tienes, más cuesta ver usos nuevos para lo que ya conoces. La experiencia crea eficiencia y también rigidez.",
+    "title": "La experiencia puede cegar",
+    "content": "Cuanta más experiencia tienes, más cuesta ver usos nuevos para lo que ya conoces. La experiencia crea eficiencia, pero también rigidez.",
     "plan": "PREMIUM"
   },
   {
@@ -337,14 +337,14 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Interferencia entre aprendizajes",
-    "content": "Aprender cosas similares muy seguidas puede generar interferencia. El cerebro mezcla lo parecido. Separar en el tiempo o diferenciar más ayuda.",
+    "title": "Lo parecido se mezcla",
+    "content": "Aprender cosas muy seguidas que se parecen puede hacer que se te mezclen. Separar en el tiempo o hacerlas más distintas ayuda.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Umbral de competencia",
-    "content": "La práctica deliberada solo funciona si ya tienes una base mínima. Antes de ese umbral, necesitas instrucción, no práctica a ciegas.",
+    "title": "Necesitas base primero",
+    "content": "La práctica intensiva solo funciona si ya tienes una base. Antes de eso, necesitas que te enseñen — no práctica a ciegas.",
     "plan": "PREMIUM"
   },
   {
@@ -362,13 +362,13 @@
   {
     "empire": "crecimiento",
     "title": "La curva de olvido",
-    "content": "Olvidar es natural. La curva de Ebbinghaus muestra que lo que no se repasa se pierde rápido. La solución no es memorizar más — es repasar mejor.",
+    "content": "Olvidar es natural. Lo que no se repasa se pierde rápido. La solución no es memorizar más — es repasar mejor.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Metacognición",
-    "content": "Pensar sobre cómo piensas —metacognición— es la habilidad que más diferencia a quienes aprenden bien. No es talento: es hábito de autoobservación.",
+    "title": "Pensar sobre cómo piensas",
+    "content": "Pensar sobre cómo piensas es la habilidad que más diferencia a quienes aprenden bien. No es talento — es hábito de observarse.",
     "plan": "PREMIUM"
   },
   {
@@ -470,7 +470,7 @@
   {
     "empire": "crecimiento",
     "title": "El costo de cambiar",
-    "content": "Cambiar de dirección tiene un costo: lo invertido en la dirección anterior. Pero quedarse por ese costo es la falacia del sunk cost aplicada a la vida.",
+    "content": "Cambiar de dirección tiene un costo: lo invertido en la dirección anterior. Pero quedarse por ese costo es seguir pagando por algo que ya no funciona.",
     "plan": "PREMIUM"
   },
   {
@@ -505,8 +505,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "La práctica deliberada duele",
-    "content": "Práctica deliberada no es lo que disfrutas. Es lo que te empuja justo al borde de tu capacidad. No se siente bien — funciona.",
+    "title": "Practicar al borde",
+    "content": "Practicar lo que se te da bien no es practicar de verdad. Lo que te empuja justo al límite de tu capacidad es lo que mejora. No se siente bien — funciona.",
     "plan": "PREMIUM"
   },
   {
@@ -548,7 +548,7 @@
   {
     "empire": "crecimiento",
     "title": "La inoculación mental",
-    "content": "Imaginar obstáculos antes de que pasen —no para preocuparte, sino para prepararte— reduce su impacto cuando llegan. Se llama inoculación cognitiva.",
+    "content": "Imaginar obstáculos antes de que pasen —no para preocuparte, sino para prepararte— reduce su impacto cuando llegan.",
     "plan": "PREMIUM"
   },
   {
