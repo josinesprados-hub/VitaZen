@@ -5,7 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 
 // ═══════════════════════════════════════════
-// useEmpireTips — contemplative tip rotation
+// useEmpireTips — stable tip rotation
 // ═══════════════════════════════════════════
 //
 // Single source of truth: the server.
@@ -13,8 +13,11 @@ import { useAuth } from '@/context/AuthContext';
 // The server decides the tip order and rotation,
 // all devices show the same tips.
 //
-// Rarity and cycle timing are still preserved —
-// they're tracked server-side with the same rules.
+// Rules:
+//   - FREE users: always 2 FREE tips
+//   - ÉLITE users: always 2 FREE + 1 PREMIUM
+//   - Tips rotate every 3 days (server-side)
+//   - No disappearance. No silence. No hiding.
 
 export interface Tip {
   id: string;
@@ -24,9 +27,9 @@ export interface Tip {
 }
 
 export interface EmpireTipsResult {
-  /** Current FREE tips to display (rotated server-side) */
+  /** Current FREE tips to display (always 2) */
   freeTips: Tip[];
-  /** Current PREMIUM tips (rotated server-side) */
+  /** Current PREMIUM tips (1 for ÉLITE, 0 for FREE) */
   premiumTips: Tip[];
   /** Whether user is premium */
   isPremium: boolean;
@@ -49,25 +52,40 @@ export function useEmpireTips(empire: string): EmpireTipsResult {
       if (res.ok) {
         const data = await res.json();
 
-        // Use server-side rotated tips when available AND non-empty.
-        // NOTE: JavaScript empty arrays [] are truthy, so we must
-        // explicitly check for Array.isArray + length to avoid setting
-        // empty arrays when the fallback (data.tips) has real data.
+        // ─── Priority 1: Server-side rotated tips ───
+        // The server returns rotatedFreeTips and rotatedPremiumTips
+        // which are already filtered by plan (FREE battery / PREMIUM battery).
         const hasRotatedFree = Array.isArray(data.rotatedFreeTips) && data.rotatedFreeTips.length > 0;
         const hasRotatedPremium = Array.isArray(data.rotatedPremiumTips) && data.rotatedPremiumTips.length > 0;
 
-        if (hasRotatedFree || hasRotatedPremium) {
-          setFreeTips(hasRotatedFree ? data.rotatedFreeTips : []);
-          setPremiumTips(hasRotatedPremium ? data.rotatedPremiumTips : []);
-        } else {
-          // Fallback: use raw tips (backwards compatibility / empty rotation)
+        if (hasRotatedFree) {
+          setFreeTips(data.rotatedFreeTips.slice(0, 2)); // Always exactly 2 FREE
+        }
+
+        if (hasRotatedPremium) {
+          setPremiumTips(data.rotatedPremiumTips.slice(0, 1)); // Always exactly 1 PREMIUM
+        }
+
+        // ─── Priority 2: Fallback from raw tips ───
+        // If server rotation didn't return results, use raw tips with client-side filtering.
+        // This ensures tips ALWAYS render even if rotation logic has an edge case.
+        if (!hasRotatedFree || !hasRotatedPremium) {
           const allTips: Tip[] = data.tips || [];
-          setFreeTips(allTips.filter(t => t.plan !== 'PREMIUM').slice(0, 2));
-          setPremiumTips(allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1));
+
+          if (!hasRotatedFree && allTips.length > 0) {
+            const freeFromRaw = allTips.filter(t => t.plan !== 'PREMIUM').slice(0, 2);
+            setFreeTips(freeFromRaw);
+          }
+
+          if (!hasRotatedPremium && allTips.length > 0) {
+            const premiumFromRaw = allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1);
+            setPremiumTips(premiumFromRaw);
+          }
         }
       }
     } catch (error) {
       console.error('Error fetching tips:', error);
+      // Don't clear existing tips on error — keep showing what we have
     } finally {
       setLoading(false);
     }

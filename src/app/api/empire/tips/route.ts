@@ -18,19 +18,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'empire parameter required' }, { status: 400 });
     }
 
-    // Fetch all tips from DB (no limit — need full battery for deterministic rotation)
+    // Fetch all tips from DB for this empire — no limit, need full battery
     const allTips = await db.empireTip.findMany({
       where: { empire },
       orderBy: [
-        { plan: 'asc' },   // FREE tips first
+        { plan: 'asc' },   // FREE first, then PREMIUM
         { createdAt: 'desc' },
       ],
     });
 
-    // Use server-side deterministic rotation instead of client-side Math.random
+    // Server-side deterministic rotation — returns { freeTips, premiumTips }
+    // already separated by plan. FREE tips come exclusively from FREE battery.
+    // PREMIUM tips come exclusively from PREMIUM battery. No cross-contamination.
     const { freeTips, premiumTips } = await getDeterministicTips(user.id, empire, allTips);
 
-    return NextResponse.json({ tips: allTips, rotatedFreeTips: freeTips, rotatedPremiumTips: premiumTips });
+    return NextResponse.json({
+      tips: allTips,
+      rotatedFreeTips: freeTips,
+      rotatedPremiumTips: premiumTips,
+    });
   } catch (error) {
     console.error('Empire tips GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

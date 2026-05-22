@@ -531,8 +531,6 @@ export async function getDeterministicTips(
 
   // ─── Defensive clamping ───
   // Guard against corrupted state where position exceeds count.
-  // This can happen if tips were removed from the DB between runs,
-  // or if a previous write failed after advancing the position.
   if (freeCount > 0 && empireState.freePosition >= freeCount) {
     empireState.freePosition = 0;
   }
@@ -540,14 +538,17 @@ export async function getDeterministicTips(
     empireState.premiumPosition = 0;
   }
 
-  // Select FREE tips
+  // ─── Select FREE tips — ALWAYS exactly 2 ───
+  // Wraps around the shuffled order if needed to guarantee 2 tips.
+  // With 50 FREE tips per empire, this is always satisfiable.
   const selectedFree: typeof allTips = [];
   const freeIndices: number[] = [];
   if (freeCount > 0) {
-    const remaining = freeCount - empireState.freePosition;
-    const toShow = Math.min(FREE_TIPS_VISIBLE, Math.max(0, remaining));
-    for (let i = 0; i < toShow; i++) {
-      const idx = empireState.freeOrder[empireState.freePosition + i];
+    const needed = Math.min(FREE_TIPS_VISIBLE, freeCount);
+    for (let i = 0; i < needed; i++) {
+      // Wrap around: if we reach the end, continue from the beginning
+      const pos = (empireState.freePosition + i) % freeCount;
+      const idx = empireState.freeOrder[pos];
       if (idx !== undefined && freeTipsAll[idx]) {
         selectedFree.push(freeTipsAll[idx]);
         freeIndices.push(idx);
@@ -558,14 +559,16 @@ export async function getDeterministicTips(
   // Track recent free indices
   empireState.recentFree = [...empireState.recentFree, ...freeIndices].slice(-AVOID_RECENT_COUNT);
 
-  // Select PREMIUM tips
+  // ─── Select PREMIUM tip — ALWAYS exactly 1 ───
+  // From the ÉLITE-only battery. Never mixed with FREE.
   const selectedPremium: typeof allTips = [];
   const premiumIndices: number[] = [];
   if (premiumCount > 0) {
-    const startIdx = empireState.premiumOrder[empireState.premiumPosition];
-    if (startIdx !== undefined && premiumTipsAll[startIdx]) {
-      selectedPremium.push(premiumTipsAll[startIdx]);
-      premiumIndices.push(startIdx);
+    const pos = empireState.premiumPosition % premiumCount;
+    const idx = empireState.premiumOrder[pos];
+    if (idx !== undefined && premiumTipsAll[idx]) {
+      selectedPremium.push(premiumTipsAll[idx]);
+      premiumIndices.push(idx);
     }
   }
 
