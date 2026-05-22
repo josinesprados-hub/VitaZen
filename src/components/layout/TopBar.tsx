@@ -44,7 +44,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
   return (
     <header className="sticky top-0 z-30 bg-[#000000]/95 backdrop-blur-md border-b border-[#1a1a1a] safe-top">
-      <div className="flex items-center justify-between h-14 sm:h-16 px-4 sm:px-4 lg:px-6">
+      <div className="flex items-center justify-between h-12 sm:h-14 px-4 sm:px-4 lg:px-6">
+        {/* Left: mobile hamburger + page title */}
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuClick}
@@ -61,14 +62,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           )}
         </div>
 
-        <div className="hidden lg:block">
-          <p className="text-sm text-[#666]">
-            <span className="text-[#999]">{user?.name || ''}</span>
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Quiet plan indicator — no badge, no crown, just a whisper */}
+        {/* Right: quiet Élite whisper — the only desktop element */}
+        <div className="flex items-center">
           {user?.plan === 'PREMIUM' && (
             <span className="text-[9px] font-medium text-[#c8a55a]/40 tracking-wider">
               Élite
