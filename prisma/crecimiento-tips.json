@@ -1,0 +1,662 @@
+[
+  {
+    "empire": "crecimiento",
+    "title": "Un poco cada día",
+    "content": "Veinte minutos diarios superan a tres horas los domingos. La repetición espaciada consolida más que la concentración esporádica.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Mirar la semana",
+    "content": "Un momento cada siete días: qué aprendiste, qué cambiarías, qué te quedas. No es evaluación — es reconocimiento.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que no funcionó",
+    "content": "Lo que sale mal suele enseñar más que lo que sale bien — si se mira sin juicio. Revisar sin castigar es donde está el dato.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Explicar revela",
+    "content": "Explicar algo a otra persona revela lo que no habías entendido. Si no puedes explicarlo simple, aún no lo dominas.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La meseta es normal",
+    "content": "Dejar de mejorar durante una temporada no significa estancarse. La meseta es donde el cerebro consolida lo que aprendió.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Intentar recordar",
+    "content": "Intentar recordar algo antes de abrir el libro fortalece más la memoria que releer. El esfuerzo de recuperar fija más que el de recibir.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Preguntar antes de leer",
+    "content": "Antes de leer algo nuevo, pregúntate qué ya sabes del tema. El cerebro ancla mejor lo nuevo cuando tiene dónde colgarlo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Variar practica",
+    "content": "Practicar lo mismo siempre no es practicar igual. Variar dentro de la repetición mejora la transferencia y la retención.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Escribir para pensar",
+    "content": "Escribir lo que aprendiste obliga a ordenarlo. Lo que no puedes escribir claro probablemente aún no lo tienes claro.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Pequeños ajustes",
+    "content": "Un pequeño cambio en cómo haces algo puede tener un efecto grande en el resultado. La mejora no siempre requiere empezar de cero.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Quién te ve",
+    "content": "Tener alguien que observa tu progreso —aunque sea una vez por semana— aumenta la consistencia. No por presión. Por visibilidad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que ya sabes",
+    "content": "Conectar lo nuevo con lo que ya sabes hace que se recuerde mejor. El cerebro no guarda información suelta — la ancla a lo existente.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El error como dato",
+    "content": "Cada error contiene información sobre lo que no funciona. Tratarlo como dato en vez de como fracaso cambia la relación con el aprendizaje.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Repetir espaciado",
+    "content": "Repasar hoy, en tres días y en una semana fija más que repasar diez veces seguidas. El espacio entre repeticiones es donde se consolida.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Una pregunta",
+    "content": "Si hoy fuera el único día que importara, ¿qué harías diferente? La respuesta dice más sobre las prioridades que cualquier plan.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Hacer vs aprender",
+    "content": "Hay una diferencia entre saber cómo se hace y poder hacerlo. Solo la práctica real cierra esa distancia.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La incomodidad informa",
+    "content": "La zona donde tropiezas es donde el cerebro se está reorganizando. La incomodidad es información, no señal de parar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Copiar no es robar",
+    "content": "Imitar a quien lo hace bien es la forma más antigua de aprender. La originalidad viene después — no al principio.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El descanso procesa",
+    "content": "El cerebro sigue procesando lo que aprendiste después de parar. Una pausa no es interrumpir — es dejar que el cerebro trabaje solo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Objetivo concreto",
+    "content": "«Quiero mejorar» es un deseo. «Quiero poder hacer X en Y tiempo» es un objetivo. Lo concreto se puede planear. Lo vago, no.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La prueba pequeña",
+    "content": "Antes de comprometerte con algo grande, haz una versión pequeña. La prueba te dice más que la teoría.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que repites eres",
+    "content": "Pensar «soy alguien que aprende» cambia más que pensar «tengo que aprender esto». La identidad sostiene lo que la obligación abandona.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Ver patrones",
+    "content": "Tres personas que ya viven lo que buscas. No necesitas hablar con ellas — observar sus patrones ya enseña.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El retroceso es real",
+    "content": "Volver a donde estabas tras mejorar no es fracaso. Es parte del ciclo. La curva no es recta.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Menos, más frecuente",
+    "content": "Practicar quince minutos seis días supera a practicar noventa minutos uno. La frecuencia le dice al cerebro que esto importa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La opinión de quien sabe",
+    "content": "La retroalimentación funciona mejor cuando llega pronto y viene de alguien que sabe. La opinión genérica no cuenta igual.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Escribir lo aprendido",
+    "content": "Al final del día, escribir una cosa que aprendiste hace que el cerebro la marque como importante. Lo que se anota se retiene más.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Pensar en voz alta",
+    "content": "Pensar en voz alta sobre un problema revela atajos que el pensamiento silencioso salta. Oír tu propio proceso cambia el proceso.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El prójimo enseña",
+    "content": "Enseñar lo que sabes refuerza tu propio aprendizaje. El que más aprende de una explicación suele ser quien la da.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "No es lineal",
+    "content": "El progreso no es una línea recta. Hay saltos, mesetas y retrocesos. Esperar linealidad genera frustración innecesaria.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Registrar sin juzgar",
+    "content": "Anotar lo que haces sin juzgarlo te da información real. El juicio distorsiona el dato. Primero observa, luego decide.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que te cuesta",
+    "content": "Lo que más te cuesta hacer suele ser lo que más necesitas practicar. Evitar lo difícil es natural, pero no mejora nada.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Curiosidad sin priza",
+    "content": "Seguir una curiosidad sin exigir resultado inmediato a veces lleva a los lugares más interesantes. No todo necesita ser productivo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Cerrar algo",
+    "content": "Terminar algo, aunque no sea perfecto, enseña más que dejarlo a medias por buscar la versión ideal. Lo completo instruye. Lo incompleto estanca.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El antes y después",
+    "content": "Mirar dónde estabas hace un año revela cambio que el día a día oculta. La perspectiva larga muestra lo que la corta pierde.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Hacerlo mal primero",
+    "content": "Hacerlo mal la primera vez es condición para hacerlo bien después. La versión buena viene de la versión mala, no de la versión imaginada.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La pregunta que no hiciste",
+    "content": "La pregunta que no haces por vergüenza suele ser la que más necesitas responder. Lo que no preguntas te mantiene donde estás.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Mismo tiempo, mismo lugar",
+    "content": "Practicar siempre en el mismo contexto ayuda a que el cerebro active el modo aprendizaje automáticamente. El entorno es parte del ritual.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Intercalar temas",
+    "content": "Alternar entre temas distintos en una sesión mejora la retención a largo plazo. Mezclar practica la discriminación, no solo la repetición.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que te distrae",
+    "content": "Lo que te distrae mientras aprendes puede ser una señal de que el cerebro está saturado. La distracción a veces es el cuerpo pidiendo pausa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El mapa y el terreno",
+    "content": "Leer sobre algo no es lo mismo que hacerlo. El mapa no es el terreno. La teoría sin práctica es una foto del lugar sin haber ido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que decides ignorar",
+    "content": "Elegir qué no aprender es tan importante como qué aprender. La profundidad necesita que dejes cosas afuera.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La gente que te rodea",
+    "content": "Las personas con las que pasas tiempo influyen en lo que consideras normal. Rodearte de quien aprende hace que aprender se sienta normal.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Dormir consolida",
+    "content": "El sueño no es pausa — es procesamiento. Lo que aprendes de día se consolida de noche. Dormir menos no es ganar tiempo, es perderlo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La revisión mensual",
+    "content": "Mirar un mes completo revela patrones que la semana esconde. Lo que parece caótico diario a veces tiene estructura mensual.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Empezar por lo difícil",
+    "content": "Hacer lo más difícil primero, cuando la energía es alta, deja lo fácil para después. Al revés, lo difícil se pospone.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que ya hiciste",
+    "content": "Reconocer lo que ya lograste no es conformismo. Es tener una base real desde la que seguir creciendo, en vez de sentir que siempre estás al inicio.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Cambiar de enfoque",
+    "content": "Cuando algo no avanza, cambiar el enfoque no es rendirse. A veces el problema no es de esfuerzo sino de ángulo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Zona proximal",
+    "content": "Aprendes más en la zona donde algo es difícil pero no imposible. Demasiado fácil no estimula. Demasiado difícil frustra. El medio es donde creces.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La ilusión de fluidez",
+    "content": "Leer algo y sentir que lo entiendes no es entenderlo. La fluidez percibida es una trampa. Solo intentar usarlo revela si realmente lo sabes.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El efecto Dunning-Kruger",
+    "content": "Los principiantes sobreestiman su competencia. Los expertos la subestiman. La confianza sin base es la señal de que aún falta mucho por aprender.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Doble ciclo",
+    "content": "Aprender de los errores es un ciclo. Cuestionar los supuestos que te llevaron a esos errores es otro. El segundo ciclo es donde está el crecimiento real.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Representaciones mentales",
+    "content": "Un experto no solo sabe más — tiene representaciones mentales más ricas. Ve patrones donde el novato ve detalles aislados. Eso toma tiempo y práctica deliberada.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Fijeza funcional",
+    "content": "Cuanto más experiencia tienes, más cuesta ver usos nuevos para lo que ya conoces. La experiencia crea eficiencia y también rigidez.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Autocompasión como requisito",
+    "content": "La autocompasión no es permiso para rendirse — es requisito para persistir. Castigarte tras un error aumenta la probabilidad de abandonar, no de mejorar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Sobreaprendizaje",
+    "content": "Practicar algo más allá del punto donde ya lo haces bien crea una reserva. Cuando estés cansado o estresado, el sobreaprendizaje mantiene el nivel.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Interferencia entre aprendizajes",
+    "content": "Aprender cosas similares muy seguidas puede generar interferencia. El cerebro mezcla lo parecido. Separar en el tiempo o diferenciar más ayuda.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Umbral de competencia",
+    "content": "La práctica deliberada solo funciona si ya tienes una base mínima. Antes de ese umbral, necesitas instrucción, no práctica a ciegas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Quién, no qué",
+    "content": "Las metas sin identidad son deseos. La identidad sin metas es fantasía. Primero: quién quieres ser. Luego: qué haría esa persona.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El efecto del mentor",
+    "content": "Un buen mentor no te da las respuestas — te hace las preguntas que no te harías solo. El valor está en la perspectiva, no en la solución.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La curva de olvido",
+    "content": "Olvidar es natural. La curva de Ebbinghaus muestra que lo que no se repasa se pierde rápido. La solución no es memorizar más — es repasar mejor.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Metacognición",
+    "content": "Pensar sobre cómo piensas —metacognición— es la habilidad que más diferencia a quienes aprenden bien. No es talento: es hábito de autoobservación.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El contexto de la prueba",
+    "content": "Recordas mejor en el contexto donde aprendiste. Si siempre estudias en el mismo sitio, cambiar de sitio al usar lo aprendido puede costar más.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La motivación que dura",
+    "content": "La motivación inicial es emoción. La que dura es identidad. Pasar de «quiero hacer esto» a «soy alguien que hace esto» es el cambio que sostiene.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Transfer lejano",
+    "content": "Transferir lo aprendido a un contexto distinto es difícil pero valioso. Es lo que separa saber algo de entenderlo de verdad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La práctica lenta",
+    "content": "Practicar lento y bien construye las conexiones correctas. Practicar rápido y mal refuerza los errores. La velocidad viene después de la precisión.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El efecto de generación",
+    "content": "Generar la respuesta tú mismo —antes de ver la solución— fija más que leer la solución directamente. El esfuerzo de generar es el que aprende.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El tiempo de la consolidación",
+    "content": "El cerebro no consolida lo aprendido al instante. Necesita horas y noches. Lo que parece aprendido hoy se pierde mañana sin el espacio adecuado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La práctica sin feedback",
+    "content": "Practicar sin retroalimentación puede afianzar errores. No es que la práctica hace al maestro — la práctica correcta sí. La incorrecta te aleja.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Modelos mentales",
+    "content": "Un buen modelo mental simplifica lo complejo sin perder lo esencial. Construir modelos es una de las habilidades más útiles que puedes desarrollar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Los tres niveles",
+    "content": "Novato sigue reglas. Competente adapta. Experto intuye. No se salta niveles. Cada uno tiene su lógica y su utilidad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El pre-mortem",
+    "content": "Antes de empezar algo, imagina que ya fracasaste y pregúntate por qué. Este ejercicio revela riesgos que la optimización oculta.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La reversión a la media",
+    "content": "Los cambios extremos suelen revertir. Los graduales se mantienen. Si mejoraste mucho de golpe, parte de eso volverá — y eso es normal.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Pensamiento inverso",
+    "content": "En lugar de pensar cómo tener éxito, piensa cómo garantizar el fracaso. Las respuestas invertidas suelen ser más claras y más prácticas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El riesgo de la rutina",
+    "content": "La rutina es eficiente pero puede volverse ciega. Hacer lo mismo sin cuestionarlo no es práctica — es repetición sin dirección.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El segundo orden",
+    "content": "Las decisiones tienen efectos de primer orden (inmediatos) y de segundo orden (consecuencias de las consecuencias). Lo importante suele estar en el segundo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La disciplina de parar",
+    "content": "Saber cuándo parar de profundizar en algo es tan importante como saber cuándo empezar. La profundidad infinita no es maestría — es obsesión.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Sabiduría vs información",
+    "content": "La información se acumula. La sabiduría se destila. No necesitas saber más — necesitas entender mejor lo que ya sabes.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El costo de cambiar",
+    "content": "Cambiar de dirección tiene un costo: lo invertido en la dirección anterior. Pero quedarse por ese costo es la falacia del sunk cost aplicada a la vida.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La conversación difícil",
+    "content": "Evitar la conversación que necesitas tener no la hace desaparecer. La hace crecer en tu cabeza. Decirla suele ser más simple de lo que imaginas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El feedback negativo vale más",
+    "content": "El feedback que te molesta suele ser el más valioso. No porque tenga razón siempre, sino porque toca algo real que el elogio ignora.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Principios primero",
+    "content": "Pensar desde primeros principios —las verdades básicas del problema— genera soluciones más creativas que pensar por analogía.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La ventaja del novato",
+    "content": "No saber cómo se hace puede ser una ventaja. El novato ve opciones que el experto descarta automáticamente por experiencia.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El valor del reposo",
+    "content": "El crecimiento no ocurre solo durante el esfuerzo. Ocurre durante la recuperación posterior. Sin recuperación, el esfuerzo se desgasta.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La práctica deliberada duele",
+    "content": "Práctica deliberada no es lo que disfrutas. Es lo que te empuja justo al borde de tu capacidad. No se siente bien — funciona.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El experto y lo obvio",
+    "content": "Un experto hace que lo difícil parezca simple. Pero lo simple para el experto sigue siendo difícil para el principiante. No confundas simple con fácil.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Esfuerzo sin estrategia",
+    "content": "Esfuerzo sin estrategia es solo cansancio. La estrategia sin esfuerzo es solo teoría. Se necesitan ambas, y en orden.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Consolidar antes de avanzar",
+    "content": "Avanzar sin consolidar lo anterior genera una base falsa. Parece progreso, pero es frágil. Lo que no se asimila se desmorona bajo presión.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El efecto de los demás",
+    "content": "Tu red de contactos no es solo quién conoces. Es qué conversaciones tienes. Una conversación buena puede hacer más que cien genéricas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La paciencia del sistema",
+    "content": "Los sistemas complejos —como una persona creciendo— cambian lento y luego de golpe. La paciencia no es esperar — es seguir mientras llega el cambio.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Lo que repites lo eres",
+    "content": "Cada repetición es un voto por quién eres. No importa lo que digas una vez — importa lo que hagas consistentemente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La inoculación mental",
+    "content": "Imaginar obstáculos antes de que pasen —no para preocuparte, sino para prepararte— reduce su impacto cuando llegan. Se llama inoculación cognitiva.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Aprender a aprender",
+    "content": "La habilidad más transferible no es ninguna disciplina concreta — es aprender a aprender. Todo lo demás cambia. Esa habilidad se queda.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El filtro de lo útil",
+    "content": "No todo lo que se puede aprender vale la pena. Aprender a filtrar por utilidad real es una habilidad que libera tiempo y profundiza lo que importa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La señal del aburrimiento",
+    "content": "El aburrimiento a veces es señal de que ya dominas algo. Otras veces es resistencia a lo que aún te cuesta. Saber cuál es cuál importa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Registros de progreso",
+    "content": "Llevar un registro simple de lo que practicas y cuándo te da información que la memoria sola no puede. El registro es la memoria externa del crecimiento.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La reversión experta",
+    "content": "Un experto vuelve a lo básico con más frecuencia que un intermedio. La maestría no es complejidad — es dominio de lo fundamental.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Aprender de lo ajeno",
+    "content": "Leer las experiencias de otros no es solo inspiración. Es datos. Las biografías y los casos reales son experimentos naturales de los que puedes extraer patrones.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El ciclo completo",
+    "content": "Un ciclo completo de aprendizaje incluye: intentar, fallar, recibir feedback, ajustar, volver a intentar. Saltarse pasos acelera pero no profundiza.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El lenguaje del dominio",
+    "content": "Dominar un campo implica dominar su lenguaje. Las palabras precisas no son jerga — son herramientas de pensamiento más fino.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La anticipación como práctica",
+    "content": "Antes de una situación difícil, imaginar cómo quieres responder entrena la respuesta real. No es visualización mágica — es ensayo mental.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El descanso entre",
+    "content": "Descansar entre sesiones de práctica no es perder tiempo. Es darle al cerebro la oportunidad de consolidar lo que acaba de procesar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Un buen error",
+    "content": "Un error que te enseña algo nuevo vale más que un éxito que no te dice nada. La calidad del error importa tanto como la del acierto.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La zona del maestro",
+    "content": "El maestro no es quien más sabe — es quien mejor sabe qué no sabe. La conciencia de los propios límites es señal de profundidad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Comprensión profunda",
+    "content": "La comprensión profunda se nota cuando puedes explicar algo de tres formas distintas. Si solo tienes una, probablemente sea memorización.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "El momento de dejar ir",
+    "content": "Saber cuándo dejar ir una estrategia que ya no funciona es tan importante como saber cuándo persistir. La flexibilidad no es debilidad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Energía y aprendizaje",
+    "content": "El aprendizaje intencional consume energía mental. Intentar aprender cuando estás agotado es ineficiente. Aprende cuando la energía está alta.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La pregunta mejor",
+    "content": "Una buena pregunta vale más que diez respuestas correctas. La calidad de lo que aprendes depende de la calidad de lo que preguntas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Práctica distribuida",
+    "content": "La práctica distribuida en el tiempo supera a la masiva en casi todos los dominios. No es cuánto practicas en un día — es cuántos días practicas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "La piel del aprendizaje",
+    "content": "Solo cuando algo te importa de verdad lo aprendes de verdad. La emoción no es distractora — es el pegamento del aprendizaje.",
+    "plan": "PREMIUM"
+  }
+]

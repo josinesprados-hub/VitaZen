@@ -1,4 +1,9 @@
 import { PrismaClient } from '@prisma/client';
+import disciplinaTips from './disciplina-tips.json';
+import menteTips from './mente-tips.json';
+import energiaTips from './energia-tips.json';
+import riquezaTips from './riqueza-tips.json';
+import crecimientoTips from './crecimiento-tips.json';
 
 const prisma = new PrismaClient();
 
@@ -87,64 +92,36 @@ async function main() {
   console.log(`Created ${challenges.length} daily challenges`);
 
   // ═══════════════════════════════════════════
-  // EMPIRE TIPS
+  // EMPIRE TIPS — 550 tips curados
   // ═══════════════════════════════════════════
+  //
+  // 5 imperios × (50 FREE + 60 PREMIUM) = 550 tips
+  //
+  // Los tips son micro-conocimiento útil, humano, silencioso,
+  // basado en evidencia real. NO son frases motivacionales,
+  // coaching, wellness genérico, ni pseudo-ciencia.
+  //
+  // FREE: observaciones prácticas, inmediatamente útiles
+  // PREMIUM: más profundidad, más rareza, más contexto, más refinamiento
+  //
+  // Cada batería está en un JSON independiente:
+  //   prisma/disciplina-tips.json
+  //   prisma/mente-tips.json
+  //   prisma/energia-tips.json
+  //   prisma/riqueza-tips.json
+  //   prisma/crecimiento-tips.json
 
-  const tips = [
-    // DISCIPLINA — observaciones, no instrucciones
-    { empire: 'disciplina', title: 'Dos días', content: 'Un día sin hábito es un accidente. Dos días ya es costumbre nueva.', plan: 'FREE' },
-    { empire: 'disciplina', title: 'Anclaje', content: 'Conecta lo nuevo con lo que ya haces sin pensar. Lo que empieza unido al ritmo existente tiene más probabilidad de quedarse.', plan: 'FREE' },
-    { empire: 'disciplina', title: 'La noche antes', content: 'Lo que dejas listo la noche anterior suele hacerse. Lo que queda para la mañana depende del estado de ánimo.', plan: 'FREE' },
-    { empire: 'disciplina', title: 'Menos fricción', content: 'Cuando algo requiere pocos pasos, se hace. Cuando tiene obstáculos, se pospone. Cambiar el entorno cuesta menos que cambiar la intención.', plan: 'FREE' },
-    { empire: 'disciplina', title: 'Lo que dices en voz alta', content: 'Decirle a alguien lo que quieres cambiar le da peso. No por presión — porque lo saca del pensamiento y lo pone en el mundo.', plan: 'PREMIUM' },
-    { empire: 'disciplina', title: 'El entorno decide', content: 'Lo que rodea un hábito importa más que la voluntad. Si el libro está en la mesa de noche, se lee. Si el teléfono está en otra habitación, no se mira.', plan: 'PREMIUM' },
-    { empire: 'disciplina', title: 'Lo que mides', content: 'Anotar lo que haces — aunque sea una marca en el calendario — cambia la relación con el hábito. Lo visible se cuida más que lo invisible.', plan: 'PREMIUM' },
-    { empire: 'disciplina', title: 'Identidad, no metas', content: 'Pensar "soy alguien que corre" funciona distinto a "tengo que correr". La identidad sostiene lo que la motivación abandona.', plan: 'PREMIUM' },
+  type TipInput = { empire: string; title: string; content: string; plan: string };
 
-    // MENTE — calma, no técnicas
-    { empire: 'mente', title: 'Respirar antes de seguir', content: 'Inhala despacio. Retén. Exhala más lento. No es meditación. Es volver al cuerpo antes de que la mente siga corriendo.', plan: 'FREE' },
-    { empire: 'mente', title: 'Tres minutos', content: 'No hacen falta treinta minutos. Tres minutos de atención plena, tres veces al día, ya cambian la relación con el ruido.', plan: 'FREE' },
-    { empire: 'mente', title: 'Nombrar lo que sientes', content: 'Ponerle nombre a la emoción no la resuelve. Pero la investigación muestra que nombrarla reduce su intensidad.', plan: 'FREE' },
-    { empire: 'mente', title: 'El espacio entre', content: 'Entre lo que pasa y lo que haces hay un espacio. Ampliarlo, aunque sea un segundo, cambia la respuesta.', plan: 'FREE' },
-    { empire: 'mente', title: 'Lo que no quieres ver', content: 'Escribir lo que juzgas en ti no es terapia. Es observación sin filtro. A veces, solo nombrarlo cambia algo.', plan: 'PREMIUM' },
-    { empire: 'mente', title: 'De dónde viene eso', content: 'Cada creencia tiene un origen. Si la encuentras, puedes decidir si sigue siendo tuya o la heredaste sin darte cuenta.', plan: 'PREMIUM' },
-    { empire: 'mente', title: 'La segunda flecha', content: 'El dolor llega solo. El sufrimiento viene de lo que agregas después: la historia, el juicio, la repetición. La primera flecha no se evita. La segunda, sí.', plan: 'PREMIUM' },
-    { empire: 'mente', title: 'Lo escrito se ve', content: 'Escribir lo que piensas no es lo mismo que pensarlo. La escritura obliga a ordenar. Lo ordenado se ve distinto.', plan: 'PREMIUM' },
-
-    // ENERGÍA — sensaciones, no optimización
-    { empire: 'energia', title: 'Lo primero del día', content: 'El cuerpo pierde un litro de agua por la noche. Empezar con medio litro no es optimización — es sentido común.', plan: 'FREE' },
-    { empire: 'energia', title: 'Cada hora, muévete', content: 'Cinco minutos de movimiento cada hora. No es ejercicio. Es recordar que tienes cuerpo.', plan: 'FREE' },
-    { empire: 'energia', title: 'Luz temprana', content: 'Quince minutos de luz natural por la mañana ajustan el reloj interno. No es wellness — es biología.', plan: 'FREE' },
-    { empire: 'energia', title: 'Después de comer', content: 'Diez minutos de caminata después de comer reducen el pico de glucosa. El cuerpo procesa mejor lo que llega con movimiento.', plan: 'FREE' },
-    { empire: 'energia', title: 'Proteína por la mañana', content: 'Lo que comes al despertar marca el ritmo del día. Proteína en el desayuno estabiliza la energía sin picos.', plan: 'PREMIUM' },
-    { empire: 'energia', title: 'Lo que pasa antes de dormir', content: 'La habitación fresca y oscura. Sin pantallas antes de acostarse. El sueño es la base de todo lo demás.', plan: 'PREMIUM' },
-    { empire: 'energia', title: 'La ventana del café', content: 'La cafeína funciona mejor noventa minutos después de despertar. Si llega antes, interrumpe la limpieza de adenosina y la caída llega antes.', plan: 'PREMIUM' },
-    { empire: 'energia', title: 'Recuperar no es perder', content: 'El rendimiento no sube linealmente. Los periodos de descanso son donde el cuerpo asimila el esfuerzo. Descansar no es interrumpir — es completar.', plan: 'PREMIUM' },
-
-    // RIQUEZA — tranquilidad, no rentabilidad
-    { empire: 'riqueza', title: 'Págate primero', content: 'Antes de cualquier gasto, destina algo a ahorro. No es una regla financiera — es una forma de priorizarte.', plan: 'FREE' },
-    { empire: 'riqueza', title: 'Lo que pagas sin usar', content: 'Revisa las suscripciones. Lo que no usas activamente es dinero que se fue sin que lo notaras.', plan: 'FREE' },
-    { empire: 'riqueza', title: 'Veinticuatro horas', content: 'Esperar un día antes de comprar algo no planificado suele resolver la mitad de las compras impulsivas. Lo que urge hoy, mañana se ve distinto.', plan: 'FREE' },
-    { empire: 'riqueza', title: 'Automatizar', content: 'Automatizar el ahorro evita decidir cada mes. Lo que no depende de la voluntad del momento tiene más probabilidad de cumplirse.', plan: 'FREE' },
-    { empire: 'riqueza', title: '50, 30, 20', content: 'La mitad a lo necesario. Un tercio a lo que quieres. El resto, al futuro. Simple, no perfecto.', plan: 'PREMIUM' },
-    { empire: 'riqueza', title: 'La seguridad primero', content: 'Antes de invertir, tener tres a seis meses de gastos guardados. La tranquilidad de saber que puedes parar cambia las decisiones.', plan: 'PREMIUM' },
-    { empire: 'riqueza', title: 'El interés compuesto', content: 'El dinero que genera dinero, que a su vez genera dinero, crece de forma que sorprende. El factor clave es el tiempo, no la cantidad inicial.', plan: 'PREMIUM' },
-    { empire: 'riqueza', title: 'Entra y sale', content: 'Anotar todos los gastos durante una semana revela lo que el recuerdo oculta. La diferencia entre lo que crees que gastas y lo que gastas suele ser notable.', plan: 'PREMIUM' },
-
-    // CRECIMIENTO — reflexión, no productividad
-    { empire: 'crecimiento', title: 'Mirar la semana', content: 'Un momento cada siete días: qué aprendiste, qué cambiarías, qué te quedas. No es evaluación — es reconocimiento.', plan: 'FREE' },
-    { empire: 'crecimiento', title: 'Una pregunta', content: 'Si hoy fuera el único día que importara, ¿qué harías diferente? La respuesta dice más sobre las prioridades que cualquier plan.', plan: 'FREE' },
-    { empire: 'crecimiento', title: 'Un poco cada día', content: 'Veinte minutos diarios superan a tres horas los domingos. La repetición espaciada consolida más que la concentración esporádica.', plan: 'FREE' },
-    { empire: 'crecimiento', title: 'Lo que no funcionó', content: 'Lo que sale mal suele enseñar más que lo que sale bien — si se mira sin juicio. Revisar sin castigar es donde está el dato.', plan: 'FREE' },
-    { empire: 'crecimiento', title: 'Quién, no qué', content: 'Las metas sin identidad son deseos. La identidad sin metas es fantasía. Primero: quién quieres ser. Luego: qué haría esa persona.', plan: 'PREMIUM' },
-    { empire: 'crecimiento', title: 'Los que ya están ahí', content: 'Tres personas que ya viven lo que buscas. No necesitas hablar con ellas — observar sus patrones ya enseña.', plan: 'PREMIUM' },
-    { empire: 'crecimiento', title: 'La zona incómoda', content: 'Mejorar no se siente fluido. La zona donde tropiezas es donde el cerebro se está reorganizando. La incomodidad es información, no señal de parar.', plan: 'PREMIUM' },
-    { empire: 'crecimiento', title: 'Quién te ve', content: 'Tener alguien que observa tu progreso — aunque sea una vez por semana — aumenta la consistencia. No por presión. Por visibilidad.', plan: 'PREMIUM' },
+  const tips: TipInput[] = [
+    ...(disciplinaTips as TipInput[]),
+    ...(menteTips as TipInput[]),
+    ...(energiaTips as TipInput[]),
+    ...(riquezaTips as TipInput[]),
+    ...(crecimientoTips as TipInput[]),
   ];
 
   for (const tip of tips) {
-    // Use createMany with skipDuplicates for idempotent seeding
-    // (re-running the seed won't fail on duplicate content)
     await prisma.empireTip.upsert({
       where: { id: `${tip.empire}-${tip.title.slice(0, 30).replace(/\s+/g, '-').toLowerCase()}` },
       update: { title: tip.title, content: tip.content, plan: tip.plan },

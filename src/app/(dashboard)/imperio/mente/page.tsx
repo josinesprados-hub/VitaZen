@@ -722,7 +722,7 @@ export default function MentePage() {
       </div>
 
       {/* Tips */}
-      <EmpireTipsSection empire="mente" subtitle="Reflexiones para tu mente" />
+      <EmpireTipsSection empire="mente" subtitle="Notas para tu mente" />
     </div>
   );
 }

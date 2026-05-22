@@ -28,3 +28,28 @@ Stage Summary:
 - Toda la app ahora usa observación calmada, no coaching/wellbeing
 - El silencio se protege: strings vacíos donde no hay nada valioso que decir
 - Sin cambios en Stripe, auth, lógica de negocio, arquitectura, navegación, Android/TWA
+---
+Task ID: 1
+Agent: main
+Task: Audit and recover practical empire tips
+
+Work Log:
+- Read /docs/vitazen-finanzas-principios.md (mandatory first step)
+- Audited entire tips system: useEmpireTips hook, EmpireTipsSection component, /api/empire/tips API route, getDeterministicTips server-side rotation, seed data
+- Found tips were NOT eliminated — they existed and worked in 4 of 5 empires
+- Identified RIQUEZA as the only empire missing EmpireTipsSection
+- Found battery was too thin: only 4 tips per empire (2 FREE + 2 PREMIUM)
+- Found existing tips were more contemplative than practical
+- Expanded battery from 20→40 tips (4→8 per empire) with evidence-based practical tips
+- Added EmpireTipsSection to riqueza page with import
+- Made seed idempotent (create → upsert with deterministic IDs)
+- Verified build passes (npm run build successful)
+- Committed and pushed to GitHub
+
+Stage Summary:
+- Tips were NOT eliminated — just thin and missing from riqueza
+- Batería expandida: 20→40 tips, all practical and evidence-based
+- Riqueza page now has EmpireTipsSection
+- Seed is now idempotent (upsert instead of create)
+- Free→2 tips, Élite→3 tips confirmed (server-side deterministic rotation)
+- Cross-device coherence maintained (server-side rotation via getDeterministicTips)

@@ -79,8 +79,8 @@ export interface EmotionalDashboardSnapshot {
 
 const SILENCE_PATTERN = [false, false, true]; // 2 show, 1 rest — ~35% silence
 const FREE_TIPS_VISIBLE = 2;
-const AVOID_RECENT_COUNT = 3;
-const CYCLE_MS = 4 * 24 * 60 * 60 * 1000; // 4-day tip cycle
+const AVOID_RECENT_COUNT = 6;
+const CYCLE_MS = 3 * 24 * 60 * 60 * 1000; // 3-day tip cycle
 const WEIGHTS: Record<ReflectionWeight, number> = {
   light: 0.50,
   relevant: 0.35,

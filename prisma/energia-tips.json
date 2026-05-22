@@ -1,0 +1,662 @@
+[
+  {
+    "empire": "energia",
+    "title": "Agua al despertar",
+    "content": "El cuerpo pierde casi un litro de agua por la noche. Medio litro al despertar no es wellness — es sentido común.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Cada hora, muévete",
+    "content": "Cinco minutos de movimiento cada hora. No es ejercicio. Es recordar que tienes cuerpo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Luz temprana",
+    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. No es tendencia — es biología.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Después de comer",
+    "content": "Diez minutos de caminata después de comer reducen el pico de glucosa. El cuerpo procesa mejor con movimiento.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Dormir tarde cuesta",
+    "content": "Acostarse tarde desplaza toda la estructura del día siguiente. No solo el sueño — el hambre, el foco, el ánimo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La siesta corta",
+    "content": "Una siesta de veinte minutos restaura la alerta sin entrar en sueño profundo. Más de treinta suele empeorar.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Mismo horario",
+    "content": "Acostarse y levantarse a la misma hora importa más que cuántas horas duermes. La consistencia construye el ritmo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Habitación fresca",
+    "content": "El cuerpo necesita bajar temperatura para dormir. Una habitación entre 18 y 20 grados facilita conciliar el sueño.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Lo que comes primero",
+    "content": "Lo primero que comes al despertar marca el ritmo de energía del día. Azúcar simple al inicio genera caída rápida.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La ventana del café",
+    "content": "La cafeína funciona mejor noventa minutos después de despertar. Si llega antes, interrumpe la limpieza de adenosina.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Caminar piensa",
+    "content": "Caminar mejora el flujo sanguíneo cerebral. Muchas ideas buenas aparecen caminando porque el cerebro funciona mejor en movimiento.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La caída de las tres",
+    "content": "La bajada de energía a media tarde es real y tiene base circadiana. Una pausa breve funciona mejor que otro café.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Menos pantallas antes",
+    "content": "La luz de las pantallas engaña al cerebro para que crea que aún es de día. Una hora sin pantallas antes de dormir ayuda.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Respirar pausa",
+    "content": "Tres respiraciones profundas entre tareas no es meditación. Es darle al sistema nervioso un momento antes de la siguiente demanda.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Proteína temprano",
+    "content": "Proteína en el desayuno estabiliza la energía sin picos. El cuerpo no necesita azúcar al despertar — necesita construcción.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Estirar no es calentar",
+    "content": "Estirar al despertar devuelve movilidad al cuerpo tras horas quieto. No necesitas una rutina — basta con moverte con intención.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El último café",
+    "content": "La cafeína tiene una vida media de cinco a seis horas. Tomar café después de las dos de la tarde interrumpe el sueño nocturno.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Ventana y reloj",
+    "content": "La luz por la ventana por la mañana y la oscuridad por la noche son las dos señales que más estabilizan tu ritmo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Comer lento",
+    "content": "Comer rápido hace que llegues a la saciedad tarde. El cerebro tarda unos veinte minutos en registrar que ya es suficiente.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Movimiento, no ejercicio",
+    "content": "No necesitas ir al gimnasio cada día. Necesitas moverte cada día. La diferencia es importante.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La temperatura del agua",
+    "content": "Una ducha fría de treinta segundos al final activa el sistema nervioso. No es extremo — es estimulación simple.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La comida que pesa",
+    "content": "Las comidas pesadas al mediodía generan letargo por la tarde. Comer ligero mantiene más estable la energía.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Pantano del sofá",
+    "content": "Llegar a casa y tirarse al sofá es una trampa. Si necesitas descansar, mejor una siesta corta que el sofá infinito.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Cena ligera",
+    "content": "Cenar mucho y tarde hace que el cuerpo digiera en vez de descansar. La calidad del sueño cambia con lo que comes antes.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Aire real",
+    "content": "Pasar todo el día en espacios cerrados reduce la oxigenación y el estado de alerta. Salir aunque sea cinco minutos cambia algo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El azúcar no alimenta",
+    "content": "El azúcar da un pico rápido y una caída lenta. La energía que sientes al principio se cobra después con intereses.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El ritmo del cuerpo",
+    "content": "El cuerpo tiene un ritmo natural de noventa minutos de foco y veinte de descanso. Forzar más allá no produce más — produce menos.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Lo que hidrata",
+    "content": "La mayoría de la gente confunde sed con hambre o cansancio. Beber agua antes de buscar algo más suele resolverlo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Sol y ánimo",
+    "content": "La exposición a luz natural no solo regula el sueño. También afecta la producción de serotonina y el estado de ánimo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Fibra y estabilidad",
+    "content": "Los alimentos con fibra liberan su energía de forma gradual. El cuerpo humano no fue diseñado para picos constantes de glucosa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "De pie un rato",
+    "content": "Estar de pie veinte minutos por hora mejora la circulación y reduce la sensación de pesadez. No necesitas un escritorio especial.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La alarma consistente",
+    "content": "Cambiar la hora de la alarma cada día confunde el reloj interno. Lo mismo los fines de semana que entre semana estabiliza todo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Música y ritmo",
+    "content": "La música con tempo rápido aumenta temporalmente la energía y reduce la percepción de esfuerzo físico. No es magia — es ritmo compartido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Fibra y saciedad",
+    "content": "Comer fibra no solo ayuda a la digestión. Prolonga la saciedad y evita que la energía se vaya en picos.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Poco pero seguido",
+    "content": "Cinco minutos de movimiento seis veces al día suman treinta minutos. Es más sostenible que una hora que nunca haces.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La noche construye el día",
+    "content": "Lo que haces las dos horas antes de dormir define cómo vas a estar al despertar. La energía de mañana empieza esta noche.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El peso del almuerzo",
+    "content": "Un almuerzo pesado pide siesta. Un almuerzo moderado permite seguir. La cantidad importa tanto como la calidad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Grasa para durar",
+    "content": "Las grasas saludables en la comida aportan energía sostenida. Sin grasa, la comida se quema rápido y la caída llega antes.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Despertar natural",
+    "content": "Despertar con luz gradual es menos brusco que con una alarma. Si puedes, deja que la luz entre antes del sonido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La máquina camina",
+    "content": "Caminar treinta minutos al día reduce el riesgo cardiovascular y mejora el sueño. No necesitas correr — caminar ya cuenta.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Orden del plato",
+    "content": "Comer primero la verdura, luego la proteína y al final los carbohidratos reduce el pico de glucosa tras la comida.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La postura respira",
+    "content": "Estar encorvado reduce la capacidad pulmonar. Sentarse derecho no es estética — es que tus pulmones tienen más espacio.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Un vaso antes",
+    "content": "Beber un vaso de agua antes de cada comida ayuda a la digestión y reduce la cantidad que necesitas para sentirte satisfecho.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El fin de semana cuenta",
+    "content": "Cambiar el horario del sueño los fines de semana genera un jetlag social que el lunes te cobra. La consistencia no toma vacaciones.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Azúcar oculta",
+    "content": "Mucho de lo que parece salado o neutral tiene azúcar añadido. Leer etiquetas revela que la energía falsa está en todas partes.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La merienda que sostiene",
+    "content": "Una merienda con proteína y grasa a media tarde previene la caída de energía. Una con solo carbohidratos la amplifica.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Agua fría temprano",
+    "content": "Beber agua fría por la mañana activa una respuesta de alerta en el cuerpo. No es dramático — pero nota la diferencia.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Lo básico primero",
+    "content": "Antes de buscar suplementos o rutinas raras: duerme bien, muévete, come real, bebe agua. Lo básico resuelve el ochenta por ciento.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Adenosina y café",
+    "content": "La adenosina se acumula mientras estás despierto. La cafeína no la elimina — la enmascara. Cuando se acaba el café, la adenosina sigue ahí.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Ciclos de noventa",
+    "content": "El sueño se estructura en ciclos de unos noventa minutos. Despertar al final de un ciclo se siente mejor que despertar a mitad, aunque duermas más.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Cortisol al amanecer",
+    "content": "El cortisol sube naturalmente justo antes de despertar para darte energía. Si te despiertas agotado, puede que el ciclo de cortisol esté desalineado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El gen del café",
+    "content": "El gen CYP1A2 determina si metabolizas la cafeína rápido o lento. Si eres lento, ese café de las tres te afecta más de lo que crees.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Deuda de sueño",
+    "content": "La deuda de sueño se acumula. Dormir seis horas cuatro noches seguidas no se compensa con una de diez. El cerebro no funciona igual.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "NEAT: lo invisible",
+    "content": "La mayor parte de la energía diaria que quemas no es ejercicio — es movimiento espontáneo. Caminar, gesticular, moverte. Se llama NEAT y varía hasta quinientas calorías entre personas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Zona 2",
+    "content": "El ejercicio en zona 2 —donde puedes hablar pero no cantar— construye la base aeróbica. No es sexy, pero es lo que sostiene todo lo demás.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "HRV como señal",
+    "content": "La variabilidad de la frecuencia cardíaca refleja la capacidad de recuperación. Si baja, el cuerpo está pidiendo descanso, no más esfuerzo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Reloj periférico",
+    "content": "Además del reloj central en el cerebro, cada órgano tiene su propio ritmo. La hora a la que comes sincroniza los relojes periféricos digestivos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Secuencia de comida",
+    "content": "El orden en que comes los nutrientes afecta la respuesta de insulina. Verdura primero, proteína después, carbohidratos al final reduce el pico glucémico hasta un setenta por ciento.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Sueño profundo",
+    "content": "El sueño profundo se concentra en la primera mitad de la noche. Acostarte tarde no solo reduce la cantidad — reduce específicamente la fase más reparadora.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "REM y emoción",
+    "content": "El sueño REM procesa experiencias emocionales del día. Si lo reduces, las emociones del día siguiente se sienten más intensas y menos manejables.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El ritmo del intestino",
+    "content": "El intestino tiene su propio reloj circadiano. Comer a horas irregulares altera la microbiota y la digestión, independientemente de lo que comas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Fase lunar del cuerpo",
+    "content": "El ciclo menstrual afecta la energía, el sueño y la tolerancia al esfuerzo. Entrenar igual todo el mes ignora cómo funciona la fisiología.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Recuperación activa",
+    "content": "La recuperación activa —movimiento suave tras esfuerzo intenso— elimina lactato más rápido que el reposo completo. El cuerpo se repara en movimiento, no parado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Glicación y sueño",
+    "content": "La privación de sueño aumenta los marcadores de glicación —el mismo proceso que el exceso de azúcar. Dormir mal envejece células.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El umbral de vitamina D",
+    "content": "Niveles bajos de vitamina D se asocian con fatiga y menor rendimiento muscular. No es suplementación mágica — es corregir un déficit real.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Microbiota y energía",
+    "content": "La composición de tu microbiota influye en cuánta energía extraes de los alimentos. Dos personas comen lo mismo y absorben distinto.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Termorregulación y sueño",
+    "content": "El cuerpo necesita bajar un grado para dormir. Una ducha caliente antes de acostarse ayuda porque la evaporación posterior enfría el cuerpo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El costo del alcohol",
+    "content": "El alcohol puede ayudar a dormir más rápido, pero destruye la arquitectura del sueño. El sueño bajo alcohol es menos reparador, aunque no lo sientas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Fibra muscular",
+    "content": "Las fibras musculares de contracción lenta se entrenan con esfuerzo sostenido moderado. Las rápidas, con esfuerzo breve e intenso. Ambas necesitan estímulo distinto.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Hierro y fatiga",
+    "content": "La falta de hierro es una de las causas más comunes de fatiga crónica ignorada. No siempre es falta de sueño — a veces es falta de transporte de oxígeno.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Proteína y saciedad",
+    "content": "La proteína genera más saciedad por caloría que carbohidratos o grasa. No es una dieta — es cómo funciona la señal de lleno.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Glucógeno y voluntad",
+    "content": "El cerebro usa glucosa. Cuando el glucógeno está bajo, la función ejecutiva se degrada. No es falta de carácter — es falta de combustible.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Ventana de alimentación",
+    "content": "Comer dentro de una ventana de ocho a diez horas mejora marcadores metabólicos independientemente de las calorías. No es ayuno — es timing.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Luz artificial de noche",
+    "content": "La luz artificial por la noche suprime melatonina hasta en cantidades moderadas. Una lámpara cálida de mesa es mejor que el techo entero encendido.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El deload necesario",
+    "content": "Cada cuatro a seis semanas de entrenamiento progresivo, una semana más ligera permite al cuerpo asimilar el estímulo. Sin deload, el progreso se estanca.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Circadiano y medicación",
+    "content": "La eficacia de muchos medicamentos varía según la hora del día. El cuerpo no procesa igual a las ocho de la mañana que a las ocho de la noche.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Electrolitos y rendimiento",
+    "content": "La fatiga muscular durante ejercicio prolongado suele ser de electrolitos, no solo de carbohidratos. Sodio, potasio y magnesio importan.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Magnesio y sueño",
+    "content": "El magnesio participa en la regulación del sistema nervioso y la calidad del sueño. Los déficits son comunes y silenciosos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "VO2max como predictor",
+    "content": "El VO2max es uno de los mejores predictores de longevidad. No necesitas ser atleta — pero sí necesitas desafiar tu sistema cardiovascular regularmente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Linfático y movimiento",
+    "content": "El sistema linfático no tiene bomba como el corazón. El movimiento es lo que hace circular la linfa. Sin movimiento, la recuperación se ralentiza.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Siesta y memoria",
+    "content": "Una siesta corta tras aprender algo nuevo mejora la consolidación de memoria. No es pereza — es procesamiento.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Carga alostática",
+    "content": "La carga alostática es el desgaste acumulado del estrés crónico. No se siente hasta que se siente. Dormir bien y moverse son las dos cosas que más la reducen.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "La proteína antes de dormir",
+    "content": "Una pequeña cantidad de proteína antes de dormir mejora la síntesis muscular nocturna. El cuerpo se repara mientras descansa, si tiene material.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Cetosis y cerebro",
+    "content": "El cerebro puede usar cetonas como combustible alternativo. Algunas personas reportan claridad mental en cetosis leve, pero no es universal.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El enfriamiento post-ejercicio",
+    "content": "Enfriarse progresivamente tras el ejercicio reduce la inflamación sin bloquear la adaptación. El contraste frío-calor no es solo recuperación — es señal.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Sincronizadores circadianos",
+    "content": "Los tres sincronizadores principales del reloj interno son: luz, comida y movimiento. Alinear los tres es más poderoso que optimizar solo uno.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "La proteína mínima",
+    "content": "La cantidad mínima de proteína para mantener masa muscular es un gramo por kilo al día. Menos que eso y el cuerpo empieza a recurrir al músculo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Índice glucémico en contexto",
+    "content": "El índice glucémico de un alimento cambia cuando se come con otros. La proteína y la fibra reducen el impacto del carbohidrato que los acompaña.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Circadiano y metabolismo",
+    "content": "La misma comida se metaboliza distinto a las ocho de la mañana que a las ocho de la noche. La sensibilidad a insulina es mayor por la mañana.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El overreaching",
+    "content": "Hay un punto donde entrenar más no produce más — produce menos. Se llama overreaching y la única solución es descansar, no insistir.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Omega-3 y inflamación",
+    "content": "Los ácidos grasos omega-3 modulan la inflamación sistémica. No es antiinflamatorio como una pastilla — es regulador como parte de la dieta.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Respiración y pH",
+    "content": "La respiración no solo aporta oxígeno — regula el pH de la sangre. Respirar rápido y superficial acidifica. Respirar lento y profundo equilibra.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El descenso de la tarde",
+    "content": "La caída de energía a media tarde no es solo digestión — es un punto bajo circadiano real. La siesta corta o el movimiento suave lo manejan mejor que la cafeína.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Masa muscular y longevidad",
+    "content": "La masa muscular es un tejido metabólicamente activo que protege contra enfermedades metabólicas. No es estética — es reserva de salud.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "La postura del sueño",
+    "content": "Dormir de lado con las piernas flexionadas es la posición que menos presión pone en la columna. Boca abajo es la peor para la mayoría.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Vitamina C y cortisol",
+    "content": "La vitamina C en cantidades moderadas ayuda a regular los niveles de cortisol tras el estrés agudo. No es calmante — es modulador.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El sueño del atleta",
+    "content": "Los atletas de élite duermen entre nueve y diez horas. No porque puedan — porque necesitan. El rendimiento alto exige recuperación alta.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El costo de la pantalla",
+    "content": "La luz azul de las pantallas retrasa la melatonina hasta dos horas. No es solo insomnio — es sueño de peor calidad que no se siente hasta el día siguiente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Adaptación térmica",
+    "content": "El cuerpo se adapta al calor y al frío con exposición repetida. No necesitas extremos — consistencia moderada ya genera adaptación.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El ritmo del hambre",
+    "content": "El hambre sigue un ritmo circadiano. Si comes a horas fijas, el hambre aparece antes de comer — no como emergencia, como expectativa.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Supercompensación",
+    "content": "Tras un esfuerzo y la recuperación adecuada, el cuerpo no vuelve al nivel anterior — sube un poco más. Se llama supercompensación y es la base del progreso.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "La vitamina del sol",
+    "content": "La vitamina D se sintetiza con exposición solar. Un déficit afecta huesos, músculos, ánimo y sistema inmune. No es opcional — es infraestructura.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Masticar lento",
+    "content": "Masticar más tiempo mejora la digestión y la absorción de nutrientes. El estómago no tiene dientes — el trabajo empieza en la boca.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Ritmo de comidas",
+    "content": "Comer a horas regulares ayuda a que el cuerpo sepa cuándo esperar energía. Los horarios irregulares confunden más que el contenido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El sueño del deportista",
+    "content": "El ejercicio regular mejora la eficiencia del sueño. Quien se mueve necesita menos tiempo en cama para obtener la misma recuperación.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Latencia del sueño",
+    "content": "Si te duermes en menos de cinco minutos, probablemente estás crónicamente cansado. Lo normal es entre diez y veinte minutos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "El músculo que quema",
+    "content": "El músculo en reposo consume más calorías que la grasa. No mucho más, pero suficiente para que importe a largo plazo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Cortisol y luz azul",
+    "content": "La luz azul de las pantallas por la noche no solo retrasa la melatonina — también puede elevar el cortisol. Doble impacto en la recuperación.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Hidratación y rendimiento",
+    "content": "Una deshidratación del dos por ciento ya reduce el rendimiento físico y cognitivo. No necesitas sentir sed para estar deshidratado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "La temperatura del sueño",
+    "content": "La temperatura corporal central baja durante el sueño. Una habitación a 18-20 grados facilita este descenso. Más calor cuesta más conciliar.",
+    "plan": "PREMIUM"
+  }
+]

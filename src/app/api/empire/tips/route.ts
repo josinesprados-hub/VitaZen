@@ -18,14 +18,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'empire parameter required' }, { status: 400 });
     }
 
-    // Fetch all tips from DB
+    // Fetch all tips from DB (no limit — need full battery for deterministic rotation)
     const allTips = await db.empireTip.findMany({
       where: { empire },
       orderBy: [
         { plan: 'asc' },   // FREE tips first
         { createdAt: 'desc' },
       ],
-      take: 10,
     });
 
     // Use server-side deterministic rotation instead of client-side Math.random
