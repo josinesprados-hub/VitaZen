@@ -11,6 +11,7 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
+import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import { formatCurrency } from '@/lib/utils';
 
 // ═══════════════════════════════════════════
@@ -1182,6 +1183,9 @@ export default function RiquezaPage() {
           </div>
         </div>
       )}
+
+      {/* Tips */}
+      <EmpireTipsSection empire="riqueza" subtitle="Notas sobre tu dinero" />
     </div>
   );
 }
