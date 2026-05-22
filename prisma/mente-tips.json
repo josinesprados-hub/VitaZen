@@ -8,7 +8,7 @@
   {
     "empire": "mente",
     "title": "El foco se agota",
-    "content": "La atención sostenida se degrada tras 20-25 minutos. Pausas breves la restauran parcialmente; ignorar el agotamiento no lo elimina.",
+    "content": "La atención se agota tras unos veinte minutos. Pausas breves la restauran; ignorarlo no lo elimina.",
     "plan": "FREE"
   },
   {
@@ -26,7 +26,7 @@
   {
     "empire": "mente",
     "title": "La novedad captura",
-    "content": "El cerebro reacciona a lo nuevo por instinto. Por eso cuesta tanto ignorar lo imprevisible.",
+    "content": "El cerebro reacciona a lo nuevo por instinto. No es debilidad — es cómo está diseñado. Por eso cuesta tanto ignorar lo imprevisible.",
     "plan": "FREE"
   },
   {
@@ -50,7 +50,7 @@
   {
     "empire": "mente",
     "title": "Nombrar reduce",
-    "content": "Ponerle palabra a lo que sientes reduce su intensidad. No es terapia — es algo que el cerebro hace cuando nombra lo que pasa.",
+    "content": "Ponerle palabra a lo que sientes reduce su intensidad. No es terapia — el cerebro mismo se calma cuando nombra lo que pasa.",
     "plan": "FREE"
   },
   {
@@ -68,31 +68,31 @@
   {
     "empire": "mente",
     "title": "Emociones como datos",
-    "content": "Las emociones no son órdenes ni verdades absolutas. Son señales rápidas con información limitada sobre lo que pasa.",
+    "content": "Las emociones no son órdenes ni verdades absolutas. Son señales rápidas con información limitada. No hay que obedecerlas ni ignorarlas — solo leerlas.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "El cuerpo primero",
-    "content": "Los cambios físicos — tensión, calor, ritmo — suelen aparecer antes de que seas consciente de la emoción.",
+    "content": "Los cambios físicos — tensión en los hombros, calor en la cara, ritmo acelerado — suelen aparecer antes de que seas consciente de la emoción. El cuerpo avisa primero.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Reinterpretar funciona",
-    "content": "Cambiar cómo interpretas una situación cambia cómo te sientes, más que cambiar la situación misma.",
+    "content": "Cambiar cómo interpretas una situación cambia cómo te sientes, más que cambiar la situación misma. Es una de las herramientas más sólidas que existen para regular emociones.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Ventilar no cura",
-    "content": "Expresar rabia repetidamente puede hacerla crecer en vez de aliviarla. Descargarse no siempre equivale a sentirse mejor.",
+    "content": "Expresar rabia repetidamente puede hacerla crecer en vez de aliviarla. Descargarse no siempre equivale a sentirse mejor — a veces es repasar la herida.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Confirmas lo creído",
-    "content": "Buscas y valoras más la información que coincide con lo que ya piensas. Es un sesgo automático, no una elección.",
+    "content": "Buscas y valoras más la información que coincide con lo que ya piensas. Es un sesgo automático — el de confirmación — y no es una elección.",
     "plan": "FREE"
   },
   {
@@ -104,31 +104,31 @@
   {
     "empire": "mente",
     "title": "Lo reciente pesa más",
-    "content": "Lo que pasó últimamente parece más frecuente o importante de lo que realmente es. La memoria no es una encuesta objetiva.",
+    "content": "Lo que pasó últimamente parece más frecuente o importante de lo que realmente es. La memoria no es una encuesta objetiva — sesga hacia lo reciente.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Costo hundido",
-    "content": "Seguir invirtiendo en algo que no funciona solo porque ya invertiste es un sesgo conocido. Lo invertido no se recupera por insistir.",
+    "content": "Seguir invirtiendo en algo que no funciona solo porque ya invertiste es un sesgo conocido. Lo invertido ya se fue. Seguir por lealtad al pasado no lo recupera.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "El default gana",
-    "content": "Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Cambiar el default cambia el comportamiento más que la información.",
+    "content": "Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Es uno de los hallazgos más replicados: cambiar el default cambia el comportamiento más que la información.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Sobreestimas tu control",
-    "content": "Tendemos a creer que tenemos más control sobre los resultados del que realmente tenemos, especialmente en situaciones inciertas.",
+    "content": "Tendemos a creer que tenemos más control sobre los resultados del que realmente tenemos, especialmente en situaciones inciertas. La ilusión de control es persistente.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
-    "title": "La primera impresión tiñe",
-    "content": "Una cualidad positiva — como la simpatía — hace que juzgues todo lo demás de esa persona mejor de lo que es.",
+    "title": "Efecto halo",
+    "content": "Una cualidad positiva — como la simpatía — hace que juzgues todo lo demás de esa persona mejor de lo que es. Se llama efecto halo, y sesga sin que lo notes.",
     "plan": "FREE"
   },
   {
@@ -164,7 +164,7 @@
   {
     "empire": "mente",
     "title": "Repetir espaciado",
-    "content": "Repasar información en intervalos crecientes la retiene mejor que repasar todo de una vez. El tiempo entre repaso y repaso es parte del aprendizaje.",
+    "content": "Repasar información en intervalos crecientes la retiene mejor que repasar todo de una vez. La repetición espaciada lleva décadas funcionando — el tiempo entre repaso y repaso es parte del aprendizaje.",
     "plan": "FREE"
   },
   {
@@ -188,7 +188,7 @@
   {
     "empire": "mente",
     "title": "El sueño fija",
-    "content": "Dormir después de aprender fija lo que aprendiste. Sin sueño suficiente, se pierde más de lo que crees, aunque hayas estudiado más.",
+    "content": "Dormir después de aprender fija lo que aprendiste. El cerebro consolida de noche lo que procesó de día. Sin sueño suficiente, se pierde más de lo que crees.",
     "plan": "FREE"
   },
   {
@@ -326,7 +326,7 @@
   {
     "empire": "mente",
     "title": "El flujo tiene condiciones",
-    "content": "El estado de flujo ocurre cuando el desafío coincide con tu habilidad. Si es demasiado fácil, aburre; si es demasiado difícil, ansía. El balance es específico.",
+    "content": "Lo que llamamos flujo ocurre cuando el desafío coincide con tu habilidad. Si es demasiado fácil, aburre; si es demasiado difícil, angustia. El balance es específico.",
     "plan": "PREMIUM"
   },
   {
@@ -356,7 +356,7 @@
   {
     "empire": "mente",
     "title": "Reevaluación tardía",
-    "content": "Reinterpretar un evento emocional incluso horas después sigue reduciendo su carga emocional. No tiene que ser instantáneo para funcionar.",
+    "content": "Reinterpretar un evento emocional incluso horas después sigue reduciendo su carga. No tiene que ser instantáneo para funcionar. La reevaluación tiene ventana amplia.",
     "plan": "PREMIUM"
   },
   {
@@ -391,8 +391,8 @@
   },
   {
     "empire": "mente",
-    "title": "Solo ves lo que funciona",
-    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. La muestra visible nunca es la completa.",
+    "title": "Sesgo del superviviente",
+    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. Es el sesgo del superviviente: la muestra visible nunca es la completa.",
     "plan": "PREMIUM"
   },
   {
@@ -403,20 +403,20 @@
   },
   {
     "empire": "mente",
-    "title": "Confianza sin base",
-    "content": "Menos competencia genera más confianza; más competencia genera más duda. Saber poco se siente como saber suficiente, y eso es parte del problema.",
+    "title": "El efecto Dunning-Kruger",
+    "content": "El efecto Dunning-Kruger aparece más de lo que creemos: quien menos sabe suele sentirse más seguro. Saber poco se siente como saber suficiente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Parecía obvio después",
-    "content": "Después de que algo pasa, parece que era obvio que iba a pasar. No lo era. Mirar atrás distorsiona lo que realmente sabías.",
+    "title": "Sesgo retrospectivo",
+    "content": "El sesgo retrospectivo hace que todo parezca obvio después de que pasa. Mirar atrás distorsiona lo que realmente sabías en el momento.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Perder pesa más",
-    "content": "Duele más perder que lo que alegra ganar lo mismo. Esto te inclina a conservar, incluso cuando arriesgar tendría ventajas.",
+    "title": "Aversión a la pérdida",
+    "content": "Kahneman mostró que perder duele más de lo que alegra ganar lo mismo. Esto te inclina a conservar, incluso cuando arriesgar tendría ventajas.",
     "plan": "PREMIUM"
   },
   {
@@ -536,43 +536,43 @@
   {
     "empire": "mente",
     "title": "La emoción va primero",
-    "content": "La emoción precede a la razón en las decisiones. La justificación racional suele venir después, como narrativa, no como causa.",
+    "content": "La emoción precede a la razón en las decisiones. La justificación racional suele venir después, como narrativa, no como causa. Sin emoción, decidir es casi imposible.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Cómo se presenta importa",
-    "content": "La misma decisión presentada como ganancia o como pérdida produce elecciones distintas, aunque el resultado sea idéntico. Cómo se cuenta cambia lo que eliges.",
+    "title": "El efecto marco",
+    "content": "El efecto marco muestra que la misma decisión presentada como ganancia o como pérdida produce elecciones distintas, aunque el resultado sea idéntico.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Estrés y lo que recuerdas",
-    "content": "El estrés hace que recuerdes cómo te sentiste, pero no lo que pasó. Los detalles neutros se pierden; la emoción se queda.",
+    "content": "El estrés hace que recuerdes cómo te sentiste, pero no lo que pasó. Los detalles neutros se pierden; la emoción se queda. Es la memoria emocional selectiva.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Recuperar es rendir",
-    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Sin recuperación, el rendimiento se degrada inevitablemente.",
+    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse — es parte del rendimiento.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Dar vueltas mantiene el estrés",
-    "content": "Revisar mentalmente un evento estresante una y otra vez mantiene activo el cuerpo mucho después de que el evento terminó.",
+    "content": "Revisar mentalmente un evento estresante una y otra vez mantiene activo el cuerpo mucho después de que el evento terminó. La rumiación es un motor que no se apaga solo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El estrés cambia el cerebro",
-    "content": "El estrés prolongado no solo se siente — cambia físicamente cómo funciona el cerebro, especialmente la memoria y la regulación emocional.",
+    "content": "El estrés prolongado no solo se siente — cambia cómo funciona el cerebro. La memoria y la regulación emocional son las primeras que se resienten.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Estrés crónico amenaza",
-    "content": "Bajo estrés crónico, el cerebro interpreta cosas inocentes como amenazas. No es que el mundo sea más peligroso — es que la alarma está más sensible.",
+    "content": "Bajo estrés crónico, el cerebro interpreta cosas inocentes como amenazas. No es que el mundo sea más peligroso — es que tu alarma está calibrada para sonar con cualquier cosa.",
     "plan": "PREMIUM"
   },
   {
@@ -608,7 +608,7 @@
   {
     "empire": "mente",
     "title": "Los incentivos dirigen",
-    "content": "Las personas responden a los incentivos que tienen, no a los que deberían tener. Entender los incentivos reales explica mucho comportamiento aparentemente irracional.",
+    "content": "Las personas responden a los incentivos que tienen, no a los que deberían tener. Entender los incentivos reales explica mucho comportamiento que parece irracional.",
     "plan": "PREMIUM"
   },
   {
@@ -620,7 +620,7 @@
   {
     "empire": "mente",
     "title": "El mapa no es el lugar",
-    "content": "Tu idea de la realidad no es la realidad. Es una representación útil pero incompleta. Confundir lo que piensas con lo que pasa genera errores de escala.",
+    "content": "Tu idea de la realidad no es la realidad. Es una representación útil pero incompleta. Confundir el mapa con el territorio es un error que se repite en todas las áreas.",
     "plan": "PREMIUM"
   },
   {
@@ -632,13 +632,13 @@
   {
     "empire": "mente",
     "title": "La explicación simple",
-    "content": "Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia — sino porque menos supuestos significan menos puntos donde fallar.",
+    "content": "Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia — porque menos supuestos significan menos puntos donde fallar.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Pensar mucho no siempre aclara",
-    "content": "Pensar mucho sobre ti no siempre te conoce mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas.",
+    "content": "Pensar mucho sobre ti no siempre te conoce mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas. La rumiación no es introspección.",
     "plan": "PREMIUM"
   },
   {
@@ -649,14 +649,14 @@
   },
   {
     "empire": "mente",
-    "title": "Tú es la situación, ellos son así",
-    "content": "Explicas tus errores por la situación, pero los de otros por su carácter. No es hipocresía consciente — es algo automático y universal.",
+    "title": "Error de atribución",
+    "content": "Explicas tus errores por la situación, pero los de otros por su carácter. No es hipocresía consciente — es el error fundamental de atribución, y es universal.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "La profecía se cumple",
-    "content": "Creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice — puede causar.",
+    "title": "Profecía autocumplida",
+    "content": "La profecía autocumplida es real: creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice — puede causar.",
     "plan": "PREMIUM"
   }
 ]

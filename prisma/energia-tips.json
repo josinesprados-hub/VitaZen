@@ -2,7 +2,7 @@
   {
     "empire": "energia",
     "title": "Agua al despertar",
-    "content": "El cuerpo pierde casi un litro de agua por la noche. Medio litro al despertar no es wellness — es sentido común.",
+    "content": "El cuerpo pierde casi un litro de agua por la noche. Medio litro al despertar no es tendencia — es lo que tu cuerpo necesita tras horas sin beber.",
     "plan": "FREE"
   },
   {
@@ -14,7 +14,7 @@
   {
     "empire": "energia",
     "title": "Luz temprana",
-    "content": "Quince minutos de luz natural por la mañana ajustan cómo tu cuerpo marca el ritmo. No es tendencia — es biología.",
+    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. No es tendencia — es la señal más fuerte que tiene el cuerpo para saber qué hora es.",
     "plan": "FREE"
   },
   {
@@ -56,7 +56,7 @@
   {
     "empire": "energia",
     "title": "La ventana del café",
-    "content": "La cafeína funciona mejor un rato después de despertar. Si llega antes, el cuerpo aún está limpiando el cansancio de la noche y el café lo posterga, no lo resuelve.",
+    "content": "La cafeína funciona mejor un rato después de despertar. Si llega antes, el cuerpo aún está limpiando la adenosina de la noche y el café la posterga, no la resuelve.",
     "plan": "FREE"
   },
   {
@@ -68,7 +68,7 @@
   {
     "empire": "energia",
     "title": "La caída de las tres",
-    "content": "La bajada de energía a media tarde es real y tiene que ver con el ritmo del cuerpo. Una pausa breve funciona mejor que otro café.",
+    "content": "La bajada de energía a media tarde es real y tiene que ver con el ritmo del cuerpo. No es solo la comida — es un ciclo natural. Una pausa breve funciona mejor que otro café.",
     "plan": "FREE"
   },
   {
@@ -98,7 +98,7 @@
   {
     "empire": "energia",
     "title": "El último café",
-    "content": "La cafeína se queda en el cuerpo más de lo que sientes. Tomar café después de las dos de la tarde puede dificultar el sueño de esa noche.",
+    "content": "La cafeína se queda en el cuerpo más horas de las que sientes. Tomar café después de las dos de la tarde puede dificultar el sueño de esa noche, aunque no lo notes.",
     "plan": "FREE"
   },
   {
@@ -158,7 +158,7 @@
   {
     "empire": "energia",
     "title": "El ritmo del cuerpo",
-    "content": "El cuerpo tiene un ritmo natural de noventa minutos de foco y veinte de descanso. Forzar más allá no produce más — produce menos.",
+    "content": "El cuerpo tiene un ritmo natural de noventa minutos de foco y veinte de descanso. Forzar más allá no produce más — produce menos. Es el ciclo ultradiano.",
     "plan": "FREE"
   },
   {
@@ -289,32 +289,44 @@
   },
   {
     "empire": "energia",
+    "title": "Masticar lento",
+    "content": "Masticar más tiempo mejora la digestión y la absorción de nutrientes. El estómago no tiene dientes — el trabajo empieza en la boca.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Ritmo de comidas",
+    "content": "Comer a horas regulares ayuda a que el cuerpo sepa cuándo esperar energía. Los horarios irregulares confunden más que el contenido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
     "title": "El café posterga",
-    "content": "La cafeína no elimina el cansancio — lo esconde. Cuando pasa el efecto, lo que postergaste sigue ahí.",
+    "content": "La cafeína no elimina el cansancio — lo posterga. Bloquea la señal de sueño, pero la sustancia que te cansa sigue ahí. Cuando pasa el efecto, lo que postergaste vuelve.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Ciclos de noventa",
-    "content": "El sueño se estructura en ciclos de unos noventa minutos. Despertar al final de un ciclo se siente mejor que despertar a mitad, aunque duermas más.",
+    "content": "El sueño se estructura en ciclos de unos noventa minutos. Despertar al final de un ciclo se siente mejor que despertar a mitad, aunque duermas más. Es la arquitectura del sueño.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Despertar agotado",
-    "content": "El cuerpo te da energía natural al despertar. Si te levantas agotado a pesar de haber dormido, algo en tu ritmo está desalineado.",
+    "content": "El cuerpo te da energía natural al despertar. Si te levantas agotado a pesar de haber dormido, algo en tu ritmo está desalineado. El cortisol matinal debería darte un empuje — si no lo hace, revisa tu sueño.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Cafeína y cuerpo",
-    "content": "Algunas personas notan la cafeína durante muchas más horas de lo que parece. Un café a las tres puede afectar el sueño incluso si no lo sientes.",
+    "content": "Algunas personas notan la cafeína durante muchas más horas de lo que parece. Un café a las tres puede afectar el sueño incluso si no lo sientes. La vida media de la cafeína varía mucho entre personas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Deuda de sueño",
-    "content": "La deuda de sueño se acumula. Dormir seis horas cuatro noches seguidas no se compensa con una de diez. El cerebro no funciona igual.",
+    "content": "La deuda de sueño se acumula. Dormir seis horas cuatro noches seguidas no se compensa con una de diez. El cerebro no vuelve a su nivel normal hasta haber saldado la deuda.",
     "plan": "PREMIUM"
   },
   {
@@ -332,7 +344,7 @@
   {
     "empire": "energia",
     "title": "El cuerpo pide descanso",
-    "content": "Hay señales que indican que necesitas descansar, no esforzarte más. Ignorarlas no las hace desaparecer.",
+    "content": "Hay señales claras de que necesitas descansar: rendimiento que no sube, sueño que no repara, irritabilidad que no corresponde a lo que pasa. Ignorarlas no las hace desaparecer.",
     "plan": "PREMIUM"
   },
   {
@@ -350,43 +362,43 @@
   {
     "empire": "energia",
     "title": "Las primeras horas",
-    "content": "La parte más reparadora del sueño ocurre en las primeras horas. Acostarte tarde no solo reduce la cantidad — reduce específicamente lo que más necesitas.",
+    "content": "La parte más reparadora del sueño ocurre en las primeras horas. Acostarte tarde no solo reduce la cantidad — reduce específicamente el sueño profundo, que es lo que más necesitas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El sueño que procesa",
-    "content": "Hay una fase del sueño que procesa las emociones del día. Si la reduces, al día siguiente todo se siente más intenso y menos manejable.",
+    "title": "Fase REM y emociones",
+    "content": "La fase REM del sueño procesa las emociones del día. Si la reduces, al día siguiente todo se siente más intenso y menos manejable. No es sueño perdido — es trabajo nocturno.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El intestino tiene ritmo",
-    "content": "Tu digestión tiene ritmo propio. Comer a horas irregulares la altera, independientemente de lo que comas. Los horarios importan más de lo que parece.",
+    "content": "Tu digestión tiene ritmo propio. Comer a horas irregulares la altera, independientemente de lo que comas. Los horarios importan más de lo que parece — el intestino tiene su propio reloj.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El ciclo cambia todo",
-    "content": "El ciclo menstrual cambia la energía, el sueño y lo que puedes exigirte. Entrenar igual todo el mes ignora cómo funciona tu cuerpo.",
+    "content": "El ciclo menstrual cambia la energía, el sueño y lo que puedes exigirte. Entrenar igual todo el mes ignora cómo funciona el cuerpo. La investigación en fases menstruales lo tiene claro.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Moverse para recuperarse",
-    "content": "Después de un esfuerzo intenso, el movimiento suave ayuda más que quedarte quieto. El cuerpo se repara mejor en movimiento ligero que parado.",
+    "content": "Después de un esfuerzo intenso, el movimiento suave ayuda más que quedarse quieto. El cuerpo se repara mejor en movimiento ligero que parado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Dormir mal envejece",
-    "content": "Dormir mal hace en el cuerpo algo parecido a comer demasiado azúcar. No se ve, pero el efecto es real y se acumula.",
+    "content": "Dormir mal hace en el cuerpo algo parecido a comer demasiado azúcar. No se ve, pero el efecto es real y se acumula. La falta de sueño crónica acelera el desgaste celular.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "El umbral de vitamina D",
-    "content": "Niveles bajos de vitamina D se asocian con fatiga y menor rendimiento muscular. No es suplementación mágica — es corregir un déficit real.",
+    "title": "Vitamina D y fatiga",
+    "content": "Niveles bajos de vitamina D se asocian con fatiga persistente y menor rendimiento muscular. No es suplementación mágica — es corregir un déficit real que mucha gente tiene sin saberlo.",
     "plan": "PREMIUM"
   },
   {
@@ -404,7 +416,7 @@
   {
     "empire": "energia",
     "title": "El costo del alcohol",
-    "content": "El alcohol puede ayudar a dormir más rápido, pero el sueño que produce es menos reparador. Aunque no lo sientas, la calidad baja.",
+    "content": "El alcohol puede ayudar a dormir más rápido, pero el sueño que produce es menos reparador. Reduce la fase REM. Aunque no lo sientas, la calidad baja.",
     "plan": "PREMIUM"
   },
   {
@@ -416,7 +428,7 @@
   {
     "empire": "energia",
     "title": "Hierro y fatiga",
-    "content": "La falta de hierro es una de las causas más comunes de fatiga crónica ignorada. No siempre es falta de sueño — a veces es falta de transporte de oxígeno.",
+    "content": "La falta de hierro es una de las causas más comunes de fatiga ignorada. No siempre es falta de sueño — a veces la sangre no transporta bien el oxígeno. Vale la pena comprobarlo.",
     "plan": "PREMIUM"
   },
   {
@@ -458,25 +470,25 @@
   {
     "empire": "energia",
     "title": "No siempre es hambre",
-    "content": "La fatiga durante el ejercicio prolongado no siempre es falta de energía. A veces son minerales — sodio, potasio, magnesio — que se pierden con el sudor.",
+    "content": "La fatiga durante el ejercicio prolongado no siempre es falta de energía. A veces son minerales que se pierden con el sudor — sodio, potasio, magnesio. El agua sola no siempre basta.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Magnesio silencioso",
-    "content": "El magnesio ayuda al sistema nervioso y al sueño. Mucha gente tiene poco sin saberlo, y se nota en la calidad del descanso.",
+    "content": "El magnesio participa en más de trescientas reacciones en el cuerpo, incluyendo la relajación muscular y el sueño. Mucha gente tiene poco sin saberlo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Corazón y duración",
-    "content": "La capacidad de tu corazón y pulmones para trabajar se relaciona con cuánto duras. No necesitas ser atleta — sí necesitas desafiar tu cuerpo regularmente.",
+    "content": "La capacidad de tu corazón y pulmones para entregar oxígeno se relaciona directamente con cuánto duras. No necesitas ser atleta — sí necesitas desafiar tu cuerpo regularmente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Mover te limpia",
-    "content": "Hay sistemas del cuerpo que no se mueven solos — necesitan que tú te muevas. Sin movimiento, la recuperación se ralentiza.",
+    "content": "El sistema linfático — que limpia desechos del cuerpo — no tiene bomba propia. Necesita que te muevas. Sin movimiento, la recuperación se ralentiza.",
     "plan": "PREMIUM"
   },
   {
@@ -494,19 +506,19 @@
   {
     "empire": "energia",
     "title": "La proteína antes de dormir",
-    "content": "Un poco de proteína antes de dormir ayuda a que el cuerpo se repare durante la noche. Descansa, pero si tiene material, también reconstruye.",
+    "content": "Un poco de proteína antes de dormir ayuda a que el cuerpo se repare durante la noche. Descansa, pero si tiene material, también reconstruye. La síntesis muscular nocturna es real.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El cerebro y la energía alternativa",
-    "content": "El cerebro puede usar otros combustibles además del azúcar. Algunas personas notan más claridad mental con ciertos cambios de alimentación, pero no funciona igual para todos.",
+    "content": "El cerebro puede usar otros combustibles además de la glucosa habitual. Algunas personas notan más claridad mental con ciertos cambios de alimentación, pero no funciona igual para todos.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El enfriamiento post-ejercicio",
-    "content": "Enfriarse progresivamente tras el ejercicio reduce la inflamación sin bloquear la adaptación. El contraste frío-calor no es solo recuperación — es señal.",
+    "content": "Enfriarse progresivamente tras el ejercicio reduce la inflamación sin bloquear la adaptación. Un rato de movimiento suave al final funciona mejor que parar de golpe.",
     "plan": "PREMIUM"
   },
   {
@@ -518,7 +530,7 @@
   {
     "empire": "energia",
     "title": "La proteína justa",
-    "content": "El cuerpo necesita un mínimo de proteína para no perder músculo. Menos de un gramo por kilo al día y empieza a recurrir al músculo como reserva.",
+    "content": "El cuerpo necesita un mínimo de proteína para no perder músculo. Menos de un gramo por kilo al día y empieza a recurrir al músculo como reserva. La investigación en sarcopenia lo tiene claro.",
     "plan": "PREMIUM"
   },
   {
@@ -529,8 +541,8 @@
   },
   {
     "empire": "energia",
-    "title": "La mañana procesa mejor",
-    "content": "El mismo plato se procesa distinto por la mañana que por la noche. El cuerpo aprovecha mejor lo que comes temprano.",
+    "title": "Ritmo circadiano y comida",
+    "content": "El mismo plato se procesa distinto por la mañana que por la noche. El ritmo circadiano afecta la digestión y la absorción. El cuerpo aprovecha mejor lo que comes temprano.",
     "plan": "PREMIUM"
   },
   {
@@ -572,7 +584,7 @@
   {
     "empire": "energia",
     "title": "Vitamina C y estrés",
-    "content": "La vitamina C ayuda al cuerpo a gestionar el estrés. No es un calmante — es un apoyo real cuando las demandas son altas.",
+    "content": "La vitamina C ayuda al cuerpo a gestionar el estrés. Las glándulas suprarrenales la consumen más cuando las demandas son altas. No es un calmante — es un apoyo real.",
     "plan": "PREMIUM"
   },
   {
@@ -608,49 +620,37 @@
   {
     "empire": "energia",
     "title": "La vitamina del sol",
-    "content": "La vitamina D se forma con el sol. Si te falta, se resienten los huesos, los músculos, el ánimo y las defensas. No es opcional — es infraestructura.",
+    "content": "La vitamina D se forma con el sol. Si te falta, se resienten los huesos, los músculos, el ánimo y las defensas. No es opcional — es infraestructura que mucha gente tiene por debajo de lo necesario.",
     "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "Masticar lento",
-    "content": "Masticar más tiempo mejora la digestión y la absorción de nutrientes. El estómago no tiene dientes — el trabajo empieza en la boca.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Ritmo de comidas",
-    "content": "Comer a horas regulares ayuda a que el cuerpo sepa cuándo esperar energía. Los horarios irregulares confunden más que el contenido.",
-    "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "El sueño del deportista",
-    "content": "El ejercicio regular mejora la eficiencia del sueño. Quien se mueve necesita menos tiempo en cama para obtener la misma recuperación.",
+    "content": "El ejercicio regular mejora la eficiencia del sueño. Quien se mueve necesita menos tiempo en cama para obtener la misma recuperación. Moverse bien y dormir bien se refuerzan.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Latencia del sueño",
-    "content": "Si te duermes en menos de cinco minutos, probablemente estás crónicamente cansado. Lo normal es entre diez y veinte minutos.",
+    "title": "Cuánto tardas en dormir",
+    "content": "Si te duermes en menos de cinco minutos, probablemente estás crónicamente cansado. Lo normal es entre diez y veinte minutos. Menos de eso no es habilidad — es déficit.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "El músculo que quema",
-    "content": "El músculo en reposo gasta más que la grasa. No mucho más, pero suficiente para que importe a largo plazo.",
+    "content": "El músculo en reposo gasta más que la grasa. No mucho más, pero suficiente para que importe a largo plazo. El tejido muscular es metabólicamente activo incluso cuando no haces nada.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Pantallas de noche",
-    "content": "Las pantallas por la noche no solo dificultan dormir — también pueden mantenerte alerta cuando tu cuerpo debería relajarse. Doble impacto en la recuperación.",
+    "content": "Las pantallas por la noche no solo dificultan dormir — también reducen la calidad del sueño profundo. La luz azul engaña al cerebro y el cuerpo no prepara la melatonina que necesita.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Sed que no se siente",
-    "content": "Perder muy poco agua ya afecta cómo rindes física y mentalmente. No necesitas sentir sed para estar menos hidratado de lo conveniente.",
+    "content": "Perder muy poco agua ya afecta cómo rindes física y mentalmente. No necesitas sentir sed para estar menos hidratado de lo conveniente. La sed es una señal tardía.",
     "plan": "PREMIUM"
   },
   {

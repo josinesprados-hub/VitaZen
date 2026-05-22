@@ -2,31 +2,31 @@
   {
     "empire": "disciplina",
     "title": "Anclar",
-    "content": "Conectar un hábito nuevo a uno que ya haces sin pensar cuesta menos que empezar desde cero.",
+    "content": "Conectar un hábito nuevo a uno que ya haces sin pensar cuesta menos que empezar desde cero. Es la técnica de anclaje, y funciona porque usa una rutina existente como trampolín.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
     "title": "Menos pasos",
-    "content": "Cuantos menos pasos haya entre tú y la acción, más probable es que la hagas.",
+    "content": "Cuantos menos pasos haya entre tú y la acción, más probable es que la hagas. Reducir la fricción funciona mejor que aumentar la motivación.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
-    "title": "Si-entonces",
-    "content": "Decidir «si pasa X, entonces hago Y» duplica la probabilidad de actuar según la investigación.",
+    "title": "Intenciones de implementación",
+    "content": "Decidir «si pasa X, entonces hago Y» duplica la probabilidad de actuar. Peter Gollwitzer lo demostró: las intenciones de implementación funcionan mejor que la motivación sola.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
     "title": "Lo visible",
-    "content": "Lo que está a la vista se hace. Lo que se guarda se olvida.",
+    "content": "Lo que está a la vista se hace. Lo que se guarda se olvida. La visibilidad es una de las señales más potentes para la conducta.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
     "title": "El entorno primero",
-    "content": "Cambiar tu espacio cuesta menos esfuerzo que cambiar tu intención.",
+    "content": "Cambiar tu espacio cuesta menos esfuerzo que cambiar tu intención. El diseño del entorno suele superar a la fuerza de voluntad.",
     "plan": "FREE"
   },
   {
@@ -38,19 +38,19 @@
   {
     "empire": "disciplina",
     "title": "Pensar como alguien",
-    "content": "Pensar «soy alguien que corre» funciona distinto a «tengo que correr».",
+    "content": "Pensar «soy alguien que corre» funciona distinto a «tengo que correr». La identidad dirige la conducta más que la obligación.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
     "title": "Mínimo viable",
-    "content": "Hacer algo pequeño cada día construye más que hacer algo grande una vez.",
+    "content": "Hacer algo pequeño cada día construye más que hacer algo grande una vez. La consistencia le dice al cerebro que esto importa.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
     "title": "Fricción inversa",
-    "content": "Poner obstáculos en lo que quieres dejar hace que suceda menos.",
+    "content": "Poner obstáculos en lo que quieres dejar hace que suceda menos. Añadir fricción funciona incluso con obstáculos pequeños.",
     "plan": "FREE"
   },
   {
@@ -62,7 +62,7 @@
   {
     "empire": "disciplina",
     "title": "Lo simple se repite",
-    "content": "La complejidad mata la repetición. Si un hábito requiere pensar mucho, no se automatiza.",
+    "content": "La complejidad mata la repetición. Si un hábito requiere pensar mucho, no se automatiza. Lo simple se repite; lo complejo se abandona.",
     "plan": "FREE"
   },
   {
@@ -74,7 +74,7 @@
   {
     "empire": "disciplina",
     "title": "Registrar cambia",
-    "content": "Lo que mides tiende a cambiar, solo por el hecho de prestarle atención.",
+    "content": "Lo que mides tiende a cambiar, solo por el hecho de prestarle atención. Es el efecto de observación — la consciencia por sí sola mueve la aguja.",
     "plan": "FREE"
   },
   {
@@ -92,13 +92,13 @@
   {
     "empire": "disciplina",
     "title": "Recompensa cercana",
-    "content": "El cerebro aprende con recompensas cercanas, no con promesas lejanas.",
+    "content": "El cerebro aprende con recompensas cercanas, no con promesas lejanas. La demora entre acción y recompensa es lo que más debilita un hábito nuevo.",
     "plan": "FREE"
   },
   {
     "empire": "disciplina",
     "title": "La señal primero",
-    "content": "Un hábito empieza con una señal. Diseña la señal, no solo la acción.",
+    "content": "Un hábito empieza con una señal. Diseña la señal, no solo la acción. Sin señal clara, el cerebro no tiene disparador.",
     "plan": "FREE"
   },
   {
@@ -128,7 +128,7 @@
   {
     "empire": "disciplina",
     "title": "Empezar chico",
-    "content": "Comenzar con dos minutos cambia la percepción de dificultad de cualquier acción.",
+    "content": "Comenzar con dos minutos cambia la percepción de dificultad de cualquier acción. Es la regla de los dos minutos: reducir la barrera de entrada lo cambia todo.",
     "plan": "FREE"
   },
   {
@@ -301,20 +301,20 @@
   },
   {
     "empire": "disciplina",
-    "title": "Voluntad, la versión completa",
-    "content": "La fuerza de voluntad como músculo que se agota es una idea parcial. A veces lo que se agota es la motivación, no la capacidad.",
+    "title": "Voluntad: músculo o señal",
+    "content": "La fuerza de voluntad como músculo que se agota es una idea de Baumeister. Pero la investigación posterior muestra que a veces lo que se agota es la motivación, no la capacidad. Si crees que se renueva, rindes más.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Identidad lenta",
-    "content": "Cuando un hábito se vuelve parte de quién eres, no necesitas motivación. Pero la identidad se construye lentamente, con evidencia acumulada.",
+    "content": "Cuando un hábito se vuelve parte de quién eres, no necesitas motivación. Pero la identidad se construye lentamente, con evidencia acumulada. No se declara — se demuestra.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Contexto y hábito viajan juntos",
-    "content": "Un hábito atado a un contexto se activa ahí. Cambiar de contexto puede desactivarlo — por eso los viajes rompen rutinas.",
+    "content": "Un hábito atado a un contexto se activa ahí. Cambiar de contexto puede desactivarlo — por eso los viajes rompen rutinas. El contexto es parte del hábito.",
     "plan": "PREMIUM"
   },
   {
@@ -326,37 +326,37 @@
   {
     "empire": "disciplina",
     "title": "El malvavisco con matices",
-    "content": "El famoso experimento de esperar para obtener más no solo mide voluntad. También mide si confías en que la recompensa realmente va a llegar.",
+    "content": "El famoso experimento del malvavisco no solo mide voluntad. También mide si confías en que la recompensa realmente va a llegar. Walter Mischel lo mostró: el contexto y la confianza importan tanto como la paciencia.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
-    "title": "Diseñar el default",
-    "content": "La opción por defecto no es neutral: es la que más gente toma. Diseñar el default es diseñar la conducta.",
+    "title": "Diseño de elecciones",
+    "content": "La opción por defecto no es neutral: es la que más gente toma. Thaler y Sunstein lo llamaron nudge — diseñar las elecciones. Diseñar el default es diseñar la conducta.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "La brecha real",
-    "content": "La mayoría sabe qué hacer. La brecha está entre saberlo y hacerlo. Reducirla es el verdadero trabajo.",
+    "content": "La mayoría sabe qué hacer. La brecha está entre saberlo y hacerlo. Reducirla es el verdadero trabajo — y no se resuelve con más información.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Estrés amplifica",
-    "content": "Bajo estrés, los hábitos se vuelven más automáticos — buenos y malos. El estrés no rompe hábitos, los amplifica.",
+    "content": "Bajo estrés, los hábitos se vuelven más automáticos — buenos y malos. El estrés no rompe hábitos, los amplifica. Es por eso que en épocas difíciles recurres a lo conocido.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Fricción asimétrica",
-    "content": "Agregar un poco de fricción a lo malo y quitar un poco a lo bueno tiene efecto desproporcionado. No necesitas cambios extremos.",
+    "content": "Agregar un poco de fricción a lo malo y quitar un poco a lo bueno tiene efecto desproporcionado. No necesitas cambios extremos — la asimetría pequeña es suficiente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
-    "title": "Los 21 días son un mito",
-    "content": "Un hábito simple puede tomar 21 días. Uno complejo puede tomar 254. El promedio real está alrededor de 66.",
+    "title": "El mito de los 21 días",
+    "content": "Un hábito simple puede tomar 21 días. Uno complejo puede tomar 254. El promedio real, según la investigación de Lally, está alrededor de 66 días. El mito de los 21 días viene de una simplificación antigua.",
     "plan": "PREMIUM"
   },
   {
@@ -367,14 +367,14 @@
   },
   {
     "empire": "disciplina",
-    "title": "El bundle con condición",
-    "content": "El temptation bundling funciona si la recompensa solo está disponible con la acción. Si puedes obtenerla aparte, pierde efecto.",
+    "title": "Lo bueno con lo difícil",
+    "content": "Juntar lo que disfrutas con lo que te cuesta funciona — pero solo si lo disfrutado solo está disponible cuando haces lo difícil. Si puedes obtenerlo aparte, pierde efecto.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Eres lo que repites",
-    "content": "Cada acción que haces es evidencia para ti mismo sobre quién eres. No eres lo que piensas, eres lo que haces repetidamente.",
+    "content": "Cada acción que haces es evidencia para ti mismo sobre quién eres. No eres lo que piensas — eres lo que haces repetidamente. La identidad se construye con hechos, no con intenciones.",
     "plan": "PREMIUM"
   },
   {
@@ -392,13 +392,13 @@
   {
     "empire": "disciplina",
     "title": "Pre-compromiso como diseño",
-    "content": "El pre-compromiso no es voluntad: es rediseñar tus opciones futuras para que la correcta sea la más fácil.",
+    "content": "El pre-compromiso no es voluntad: es rediseñar tus opciones futuras para que la correcta sea la más fácil. Ulises atándose al mástil era diseño, no fuerza.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "La inercia mental",
-    "content": "El cerebro prefiere seguir haciendo lo que ya hace. Empezar algo nuevo rompe esa inercia — por eso el arranque cuesta más que la continuación.",
+    "content": "El cerebro prefiere seguir haciendo lo que ya hace. Empezar algo nuevo rompe esa inercia — por eso el arranque cuesta más que la continuación. Una vez en movimiento, seguir es más fácil.",
     "plan": "PREMIUM"
   },
   {
@@ -434,13 +434,13 @@
   {
     "empire": "disciplina",
     "title": "Quien vuelve rápido",
-    "content": "La gente que vuelve rápido tras un lapsus no es la más motivada, sino la que tiene un plan preestablecido para volver.",
+    "content": "La gente que vuelve rápido tras un lapsus no es la más motivada — es la que tenía un plan para volver. La preparación supera a la inspiración.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "El ritual de registrar",
-    "content": "El acto de registrar tiene un efecto ritual que refuerza la conducta, independiente de los datos que produce.",
+    "content": "El acto de registrar tiene un efecto que va más allá de los datos. Es un ritual que le dice al cerebro: esto importa. La conducta se refuerza al marcarla.",
     "plan": "PREMIUM"
   },
   {
@@ -452,19 +452,19 @@
   {
     "empire": "disciplina",
     "title": "Ya que estoy aquí",
-    "content": "«Ya que estoy aquí, hago X» usa la inercia del momento para activar conducta sin esfuerzo adicional.",
+    "content": "«Ya que estoy aquí, hago X» usa la inercia del momento para activar conducta sin esfuerzo adicional. Es el efecto de arrastre: lo que ya está en movimiento tiende a seguir.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "La señal, no la motivación",
-    "content": "Cuando un hábito está formado, la señal activa la conducta sin necesidad de motivación. La motivación fue el andamio, no el edificio.",
+    "content": "Cuando un hábito está formado, la señal activa la conducta sin necesidad de motivación. La motivación fue el andamio — el edificio no lo necesita.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Fricción escondida",
-    "content": "A veces no haces algo no por pereza sino porque hay un paso oculto que molesta. Encontrar y eliminar ese paso cambia todo.",
+    "content": "A veces no haces algo no por pereza sino porque hay un paso oculto que molesta. Encontrar y eliminar ese paso cambia todo. La fricción invisible es la más dañina.",
     "plan": "PREMIUM"
   },
   {
@@ -482,13 +482,13 @@
   {
     "empire": "disciplina",
     "title": "Sueño y regulación",
-    "content": "Dormir mal debilita específicamente la capacidad de controlarte. Cualquier hábito nuevo se sabotea si no duermes bien.",
+    "content": "Dormir mal debilita específicamente la capacidad de controlarte. La corteza prefrontal —que regula los impulsos— es la primera que sufre con falta de sueño.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "El efecto inicio limpio",
-    "content": "Un nuevo comienzo —lunes, año nuevo, cumpleaños— da un impulso real. Pero se desvanece sin estructura que lo sostenga.",
+    "content": "Un nuevo comienzo — lunes, año nuevo, cumpleaños — da un impulso real. Se llama efecto de inicio fresco. Pero se desvanece sin estructura que lo sostenga.",
     "plan": "PREMIUM"
   },
   {
@@ -500,25 +500,25 @@
   {
     "empire": "disciplina",
     "title": "Lo que absorbes",
-    "content": "Adoptas hábitos de la gente con quien pasas tiempo sin darte cuenta. No es imitación consciente, es adaptación al entorno social.",
+    "content": "Adoptas hábitos de la gente con quien pasas tiempo sin darte cuenta. No es imitación consciente — es contagio social. La red más cercana define lo que te parece normal.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Cada repetición deposita",
-    "content": "Cada repetición es como depositar en una cuenta. Al principio los intereses son mínimos. Con el tiempo, la automatización aparece.",
+    "content": "Cada repetición es como depositar en una cuenta. Al principio los intereses son mínimos. Con el tiempo, la automatización aparece. Es la ley de la acumulación.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Creer que puedes",
-    "content": "Creer que la voluntad es limitada hace que se agote más rápido. Creer que es renovable cambia cómo te sientes ante los retos.",
+    "content": "Creer que la voluntad es limitada hace que se agote más rápido. Creer que es renovable cambia cómo te sientes ante los retos. La creencia sobre tu voluntad afecta tu voluntad.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Lo conocido pesa",
-    "content": "A veces no rompes un hábito porque el conocido, aunque malo, se siente más seguro que lo desconocido. La incomodidad del cambio no es debilidad.",
+    "content": "A veces no rompes un hábito porque el conocido, aunque malo, se siente más seguro que lo desconocido. La incomodidad del cambio no es debilidad — es el costo real de moverse.",
     "plan": "PREMIUM"
   },
   {
@@ -530,13 +530,13 @@
   {
     "empire": "disciplina",
     "title": "La rutina como contenedor",
-    "content": "Una rutina no es rigidez. Es un contenedor que reduce el caos y deja energía para lo que sí necesita decisión.",
+    "content": "Una rutina no es rigidez. Es un contenedor que reduce el caos y deja energía para lo que sí necesita decisión. La estructura libera, no aprisiona.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
-    "title": "Autocompasión estratégica",
-    "content": "Castigarte tras un lapsus aumenta la probabilidad de otro. La autocompasión no es permiso: es una estrategia de recuperación.",
+    "title": "Autocompasión y persistencia",
+    "content": "Castigarte tras un lapsus aumenta la probabilidad de otro. Kristin Neff lo ha mostrado repetidamente: la autocompasión no es permiso — es una estrategia de recuperación más efectiva que el castigo.",
     "plan": "PREMIUM"
   },
   {
@@ -560,7 +560,7 @@
   {
     "empire": "disciplina",
     "title": "Emoción acelera",
-    "content": "Los hábitos se forman más rápido cuando la conducta se asocia con una emoción, no solo con una recompensa.",
+    "content": "Los hábitos se forman más rápido cuando la conducta se asocia con una emoción, no solo con una recompensa. La emoción es el acelerador del aprendizaje.",
     "plan": "PREMIUM"
   },
   {
@@ -572,7 +572,7 @@
   {
     "empire": "disciplina",
     "title": "Señal compuesta",
-    "content": "Una señal que combina lugar, hora y estado emocional activa el hábito con más fuerza que una señal simple.",
+    "content": "Una señal que combina lugar, hora y estado emocional activa el hábito con más fuerza que una señal simple. Cuantas más pistas, más robusto el disparador.",
     "plan": "PREMIUM"
   },
   {
@@ -638,25 +638,25 @@
   {
     "empire": "disciplina",
     "title": "La marca como recompensa",
-    "content": "A veces la recompensa que sostiene un hábito es simbólica: una marca, un check, un símbolo visual.",
+    "content": "A veces la recompensa que sostiene un hábito es simbólica: una marca, un check, un símbolo visual. El cerebro responde a la completitud tanto como al placer.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Plan B mínimo",
-    "content": "Tener un plan B que es una versión reducida del plan A previene el efecto todo-o-nada cuando las condiciones no son ideales.",
+    "content": "Tener un plan B que es una versión reducida del plan A previene el efecto todo-o-nada. Cuando las condiciones no son ideales, algo pequeño sigue siendo algo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Lo que sientes antes",
-    "content": "El estado emocional puede ser una señal. Entender qué sientes antes de un hábito automático te da información para rediseñarlo.",
+    "content": "El estado emocional puede ser una señal. Entender qué sientes antes de un hábito automático te da información para rediseñarlo. La emoción es el prefacio de la acción.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
     "title": "Elegir ayuda",
-    "content": "Los hábitos que sientes elegidos se sostienen más que los impuestos. Incluso la ilusión de elección aumenta la adherencia.",
+    "content": "Los hábitos que sientes elegidos se sostienen más que los impuestos. Incluso la ilusión de elección aumenta la adherencia. La autonomía es combustible.",
     "plan": "PREMIUM"
   }
 ]
