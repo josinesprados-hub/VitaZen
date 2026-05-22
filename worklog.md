@@ -80,3 +80,39 @@ Stage Summary:
 - FREE cycle: 75 días antes de reshuffle (25 ciclos × 3 días)
 - PREMIUM cycle: 180 días antes de reshuffle (60 ciclos × 3 días)
 - Commit: b6e88dd — pushed to main
+---
+Task ID: 1
+Agent: main
+Task: Debug técnico — tips no aparecen en ningún imperio
+
+Work Log:
+- Leído documento de principios /docs/vitazen-finanzas-principios.md
+- Auditado flujo completo end-to-end: seed → DB → API route → getDeterministicTips → useEmpireTips → EmpireTipsSection → empire pages
+- Verificado: EmpireTipsSection montado en TODOS los 5 imperios (mente, energia, disciplina, riqueza, crecimiento)
+- Verificado: JSON tip data correcta (550 tips, 50 FREE + 60 PREMIUM por imperio, 0 colisiones de ID)
+- Verificado: API route /api/empire/tips correcta (auth, filtros, rotación determinista, response format)
+- Verificado: Plan gating correcto (FREE=2 tips, ÉLITE=2+1)
+- Verificado: No hay middleware bloqueando la API
+- Verificado: No hay Suspense/loading.tsx interfiriendo
+- Verificado: Dashboard layout gates auth correctamente antes de renderizar
+- Encontrado BUG #1 CRÍTICO: useEmpireTips.ts — arrays vacíos son truthy en JS
+  - Condición `data.rotatedFreeTips && data.rotatedPremiumTips` era true para [] 
+  - El fallback que usaba data.tips (con tips reales) NUNCA se ejecutaba
+  - Fix: Array.isArray() + length check explícito
+- Encontrado BUG #2: getDeterministicTips — position overflow sin clamping
+  - freePosition/premiumPosition podían exceder freeCount/premiumCount
+  - toShow podía ser negativo → 0 FREE tips seleccionados
+  - Fix: defensive clamping + Math.max(0, remaining)
+- Encontrado BUG #3: getDeterministicTips — upsert sin try/catch
+  - Si el upsert fallaba, la función lanzaba error → API 500 → tips no renderizaban
+  - Fix: try/catch alrededor del upsert, tips se retornan igual
+- Encontrado BUG #4: seed.ts — PrismaClient sin PrismaPg adapter
+  - El seed usaba new PrismaClient() sin adapter, la app usa PrismaPg
+  - Fix: mismo PrismaPg adapter + verificación de conteo post-seed
+- Build exitoso, commit limpio, push a GitHub
+
+Stage Summary:
+- 4 bugs corregidos: 1 crítico (truthy arrays), 2 medium (position overflow, upsert failure), 1 low (seed adapter)
+- BUG #1 era el más probable causante de "tips no aparecen": cuando el servidor devolvía rotated arrays vacíos (seed no ejecutado, DB vacía, o rotation returning []), el cliente aceptaba [] como datos válidos en vez de caer al fallback de data.tips
+- Commit: 9a20fda — pushed to main
+- IMPORTANTE: Si el seed no se ha ejecutado en la DB de producción, ejecutar `npm run db:seed` para que los 550 tips existan en la base de datos
