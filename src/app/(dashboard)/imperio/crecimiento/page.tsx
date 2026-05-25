@@ -113,6 +113,7 @@ export default function CrecimientoPage() {
 
     setLoading(true);
     setFetchError(false);
+
     try {
       const res = await apiFetch('/api/journal');
       if (res.ok) {
@@ -310,12 +311,12 @@ export default function CrecimientoPage() {
             <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
           </h2>
           {!screenshotMode && (
-          <button
-            onClick={() => setShowAdd(!showAdd)}
-            className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
-          >
-            <Plus size={18} /> Nueva entrada
-          </button>
+            <button
+              onClick={() => setShowAdd(!showAdd)}
+              className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
+            >
+              <Plus size={18} /> Nueva entrada
+            </button>
           )}
         </div>
 
@@ -378,22 +379,22 @@ export default function CrecimientoPage() {
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <h4 className="text-[#c8a55a] font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#666] italic">Sin título</span>}</h4>
                         {!screenshotMode && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <button
-                            onClick={() => startEdit(entry)}
-                            className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press"
-                            title="Editar"
-                          >
-                            <Pencil size={14} />
-                          </button>
-                          <button
-                            onClick={() => setPendingDeleteId(entry.id)}
-                            className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => startEdit(entry)}
+                              className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press"
+                              title="Editar"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                            <button
+                              onClick={() => setPendingDeleteId(entry.id)}
+                              className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         )}
                       </div>
 
