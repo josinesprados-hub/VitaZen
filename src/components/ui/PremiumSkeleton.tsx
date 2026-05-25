@@ -443,54 +443,50 @@ export function CheckinSkeleton() {
   return (
     <div className="max-w-4xl mx-auto skeleton-entrance">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <SkeletonIcon size="md" />
-            <SkeletonLine width="200px" className="h-7" />
-          </div>
-          <SkeletonLine width="180px" className="h-4 mt-2" />
+      <div className="flex items-center justify-between mb-5 sm:mb-7">
+        <div className="flex items-center gap-2.5">
+          <SkeletonIcon size="sm" />
+          <SkeletonLine width="170px" className="h-6" />
         </div>
-        <SkeletonBlock className="h-10 w-32 rounded-xl" />
+        <SkeletonBlock className="h-9 w-24 rounded-lg" />
       </div>
 
       {/* Today Summary */}
-      <SkeletonCard className="p-6 mb-8 border-[#c8a55a]/20">
-        <div className="flex items-center gap-3 mb-4">
-          <SkeletonCircle size={24} className="shrink-0" />
-          <div className="space-y-2 flex-1">
-            <SkeletonLine width="45%" className="h-4" />
-            <SkeletonLine width="60%" className="h-3" />
+      <SkeletonCard className="p-3 sm:p-4 mb-5 sm:mb-7 border-[#c8a55a]/10 rounded-lg">
+        <div className="flex items-center gap-2.5 mb-3">
+          <SkeletonCircle size={18} className="shrink-0" />
+          <div className="space-y-1.5 flex-1">
+            <SkeletonLine width="45%" className="h-3" />
+            <SkeletonLine width="55%" className="h-2.5" />
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="text-center space-y-2">
-              <SkeletonLine width="50%" className="h-6 mx-auto" />
-              <SkeletonLine width="40%" className="h-2.5 mx-auto" />
+            <div key={i} className="text-center space-y-1.5">
+              <SkeletonLine width="45%" className="h-4 mx-auto" />
+              <SkeletonLine width="35%" className="h-2 mx-auto" />
             </div>
           ))}
         </div>
       </SkeletonCard>
 
       {/* Trends */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-5">
-          <SkeletonCircle size={18} className="shrink-0" />
-          <SkeletonLine width="110px" className="h-5" />
+      <div className="mb-7">
+        <div className="flex items-center gap-2 mb-3">
+          <SkeletonCircle size={14} className="shrink-0" />
+          <SkeletonLine width="100px" className="h-4.5" />
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           {[1, 2, 3, 4].map((i) => (
-            <SkeletonCard key={i} className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <SkeletonCircle size={14} className="shrink-0" />
-                <SkeletonLine width="55%" className="h-2.5" />
+            <SkeletonCard key={i} className="p-2.5 sm:p-3 rounded-lg">
+              <div className="flex items-center gap-1.5 mb-2">
+                <SkeletonCircle size={10} className="shrink-0" />
+                <SkeletonLine width="50%" className="h-2" />
               </div>
-              <SkeletonLine width="35%" className="h-7" />
-              <SkeletonLine width="20%" className="h-2.5 mt-1" />
-              <div className="flex items-end gap-1 h-16 mt-2">
+              <SkeletonLine width="30%" className="h-5" />
+              <div className="flex items-end gap-1.5 h-8 mt-1.5">
                 {[1, 2, 3, 4, 5, 6, 7].map((bar) => (
-                  <SkeletonBlock key={bar} className="flex-1 rounded-t-sm" style={{ height: `${30 + ((i * 17 + bar * 11) % 60)}%` }} />
+                  <SkeletonBlock key={bar} className="flex-1 rounded-t-full" style={{ height: `${30 + ((i * 17 + bar * 11) % 60)}%` }} />
                 ))}
               </div>
             </SkeletonCard>
@@ -500,23 +496,23 @@ export function CheckinSkeleton() {
 
       {/* History */}
       <div>
-        <div className="flex items-center gap-2 mb-5">
-          <SkeletonCircle size={18} className="shrink-0" />
-          <SkeletonLine width="90px" className="h-5" />
+        <div className="flex items-center gap-2 mb-3">
+          <SkeletonCircle size={14} className="shrink-0" />
+          <SkeletonLine width="80px" className="h-4.5" />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <SkeletonCard key={i} className="p-4">
-              <div className="flex items-center gap-4">
-                <SkeletonCircle size={20} className="shrink-0" />
-                <div className="flex-1 space-y-2">
+            <SkeletonCard key={i} className="px-3 py-3 rounded-lg">
+              <div className="flex items-center gap-3">
+                <SkeletonCircle size={16} className="shrink-0" />
+                <div className="flex-1 space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <SkeletonLine width="50px" className="h-3" />
-                    <SkeletonLine width="40%" className="h-3" />
+                    <SkeletonLine width="40px" className="h-2.5" />
+                    <SkeletonLine width="35%" className="h-2.5" />
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     {[1, 2, 3, 4].map((j) => (
-                      <SkeletonLine key={j} width="30px" className="h-2.5" />
+                      <SkeletonLine key={j} width="25px" className="h-2" />
                     ))}
                   </div>
                 </div>

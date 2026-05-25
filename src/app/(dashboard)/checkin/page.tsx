@@ -67,15 +67,15 @@ const MiniBarChart = memo(function MiniBarChart({ data, metricKey }: { data: Tre
   if (data.length === 0) return null;
 
   return (
-    <div className="flex items-end gap-1 h-16">
+    <div className="flex items-end gap-1.5 h-8">
       {data.slice(-14).map((d, i) => {
         const val = (d as any)[metricKey] as number;
         const pct = (val / 5) * 100;
         return (
           <div
             key={i}
-            className="flex-1 bg-[#c8a55a] rounded-t-sm transition-all duration-300"
-            style={{ height: `${pct}%`, opacity: 0.3 + (pct / 100) * 0.7 }}
+            className="flex-1 bg-[#c8a55a]/50 rounded-t-full transition-all duration-300"
+            style={{ height: `${pct}%`, opacity: 0.35 + (pct / 100) * 0.65 }}
             title={`${val}/5`}
           />
         );
@@ -260,17 +260,14 @@ export default function CheckinPage() {
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 sm:mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-1.5">
-            <Sunrise size={20} className="text-[#c8a55a] sm:w-6 sm:h-6" />
-            <h1 className="text-lg sm:text-2xl font-bold text-white">Check-in Diario</h1>
-          </div>
-          <p className="subtitle-silent">Check-in</p>
+      <div className="flex items-center justify-between gap-3 mb-5 sm:mb-7">
+        <div className="flex items-center gap-2.5">
+          <Sunrise size={18} className="text-[#c8a55a]" />
+          <h1 className="text-lg sm:text-xl font-bold text-white">Check-in Diario</h1>
         </div>
         <button
           onClick={() => { setEditingCheckin(null); setShowModal(true); }}
-          className="bg-[#c8a55a] text-[#000000] font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+          className="border border-[#c8a55a]/30 text-[#c8a55a] font-medium px-4 py-2 rounded-lg hover:bg-[#c8a55a]/8 transition-colors text-sm"
         >
           {todayCheckin ? 'Editar hoy' : 'Check-in'}
         </button>
@@ -278,15 +275,15 @@ export default function CheckinPage() {
 
       {/* Today Summary */}
       {todayCheckin && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-xl p-3.5 sm:p-6 mb-5 sm:mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
+        <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-lg p-3 sm:p-4 mb-5 sm:mb-7">
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="text-lg">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
             <div>
-              <p className="text-white font-semibold text-sm">Tu check-in de hoy</p>
-              <p className="text-[#c8a55a] text-xs font-medium italic">«{todayCheckin.intention}»</p>
+              <p className="text-white font-medium text-xs">Tu check-in de hoy</p>
+              <p className="text-[#c8a55a]/80 text-xs italic">«{todayCheckin.intention}»</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {[
               { label: 'Emoción', val: todayCheckin.emotion },
               { label: 'Energía', val: todayCheckin.energy },
@@ -294,40 +291,40 @@ export default function CheckinPage() {
               { label: 'Estrés', val: todayCheckin.stress },
             ].map((item) => (
               <div key={item.label} className="text-center">
-                <p className="text-lg font-bold text-[#c8a55a]">{item.val}/5</p>
-                <p className="text-[10px] text-[#555]">{item.label}</p>
+                <p className="text-sm font-medium text-[#c8a55a]/70">{item.val}<span className="text-[10px] text-[#444]">/5</span></p>
+                <p className="text-[10px] text-[#444]">{item.label}</p>
               </div>
             ))}
           </div>
           {todayCheckin.note && (
-            <p className="text-xs text-[#666] mt-3 border-t border-[#1a1a1a] pt-3">{todayCheckin.note}</p>
+            <p className="text-[11px] text-[#555] mt-2.5 border-t border-[#1a1a1a] pt-2.5">{todayCheckin.note}</p>
           )}
         </div>
       )}
 
       {/* Trends */}
       {trends && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp size={18} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Tendencias</h2>
-            <span className="text-xs text-[#666]">últimos {trends.totalDays} días</span>
+        <div className="mb-7">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp size={16} className="text-[#c8a55a]/60" />
+            <h2 className="text-base font-semibold text-white">Tendencias</h2>
+            <span className="text-[11px] text-[#555]">últimos {trends.totalDays} días</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {METRIC_CONFIG.map((metric) => {
               const Icon = metric.icon;
               const val = (trends as any)[metric.key] as number;
               return (
                 <div
                   key={metric.key}
-                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-4 hover:border-[#c8a55a]/20 transition-colors touch-press"
+                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3 hover:border-[#c8a55a]/15 transition-colors touch-press"
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <Icon size={14} className="text-[#c8a55a]" />
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Icon size={12} className="text-[#c8a55a]/60" />
                     <span className="label-discrete">{metric.label}</span>
                   </div>
-                  <p className="text-xl font-bold text-white mb-1">{val.toFixed(1)}<span className="text-xs text-[#555]">/5</span></p>
+                  <p className="text-lg font-semibold text-white mb-1.5">{val.toFixed(1)}<span className="text-[10px] text-[#444]">/5</span></p>
                   <MiniBarChart data={trends.daily} metricKey={metric.key} />
                 </div>
               );
@@ -338,13 +335,13 @@ export default function CheckinPage() {
 
       {/* History */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Calendar size={18} className="text-[#c8a55a]" />
-            <h2 className="text-lg font-semibold text-white">Historial</h2>
+            <Calendar size={16} className="text-[#c8a55a]/60" />
+            <h2 className="text-base font-semibold text-white">Historial</h2>
           </div>
           {checkins.length > 0 && (
-            <span className="text-xs text-[#666] bg-[#000000] border border-[#1a1a1a] rounded-full px-3 py-1">{checkins.length} check-in{checkins.length !== 1 ? 's' : ''}</span>
+            <span className="text-[11px] text-[#555] bg-[#0a0a0a] border border-[#1a1a1a] rounded-full px-2.5 py-0.5">{checkins.length} check-in{checkins.length !== 1 ? 's' : ''}</span>
           )}
         </div>
 
@@ -358,41 +355,41 @@ export default function CheckinPage() {
           size="md"
         />
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {checkins.map((c, idx) => (
               <div
                 key={c.id}
-                className={`bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors stagger-${Math.min(idx + 1, 6)}`}
+                className={`bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-3 group hover:border-[#222] transition-colors stagger-${Math.min(idx + 1, 6)}`}
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                    <span className="text-base">{c.emotion >= 4 ? '😊' : c.emotion >= 3 ? '😐' : '😔'}</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#c8a55a]/8 flex items-center justify-center shrink-0">
+                    <span className="text-sm">{c.emotion >= 4 ? '😊' : c.emotion >= 3 ? '😐' : '😔'}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#999]">{formatDate(c.date)}</span>
-                      <span className="text-[#c8a55a] text-xs font-medium truncate">«{c.intention}»</span>
+                      <span className="text-[11px] text-[#888]">{formatDate(c.date)}</span>
+                      <span className="text-[#c8a55a]/70 text-[11px] font-medium truncate">«{c.intention}»</span>
                     </div>
-                    <div className="flex gap-4 mt-1">
+                    <div className="flex gap-3 mt-0.5">
                       {[
                         { label: 'Emoción', val: c.emotion },
                         { label: 'Energía', val: c.energy },
                         { label: 'Enfoque', val: c.focus },
                         { label: 'Estrés', val: c.stress },
                       ].map((item) => (
-                        <span key={item.label} className="text-[10px] text-[#555]">
-                          {item.label} <span className="text-[#c8a55a]/80">{item.val}</span>
+                        <span key={item.label} className="text-[10px] text-[#444]">
+                          {item.label} <span className="text-[#c8a55a]/60">{item.val}</span>
                         </span>
                       ))}
                     </div>
-                    {c.note && <p className="text-[10px] text-[#444] mt-1 truncate">{c.note}</p>}
+                    {c.note && <p className="text-[10px] text-[#3a3a3a] mt-0.5 truncate">{c.note}</p>}
                   </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditCheckin(c)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
-                      <Pencil size={14} />
+                  <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-[#c8a55a]/8 text-[#444] hover:text-[#c8a55a] transition-all touch-press-sm" title="Editar">
+                      <Pencil size={13} />
                     </button>
-                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
-                      <Trash2 size={14} />
+                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/8 text-[#444] hover:text-red-400 transition-all touch-press-sm" title="Eliminar">
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
