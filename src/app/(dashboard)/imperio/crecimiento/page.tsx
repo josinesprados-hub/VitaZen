@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { SCREENSHOT_JOURNAL_ENTRIES } from '@/lib/screenshot-data';
 import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock, X, Check } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -77,6 +79,7 @@ function MoodDisplay({ mood }: { mood: number | null }) {
 export default function CrecimientoPage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', mood: 3, gratitude: '' });
@@ -101,6 +104,13 @@ export default function CrecimientoPage() {
   }, [editingEntry, pendingDeleteId]);
 
   const fetchData = useCallback(async () => {
+    // ── Screenshot mode: use frozen demo data, skip API calls ──
+    if (screenshotMode) {
+      setEntries(SCREENSHOT_JOURNAL_ENTRIES as JournalEntry[]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setFetchError(false);
     try {
@@ -117,7 +127,7 @@ export default function CrecimientoPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
     fetchData();
@@ -299,12 +309,14 @@ export default function CrecimientoPage() {
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
           </h2>
+          {!screenshotMode && (
           <button
             onClick={() => setShowAdd(!showAdd)}
             className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
           >
             <Plus size={18} /> Nueva entrada
           </button>
+          )}
         </div>
 
 
@@ -365,6 +377,7 @@ export default function CrecimientoPage() {
                       {/* Top row: title + actions */}
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <h4 className="text-[#c8a55a] font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#666] italic">Sin título</span>}</h4>
+                        {!screenshotMode && (
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <button
                             onClick={() => startEdit(entry)}
@@ -381,6 +394,7 @@ export default function CrecimientoPage() {
                             <Trash2 size={14} />
                           </button>
                         </div>
+                        )}
                       </div>
 
                       {/* Date + Time row */}

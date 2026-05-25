@@ -362,13 +362,122 @@ export const SCREENSHOT_SILENT_MEMORY = {
   date: new Date(Date.now() - 47 * 86400000).toISOString(),
 };
 
+// ─── Journal Entries (Crecimiento) ──────────
+// Elena's diary over ~2 weeks.
+// Human, imperfect: some short, some long, varied moods,
+// some with gratitude, some without, some edited.
+// Feels like a real person's journal — not a demo.
+
+export const SCREENSHOT_JOURNAL_ENTRIES = [
+  // ── Hoy ──
+  {
+    id: 'demo-journal-1',
+    title: 'Día tranquilo',
+    content: 'Nada extraordinario. Café, ventana, silencio. A veces un día sin ruido es el mejor regalo que te puedes dar. No necesité hacer nada especial para sentir que estaba bien.',
+    mood: 4,
+    gratitude: 'La luz de la mañana en la cocina',
+    createdAt: new Date(Date.now() - 2 * 3600000).toISOString(), // 2h ago
+    updatedAt: new Date(Date.now() - 1 * 3600000).toISOString(), // edited 1h ago
+  },
+  {
+    id: 'demo-journal-2',
+    title: 'Reunión difícil',
+    content: 'La reunión de las 10 fue tensa. No dije lo que pensaba hasta el final, y cuando lo dije salió mejor de lo que esperaba. Me recordó que no siempre hay que tener la respuesta inmediata. A veces esperar es también una forma de participar.',
+    mood: 2,
+    gratitude: null,
+    createdAt: new Date(Date.now() - 6 * 3600000).toISOString(), // 6h ago
+    updatedAt: new Date(Date.now() - 6 * 3600000).toISOString(),
+  },
+
+  // ── Ayer ──
+  {
+    id: 'demo-journal-3',
+    title: 'Caminata sin rumbo',
+    content: 'Salí a caminar sin destino y acabé en el parque. Me senté un rato. No pensé en nada concreto, solo escuché los pájaros y el ruido lejano de la calle.',
+    mood: 4,
+    gratitude: 'El silencio entre los árboles',
+    createdAt: new Date(Date.now() - 1 * 86400000 - 10 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 86400000 - 10 * 3600000).toISOString(),
+  },
+  {
+    id: 'demo-journal-4',
+    title: 'Sin motivación',
+    content: 'Me costó levantarme. Nada grave, solo ese peso invisible que a veces aparece. No luché contra él. Lo dejé estar y al final del día estaba un poco mejor. No siempre hay que ganar la batalla del lunes.',
+    mood: 2,
+    gratitude: null,
+    createdAt: new Date(Date.now() - 1 * 86400000 - 18 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 86400000 - 18 * 3600000).toISOString(),
+  },
+
+  // ── Esta semana ──
+  {
+    id: 'demo-journal-5',
+    title: 'Algo cambió',
+    content: 'No sé explicarlo bien. Hoy me di cuenta de que llevaba semanas queriendo hacer algo y hoy simplemente lo hice. Sin plan, sin preparación. A veces el impulso es más honesto que la estrategia.',
+    mood: 5,
+    gratitude: 'Darme cuenta de que no necesito hacerlo todo perfecto',
+    createdAt: new Date(Date.now() - 3 * 86400000 - 20 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 3 * 86400000 - 18 * 3600000).toISOString(), // edited
+  },
+  {
+    id: 'demo-journal-6',
+    title: 'Progresos pequeños',
+    content: 'Hoy completé 3 hábitos antes del mediodía. No parece mucho, pero hace un mes ni me acordaba de mirar la app por las mañanas. El cambio es lento y casi invisible hasta que miras atrás.',
+    mood: 3,
+    gratitude: 'La llamada con Carlota',
+    createdAt: new Date(Date.now() - 4 * 86400000 - 14 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 4 * 86400000 - 14 * 3600000).toISOString(),
+  },
+  {
+    id: 'demo-journal-7',
+    title: 'Cansancio bueno',
+    content: 'Terminé el día agotada, pero de ese cansancio que viene de haber hecho cosas que importan. No de ese otro, el de dar vueltas sin moverse.',
+    mood: 3,
+    gratitude: null,
+    createdAt: new Date(Date.now() - 5 * 86400000 - 22 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 5 * 86400000 - 22 * 3600000).toISOString(),
+  },
+
+  // ── Hace 2 semanas ──
+  {
+    id: 'demo-journal-8',
+    title: 'Vuelta a empezar',
+    content: 'Después de una semana sin escribir, volví. No hay culpa. Solo el hecho de abrir la app y escribir algo ya es suficiente. No necesito recuperar los días perdidos, solo estar aquí ahora.',
+    mood: 3,
+    gratitude: 'Empezar de nuevo sin culpa',
+    createdAt: new Date(Date.now() - 10 * 86400000 - 19 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 10 * 86400000 - 19 * 3600000).toISOString(),
+  },
+  {
+    id: 'demo-journal-9',
+    title: 'Primera vez en semanas',
+    content: 'Hoy medité 15 minutos seguidos. Hacía semanas que no pasaba de 5. No fue fácil al principio, la mente no paraba. Pero en algún momento se calmó sola. No la forcé.',
+    mood: 4,
+    gratitude: null,
+    createdAt: new Date(Date.now() - 11 * 86400000 - 8 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 11 * 86400000 - 8 * 3600000).toISOString(),
+  },
+  {
+    id: 'demo-journal-10',
+    title: 'Reflexión de abril',
+    content: 'Cerré el mes sin hacer el cierre formal. Solo me senté a pensar en qué fue abril. Hubo días buenos y días donde solo quería que terminara la semana. Pero aquí sigo. Eso cuenta.',
+    mood: 3,
+    gratitude: 'Cerrar el mes a mi manera',
+    createdAt: new Date(Date.now() - 13 * 86400000 - 21 * 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 13 * 86400000 - 21 * 3600000).toISOString(),
+  },
+];
+
 // ─── Achievements for Logros page ────────────
-// A mix of unlocked and in-progress achievements
+// Full 45 achievements: 27 visible + 18 hidden
+// Mix of unlocked, in-progress, mystery, and truly hidden.
+// Coherent story: ~3 months of use, uneven progress,
+// some weeks better than others, some habits newer.
 
 export const SCREENSHOT_ACHIEVEMENTS = {
-  stats: { total: 27, unlocked: 8, percent: 30 },
+  stats: { total: 45, unlocked: 15, percent: 33 },
   achievements: [
-    // Unlocked
+    // ═══ UNLOCKED — VISIBLE (13) ═══
     { key: 'meditation_first', title: 'Primer Silencio', description: 'Tu primera pausa consciente', category: 'meditation', icon: 'Wind', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-02-14T08:00:00.000Z', hidden: false },
     { key: 'journal_first', title: 'Primera Página', description: 'Tu primera reflexión escrita', category: 'journal', icon: 'BookOpen', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-02-14T22:00:00.000Z', hidden: false },
     { key: 'wellness_first', title: 'Primer Escucha', description: 'Tu primer registro de bienestar', category: 'wellness', icon: 'Heart', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-02-15T07:00:00.000Z', hidden: false },
@@ -377,25 +486,47 @@ export const SCREENSHOT_ACHIEVEMENTS = {
     { key: 'finance_first', title: 'Primer Registro', description: 'Tu primer movimiento financiero', category: 'finance', icon: 'Wallet', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-02-17T18:00:00.000Z', hidden: false },
     { key: 'nutrition_first', title: 'Atención al Cuerpo', description: 'Tu primer registro alimentario', category: 'nutrition', icon: 'Utensils', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-03-01T13:00:00.000Z', hidden: false },
     { key: 'finance_income_first', title: 'Entró Algo', description: 'Tu primer ingreso registrado', category: 'finance', icon: 'PiggyBank', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-03-05T09:00:00.000Z', hidden: false },
-
-    // In-progress — varying levels
-    { key: 'meditation_10', title: 'Calma Reencontrada', description: '10 sesiones de meditación', category: 'meditation', icon: 'Wind', target: 10, current: 7, percent: 70, unlocked: false, unlockedAt: null, hidden: false },
-    { key: 'journal_10', title: 'Voces que Vuelven', description: '10 entradas en tu diario', category: 'journal', icon: 'BookOpen', target: 10, current: 12, percent: 100, unlocked: true, unlockedAt: '2026-04-02T21:00:00.000Z', hidden: false },
+    { key: 'journal_10', title: 'Voces que Vuelven', description: '10 entradas en tu diario', category: 'journal', icon: 'BookOpen', target: 10, current: 10, percent: 100, unlocked: true, unlockedAt: '2026-04-02T21:00:00.000Z', hidden: false },
     { key: 'checkin_7', title: 'Semana Consciente', description: '7 check-ins diarios', category: 'checkin', icon: 'Sun', target: 7, current: 7, percent: 100, unlocked: true, unlockedAt: '2026-03-20T07:00:00.000Z', hidden: false },
-    { key: 'wellness_15', title: 'Observación Constante', description: '15 registros de bienestar', category: 'wellness', icon: 'Heart', target: 15, current: 11, percent: 73, unlocked: false, unlockedAt: null, hidden: false },
     { key: 'habits_5', title: 'Ritmo Interior', description: '5 hábitos activos', category: 'habits', icon: 'CheckCircle', target: 5, current: 5, percent: 100, unlocked: true, unlockedAt: '2026-03-10T08:00:00.000Z', hidden: false },
-    { key: 'habits_steady_14', title: 'Constancia Tranquila', description: '14 días seguidos en un hábito', category: 'habits', icon: 'Flame', target: 14, current: 9, percent: 64, unlocked: false, unlockedAt: null, hidden: false },
-    { key: 'meditation_30', title: 'Silencio Habitual', description: '30 sesiones de meditación', category: 'meditation', icon: 'Wind', target: 30, current: 18, percent: 60, unlocked: false, unlockedAt: null, hidden: false },
-    { key: 'journal_30', title: 'Rastro Escrito', description: '30 entradas en tu diario', category: 'journal', icon: 'BookOpen', target: 30, current: 22, percent: 73, unlocked: false, unlockedAt: null, hidden: false },
-    { key: 'nutrition_15', title: 'Cuerpo Escuchado', description: '15 registros de nutrición', category: 'nutrition', icon: 'Utensils', target: 15, current: 8, percent: 53, unlocked: false, unlockedAt: null, hidden: false },
-    { key: 'finance_20', title: 'Memoria Económica', description: '20 registros financieros', category: 'finance', icon: 'Wallet', target: 20, current: 17, percent: 85, unlocked: false, unlockedAt: null, hidden: false },
-    { key: 'checkin_30', title: 'Mes Presente', description: '30 check-ins diarios', category: 'checkin', icon: 'Sun', target: 30, current: 23, percent: 77, unlocked: false, unlockedAt: null, hidden: false },
     { key: 'empire_all', title: 'Cinco Caminos', description: 'Actividad en los 5 imperios', category: 'general', icon: 'Crown', target: 5, current: 5, percent: 100, unlocked: true, unlockedAt: '2026-03-15T19:00:00.000Z', hidden: false },
     { key: 'monthly_closure_first', title: 'Primer Cierre', description: 'Tu primer cierre mensual', category: 'general', icon: 'Calendar', target: 1, current: 1, percent: 100, unlocked: true, unlockedAt: '2026-04-01T20:00:00.000Z', hidden: false },
-    { key: 'monthly_closure_3', title: 'Tiempo Reflexionado', description: '3 cierres mensuales', category: 'general', icon: 'Calendar', target: 3, current: 2, percent: 67, unlocked: false, unlockedAt: null, hidden: false },
+
+    // ═══ IN-PROGRESS — VISIBLE (14) ═══
+    // Varying progress levels: some close, some far, some just started
+    { key: 'meditation_10', title: 'Calma Reencontrada', description: '10 sesiones de meditación', category: 'meditation', icon: 'Wind', target: 10, current: 7, percent: 70, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'meditation_30', title: 'Silencio Habitual', description: '30 sesiones de meditación', category: 'meditation', icon: 'Wind', target: 30, current: 18, percent: 60, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'meditation_100', title: 'Respiración Profunda', description: '100 sesiones de meditación', category: 'meditation', icon: 'Wind', target: 100, current: 18, percent: 18, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'journal_30', title: 'Rastro Escrito', description: '30 entradas en tu diario', category: 'journal', icon: 'BookOpen', target: 30, current: 22, percent: 73, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'journal_100', title: 'Memoria Viva', description: '100 entradas en tu diario', category: 'journal', icon: 'BookOpen', target: 100, current: 22, percent: 22, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'wellness_15', title: 'Observación Constante', description: '15 registros de bienestar', category: 'wellness', icon: 'Heart', target: 15, current: 11, percent: 73, unlocked: false, unlockedAt: null, hidden: false },
     { key: 'wellness_50', title: 'Consciencia Asentada', description: '50 registros de bienestar', category: 'wellness', icon: 'Heart', target: 50, current: 24, percent: 48, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'habits_steady_14', title: 'Constancia Tranquila', description: '14 días seguidos en un hábito', category: 'habits', icon: 'Flame', target: 14, current: 9, percent: 64, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'nutrition_15', title: 'Cuerpo Escuchado', description: '15 registros de nutrición', category: 'nutrition', icon: 'Utensils', target: 15, current: 8, percent: 53, unlocked: false, unlockedAt: null, hidden: false },
     { key: 'nutrition_50', title: 'Cuidado Sostenido', description: '50 registros de nutrición', category: 'nutrition', icon: 'Utensils', target: 50, current: 14, percent: 28, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'finance_20', title: 'Memoria Económica', description: '20 registros financieros', category: 'finance', icon: 'Wallet', target: 20, current: 17, percent: 85, unlocked: false, unlockedAt: null, hidden: false },
     { key: 'finance_50', title: 'Trayectoria Clara', description: '50 registros financieros', category: 'finance', icon: 'Wallet', target: 50, current: 33, percent: 66, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'checkin_30', title: 'Mes Presente', description: '30 check-ins diarios', category: 'checkin', icon: 'Sun', target: 30, current: 23, percent: 77, unlocked: false, unlockedAt: null, hidden: false },
+    { key: 'monthly_closure_3', title: 'Tiempo Reflexionado', description: '3 cierres mensuales', category: 'general', icon: 'Calendar', target: 3, current: 2, percent: 67, unlocked: false, unlockedAt: null, hidden: false },
+
+    // ═══ UNLOCKED — HIDDEN (2) ═══
+    // These appeared as mysteries and got unlocked — feels rewarding
+    { key: 'hidden_finance_both_5', title: 'Dos Direcciones', description: '5 ingresos y 5 gastos registrados', category: 'finance', icon: 'TrendingUp', target: 5, current: 5, percent: 100, unlocked: true, unlockedAt: '2026-04-10T16:00:00.000Z', hidden: false }, // revealed after unlock
+    { key: 'hidden_streak_7_checkin', title: 'Siete Mañanas', description: '7 check-ins consecutivos', category: 'checkin', icon: 'Zap', target: 7, current: 7, percent: 100, unlocked: true, unlockedAt: '2026-03-21T07:00:00.000Z', hidden: false }, // revealed after unlock
+
+    // ═══ MYSTERY — Hidden near-unlock (≥75%) (3) ═══
+    // Title/description hidden, shown as "???" with progress visible
+    { key: 'hidden_gratitude_10', title: '???', description: 'Algo está por aparecer', category: 'journal', icon: 'Sparkles', target: 10, current: 8, percent: 80, unlocked: false, unlockedAt: null, hidden: true },
+    { key: 'hidden_wellness_all_moods', title: '???', description: 'Algo está por aparecer', category: 'wellness', icon: 'Eye', target: 5, current: 4, percent: 80, unlocked: false, unlockedAt: null, hidden: true },
+    { key: 'hidden_finance_context_10', title: '???', description: 'Algo está por aparecer', category: 'finance', icon: 'MessageCircle', target: 10, current: 8, percent: 80, unlocked: false, unlockedAt: null, hidden: true },
+
+    // ═══ TRULY HIDDEN — not included ═══
+    // In the real system (buildAchievementResponse), hidden achievements
+    // with <75% progress are excluded from the response entirely.
+    // They still count toward stats.total (45), but are never shown.
+    // This matches that behavior: the 13 truly hidden ones exist in the
+    // system but won't appear as cards — only as the gap between
+    // visible cards (32) and stats.total (45).
   ],
   newlyUnlocked: [],
 };
