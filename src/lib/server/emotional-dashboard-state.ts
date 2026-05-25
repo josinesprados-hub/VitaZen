@@ -51,16 +51,6 @@ interface ReflectionState {
   visitTotal: number;
 }
 
-interface TipCycleState {
-  freeOrder: number[];
-  freePosition: number;
-  premiumOrder: number[];
-  premiumPosition: number;
-  cycleStart: number;
-  recentFree: number[];
-  recentPremium: number[];
-}
-
 interface MemoryState {
   lastShown: Record<SilentMemoryType, string | null>;
   shown: string[];
@@ -79,8 +69,6 @@ export interface EmotionalDashboardSnapshot {
 
 const SILENCE_PATTERN = [false, false, true]; // 2 show, 1 rest — ~35% silence
 const FREE_TIPS_VISIBLE = 2;
-const AVOID_RECENT_COUNT = 6;
-const CYCLE_MS = 3 * 24 * 60 * 60 * 1000; // 3-day tip cycle
 const WEIGHTS: Record<ReflectionWeight, number> = {
   light: 0.50,
   relevant: 0.35,
@@ -455,7 +443,27 @@ export async function getEmotionalDashboardSnapshot(
   };
 }
 
-// ─── Tips: Server-Side Deterministic Rotation ─
+// ─── Tips: Server-Side Deterministic Date-Based Rotation ─
+//
+// The position is computed from the date — NOT stored in DB state.
+// This eliminates all rotation bugs caused by:
+//   - Write race conditions (emotional snapshot + tips writing concurrently)
+//   - Lost state (server restarts, DB errors, corrupted JSON)
+//   - cycleStart drift (timezone, server clock differences)
+//
+// How it works:
+//   - cycleIndex = floor(daysSinceEpoch / 3) — changes every 3 days
+//   - For each cycleIndex, a deterministic shuffle is produced
+//     from seed = userId:empire:cycleIndex
+//   - FREE position = (cycleIndex * 2) % freeCount within that shuffle
+//   - PREMIUM position = cycleIndex % premiumCount within that shuffle
+//
+// Same userId + same date = same tips everywhere. No state needed for position.
+// State is only persisted for recentFree/recentPremium (avoid-recent tracking).
+
+// Reference epoch: 2025-01-01 (a fixed date so cycleIndex is predictable)
+const TIPS_EPOCH = new Date('2025-01-01T00:00:00Z').getTime();
+const CYCLE_DAYS = 3; // Tips rotate every 3 days
 
 export async function getDeterministicTips(
   userId: string,
@@ -464,135 +472,50 @@ export async function getDeterministicTips(
 ) {
   if (allTips.length === 0) return { freeTips: [], premiumTips: [] };
 
-  const state = await getOrCreateState(userId);
-
-  let tipsState: Record<string, TipCycleState>;
-  try {
-    tipsState = JSON.parse(state.tipsState);
-    if (typeof tipsState !== 'object' || tipsState === null) tipsState = {};
-  } catch {
-    tipsState = {};
-  }
-
   const freeTipsAll = allTips.filter(t => t.plan !== 'PREMIUM');
   const premiumTipsAll = allTips.filter(t => t.plan === 'PREMIUM');
   const freeCount = freeTipsAll.length;
   const premiumCount = premiumTipsAll.length;
 
-  let empireState = tipsState[empire] as TipCycleState | undefined;
+  // ─── Compute cycle index from date ───
+  // cycleIndex increments every 3 days since epoch.
+  // Same date on any device = same cycleIndex = same tips.
+  const daysSinceEpoch = Math.floor((Date.now() - TIPS_EPOCH) / 86400000);
+  const cycleIndex = Math.floor(daysSinceEpoch / CYCLE_DAYS);
 
-  // Create or validate empire state
-  if (
-    !empireState ||
-    !empireState.freeOrder ||
-    empireState.freeOrder.length !== freeCount ||
-    !empireState.premiumOrder ||
-    empireState.premiumOrder.length !== premiumCount
-  ) {
-    // Use deterministic shuffle based on userId + empire + dateKey
-    const dateKey = getTodayDateKey();
-    const seed = `${userId}:${empire}:${dateKey}`;
-    empireState = {
-      freeOrder: deterministicShuffle(freeCount, seed + ':free'),
-      freePosition: 0,
-      premiumOrder: deterministicShuffle(premiumCount, seed + ':premium'),
-      premiumPosition: 0,
-      cycleStart: Date.now(),
-      recentFree: [],
-      recentPremium: [],
-    };
-  }
-
-  // Advance if cycle has passed
-  const now = Date.now();
-  const elapsed = now - empireState.cycleStart;
-
-  if (elapsed >= CYCLE_MS) {
-    empireState.freePosition += FREE_TIPS_VISIBLE;
-    if (empireState.freePosition >= freeCount) {
-      const dateKey = getTodayDateKey();
-      const seed = `${userId}:${empire}:${dateKey}:r${empireState.recentFree.join(',')}`;
-      empireState.freeOrder = deterministicShuffle(freeCount, seed + ':free');
-      empireState.freePosition = 0;
-      empireState.recentFree = [];
-    }
-
-    empireState.premiumPosition += 1;
-    if (empireState.premiumPosition >= premiumCount) {
-      const dateKey = getTodayDateKey();
-      const seed = `${userId}:${empire}:${dateKey}:r${empireState.recentPremium.join(',')}`;
-      empireState.premiumOrder = deterministicShuffle(premiumCount, seed + ':premium');
-      empireState.premiumPosition = 0;
-      empireState.recentPremium = [];
-    }
-
-    empireState.cycleStart = now;
-  }
-
-  // ─── Defensive clamping ───
-  // Guard against corrupted state where position exceeds count.
-  if (freeCount > 0 && empireState.freePosition >= freeCount) {
-    empireState.freePosition = 0;
-  }
-  if (premiumCount > 0 && empireState.premiumPosition >= premiumCount) {
-    empireState.premiumPosition = 0;
-  }
+  // ─── Deterministic shuffle for this cycle ───
+  // Each cycleIndex produces a unique shuffle order.
+  // With 50 FREE tips and 3-day cycles, we get 25 unique cycles
+  // before wrapping — enough variety for 75 days before repeating.
+  const freeOrder = deterministicShuffle(freeCount, `${userId}:${empire}:${cycleIndex}:free`);
+  const premiumOrder = deterministicShuffle(premiumCount, `${userId}:${empire}:${cycleIndex}:premium`);
 
   // ─── Select FREE tips — ALWAYS exactly 2 ───
-  // Wraps around the shuffled order if needed to guarantee 2 tips.
-  // With 50 FREE tips per empire, this is always satisfiable.
+  // Position within the shuffled order: advances 2 per cycle.
+  // Wraps around when it reaches the end.
   const selectedFree: typeof allTips = [];
-  const freeIndices: number[] = [];
   if (freeCount > 0) {
+    const basePosition = (cycleIndex * FREE_TIPS_VISIBLE) % freeCount;
     const needed = Math.min(FREE_TIPS_VISIBLE, freeCount);
     for (let i = 0; i < needed; i++) {
-      // Wrap around: if we reach the end, continue from the beginning
-      const pos = (empireState.freePosition + i) % freeCount;
-      const idx = empireState.freeOrder[pos];
+      const pos = (basePosition + i) % freeCount;
+      const idx = freeOrder[pos];
       if (idx !== undefined && freeTipsAll[idx]) {
         selectedFree.push(freeTipsAll[idx]);
-        freeIndices.push(idx);
       }
     }
   }
 
-  // Track recent free indices
-  empireState.recentFree = [...empireState.recentFree, ...freeIndices].slice(-AVOID_RECENT_COUNT);
-
   // ─── Select PREMIUM tip — ALWAYS exactly 1 ───
   // From the ÉLITE-only battery. Never mixed with FREE.
+  // Advances 1 per cycle.
   const selectedPremium: typeof allTips = [];
-  const premiumIndices: number[] = [];
   if (premiumCount > 0) {
-    const pos = empireState.premiumPosition % premiumCount;
-    const idx = empireState.premiumOrder[pos];
+    const pos = cycleIndex % premiumCount;
+    const idx = premiumOrder[pos];
     if (idx !== undefined && premiumTipsAll[idx]) {
       selectedPremium.push(premiumTipsAll[idx]);
-      premiumIndices.push(idx);
     }
-  }
-
-  empireState.recentPremium = [...empireState.recentPremium, ...premiumIndices].slice(-AVOID_RECENT_COUNT);
-
-  // Persist updated tips state — wrap in try/catch so tips are still
-  // returned even if the DB write fails (e.g. connection issue, race).
-  // A failed write means the next request recomputes from stale state,
-  // which is acceptable — tips still render.
-  tipsState[empire] = empireState;
-  try {
-    await db.emotionalDashboardState.upsert({
-      where: { userId },
-      update: {
-        tipsState: JSON.stringify(tipsState),
-      },
-      create: {
-        userId,
-        tipsState: JSON.stringify(tipsState),
-        dateKey: getTodayDateKey(),
-      },
-    });
-  } catch (persistError) {
-    console.error('[Tips] Failed to persist tip cycle state — tips will still be returned:', persistError);
   }
 
   return { freeTips: selectedFree, premiumTips: selectedPremium };
