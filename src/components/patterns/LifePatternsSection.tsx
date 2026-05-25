@@ -21,6 +21,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { Circle, Link2 } from 'lucide-react';
 import { EMPTY_STATE_MESSAGE, SECTION_TITLE, SECTION_SUBTITLE } from '@/lib/patterns/copy';
@@ -210,12 +211,13 @@ function SilentSkeleton() {
 
 export default function LifePatternsSection() {
   const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const { apiFetch } = useApi();
   const [data, setData] = useState<PatternsResponse | null>(null);
   const [mounted, setMounted] = useState(false);
   const fetchedRef = useRef(false);
 
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   // Mount guard — prevent hydration issues with localStorage
   useEffect(() => { setMounted(true); }, []);

@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const { apiFetch } = useApi();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isActive: screenshotMode } = useScreenshotMode();
+  const { isActive: screenshotMode, displayUser } = useScreenshotMode();
   const [empires, setEmpires] = useState<EmpireData[]>([]);
   const [loading, setLoading] = useState(true);
   const [todayCheckin, setTodayCheckin] = useState<any | null>(null);
@@ -145,7 +145,7 @@ export default function DashboardPage() {
           {/* 1. Greeting — human, not UI */}
           <div className="dash-section-enter dash-section-delay-1 pt-2 sm:pt-4">
             <h1 className="title-page">
-              {timeGreeting}, <span className="text-[#c8a55a]">{user?.name || ''}</span>
+              {timeGreeting}, <span className="text-[#c8a55a]">{displayUser?.name || ''}</span>
             </h1>
             <SilentMemory />
           </div>

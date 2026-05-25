@@ -2,7 +2,7 @@
 
 import { Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -38,7 +38,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ onMenuClick }: TopBarProps) {
-  const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const pathname = usePathname();
   const pageTitle = getPageTitle(pathname);
 
@@ -64,7 +64,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
         {/* Right: quiet Élite whisper — the only desktop element */}
         <div className="flex items-center">
-          {user?.plan === 'PREMIUM' && (
+          {displayUser?.plan === 'PREMIUM' && (
             <span className="text-[9px] font-medium text-[#c8a55a]/40 tracking-wider">
               Élite
             </span>

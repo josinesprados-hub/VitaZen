@@ -167,10 +167,10 @@ export default function InsightsPage() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
   const router = useRouter();
-  const { isActive: screenshotMode } = useScreenshotMode();
+  const { isActive: screenshotMode, displayUser } = useScreenshotMode();
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const isPremium = screenshotMode ? true : (user?.plan === 'PREMIUM');
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   const fetchInsights = useCallback(async () => {
     // ── Screenshot mode: use mock data, skip API calls ──

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { useRouter } from 'next/navigation';
 import {
@@ -36,11 +37,12 @@ import {
 
 export default function ElitePage() {
   const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const { apiFetch } = useApi();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   const handleUpgrade = async () => {
     setLoading(true);

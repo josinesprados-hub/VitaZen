@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { Check, Loader2, Link2, Circle, Eye } from 'lucide-react';
 
@@ -16,6 +17,7 @@ import { Check, Loader2, Link2, Circle, Eye } from 'lucide-react';
 
 export default function PricingPage() {
   const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const { apiFetch } = useApi();
   const [loading, setLoading] = useState(false);
 
@@ -156,7 +158,7 @@ export default function PricingPage() {
             ))}
           </div>
 
-          {user?.plan === 'PREMIUM' ? (
+          {displayUser?.plan === 'PREMIUM' ? (
             <button
               onClick={handleManage}
               disabled={loading}

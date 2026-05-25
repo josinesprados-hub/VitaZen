@@ -25,7 +25,7 @@ interface SubscriptionData {
   cancelAtPeriodEnd: boolean;
 }
 
-interface UserData {
+export interface UserData {
   id: string;
   firebaseUid: string;
   email: string;

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { Switch } from '@/components/ui/switch';
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
 import { SubscriptionManager } from '@/components/settings/SubscriptionManager';
@@ -23,6 +24,7 @@ const APP_VERSION = '0.2.0';
 
 export default function AjustesPage() {
   const { user, firebaseUser, signOut, refreshUser } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const router = useRouter();
 
   const [settings, setSettings] = useState({
@@ -311,7 +313,7 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#999]">Plan</p>
             <div className="flex items-center gap-2">
-              {user?.plan === 'PREMIUM' ? (
+              {displayUser?.plan === 'PREMIUM' ? (
                 <span className="text-[9px] font-medium text-[#c8a55a]/50">Élite</span>
               ) : (
                 <span className="text-[9px] font-medium text-[#555]">Free</span>
@@ -320,7 +322,7 @@ export default function AjustesPage() {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#999]">Email verificado</p>
-            {user?.emailVerified ? (
+            {displayUser?.emailVerified ? (
               <span className="flex items-center gap-1.5 text-sm text-[#c8a55a]">
                 <Check size={14} />
                 Verificado

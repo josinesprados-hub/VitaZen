@@ -163,12 +163,12 @@ function getCategoryHref(category: string): string {
 export function WeeklyRecap() {
   const { user } = useAuth();
   const { apiFetch } = useApi();
-  const { isActive: screenshotMode } = useScreenshotMode();
+  const { isActive: screenshotMode, displayUser } = useScreenshotMode();
   const [data, setData] = useState<RecapData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
-  const isPremium = screenshotMode ? true : (user?.plan === 'PREMIUM');
+  const isPremium = screenshotMode ? true : (displayUser?.plan === 'PREMIUM');
 
   const fetchRecap = useCallback(async () => {
     // ── Screenshot mode: use mock data, skip API calls ──

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import {
   Shield,
   Brain,
@@ -40,6 +41,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const { displayUser } = useScreenshotMode();
 
   // Lock body scroll when sidebar is open on mobile.
   // overflow:hidden prevents background scrolling without position:fixed,
@@ -218,20 +220,20 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               className="flex items-center gap-3 mb-3 hover:opacity-80 transition-opacity"
             >
               <div className="w-9 h-9 rounded-full bg-[#c8a55a]/20 flex items-center justify-center text-[#c8a55a] text-sm font-bold overflow-hidden">
-                {user?.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                {displayUser?.avatarUrl ? (
+                  <img src={displayUser.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  user?.name?.charAt(0)?.toUpperCase() || 'V'
+                  displayUser?.name?.charAt(0)?.toUpperCase() || 'V'
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white truncate">{user?.name || 'Usuario'}</p>
-                <p className="text-xs text-[#c8a55a]/50">{user?.plan === 'PREMIUM' ? 'Élite' : 'Free'}</p>
+                <p className="text-sm text-white truncate">{displayUser?.name || 'Usuario'}</p>
+                <p className="text-xs text-[#c8a55a]/50">{displayUser?.plan === 'PREMIUM' ? 'Élite' : 'Free'}</p>
               </div>
             </Link>
 
             {/* Élite entry — navigates to Élite page, not Stripe direct */}
-            {user?.plan === 'FREE' ? (
+            {displayUser?.plan === 'FREE' ? (
               <button
                 onClick={() => {
                   onClose();

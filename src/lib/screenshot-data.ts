@@ -25,11 +25,33 @@
 import type { EmotionalState, EmotionalMetric } from './emotional-state';
 
 // ─── Demo User Identity ──────────────────────
+// Coherent editorial identity for screenshot mode.
+// This is the ONLY user data the UI should render
+// when screenshot mode is active.
 
 export const SCREENSHOT_USER = {
+  id: 'screenshot-editorial',
+  firebaseUid: 'screenshot-editorial',
   name: 'Elena',
+  email: 'elena@vitazen.app',
   plan: 'PREMIUM' as const,
+  avatarUrl: null as string | null,  // Uses initial "E" — clean & editorial
+  country: 'España',
+  city: 'Madrid',
+  age: 31,
+  bio: 'Aprendiendo a estar presente.',
   onboardingCompleted: true,
+  emailVerified: true,
+  createdAt: '2026-02-14T08:00:00.000Z',
+  subscription: {
+    id: 'sub-screenshot',
+    stripeSubscriptionId: 'sub_screenshot_editorial',
+    stripePriceId: 'price_screenshot',
+    status: 'active',
+    currentPeriodStart: '2026-05-01T00:00:00.000Z',
+    currentPeriodEnd: '2026-06-01T00:00:00.000Z',
+    cancelAtPeriodEnd: false,
+  } as any,
 };
 
 // ─── Dashboard: Empires ──────────────────────

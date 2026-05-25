@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
@@ -153,11 +154,12 @@ function dayImperios(items: TimelineItem[]): string[] {
 export default function TimelinePage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   const fetchTimeline = useCallback(async (category?: string) => {
     setLoading(true);

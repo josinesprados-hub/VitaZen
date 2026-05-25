@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { MentorSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
@@ -127,6 +128,7 @@ function getProgressColor(rem: number, limit: number): string {
 export default function MentorChat({ backHref, headerIcon = 'sparkles' }: MentorChatProps) {
   const { apiFetch } = useApi();
   const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThread, setActiveThread] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -174,7 +176,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const prevUserIdRef = useRef<string | null>(null);
   const visibilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   // User-scoped storage key: prevents cross-user thread leaks on shared devices
   const storageKey = user?.id ? `${STORAGE_KEY_PREFIX}_${user.id}` : STORAGE_KEY_PREFIX;

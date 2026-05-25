@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { Circle, CreditCard, Loader2, ChevronRight, Eye } from 'lucide-react';
 
@@ -21,12 +22,13 @@ function formatDate(dateStr: string): string {
 
 export function SubscriptionManager() {
   const { user, refreshUser } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const { apiFetch } = useApi();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const isPremium = user?.plan === 'PREMIUM';
-  const subscription = user?.subscription;
+  const isPremium = displayUser?.plan === 'PREMIUM';
+  const subscription = displayUser?.subscription;
 
   const handleManageSubscription = async () => {
     setLoading(true);

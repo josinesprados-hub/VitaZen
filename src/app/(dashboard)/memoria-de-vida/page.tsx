@@ -15,6 +15,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { Circle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -67,8 +68,9 @@ interface LifeMemoryData {
 
 export default function EtapasPage() {
   const { user } = useAuth();
+  const { displayUser } = useScreenshotMode();
   const { apiFetch } = useApi();
-  const isPremium = user?.plan === 'PREMIUM';
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   const [data, setData] = useState<LifeMemoryData | null>(null);
   const [loading, setLoading] = useState(true);

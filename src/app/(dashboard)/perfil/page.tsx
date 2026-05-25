@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { NumericInput } from '@/components/ui/NumericInput';
@@ -21,6 +22,7 @@ import {
 
 export default function PerfilPage() {
   const { user, firebaseUser, refreshUser } = useAuth();
+  const { displayUser, isActive: screenshotMode } = useScreenshotMode();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -44,19 +46,19 @@ export default function PerfilPage() {
     bio: '',
   });
 
-  // Sync form with user data
+  // Sync form with display user data (screenshot or real)
   useEffect(() => {
-    if (user) {
+    if (displayUser) {
       setForm({
-        name: user.name || '',
-        avatarUrl: user.avatarUrl || '',
-        country: user.country || '',
-        city: user.city || '',
-        age: user.age?.toString() || '',
-        bio: user.bio || '',
+        name: displayUser.name || '',
+        avatarUrl: displayUser.avatarUrl || '',
+        country: displayUser.country || '',
+        city: displayUser.city || '',
+        age: displayUser.age?.toString() || '',
+        bio: displayUser.bio || '',
       });
     }
-  }, [user]);
+  }, [displayUser]);
 
   // Auto-dismiss errors after 3s
   useEffect(() => {
@@ -135,8 +137,8 @@ export default function PerfilPage() {
     });
   };
 
-  const planLabel = user?.plan === 'PREMIUM' ? 'Élite' : 'Free';
-  const isPremium = user?.plan === 'PREMIUM';
+  const planLabel = displayUser?.plan === 'PREMIUM' ? 'Élite' : 'Free';
+  const isPremium = displayUser?.plan === 'PREMIUM';
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 page-transition">
@@ -156,7 +158,7 @@ export default function PerfilPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-white">Mi Perfil</h1>
           <p className="subtitle-silent mt-1">Tu espacio, tu ritmo</p>
         </div>
-        {!editing ? (
+        {!screenshotMode && !editing ? (
           <button
             onClick={() => setEditing(true)}
             className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-lg hover:bg-[#c8a55a]/20 transition-colors touch-press"
@@ -164,7 +166,7 @@ export default function PerfilPage() {
             <Pencil size={16} />
             Editar
           </button>
-        ) : (
+        ) : !screenshotMode && editing ? (
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -201,7 +203,7 @@ export default function PerfilPage() {
               {saving ? 'Guardando...' : saved ? 'Guardado' : 'Guardar'}
             </button>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Avatar + Name Card */}
@@ -218,7 +220,7 @@ export default function PerfilPage() {
                 />
               ) : (
                 <span className="text-3xl font-bold text-[#c8a55a]">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'V'}
+                  {displayUser?.name?.charAt(0)?.toUpperCase() || 'V'}
                 </span>
               )}
             </div>
@@ -259,9 +261,9 @@ export default function PerfilPage() {
               </div>
             ) : (
               <>
-                <h2 className="text-lg font-semibold text-white">{user?.name || 'Sin nombre'}</h2>
+                <h2 className="text-lg font-semibold text-white">{displayUser?.name || 'Sin nombre'}</h2>
                 <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
-                  {user?.plan === 'PREMIUM' ? (
+                  {displayUser?.plan === 'PREMIUM' ? (
                     <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
                       <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
                       Élite
@@ -296,7 +298,7 @@ export default function PerfilPage() {
                 className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11"
               />
             ) : (
-              <p className="text-white text-sm mt-1">{user?.country || '—'}</p>
+              <p className="text-white text-sm mt-1">{displayUser?.country || '—'}</p>
             )}
           </div>
           <div>
@@ -313,7 +315,7 @@ export default function PerfilPage() {
                 className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11"
               />
             ) : (
-              <p className="text-white text-sm mt-1">{user?.city || '—'}</p>
+              <p className="text-white text-sm mt-1">{displayUser?.city || '—'}</p>
             )}
           </div>
         </div>
@@ -336,7 +338,7 @@ export default function PerfilPage() {
               className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11 w-32 rounded-md border px-3 py-2 text-sm"
             />
           ) : (
-            <p className="text-white text-sm mt-1">{user?.age ? `${user.age} años` : '—'}</p>
+            <p className="text-white text-sm mt-1">{displayUser?.age ? `${displayUser.age} años` : '—'}</p>
           )}
         </div>
 
@@ -356,7 +358,7 @@ export default function PerfilPage() {
               <p className="text-[#555] text-xs mt-1">{form.bio.length}/300</p>
             </>
           ) : (
-            <p className="text-white text-sm mt-1">{user?.bio || '—'}</p>
+            <p className="text-white text-sm mt-1">{displayUser?.bio || '—'}</p>
           )}
         </div>
       </div>
@@ -372,7 +374,7 @@ export default function PerfilPage() {
             </div>
             <div>
               <p className="text-[#999] text-xs">Email</p>
-              <p className="text-white text-sm">{user?.email || '—'}</p>
+              <p className="text-white text-sm">{displayUser?.email || '—'}</p>
             </div>
           </div>
 
@@ -388,7 +390,7 @@ export default function PerfilPage() {
               <p className="text-[#999] text-xs">Plan actual</p>
               <div className="flex items-center gap-2">
                 <p className="text-white text-sm">{planLabel}</p>
-                {user?.plan === 'PREMIUM' && (
+                {displayUser?.plan === 'PREMIUM' && (
                   <span className="text-[8px] font-medium text-[#c8a55a]/40">Activo</span>
                 )}
               </div>
@@ -401,7 +403,7 @@ export default function PerfilPage() {
             </div>
             <div>
               <p className="text-[#999] text-xs">Miembro desde</p>
-              <p className="text-white text-sm">{formatDate(user?.createdAt)}</p>
+              <p className="text-white text-sm">{formatDate(displayUser?.createdAt)}</p>
             </div>
           </div>
         </div>

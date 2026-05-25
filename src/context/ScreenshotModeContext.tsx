@@ -1,6 +1,8 @@
 'use client';
 
 import { createContext, useContext, useMemo, useEffect, type ReactNode } from 'react';
+import { useAuth, type UserData } from '@/context/AuthContext';
+import { SCREENSHOT_USER } from '@/lib/screenshot-data';
 
 // ═══════════════════════════════════════════
 // Screenshot Mode — Premium editorial layer
@@ -18,6 +20,7 @@ import { createContext, useContext, useMemo, useEffect, type ReactNode } from 'r
 //   - isActive: boolean — whether screenshot mode is active
 //   - device: 'mobile' | 'desktop' | null — device variant
 //   - hideTransient: boolean — always true when active, for CSS class
+//   - displayUser: UserData — editorial user in screenshot mode, real user otherwise
 //
 // Components check this to:
 //   - Skip API calls and render frozen demo data
@@ -30,6 +33,7 @@ import { createContext, useContext, useMemo, useEffect, type ReactNode } from 'r
 //   - Modify backend data or Prisma
 //   - Persist any state
 //   - Affect normal users
+//   - Replace the real Firebase user — only overrides VISUAL display data
 
 export type ScreenshotDevice = 'mobile' | 'desktop';
 
@@ -40,12 +44,15 @@ interface ScreenshotModeValue {
   device: ScreenshotDevice | null;
   /** Whether to hide transient UI elements (always true when active) */
   hideTransient: boolean;
+  /** Visual user identity: screenshot user when active, real user otherwise */
+  displayUser: UserData | null;
 }
 
 const ScreenshotModeContext = createContext<ScreenshotModeValue>({
   isActive: false,
   device: null,
   hideTransient: false,
+  displayUser: null,
 });
 
 /**
@@ -76,12 +83,22 @@ function parseScreenshotParams(): { active: boolean; device: ScreenshotDevice | 
 
 export function ScreenshotModeProvider({ children }: { children: ReactNode }) {
   const parsed = useMemo(() => parseScreenshotParams(), []);
+  const { user } = useAuth();
+
+  // Build displayUser: editorial identity when screenshot mode, real user otherwise
+  const displayUser = useMemo<UserData | null>(() => {
+    if (parsed.active) {
+      return SCREENSHOT_USER as UserData;
+    }
+    return user;
+  }, [parsed.active, user]);
 
   const value = useMemo<ScreenshotModeValue>(() => ({
     isActive: parsed.active,
     device: parsed.device,
     hideTransient: parsed.active,
-  }), [parsed.active, parsed.device]);
+    displayUser,
+  }), [parsed.active, parsed.device, displayUser]);
 
   // Add/remove body class for global CSS rules
   useEffect(() => {
@@ -104,12 +121,12 @@ export function ScreenshotModeProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Hook to check screenshot mode state.
- * Returns { isActive, device, hideTransient }.
+ * Hook to check screenshot mode state and get display user.
+ * Returns { isActive, device, hideTransient, displayUser }.
  *
  * Usage:
- *   const { isActive, device, hideTransient } = useScreenshotMode();
- *   if (isActive) { /* use frozen demo data *\/ }
+ *   const { isActive, displayUser } = useScreenshotMode();
+ *   // displayUser.name → 'Elena' in screenshot mode, real name otherwise
  */
 export function useScreenshotMode(): ScreenshotModeValue {
   return useContext(ScreenshotModeContext);
