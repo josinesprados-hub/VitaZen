@@ -8,10 +8,16 @@ import { SCREENSHOT_USER } from '@/lib/screenshot-data';
 // Screenshot Mode — Premium editorial layer
 // ═══════════════════════════════════════════
 //
-// Activated ONLY via ?screenshot=true query param.
-// Never active by default. Zero impact on production.
+// Activated ONLY when BOTH conditions are met:
+//   1. NEXT_PUBLIC_ENABLE_SCREENSHOT_MODE=true (env flag)
+//   2. ?screenshot=true query param in the URL
 //
-// Query params:
+// If the env flag is missing or not "true", screenshot mode
+// is completely disabled regardless of query params.
+// This prevents public access in production while keeping
+// the system reusable for future screenshot sessions.
+//
+// Query params (only when env flag is enabled):
 //   ?screenshot=true              → activate screenshot mode
 //   ?screenshot=true&device=mobile   → mobile layout variant
 //   ?screenshot=true&device=desktop  → desktop layout variant
@@ -34,6 +40,8 @@ import { SCREENSHOT_USER } from '@/lib/screenshot-data';
 //   - Persist any state
 //   - Affect normal users
 //   - Replace the real Firebase user — only overrides VISUAL display data
+//
+// To re-enable: set NEXT_PUBLIC_ENABLE_SCREENSHOT_MODE=true in .env
 
 export type ScreenshotDevice = 'mobile' | 'desktop';
 
@@ -56,10 +64,25 @@ const ScreenshotModeContext = createContext<ScreenshotModeValue>({
 });
 
 /**
+ * Check if screenshot mode is enabled via environment variable.
+ * Defaults to false if the env var is missing or not "true".
+ * This is the gatekeeper — all screenshot logic is dead without it.
+ */
+function isScreenshotModeEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_SCREENSHOT_MODE === 'true';
+}
+
+/**
  * Parse screenshot query params from current URL.
+ * Returns { active: false } unless BOTH conditions are met:
+ *   1. NEXT_PUBLIC_ENABLE_SCREENSHOT_MODE=true
+ *   2. ?screenshot=true in the URL
  * Robust parser: handles malformed URLs, extra params, etc.
  */
 function parseScreenshotParams(): { active: boolean; device: ScreenshotDevice | null } {
+  // Gate: env flag must be explicitly enabled
+  if (!isScreenshotModeEnabled()) return { active: false, device: null };
+
   if (typeof window === 'undefined') return { active: false, device: null };
   try {
     const params = new URLSearchParams(window.location.search);
@@ -135,8 +158,10 @@ export function useScreenshotMode(): ScreenshotModeValue {
 /**
  * Standalone helper — can be used outside React components.
  * Reads from URL directly. Not reactive.
+ * Also checks env flag — returns false if not enabled.
  */
 export function isScreenshotMode(): boolean {
+  if (!isScreenshotModeEnabled()) return false;
   if (typeof window === 'undefined') return false;
   try {
     return new URLSearchParams(window.location.search).get('screenshot') === 'true';

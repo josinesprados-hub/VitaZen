@@ -2016,7 +2016,9 @@ input, textarea, select {
    Screenshot Mode — Editorial Layer
    ═══════════════════════════════════════════
 
-   Activated ONLY via ?screenshot=true query param.
+   Activated ONLY when BOTH conditions are met:
+     1. NEXT_PUBLIC_ENABLE_SCREENSHOT_MODE=true (env flag)
+     2. ?screenshot=true query param in the URL
    Adds .screenshot-mode class to <body>.
 
    Hides all transient, non-editorial UI:
