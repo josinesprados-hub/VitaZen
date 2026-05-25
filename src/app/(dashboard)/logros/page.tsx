@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { SCREENSHOT_ACHIEVEMENTS } from '@/lib/screenshot-data';
 import { LogrosSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import {
@@ -121,6 +123,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function LogrosPage() {
   const { apiFetch } = useApi();
+  const { isActive: screenshotMode } = useScreenshotMode();
   const [data, setData] = useState<AchievementsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -132,6 +135,14 @@ export default function LogrosPage() {
     const fetchAchievements = async () => {
       setLoading(true);
       setError(false);
+
+      // ── Screenshot mode: use frozen demo data ──
+      if (screenshotMode) {
+        setData(SCREENSHOT_ACHIEVEMENTS as any);
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await apiFetch('/api/achievements');
         if (!cancelled && res.ok) {
@@ -157,7 +168,7 @@ export default function LogrosPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiFetch]);
+  }, [apiFetch, screenshotMode]);
 
   if (loading) {
     return <LogrosSkeleton />;

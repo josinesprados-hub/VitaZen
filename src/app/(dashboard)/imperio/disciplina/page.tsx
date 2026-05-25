@@ -371,10 +371,8 @@ export default function DisciplinaPage() {
         )}
       </div>
 
-      {/* Tips — hidden in screenshot mode */}
-      {!screenshotMode && (
-        <EmpireTipsSection empire="disciplina" subtitle="Ideas para tu disciplina" />
-      )}
+      {/* Tips — frozen in screenshot mode, normal rotation otherwise */}
+      <EmpireTipsSection empire="disciplina" subtitle="Ideas para tu disciplina" />
       {/* Micro-reward for habit completion */}
       <MicroReward trigger={showReward} message="Hábito completado" onComplete={() => setShowReward(false)} />
     </div>

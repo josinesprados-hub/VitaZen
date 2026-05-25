@@ -2011,3 +2011,74 @@ input, textarea, select {
     padding-left: 2rem;
   }
 }
+
+/* ═══════════════════════════════════════════
+   Screenshot Mode — Editorial Layer
+   ═══════════════════════════════════════════
+
+   Activated ONLY via ?screenshot=true query param.
+   Adds .screenshot-mode class to <body>.
+
+   Hides all transient, non-editorial UI:
+   - Toasts and notifications
+   - Loading skeletons and spinners
+   - Route transition progress bar
+   - Contextual help tooltips
+   - Debug/development elements
+   - Email verification banner
+   - Premium CTAs and upsells
+
+   Does NOT hide:
+   - Core content and navigation
+   - Empire tips (frozen, not hidden)
+   - Achievement cards
+   - Check-in data
+
+   Device variants:
+   .screenshot-mobile  → mobile-optimized viewport
+   .screenshot-desktop → desktop-optimized viewport
+   ═══════════════════════════════════════════ */
+
+/* Global: hide transient UI */
+body.screenshot-mode [data-sonner-toaster],
+body.screenshot-mode [data-slot="toast"],
+body.screenshot-mode .route-progress-bar,
+body.screenshot-mode .premium-shimmer,
+body.screenshot-mode .premium-shimmer-gold,
+body.screenshot-mode .skeleton-entrance {
+  display: none !important;
+}
+
+/* Hide contextual help */
+body.screenshot-mode [data-contextual-help] {
+  display: none !important;
+}
+
+/* Prevent animations during screenshots — everything frozen */
+body.screenshot-mode .animate-in,
+body.screenshot-mode .stagger-1,
+body.screenshot-mode .stagger-2,
+body.screenshot-mode .stagger-3,
+body.screenshot-mode .stagger-4,
+body.screenshot-mode .stagger-5,
+body.screenshot-mode .stagger-6,
+body.screenshot-mode .hero-fade-in,
+body.screenshot-mode .hero-pulse-gold,
+body.screenshot-mode .hero-pulse-warm,
+body.screenshot-mode .micro-celebrate,
+body.screenshot-mode .streak-pulse,
+body.screenshot-mode .error-icon-pulse,
+body.screenshot-mode .archive-badge {
+  animation: none !important;
+}
+
+/* Device variant: mobile viewport control */
+body.screenshot-mobile {
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+/* Device variant: desktop viewport control */
+body.screenshot-desktop {
+  min-width: 1280px;
+}
