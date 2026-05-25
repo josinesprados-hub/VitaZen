@@ -20,6 +20,21 @@ import {
   AlertCircle,
   RefreshCw,
   Circle,
+  Sun,
+  Calendar,
+  Clock,
+  Sparkles,
+  MessageCircle,
+  Layers,
+  Eye,
+  Mountain,
+  Sunrise,
+  Leaf,
+  TrendingUp,
+  Moon,
+  Compass,
+  RotateCcw,
+  Zap,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -35,10 +50,12 @@ interface AchievementData {
   percent: number;
   unlocked: boolean;
   unlockedAt: string | null;
+  hidden: boolean;
 }
 
 interface AchievementsResponse {
   achievements: AchievementData[];
+  newlyUnlocked: string[];
   stats: {
     total: number;
     unlocked: number;
@@ -58,6 +75,21 @@ const ICON_MAP: Record<string, any> = {
   Flame,
   Crown,
   PiggyBank,
+  Sun,
+  Calendar,
+  Clock,
+  Sparkles,
+  MessageCircle,
+  Layers,
+  Eye,
+  Mountain,
+  Sunrise,
+  Leaf,
+  TrendingUp,
+  Moon,
+  Compass,
+  RotateCcw,
+  Zap,
 };
 
 // ─── Category Config ─────────────────────────────────────
@@ -70,6 +102,7 @@ const CATEGORIES = [
   { key: 'habits', label: 'Hábitos', icon: CheckCircle },
   { key: 'nutrition', label: 'Nutrición', icon: Utensils },
   { key: 'finance', label: 'Finanzas', icon: Wallet },
+  { key: 'checkin', label: 'Check-in', icon: Sun },
   { key: 'general', label: 'General', icon: Crown },
 ] as const;
 
@@ -80,6 +113,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   habits: 'Hábitos',
   nutrition: 'Nutrición',
   finance: 'Finanzas',
+  checkin: 'Check-in',
   general: 'General',
 };
 
@@ -154,7 +188,8 @@ export default function LogrosPage() {
     : data.achievements.filter((a) => a.category === activeFilter);
 
   const unlockedList = filteredAchievements.filter((a) => a.unlocked);
-  const lockedList = filteredAchievements.filter((a) => !a.unlocked);
+  const lockedVisibleList = filteredAchievements.filter((a) => !a.unlocked && !a.hidden);
+  const mysteryList = filteredAchievements.filter((a) => !a.unlocked && a.hidden);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -175,8 +210,8 @@ export default function LogrosPage() {
               <Crown size={20} className="text-[#c8a55a]" />
             </div>
             <div>
-              <p className="text-white font-semibold">Progreso General</p>
-              <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} logros descubiertos</p>
+              <p className="text-white font-semibold">Camino</p>
+              <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} momentos recordados</p>
             </div>
           </div>
           <span className="text-2xl font-bold text-[#c8a55a]">{data.stats.percent}%</span>
@@ -219,8 +254,8 @@ export default function LogrosPage() {
       {unlockedList.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-5">
-            <Crown size={16} className="text-[#c8a55a]" />
-            <h2 className="label-discrete" style={{ color: '#c8a55a' }}>Descubiertos</h2>
+            <Circle size={8} fill="currentColor" className="text-[#c8a55a]" />
+            <h2 className="label-discrete" style={{ color: '#c8a55a' }}>Recordado</h2>
             <span className="text-xs text-[#666] ml-1">({unlockedList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -231,16 +266,32 @@ export default function LogrosPage() {
         </div>
       )}
 
-      {/* Locked Section */}
-      {lockedList.length > 0 && (
+      {/* Mystery Section — hidden achievements near unlock */}
+      {mysteryList.length > 0 && (
+        <div className="mb-10">
+          <div className="flex items-center gap-2 mb-5">
+            <Eye size={16} className="text-[#c8a55a]/40" />
+            <h2 className="label-discrete" style={{ color: 'rgba(200,165,90,0.5)' }}>Cerca de aparecer</h2>
+            <span className="text-xs text-[#444] ml-1">({mysteryList.length})</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mysteryList.map((achievement, index) => (
+              <MysteryCard key={achievement.key} achievement={achievement} index={index} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Locked Visible Section */}
+      {lockedVisibleList.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-5">
             <Lock size={16} className="text-[#555]" />
-            <h2 className="label-discrete" style={{ color: '#555' }}>Por descubrir</h2>
-            <span className="text-xs text-[#444] ml-1">({lockedList.length})</span>
+            <h2 className="label-discrete" style={{ color: '#555' }}>Por aparecer</h2>
+            <span className="text-xs text-[#444] ml-1">({lockedVisibleList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {lockedList.map((achievement, index) => (
+            {lockedVisibleList.map((achievement, index) => (
               <AchievementCard key={achievement.key} achievement={achievement} index={index} />
             ))}
           </div>
@@ -260,6 +311,9 @@ export default function LogrosPage() {
 }
 
 // ─── Achievement Card ────────────────────────────────────
+// Clean, silent, no ribbon, no "HECHO" badge.
+// Unlocked = subtle gold dot + warm tone.
+// Locked = dimmed, quiet.
 
 function AchievementCard({ achievement, index }: { achievement: AchievementData; index: number }) {
   const Icon = ICON_MAP[achievement.icon] || Trophy;
@@ -274,15 +328,6 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
       }`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      {/* Badge shine for unlocked */}
-      {isUnlocked && (
-        <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden rounded-tr-xl">
-          <div className="absolute top-3 -right-6 bg-[#c8a55a] text-[#000000] text-[9px] font-bold px-8 py-1 rotate-45 uppercase tracking-wider">
-            Hecho
-          </div>
-        </div>
-      )}
-
       <div className="flex items-start gap-4">
         {/* Icon */}
         <div
@@ -306,6 +351,9 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
             <span className="label-discrete">
               {CATEGORY_LABELS[achievement.category] || achievement.category}
             </span>
+            {isUnlocked && (
+              <Circle size={5} fill="currentColor" className="text-[#c8a55a]" />
+            )}
           </div>
           <h3
             className={`font-semibold text-sm truncate transition-colors ${
@@ -342,12 +390,67 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
             </div>
           </div>
 
-          {/* Unlocked date */}
+          {/* Unlocked date — subtle, like a memory */}
           {isUnlocked && achievement.unlockedAt && (
             <p className="text-[9px] text-[#555] mt-2">
-              Descubierto {new Date(achievement.unlockedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+              Recordado {new Date(achievement.unlockedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mystery Card ────────────────────────────────────────
+// For hidden achievements near-unlock (>=75% progress).
+// Shows category + progress, but title and description are "???"
+
+function MysteryCard({ achievement, index }: { achievement: AchievementData; index: number }) {
+  const Icon = ICON_MAP[achievement.icon] || Trophy;
+
+  return (
+    <div
+      className="relative rounded-xl p-5 bg-[#080808] border border-[#c8a55a]/10 hover:border-[#c8a55a]/20 transition-all duration-300 group animate-in"
+      style={{ animationDelay: `${index * 60}ms` }}
+    >
+      <div className="flex items-start gap-4">
+        {/* Mysterious icon */}
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-[#c8a55a]/5 border border-[#c8a55a]/15">
+          <Icon size={22} className="text-[#c8a55a]/30" />
+        </div>
+
+        {/* Content — title and description hidden */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="label-discrete">
+              {CATEGORY_LABELS[achievement.category] || achievement.category}
+            </span>
+          </div>
+          <h3 className="font-semibold text-sm text-[#c8a55a]/40 italic">
+            ???
+          </h3>
+          <p className="text-xs mt-0.5 text-[#555] italic">
+            Algo está por aparecer
+          </p>
+
+          {/* Progress — shows it's real, not imaginary */}
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] text-[#555]">
+                {achievement.current}/{achievement.target}
+              </span>
+              <span className="text-[10px] font-semibold text-[#c8a55a]/50">
+                {achievement.percent}%
+              </span>
+            </div>
+            <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-1.5 rounded-full bg-[#c8a55a]/30 transition-all duration-700 ease-out"
+                style={{ width: `${achievement.percent}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
