@@ -484,9 +484,11 @@ export function CheckinSkeleton() {
                 <SkeletonLine width="50%" className="h-2" />
               </div>
               <SkeletonLine width="30%" className="h-5" />
-              <div className="flex items-end gap-1.5 h-8 mt-1.5">
+              <div className="flex items-end gap-[3px] h-5 mt-1.5">
                 {[1, 2, 3, 4, 5, 6, 7].map((bar) => (
-                  <SkeletonBlock key={bar} className="flex-1 rounded-t-full" style={{ height: `${30 + ((i * 17 + bar * 11) % 60)}%` }} />
+                  <div key={bar} className="flex-1 h-5 rounded-sm bg-[#1a1a1a] overflow-hidden">
+                    <SkeletonBlock className="w-full rounded-sm" style={{ height: `${30 + ((i * 17 + bar * 11) % 60)}%` }} />
+                  </div>
                 ))}
               </div>
             </SkeletonCard>

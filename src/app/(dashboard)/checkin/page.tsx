@@ -67,17 +67,21 @@ const MiniBarChart = memo(function MiniBarChart({ data, metricKey }: { data: Tre
   if (data.length === 0) return null;
 
   return (
-    <div className="flex items-end gap-1.5 h-8">
+    <div className="flex items-end gap-[3px] h-5">
       {data.slice(-14).map((d, i) => {
         const val = (d as any)[metricKey] as number;
         const pct = (val / 5) * 100;
         return (
           <div
             key={i}
-            className="flex-1 bg-[#c8a55a]/50 rounded-t-full transition-all duration-300"
-            style={{ height: `${pct}%`, opacity: 0.35 + (pct / 100) * 0.65 }}
+            className="flex-1 h-5 rounded-sm bg-[#1a1a1a] overflow-hidden transition-all duration-300"
             title={`${val}/5`}
-          />
+          >
+            <div
+              className="w-full bg-[#c8a55a]/30 rounded-sm"
+              style={{ height: `${pct}%` }}
+            />
+          </div>
         );
       })}
     </div>
