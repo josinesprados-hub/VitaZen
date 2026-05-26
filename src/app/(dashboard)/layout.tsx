@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { EmailVerificationBanner } from '@/components/ui/EmailVerificationBanner';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { useNetworkStatus } from '@/hooks/use-network-status';
 import { trackEvent } from '@/lib/analytics';
+import { RefreshCw, WifiOff } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -15,11 +17,44 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, loading, syncError, firebaseUser } = useAuth();
+  const { user, loading, syncError, firebaseUser, refreshUser } = useAuth();
   const { isActive: screenshotMode } = useScreenshotMode();
+  const { isOffline } = useNetworkStatus();
   const router = useRouter();
   const pathname = usePathname();
   const sessionTracked = useRef(false);
+
+  // ─── Sync timeout: prevent infinite "Cargando" spinner ───
+  // If we have firebaseUser but no user data after 20s (slow network + cold Neon),
+  // show a network-aware fallback instead of a silent infinite spinner.
+  const [syncTimedOut, setSyncTimedOut] = useState(false);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    // Reset timeout when user data arrives
+    if (user) {
+      setSyncTimedOut(false);
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+        syncTimeoutRef.current = undefined;
+      }
+      return;
+    }
+
+    // Start timeout when we have firebaseUser but no user data
+    if (firebaseUser && !user && !syncTimeoutRef.current) {
+      syncTimeoutRef.current = setTimeout(() => {
+        if (!firebaseUser) return; // Already resolved
+        setSyncTimedOut(true);
+      }, 20_000); // 20s — generous for cold starts + slow networks
+    }
+
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, [firebaseUser, user]);
 
   // ─── Route transition progress ───
   // Shows a thin gold bar at the top during client-side navigations.
@@ -85,6 +120,14 @@ export default function DashboardLayout({
     }
   }, [user, firebaseUser, loading, syncError, router]);
 
+  // ─── Offline banner + retry handler ───
+  const handleRetry = useCallback(() => {
+    setSyncTimedOut(false);
+    if (firebaseUser) {
+      refreshUser();
+    }
+  }, [firebaseUser, refreshUser]);
+
   // ─── 1. Auth resolving (no firebaseUser yet) ───
   if (loading && !firebaseUser) {
     return (
@@ -101,6 +144,37 @@ export default function DashboardLayout({
 
   // ─── 2. Sync pending (firebaseUser confirmed, waiting for server) ───
   if (firebaseUser && !user) {
+    // Show network-aware fallback instead of infinite spinner
+    if (syncTimedOut) {
+      return (
+        <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
+          <div className="text-center px-6 max-w-sm">
+            <div className="w-14 h-14 rounded-2xl bg-[#c8a55a]/5 border border-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
+              <WifiOff size={22} className="text-[#c8a55a]/50" />
+            </div>
+            <p className="text-sm text-[#888] font-medium mb-1.5">
+              {isOffline ? 'Sin conexión' : 'Cargando tu espacio'}
+            </p>
+            <p className="text-xs text-[#555] leading-relaxed mb-5">
+              {isOffline
+                ? 'Revisa tu conexión a internet e intenta de nuevo.'
+                : 'La conexión está tardando más de lo habitual. Tu datos están seguros.'}
+            </p>
+            <button
+              onClick={handleRetry}
+              className="inline-flex items-center gap-2 text-[#c8a55a] text-xs font-medium
+                         bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg px-4 py-2
+                         hover:bg-[#c8a55a]/10 hover:border-[#c8a55a]/25
+                         transition-all duration-200 active:scale-[0.97] touch-press"
+            >
+              <RefreshCw size={12} />
+              Reintentar
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">

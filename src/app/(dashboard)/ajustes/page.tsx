@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { Switch } from '@/components/ui/switch';
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
@@ -24,6 +25,7 @@ const APP_VERSION = '0.2.0';
 
 export default function AjustesPage() {
   const { user, firebaseUser, signOut, refreshUser } = useAuth();
+  const { apiFetch } = useApi();
   const { displayUser } = useScreenshotMode();
   const router = useRouter();
 
@@ -74,13 +76,8 @@ export default function AjustesPage() {
     setError(null);
 
     try {
-      const idToken = await firebaseUser.getIdToken();
-      const res = await fetch('/api/settings', {
+      const res = await apiFetch('/api/settings', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
         body: JSON.stringify({ [key]: value }),
       });
 
@@ -119,13 +116,8 @@ export default function AjustesPage() {
     if (!firebaseUser || verifySending || verifySent) return;
     setVerifySending(true);
     try {
-      const idToken = await firebaseUser.getIdToken();
-      const res = await fetch('/api/auth/send-verification', {
+      const res = await apiFetch('/api/auth/send-verification', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
       });
       const data = await res.json();
       if (data.alreadyVerified) {

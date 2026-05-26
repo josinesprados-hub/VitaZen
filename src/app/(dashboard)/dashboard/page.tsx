@@ -112,6 +112,7 @@ export default function DashboardPage() {
     }
 
     let cancelled = false;
+    const controller = new AbortController();
 
     const fetchData = async () => {
       try {
@@ -120,8 +121,8 @@ export default function DashboardPage() {
         // Emotional state, momentum, streaks, challenges, and metrics
         // are fetched by their own components or removed entirely.
         const [empRes, checkRes] = await Promise.all([
-          apiFetch('/api/empire'),
-          apiFetch('/api/checkin?mode=today'),
+          apiFetch('/api/empire', { signal: controller.signal }),
+          apiFetch('/api/checkin?mode=today', { signal: controller.signal }),
         ]);
 
         if (cancelled) return;
@@ -137,6 +138,8 @@ export default function DashboardPage() {
         }
       } catch (error) {
         if (cancelled) return;
+        // AbortError means the effect was cleaned up — not a real error
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.error('Error fetching dashboard data:', error);
       } finally {
         if (!cancelled) setLoading(false);
@@ -144,7 +147,10 @@ export default function DashboardPage() {
     };
 
     fetchData();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [user, onboardingConfirmed, apiFetch, screenshotMode]);
 
   const handleCheckinSave = useCallback(async (data: any) => {

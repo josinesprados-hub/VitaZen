@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,6 +24,7 @@ import { processAvatar, type AvatarProcessError } from '@/lib/avatar';
 
 export default function PerfilPage() {
   const { user, firebaseUser, refreshUser } = useAuth();
+  const { apiFetch } = useApi();
   const { displayUser, isActive: screenshotMode } = useScreenshotMode();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -101,13 +103,8 @@ export default function PerfilPage() {
     setError(null);
 
     try {
-      const idToken = await firebaseUser.getIdToken();
-      const res = await fetch('/api/profile', {
+      const res = await apiFetch('/api/profile', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
         body: JSON.stringify({
           name: form.name || null,
           avatarUrl: form.avatarUrl || null,

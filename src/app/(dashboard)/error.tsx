@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { isNetworkError } from '@/hooks/use-network-status';
 import { reportError } from '@/lib/observability';
 
 // ═══════════════════════════════════════════
@@ -22,11 +23,6 @@ export default function DashboardError({
 }) {
   // Report error to observability
   useEffect(() => {
-    const isNetworkError =
-      error.message?.toLowerCase().includes('network') ||
-      error.message?.toLowerCase().includes('fetch') ||
-      error.message?.toLowerCase().includes('failed to fetch');
-
     const isSessionError =
       error.message?.toLowerCase().includes('unauthorized') ||
       error.message?.toLowerCase().includes('401') ||
@@ -41,19 +37,16 @@ export default function DashboardError({
   }, [error]);
 
   // Determine variant based on error type
-  const isNetworkError =
-    error.message?.toLowerCase().includes('network') ||
-    error.message?.toLowerCase().includes('fetch') ||
-    error.message?.toLowerCase().includes('failed to fetch');
-
   const isSessionError =
     error.message?.toLowerCase().includes('unauthorized') ||
     error.message?.toLowerCase().includes('401') ||
     error.message?.toLowerCase().includes('session');
 
+  const isNetError = isNetworkError(error);
+
   const variant = isSessionError
     ? 'session'
-    : isNetworkError
+    : isNetError
     ? 'network'
     : 'loading';
 

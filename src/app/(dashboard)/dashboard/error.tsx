@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
+import { isNetworkError } from '@/hooks/use-network-status';
 import { reportError } from '@/lib/observability';
 
 // ═══════════════════════════════════════════
@@ -30,15 +31,12 @@ export default function DashboardPageError({
     );
   }, [error]);
 
-  const isNetworkError =
-    error.message?.toLowerCase().includes('network') ||
-    error.message?.toLowerCase().includes('fetch') ||
-    error.message?.toLowerCase().includes('failed to fetch');
+  const isNetError = isNetworkError(error);
 
   return (
     <div className="max-w-7xl mx-auto min-h-[60dvh] flex items-center justify-center">
       <PremiumErrorState
-        variant={isNetworkError ? 'network' : 'loading'}
+        variant={isNetError ? 'network' : 'loading'}
         title="No se pudo cargar el dashboard"
         subtitle="Tu progreso está seguro. Intenta recargar para volver a verlo."
         onRetry={reset}

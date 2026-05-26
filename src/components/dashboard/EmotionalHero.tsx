@@ -42,7 +42,7 @@ export function EmotionalHero() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const fetchState = useCallback(async () => {
+  const fetchState = useCallback(async (signal?: AbortSignal) => {
     if (screenshotMode) {
       setState(SCREENSHOT_EMOTIONAL_STATE);
       setLoading(false);
@@ -52,14 +52,16 @@ export function EmotionalHero() {
     setLoading(true);
     setError(false);
     try {
-      const res = await apiFetch('/api/emotional-state');
+      const res = await apiFetch('/api/emotional-state', { signal });
       if (res.ok) {
         const data = await res.json();
         setState(data);
       } else {
         setError(true);
       }
-    } catch {
+    } catch (err) {
+      // AbortError means the component unmounted — not a real error
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(true);
     } finally {
       setLoading(false);
@@ -67,7 +69,9 @@ export function EmotionalHero() {
   }, [apiFetch, screenshotMode]);
 
   useEffect(() => {
-    fetchState();
+    const controller = new AbortController();
+    fetchState(controller.signal);
+    return () => controller.abort();
   }, [fetchState]);
 
   // Loading: calm, not frantic
