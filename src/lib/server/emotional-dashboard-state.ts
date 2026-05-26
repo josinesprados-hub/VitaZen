@@ -41,6 +41,16 @@ import {
   getTodayDateKey,
 } from '@/lib/deterministic';
 
+// ─── Concurrency guard ──────────────────────
+// Prevents race conditions when two concurrent requests
+// (e.g., mobile + desktop opening simultaneously) both
+// call getEmotionalDashboardSnapshot for the same user.
+// Without this, both read the same state, compute different
+// advances, and one overwrites the other's update.
+// The second request reuses the first request's result.
+
+const inFlightSnapshots = new Map<string, Promise<EmotionalDashboardSnapshot>>();
+
 // ─── Types ──────────────────────────────────
 
 interface ReflectionState {
@@ -323,6 +333,24 @@ function selectSilentMemory(
 // ─── Main: Get Emotional Dashboard Snapshot ─
 
 export async function getEmotionalDashboardSnapshot(
+  userId: string,
+): Promise<EmotionalDashboardSnapshot> {
+  // ─── Concurrency guard ───────────────────
+  // If a snapshot is already being computed for this user
+  // (e.g., two tabs/devices opened simultaneously),
+  // reuse the in-flight promise instead of starting
+  // a second computation that could overwrite the first.
+  const existing = inFlightSnapshots.get(userId);
+  if (existing) return existing;
+
+  const promise = computeSnapshot(userId).finally(() => {
+    inFlightSnapshots.delete(userId);
+  });
+  inFlightSnapshots.set(userId, promise);
+  return promise;
+}
+
+async function computeSnapshot(
   userId: string,
 ): Promise<EmotionalDashboardSnapshot> {
   const state = await getOrCreateState(userId);

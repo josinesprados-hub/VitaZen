@@ -76,8 +76,24 @@ export function deterministicWeightedSelect(weights: number[], seed: string): nu
 
 // ─── Date Key Helper ────────────────────────
 // Returns today's date as YYYY-MM-DD for use in seeds.
+//
+// IMPORTANT: Uses Europe/Madrid timezone (VitaZen's primary market).
+// This ensures the "day" boundary matches when Spanish users
+// experience their day change — not UTC midnight.
+//
+// A user in CET visiting at 23:00 local time should see
+// today's content (not tomorrow's UTC content).
+// Before this fix, getTodayDateKey() used server-local time
+// (typically UTC), causing the daily emotional reset to happen
+// at a different time than the user's day boundary.
 
 export function getTodayDateKey(): string {
+  // Format date in Europe/Madrid timezone.
+  // This produces YYYY-MM-DD in the user's perceived "today".
+  // Even if the server is in UTC, the dateKey will match
+  // what a Spanish user considers "today".
   const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const madridStr = now.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  // sv-SE locale gives YYYY-MM-DD format natively
+  return madridStr.split(' ')[0]; // Extract date part
 }

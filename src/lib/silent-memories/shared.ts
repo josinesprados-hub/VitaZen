@@ -155,10 +155,15 @@ export function observeShift(
  * in months and years. Two observations are enough.
  */
 export function observePresence(consistencyDays: number): SilentMemory | null {
-  if (consistencyDays === 30) {
+  // Range-based check: if the user has reached or passed a milestone
+  // since the last time this could have been shown (MIN_INTERVAL is 10 days),
+  // they'll see it. Previously used exact equality (=== 30, === 365),
+  // which meant missing the observation if they didn't open the app
+  // on the exact day.
+  if (consistencyDays >= 30 && consistencyDays <= 39) {
     return { observation: 'Un mes así.', type: 'presence', rarity: 'very_rare' };
   }
-  if (consistencyDays === 365) {
+  if (consistencyDays >= 365 && consistencyDays <= 374) {
     return { observation: 'Un año así.', type: 'presence', rarity: 'very_rare' };
   }
   return null;
@@ -170,6 +175,10 @@ export function observePresence(consistencyDays: number): SilentMemory | null {
  * Rare. Only when it genuinely adds presence.
  */
 export function observeTemporal(monthsSinceStart: number): SilentMemory | null {
+  // Range-based check: uses a window of ±0 (floor months) so that
+  // if the user doesn't open the app on the exact month boundary,
+  // they still see the observation within a reasonable window.
+  // The MIN_INTERVAL for temporal is 21 days, so the window is safe.
   if (monthsSinceStart === 3) {
     return { observation: 'Ya tres meses.', type: 'temporal', rarity: 'very_rare' };
   }

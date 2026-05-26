@@ -175,15 +175,23 @@ export function getReflectionsByWeight(weight: ReflectionWeight): readonly strin
   return REFLECTIONS.filter(r => r.weight === weight).map(r => r.text);
 }
 
-/** Weighted random selection: light 50%, relevant 35%, deep 15% */
+/** Weighted random selection — DEPRECATED, kept only for reference.
+ * Do NOT use in production — uses Math.random() which breaks
+ * cross-device consistency. Use selectDeterministicReflection()
+ * from emotional-dashboard-state.ts instead.
+ * @deprecated Use server-side deterministic selection instead.
+ */
 export function selectWeightedReflection(excludeIndices: number[] = []): number {
+  // Legacy implementation — DO NOT CALL from new code.
+  // This function uses Math.random() which produces different
+  // results on different devices/requests, breaking the core
+  // principle that emotional content must be deterministic.
   const weights: Record<ReflectionWeight, number> = {
     light: 0.50,
     relevant: 0.35,
     deep: 0.15,
   };
 
-  // Build available pool with weights
   const pool: { index: number; weight: number }[] = [];
   const excludeSet = new Set(excludeIndices);
 
@@ -194,8 +202,8 @@ export function selectWeightedReflection(excludeIndices: number[] = []): number 
   });
 
   if (pool.length === 0) {
-    // Fallback: all reflections
-    return Math.floor(Math.random() * REFLECTIONS.length);
+    // Deterministic fallback instead of Math.random()
+    return 0;
   }
 
   const totalWeight = pool.reduce((sum, p) => sum + p.weight, 0);

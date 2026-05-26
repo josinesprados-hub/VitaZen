@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
+import { fetchSnapshot } from './SilentMemory';
 
 // ═══════════════════════════════════════════
 // PremiumReflection — contemplative rotation
@@ -44,10 +45,7 @@ export default function PremiumReflection() {
 
     async function fetchReflection() {
       try {
-        const res = await apiFetch('/api/emotional-snapshot');
-        if (!res.ok || cancelled) return;
-
-        const data = await res.json();
+        const data = await fetchSnapshot(apiFetch);
         if (cancelled) return;
 
         if (data.reflection && !data.reflection.isSilent) {

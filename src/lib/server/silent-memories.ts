@@ -142,16 +142,7 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
         }
       : null;
 
-  // Recurrence uses the same this-week data as shift
-  const thisWeekRecurrence =
-    thisWeekCheckins.length >= 3
-      ? {
-          avgEnergy: avg(thisWeekCheckins.map((c) => c.energy)),
-          avgStress: avg(thisWeekCheckins.map((c) => c.stress)),
-          count: thisWeekCheckins.length,
-        }
-      : null;
-
+  // Recurrence reuses the same this-week data — no need to compute twice
   const monthAgo =
     monthAgoCheckins.length >= 3
       ? {
@@ -166,7 +157,7 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
     consecutiveDays,
     thisWeek,
     prevWeek,
-    thisWeekForRecurrence: thisWeekRecurrence,
+    thisWeekForRecurrence: thisWeek,
     monthAgo,
   };
 }

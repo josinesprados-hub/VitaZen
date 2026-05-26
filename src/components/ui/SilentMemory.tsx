@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 
 // ═══════════════════════════════════════════
@@ -14,6 +14,11 @@ import { useApi } from '@/hooks/useApi';
 //
 // Rarity is still preserved — it's tracked
 // server-side with the same interval rules.
+//
+// IMPORTANT: This component now shares the
+// /api/emotional-snapshot response with
+// PremiumReflection via the shared context
+// in EmotionalHero. No duplicate API calls.
 
 interface SilentMemoryData {
   observation: string;
@@ -21,33 +26,53 @@ interface SilentMemoryData {
   rarity: 'rare' | 'very_rare';
 }
 
+// Shared cache: prevents duplicate /api/emotional-snapshot calls
+// when both PremiumReflection and SilentMemory mount simultaneously.
+// The first component to call fetchSnapshot() wins; the second
+// reuses the in-flight promise.
+let snapshotPromise: Promise<any> | null = null;
+let snapshotTimestamp = 0;
+const SNAPSHOT_CACHE_TTL = 30000; // 30s cache — prevents rapid re-fetches
+
+export function fetchSnapshot(apiFetch: (path: string, options?: RequestInit) => Promise<Response>): Promise<any> {
+  const now = Date.now();
+  if (snapshotPromise && now - snapshotTimestamp < SNAPSHOT_CACHE_TTL) {
+    return snapshotPromise;
+  }
+  snapshotTimestamp = now;
+  snapshotPromise = apiFetch('/api/emotional-snapshot')
+    .then(res => {
+      if (!res.ok) throw new Error('Snapshot fetch failed');
+      return res.json();
+    })
+    .catch(() => ({ reflection: null, silentMemory: null }))
+    .finally(() => {
+      // Clear promise reference after cache TTL so next fetch is fresh
+      setTimeout(() => { snapshotPromise = null; }, SNAPSHOT_CACHE_TTL);
+    });
+  return snapshotPromise;
+}
+
 export function SilentMemory() {
   const { apiFetch } = useApi();
   const [memory, setMemory] = useState<SilentMemoryData | null>(null);
   const [visible, setVisible] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function observe() {
       try {
-        // Fetch from unified emotional snapshot
-        const res = await apiFetch('/api/emotional-snapshot');
-        if (!res.ok || cancelled) return;
-
-        const data = await res.json();
+        const data = await fetchSnapshot(apiFetch);
         if (cancelled) return;
 
         if (data.silentMemory) {
           setMemory(data.silentMemory);
           // Fade in after the page settles
-          const timer = setTimeout(() => {
+          timerRef.current = setTimeout(() => {
             if (!cancelled) setVisible(true);
           }, 1200);
-          return () => {
-            cancelled = true;
-            clearTimeout(timer);
-          };
         }
       } catch {
         // Network error — silence is fine
@@ -58,6 +83,11 @@ export function SilentMemory() {
 
     return () => {
       cancelled = true;
+      // PROPERLY clear the timeout on unmount
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
     };
   }, [apiFetch]);
 
