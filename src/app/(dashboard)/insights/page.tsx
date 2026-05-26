@@ -88,8 +88,8 @@ interface InsightsData {
 
 function getScoreColor(score: number): string {
   if (score >= 75) return '#22c55e';
-  if (score >= 50) return '#c8a55a';
-  if (score >= 30) return '#e8a849';
+  if (score >= 50) return '#b8995e';   // muted champagne — less orange, more editorial
+  if (score >= 30) return '#c49856';   // warm amber — not neon, still warm
   return '#ef4444';
 }
 
@@ -123,7 +123,7 @@ function getInsightBorderClass(type: string): string {
   switch (type) {
     case 'positive': return 'border-[#22c55e]/20 hover:border-[#22c55e]/40';
     case 'warning': return 'border-[#e8a849]/20 hover:border-[#e8a849]/40';
-    case 'trend': return 'border-[#c8a55a]/20 hover:border-[#c8a55a]/40';
+    case 'trend': return 'border-[#b8995e]/20 hover:border-[#b8995e]/40';
     default: return 'border-[#1a1a1a] hover:border-[#2a2a2a]';
   }
 }
@@ -132,7 +132,7 @@ function getInsightBadgeClass(type: string): string {
   switch (type) {
     case 'positive': return 'bg-[#22c55e]/10 text-[#22c55e]';
     case 'warning': return 'bg-[#e8a849]/10 text-[#e8a849]';
-    case 'trend': return 'bg-[#c8a55a]/10 text-[#c8a55a]';
+    case 'trend': return 'bg-[#b8995e]/10 text-[#b8995e]';
     default: return 'bg-[#1a1a1a] text-[#666]';
   }
 }
@@ -147,7 +147,7 @@ function TrendIndicator({ value, label }: { value: number; label: string }) {
   }
   if (value < -0.2) {
     return (
-      <span className="flex items-center gap-1 text-[11px] text-[#e8a849]">
+      <span className="flex items-center gap-1 text-[11px] text-[#c49856]">
         <TrendingDown size={12} /> {label} ↓
       </span>
     );
@@ -416,15 +416,15 @@ export default function InsightsPage() {
               <div className="mt-3 space-y-1">
                 <div className="flex justify-between text-[10px]">
                   <span className="text-[#666]">Emoción</span>
-                  <span className="text-[#c8a55a]">{summary.checkins.avgEmotion}/5</span>
+                  <span className="text-[#b8995e]">{summary.checkins.avgEmotion}/5</span>
                 </div>
                 <div className="flex justify-between text-[10px]">
                   <span className="text-[#666]">Energía</span>
-                  <span className="text-[#c8a55a]">{summary.checkins.avgEnergy}/5</span>
+                  <span className="text-[#b8995e]">{summary.checkins.avgEnergy}/5</span>
                 </div>
                 <div className="flex justify-between text-[10px]">
                   <span className="text-[#666]">Estrés</span>
-                  <span className="text-[#c8a55a]">{summary.checkins.avgStress}/5</span>
+                  <span className="text-[#b8995e]">{summary.checkins.avgStress}/5</span>
                 </div>
               </div>
             )}
@@ -440,7 +440,7 @@ export default function InsightsPage() {
             <p className="text-[10px] text-[#555] mt-1">completados</p>
             {summary.habits.topStreak > 0 && (
               <div className="mt-3">
-                <p className="text-[10px] text-[#c8a55a] flex items-center gap-1">
+                <p className="text-[10px] text-[#b8995e] flex items-center gap-1">
                   <Flame size={10} /> Mejor racha: {summary.habits.topStreak} días
                 </p>
                 {summary.habits.topHabit && (
@@ -486,11 +486,11 @@ export default function InsightsPage() {
                 <div className="mt-3 space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-[#666]">Ánimo</span>
-                    <span className="text-[#c8a55a]">{summary.wellness.avgMood}/5</span>
+                    <span className="text-[#b8995e]">{summary.wellness.avgMood}/5</span>
                   </div>
                   <div className="flex justify-between text-[10px]">
                     <span className="text-[#666]">Sueño</span>
-                    <span className="text-[#c8a55a]">{summary.wellness.avgSleep}/5</span>
+                    <span className="text-[#b8995e]">{summary.wellness.avgSleep}/5</span>
                   </div>
                 </div>
               )}
@@ -519,7 +519,7 @@ export default function InsightsPage() {
                 <Gem size={16} className="text-[#c8a55a]" />
                 <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
               </div>
-              <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+              <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-[#b8995e]' : 'text-red-400'}`}>
                 {summary.finance.balance >= 0 ? '+' : ''}{formatCurrency(Math.abs(summary.finance.balance))}
               </p>
               <p className="text-[10px] text-[#555] mt-1">balance semanal</p>
@@ -536,7 +536,7 @@ export default function InsightsPage() {
               <p className="text-2xl font-bold text-white">{summary.streaks.bestEmpireStreak}</p>
               <p className="text-[10px] text-[#555] mt-1">mejor racha</p>
               {summary.streaks.bestEmpireName && (
-                <p className="text-[10px] text-[#c8a55a] mt-2">{summary.streaks.bestEmpireName}</p>
+                <p className="text-[10px] text-[#b8995e] mt-2">{summary.streaks.bestEmpireName}</p>
               )}
             </Link>
           </PremiumGate>
