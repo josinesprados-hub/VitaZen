@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
-import { verifyFirebaseToken } from '@/lib/auth';
+import { verifyFirebaseToken, getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
@@ -12,24 +11,64 @@ export async function GET(request: NextRequest) {
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    const user = await getAuthUser(idToken);
+
+    // Verify token once — reuse the decoded result for both
+    // user lookup and emailVerified sync (was verifying twice).
+    const decodedToken = await verifyFirebaseToken(idToken);
+
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Look up user by firebaseUid (decoded token already verified)
+    let user = await db.user.findUnique({
+      where: { firebaseUid: decodedToken.uid },
+      include: {
+        aiUsage: { select: { count: true, resetAt: true } },
+        subscriptions: {
+          where: { status: { in: ['active', 'trialing'] } },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    // Fallback: search by email if firebaseUid doesn't match
+    // (same logic as getAuthUser, but without a second token verify)
+    if (!user && decodedToken.email) {
+      user = await db.user.findUnique({
+        where: { email: decodedToken.email },
+        include: {
+          aiUsage: { select: { count: true, resetAt: true } },
+          subscriptions: {
+            where: { status: { in: ['active', 'trialing'] } },
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      // Sync firebaseUid if mismatch (same pattern as getAuthUser)
+      if (user && user.firebaseUid !== decodedToken.uid) {
+        await db.user.update({
+          where: { id: user.id },
+          data: { firebaseUid: decodedToken.uid },
+        });
+        user.firebaseUid = decodedToken.uid;
+      }
+    }
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Sync emailVerified from Firebase token to DB if needed
-    try {
-      const decodedToken = await verifyFirebaseToken(idToken);
-      if (decodedToken?.email_verified && !user.emailVerified) {
-        await db.user.update({
-          where: { id: user.id },
-          data: { emailVerified: true },
-        });
-        user.emailVerified = true;
-      }
-    } catch {
-      // Non-critical — don't fail the session request
+    // Sync emailVerified from token to DB if needed (single token verify)
+    if (decodedToken.email_verified && !user.emailVerified) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true },
+      });
+      user.emailVerified = true;
     }
 
     return NextResponse.json({
@@ -52,10 +91,7 @@ export async function GET(request: NextRequest) {
         createdAt: user.createdAt,
         onboardingCompleted: user.onboardingCompleted,
         aiUsage: user.aiUsage
-          ? {
-              count: user.aiUsage.count,
-              resetAt: user.aiUsage.resetAt,
-            }
+          ? { count: user.aiUsage.count, resetAt: user.aiUsage.resetAt }
           : null,
         subscription: user.subscriptions[0] || null,
       },

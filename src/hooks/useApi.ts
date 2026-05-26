@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import type { User as FirebaseUser } from 'firebase/auth';
 
 export function useApi() {
   const { firebaseUser, signOut } = useAuth();
@@ -7,12 +8,27 @@ export function useApi() {
   const signOutPromise = useRef<Promise<void> | null>(null);
   const last401Time = useRef(0);
 
+  // Keep a live ref to firebaseUser so the fetch callback always sees
+  // the current value — even if firebaseUser changes between render
+  // and the async fetch completing (e.g. user signs out in another tab).
+  const firebaseUserRef = useRef<FirebaseUser | null>(firebaseUser);
+  firebaseUserRef.current = firebaseUser;
+
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    if (!firebaseUser) {
+    // Read from ref — always current, never stale
+    const currentUser = firebaseUserRef.current;
+
+    if (!currentUser) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const idToken = await firebaseUser.getIdToken();
+    let idToken: string;
+    try {
+      idToken = await currentUser.getIdToken();
+    } catch {
+      // Token retrieval failed — user may have been signed out
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -37,8 +53,14 @@ export function useApi() {
       }
       last401Time.current = now;
 
+      // Re-read from ref — user may have signed out while the fetch was in flight
+      const refreshUser = firebaseUserRef.current;
+      if (!refreshUser) {
+        return res;
+      }
+
       try {
-        const freshToken = await firebaseUser.getIdToken(true);
+        const freshToken = await refreshUser.getIdToken(true);
         if (freshToken) {
           const retryHeaders: Record<string, string> = {
             'Content-Type': 'application/json',
@@ -68,7 +90,7 @@ export function useApi() {
     }
 
     return res;
-  }, [firebaseUser, signOut]);
+  }, [signOut]); // Removed firebaseUser from deps — we use the ref instead
 
   return { apiFetch };
 }

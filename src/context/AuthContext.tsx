@@ -98,36 +98,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // First attempt
-    const firstOk = await attemptSync(1);
-    if (firstOk) {
-      syncInFlight.current = false;
-      return;
-    }
+    try {
+      // First attempt
+      const firstOk = await attemptSync(1);
+      if (firstOk) return;
 
-    // Auto-retry once after 1.5s delay for resilience on mobile/slow connections
-    await new Promise((r) => setTimeout(r, 1500));
-    const retryOk = await attemptSync(2);
-    if (retryOk) {
-      syncInFlight.current = false;
-      return;
-    }
+      // Auto-retry once after 1.5s delay for resilience on mobile/slow connections
+      await new Promise((r) => setTimeout(r, 1500));
+      const retryOk = await attemptSync(2);
+      if (retryOk) return;
 
-    // Both attempts failed
-    setSyncError(true);
-    syncInFlight.current = false;
+      // Both attempts failed
+      setSyncError(true);
+    } finally {
+      // ALWAYS reset — even if an unexpected error occurs.
+      // Without this, a single unhandled rejection would lock
+      // syncInFlight forever, blocking all future syncs.
+      syncInFlight.current = false;
+    }
   }, []);
 
+  // Keep a live ref to firebaseUser so refreshUser always uses the
+  // current user — even if called after a re-render that hasn't yet
+  // updated the callback closure.
+  const firebaseUserRef = useRef<FirebaseUser | null>(firebaseUser);
+  firebaseUserRef.current = firebaseUser;
+
   const refreshUser = useCallback(async (options?: { reloadFirebase?: boolean }) => {
-    if (!firebaseUser) return;
+    const currentUser = firebaseUserRef.current;
+    if (!currentUser) return;
     try {
       // Only reload Firebase user when explicitly needed (e.g. email verification).
       // Skipping this saves ~200-500ms on onboarding completion.
       if (options?.reloadFirebase) {
-        await firebaseUser.reload();
+        await currentUser.reload();
       }
       // Force token refresh to get fresh claims (including emailVerified)
-      const idToken = await firebaseUser.getIdToken(true);
+      const idToken = await currentUser.getIdToken(true);
 
       // Try session endpoint first (faster, lookup-only)
       const sessionRes = await fetch('/api/auth/session', {
@@ -162,10 +169,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('[Auth] refresh error:', error);
       setSyncError(true);
     }
-  }, [firebaseUser]);
+  }, []); // No firebaseUser dep — uses ref instead
 
   useEffect(() => {
     let authResolved = false;
+    let mounted = true;
 
     // Defensive timeout: if onAuthStateChanged never fires (e.g. Firebase
     // init hangs in Android TWA/WebView), force loading=false after 8s to
@@ -173,13 +181,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const timeoutId = setTimeout(() => {
       if (!authResolved) {
         console.warn('[Auth] onAuthStateChanged timeout — forcing loading=false');
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }, 8000);
 
     const unsubscribe = onAuthStateChanged(getAuthInstance(), (fbUser) => {
       authResolved = true;
       clearTimeout(timeoutId);
+      if (!mounted) return; // Don't update state after unmount
       setFirebaseUser(fbUser);
       if (fbUser) {
         // Fire-and-forget: sync user data in background.
@@ -198,6 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => {
+      mounted = false;
       clearTimeout(timeoutId);
       unsubscribe();
     };
