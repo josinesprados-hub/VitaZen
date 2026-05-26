@@ -131,30 +131,19 @@ export function getHiddenAchievements(): AchievementDef[] {
 
 // ─── Progress Calculation ────────────────────────────────
 // Runs all DB queries in parallel for efficiency.
+// Uses Promise.allSettled so that a single failing query
+// (e.g. missing table, Neon timeout) doesn't crash the
+// entire function — the affected achievements degrade to 0.
 // Returns a map of achievement key → current progress number.
 
+type Settled<T> = PromiseFulfilledResult<T> | PromiseRejectedResult;
+
+function fulfilled<T>(result: Settled<T>, fallback: T): T {
+  return result.status === 'fulfilled' ? result.value : fallback;
+}
+
 export async function calculateProgress(userId: string): Promise<Record<string, number>> {
-  const [
-    meditationCount,
-    journalCount,
-    wellnessCount,
-    habitsCount,
-    maxStreakResult,
-    nutritionCount,
-    financeCount,
-    incomeCount,
-    expenseCount,
-    userData,
-    checkinCount,
-    monthlyClosureCount,
-    empireActiveResult,
-    gratitudeCount,
-    financeContextCount,
-    meditationTypeResult,
-    wellnessMoodResult,
-    empireHighLevelResult,
-    recentCheckins,
-  ] = await Promise.all([
+  const results = await Promise.allSettled([
     // 1. Meditation sessions
     db.meditationSession.count({ where: { userId } }),
 
@@ -240,6 +229,26 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
       select: { date: true },
     }),
   ]);
+
+  const meditationCount     = fulfilled(results[0],  0);
+  const journalCount        = fulfilled(results[1],  0);
+  const wellnessCount       = fulfilled(results[2],  0);
+  const habitsCount         = fulfilled(results[3],  0);
+  const maxStreakResult     = fulfilled(results[4],  [] as { streak: number }[]);
+  const nutritionCount      = fulfilled(results[5],  0);
+  const financeCount        = fulfilled(results[6],  0);
+  const incomeCount         = fulfilled(results[7],  0);
+  const expenseCount        = fulfilled(results[8],  0);
+  const userData            = fulfilled(results[9],  null as { createdAt: Date } | null);
+  const checkinCount        = fulfilled(results[10], 0);
+  const monthlyClosureCount = fulfilled(results[11], 0);
+  const empireActiveResult  = fulfilled(results[12], [] as { empire: string }[]);
+  const gratitudeCount      = fulfilled(results[13], 0);
+  const financeContextCount = fulfilled(results[14], 0);
+  const meditationTypeResult = fulfilled(results[15], [] as { type: string }[]);
+  const wellnessMoodResult  = fulfilled(results[16], [] as { mood: number }[]);
+  const empireHighLevelResult = fulfilled(results[17], [] as { empire: string }[]);
+  const recentCheckins      = fulfilled(results[18], [] as { date: Date }[]);
 
   const progress: Record<string, number> = {};
   const maxStreak = maxStreakResult[0]?.streak || 0;

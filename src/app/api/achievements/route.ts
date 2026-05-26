@@ -60,8 +60,13 @@ export async function GET(request: NextRequest) {
         percent: totalVisible > 0 ? Math.round((unlockedVisible / totalVisible) * 100) : 0,
       },
     });
-  } catch (error) {
-    console.error('Achievements error:', error);
+  } catch (error: unknown) {
+    // Structured error logging — includes Prisma code and message so
+    // that "table does not exist" or connection errors are immediately
+    // visible in server logs without hiding behind a generic message.
+    const message = error instanceof Error ? error.message : String(error);
+    const code = (error as any)?.code || (error as any)?.prismaCode || 'UNKNOWN';
+    console.error(`[ACHIEVEMENTS] Unhandled error (code=${code}):`, message);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
