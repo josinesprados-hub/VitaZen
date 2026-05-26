@@ -69,60 +69,44 @@ export async function getAuthUser(idToken: string) {
 // This saves 2 unnecessary joins per request on most routes.
 
 export async function getAuthUserBasic(idToken: string): Promise<{ id: string; plan: string; firebaseUid: string; email: string } | null> {
-  // [DEBUG] Temporary diagnostic logging — remove after bug fix
-  console.log('[DEBUG:getAuthUserBasic] called');
+  const decodedToken = await verifyFirebaseToken(idToken);
+  if (!decodedToken) return null;
 
-  let decodedToken;
-  try {
-    decodedToken = await verifyFirebaseToken(idToken);
-  } catch (err) {
-    console.error('[DEBUG:getAuthUserBasic] verifyFirebaseToken THREW:', err);
-    return null;
-  }
-  if (!decodedToken) {
-    console.warn('[DEBUG:getAuthUserBasic] verifyFirebaseToken returned null');
-    return null;
-  }
-  console.log('[DEBUG:getAuthUserBasic] token verified, uid:', decodedToken.uid, 'email:', decodedToken.email);
+  // Use `include: {}` (empty — no extra relations) instead of `select`.
+  // The `select` clause can behave differently with driver adapters
+  // (PrismaPg) — returning null in edge cases where `include` works.
+  // By using `include: {}` we get the same performance benefit (no
+  // unnecessary joins) while using the proven query pattern from
+  // getAuthUser. We then pick only the fields we need from the result.
 
-  let user;
-  try {
-    user = await db.user.findUnique({
-      where: { firebaseUid: decodedToken.uid },
-      select: { id: true, plan: true, firebaseUid: true, email: true },
-    });
-  } catch (err) {
-    console.error('[DEBUG:getAuthUserBasic] findUnique by firebaseUid THREW:', err);
-    return null;
-  }
-  console.log('[DEBUG:getAuthUserBasic] findUnique by firebaseUid result:', user ? `id=${user.id}` : 'null');
+  let user = await db.user.findUnique({
+    where: { firebaseUid: decodedToken.uid },
+    include: {},  // Empty include — no extra joins, but uses proven query path
+  });
 
   // Same email fallback as getAuthUser
   if (!user && decodedToken.email) {
-    try {
-      user = await db.user.findUnique({
-        where: { email: decodedToken.email },
-        select: { id: true, plan: true, firebaseUid: true, email: true },
-      });
-    } catch (err) {
-      console.error('[DEBUG:getAuthUserBasic] findUnique by email THREW:', err);
-      return null;
-    }
-    console.log('[DEBUG:getAuthUserBasic] findUnique by email result:', user ? `id=${user.id}` : 'null');
+    user = await db.user.findUnique({
+      where: { email: decodedToken.email },
+      include: {},
+    });
     if (user && user.firebaseUid !== decodedToken.uid) {
-      try {
-        await db.user.update({
-          where: { id: user.id },
-          data: { firebaseUid: decodedToken.uid },
-        });
-      } catch (err) {
-        console.error('[DEBUG:getAuthUserBasic] firebaseUid update THREW:', err);
-      }
+      await db.user.update({
+        where: { id: user.id },
+        data: { firebaseUid: decodedToken.uid },
+      });
     }
   }
 
-  console.log('[DEBUG:getAuthUserBasic] returning:', user ? `id=${user.id} plan=${user.plan}` : 'null');
-  return user;
+  if (!user) return null;
+
+  // Return only the fields the caller needs
+  return {
+    id: user.id,
+    plan: user.plan,
+    firebaseUid: user.firebaseUid,
+    email: user.email,
+  };
 }
 
 export async function syncUserToDatabase(firebaseUid: string, email: string, name?: string) {
