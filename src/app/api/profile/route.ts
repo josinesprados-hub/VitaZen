@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { validateAvatarUrlServer } from '@/lib/avatar';
 
 // GET /api/profile — Fetch current user profile
 export async function GET(request: NextRequest) {
@@ -71,6 +72,12 @@ export async function PUT(request: NextRequest) {
     }
     if (city !== undefined && city !== null && city.length > 80) {
       return NextResponse.json({ error: 'City name too long' }, { status: 400 });
+    }
+
+    // Validate avatar URL (data URL format, size, type)
+    const avatarError = validateAvatarUrlServer(avatarUrl);
+    if (avatarError) {
+      return NextResponse.json({ error: avatarError }, { status: 400 });
     }
 
     const updatedUser = await db.user.update({

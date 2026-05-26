@@ -19,6 +19,7 @@ import {
   Loader2,
   Pencil,
 } from 'lucide-react';
+import { processAvatar, type AvatarProcessError } from '@/lib/avatar';
 
 export default function PerfilPage() {
   const { user, firebaseUser, refreshUser } = useAuth();
@@ -27,6 +28,7 @@ export default function PerfilPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [processingAvatar, setProcessingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -71,19 +73,25 @@ export default function PerfilPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // For now, use a data URL approach (simple, no external storage needed)
-    // In production, you'd upload to S3/Cloudinary
-    if (file.size > 2 * 1024 * 1024) {
-      setError('La imagen es demasiado grande (max 2MB)');
-      return;
-    }
+    // Reset the input so the same file can be re-selected after an error
+    e.target.value = '';
 
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setForm(prev => ({ ...prev, avatarUrl: dataUrl }));
-    };
-    reader.readAsDataURL(file);
+    setProcessingAvatar(true);
+    setError(null);
+
+    try {
+      const result = await processAvatar(file);
+      setForm(prev => ({ ...prev, avatarUrl: result.dataUrl }));
+    } catch (err) {
+      const avatarErr = err as AvatarProcessError;
+      if (avatarErr?.message) {
+        setError(avatarErr.message);
+      } else {
+        setError('No se pudo procesar la imagen. Intenta con otra foto.');
+      }
+    } finally {
+      setProcessingAvatar(false);
+    }
   };
 
   const handleSave = async () => {
@@ -212,7 +220,9 @@ export default function PerfilPage() {
           {/* Avatar */}
           <div className="relative group">
             <div className="w-24 h-24 rounded-full overflow-hidden bg-[#c8a55a]/10 border-2 border-[#1a1a1a] flex items-center justify-center">
-              {form.avatarUrl ? (
+              {processingAvatar ? (
+                <Loader2 size={24} className="text-[#c8a55a] animate-spin" />
+              ) : form.avatarUrl ? (
                 <img
                   src={form.avatarUrl}
                   alt="Avatar"
@@ -224,7 +234,7 @@ export default function PerfilPage() {
                 </span>
               )}
             </div>
-            {editing && (
+            {editing && !processingAvatar && (
               <>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -235,7 +245,7 @@ export default function PerfilPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={handleAvatarChange}
                   className="hidden"
                 />
