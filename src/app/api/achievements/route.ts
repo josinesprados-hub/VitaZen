@@ -5,7 +5,6 @@ import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import {
   ACHIEVEMENTS,
-  calculateProgress,
   checkAndUnlock,
   buildAchievementResponse,
 } from '@/lib/achievements';
@@ -29,17 +28,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Auto-unlock achievements that meet their target (non-blocking)
-    // This is the "algo se recordó" moment — not an instant reward
-    const newlyUnlocked = await checkAndUnlock(user.id);
+    // Auto-unlock achievements that meet their target.
+    // checkAndUnlock returns progressData + unlockedKeys so we
+    // don't need to recalculate — eliminates a duplicate set of
+    // ~19 DB queries that was causing timeouts and failures.
+    const { newlyUnlocked, progressData, unlockedKeys } = await checkAndUnlock(user.id);
 
-    // Fetch all unlocked achievements + progress in parallel
-    const [unlocked, progressData] = await Promise.all([
-      db.achievement.findMany({ where: { userId: user.id } }),
-      calculateProgress(user.id),
-    ]);
-
-    const unlockedKeys = new Set(unlocked.map(a => a.key));
+    // Fetch unlockedAt timestamps (lightweight — only the unlocked records)
+    const unlocked = await db.achievement.findMany({ where: { userId: user.id } });
     const unlockedAtMap = new Map(unlocked.map(a => [a.key, a.unlockedAt.toISOString()]));
 
     // Build response with hidden achievement logic

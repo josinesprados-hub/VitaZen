@@ -381,9 +381,16 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
 // Checks all achievements against current progress.
 // Creates Achievement records for any that meet their target
 // but haven't been unlocked yet.
-// Returns list of newly unlocked achievement keys.
+// Returns newly unlocked keys + progressData + unlockedKeys
+// so callers don't need to re-query or re-calculate.
 
-export async function checkAndUnlock(userId: string): Promise<string[]> {
+export interface UnlockResult {
+  newlyUnlocked: string[];
+  progressData: Record<string, number>;
+  unlockedKeys: Set<string>;
+}
+
+export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
   const [unlocked, progressData] = await Promise.all([
     db.achievement.findMany({
       where: { userId },
@@ -412,7 +419,7 @@ export async function checkAndUnlock(userId: string): Promise<string[]> {
     }
   }
 
-  return newlyUnlocked;
+  return { newlyUnlocked, progressData, unlockedKeys };
 }
 
 // ─── Achievement Response Builder ────────────────────────

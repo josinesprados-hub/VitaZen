@@ -231,12 +231,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // syncUser handled by onAuthStateChanged
   };
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await firebaseSignOut(getAuthInstance());
     setUser(null);
     setFirebaseUser(null);
     setSyncError(false);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ firebaseUser, user, loading, syncError, signIn, signUp, signInWithGoogle, signOut, refreshUser }}>

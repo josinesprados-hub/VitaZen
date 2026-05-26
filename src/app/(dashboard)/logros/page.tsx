@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_ACHIEVEMENTS } from '@/lib/screenshot-data';
 import { LogrosSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -19,8 +20,6 @@ import {
   Lock,
   Filter,
   PiggyBank,
-  AlertCircle,
-  RefreshCw,
   Circle,
   Sun,
   Calendar,
@@ -123,37 +122,65 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function LogrosPage() {
   const { apiFetch } = useApi();
+  const { firebaseUser } = useAuth();
   const { isActive: screenshotMode } = useScreenshotMode();
   const [data, setData] = useState<AchievementsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    // ── Screenshot mode: use frozen demo data ──
+    if (screenshotMode) {
+      setData(SCREENSHOT_ACHIEVEMENTS as any);
+      setLoading(false);
+      return;
+    }
+
+    // ── Wait for Firebase auth before fetching ──
+    // The dashboard layout guarantees `user` exists when we mount,
+    // but `firebaseUser` in useApi might briefly be null during
+    // the initial render cycle. Guarding here prevents the
+    // synthetic 401 that useApi returns when firebaseUser is null.
+    if (!firebaseUser) return;
+
+    // ── Abort any in-flight request from a previous effect ──
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     let cancelled = false;
 
     const fetchAchievements = async () => {
       setLoading(true);
       setError(false);
 
-      // ── Screenshot mode: use frozen demo data ──
-      if (screenshotMode) {
-        setData(SCREENSHOT_ACHIEVEMENTS as any);
-        setLoading(false);
-        return;
-      }
-
       try {
-        const res = await apiFetch('/api/achievements');
-        if (!cancelled && res.ok) {
+        const res = await apiFetch('/api/achievements', {
+          signal: controller.signal,
+        });
+
+        if (cancelled || controller.signal.aborted) return;
+
+        if (res.ok) {
           const json = await res.json();
-          setData(json);
-        } else if (!cancelled) {
-          setError(true);
+          if (!cancelled) {
+            setData(json);
+          }
+        } else {
+          // 401 is handled by useApi (token refresh / sign-out).
+          // For anything else, show a graceful error state.
+          if (!cancelled && res.status !== 401) {
+            setError(true);
+          }
         }
       } catch (err) {
+        // AbortError means the effect was cleaned up — not a real error
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         if (!cancelled) {
-          console.error('[ACHIEVEMENTS] Error:', err);
           setError(true);
         }
       } finally {
@@ -167,8 +194,9 @@ export default function LogrosPage() {
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, [apiFetch, screenshotMode]);
+  }, [apiFetch, screenshotMode, firebaseUser]);
 
   if (loading) {
     return <LogrosSkeleton />;
@@ -177,17 +205,13 @@ export default function LogrosPage() {
   if (error) {
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
-          <AlertCircle size={32} className="text-[#666]" />
-          <p className="text-[#999] text-sm">No se pudieron cargar los logros</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="flex items-center gap-2 text-[#c8a55a] text-sm hover:underline"
-          >
-            <RefreshCw size={14} />
-            Reintentar
-          </button>
-        </div>
+        <PremiumEmptyState
+          icon={Trophy}
+          title="Los logros están descansando"
+          subtitle="No pudimos cargarlos ahora. Vuelve en un momento."
+          size="lg"
+          variant="gold"
+        />
       </div>
     );
   }
