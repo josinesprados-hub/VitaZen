@@ -54,9 +54,24 @@ export default function ElitePage() {
           window.location.href = data.url;
           return;
         }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        if (data.error === 'already_subscribed') {
+          // User already has Élite — redirect to manage subscription
+          const portalRes = await apiFetch('/api/stripe/portal', { method: 'POST' });
+          if (portalRes.ok) {
+            const portalData = await portalRes.json();
+            if (portalData.url) {
+              window.location.href = portalData.url;
+              return;
+            }
+          }
+          router.push('/ajustes');
+        } else {
+          // Generic failure — fallback to pricing
+          router.push('/pricing');
+        }
       }
-      // Fallback to pricing if checkout fails
-      router.push('/pricing');
     } catch {
       router.push('/pricing');
     } finally {

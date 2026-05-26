@@ -495,3 +495,21 @@ model EmotionalDashboardState {
 
   @@index([userId])
 }
+
+// ═══════════════════════════════════════════
+// STRIPE WEBHOOK IDEMPOTENCY
+// Prevents duplicate processing of Stripe events.
+// Stripe retries webhooks on 500 responses — without
+// dedup, a single event could create duplicate
+// Subscription records, send duplicate emails, etc.
+// Auto-cleaned after 7 days via webhook handler.
+// ═══════════════════════════════════════════
+
+model StripeEventLog {
+  id        String   @id @default(cuid())
+  eventId   String   @unique  // Stripe event ID (evt_...)
+  eventType String              // checkout.session.completed, etc.
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

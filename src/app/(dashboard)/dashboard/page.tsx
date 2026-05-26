@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -46,15 +46,59 @@ export default function DashboardPage() {
 
   const onboardingConfirmed = user?.onboardingCompleted === true;
 
-  // Handle post-Stripe redirect: refresh user plan state and clean URL
+  // ─── Post-checkout: poll for premium activation ──────────────────
+  // After Stripe checkout, the user returns to /dashboard?upgraded=true.
+  // The webhook might not have processed yet, so a single refreshUser()
+  // could return FREE even though payment succeeded.
+  //
+  // Strategy: poll with increasing backoff (2s, 4s, 8s).
+  // If premium is detected, stop polling and clean URL.
+  // If all attempts fail, show a calm "activating" state — the user
+  // doesn't lose anything; the webhook will process eventually.
+  const upgradedPollingRef = useRef(false);
+
   useEffect(() => {
-    if (searchParams.get('upgraded') === 'true') {
-      // Stripe webhook may not have processed yet — refresh user to get updated plan
-      refreshUser();
-      // Clean URL without full reload to avoid re-triggering
+    if (searchParams.get('upgraded') !== 'true') return;
+    if (upgradedPollingRef.current) return;
+    upgradedPollingRef.current = true;
+
+    const pollDelays = [2000, 4000, 8000]; // 2s, 4s, 8s
+    let attempt = 0;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const poll = async () => {
+      await refreshUser();
+      // If premium is now active, stop polling and clean URL
+      // Note: we can't check `user.plan` here because it won't be
+      // updated yet (refreshUser is async, state update is batched).
+      // Instead, we'll check in a separate effect below.
+      attempt++;
+      if (attempt < pollDelays.length) {
+        timeoutId = setTimeout(poll, pollDelays[attempt]);
+      } else {
+        // All attempts exhausted — clean URL regardless.
+        // The webhook will process eventually, and the next
+        // natural refreshUser() will pick it up.
+        router.replace('/dashboard');
+      }
+    };
+
+    // Start first poll immediately
+    poll();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Separate effect: when user.plan becomes PREMIUM during polling,
+  // clean the URL immediately (no need to keep polling).
+  useEffect(() => {
+    if (user?.plan === 'PREMIUM' && searchParams.get('upgraded') === 'true') {
       router.replace('/dashboard');
     }
-  }, [searchParams, refreshUser, router]);
+  }, [user?.plan, searchParams, router]);
 
   useEffect(() => {
     if (!user || !onboardingConfirmed) return;

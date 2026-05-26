@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
@@ -19,6 +20,7 @@ export default function PricingPage() {
   const { user } = useAuth();
   const { displayUser } = useScreenshotMode();
   const { apiFetch } = useApi();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleUpgrade = async () => {
@@ -31,8 +33,22 @@ export default function PricingPage() {
           window.location.href = data.url;
         }
       } else {
-        const data = await res.json();
-        alert(data.error || 'No se ha podido procesar. Inténtalo de nuevo.');
+        const data = await res.json().catch(() => ({}));
+        if (data.error === 'already_subscribed') {
+          // User already has Élite — redirect to manage subscription
+          const portalRes = await apiFetch('/api/stripe/portal', { method: 'POST' });
+          if (portalRes.ok) {
+            const portalData = await portalRes.json();
+            if (portalData.url) {
+              window.location.href = portalData.url;
+              return;
+            }
+          }
+          // Portal also failed — go to settings
+          router.push('/ajustes');
+        } else {
+          alert(data.message || data.error || 'No se ha podido procesar. Inténtalo de nuevo.');
+        }
       }
     } catch (error) {
       console.error('Checkout error:', error);

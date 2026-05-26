@@ -40,8 +40,15 @@ export function SubscriptionManager() {
           window.location.href = data.url;
           return;
         }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        // If no Stripe customer yet (webhook race), show a calm message
+        if (data.error?.includes('No Stripe customer')) {
+          alert('Tu suscripción se está activando. Vuelve a intentarlo en unos segundos.');
+        } else {
+          router.push('/pricing');
+        }
       }
-      router.push('/pricing');
     } catch {
       router.push('/pricing');
     } finally {

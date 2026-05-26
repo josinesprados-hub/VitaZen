@@ -19,7 +19,47 @@ export async function POST(request: NextRequest) {
     }
 
     if (user.plan === 'PREMIUM') {
-      return NextResponse.json({ error: 'Already subscribed' }, { status: 400 });
+      // User already has premium — check if they have an active subscription
+      const activeSub = user.subscriptions?.find(
+        (s) => s.status === 'active' || s.status === 'trialing'
+      );
+      if (activeSub) {
+        return NextResponse.json(
+          { error: 'already_subscribed', message: 'Ya tienes Élite activo. Puedes gestionar tu suscripción en Ajustes.' },
+          { status: 400 }
+        );
+      }
+      // User is PREMIUM but has no active subscription — allow checkout
+      // (could be a manual admin promotion, or a ghost state from a bug)
+      console.warn('[Checkout] User is PREMIUM but has no active subscription — allowing checkout:', user.id);
+    }
+
+    // ─── Prevent duplicate active checkout sessions ───────────────
+    // Check if user already has an active subscription to avoid creating
+    // a second one. This catches edge cases where:
+    //   - User opens checkout in two tabs
+    //   - Webhook hasn't processed yet but user tries again
+    const existingActiveSub = await db.subscription.findFirst({
+      where: {
+        userId: user.id,
+        status: { in: ['active', 'trialing'] },
+      },
+    });
+
+    if (existingActiveSub) {
+      // User has an active subscription but plan might not be PREMIUM yet
+      // (webhook race condition). Promote them and redirect to portal.
+      if (user.plan !== 'PREMIUM') {
+        await db.user.update({
+          where: { id: user.id },
+          data: { plan: 'PREMIUM' },
+        });
+        console.log('[Checkout] Found active subscription but FREE plan — promoted:', user.id);
+      }
+      return NextResponse.json(
+        { error: 'already_subscribed', message: 'Ya tienes una suscripción activa. Puedes gestionarla en Ajustes.' },
+        { status: 400 }
+      );
     }
 
     // Create or retrieve Stripe customer
@@ -52,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Track premium upgrade click
-    trackEvent({ event: 'premium_upgrade_clicked', userId: user.id });
+    trackEvent({ event: 'premium_upgrade_clicked', userId: user.id }).catch(() => {});
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
