@@ -19,16 +19,21 @@ import { serverLog } from '@/lib/observability/server-logger';
 // ═══════════════════════════════════════════
 
 async function handler(request: NextRequest) {
+  // [DEBUG] Temporary diagnostic logging
+  console.log('[DEBUG:achievements] GET /api/achievements called');
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
+      console.warn('[DEBUG:achievements] No Bearer token');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) {
+      console.warn('[DEBUG:achievements] getAuthUserBasic returned null');
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+    console.log('[DEBUG:achievements] user resolved, id:', user.id);
 
     // Auto-unlock achievements that meet their target.
     // checkAndUnlock returns progressData + unlockedKeys so we

@@ -69,28 +69,59 @@ export async function getAuthUser(idToken: string) {
 // This saves 2 unnecessary joins per request on most routes.
 
 export async function getAuthUserBasic(idToken: string): Promise<{ id: string; plan: string; firebaseUid: string; email: string } | null> {
-  const decodedToken = await verifyFirebaseToken(idToken);
-  if (!decodedToken) return null;
+  // [DEBUG] Temporary diagnostic logging — remove after bug fix
+  console.log('[DEBUG:getAuthUserBasic] called');
 
-  let user = await db.user.findUnique({
-    where: { firebaseUid: decodedToken.uid },
-    select: { id: true, plan: true, firebaseUid: true, email: true },
-  });
+  let decodedToken;
+  try {
+    decodedToken = await verifyFirebaseToken(idToken);
+  } catch (err) {
+    console.error('[DEBUG:getAuthUserBasic] verifyFirebaseToken THREW:', err);
+    return null;
+  }
+  if (!decodedToken) {
+    console.warn('[DEBUG:getAuthUserBasic] verifyFirebaseToken returned null');
+    return null;
+  }
+  console.log('[DEBUG:getAuthUserBasic] token verified, uid:', decodedToken.uid, 'email:', decodedToken.email);
+
+  let user;
+  try {
+    user = await db.user.findUnique({
+      where: { firebaseUid: decodedToken.uid },
+      select: { id: true, plan: true, firebaseUid: true, email: true },
+    });
+  } catch (err) {
+    console.error('[DEBUG:getAuthUserBasic] findUnique by firebaseUid THREW:', err);
+    return null;
+  }
+  console.log('[DEBUG:getAuthUserBasic] findUnique by firebaseUid result:', user ? `id=${user.id}` : 'null');
 
   // Same email fallback as getAuthUser
   if (!user && decodedToken.email) {
-    user = await db.user.findUnique({
-      where: { email: decodedToken.email },
-      select: { id: true, plan: true, firebaseUid: true, email: true },
-    });
-    if (user && user.firebaseUid !== decodedToken.uid) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { firebaseUid: decodedToken.uid },
+    try {
+      user = await db.user.findUnique({
+        where: { email: decodedToken.email },
+        select: { id: true, plan: true, firebaseUid: true, email: true },
       });
+    } catch (err) {
+      console.error('[DEBUG:getAuthUserBasic] findUnique by email THREW:', err);
+      return null;
+    }
+    console.log('[DEBUG:getAuthUserBasic] findUnique by email result:', user ? `id=${user.id}` : 'null');
+    if (user && user.firebaseUid !== decodedToken.uid) {
+      try {
+        await db.user.update({
+          where: { id: user.id },
+          data: { firebaseUid: decodedToken.uid },
+        });
+      } catch (err) {
+        console.error('[DEBUG:getAuthUserBasic] firebaseUid update THREW:', err);
+      }
     }
   }
 
+  console.log('[DEBUG:getAuthUserBasic] returning:', user ? `id=${user.id} plan=${user.plan}` : 'null');
   return user;
 }
 
