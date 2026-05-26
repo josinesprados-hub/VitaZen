@@ -167,14 +167,14 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     // 6. Nutrition logs
     db.nutritionLog.count({ where: { userId } }),
 
-    // 7. Finance logs (all)
-    db.financeLog.count({ where: { userId } }),
-
-    // 8. Finance logs (income)
-    db.financeLog.count({ where: { userId, type: 'income' } }),
-
-    // 9. Finance logs (expense)
-    db.financeLog.count({ where: { userId, type: 'expense' } }),
+    // 7-9. Finance logs — consolidated from 3 separate count queries into 1 groupBy
+    // Previously: 3 separate count queries (all, income, expense) = 3 DB roundtrips
+    // Now: 1 groupBy query returning all 3 counts
+    db.financeLog.groupBy({
+      by: ['type'],
+      where: { userId },
+      _count: { type: true },
+    }),
 
     // 10. User data (createdAt)
     db.user.findUnique({ where: { id: userId }, select: { createdAt: true } }),
@@ -236,19 +236,27 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   const habitsCount         = fulfilled(results[3],  0);
   const maxStreakResult     = fulfilled(results[4],  [] as { streak: number }[]);
   const nutritionCount      = fulfilled(results[5],  0);
-  const financeCount        = fulfilled(results[6],  0);
-  const incomeCount         = fulfilled(results[7],  0);
-  const expenseCount        = fulfilled(results[8],  0);
-  const userData            = fulfilled(results[9],  null as { createdAt: Date } | null);
-  const checkinCount        = fulfilled(results[10], 0);
-  const monthlyClosureCount = fulfilled(results[11], 0);
-  const empireActiveResult  = fulfilled(results[12], [] as { empire: string }[]);
-  const gratitudeCount      = fulfilled(results[13], 0);
-  const financeContextCount = fulfilled(results[14], 0);
-  const meditationTypeResult = fulfilled(results[15], [] as { type: string }[]);
-  const wellnessMoodResult  = fulfilled(results[16], [] as { mood: number }[]);
-  const empireHighLevelResult = fulfilled(results[17], [] as { empire: string }[]);
-  const recentCheckins      = fulfilled(results[18], [] as { date: Date }[]);
+  const financeGroupBy      = fulfilled(results[6],  [] as { type: string; _count: { type: number } }[]);
+  const userData            = fulfilled(results[7],  null as { createdAt: Date } | null);
+  const checkinCount        = fulfilled(results[8],  0);
+  const monthlyClosureCount = fulfilled(results[9],  0);
+  const empireActiveResult  = fulfilled(results[10], [] as { empire: string }[]);
+  const gratitudeCount      = fulfilled(results[11], 0);
+  const financeContextCount = fulfilled(results[12], 0);
+  const meditationTypeResult = fulfilled(results[13], [] as { type: string }[]);
+  const wellnessMoodResult  = fulfilled(results[14], [] as { mood: number }[]);
+  const empireHighLevelResult = fulfilled(results[15], [] as { empire: string }[]);
+  const recentCheckins      = fulfilled(results[16], [] as { date: Date }[]);
+
+  // Extract finance counts from groupBy result (was 3 separate queries)
+  let financeCount = 0;
+  let incomeCount = 0;
+  let expenseCount = 0;
+  for (const row of financeGroupBy) {
+    financeCount += row._count.type;
+    if (row.type === 'income') incomeCount = row._count.type;
+    if (row.type === 'expense') expenseCount = row._count.type;
+  }
 
   const progress: Record<string, number> = {};
   const maxStreak = maxStreakResult[0]?.streak || 0;

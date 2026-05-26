@@ -61,6 +61,39 @@ export async function getAuthUser(idToken: string) {
   return user;
 }
 
+// ═══════════════════════════════════════════
+// Lightweight auth lookup — only id, plan, firebaseUid
+// ═══════════════════════════════════════════
+// Use this in API routes that only need to identify the user
+// and check their plan — skip the aiUsage + subscriptions joins.
+// This saves 2 unnecessary joins per request on most routes.
+
+export async function getAuthUserBasic(idToken: string): Promise<{ id: string; plan: string; firebaseUid: string; email: string } | null> {
+  const decodedToken = await verifyFirebaseToken(idToken);
+  if (!decodedToken) return null;
+
+  let user = await db.user.findUnique({
+    where: { firebaseUid: decodedToken.uid },
+    select: { id: true, plan: true, firebaseUid: true, email: true },
+  });
+
+  // Same email fallback as getAuthUser
+  if (!user && decodedToken.email) {
+    user = await db.user.findUnique({
+      where: { email: decodedToken.email },
+      select: { id: true, plan: true, firebaseUid: true, email: true },
+    });
+    if (user && user.firebaseUid !== decodedToken.uid) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { firebaseUid: decodedToken.uid },
+      });
+    }
+  }
+
+  return user;
+}
+
 export async function syncUserToDatabase(firebaseUid: string, email: string, name?: string) {
   const existingUser = await db.user.findUnique({
     where: { firebaseUid },

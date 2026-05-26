@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 // ═══════════════════════════════════════════
 // useNetworkStatus — shared online/offline state
@@ -38,8 +38,13 @@ function updateState(online: boolean) {
   listeners.forEach(fn => fn());
 }
 
-// Install global listeners once
-if (typeof window !== 'undefined') {
+// Install global listeners lazily — only when the first hook mounts.
+// This prevents memory leaks from module-level listeners that are never cleaned up.
+let globalListenersInstalled = false;
+
+function installGlobalListeners() {
+  if (globalListenersInstalled || typeof window === 'undefined') return;
+  globalListenersInstalled = true;
   window.addEventListener('online', () => updateState(true));
   window.addEventListener('offline', () => updateState(false));
 }
@@ -48,6 +53,9 @@ export function useNetworkStatus(): NetworkStatus {
   const [state, setState] = useState<NetworkStatus>(getInitialState);
 
   useEffect(() => {
+    // Install global listeners on first hook mount (not module import)
+    installGlobalListeners();
+
     // Sync with latest shared state on mount
     setState(getInitialState());
 

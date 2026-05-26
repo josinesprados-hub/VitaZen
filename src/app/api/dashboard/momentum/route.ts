@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 // ═══════════════════════════════════════════
@@ -38,21 +38,43 @@ export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    // Streak calculation: only need last 60 days (no real streak exceeds this)
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-    // Fetch 7-day activity counts
+    // ═══ PERFORMANCE FIX: Merge all 4 sequential rounds into 1 parallel round ═══
+    // Previously: 4 rounds × 4-5 queries each = 18 queries sequentially
+    // Now: 1 single Promise.all with all 13 count/date queries + 4 bounded streak queries
     const [
+      // 7-day counts
       meditationSessions,
       habitCompletions,
       journalEntries,
       checkins,
       challengesCompleted,
+      // 14-day counts (for trend)
+      prevMeditation,
+      prevHabits,
+      prevJournal,
+      prevCheckins,
+      prevChallenges,
+      // 7-day date lookups (for active days)
+      medDates,
+      habDates,
+      jouDates,
+      checkDates,
+      // Bounded streak data (60 days, not ALL TIME)
+      streakMed,
+      streakHab,
+      streakJou,
+      streakCheck,
     ] = await Promise.all([
+      // ─── 7-day activity counts ───
       db.meditationSession.count({
         where: { userId: user.id, completedAt: { gte: sevenDaysAgo } },
       }),
@@ -68,59 +90,23 @@ export async function GET(request: NextRequest) {
       db.userChallenge.count({
         where: { userId: user.id, completed: true, completedAt: { gte: sevenDaysAgo } },
       }),
-    ]);
-
-    // Fetch 14-day activity for trend comparison
-    const [
-      prevMeditation,
-      prevHabits,
-      prevJournal,
-      prevCheckins,
-      prevChallenges,
-    ] = await Promise.all([
+      // ─── 14-day activity for trend comparison ───
       db.meditationSession.count({
-        where: {
-          userId: user.id,
-          completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo },
-        },
+        where: { userId: user.id, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
       }),
       db.habitLog.count({
-        where: {
-          userId: user.id,
-          lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo, not: null },
-        },
+        where: { userId: user.id, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo, not: null } },
       }),
       db.journalEntry.count({
-        where: {
-          userId: user.id,
-          createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo },
-        },
+        where: { userId: user.id, createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
       }),
       db.dailyCheckin.count({
-        where: {
-          userId: user.id,
-          date: { gte: fourteenDaysAgo, lt: sevenDaysAgo },
-        },
+        where: { userId: user.id, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
       }),
       db.userChallenge.count({
-        where: {
-          userId: user.id,
-          completed: true,
-          completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo },
-        },
+        where: { userId: user.id, completed: true, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
       }),
-    ]);
-
-    // Count unique active days in last 7 days
-    const allRecentDates = new Set<string>();
-    const addDates = (dates: Date[]) => {
-      for (const d of dates) {
-        const day = new Date(d);
-        allRecentDates.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
-      }
-    };
-
-    const [medDates, habDates, jouDates, checkDates] = await Promise.all([
+      // ─── 7-day date lookups for active days ───
       db.meditationSession.findMany({
         where: { userId: user.id, completedAt: { gte: sevenDaysAgo } },
         select: { completedAt: true },
@@ -137,7 +123,37 @@ export async function GET(request: NextRequest) {
         where: { userId: user.id, date: { gte: sevenDaysAgo } },
         select: { date: true },
       }),
+      // ─── Streak data: 60-day bounded (was unbounded ALL TIME) ───
+      db.meditationSession.findMany({
+        where: { userId: user.id, completedAt: { gte: sixtyDaysAgo } },
+        select: { completedAt: true },
+        orderBy: { completedAt: 'desc' },
+      }),
+      db.habitLog.findMany({
+        where: { userId: user.id, lastCompletedAt: { not: null, gte: sixtyDaysAgo } },
+        select: { lastCompletedAt: true },
+        orderBy: { lastCompletedAt: 'desc' },
+      }),
+      db.journalEntry.findMany({
+        where: { userId: user.id, createdAt: { gte: sixtyDaysAgo } },
+        select: { createdAt: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      db.dailyCheckin.findMany({
+        where: { userId: user.id, date: { gte: sixtyDaysAgo } },
+        select: { date: true },
+        orderBy: { date: 'desc' },
+      }),
     ]);
+
+    // ─── Calculate active days ───
+    const allRecentDates = new Set<string>();
+    const addDates = (dates: Date[]) => {
+      for (const d of dates) {
+        const day = new Date(d);
+        allRecentDates.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+      }
+    };
 
     addDates(medDates.map(m => m.completedAt));
     addDates(habDates.map(h => h.lastCompletedAt!));
@@ -146,77 +162,42 @@ export async function GET(request: NextRequest) {
 
     const activeDays = allRecentDates.size;
 
-    // Calculate streak for bonus
-    const currentStreak = await (async () => {
-      // Get all activity dates ever for this user
-      const [allMed, allHab, allJou, allCheck] = await Promise.all([
-        db.meditationSession.findMany({
-          where: { userId: user.id },
-          select: { completedAt: true },
-          orderBy: { completedAt: 'desc' },
-        }),
-        db.habitLog.findMany({
-          where: { userId: user.id, lastCompletedAt: { not: null } },
-          select: { lastCompletedAt: true },
-          orderBy: { lastCompletedAt: 'desc' },
-        }),
-        db.journalEntry.findMany({
-          where: { userId: user.id },
-          select: { createdAt: true },
-          orderBy: { createdAt: 'desc' },
-        }),
-        db.dailyCheckin.findMany({
-          where: { userId: user.id },
-          select: { date: true },
-          orderBy: { date: 'desc' },
-        }),
-      ]);
+    // ─── Calculate streak from bounded data ───
+    const streakDays = new Set<string>();
+    for (const d of [
+      ...streakMed.map(m => m.completedAt),
+      ...streakHab.map(h => h.lastCompletedAt!),
+      ...streakJou.map(j => j.createdAt),
+      ...streakCheck.map(c => c.date),
+    ]) {
+      const day = new Date(d);
+      streakDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+    }
 
-      const uniqueDays = new Set<string>();
-      for (const d of [...allMed.map(m => m.completedAt), ...allHab.map(h => h.lastCompletedAt!), ...allJou.map(j => j.createdAt), ...allCheck.map(c => c.date)]) {
-        const day = new Date(d);
-        uniqueDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
-      }
+    let checkDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const todayStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
+    if (!streakDays.has(todayStr)) {
+      checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+    }
 
-      let checkDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-      const todayStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
-      if (!uniqueDays.has(todayStr)) {
+    let currentStreak = 0;
+    while (true) {
+      const dateStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
+      if (streakDays.has(dateStr)) {
+        currentStreak++;
         checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+      } else {
+        break;
       }
-
-      let streak = 0;
-      while (true) {
-        const dateStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
-        if (uniqueDays.has(dateStr)) {
-          streak++;
-          checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
-        } else {
-          break;
-        }
-      }
-      return streak;
-    })();
+    }
 
     // ─── Calculate Momentum Score ───
-    // Activity days: up to 25 (7 days = 25 pts, scale linearly)
     const activityScore = Math.min(25, Math.round((activeDays / 7) * 25));
-
-    // Habits: up to 20 (7 completions = 20 pts)
     const habitScore = Math.min(20, Math.round((habitCompletions / 7) * 20));
-
-    // Check-ins: up to 15 (7 checkins = 15 pts)
     const checkinScore = Math.min(15, Math.round((checkins / 7) * 15));
-
-    // Meditation: up to 15 (5 sessions = 15 pts)
     const meditationScore = Math.min(15, Math.round((meditationSessions / 5) * 15));
-
-    // Journal: up to 10 (3 entries = 10 pts)
     const journalScore = Math.min(10, Math.round((journalEntries / 3) * 10));
-
-    // Challenges: up to 10 (3 completed = 10 pts)
     const challengeScore = Math.min(10, Math.round((challengesCompleted / 3) * 10));
-
-    // Streak bonus: up to 5 (7+ day streak = 5 pts)
     const streakBonus = Math.min(5, Math.round((currentStreak / 7) * 5));
 
     const totalScore = Math.min(100, activityScore + habitScore + checkinScore + meditationScore + journalScore + challengeScore + streakBonus);
@@ -230,8 +211,6 @@ export async function GET(request: NextRequest) {
     else if (currentWeekTotal < prevWeekTotal - 2) trend = 'down';
 
     const momentumLevel = getMomentumLevel(totalScore);
-
-    // Override trend from level calculation if we have real data
     const finalTrend = currentWeekTotal > 0 ? trend : momentumLevel.trend;
 
     return NextResponse.json({

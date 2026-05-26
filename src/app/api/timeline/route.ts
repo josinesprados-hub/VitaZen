@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { formatCurrency } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+  const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
         where: { userId: user.id },
         orderBy: { createdAt: 'desc' },
         take: limit,
+        select: { id: true, title: true, content: true, mood: true, gratitude: true, createdAt: true },
       }).then((entries) => {
         for (const e of entries) {
           items.push({

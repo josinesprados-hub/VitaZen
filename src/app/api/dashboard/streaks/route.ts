@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 function calcStreak(dates: Date[]): number {
@@ -58,28 +58,33 @@ export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    // Fetch all dates for each category
+    // ═══ PERFORMANCE FIX: Bound queries to 60 days instead of ALL TIME ═══
+    // No real streak exceeds 60 days, and unbounded queries grow linearly
+    // with user history — becoming slower every month.
+    const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
+
+    // Fetch dates for each category (bounded)
     const [meditationDates, habitDates, journalDates, checkinDates] = await Promise.all([
       db.meditationSession.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, completedAt: { gte: sixtyDaysAgo } },
         select: { completedAt: true },
         orderBy: { completedAt: 'desc' },
       }),
       db.habitLog.findMany({
-        where: { userId: user.id, lastCompletedAt: { not: null } },
+        where: { userId: user.id, lastCompletedAt: { not: null, gte: sixtyDaysAgo } },
         select: { lastCompletedAt: true },
         orderBy: { lastCompletedAt: 'desc' },
       }),
       db.journalEntry.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, createdAt: { gte: sixtyDaysAgo } },
         select: { createdAt: true },
         orderBy: { createdAt: 'desc' },
       }),
       db.dailyCheckin.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, date: { gte: sixtyDaysAgo } },
         select: { date: true },
         orderBy: { date: 'desc' },
       }),
@@ -102,7 +107,7 @@ export async function GET(request: NextRequest) {
     // Check if user was active yesterday (for message context)
     const now = new Date();
     const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - 24 * 60 * 60 * 1000);
-    const yesterdayStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
+    const yesterdayStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${yesterday.getUTCDate().padStart(2, '0')}`;
     const uniqueAllDays = new Set<string>();
     for (const d of allDates) {
       const day = new Date(d);

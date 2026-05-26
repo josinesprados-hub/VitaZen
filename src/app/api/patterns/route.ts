@@ -10,7 +10,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { detectPatterns } from '@/lib/patterns/detector';
 import type { CrossEmpireData } from '@/lib/patterns/types';
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const user = await getAuthUser(authHeader.split('Bearer ')[1]);
+    const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }

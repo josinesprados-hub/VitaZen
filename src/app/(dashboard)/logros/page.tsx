@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
@@ -218,13 +218,17 @@ export default function LogrosPage() {
 
   if (!data) return null;
 
-  const filteredAchievements = activeFilter === 'all'
-    ? data.achievements
-    : data.achievements.filter((a) => a.category === activeFilter);
-
-  const unlockedList = filteredAchievements.filter((a) => a.unlocked);
-  const lockedVisibleList = filteredAchievements.filter((a) => !a.unlocked && !a.hidden);
-  const mysteryList = filteredAchievements.filter((a) => !a.unlocked && a.hidden);
+  // Memoize filtered lists to avoid 3× .filter() on every render
+  const { unlockedList, lockedVisibleList, mysteryList } = useMemo(() => {
+    const filteredAchievements = activeFilter === 'all'
+      ? data.achievements
+      : data.achievements.filter((a) => a.category === activeFilter);
+    return {
+      unlockedList: filteredAchievements.filter((a) => a.unlocked),
+      lockedVisibleList: filteredAchievements.filter((a) => !a.unlocked && !a.hidden),
+      mysteryList: filteredAchievements.filter((a) => !a.unlocked && a.hidden),
+    };
+  }, [data.achievements, activeFilter]);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -333,7 +337,7 @@ export default function LogrosPage() {
         </div>
       )}
 
-      {filteredAchievements.length === 0 && (
+      {unlockedList.length === 0 && lockedVisibleList.length === 0 && mysteryList.length === 0 && (
         <PremiumEmptyState
           icon={Trophy}
           title="No hay logros en esta categoría"

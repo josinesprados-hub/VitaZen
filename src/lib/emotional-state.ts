@@ -6,6 +6,12 @@ import { gatherData, type RawData } from './insights';
 // using simple rules from real activity data.
 // No AI. No invented data.
 // ═══════════════════════════════════════════
+//
+// PERFORMANCE NOTE: getEmotionalState() can accept
+// pre-fetched RawData to avoid a duplicate gatherData()
+// call when both insights + emotional state are needed
+// (e.g. /api/weekly-recap). This halves DB queries
+// from 28 → 14 in that route.
 
 // ─────────────────────────────────────────
 // Types
@@ -399,8 +405,11 @@ function getTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
 // Main function
 // ─────────────────────────────────────────
 
-export async function getEmotionalState(userId: string, plan: string): Promise<EmotionalState> {
-  const data = await gatherData(userId);
+export async function getEmotionalState(userId: string, plan: string, existingData?: RawData): Promise<EmotionalState> {
+  // PERFORMANCE: Accept pre-fetched data to avoid duplicate gatherData() calls.
+  // When both insights + emotional state are needed, the caller can fetch
+  // data once and pass it here — saving 14 DB queries.
+  const data = existingData || await gatherData(userId);
   const isPremium = plan === 'PREMIUM';
 
   // Compute all metrics

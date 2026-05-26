@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo, ReactNode } from 'react';
 import {
   onAuthStateChanged,
   User as FirebaseUser,
@@ -248,8 +248,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncError(false);
   }, []);
 
+  // Memoize the provider value to prevent cascade re-renders.
+  // Without this, every auth state change creates a new object reference,
+  // causing ALL consumers (Sidebar, TopBar, every page) to re-render
+  // even if they only use `signIn` or `signOut` (which are stable).
+  const contextValue = useMemo(() => ({
+    firebaseUser, user, loading, syncError,
+    signIn, signUp, signInWithGoogle, signOut, refreshUser,
+  }), [firebaseUser, user, loading, syncError, signIn, signUp, signInWithGoogle, signOut, refreshUser]);
+
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading, syncError, signIn, signUp, signInWithGoogle, signOut, refreshUser }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
@@ -230,7 +230,7 @@ export default function CrecimientoPage() {
     );
   }
 
-  const grouped = groupEntriesByDate(entries);
+  const grouped = useMemo(() => groupEntriesByDate(entries), [entries]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">

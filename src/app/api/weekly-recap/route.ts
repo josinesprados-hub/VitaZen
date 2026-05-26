@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
-import { generateWeeklyInsights, type WeeklySummary, type WeeklyComparison, type Insight } from '@/lib/insights';
+import { generateWeeklyInsights, gatherData, type WeeklySummary, type WeeklyComparison, type Insight } from '@/lib/insights';
 import { getEmotionalState, type EmotionalState } from '@/lib/emotional-state';
 import { trackEvent } from '@/lib/analytics-server';
 
@@ -135,10 +135,15 @@ export async function GET(request: NextRequest) {
 
     const isPremium = user.plan === 'PREMIUM';
 
-    // Reuse existing engines — no duplicated logic
+    // ═══ PERFORMANCE FIX: Call gatherData() ONCE, share with both engines ═══
+    // Previously: generateWeeklyInsights() + getEmotionalState() each called
+    // gatherData() independently = 28 DB queries where 14 suffice.
+    // Now: fetch data once, pass to both, and run them in parallel.
+    const sharedData = await gatherData(user.id);
+
     const [insightsResult, emotionalResult] = await Promise.all([
-      generateWeeklyInsights(user.id, user.plan),
-      getEmotionalState(user.id, user.plan),
+      generateWeeklyInsights(user.id, user.plan, sharedData),
+      getEmotionalState(user.id, user.plan, sharedData),
     ]);
 
     const { summary, insights, comparison } = insightsResult;

@@ -605,8 +605,11 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
 // Main function
 // ─────────────────────────────────────────
 
-export async function generateWeeklyInsights(userId: string, plan: string): Promise<InsightsResult> {
-  const data = await gatherData(userId);
+export async function generateWeeklyInsights(userId: string, plan: string, existingData?: RawData): Promise<InsightsResult> {
+  // PERFORMANCE: Accept pre-fetched data to avoid duplicate gatherData() calls.
+  // When both insights + emotional state are needed (e.g. /api/weekly-recap),
+  // the caller can fetch data once and pass it here — saving 14 DB queries.
+  const data = existingData || await gatherData(userId);
   const summary = buildSummary(data);
   const comparison = plan === 'PREMIUM' ? buildComparison(data) : null;
   const insights = generateInsights(summary, comparison, plan);
