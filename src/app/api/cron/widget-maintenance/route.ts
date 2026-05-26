@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { cleanupExpiredSnapshots, batchRefreshExpiredSnapshots } from '@/lib/widgets';
 import { startCacheCleanup } from '@/lib/widgets/cache';
-import { trackCronFailure, trackBatchProcessingFailure } from '@/lib/observability/server-tracking';
+import { trackCronFailure, trackCronSlowRun, trackBatchProcessingFailure } from '@/lib/observability/server-tracking';
+import { serverLog } from '@/lib/observability/server-logger';
 
 // ═══════════════════════════════════════════
 // CRON: Widget Maintenance
@@ -18,13 +19,18 @@ import { trackCronFailure, trackBatchProcessingFailure } from '@/lib/observabili
 //   3. Start cache cleanup timer (if not already running)
 
 export async function GET(request: NextRequest) {
+  const start = Date.now();
+
   // ── Auth: verify cron secret ──
   const authHeader = request.headers.get('Authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    serverLog.warn('cron/widget-maintenance', 'Unauthorized attempt');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  serverLog.info('cron/widget-maintenance', 'Triggered');
 
   try {
     // ── 1. Start cache cleanup timer ──
@@ -35,11 +41,21 @@ export async function GET(request: NextRequest) {
 
     // ── 3. Refresh stale snapshots (limited batch) ──
     const refreshResult = await batchRefreshExpiredSnapshots(50);
+    const durationMs = Date.now() - start;
 
     // Track batch processing issues
     if (refreshResult.errors > 0) {
       trackBatchProcessingFailure('widget_refresh', refreshResult.errors, refreshResult.processed);
     }
+
+    serverLog.info('cron/widget-maintenance', 'Completed', {
+      deletedSnapshots: deletedCount,
+      processed: refreshResult.processed,
+      errors: refreshResult.errors,
+      durationMs,
+    });
+
+    trackCronSlowRun('widget-maintenance', durationMs);
 
     return NextResponse.json({
       success: true,
@@ -47,8 +63,9 @@ export async function GET(request: NextRequest) {
       refresh: refreshResult,
     });
   } catch (error) {
-    console.error('[WidgetCron] Maintenance error:', error);
-    trackCronFailure('widget-maintenance', error);
+    const durationMs = Date.now() - start;
+    serverLog.error('cron/widget-maintenance', 'Fatal error', error, { durationMs });
+    trackCronFailure('widget-maintenance', error, durationMs);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

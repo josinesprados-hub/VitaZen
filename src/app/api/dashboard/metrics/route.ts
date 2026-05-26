@@ -2,8 +2,10 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { withTiming, timeOperation } from '@/lib/observability/api-timing';
+import { serverLog } from '@/lib/observability/server-logger';
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -60,7 +62,9 @@ export async function GET(request: NextRequest) {
       totalExpense,
     });
   } catch (error) {
-    console.error('Dashboard metrics error:', error);
+    serverLog.apiError('api/dashboard/metrics', 'GET', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const GET = withTiming('api/dashboard/metrics', handler);

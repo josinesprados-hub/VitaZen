@@ -3,7 +3,8 @@ export const maxDuration = 300; // 5 min timeout for batch email sending
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWeeklyRecaps } from '@/lib/weekly-recap-sender';
-import { trackCronFailure } from '@/lib/observability/server-tracking';
+import { trackCronFailure, trackCronSlowRun } from '@/lib/observability/server-tracking';
+import { serverLog } from '@/lib/observability/server-logger';
 
 // ═══════════════════════════════════════════
 // CRON: WEEKLY RECAP EMAILS
@@ -12,27 +13,38 @@ import { trackCronFailure } from '@/lib/observability/server-tracking';
 // ═══════════════════════════════════════════
 
 export async function GET(request: NextRequest) {
+  const start = Date.now();
+
   // Verify cron secret to prevent unauthorized invocation
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    console.warn('[CRON/WEEKLY-RECAP] Unauthorized attempt');
+    serverLog.warn('cron/weekly-recap', 'Unauthorized attempt');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  console.log('[CRON/WEEKLY-RECAP] Triggered at', new Date().toISOString());
+  serverLog.info('cron/weekly-recap', 'Triggered');
 
   try {
     const result = await sendWeeklyRecaps();
+    const durationMs = Date.now() - start;
+
+    serverLog.info('cron/weekly-recap', 'Completed', {
+      ...result,
+      durationMs,
+    });
+
+    trackCronSlowRun('weekly-recap', durationMs);
 
     return NextResponse.json({
       success: true,
       ...result,
     });
   } catch (error) {
-    console.error('[CRON/WEEKLY-RECAP] Fatal error:', error);
-    trackCronFailure('weekly-recap', error);
+    const durationMs = Date.now() - start;
+    serverLog.error('cron/weekly-recap', 'Fatal error', error, { durationMs });
+    trackCronFailure('weekly-recap', error, durationMs);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

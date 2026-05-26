@@ -73,7 +73,7 @@ export {
   trackNotificationDedupFailure,
 } from './notification-tracking';
 
-// Background task monitoring
+// Background task monitoring (server-side — now uses server-logger)
 export {
   trackCronFailure,
   trackCronSlowRun,
@@ -82,6 +82,12 @@ export {
   trackApiRouteError,
   trackNetworkFailure,
 } from './server-tracking';
+
+// Server-side structured logging (for API routes, webhooks, cron)
+export { serverLog } from './server-logger';
+
+// API route timing wrapper
+export { withTiming, timeOperation } from './api-timing';
 
 // ─── One-time Initialization ────────────────
 

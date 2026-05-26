@@ -8,6 +8,8 @@ import {
   checkAndUnlock,
   buildAchievementResponse,
 } from '@/lib/achievements';
+import { withTiming } from '@/lib/observability/api-timing';
+import { serverLog } from '@/lib/observability/server-logger';
 
 // ═══════════════════════════════════════════
 // GET — List achievements with progress
@@ -16,7 +18,7 @@ import {
 // are "remembered" when the user visits this page.
 // ═══════════════════════════════════════════
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -66,7 +68,9 @@ export async function GET(request: NextRequest) {
     // visible in server logs without hiding behind a generic message.
     const message = error instanceof Error ? error.message : String(error);
     const code = (error as any)?.code || (error as any)?.prismaCode || 'UNKNOWN';
-    console.error(`[ACHIEVEMENTS] Unhandled error (code=${code}):`, message);
+    serverLog.apiError('api/achievements', 'GET', 500, error, { prismaCode: code, errorMessage: message });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const GET = withTiming('api/achievements', handler, { slowThresholdMs: 5_000 });

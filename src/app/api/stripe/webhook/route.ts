@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { sendSubscriptionConfirmedEmail } from '@/lib/emails/sender';
 import { trackEvent } from '@/lib/analytics-server';
+import { serverLog } from '@/lib/observability/server-logger';
 import Stripe from 'stripe';
 
 // ─── Idempotency: prevent duplicate event processing ─────────────────
@@ -24,7 +25,7 @@ async function isEventProcessed(eventId: string): Promise<boolean> {
   } catch {
     // If the table doesn't exist yet (migration not applied), log and continue
     // rather than blocking ALL webhook processing.
-    console.warn('[Webhook] StripeEventLog table not available — skipping dedup for event:', eventId);
+    serverLog.warn('webhook/stripe', 'StripeEventLog table not available — skipping dedup', { eventId });
     return false;
   }
 }
@@ -47,7 +48,7 @@ async function cleanupOldEvents(): Promise<void> {
       where: { createdAt: { lt: cutoff } },
     });
     if (result.count > 0) {
-      console.log('[Webhook] Cleaned up', result.count, 'old event logs');
+      serverLog.info('webhook/stripe', 'Cleaned up old event logs', { count: result.count });
     }
   } catch {
     // Non-critical: cleanup failure must never block webhook processing
@@ -69,40 +70,44 @@ async function resolveUserId(session: Stripe.Checkout.Session): Promise<string |
   // Fallback: look up customer metadata
   const customerId = session.customer as string | null;
   if (!customerId) {
-    console.warn('[Webhook] No userId in metadata and no customer ID — cannot resolve user');
+    serverLog.warn('webhook/stripe', 'No userId in metadata and no customer ID — cannot resolve user');
     return null;
   }
 
   try {
     const customer = await stripe.customers.retrieve(customerId);
     if ('deleted' in customer && customer.deleted) {
-      console.warn('[Webhook] Customer deleted — cannot resolve userId:', customerId);
+      serverLog.warn('webhook/stripe', 'Customer deleted — cannot resolve userId', { customerId });
       return null;
     }
     if ('metadata' in customer && customer.metadata?.userId) {
-      console.log('[Webhook] Resolved userId from customer metadata (fallback):', customer.metadata.userId);
+      serverLog.info('webhook/stripe', 'Resolved userId from customer metadata (fallback)');
       return customer.metadata.userId;
     }
   } catch (e) {
-    console.error('[Webhook] Failed to retrieve customer for userId fallback:', e);
+    serverLog.error('webhook/stripe', 'Failed to retrieve customer for userId fallback', e);
   }
 
   // Last resort: search our DB by stripeCustomerId
   try {
     const user = await db.user.findUnique({ where: { stripeCustomerId: customerId } });
     if (user) {
-      console.log('[Webhook] Resolved userId from DB stripeCustomerId (last resort):', user.id);
+      serverLog.info('webhook/stripe', 'Resolved userId from DB stripeCustomerId (last resort)');
       return user.id;
     }
   } catch {
     // DB lookup failed
   }
 
-  console.warn('[Webhook] Could not resolve userId for session:', session.id);
+  serverLog.warn('webhook/stripe', 'Could not resolve userId for session');
   return null;
 }
 
 export async function POST(request: NextRequest) {
+  const start = Date.now();
+  let eventType = 'unknown';
+  let eventId = 'unknown';
+
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -114,14 +119,18 @@ export async function POST(request: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+    eventType = event.type;
+    eventId = event.id;
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+    serverLog.error('webhook/stripe', 'Webhook signature verification failed', err, {
+      eventType,
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   // ─── Idempotency check ──────────────────────────────────────────
   if (await isEventProcessed(event.id)) {
-    console.log('[Webhook] Duplicate event skipped:', event.id, event.type);
+    serverLog.info('webhook/stripe', 'Duplicate event skipped', { eventType, eventId });
     return NextResponse.json({ received: true, deduplicated: true });
   }
 
@@ -132,10 +141,17 @@ export async function POST(request: NextRequest) {
         const customerId = session.customer as string | null;
         const userId = await resolveUserId(session);
 
-        console.log('[Webhook] checkout.session.completed — userId:', userId || 'null', 'customerId:', customerId || 'null', 'eventId:', event.id);
+        serverLog.info('webhook/stripe', 'checkout.session.completed', {
+          userId: userId ? '[RESOLVED]' : 'null',
+          customerId: customerId || 'null',
+          eventId,
+        });
 
         if (!userId) {
-          console.error('[Webhook] checkout.session.completed — CANNOT resolve userId. Session:', session.id, 'Customer paid but will NOT get premium. Manual intervention required.');
+          serverLog.error('webhook/stripe', 'CANNOT resolve userId — customer paid but will NOT get premium. Manual intervention required.', undefined, {
+            sessionId: session.id,
+            eventType,
+          });
           // Still mark as processed to avoid infinite retries
           await markEventProcessed(event.id, event.type);
           await cleanupOldEvents();
@@ -157,14 +173,13 @@ export async function POST(request: NextRequest) {
             periodStart = new Date(subscription.current_period_start * 1000);
             periodEnd = new Date(subscription.current_period_end * 1000);
           } catch (e) {
-            console.error('[Webhook] Could not retrieve subscription details:', e);
+            serverLog.error('webhook/stripe', 'Could not retrieve subscription details', e, {
+              subscriptionId,
+            });
           }
         }
 
         // ─── ATOMIC: user update + subscription create in one transaction ───
-        // Previously these were separate operations — if subscription.create
-        // failed, the user was PREMIUM with no Subscription record (ghost state).
-        // Now they succeed or fail together.
         await db.$transaction(async (tx) => {
           // Mark any existing active subscriptions as superseded
           const existingActive = await tx.subscription.findFirst({
@@ -172,7 +187,9 @@ export async function POST(request: NextRequest) {
           });
 
           if (existingActive) {
-            console.warn('[Webhook] User already has active subscription — marking old as superseded:', existingActive.id);
+            serverLog.warn('webhook/stripe', 'User already has active subscription — marking old as superseded', {
+              oldSubId: existingActive.id,
+            });
             await tx.subscription.update({
               where: { id: existingActive.id },
               data: { status: 'superseded' },
@@ -184,7 +201,7 @@ export async function POST(request: NextRequest) {
           if (customerId) {
             updateData.stripeCustomerId = customerId;
           } else {
-            console.warn('[Webhook] checkout.session.completed — no session.customer, stripeCustomerId not updated for user:', userId);
+            serverLog.warn('webhook/stripe', 'No session.customer — stripeCustomerId not updated');
           }
 
           await tx.user.update({
@@ -192,11 +209,9 @@ export async function POST(request: NextRequest) {
             data: updateData,
           });
 
-          console.log('[Webhook] User updated — plan: PREMIUM, stripeCustomerId:', customerId || 'unchanged');
+          serverLog.info('webhook/stripe', 'User updated — plan: PREMIUM');
 
           // Create subscription record (within transaction)
-          // Use upsert to handle edge case where subscription already exists
-          // (e.g. from a previous failed webhook attempt that partially succeeded)
           if (subscriptionId) {
             await tx.subscription.upsert({
               where: { stripeSubscriptionId: subscriptionId },
@@ -240,8 +255,8 @@ export async function POST(request: NextRequest) {
           const user = await db.user.findUnique({ where: { id: userId } });
           if (user?.email) {
             sendSubscriptionConfirmedEmail(user.email, user.name || 'Amigo', 'Élite')
-              .then(() => console.log('[Webhook] Subscription confirmation email sent'))
-              .catch((err) => console.error('[Webhook] Subscription confirmation email failed:', err instanceof Error ? err.message : err));
+              .then(() => serverLog.info('webhook/stripe', 'Subscription confirmation email sent'))
+              .catch((err) => serverLog.error('webhook/stripe', 'Subscription confirmation email failed', err));
           }
         } catch {
           // Email lookup failure must not affect webhook response
@@ -252,7 +267,11 @@ export async function POST(request: NextRequest) {
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
-        console.log('[Webhook] customer.subscription.updated — subId:', subscription.id, 'status:', subscription.status, 'eventId:', event.id);
+        serverLog.info('webhook/stripe', 'customer.subscription.updated', {
+          subId: subscription.id,
+          status: subscription.status,
+          eventId,
+        });
 
         // Resolve userId from customer
         let userId: string | null = null;
@@ -262,7 +281,7 @@ export async function POST(request: NextRequest) {
             userId = customer.metadata.userId || null;
           }
         } catch (e) {
-          console.error('[Webhook] Could not retrieve customer for subscription update:', e);
+          serverLog.error('webhook/stripe', 'Could not retrieve customer for subscription update', e);
         }
 
         // Fallback: find user by subscription in our DB
@@ -274,7 +293,7 @@ export async function POST(request: NextRequest) {
             });
             if (existingSub) {
               userId = existingSub.userId;
-              console.log('[Webhook] Resolved userId from existing subscription record:', userId);
+              serverLog.info('webhook/stripe', 'Resolved userId from existing subscription record');
             }
           } catch {
             // DB lookup failed
@@ -282,7 +301,9 @@ export async function POST(request: NextRequest) {
         }
 
         if (!userId) {
-          console.warn('[Webhook] customer.subscription.updated — cannot resolve userId for sub:', subscription.id);
+          serverLog.warn('webhook/stripe', 'customer.subscription.updated — cannot resolve userId', {
+            subId: subscription.id,
+          });
           await markEventProcessed(event.id, event.type);
           await cleanupOldEvents();
           break;
@@ -308,21 +329,12 @@ export async function POST(request: NextRequest) {
             },
           });
         } catch (e) {
-          console.error('[Webhook] Failed to update subscription record:', e);
+          serverLog.error('webhook/stripe', 'Failed to update subscription record', e, {
+            subId: subscription.id,
+          });
         }
 
         // ─── Sync user.plan with subscription status ───────────────────
-        // CRITICAL: Don't downgrade on `past_due` — Stripe is still retrying
-        // the payment. Only downgrade on terminal/confirmed-inactive statuses.
-        //
-        // Grace period strategy:
-        //   past_due     → keep PREMIUM (Stripe retries payment for ~7 days)
-        //   trialing     → keep PREMIUM
-        //   active       → ensure PREMIUM
-        //   incomplete   → keep PREMIUM briefly (initial payment may be processing)
-        //   incomplete_expired → downgrade (terminal, payment definitively failed)
-        //   canceled     → downgrade
-        //   unpaid       → downgrade
         const keepPremiumStatuses = ['active', 'trialing', 'past_due', 'incomplete'];
         const downgradeStatuses = ['canceled', 'unpaid', 'incomplete_expired'];
 
@@ -340,40 +352,37 @@ export async function POST(request: NextRequest) {
               where: { id: userId },
               data: { plan: 'FREE' },
             });
-            console.log('[Webhook] Subscription terminal-inactive — user downgraded to FREE:', userId, 'status:', subscription.status);
+            serverLog.info('webhook/stripe', 'Subscription terminal-inactive — user downgraded to FREE', {
+              status: subscription.status,
+            });
           } else {
-            console.log('[Webhook] Subscription inactive but another active sub exists — keeping PREMIUM:', userId);
+            serverLog.info('webhook/stripe', 'Subscription inactive but another active sub exists — keeping PREMIUM');
           }
         } else if (subscription.status === 'active') {
           // Ensure user is marked PREMIUM if subscription is active
-          // (restores premium if it was temporarily lost)
           const user = await db.user.findUnique({ where: { id: userId } });
           if (user && user.plan !== 'PREMIUM') {
             await db.user.update({
               where: { id: userId },
               data: { plan: 'PREMIUM' },
             });
-            console.log('[Webhook] Subscription active — user restored to PREMIUM:', userId);
+            serverLog.info('webhook/stripe', 'Subscription active — user restored to PREMIUM');
           }
         } else if (subscription.status === 'past_due') {
-          // past_due: Stripe is retrying the payment (up to ~7 days).
-          // Keep user as PREMIUM during retry period.
-          // If retries all fail, Stripe will transition to 'canceled' or 'unpaid',
-          // which WILL trigger downgrade in the block above.
-          console.log('[Webhook] Subscription past_due — keeping PREMIUM during Stripe retry period:', userId);
+          serverLog.info('webhook/stripe', 'Subscription past_due — keeping PREMIUM during Stripe retry period');
         } else if (subscription.status === 'incomplete') {
-          // incomplete: initial payment is still processing.
-          // Keep PREMIUM and let Stripe resolve it.
-          console.log('[Webhook] Subscription incomplete — keeping PREMIUM while payment processes:', userId);
+          serverLog.info('webhook/stripe', 'Subscription incomplete — keeping PREMIUM while payment processes');
         }
 
-        console.log('[Webhook] Subscription updated for user:', userId);
         break;
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
-        console.log('[Webhook] customer.subscription.deleted — subId:', subscription.id, 'eventId:', event.id);
+        serverLog.info('webhook/stripe', 'customer.subscription.deleted', {
+          subId: subscription.id,
+          eventId,
+        });
 
         // Resolve userId — try customer metadata first, then DB fallback
         let userId: string | null = null;
@@ -383,7 +392,7 @@ export async function POST(request: NextRequest) {
             userId = customer.metadata.userId || null;
           }
         } catch (e) {
-          console.error('[Webhook] Could not retrieve customer for subscription deletion:', e);
+          serverLog.error('webhook/stripe', 'Could not retrieve customer for subscription deletion', e);
         }
 
         // Fallback: find user by subscription in our DB
@@ -395,7 +404,7 @@ export async function POST(request: NextRequest) {
             });
             if (existingSub) {
               userId = existingSub.userId;
-              console.log('[Webhook] Resolved userId from existing subscription record (deleted):', userId);
+              serverLog.info('webhook/stripe', 'Resolved userId from existing subscription record (deleted)');
             }
           } catch {
             // DB lookup failed
@@ -403,7 +412,9 @@ export async function POST(request: NextRequest) {
         }
 
         if (!userId) {
-          console.warn('[Webhook] customer.subscription.deleted — cannot resolve userId for sub:', subscription.id);
+          serverLog.warn('webhook/stripe', 'customer.subscription.deleted — cannot resolve userId', {
+            subId: subscription.id,
+          });
           await markEventProcessed(event.id, event.type);
           await cleanupOldEvents();
           break;
@@ -423,12 +434,12 @@ export async function POST(request: NextRequest) {
             where: { id: userId },
             data: { plan: 'FREE' },
           });
-          console.log('[Webhook] Subscription canceled, user downgraded to FREE:', userId);
+          serverLog.info('webhook/stripe', 'Subscription canceled, user downgraded to FREE');
         } else {
-          console.log('[Webhook] Subscription canceled but another active sub exists — keeping PREMIUM:', userId);
+          serverLog.info('webhook/stripe', 'Subscription canceled but another active sub exists — keeping PREMIUM');
         }
 
-        // Mark this subscription as canceled (use updateMany for safety)
+        // Mark this subscription as canceled
         await db.subscription.updateMany({
           where: { stripeSubscriptionId: subscription.id },
           data: { status: 'canceled' },
@@ -441,24 +452,30 @@ export async function POST(request: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = invoice.subscription as string | null;
 
-        console.log('[Webhook] invoice.payment_failed — invoice:', invoice.id, 'subscription:', subscriptionId || 'null', 'attempt:', invoice.attempt_count, 'eventId:', event.id);
+        serverLog.warn('webhook/stripe', 'invoice.payment_failed', {
+          invoiceId: invoice.id,
+          subscriptionId: subscriptionId || 'null',
+          attemptCount: invoice.attempt_count,
+          eventId,
+        });
 
-        // Log for observability — we don't downgrade on payment failure
-        // because Stripe will send customer.subscription.updated with
-        // past_due status, which we handle with a grace period above.
-        // If all retries fail, Stripe transitions to canceled/unpaid,
-        // which triggers downgrade in the subscription.updated handler.
-        //
-        // This handler exists purely for logging/observability.
-        // In the future, it could trigger a notification email to the user.
+        // We don't downgrade on payment failure because Stripe will send
+        // customer.subscription.updated with past_due status, which we
+        // handle with a grace period. If all retries fail, Stripe
+        // transitions to canceled/unpaid, which triggers downgrade.
         break;
       }
 
       default:
-        console.log('[Webhook] Unhandled event type:', event.type, 'eventId:', event.id);
+        serverLog.info('webhook/stripe', 'Unhandled event type', { eventType: event.type, eventId: event.id });
     }
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    const durationMs = Date.now() - start;
+    serverLog.error('webhook/stripe', 'Webhook handler error', error, {
+      eventType,
+      eventId,
+      durationMs,
+    });
     // DON'T mark as processed — Stripe will retry, which is correct
     // because the handler failed. If the error is persistent, we need
     // to know about it (and Stripe will alert us after multiple failures).
@@ -470,6 +487,13 @@ export async function POST(request: NextRequest) {
   // This way, Stripe retries are useful for actual failures.
   await markEventProcessed(event.id, event.type);
   await cleanupOldEvents();
+
+  const durationMs = Date.now() - start;
+  serverLog.info('webhook/stripe', 'Webhook processed successfully', {
+    eventType,
+    eventId,
+    durationMs,
+  });
 
   return NextResponse.json({ received: true });
 }

@@ -13,9 +13,8 @@
 //   - POST with JSON body (fetch fallback)
 //   - POST with Blob body (sendBeacon)
 //
-// Reports are logged server-side (structured JSON logs)
-// and can be forwarded to an external monitoring service
-// (Sentry, Datadog, etc.) in production.
+// Reports are logged server-side using structured JSON via serverLog
+// and can be filtered in Vercel with: vz_obs:true
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +24,7 @@ import {
   ErrorReport,
   PerformanceReport,
 } from '@/lib/observability/types';
+import { serverLog } from '@/lib/observability/server-logger';
 
 // ─── Rate Limiting (in-memory) ──────────────
 //
@@ -59,37 +59,56 @@ function isRateLimited(sessionId: string): boolean {
 // ─── Report Processing ──────────────────────
 
 function processErrorReport(report: ErrorReport): void {
-  // Structured log for server-side observability
-  // In production, this could forward to Sentry/Datadog
-  console.info(JSON.stringify({
-    vz_obs: true,
-    type: 'error',
-    category: report.category,
-    severity: report.severity,
-    errorType: report.errorType,
-    route: report.route,
-    widgetType: report.widgetType,
-    messageHash: report.messageHash,
-    ts: report.ts,
-  }));
+  // Use serverLog for structured, consistent, filterable output
+  const level = report.severity === 'critical' || report.severity === 'error' ? 'error' : 'warn';
+  if (level === 'error') {
+    serverLog.error(
+      `client/${report.category}`,
+      `Client error: ${report.errorType}`,
+      undefined,
+      {
+        category: report.category,
+        severity: report.severity,
+        errorType: report.errorType,
+        route: report.route,
+        widgetType: report.widgetType,
+        messageHash: report.messageHash,
+        clientTs: report.ts,
+      },
+    );
+  } else {
+    serverLog.warn(
+      `client/${report.category}`,
+      `Client warning: ${report.errorType}`,
+      {
+        category: report.category,
+        severity: report.severity,
+        errorType: report.errorType,
+        route: report.route,
+        messageHash: report.messageHash,
+        clientTs: report.ts,
+      },
+    );
+  }
 }
 
 function processPerformanceReport(report: PerformanceReport): void {
-  // Structured log for performance metrics
-  console.info(JSON.stringify({
-    vz_obs: true,
-    type: 'performance',
-    perfType: report.type,
-    durationMs: report.durationMs,
-    route: report.route,
-    component: report.component,
-    memory: report.memory ? {
-      usedMB: Math.round((report.memory.usedJSHeapSize || 0) / 1024 / 1024),
-      totalMB: Math.round((report.memory.totalJSHeapSize || 0) / 1024 / 1024),
-      limitMB: Math.round((report.memory.jsHeapSizeLimit || 0) / 1024 / 1024),
-    } : undefined,
-    ts: report.ts,
-  }));
+  serverLog.info(
+    `client/perf/${report.type}`,
+    `Client perf: ${report.type}`,
+    {
+      perfType: report.type,
+      durationMs: report.durationMs,
+      route: report.route,
+      component: report.component,
+      memory: report.memory ? {
+        usedMB: Math.round((report.memory.usedJSHeapSize || 0) / 1024 / 1024),
+        totalMB: Math.round((report.memory.totalJSHeapSize || 0) / 1024 / 1024),
+        limitMB: Math.round((report.memory.jsHeapSizeLimit || 0) / 1024 / 1024),
+      } : undefined,
+      clientTs: report.ts,
+    },
+  );
 }
 
 // ─── POST Handler ───────────────────────────
@@ -140,21 +159,23 @@ export async function POST(request: NextRequest) {
 
     // ── Log session info ──
     if (body.deviceClass || body.connectionType) {
-      console.info(JSON.stringify({
-        vz_obs: true,
-        type: 'session_info',
-        sessionId: body.sessionId,
-        deviceClass: body.deviceClass,
-        connectionType: body.connectionType,
-        errorCount: body.errors?.length || 0,
-        perfCount: body.performance?.length || 0,
-      }));
+      serverLog.info(
+        'client/session',
+        'Client session report',
+        {
+          sessionId: body.sessionId,
+          deviceClass: body.deviceClass,
+          connectionType: body.connectionType,
+          errorCount: body.errors?.length || 0,
+          perfCount: body.performance?.length || 0,
+        },
+      );
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
     // Observability endpoint must never break the app
-    console.error('[Observability] Report processing error:', error);
+    serverLog.error('observability/report', 'Report processing error', error);
     return NextResponse.json(
       { received: false },
       { status: 500 },

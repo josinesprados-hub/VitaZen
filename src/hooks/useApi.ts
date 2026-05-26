@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import type { User as FirebaseUser } from 'firebase/auth';
+import { reportError } from '@/lib/observability';
 
 // ═══════════════════════════════════════════
 // useApi — Network-resilient fetch wrapper
@@ -12,6 +13,10 @@ import type { User as FirebaseUser } from 'firebase/auth';
 //   3. Request deduplication — same path + method reuses in-flight promise
 //   4. 401 handling with token refresh (existing, preserved)
 //
+// Observability (Audit #6):
+//   5. Retry tracking — reports when a retry happens, so we can detect
+//      server-side issues patterns (frequent retries = something's wrong)
+//
 // Retry strategy:
 //   - Only retries on: 5xx status, network errors (TypeError), AbortError from timeout
 //   - Does NOT retry on: 4xx (client errors), AbortError from caller signal
@@ -22,6 +27,39 @@ import type { User as FirebaseUser } from 'firebase/auth';
 const DEFAULT_TIMEOUT_MS = 15_000;
 const RETRY_DELAY_MS = 1_500;
 const RETRY_STATUS_CODES = new Set([502, 503, 504, 520, 521, 522, 524]);
+
+// ─── Retry tracking ─────────────────────────
+// Track how often retries happen per path.
+// If a path retries frequently, the server has issues.
+// Reports to observability (dedup + rate-limited as usual).
+
+const retryCounts = new Map<string, { count: number; firstSeen: number }>();
+const RETRY_REPORT_WINDOW_MS = 60_000;
+
+function trackRetry(path: string, reason: string): void {
+  const now = Date.now();
+  const existing = retryCounts.get(path);
+
+  if (!existing || (now - existing.firstSeen) > RETRY_REPORT_WINDOW_MS) {
+    retryCounts.set(path, { count: 1, firstSeen: now });
+    return;
+  }
+
+  existing.count++;
+
+  // Report when a path retries 3+ times within the window
+  // (this means at least 3 different requests to the same path
+  //  needed a retry — indicates a server-side issue)
+  if (existing.count === 3) {
+    reportError(
+      'network_failure',
+      'warning',
+      `Frequent retries on ${path}: ${reason}`,
+      'RetryStorm',
+      { route: path },
+    );
+  }
+}
 
 // ─── Request deduplication ──────────────────
 // Prevents duplicate concurrent requests to the same path.
@@ -132,6 +170,8 @@ export function useApi() {
 
         // ─── Retry on transient server errors ───
         if (isRetryableStatus(res.status)) {
+          trackRetry(path, `${res.status}`);
+
           // Wait and retry once
           await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
           // Refresh token before retry in case it expired during the wait
@@ -157,6 +197,8 @@ export function useApi() {
         }
 
         if (isRetryableError(error)) {
+          trackRetry(path, error instanceof DOMException ? 'timeout' : 'network_error');
+
           // Wait and retry once
           await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
           const retryUser = firebaseUserRef.current;

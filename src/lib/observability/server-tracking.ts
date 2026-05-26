@@ -3,17 +3,17 @@
 // Monitor cron jobs, scheduled tasks, and server-side failures
 // ═══════════════════════════════════════════
 //
-// Background tasks (cron jobs, scheduled notifications, etc.)
-// are invisible to the user and often fail silently.
-// This module tracks:
-//   - Cron job failures
-//   - Scheduled task timeouts
-//   - Batch processing errors
-//   - Token cleanup failures
+// CRITICAL FIX: Previously imported from ./logger (client-side),
+// which silently did nothing on the server because it uses
+// browser APIs (navigator.sendBeacon, etc.).
+//
+// Now uses ./server-logger which actually works server-side.
+// All tracking functions now produce real, structured,
+// searchable logs in Vercel.
 //
 // All tracking is fire-and-forget and non-blocking.
 
-import { reportError } from './logger';
+import { serverLog } from './server-logger';
 
 // ─── Cron Job Tracking ──────────────────────
 
@@ -26,15 +26,14 @@ export function trackCronFailure(
   error: unknown,
   durationMs?: number,
 ): void {
-  const message = error instanceof Error ? error.message : 'Cron job failed';
-  const duration = durationMs ? ` (${durationMs}ms)` : '';
-
-  reportError(
-    'background_task',
-    'error',
-    `Cron failed: ${cronName}${duration} — ${message}`,
-    error instanceof Error ? error.constructor.name : 'CronError',
-    { route: `/api/cron/${cronName}` },
+  serverLog.error(
+    `cron/${cronName}`,
+    `Cron failed: ${cronName}`,
+    error,
+    {
+      durationMs,
+      route: `/api/cron/${cronName}`,
+    },
   );
 }
 
@@ -49,12 +48,14 @@ export function trackCronSlowRun(
 ): void {
   if (durationMs < thresholdMs) return;
 
-  reportError(
-    'background_task',
-    'warning',
+  serverLog.slow(
+    `cron/${cronName}`,
     `Cron slow run: ${cronName} took ${durationMs}ms (threshold: ${thresholdMs}ms)`,
-    'SlowCronWarning',
-    { route: `/api/cron/${cronName}` },
+    durationMs,
+    {
+      route: `/api/cron/${cronName}`,
+      thresholdMs,
+    },
   );
 }
 
@@ -70,13 +71,15 @@ export function trackBatchProcessingFailure(
   totalCount: number,
   error?: unknown,
 ): void {
-  const message = error instanceof Error ? error.message : 'Batch processing errors';
-
-  reportError(
-    'background_task',
-    errorCount > totalCount * 0.5 ? 'error' : 'warning',
-    `Batch ${taskName}: ${errorCount}/${totalCount} failed — ${message}`,
-    'BatchProcessingError',
+  serverLog.error(
+    `batch/${taskName}`,
+    `Batch ${taskName}: ${errorCount}/${totalCount} failed`,
+    error,
+    {
+      errorCount,
+      totalCount,
+      failureRate: `${Math.round((errorCount / totalCount) * 100)}%`,
+    },
   );
 }
 
@@ -91,15 +94,30 @@ export function trackAuthSyncFailure(
   statusCode?: number,
   error?: unknown,
 ): void {
-  const message = error instanceof Error ? error.message : `Auth sync failed (attempt ${attempt})`;
+  const level = attempt >= 2 ? 'error' : 'warn';
 
-  reportError(
-    'auth_sync',
-    attempt >= 2 ? 'error' : 'warning',
-    `Auth sync failure (attempt ${attempt}): ${statusCode || 'N/A'} — ${message}`,
-    error instanceof Error ? error.constructor.name : 'AuthSyncError',
-    { route: '/api/auth/sync' },
-  );
+  if (level === 'error') {
+    serverLog.error(
+      'auth/sync',
+      `Auth sync failure (attempt ${attempt})`,
+      error,
+      {
+        attempt,
+        statusCode,
+        route: '/api/auth/sync',
+      },
+    );
+  } else {
+    serverLog.warn(
+      'auth/sync',
+      `Auth sync failure (attempt ${attempt})`,
+      {
+        attempt,
+        statusCode,
+        route: '/api/auth/sync',
+      },
+    );
+  }
 }
 
 // ─── API Route Error Tracking ───────────────
@@ -114,15 +132,7 @@ export function trackApiRouteError(
   statusCode: number,
   error: unknown,
 ): void {
-  const message = error instanceof Error ? error.message : 'API route error';
-
-  reportError(
-    'api_route',
-    statusCode >= 500 ? 'error' : 'warning',
-    `API ${method} ${route} → ${statusCode}: ${message}`,
-    error instanceof Error ? error.constructor.name : 'ApiError',
-    { route },
-  );
+  serverLog.apiError(route, method, statusCode, error);
 }
 
 // ─── Network Error Tracking ─────────────────
@@ -136,17 +146,18 @@ export function trackNetworkFailure(
   method: string,
   error: unknown,
 ): void {
-  const message = error instanceof Error ? error.message : 'Network request failed';
-
   // Strip any tokens/PII from URL
   const cleanUrl = url
     .replace(/Bearer\s+[\w.-]+/gi, '')
     .replace(/token=[^&]+/gi, 'token=[REDACTED]');
 
-  reportError(
-    'network_failure',
-    'warning',
-    `Network ${method} ${cleanUrl}: ${message}`,
-    error instanceof Error ? error.constructor.name : 'NetworkError',
+  serverLog.warn(
+    'network',
+    `Network ${method} ${cleanUrl}: failed`,
+    {
+      method,
+      url: cleanUrl,
+      errorType: error instanceof Error ? error.constructor.name : 'NetworkError',
+    },
   );
 }

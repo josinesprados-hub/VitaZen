@@ -1,11 +1,35 @@
 'use client';
 
+import { useEffect } from 'react';
+import { reportError } from '@/lib/observability';
+
+// ═══════════════════════════════════════════
+// Global error boundary — VitaZen
+// ═══════════════════════════════════════════
+//
+// Catches unhandled errors at the root level.
+// Reports to the observability system so we can
+// detect and fix root-level crashes.
+//
+// The UX is preserved: calm, premium, no debugging artifacts.
+
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // Report to observability
+  useEffect(() => {
+    reportError(
+      'error_boundary',
+      'critical',
+      error.message || 'Global error boundary triggered',
+      error.constructor?.name || 'Error',
+    );
+  }, [error]);
+
   return (
     <div
       style={{

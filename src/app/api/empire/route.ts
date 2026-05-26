@@ -2,10 +2,12 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { withTiming } from '@/lib/observability/api-timing';
+import { serverLog } from '@/lib/observability/server-logger';
 
 const XP_PER_LEVEL = 100;
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -28,7 +30,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ empires });
   } catch (error) {
-    console.error('Empire GET error:', error);
+    serverLog.apiError('api/empire', 'GET', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const GET = withTiming('api/empire', handler);

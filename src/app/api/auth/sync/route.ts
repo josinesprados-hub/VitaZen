@@ -5,10 +5,12 @@ import { db } from '@/lib/db';
 import { sendWelcomeEmail, sendVerifyEmail } from '@/lib/emails/sender';
 import { adminAuth } from '@/lib/firebase-admin';
 import { trackEvent } from '@/lib/analytics-server';
+import { withTiming } from '@/lib/observability/api-timing';
+import { serverLog } from '@/lib/observability/server-logger';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const { idToken } = await request.json();
 
@@ -64,7 +66,10 @@ export async function POST(request: NextRequest) {
       // This keeps the DB in sync with the current auth method.
       // Safe because we've already verified the Firebase ID token.
       if (existingUser.firebaseUid !== decodedToken.uid) {
-        console.warn('[SYNC] firebaseUid mismatch — updating from', existingUser.firebaseUid, 'to', decodedToken.uid, 'for email', decodedToken.email);
+        serverLog.warn('auth/sync', 'firebaseUid mismatch — updating', {
+          oldUid: existingUser.firebaseUid,
+          newUid: decodedToken.uid,
+        });
         await db.user.update({
           where: { id: existingUser.id },
           data: { firebaseUid: decodedToken.uid },
@@ -87,19 +92,13 @@ export async function POST(request: NextRequest) {
           });
 
           if (updated.count > 0) {
-            console.log('[WELCOME] retry — user created', Math.round(userAge / 1000), 's ago, sending welcome email');
+            serverLog.info('auth/sync', 'Welcome email retry — sending', { userAgeSec: Math.round(userAge / 1000) });
             sendWelcomeEmail(existingUser.email, existingUser.name || 'Amigo')
-              .then(() => console.log('[WELCOME] retry sent ✓'))
-              .catch((err) => console.error('[WELCOME] retry failed:', err instanceof Error ? err.message : err));
+              .then(() => serverLog.info('auth/sync', 'Welcome email retry sent'))
+              .catch((err) => serverLog.error('auth/sync', 'Welcome email retry failed', err));
             // Fire-and-forget: do NOT await — return the response immediately.
-          } else {
-            console.log('[WELCOME] skipped — another sync already claimed welcome email');
           }
-        } else {
-          console.log('[WELCOME] skipped — user too old for retry, age:', Math.round(userAge / 1000), 's');
         }
-      } else if (existingUser.welcomeEmailSent) {
-        console.log('[WELCOME] skipped — welcome email already sent');
       }
 
       return NextResponse.json({
@@ -127,7 +126,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ─── New user path ───
-    console.log('[SYNC] new user — email:', decodedToken.email);
+    serverLog.info('auth/sync', 'New user registration', { email: decodedToken.email ? '[EMAIL]' : 'null' });
 
     const user = await syncUserToDatabase(
       decodedToken.uid,
@@ -147,12 +146,12 @@ export async function POST(request: NextRequest) {
 
       if (claimed.count > 0) {
         // We won the race — fire emails in background (do NOT await)
-        console.log('[WELCOME] claimed — scheduling welcome email for:', user.email);
+        serverLog.info('auth/sync', 'Claimed welcome email — scheduling send');
 
         // 1. Welcome email (fire-and-forget, non-throwing)
         sendWelcomeEmail(user.email, user.name || 'Amigo')
-          .then(() => console.log('[WELCOME] sent ✓'))
-          .catch((err) => console.error('[WELCOME] failed:', err instanceof Error ? err.message : err));
+          .then(() => serverLog.info('auth/sync', 'Welcome email sent'))
+          .catch((err) => serverLog.error('auth/sync', 'Welcome email failed', err));
 
         // 2. Verification email (only for non-Google users, fire-and-forget)
         if (!decodedToken.email_verified) {
@@ -163,17 +162,13 @@ export async function POST(request: NextRequest) {
                 { url: `${APP_URL}/verify-email?uid=${user.id}` }
               );
               await sendVerifyEmail(user.email!, user.name || 'Amigo', verificationLink);
-              console.log('[AUTH SYNC] Verification email sent to:', user.email);
+              serverLog.info('auth/sync', 'Verification email sent');
             } catch (verifyError) {
-              console.error('[AUTH SYNC] Verification email failed:', verifyError instanceof Error ? verifyError.message : verifyError);
+              serverLog.error('auth/sync', 'Verification email failed', verifyError);
             }
           })();
         }
-      } else {
-        console.log('[WELCOME] skipped — another sync already claimed welcome email');
       }
-    } else {
-      console.log('[WELCOME] skipped — user.email is falsy or already sent');
     }
 
     // ─── Analytics — fire-and-forget (never block the response) ───
@@ -205,7 +200,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Auth] sync error:', error);
+    serverLog.apiError('api/auth/sync', 'POST', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const POST = withTiming('api/auth/sync', handler, { slowThresholdMs: 5_000 });

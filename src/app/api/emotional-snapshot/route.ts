@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { getEmotionalDashboardSnapshot } from '@/lib/server/emotional-dashboard-state';
+import { withTiming } from '@/lib/observability/api-timing';
+import { serverLog } from '@/lib/observability/server-logger';
 
 // ═══════════════════════════════════════════
 // GET /api/emotional-snapshot
@@ -18,7 +20,7 @@ import { getEmotionalDashboardSnapshot } from '@/lib/server/emotional-dashboard-
 //
 // No more per-device inconsistency.
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -35,7 +37,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(snapshot);
   } catch (error) {
-    console.error('Emotional snapshot error:', error);
+    serverLog.apiError('api/emotional-snapshot', 'GET', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const GET = withTiming('api/emotional-snapshot', handler);

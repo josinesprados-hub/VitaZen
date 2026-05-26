@@ -3,7 +3,8 @@ export const maxDuration = 300; // 5 min timeout for batch processing
 
 import { NextRequest, NextResponse } from 'next/server';
 import { processReflectionBatch } from '@/lib/notifications/reminders/reflection';
-import { trackCronFailure } from '@/lib/observability/server-tracking';
+import { trackCronFailure, trackCronSlowRun } from '@/lib/observability/server-tracking';
+import { serverLog } from '@/lib/observability/server-logger';
 
 // ═══════════════════════════════════════════
 // CRON: REFLECTION REMINDERS
@@ -23,23 +24,32 @@ import { trackCronFailure } from '@/lib/observability/server-tracking';
 // ═══════════════════════════════════════════
 
 export async function GET(request: NextRequest) {
+  const start = Date.now();
+
   // Verify cron secret to prevent unauthorized invocation
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    console.warn('[CRON/REFLECTION] Unauthorized attempt');
+    serverLog.warn('cron/reflection-reminder', 'Unauthorized attempt');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  console.log('[CRON/REFLECTION] Triggered at', new Date().toISOString());
+  serverLog.info('cron/reflection-reminder', 'Triggered');
 
   try {
     const result = await processReflectionBatch();
+    const durationMs = Date.now() - start;
 
-    console.log(
-      `[CRON/REFLECTION] Complete: ${result.sent} sent, ${result.skipped} skipped, ${result.errors} errors out of ${result.total} candidates`,
-    );
+    serverLog.info('cron/reflection-reminder', 'Completed', {
+      sent: result.sent,
+      skipped: result.skipped,
+      errors: result.errors,
+      total: result.total,
+      durationMs,
+    });
+
+    trackCronSlowRun('reflection-reminder', durationMs);
 
     return NextResponse.json({
       success: true,
@@ -49,8 +59,9 @@ export async function GET(request: NextRequest) {
       total: result.total,
     });
   } catch (error) {
-    console.error('[CRON/REFLECTION] Fatal error:', error);
-    trackCronFailure('reflection-reminder', error);
+    const durationMs = Date.now() - start;
+    serverLog.error('cron/reflection-reminder', 'Fatal error', error, { durationMs });
+    trackCronFailure('reflection-reminder', error, durationMs);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 },

@@ -6,8 +6,10 @@ import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
 import { checkAILimit, incrementAIUsage, getDailyLimit } from '@/lib/limits';
 import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
 import { trackEvent } from '@/lib/analytics-server';
+import { withTiming } from '@/lib/observability/api-timing';
+import { serverLog } from '@/lib/observability/server-logger';
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest) {
       systemPrompt = buildContextualSystemPrompt(basePrompt, userContext);
     } catch (ctxError) {
       // If context building fails, fall back to base prompt — never block the chat
-      console.error('Context build error (non-blocking):', ctxError);
+      serverLog.error('api/ai/chat', 'Context build error (non-blocking)', ctxError);
     }
 
     const groqMessages = [
@@ -173,7 +175,9 @@ export async function POST(request: NextRequest) {
       plan: user.plan,
     });
   } catch (error) {
-    console.error('AI chat error:', error);
+    serverLog.apiError('api/ai/chat', 'POST', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const POST = withTiming('api/ai/chat', handler, { slowThresholdMs: 10_000 });
