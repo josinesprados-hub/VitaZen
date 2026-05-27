@@ -508,7 +508,11 @@ export async function getDeterministicTips(
   // ─── Compute cycle index from date ───
   // cycleIndex increments every 3 days since epoch.
   // Same date on any device = same cycleIndex = same tips.
-  const daysSinceEpoch = Math.floor((Date.now() - TIPS_EPOCH) / 86400000);
+  // Uses getTodayDateKey() (Europe/Madrid) so the cycle boundary
+  // aligns with the user's perceived midnight, not UTC midnight.
+  const todayKey = getTodayDateKey();
+  const todayMs = new Date(todayKey).getTime();
+  const daysSinceEpoch = Math.floor((todayMs - TIPS_EPOCH) / 86400000);
   const cycleIndex = Math.floor(daysSinceEpoch / CYCLE_DAYS);
 
   // ─── Deterministic shuffle for this cycle ───
