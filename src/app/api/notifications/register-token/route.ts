@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 // POST /api/notifications/register-token — Register or refresh a push token
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    const user = await getAuthUser(idToken);
+    const user = await getAuthUserBasic(idToken);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -23,6 +23,52 @@ export async function POST(request: NextRequest) {
 
     if (!token || typeof token !== 'string') {
       return NextResponse.json({ error: 'Valid FCM token is required' }, { status: 400 });
+    }
+
+    // Check if this token already exists (possibly under a different user)
+    // FCM tokens are per-device/browser — if a different Firebase Auth user
+    // logs in on the same device, getToken() returns the same FCM token.
+    const existingToken = await db.pushToken.findUnique({
+      where: { token },
+      select: { id: true, userId: true },
+    });
+
+    // If token belongs to another user, reassign it.
+    // This prevents the old user from receiving the new user's notifications
+    // (security/privacy bug: token upsert without userId update kept the old owner).
+    if (existingToken && existingToken.userId !== user.id) {
+      await db.pushToken.update({
+        where: { id: existingToken.id },
+        data: {
+          userId: user.id,
+          active: true,
+          platform: platform || 'web',
+          userAgent: userAgent || null,
+          updatedAt: new Date(),
+        },
+      });
+
+      // Enforce device limit for the new user (now including the reassigned token)
+      const userActiveTokens = await db.pushToken.findMany({
+        where: { userId: user.id, active: true },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (userActiveTokens.length > 5) {
+        const toDeactivate = userActiveTokens.slice(0, userActiveTokens.length - 5);
+        await db.pushToken.updateMany({
+          where: { id: { in: toDeactivate.map(t => t.id) } },
+          data: { active: false },
+        });
+      }
+
+      // Auto-create notification preferences if they don't exist
+      await db.notificationPreference.upsert({
+        where: { userId: user.id },
+        update: {},
+        create: { userId: user.id, pushEnabled: true },
+      });
+
+      return NextResponse.json({ success: true, tokenId: existingToken.id });
     }
 
     // Limit tokens per user to prevent abuse (max 5 devices)
@@ -44,7 +90,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Upsert: if token exists, refresh it; otherwise create
+    // Upsert: if token exists for this user, refresh it; otherwise create
     const upserted = await db.pushToken.upsert({
       where: { token },
       update: {
@@ -91,7 +137,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    const user = await getAuthUser(idToken);
+    const user = await getAuthUserBasic(idToken);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -107,6 +153,7 @@ export async function DELETE(request: NextRequest) {
     // Only deactivate if the token belongs to this user
     const pushToken = await db.pushToken.findUnique({
       where: { token },
+      select: { id: true, userId: true },
     });
 
     if (!pushToken || pushToken.userId !== user.id) {
@@ -114,7 +161,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     await db.pushToken.update({
-      where: { token },
+      where: { id: pushToken.id },
       data: { active: false },
     });
 

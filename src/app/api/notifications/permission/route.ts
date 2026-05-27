@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 // POST /api/notifications/permission — Track browser permission state change
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    const user = await getAuthUser(idToken);
+    const user = await getAuthUserBasic(idToken);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
