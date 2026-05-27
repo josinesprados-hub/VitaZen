@@ -9,6 +9,10 @@
 
 /* eslint-disable no-undef */
 
+// Inject Firebase config from server (env vars are not available in public/ static files)
+// This MUST load before firebase.initializeApp() so the config values are set on self.
+importScripts('/api/notifications/sw-config');
+
 importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js');
 

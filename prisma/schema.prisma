@@ -391,7 +391,7 @@ model NotificationPreference {
   quietHoursStart       String   @default("22:00") // HH:mm in user timezone
   quietHoursEnd         String   @default("08:00") // HH:mm in user timezone
   timezone              String   @default("Europe/Madrid")
-  maxDailyNotifications Int      @default(3) // hard cap per day
+  maxDailyNotifications Int      @default(2) // hard cap per day (matches UI: 1 or 2)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
