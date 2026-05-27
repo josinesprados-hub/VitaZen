@@ -102,20 +102,16 @@ export function useApi() {
     const currentUser = firebaseUserRef.current;
 
     if (!currentUser) {
-      console.error(JSON.stringify({ vz_debug: true, fn: 'apiFetch', step: 'noFirebaseUser', path }));
       return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
 
     let idToken: string;
     try {
       idToken = await currentUser.getIdToken();
-    } catch (tokenErr) {
-      console.error(JSON.stringify({ vz_debug: true, fn: 'apiFetch', step: 'getIdTokenFailed', path, error: tokenErr instanceof Error ? tokenErr.message : String(tokenErr) }));
+    } catch {
+      // Token retrieval failed — user may have been signed out
       return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
-
-    // VZ_DEBUG: Log token info (first 20 chars only for security)
-    console.log(JSON.stringify({ vz_debug: true, fn: 'apiFetch', step: 'tokenReady', path, tokenPrefix: idToken.substring(0, 20), tokenLength: idToken.length }));
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

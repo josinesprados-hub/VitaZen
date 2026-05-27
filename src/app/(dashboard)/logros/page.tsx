@@ -174,10 +174,6 @@ export default function LogrosPage() {
           // 401 is handled by useApi (token refresh / sign-out).
           // For anything else, show a graceful error state.
           if (!cancelled && res.status !== 401) {
-            // VZ_DEBUG: Log full response details for debugging
-            let errorBody = '';
-            try { errorBody = await res.text(); } catch {}
-            console.error(JSON.stringify({ vz_debug: true, page: 'logros', step: 'apiFailed', status: res.status, statusText: res.statusText, body: errorBody }));
             setError(true);
           }
         }
