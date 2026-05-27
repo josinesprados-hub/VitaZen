@@ -106,8 +106,21 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
   }
 
   if (!user) {
-    console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'userNotFound', uid: decodedToken.uid, email: decodedToken.email }));
-    return null;
+    // User verified in Firebase but not found in DB.
+    // This can happen if the initial /api/auth/sync failed or was interrupted.
+    // Auto-create the user to self-heal, same as /api/auth/sync does.
+    if (decodedToken.email) {
+      console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'autoSync', uid: decodedToken.uid, email: decodedToken.email }));
+      try {
+        user = await syncUserToDatabase(decodedToken.uid, decodedToken.email, decodedToken.name);
+      } catch (syncError) {
+        console.error(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'autoSyncFailed', error: syncError instanceof Error ? syncError.message : String(syncError) }));
+        return null;
+      }
+    } else {
+      console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'userNotFoundNoEmail', uid: decodedToken.uid }));
+      return null;
+    }
   }
 
   console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'success', userId: user.id, plan: user.plan }));
