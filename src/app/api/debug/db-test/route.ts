@@ -57,6 +57,45 @@ export async function GET() {
     const firstUser = await db.user.findFirst();
     results.findFirstUser = firstUser ? { id: firstUser.id, firebaseUid: firstUser.firebaseUid, plan: firstUser.plan } : null;
     results.findFirstUserDurationMs = Date.now() - t3;
+
+    // Test findUnique by firebaseUid (EXACT query used by getAuthUserBasic)
+    if (firstUser) {
+      const t4 = Date.now();
+      const byUid = await db.user.findUnique({ where: { firebaseUid: firstUser.firebaseUid } });
+      results.findUniqueByUid = byUid ? { id: byUid.id, firebaseUid: byUid.firebaseUid } : null;
+      results.findUniqueByUidIsNull = byUid === null;
+      results.findUniqueByUidDurationMs = Date.now() - t4;
+
+      // Test findUnique with select (PrismaPg bug check)
+      const t5 = Date.now();
+      const byUidSelect = await db.user.findUnique({
+        where: { firebaseUid: firstUser.firebaseUid },
+        select: { id: true, plan: true, firebaseUid: true, email: true },
+      });
+      results.findUniqueByUidSelect = byUidSelect ? { id: byUidSelect.id, plan: byUidSelect.plan } : null;
+      results.findUniqueByUidSelectIsNull = byUidSelect === null;
+      results.findUniqueByUidSelectDurationMs = Date.now() - t5;
+
+      // Test findUnique with include:{} (known PrismaPg bug)
+      const t6 = Date.now();
+      const byUidIncludeEmpty = await db.user.findUnique({
+        where: { firebaseUid: firstUser.firebaseUid },
+        include: {},
+      });
+      results.findUniqueByUidIncludeEmpty = byUidIncludeEmpty ? { id: byUidIncludeEmpty.id } : null;
+      results.findUniqueByUidIncludeEmptyIsNull = byUidIncludeEmpty === null;
+      results.findUniqueByUidIncludeEmptyDurationMs = Date.now() - t6;
+
+      // Test findUnique with include:{aiUsage:true} (like getAuthUser)
+      const t7 = Date.now();
+      const byUidInclude = await db.user.findUnique({
+        where: { firebaseUid: firstUser.firebaseUid },
+        include: { aiUsage: true },
+      });
+      results.findUniqueByUidInclude = byUidInclude ? { id: byUidInclude.id, hasAiUsage: !!byUidInclude.aiUsage } : null;
+      results.findUniqueByUidIncludeIsNull = byUidInclude === null;
+      results.findUniqueByUidIncludeDurationMs = Date.now() - t7;
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const code = (error as any)?.code;
