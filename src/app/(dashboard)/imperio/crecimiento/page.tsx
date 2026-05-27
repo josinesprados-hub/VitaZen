@@ -120,6 +120,10 @@ export default function CrecimientoPage() {
         const d = await res.json();
         setEntries(d.entries);
       } else {
+        // VZ_DEBUG: Log full response details for debugging
+        let errorBody = '';
+        try { errorBody = await res.text(); } catch {}
+        console.error(JSON.stringify({ vz_debug: true, page: 'crecimiento', step: 'apiFailed', status: res.status, statusText: res.statusText, body: errorBody }));
         setFetchError(true);
       }
     } catch (e) {
