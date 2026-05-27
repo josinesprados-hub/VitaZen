@@ -49,7 +49,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuClick}
-            className="lg:hidden flex items-center justify-center w-11 h-11 -ml-1 rounded-xl text-white hover:text-[#c8a55a] hover:bg-[#1a1a1a]/50 transition-colors touch-press"
+            className="lg:hidden flex items-center justify-center w-11 h-11 -ml-1 rounded-xl text-white hover:text-champagne hover:bg-[#1a1a1a]/50 transition-colors touch-press"
             aria-label="Abrir menú"
           >
             <Menu size={22} />
@@ -65,7 +65,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         {/* Right: quiet Élite whisper — the only desktop element */}
         <div className="flex items-center">
           {displayUser?.plan === 'PREMIUM' && (
-            <span className="text-[9px] font-medium text-[#c8a55a]/40 tracking-wider">
+            <span className="text-[9px] font-medium text-champagne/40 tracking-wider">
               Élite
             </span>
           )}

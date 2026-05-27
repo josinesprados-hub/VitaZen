@@ -54,7 +54,7 @@ function ValueSlider({
     <div>
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs text-[#999] uppercase tracking-wider font-medium">{label}</span>
-        <span className="text-xs text-[#c8a55a] font-semibold">
+        <span className="text-xs text-champagne font-semibold">
           {labels[value]?.emoji && <span className="mr-1">{labels[value].emoji}</span>}
           {labels[value]?.label}
         </span>
@@ -67,7 +67,7 @@ function ValueSlider({
             onClick={() => onChange(v)}
             className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all duration-200 value-btn ${
               v <= value
-                ? 'bg-[#c8a55a] text-[#000000]'
+                ? 'bg-champagne text-[#000000]'
                 : 'bg-[#1a1a1a] text-[#555] hover:bg-[#222] hover:text-[#888]'
             }`}
           >
@@ -183,7 +183,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
                 onChange={(e) => setIntention(e.target.value)}
                 placeholder="¿Qué te propones hoy?"
                 maxLength={120}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-[#c8a55a] transition-colors text-base sm:text-sm"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-champagne transition-colors text-base sm:text-sm"
               />
             </div>
 
@@ -198,7 +198,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
                 placeholder="Algo que quieras recordar..."
                 maxLength={300}
                 rows={2}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-[#c8a55a] transition-colors text-base sm:text-sm resize-none"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-champagne transition-colors text-base sm:text-sm resize-none"
               />
             </div>
 
@@ -226,14 +226,14 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
         {step === 2 && (
           /* Done Step */
           <div className="p-6 sm:p-8 text-center safe-bottom card-enter">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/15 flex items-center justify-center mx-auto mb-5 micro-celebrate">
+            <div className="w-16 h-16 rounded-2xl bg-champagne/15 flex items-center justify-center mx-auto mb-5 micro-celebrate">
               <span className="text-3xl">✓</span>
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Anotado</h2>
             <p className="text-sm text-[#999] leading-relaxed mb-2">
               Tu intención para hoy:
             </p>
-            <p className="text-[#c8a55a] font-medium italic mb-6">«{intention}»</p>
+            <p className="text-champagne font-medium italic mb-6">«{intention}»</p>
             <button
               onClick={onClose}
               className="w-full btn-primary py-3 rounded-xl text-sm"

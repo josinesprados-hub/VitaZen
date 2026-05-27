@@ -139,7 +139,7 @@ export default function CierreMensualPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20">
         <div className="flex items-center justify-center">
-          <div className="h-2 w-2 rounded-full bg-[#c8a55a] gentle-pulse" />
+          <div className="h-2 w-2 rounded-full bg-champagne gentle-pulse" />
         </div>
       </div>
     );
@@ -153,7 +153,7 @@ export default function CierreMensualPage() {
         {/* Back link */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 text-[#555] hover:text-[#c8a55a] transition-colors text-xs mb-12"
+          className="flex items-center gap-2 text-[#555] hover:text-champagne transition-colors text-xs mb-12"
         >
           <ArrowLeft size={14} />
           Volver
@@ -170,7 +170,7 @@ export default function CierreMensualPage() {
           <textarea
             value={reflectionText}
             onChange={(e) => setReflectionText(e.target.value)}
-            className="w-full bg-transparent border-b border-[#1a1a1a] focus:border-[#c8a55a]/30 text-white text-base leading-relaxed py-4 px-1 resize-none outline-none transition-colors min-h-[120px] placeholder:text-[#333]"
+            className="w-full bg-transparent border-b border-[#1a1a1a] focus:border-champagne/30 text-white text-base leading-relaxed py-4 px-1 resize-none outline-none transition-colors min-h-[120px] placeholder:text-[#333]"
             placeholder=""
             rows={4}
           />
@@ -185,7 +185,7 @@ export default function CierreMensualPage() {
             <button
               onClick={() => handleSaveReflection(false)}
               disabled={saving}
-              className="px-8 py-3 bg-[#c8a55a] text-black font-medium rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 text-sm"
+              className="px-8 py-3 bg-champagne text-black font-medium rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 text-sm"
             >
               {saving ? '...' : SAVE_REFLECTION}
             </button>
@@ -216,7 +216,7 @@ export default function CierreMensualPage() {
       {/* Back link */}
       <Link
         href="/dashboard"
-        className="flex items-center gap-2 text-[#555] hover:text-[#c8a55a] transition-colors text-xs mb-8"
+        className="flex items-center gap-2 text-[#555] hover:text-champagne transition-colors text-xs mb-8"
       >
         <ArrowLeft size={14} />
         Volver
@@ -332,7 +332,7 @@ export default function CierreMensualPage() {
       {!isPremium && (
         <div className="mt-8 text-center">
           <p className="text-[9px] text-[#333] flex items-center justify-center gap-1">
-            <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+            <Circle size={3} fill="currentColor" className="text-champagne/40" />
             {ELITE_DEEPER}
           </p>
         </div>

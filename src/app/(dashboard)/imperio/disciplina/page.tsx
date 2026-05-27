@@ -194,17 +194,17 @@ export default function DisciplinaPage() {
       {editingHabit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setEditingHabit(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Pencil size={20} className="text-[#c8a55a]" />
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-champagne" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar hábito</h3>
             <div className="space-y-3">
               <input type="text" placeholder="Nombre del hábito" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <select value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors appearance-none">
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors appearance-none">
                 <option value="daily">Diario</option>
                 <option value="weekly">Semanal</option>
                 <option value="monthly">Mensual</option>
@@ -212,7 +212,7 @@ export default function DisciplinaPage() {
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => setEditingHabit(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={saveEdit} disabled={editSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -246,8 +246,8 @@ export default function DisciplinaPage() {
 
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-          <Shield size={28} className="text-[#c8a55a]" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+          <Shield size={28} className="text-champagne" />
         </div>
         <div>
           <h1 className="title-page">Disciplina</h1>
@@ -257,21 +257,21 @@ export default function DisciplinaPage() {
 
       {/* Daily Challenge — auto-completes when action is performed */}
       {challenge && (
-        <div className={`bg-[#0a0a0a] border rounded-xl p-5 sm:p-6 section-enter-1 transition-all duration-300 ${challenge.completed ? 'border-[#c8a55a]/30' : 'border-[#c8a55a]/20'}`}>
+        <div className={`bg-[#0a0a0a] border rounded-xl p-5 sm:p-6 section-enter-1 transition-all duration-300 ${challenge.completed ? 'border-champagne/30' : 'border-champagne/20'}`}>
           <div className="flex items-center gap-3 mb-4">
-            <Trophy size={20} className="text-[#c8a55a]" />
+            <Trophy size={20} className="text-champagne" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
-            {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-[#c8a55a]/15 text-[#c8a55a] font-medium check-pop">Completado</span>}
+            {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-champagne/15 text-champagne font-medium check-pop">Completado</span>}
           </div>
-          <h3 className="text-[#c8a55a] font-medium mb-1">{challenge.challenge.title}</h3>
+          <h3 className="text-champagne font-medium mb-1">{challenge.challenge.title}</h3>
           <p className="text-[#999] text-sm mb-4 line-clamp-3">{challenge.challenge.description}</p>
           {!challenge.completed ? (
             <p className="text-[11px] text-[#666] flex items-center gap-1.5">
-              <Lightbulb size={12} className="text-[#c8a55a]/60" />
+              <Lightbulb size={12} className="text-champagne/60" />
               Completa la acción correspondiente para completar este desafío automáticamente
             </p>
           ) : (
-            <p className="text-[11px] text-[#c8a55a]/80 flex items-center gap-1.5">
+            <p className="text-[11px] text-champagne/80 flex items-center gap-1.5">
               <Check size={12} /> Desafío completado automáticamente al realizar la acción
             </p>
           )}
@@ -284,7 +284,7 @@ export default function DisciplinaPage() {
           <h2 className="text-lg font-semibold text-white">Mis Hábitos</h2>
           <button
             onClick={() => setShowAddHabit(!showAddHabit)}
-            className="flex items-center gap-2 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
+            className="flex items-center gap-2 text-sm text-champagne hover:text-champagne-hover touch-press"
           >
             <Plus size={18} /> Añadir hábito
           </button>
@@ -307,7 +307,7 @@ export default function DisciplinaPage() {
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]"
             />
             <div className="flex gap-2">
-              <button onClick={addHabit} className="bg-[#c8a55a] text-black font-semibold px-5 py-2 rounded-xl text-sm hover:bg-[#d4b468] transition-colors touch-press">Guardar</button>
+              <button onClick={addHabit} className="bg-champagne text-black font-semibold px-5 py-2 rounded-xl text-sm hover:bg-champagne-hover transition-colors touch-press">Guardar</button>
               <button onClick={() => setShowAddHabit(false)} className="text-[#999] px-4 py-2 text-sm hover:text-white touch-press">Cancelar</button>
             </div>
           </div>
@@ -334,11 +334,11 @@ export default function DisciplinaPage() {
                       justCompletedId === habit.id ? 'check-pop' : ''
                     } ${
                       habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString()
-                        ? 'bg-[#c8a55a] border-[#c8a55a] scale-100'
-                        : 'border-[#333] hover:border-[#c8a55a] hover:bg-[#c8a55a]/10'
+                        ? 'bg-champagne border-champagne scale-100'
+                        : 'border-[#333] hover:border-champagne hover:bg-champagne/10'
                     }`}
                   >
-                    <Check size={16} className={habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString() ? 'text-black' : 'text-[#c8a55a]'} />
+                    <Check size={16} className={habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString() ? 'text-black' : 'text-champagne'} />
                   </button>
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
@@ -352,12 +352,12 @@ export default function DisciplinaPage() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {habit.streak > 0 && (
-                    <span className="flex items-center gap-1 text-[#c8a55a] text-xs mr-1">
+                    <span className="flex items-center gap-1 text-champagne text-xs mr-1">
                       <Flame size={14} /> {habit.streak}
                     </span>
                   )}
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar">
+                    <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar">
                       <Pencil size={14} />
                     </button>
                     <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">

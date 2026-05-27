@@ -57,12 +57,12 @@ export default function PremiumGate({
           {/* Small gold dot — presence, not crown */}
           <Circle
             size={compact ? 4 : 5}
-            className="text-[#c8a55a]/40"
+            className="text-champagne/40"
             fill="currentColor"
           />
           <Link
             href="/elite"
-            className={`text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors text-center leading-snug ${
+            className={`text-champagne/50 hover:text-champagne/80 transition-colors text-center leading-snug ${
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}
           >
@@ -95,8 +95,8 @@ export function PremiumInlineBadge({
 }: PremiumInlineBadgeProps) {
   if (isPremium) {
     return (
-      <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50 bg-[#c8a55a]/5 border border-[#c8a55a]/8 px-2 py-0.5 rounded-full">
-        <Circle size={3} className="text-[#c8a55a]/40" fill="currentColor" />
+      <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50 bg-champagne/5 border border-champagne/8 px-2 py-0.5 rounded-full">
+        <Circle size={3} className="text-champagne/40" fill="currentColor" />
         {premiumLabel}
       </span>
     );
@@ -130,12 +130,12 @@ export function PremiumHistoryGate({
   return (
     <div className="flex items-center justify-center gap-2 py-4 mt-2 border-t border-[#1a1a1a]/40">
       <div className="flex items-center gap-1.5 text-[10px] text-[#444]">
-        <Circle size={3} className="text-[#c8a55a]/25" fill="currentColor" />
+        <Circle size={3} className="text-champagne/25" fill="currentColor" />
         <span>
           Hay más aquí —{' '}
           <Link
             href="/elite"
-            className="text-[#c8a55a]/50 hover:text-[#c8a55a]/80 transition-colors"
+            className="text-champagne/50 hover:text-champagne/80 transition-colors"
           >
             conocer Élite
           </Link>

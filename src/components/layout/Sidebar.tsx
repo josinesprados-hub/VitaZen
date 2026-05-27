@@ -75,9 +75,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           <div className="flex items-center justify-between p-6 border-b border-[#1a1a1a]">
             <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
               <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-10 h-10 rounded-[20%]" />
-              <span className="text-[#c8a55a] text-xl font-bold tracking-widest">VITAZEN</span>
+              <span className="text-champagne text-xl font-bold tracking-widest">VITAZEN</span>
             </Link>
-            <button onClick={onClose} className="lg:hidden text-white hover:text-[#c8a55a] close-btn">
+            <button onClick={onClose} className="lg:hidden text-white hover:text-champagne close-btn">
               <X size={20} />
             </button>
           </div>
@@ -89,8 +89,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/dashboard'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <LayoutDashboard size={18} />
@@ -102,8 +102,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/timeline'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <Clock size={18} />
@@ -115,8 +115,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/logros'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <Trophy size={18} />
@@ -128,8 +128,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/checkin'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <Sunrise size={18} />
@@ -141,8 +141,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/insights'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <Lightbulb size={18} />
@@ -154,8 +154,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/memoria-de-vida'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <Layers size={18} />
@@ -167,8 +167,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/perfil'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <UserCircle size={18} />
@@ -180,8 +180,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/ajustes'
-                  ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                  : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                  ? 'bg-champagne/10 text-champagne'
+                  : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
               }`}
             >
               <Settings size={18} />
@@ -201,8 +201,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   onClick={onClose}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                     isActive
-                      ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
-                      : 'text-white hover:bg-[#1a1a1a] hover:text-[#c8a55a]'
+                      ? 'bg-champagne/10 text-champagne'
+                      : 'text-white hover:bg-[#1a1a1a] hover:text-champagne'
                   }`}
                 >
                   <empire.icon size={18} />
@@ -219,7 +219,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               onClick={onClose}
               className="flex items-center gap-3 mb-3 hover:opacity-80 transition-opacity"
             >
-              <div className="w-9 h-9 rounded-full bg-[#c8a55a]/20 flex items-center justify-center text-[#c8a55a] text-sm font-bold overflow-hidden">
+              <div className="w-9 h-9 rounded-full bg-champagne/20 flex items-center justify-center text-champagne text-sm font-bold overflow-hidden">
                 {displayUser?.avatarUrl ? (
                   <img src={displayUser.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -228,7 +228,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{displayUser?.name || 'Usuario'}</p>
-                <p className="text-xs text-[#c8a55a]/50">{displayUser?.plan === 'PREMIUM' ? 'Élite' : 'Free'}</p>
+                <p className="text-xs text-champagne/50">{displayUser?.plan === 'PREMIUM' ? 'Élite' : 'Free'}</p>
               </div>
             </Link>
 
@@ -239,9 +239,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   onClose();
                   router.push('/elite');
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#c8a55a] hover:bg-[#c8a55a]/10 rounded-lg transition-colors touch-press"
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-champagne hover:bg-champagne/10 rounded-lg transition-colors touch-press"
               >
-                <Circle size={4} fill="currentColor" className="text-[#c8a55a]/40" />
+                <Circle size={4} fill="currentColor" className="text-champagne/40" />
                 Élite
               </button>
             ) : (
@@ -250,9 +250,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   onClose();
                   router.push('/elite');
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#999] hover:text-[#c8a55a] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#999] hover:text-champagne hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press"
               >
-                <Circle size={4} fill="currentColor" className="text-[#c8a55a]/30" />
+                <Circle size={4} fill="currentColor" className="text-champagne/30" />
                 Élite
               </button>
             )}

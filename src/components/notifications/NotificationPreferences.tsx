@@ -118,7 +118,7 @@ export function NotificationPreferences() {
   if (!pushSupported) {
     return (
       <div className="card-primary p-6 sm:p-8">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2 mb-4">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
           <BellOff size={14} />
           Notificaciones push
         </h3>
@@ -133,7 +133,7 @@ export function NotificationPreferences() {
   if (permissionState === 'denied') {
     return (
       <div className="card-primary p-6 sm:p-8">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2 mb-4">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
           <BellOff size={14} />
           Notificaciones push
         </h3>
@@ -155,7 +155,7 @@ export function NotificationPreferences() {
   if (!preferences?.pushEnabled || permissionState === 'default') {
     return (
       <div className="card-primary p-6 sm:p-8">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2 mb-4">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
           <Bell size={14} />
           Notificaciones push
         </h3>
@@ -165,22 +165,22 @@ export function NotificationPreferences() {
           </p>
           <div className="text-xs text-[#666] space-y-1.5">
             <p className="flex items-center gap-2">
-              <Check size={12} className="text-[#c8a55a]" />
+              <Check size={12} className="text-champagne" />
               Máximo 2 notificaciones al día
             </p>
             <p className="flex items-center gap-2">
-              <Moon size={12} className="text-[#c8a55a]" />
+              <Moon size={12} className="text-champagne" />
               Horas de silencio automáticas (22:00 - 08:00)
             </p>
             <p className="flex items-center gap-2">
-              <Shield size={12} className="text-[#c8a55a]" />
+              <Shield size={12} className="text-champagne" />
               Puedes desactivarlas cuando quieras
             </p>
           </div>
           <Button
             onClick={handleEnablePush}
             disabled={enablingPush}
-            className="bg-[#c8a55a] hover:bg-[#b8954a] text-black font-medium text-sm"
+            className="bg-champagne hover:bg-champagne-deep text-black font-medium text-sm"
           >
             {enablingPush ? (
               <>
@@ -204,7 +204,7 @@ export function NotificationPreferences() {
     <div className="space-y-4">
       {/* Push master toggle */}
       <div className="card-primary p-6 sm:p-8">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2 mb-5">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-5">
           <Bell size={14} />
           Notificaciones push
         </h3>
@@ -212,7 +212,7 @@ export function NotificationPreferences() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
-              <Bell size={14} className="text-[#c8a55a]" />
+              <Bell size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-sm text-white font-medium">Notificaciones activas</p>
@@ -223,7 +223,7 @@ export function NotificationPreferences() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {savingKey === 'pushEnabled' && (
-              <Loader2 size={14} className="animate-spin text-[#c8a55a]" />
+              <Loader2 size={14} className="animate-spin text-champagne" />
             )}
             <Switch
               checked={preferences.pushEnabled}
@@ -241,14 +241,14 @@ export function NotificationPreferences() {
 
       {/* Reminder types */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Heart size={14} />
           Tipos de recordatorios
         </h3>
 
         {/* Check-in reminders */}
         <ToggleRow
-          icon={<Sunrise size={14} className="text-[#c8a55a]" />}
+          icon={<Sunrise size={14} className="text-champagne" />}
           title="Check-in diario"
           description="Un recordatorio suave para tu check-in matutino"
           checked={preferences.checkinReminders}
@@ -259,7 +259,7 @@ export function NotificationPreferences() {
 
         {/* Weekly recap */}
         <ToggleRow
-          icon={<BarChart3 size={14} className="text-[#c8a55a]" />}
+          icon={<BarChart3 size={14} className="text-champagne" />}
           title="Resumen semanal"
           description="Un resumen tranquilo de tu progreso cada semana"
           checked={preferences.weeklyRecap}
@@ -270,7 +270,7 @@ export function NotificationPreferences() {
 
         {/* Comeback reminders */}
         <ToggleRow
-          icon={<RotateCcw size={14} className="text-[#c8a55a]" />}
+          icon={<RotateCcw size={14} className="text-champagne" />}
           title="Te echamos de menos"
           description="Un mensaje suave si llevas tiempo sin entrar"
           checked={preferences.comebackReminders}
@@ -281,7 +281,7 @@ export function NotificationPreferences() {
 
         {/* Reflection reminders */}
         <ToggleRow
-          icon={<Brain size={14} className="text-[#c8a55a]" />}
+          icon={<Brain size={14} className="text-champagne" />}
           title="Reflexión diaria"
           description="Un momento para ti antes de acabar el día"
           checked={preferences.reflectionReminders}
@@ -293,14 +293,14 @@ export function NotificationPreferences() {
 
       {/* Quiet hours & frequency */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Moon size={14} />
           Horas de silencio
         </h3>
 
         {/* Quiet hours toggle */}
         <ToggleRow
-          icon={<Moon size={14} className="text-[#c8a55a]" />}
+          icon={<Moon size={14} className="text-champagne" />}
           title="Activar horas de silencio"
           description={`Sin notificaciones de ${preferences.quietHoursStart} a ${preferences.quietHoursEnd}`}
           checked={preferences.quietHoursEnabled}
@@ -318,7 +318,7 @@ export function NotificationPreferences() {
                 type="time"
                 value={preferences.quietHoursStart}
                 onChange={(e) => handleToggle('quietHoursStart', e.target.value)}
-                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-[#c8a55a] focus:outline-none"
+                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-champagne focus:outline-none"
               />
             </div>
             <div className="flex items-center gap-3">
@@ -327,7 +327,7 @@ export function NotificationPreferences() {
                 type="time"
                 value={preferences.quietHoursEnd}
                 onChange={(e) => handleToggle('quietHoursEnd', e.target.value)}
-                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-[#c8a55a] focus:outline-none"
+                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-champagne focus:outline-none"
               />
             </div>
           </div>
@@ -339,13 +339,13 @@ export function NotificationPreferences() {
             <label className="text-xs text-[#999]">Zona horaria</label>
             <button
               onClick={() => setShowTimezoneSelect(!showTimezoneSelect)}
-              className="flex items-center gap-1.5 text-xs text-white hover:text-[#c8a55a] transition-colors"
+              className="flex items-center gap-1.5 text-xs text-white hover:text-champagne transition-colors"
             >
               {preferences.timezone.replace('_', ' ')}
               <ChevronDown size={12} />
             </button>
             {savingKey === 'timezone' && (
-              <Loader2 size={12} className="animate-spin text-[#c8a55a]" />
+              <Loader2 size={12} className="animate-spin text-champagne" />
             )}
           </div>
 
@@ -356,7 +356,7 @@ export function NotificationPreferences() {
                   key={tz}
                   onClick={() => handleTimezoneChange(tz)}
                   className={`w-full text-left px-3 py-2 text-xs hover:bg-[#1a1a1a] transition-colors ${
-                    preferences.timezone === tz ? 'text-[#c8a55a]' : 'text-[#999]'
+                    preferences.timezone === tz ? 'text-champagne' : 'text-[#999]'
                   }`}
                 >
                   {tz.replace(/_/g, ' ')}
@@ -370,7 +370,7 @@ export function NotificationPreferences() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
-              <Shield size={14} className="text-[#c8a55a]" />
+              <Shield size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-sm text-white font-medium">Límite diario</p>
@@ -386,7 +386,7 @@ export function NotificationPreferences() {
                 onClick={() => handleToggle('maxDailyNotifications', n)}
                 className={`w-7 h-7 rounded-full text-xs font-medium transition-all ${
                   preferences.maxDailyNotifications >= n
-                    ? 'bg-[#c8a55a] text-black'
+                    ? 'bg-champagne text-black'
                     : 'bg-[#1a1a1a] text-[#666] hover:bg-[#222]'
                 }`}
               >
@@ -428,8 +428,8 @@ function ToggleRow({
         </div>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
-        {saving && <Loader2 size={14} className="animate-spin text-[#c8a55a]" />}
-        {saved && <Check size={14} className="text-[#c8a55a]" />}
+        {saving && <Loader2 size={14} className="animate-spin text-champagne" />}
+        {saved && <Check size={14} className="text-champagne" />}
         <Switch checked={checked} onCheckedChange={onChange} />
       </div>
     </div>

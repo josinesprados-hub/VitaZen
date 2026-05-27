@@ -621,13 +621,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       <div className="p-3 border-b border-[#1a1a1a] space-y-2">
         <Link
           href={backHref}
-          className="text-[#666] text-xs hover:text-[#c8a55a] flex items-center gap-1 transition-colors"
+          className="text-[#666] text-xs hover:text-champagne flex items-center gap-1 transition-colors"
         >
           <ChevronLeft size={12} /> Volver
         </Link>
         <button
           onClick={createThread}
-          className="w-full flex items-center justify-center gap-2 bg-[#c8a55a] text-black font-semibold py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+          className="w-full flex items-center justify-center gap-2 bg-champagne text-black font-semibold py-2.5 rounded-lg hover:bg-champagne-hover transition-colors text-sm"
         >
           <Plus size={16} /> Nueva conversación
         </button>
@@ -639,40 +639,40 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           onClick={() => setTab('active')}
           className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
             tab === 'active'
-              ? 'text-[#c8a55a]'
+              ? 'text-champagne'
               : 'text-[#666] hover:text-[#999]'
           }`}
         >
           Todas
           {activeThreads.length > 0 && (
             <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-              tab === 'active' ? 'bg-[#c8a55a]/20 text-[#c8a55a]' : 'bg-[#1a1a1a] text-[#555]'
+              tab === 'active' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
             }`}>
               {activeThreads.length}
             </span>
           )}
           {tab === 'active' && (
-            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-[#c8a55a] rounded-full" />
+            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
           )}
         </button>
         <button
           onClick={() => setTab('archived')}
           className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
             tab === 'archived'
-              ? 'text-[#c8a55a]'
+              ? 'text-champagne'
               : 'text-[#666] hover:text-[#999]'
           }`}
         >
           Archivadas
           {archivedThreads.length > 0 && (
             <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-              tab === 'archived' ? 'bg-[#c8a55a]/20 text-[#c8a55a]' : 'bg-[#1a1a1a] text-[#555]'
+              tab === 'archived' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
             }`}>
               {archivedThreads.length}
             </span>
           )}
           {tab === 'archived' && (
-            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-[#c8a55a] rounded-full" />
+            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
           )}
         </button>
       </div>
@@ -718,7 +718,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       key={thread.id}
                       className={`group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ${
                         activeThread === thread.id
-                          ? 'bg-[#c8a55a]/10 text-[#c8a55a]'
+                          ? 'bg-champagne/10 text-champagne'
                           : tab === 'archived'
                           ? 'text-[#888] hover:bg-[#1a1a1a]/40'
                           : 'text-[#ccc] hover:bg-[#1a1a1a]/60'
@@ -735,7 +735,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         <MessageCircle
                           size={14}
                           className={`shrink-0 mr-2.5 ${
-                            activeThread === thread.id ? 'text-[#c8a55a]' : 'text-[#555]'
+                            activeThread === thread.id ? 'text-champagne' : 'text-[#555]'
                           }`}
                         />
                       )}
@@ -751,12 +751,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                                 if (e.key === 'Enter') renameThread(thread.id, editTitle);
                                 if (e.key === 'Escape') setEditingThreadId(null);
                               }}
-                              className="flex-1 bg-[#000] border border-[#c8a55a] rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
+                              className="flex-1 bg-[#000] border border-champagne rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
                               maxLength={100}
                             />
                             <button
                               onClick={() => renameThread(thread.id, editTitle)}
-                              className="text-[#c8a55a] hover:text-[#d4b468] p-0.5"
+                              className="text-champagne hover:text-champagne-hover p-0.5"
                             >
                               <Check size={12} />
                             </button>
@@ -782,7 +782,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       {editingThreadId !== thread.id && (
                         <button
                           onClick={(e) => handleContextMenu(e, thread.id)}
-                          className="text-[#444] hover:text-[#c8a55a] p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
+                          className="text-[#444] hover:text-champagne p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
                           title="Más opciones"
                         >
                           <MoreVertical size={14} />
@@ -834,8 +834,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             </span>
             <span className={`font-semibold ${
               remaining === 0 ? 'text-red-400' :
-              remaining <= 3 ? 'text-[#e8a849]' :
-              'text-[#c8a55a]'
+              remaining <= 3 ? 'text-champagne-warm' :
+              'text-champagne'
             }`}>
               {remaining}/{dailyLimit}
             </span>
@@ -850,17 +850,17 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             />
           </div>
           {remaining <= 3 && remaining > 0 && (
-            <p className="text-[10px] text-[#e8a849] mt-1.5 flex items-center gap-1">
-              <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+            <p className="text-[10px] text-champagne-warm mt-1.5 flex items-center gap-1">
+              <Circle size={3} fill="currentColor" className="text-champagne/40" />
               Más conexiones con Élite
             </p>
           )}
           {remaining === 0 && (
             <button
               onClick={() => setShowLimitModal(true)}
-              className="w-full mt-2 text-[10px] text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-lg py-1.5 hover:bg-[#c8a55a]/15 transition-colors flex items-center justify-center gap-1"
+              className="w-full mt-2 text-[10px] text-champagne bg-champagne/10 border border-champagne/20 rounded-lg py-1.5 hover:bg-champagne/15 transition-colors flex items-center justify-center gap-1"
             >
-              <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+              <Circle size={3} fill="currentColor" className="text-champagne/40" />
               Conversaciones sin límite
             </button>
           )}
@@ -870,7 +870,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Premium contextual memory indicator in sidebar */}
       {isPremium && (
         <div className="p-3 border-t border-[#1a1a1a]">
-          <div className="flex items-center gap-2 text-[10px] text-[#c8a55a]/70">
+          <div className="flex items-center gap-2 text-[10px] text-champagne/70">
             <BrainCircuit size={12} className="shrink-0" />
             <span>Memoria contextual profunda</span>
           </div>
@@ -913,7 +913,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
-        <div className="px-3 py-1.5 bg-[#e8a849]/10 border-b border-[#e8a849]/20 text-[#e8a849] text-xs text-center shrink-0">
+        <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
           Sin conexión — los mensajes se enviarán cuando vuelva la red
         </div>
       )}
@@ -928,7 +928,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           <Link href={backHref} className="p-1.5 -ml-1 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors shrink-0">
             <ChevronLeft size={20} />
           </Link>
-          <IconComponent size={16} className="text-[#c8a55a] shrink-0" />
+          <IconComponent size={16} className="text-champagne shrink-0" />
           <p className="text-sm font-semibold text-white truncate">
             {activeThreadData?.title || 'Mentor IA'}
           </p>
@@ -937,13 +937,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {/* Message counter pill — mobile compact */}
           {!isPremium && remaining !== null && (
             <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-              remaining <= 3 ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#1a1a1a] text-[#c8a55a] border border-[#2a2a2a]'
+              remaining <= 3 ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#1a1a1a] text-champagne border border-[#2a2a2a]'
             }`}>
               {remaining}
             </span>
           )}
           {isPremium && (
-            <InfinityIcon size={14} className="text-[#c8a55a]" />
+            <InfinityIcon size={14} className="text-champagne" />
           )}
           {/* Drawer toggle */}
           <button
@@ -962,15 +962,15 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Desktop header */}
       <div className="hidden sm:flex items-center justify-between mb-5 shrink-0">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <IconComponent size={28} className="text-[#c8a55a]" />
+          <div className="w-14 h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+            <IconComponent size={28} className="text-champagne" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-white">Mentor IA</h1>
               {isPremium && (
-                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50 px-2 py-0.5">
-                  <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50 px-2 py-0.5">
+                  <Circle size={3} fill="currentColor" className="text-champagne/40" />
                   Élite
                 </span>
               )}
@@ -985,16 +985,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         <div className="flex items-center gap-2">
           {!isPremium && remaining !== null && (
             <div className="message-counter-pill flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a]">
-              <Zap size={12} className={remaining <= 3 ? 'text-red-400' : 'text-[#c8a55a]'} />
-              <span className={remaining <= 3 ? 'text-red-400' : 'text-[#c8a55a]'}>
+              <Zap size={12} className={remaining <= 3 ? 'text-red-400' : 'text-champagne'} />
+              <span className={remaining <= 3 ? 'text-red-400' : 'text-champagne'}>
                 {remaining}/{dailyLimit}
               </span>
             </div>
           )}
           {isPremium && (
-            <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#c8a55a]/5 border border-[#c8a55a]/15">
-              <InfinityIcon size={12} className="text-[#c8a55a]" />
-              <span className="text-[#c8a55a]">Sin límite</span>
+            <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-champagne/5 border border-champagne/15">
+              <InfinityIcon size={12} className="text-champagne" />
+              <span className="text-champagne">Sin límite</span>
             </div>
           )}
           <button
@@ -1039,12 +1039,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               {/* Desktop: Chat header bar inside chat card */}
               <div className="hidden sm:flex px-5 py-3 border-b border-[#1a1a1a] items-center justify-between shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <MessageCircle size={14} className="text-[#c8a55a] shrink-0" />
+                  <MessageCircle size={14} className="text-champagne shrink-0" />
                   <p className="text-sm text-white truncate">
                     {activeThreadData?.title || 'Conversación'}
                   </p>
                   {activeThreadData?.archived && (
-                    <span className="shrink-0 text-[10px] bg-[#c8a55a]/10 text-[#c8a55a] px-2 py-0.5 rounded-full border border-[#c8a55a]/20">
+                    <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
                       Archivada
                     </span>
                   )}
@@ -1057,8 +1057,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       onMouseLeave={() => setShowContextTooltip(false)}
                       className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
                         isPremium
-                          ? 'text-[#c8a55a]/80 hover:text-[#c8a55a] border-[#c8a55a]/20 hover:border-[#c8a55a]/40'
-                          : 'text-[#c8a55a]/60 hover:text-[#c8a55a] border-[#c8a55a]/15 hover:border-[#c8a55a]/30'
+                          ? 'text-champagne/80 hover:text-champagne border-champagne/20 hover:border-champagne/40'
+                          : 'text-champagne/60 hover:text-champagne border-champagne/15 hover:border-champagne/30'
                       }`}
                     >
                       <BrainCircuit size={12} className="shrink-0" />
@@ -1084,8 +1084,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 {messages.length === 0 && (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center animate-in">
-                      <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
-                        <IconComponent size={32} className="text-[#c8a55a]" />
+                      <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                        <IconComponent size={32} className="text-champagne" />
                       </div>
                       <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
                       <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
@@ -1105,7 +1105,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                               setInput(suggestion);
                               setTimeout(() => chatInputRef.current?.focus(), 50);
                             }}
-                            className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-[#c8a55a]/30 hover:text-[#c8a55a] transition-colors"
+                            className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-champagne/30 hover:text-champagne transition-colors"
                           >
                             {suggestion}
                           </button>
@@ -1113,7 +1113,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       </div>
                       {!isPremium && (
                         <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
-                          <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
+                          <Circle size={3} fill="currentColor" className="text-champagne/30" />
                           El mentor recuerda más cuando profundizas
                         </p>
                       )}
@@ -1129,9 +1129,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     <div
                       className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
                         msg.role === 'user'
-                          ? 'bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-br-md'
+                          ? 'bg-champagne/10 border border-champagne/20 rounded-br-md'
                           : isPremium
-                          ? 'bg-[#080808] border border-[#c8a55a]/10 rounded-bl-md'
+                          ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
                           : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
                       }`}
                     >
@@ -1142,12 +1142,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 {sending && (
                   <div className="flex justify-start animate-in">
                     <div className={`border rounded-2xl rounded-bl-md p-4 ${
-                      isPremium ? 'bg-[#080808] border-[#c8a55a]/10' : 'bg-[#000000] border-[#1a1a1a]'
+                      isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
                     }`}>
                       <div className="flex gap-1.5">
-                        <span className="w-2 h-2 bg-[#c8a55a] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-2 h-2 bg-[#c8a55a] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-2 h-2 bg-[#c8a55a] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
                     </div>
                   </div>
@@ -1159,14 +1159,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
                 {/* Low message warning */}
                 {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
-                  <div className="mb-2 flex items-center gap-2 text-[10px] text-[#e8a849] bg-[#e8a849]/5 border border-[#e8a849]/10 rounded-lg px-3 py-1.5">
+                  <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
                     <Zap size={10} className="shrink-0" />
                     <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
                     <button
                       onClick={() => setShowLimitModal(true)}
-                      className="ml-auto text-[#c8a55a] hover:text-[#d4b468] flex items-center gap-1"
+                      className="ml-auto text-champagne hover:text-champagne-hover flex items-center gap-1"
                     >
-                      <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                      <Circle size={3} fill="currentColor" className="text-champagne/40" />
                       Conocer Élite
                     </button>
                   </div>
@@ -1194,14 +1194,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         ? 'border-[#333] cursor-not-allowed opacity-40'
                         : !isPremium && remaining === 0
                         ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
-                        : 'border-[#1a1a1a] focus:border-[#c8a55a] focus:outline-none'
+                        : 'border-[#1a1a1a] focus:border-champagne focus:outline-none'
                     }`}
                     disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
                   />
                   <button
                     type="submit"
                     disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
-                    className="bg-[#c8a55a] text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
+                    className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
                   >
                     <Send size={18} />
                   </button>
@@ -1212,14 +1212,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             /* No active thread — empty state */
             <div className="flex items-center justify-center flex-1 min-h-0">
               <div className="text-center animate-in px-4">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-4">
-                  <IconComponent size={28} className="text-[#c8a55a] sm:size-8" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                  <IconComponent size={28} className="text-champagne sm:size-8" />
                 </div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
                 <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
                 <button
                   onClick={createThread}
-                  className="inline-flex items-center gap-2 bg-[#c8a55a] text-black font-semibold px-5 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm touch-press"
+                  className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
                 >
                   <Plus size={16} /> Nueva conversación
                 </button>
@@ -1296,7 +1296,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         unarchiveThread(thread.id);
                         setContextMenu(null);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-[#c8a55a] transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
                     >
                       <ArchiveRestore size={14} className="text-[#666]" />
                       Restaurar
@@ -1307,7 +1307,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         archiveThread(thread.id);
                         setContextMenu(null);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-[#c8a55a] transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
                     >
                       <Archive size={14} className="text-[#666]" />
                       Archivar
@@ -1365,7 +1365,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Action error toast — auto-dismisses */}
       {actionError && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#c8a55a]/20 text-[#c8a55a] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
           onClick={() => setActionError('')}
         >
           {actionError}
@@ -1375,10 +1375,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* ────────── Premium Limit Modal ────────── */}
       {showLimitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-          <div className="modal-content bg-[#0a0a0a] border border-[#c8a55a]/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
+          <div className="modal-content bg-[#0a0a0a] border border-champagne/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
             <div className="p-8 text-center">
-              <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/8 flex items-center justify-center mx-auto mb-5">
-                <Circle size={5} fill="currentColor" className="text-[#c8a55a]/40" />
+              <div className="w-10 h-10 rounded-xl bg-champagne/8 flex items-center justify-center mx-auto mb-5">
+                <Circle size={5} fill="currentColor" className="text-champagne/40" />
               </div>
 
               <h3 className="text-xl font-bold text-white mb-2">
@@ -1402,7 +1402,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               <div className="space-y-3">
                 <Link
                   href="/elite"
-                  className="block w-full bg-[#c8a55a]/10 border border-[#c8a55a]/20 text-[#c8a55a] font-medium py-3 rounded-xl hover:bg-[#c8a55a]/15 transition-colors text-sm text-center"
+                  className="block w-full bg-champagne/10 border border-champagne/20 text-champagne font-medium py-3 rounded-xl hover:bg-champagne/15 transition-colors text-sm text-center"
                   onClick={() => setShowLimitModal(false)}
                 >
                   <span className="flex items-center justify-center gap-2">

@@ -44,32 +44,32 @@ import {
 const VARIANT_CONFIG = {
   network: {
     icon: WifiOff,
-    iconClass: 'text-[#c8a55a]/50',
-    iconBg: 'bg-[#c8a55a]/5 border border-[#c8a55a]/10',
+    iconClass: 'text-champagne/50',
+    iconBg: 'bg-champagne/5 border border-champagne/10',
     title: 'Sin conexión',
     subtitle: 'No se pudo conectar con el servidor. Revisa tu conexión a internet.',
     retryLabel: 'Reintentar',
   },
   loading: {
     icon: CloudOff,
-    iconClass: 'text-[#c8a55a]/50',
-    iconBg: 'bg-[#c8a55a]/5 border border-[#c8a55a]/10',
+    iconClass: 'text-champagne/50',
+    iconBg: 'bg-champagne/5 border border-champagne/10',
     title: 'No se pudieron cargar los datos',
     subtitle: 'Algo falló al obtener la información. Puedes intentarlo de nuevo.',
     retryLabel: 'Reintentar',
   },
   session: {
     icon: Shield,
-    iconClass: 'text-[#c8a55a]/50',
-    iconBg: 'bg-[#c8a55a]/5 border border-[#c8a55a]/10',
+    iconClass: 'text-champagne/50',
+    iconBg: 'bg-champagne/5 border border-champagne/10',
     title: 'Sesión expirada',
     subtitle: 'Tu sesión ha caducado por seguridad. Inicia sesión de nuevo para continuar.',
     retryLabel: 'Iniciar sesión',
   },
   generic: {
     icon: AlertCircle,
-    iconClass: 'text-[#c8a55a]/50',
-    iconBg: 'bg-[#c8a55a]/5 border border-[#c8a55a]/10',
+    iconClass: 'text-champagne/50',
+    iconBg: 'bg-champagne/5 border border-champagne/10',
     title: 'Algo ha ido mal',
     subtitle: 'Ha ocurrido un error inesperado. Puedes intentarlo de nuevo.',
     retryLabel: 'Reintentar',
@@ -176,9 +176,9 @@ export default function PremiumErrorState({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="inline-flex items-center gap-2 text-[#c8a55a] text-xs font-medium
-                         bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg px-4 py-2
-                         hover:bg-[#c8a55a]/10 hover:border-[#c8a55a]/25
+              className="inline-flex items-center gap-2 text-champagne text-xs font-medium
+                         bg-champagne/5 border border-champagne/15 rounded-lg px-4 py-2
+                         hover:bg-champagne/10 hover:border-champagne/25
                          transition-all duration-200 active:scale-[0.97] touch-press"
             >
               <RefreshCw size={12} />

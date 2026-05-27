@@ -68,7 +68,7 @@ function MoodDisplay({ mood }: { mood: number | null }) {
     <Heart
       key={i}
       size={12}
-      className={i < mood ? 'text-[#c8a55a] fill-[#c8a55a]' : 'text-[#333]'}
+      className={i < mood ? 'text-champagne fill-champagne' : 'text-[#333]'}
     />
   ));
   return <span className="flex items-center gap-0.5">{hearts}</span>;
@@ -239,22 +239,22 @@ export default function CrecimientoPage() {
       {editingEntry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingEntry(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Pencil size={20} className="text-[#c8a55a]" />
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-champagne" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar entrada</h3>
             <div className="space-y-3">
               <input type="text" placeholder="Título" value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <textarea placeholder="Contenido" value={editForm.content} onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666] h-28 resize-none" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-28 resize-none" />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Ánimo (1-5)</label>
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <button key={n} onClick={() => setEditForm({ ...editForm, mood: n })}
-                        className={`rating-btn w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666]'}`}>
+                        className={`rating-btn w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666]'}`}>
                         {n}
                       </button>
                     ))}
@@ -263,13 +263,13 @@ export default function CrecimientoPage() {
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Gratitud</label>
                   <input type="text" placeholder="Agradecido por..." value={editForm.gratitude} onChange={(e) => setEditForm({ ...editForm, gratitude: e.target.value })}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
                 </div>
               </div>
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => setEditingEntry(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEdit} disabled={editSaving || (!editForm.title.trim() && !editForm.content.trim() && !editForm.gratitude.trim())} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={saveEdit} disabled={editSaving || (!editForm.title.trim() && !editForm.content.trim() && !editForm.gratitude.trim())} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -294,8 +294,8 @@ export default function CrecimientoPage() {
 
       {/* ═══ Page Header ═══ */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-          <TrendingUp size={28} className="text-[#c8a55a]" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+          <TrendingUp size={28} className="text-champagne" />
         </div>
         <div>
           <h1 className="title-page">Crecimiento</h1>
@@ -308,12 +308,12 @@ export default function CrecimientoPage() {
         {/* Header + New Entry Button */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <BookOpen size={20} className="text-[#c8a55a]" /> Diario Personal
+            <BookOpen size={20} className="text-champagne" /> Diario Personal
           </h2>
           {!screenshotMode && (
             <button
               onClick={() => setShowAdd(!showAdd)}
-              className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press"
+              className="flex items-center gap-1 text-sm text-champagne hover:text-champagne-hover touch-press"
             >
               <Plus size={18} /> Nueva entrada
             </button>
@@ -334,7 +334,7 @@ export default function CrecimientoPage() {
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} onClick={() => setForm({ ...form, mood: n })}
-                      className={`rating-btn w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#666]'}`}>
+                      className={`rating-btn w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#666]'}`}>
                       {n}
                     </button>
                   ))}
@@ -347,7 +347,7 @@ export default function CrecimientoPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitEntry} disabled={saving || (!form.title.trim() && !form.content.trim() && !form.gratitude.trim())} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">
+              <button onClick={submitEntry} disabled={saving || (!form.title.trim() && !form.content.trim() && !form.gratitude.trim())} className="bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover touch-press disabled:opacity-50 disabled:cursor-not-allowed">
                 {saving ? 'Guardando...' : 'Guardar'}
               </button>
               <button onClick={() => setShowAdd(false)} className="text-[#999] px-4 py-2 text-sm touch-press">Cancelar</button>
@@ -362,7 +362,7 @@ export default function CrecimientoPage() {
               <div key={group.label}>
                 {/* Date group header */}
                 <div className="flex items-center gap-3 mb-3">
-                  <h3 className="text-xs uppercase tracking-widest font-semibold text-[#c8a55a]/70 whitespace-nowrap">
+                  <h3 className="text-xs uppercase tracking-widest font-semibold text-champagne/70 whitespace-nowrap">
                     {group.label}
                   </h3>
                   <div className="flex-1 h-px bg-[#1a1a1a]" />
@@ -377,12 +377,12 @@ export default function CrecimientoPage() {
                     >
                       {/* Top row: title + actions */}
                       <div className="flex items-start justify-between gap-3 mb-2">
-                        <h4 className="text-[#c8a55a] font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#666] italic">Sin título</span>}</h4>
+                        <h4 className="text-champagne font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#666] italic">Sin título</span>}</h4>
                         {!screenshotMode && (
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <button
                               onClick={() => startEdit(entry)}
-                              className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press"
+                              className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press"
                               title="Editar"
                             >
                               <Pencil size={14} />
@@ -426,7 +426,7 @@ export default function CrecimientoPage() {
                           {entry.content.length > 150 && (
                             <button
                               onClick={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
-                              className="text-[#c8a55a] text-xs mt-1 hover:underline"
+                              className="text-champagne text-xs mt-1 hover:underline"
                             >
                               {expandedEntry === entry.id ? 'Ver menos' : 'Ver más'}
                             </button>
@@ -437,7 +437,7 @@ export default function CrecimientoPage() {
                       {/* Gratitude */}
                       {entry.gratitude && (
                         <div className="mt-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded p-2">
-                          <p className="text-xs text-[#c8a55a]">Gratitud: <span className="text-[#999]">{entry.gratitude}</span></p>
+                          <p className="text-xs text-champagne">Gratitud: <span className="text-[#999]">{entry.gratitude}</span></p>
                         </div>
                       )}
 

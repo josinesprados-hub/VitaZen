@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4 rounded-[20%]" />
-          <h1 className="text-[#c8a55a] text-3xl font-bold tracking-widest">VITAZEN</h1>
+          <h1 className="text-champagne text-3xl font-bold tracking-widest">VITAZEN</h1>
         </div>
 
         {/* Form Card */}
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={success}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors disabled:opacity-50"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors disabled:opacity-50"
                 placeholder="tu@email.com"
               />
             </div>
@@ -84,14 +84,14 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-champagne text-[#000000] font-semibold py-3 rounded-lg hover:bg-champagne-hover transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <Link href="/login" className="text-[#c8a55a] hover:underline text-sm">
+            <Link href="/login" className="text-champagne hover:underline text-sm">
               Volver al inicio de sesión
             </Link>
           </div>

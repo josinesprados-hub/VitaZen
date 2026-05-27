@@ -147,7 +147,7 @@ export default function AjustesPage() {
 
       {/* Email Notifications Section */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Mail size={14} />
           Notificaciones por email
         </h3>
@@ -156,7 +156,7 @@ export default function AjustesPage() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
-              <Mail size={14} className="text-[#c8a55a]" />
+              <Mail size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-sm text-white font-medium">Resumen semanal</p>
@@ -167,10 +167,10 @@ export default function AjustesPage() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {savingKey === 'weeklyEmailSummary' && (
-              <Loader2 size={14} className="animate-spin text-[#c8a55a]" />
+              <Loader2 size={14} className="animate-spin text-champagne" />
             )}
             {savedKeys.has('weeklyEmailSummary') && (
-              <Check size={14} className="text-[#c8a55a]" />
+              <Check size={14} className="text-champagne" />
             )}
             <Switch
               checked={settings.weeklyEmailSummary}
@@ -183,7 +183,7 @@ export default function AjustesPage() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
-              <Bell size={14} className="text-[#c8a55a]" />
+              <Bell size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-sm text-white font-medium">Recordatorios diarios</p>
@@ -194,10 +194,10 @@ export default function AjustesPage() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {savingKey === 'dailyReminders' && (
-              <Loader2 size={14} className="animate-spin text-[#c8a55a]" />
+              <Loader2 size={14} className="animate-spin text-champagne" />
             )}
             {savedKeys.has('dailyReminders') && (
-              <Check size={14} className="text-[#c8a55a]" />
+              <Check size={14} className="text-champagne" />
             )}
             <Switch
               checked={settings.dailyReminders}
@@ -212,7 +212,7 @@ export default function AjustesPage() {
 
       {/* Privacy Section */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Shield size={14} />
           Privacidad
         </h3>
@@ -221,7 +221,7 @@ export default function AjustesPage() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
-              <Eye size={14} className="text-[#c8a55a]" />
+              <Eye size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-sm text-white font-medium">Mostrar estadísticas</p>
@@ -232,10 +232,10 @@ export default function AjustesPage() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {savingKey === 'privacyStatsVisible' && (
-              <Loader2 size={14} className="animate-spin text-[#c8a55a]" />
+              <Loader2 size={14} className="animate-spin text-champagne" />
             )}
             {savedKeys.has('privacyStatsVisible') && (
-              <Check size={14} className="text-[#c8a55a]" />
+              <Check size={14} className="text-champagne" />
             )}
             <Switch
               checked={settings.privacyStatsVisible}
@@ -247,7 +247,7 @@ export default function AjustesPage() {
 
       {/* Account Section */}
       <div className="card-primary p-6 sm:p-8 space-y-4">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest">Cuenta</h3>
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest">Cuenta</h3>
 
         {/* Profile link */}
         <button
@@ -256,14 +256,14 @@ export default function AjustesPage() {
         >
           <div className="flex items-center gap-3">
             <div className="icon-sm">
-              <UserCircle size={14} className="text-[#c8a55a]" />
+              <UserCircle size={14} className="text-champagne" />
             </div>
             <div className="text-left">
               <p className="text-sm text-white font-medium">Editar perfil</p>
               <p className="text-xs text-[#999]">Nombre, foto, ubicación y bio</p>
             </div>
           </div>
-          <ChevronRight size={16} className="text-[#555] group-hover:text-[#c8a55a] transition-colors" />
+          <ChevronRight size={16} className="text-[#555] group-hover:text-champagne transition-colors" />
         </button>
 
         {/* Divider */}
@@ -292,7 +292,7 @@ export default function AjustesPage() {
 
       {/* App Info Section */}
       <div className="card-primary p-6 sm:p-8 space-y-4">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Info size={14} />
           Información
         </h3>
@@ -306,7 +306,7 @@ export default function AjustesPage() {
             <p className="text-sm text-[#999]">Plan</p>
             <div className="flex items-center gap-2">
               {displayUser?.plan === 'PREMIUM' ? (
-                <span className="text-[9px] font-medium text-[#c8a55a]/50">Élite</span>
+                <span className="text-[9px] font-medium text-champagne/50">Élite</span>
               ) : (
                 <span className="text-[9px] font-medium text-[#555]">Free</span>
               )}
@@ -315,7 +315,7 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#999]">Email verificado</p>
             {displayUser?.emailVerified ? (
-              <span className="flex items-center gap-1.5 text-sm text-[#c8a55a]">
+              <span className="flex items-center gap-1.5 text-sm text-champagne">
                 <Check size={14} />
                 Verificado
               </span>
@@ -323,7 +323,7 @@ export default function AjustesPage() {
               <button
                 onClick={handleSendVerification}
                 disabled={verifySending || verifySent}
-                className="flex items-center gap-1.5 text-sm text-[#888] hover:text-[#c8a55a] transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 text-sm text-[#888] hover:text-champagne transition-colors disabled:opacity-50"
               >
                 {verifySending ? (
                   <>
@@ -332,8 +332,8 @@ export default function AjustesPage() {
                   </>
                 ) : verifySent ? (
                   <>
-                    <Check size={14} className="text-[#c8a55a]" />
-                    <span className="text-[#c8a55a]">Enviado</span>
+                    <Check size={14} className="text-champagne" />
+                    <span className="text-champagne">Enviado</span>
                   </>
                 ) : (
                   'Verificar ahora'
@@ -348,10 +348,10 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#999]">Legal</p>
             <div className="flex items-center gap-3">
-              <a href="/privacy" className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2">
+              <a href="/privacy" className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2">
                 Privacidad
               </a>
-              <a href="/terms" className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2">
+              <a href="/terms" className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2">
                 Términos
               </a>
             </div>

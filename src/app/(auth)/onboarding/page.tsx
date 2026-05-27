@@ -189,7 +189,7 @@ export default function OnboardingPage() {
             key={i}
             className={`rounded-full transition-all duration-500 ${
               i === step
-                ? 'w-2 h-2 bg-[#c8a55a]'
+                ? 'w-2 h-2 bg-champagne'
                 : 'w-1.5 h-1.5 bg-[#1a1a1a]'
             }`}
           />
@@ -244,8 +244,8 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
   return (
     <div className="text-center">
       <div className="onboarding-logo-enter mb-6 sm:mb-8">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#c8a55a]/10 border border-[#c8a55a]/20 flex items-center justify-center onboarding-complete-glow">
-          <Sparkles size={36} className="text-[#c8a55a]" />
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-champagne/10 border border-champagne/20 flex items-center justify-center onboarding-complete-glow">
+          <Sparkles size={36} className="text-champagne" />
         </div>
       </div>
 
@@ -259,7 +259,7 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
 
       <button
         onClick={onNext}
-        className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors text-sm"
+        className="inline-flex items-center gap-2 bg-champagne text-[#000000] font-semibold px-8 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm"
       >
         Vale
         <ArrowRight size={16} />
@@ -299,21 +299,21 @@ function GoalsStep({
               onClick={() => onToggle(goal)}
               className={`text-left p-4 rounded-xl border transition-all duration-200 ${
                 isSelected
-                  ? 'bg-[#c8a55a]/10 border-[#c8a55a]/40 onboarding-option-pop'
-                  : 'bg-[#0a0a0a] border-[#1a1a1a] hover:border-[#c8a55a]/20'
+                  ? 'bg-champagne/10 border-champagne/40 onboarding-option-pop'
+                  : 'bg-[#0a0a0a] border-[#1a1a1a] hover:border-champagne/20'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    isSelected ? 'border-[#c8a55a] bg-[#c8a55a]' : 'border-[#333]'
+                    isSelected ? 'border-champagne bg-champagne' : 'border-[#333]'
                   }`}
                 >
                   {isSelected && <Check size={12} className="text-black" />}
                 </div>
                 <span
                   className={`text-sm font-medium ${
-                    isSelected ? 'text-[#c8a55a]' : 'text-[#999]'
+                    isSelected ? 'text-champagne' : 'text-[#999]'
                   }`}
                 >
                   {goal}
@@ -334,7 +334,7 @@ function GoalsStep({
         <button
           onClick={onNext}
           disabled={selected.length === 0}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-champagne text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Continuar
           <ArrowRight size={16} />
@@ -380,23 +380,23 @@ function FocusStep({
               onClick={() => onSelect(option.key)}
               className={`w-full text-left p-5 rounded-xl border transition-all duration-200 ${
                 isSelected
-                  ? 'bg-[#c8a55a]/10 border-[#c8a55a]/40 onboarding-option-pop'
-                  : 'bg-[#0a0a0a] border-[#1a1a1a] hover:border-[#c8a55a]/20'
+                  ? 'bg-champagne/10 border-champagne/40 onboarding-option-pop'
+                  : 'bg-[#0a0a0a] border-[#1a1a1a] hover:border-champagne/20'
               }`}
             >
               <div className="flex items-center gap-4">
                 <div
                   className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
-                    isSelected ? 'bg-[#c8a55a]/20' : 'bg-[#c8a55a]/10'
+                    isSelected ? 'bg-champagne/20' : 'bg-champagne/10'
                   }`}
                 >
-                  <Icon size={22} className="text-[#c8a55a]" />
+                  <Icon size={22} className="text-champagne" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3
                       className={`font-semibold text-sm ${
-                        isSelected ? 'text-[#c8a55a]' : 'text-white'
+                        isSelected ? 'text-champagne' : 'text-white'
                       }`}
                     >
                       {option.label}
@@ -407,7 +407,7 @@ function FocusStep({
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    isSelected ? 'border-[#c8a55a] bg-[#c8a55a]' : 'border-[#333]'
+                    isSelected ? 'border-champagne bg-champagne' : 'border-[#333]'
                   }`}
                 >
                   {isSelected && <Check size={12} className="text-black" />}
@@ -419,8 +419,8 @@ function FocusStep({
       </div>
 
       {error && (
-        <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg p-3 mb-4 error-state-enter">
-          <p className="text-[#c8a55a]/80 text-sm">{error}</p>
+        <div className="bg-champagne/5 border border-champagne/15 rounded-lg p-3 mb-4 error-state-enter">
+          <p className="text-champagne/80 text-sm">{error}</p>
         </div>
       )}
 
@@ -435,7 +435,7 @@ function FocusStep({
         <button
           onClick={onComplete}
           disabled={saving || !selected}
-          className="inline-flex items-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-champagne text-[#000000] font-semibold px-6 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {saving ? (
             <>

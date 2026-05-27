@@ -15,8 +15,8 @@ export default function PrivacyPolicyPage() {
     <main className="min-h-screen bg-black text-white">
       <div className="max-w-3xl mx-auto px-6 py-16">
         {/* Header */}
-        <header className="mb-12 border-b border-[#c8a55a]/30 pb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#c8a55a] mb-3">
+        <header className="mb-12 border-b border-champagne/30 pb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-champagne mb-3">
             Política de Privacidad
           </h1>
           <p className="text-sm text-gray-400">
@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 1. Datos que recopilamos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             1. Datos que recopilamos
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 2. Cómo utilizamos tus datos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             2. Cómo utilizamos tus datos
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -153,7 +153,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 3. Compartir datos con terceros */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             3. Compartir datos con terceros
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -188,7 +188,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 4. Seguridad de los datos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             4. Seguridad de los datos
           </h2>
           <p className="text-gray-300 leading-relaxed">
@@ -204,7 +204,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 5. Retención de datos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             5. Retención de datos
           </h2>
           <p className="text-gray-300 leading-relaxed">
@@ -220,7 +220,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 6. Tus derechos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             6. Tus derechos
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -263,7 +263,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 7. Notificaciones push */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             7. Notificaciones push
           </h2>
           <p className="text-gray-300 leading-relaxed">
@@ -277,7 +277,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 8. Aplicación para Android (TWA) */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             8. Aplicación para Android
           </h2>
           <p className="text-gray-300 leading-relaxed">
@@ -292,7 +292,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 9. Privacidad de menores */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             9. Privacidad de menores
           </h2>
           <p className="text-gray-300 leading-relaxed">
@@ -307,7 +307,7 @@ export default function PrivacyPolicyPage() {
 
         {/* 10. Cambios en esta política */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             10. Cambios en esta política
           </h2>
           <p className="text-gray-300 leading-relaxed">
@@ -321,22 +321,22 @@ export default function PrivacyPolicyPage() {
 
         {/* 11. Contacto */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             11. Contacto
           </h2>
           <p className="text-gray-300 leading-relaxed">
             Si tienes preguntas, inquietudes o solicitudes relacionadas con esta Política de
             Privacidad o el tratamiento de tus datos personales, puedes contactarnos a través de:
           </p>
-          <div className="mt-4 p-5 bg-white/5 border border-[#c8a55a]/20 rounded-lg">
+          <div className="mt-4 p-5 bg-white/5 border border-champagne/20 rounded-lg">
             <p className="text-white font-medium mb-2">VitaZen — Soporte</p>
             <p className="text-gray-300">
               Correo electrónico:
-              <span className="text-[#c8a55a] font-medium"> soportevitazen@gmail.com</span>
+              <span className="text-champagne font-medium"> soportevitazen@gmail.com</span>
             </p>
             <p className="text-gray-300 mt-1">
               Sitio web:
-              <span className="text-[#c8a55a] font-medium"> https://vitazen.cc</span>
+              <span className="text-champagne font-medium"> https://vitazen.cc</span>
             </p>
           </div>
           <p className="text-gray-300 leading-relaxed mt-4">
@@ -346,7 +346,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         {/* Footer */}
-        <footer className="pt-8 border-t border-[#c8a55a]/20 text-center">
+        <footer className="pt-8 border-t border-champagne/20 text-center">
           <p className="text-sm text-gray-500">
             VitaZen — Ecosistema de desarrollo personal
           </p>
@@ -357,14 +357,14 @@ export default function PrivacyPolicyPage() {
           <div className="flex items-center justify-center gap-4 mt-4">
             <Link
               href="/privacy"
-              className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
+              className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2"
             >
               Política de Privacidad
             </Link>
             <span className="text-gray-600">|</span>
             <Link
               href="/terms"
-              className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
+              className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2"
             >
               Términos y Condiciones
             </Link>

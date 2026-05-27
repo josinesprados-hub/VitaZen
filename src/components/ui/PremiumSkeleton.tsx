@@ -170,7 +170,7 @@ export function InsightsSkeleton() {
       </SkeletonCard>
 
       {/* Weekly Comparison (Premium) */}
-      <SkeletonCard className="p-7 border-[#c8a55a]/15">
+      <SkeletonCard className="p-7 border-champagne/15">
         <div className="flex items-center gap-3 mb-5">
           <SkeletonIcon size="sm" />
           <SkeletonLine width="160px" className="h-5" />
@@ -452,7 +452,7 @@ export function CheckinSkeleton() {
       </div>
 
       {/* Today Summary */}
-      <SkeletonCard className="p-3 sm:p-4 mb-5 sm:mb-7 border-[#c8a55a]/10 rounded-lg">
+      <SkeletonCard className="p-3 sm:p-4 mb-5 sm:mb-7 border-champagne/10 rounded-lg">
         <div className="flex items-center gap-2.5 mb-3">
           <SkeletonCircle size={18} className="shrink-0" />
           <div className="space-y-1.5 flex-1">
@@ -582,7 +582,7 @@ export function EmpireSkeleton({ message }: { message: string }) {
 
       {/* Warm loading message */}
       <div className="flex items-center gap-2.5">
-        <div className="h-2 w-2 rounded-full bg-[#c8a55a] gentle-pulse" />
+        <div className="h-2 w-2 rounded-full bg-champagne gentle-pulse" />
         <p className="warm-loading-msg">{message}</p>
       </div>
 
@@ -638,7 +638,7 @@ export function FinanzasSkeleton() {
       {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-5">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#c8a55a]/5" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-champagne/5" />
           <div className="space-y-2">
             <SkeletonLine width="110px" className="h-7 sm:h-8" />
             <SkeletonLine width="160px" className="h-3 sm:h-3.5" />
@@ -667,7 +667,7 @@ export function FinanzasSkeleton() {
               </div>
               <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#c8a55a]/10"
+                  className="h-full rounded-full bg-champagne/10"
                   style={{ width: `${30 + i * 20}%` }}
                 />
               </div>
@@ -685,7 +685,7 @@ export function FinanzasSkeleton() {
       </div>
 
       {/* Insight — reserved, quiet */}
-      <div className="bg-[#c8a55a]/3 border border-[#c8a55a]/10 rounded-2xl p-5 sm:p-6 lg:p-7">
+      <div className="bg-champagne/3 border border-champagne/10 rounded-2xl p-5 sm:p-6 lg:p-7">
         <SkeletonLine width="80%" className="h-4 sm:h-4.5" />
       </div>
 

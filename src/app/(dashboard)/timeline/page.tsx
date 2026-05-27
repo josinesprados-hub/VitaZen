@@ -77,9 +77,9 @@ const IMPERIO_CONFIG: Record<string, {
   },
   riqueza: {
     icon: Gem,
-    accent: 'text-[#c8a55a]',
-    accentSubtle: 'text-[#c8a55a]/60',
-    dot: 'bg-[#c8a55a]/25 border-[#c8a55a]/50',
+    accent: 'text-champagne',
+    accentSubtle: 'text-champagne/60',
+    dot: 'bg-champagne/25 border-champagne/50',
     label: 'Riqueza',
   },
 };
@@ -264,7 +264,7 @@ export default function TimelinePage() {
                 isActive
                   ? impConfig
                     ? `${impConfig.accent} bg-white/[0.06]`
-                    : 'bg-[#c8a55a] text-[#000000]'
+                    : 'bg-champagne text-[#000000]'
                   : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-[#333] hover:text-[#bbb]'
               }`}
             >

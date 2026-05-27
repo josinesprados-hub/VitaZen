@@ -53,12 +53,12 @@ export default function ContextualHelp({ storageKey, title, text }: ContextualHe
   if (!visible) return null;
 
   return (
-    <div className="relative flex items-start gap-3 bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl px-4 py-3.5 animate-in">
-      <div className="w-7 h-7 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0 mt-0.5">
-        <Info size={14} className="text-[#c8a55a]" />
+    <div className="relative flex items-start gap-3 bg-[#0a0a0a] border border-champagne/15 rounded-xl px-4 py-3.5 animate-in">
+      <div className="w-7 h-7 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0 mt-0.5">
+        <Info size={14} className="text-champagne" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-[#c8a55a] mb-0.5">{title}</p>
+        <p className="text-xs font-semibold text-champagne mb-0.5">{title}</p>
         <p className="text-[11px] text-[#888] leading-relaxed">{text}</p>
       </div>
       <button

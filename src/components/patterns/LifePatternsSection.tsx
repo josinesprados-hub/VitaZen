@@ -140,7 +140,7 @@ function setCachedObservations(userId: string, data: PatternsResponse): void {
 function ObservationCard({ observation }: { observation: ObservationData }) {
   return (
     <div className="py-5 sm:py-6">
-      <p className="text-[#c8a55a]/70 text-base sm:text-lg italic leading-relaxed">
+      <p className="text-champagne/70 text-base sm:text-lg italic leading-relaxed">
         {observation.text}
       </p>
 
@@ -180,7 +180,7 @@ function PremiumPreview({ observation }: { observation: ObservationData }) {
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex items-center gap-1.5">
-          <Circle size={3} className="text-[#c8a55a]/25" fill="currentColor" />
+          <Circle size={3} className="text-champagne/25" fill="currentColor" />
           <span className="text-[10px] text-[#444]">Más conexiones con el tiempo</span>
         </div>
       </div>
@@ -196,7 +196,7 @@ function SilentSkeleton() {
   return (
     <div className="py-6 sm:py-8">
       <div className="flex items-center gap-2 mb-4">
-        <Link2 size={11} className="text-[#c8a55a]/10" />
+        <Link2 size={11} className="text-champagne/10" />
         <span className="text-[11px] text-[#222]">{SECTION_TITLE}</span>
       </div>
       <div className="py-4 sm:py-5">
@@ -289,9 +289,9 @@ export default function LifePatternsSection() {
     <div className="py-2 sm:py-4">
       {/* Header — whisper, not announcement */}
       <div className="flex items-center gap-2 mb-3">
-        <Link2 size={10} className="text-[#c8a55a]/15" />
+        <Link2 size={10} className="text-champagne/15" />
         <span className="text-[10px] sm:text-[11px] text-[#333]">{SECTION_TITLE}</span>
-        <Circle size={3} className="text-[#c8a55a]/15 ml-auto" fill="currentColor" />
+        <Circle size={3} className="text-champagne/15 ml-auto" fill="currentColor" />
       </div>
 
       {/* Observations */}

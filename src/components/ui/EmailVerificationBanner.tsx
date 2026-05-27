@@ -101,9 +101,9 @@ export function EmailVerificationBanner() {
   };
 
   return (
-    <div className="mx-2 sm:mx-0 mb-3 bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl px-4 py-3 flex items-center gap-3 group">
-      <div className="w-8 h-8 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center flex-shrink-0">
-        <Mail size={15} className="text-[#c8a55a]" />
+    <div className="mx-2 sm:mx-0 mb-3 bg-[#0a0a0a] border border-champagne/15 rounded-xl px-4 py-3 flex items-center gap-3 group">
+      <div className="w-8 h-8 rounded-lg bg-champagne/10 flex items-center justify-center flex-shrink-0">
+        <Mail size={15} className="text-champagne" />
       </div>
 
       <div className="flex-1 min-w-0">
@@ -123,7 +123,7 @@ export function EmailVerificationBanner() {
 
       <div className="flex items-center gap-2 flex-shrink-0">
         {sent ? (
-          <span className="flex items-center gap-1.5 text-xs text-[#c8a55a]">
+          <span className="flex items-center gap-1.5 text-xs text-champagne">
             <CheckCircle size={13} />
             <span className="hidden sm:inline">Enviado</span>
           </span>
@@ -131,7 +131,7 @@ export function EmailVerificationBanner() {
           <button
             onClick={handleSendVerification}
             disabled={sending}
-            className="flex items-center gap-1.5 text-xs text-[#c8a55a] hover:text-white transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 text-xs text-champagne hover:text-white transition-colors disabled:opacity-50"
           >
             {sending ? (
               <Loader2 size={13} className="animate-spin" />

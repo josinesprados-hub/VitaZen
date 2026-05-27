@@ -3,14 +3,31 @@
 @theme {
   --color-background: #000000;
   --color-foreground: #FFFFFF;
-  --color-gold: #c8a55a;
-  --color-gold-hover: #d4b468;
   --color-card: #0a0a0a;
   --color-card-border: #1a1a1a;
   --color-muted: #666666;
   --color-muted-foreground: #999999;
   --color-destructive: #ef4444;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ── Champagne Editorial Palette ──────────────────────
+     One family. One tone. Zero orange accidents.
+     Primary: warm champagne — editorial, calm, premium
+     Soft:    whisper-light champagne for subtle accents
+     Muted:   desaturated champagne for secondary text/scores
+     Warm:    slightly warmer champagne for warning/caution
+     Deep:    dark champagne for overloaded/pressed states
+     Hover:   lighter champagne for interactive hover states
+     ──────────────────────────────────────────────────── */
+  --color-champagne: #c8a55a;
+  --color-champagne-hover: #d4b468;
+  --color-champagne-soft: #b8995e;
+  --color-champagne-warm: #d4a84e;
+  --color-champagne-deep: #8b6f3a;
+
+  /* Legacy aliases — existing code still works */
+  --color-gold: var(--color-champagne);
+  --color-gold-hover: var(--color-champagne-hover);
 
   /* Unified transition timings — calm, deliberate, premium.
      Fast: micro-feedback (focus, active states)
@@ -63,13 +80,13 @@ html, body {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c8a55a;
+  background: var(--color-champagne);
 }
 
 /* Custom focus styles — calm, present, not flashy */
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #c8a55a;
+  border-color: var(--color-champagne);
   box-shadow: 0 0 0 1px rgba(200, 165, 90, 0.3);
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
@@ -493,7 +510,7 @@ html { scroll-behavior: smooth; }
 
 /* Primary button */
 .btn-primary {
-  background: #c8a55a;
+  background: var(--color-champagne);
   color: #000000;
   font-weight: 600;
   padding: 0.625rem 1.25rem;
@@ -502,7 +519,7 @@ html { scroll-behavior: smooth; }
   transition: background-color var(--transition-base), box-shadow var(--transition-smooth);
 }
 .btn-primary:hover {
-  background: #d4b468;
+  background: var(--color-champagne-hover);
   box-shadow: 0 2px 12px rgba(200, 165, 90, 0.12);
 }
 .btn-primary:active:not(:disabled) {
@@ -525,7 +542,7 @@ html { scroll-behavior: smooth; }
 }
 
 .progress-bar-fill {
-  background: #c8a55a;
+  background: var(--color-champagne);
   border-radius: 9999px;
   transition: width 0.7s ease-out, background-color 0.5s ease;
 }
@@ -1528,7 +1545,7 @@ body.scroll-locked {
 
 /* Warm loading message — for empire page skeletons */
 .warm-loading-msg {
-  color: #c8a55a;
+  color: var(--color-champagne);
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;

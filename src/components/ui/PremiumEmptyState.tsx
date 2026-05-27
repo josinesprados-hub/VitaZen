@@ -54,7 +54,7 @@ export default function PremiumEmptyState({
       container: 'py-8',
       iconWrapper: 'w-12 h-12 rounded-xl',
       iconSize: 20,
-      iconClass: variant === 'gold' ? 'text-[#c8a55a]/40' : 'text-[#444]',
+      iconClass: variant === 'gold' ? 'text-champagne/40' : 'text-[#444]',
       titleClass: 'text-sm',
       subtitleClass: 'text-xs',
     },
@@ -62,7 +62,7 @@ export default function PremiumEmptyState({
       container: 'py-14',
       iconWrapper: 'w-14 h-14 rounded-2xl',
       iconSize: 24,
-      iconClass: variant === 'gold' ? 'text-[#c8a55a]/50' : 'text-[#555]',
+      iconClass: variant === 'gold' ? 'text-champagne/50' : 'text-[#555]',
       titleClass: 'text-sm',
       subtitleClass: 'text-xs',
     },
@@ -70,14 +70,14 @@ export default function PremiumEmptyState({
       container: 'py-20',
       iconWrapper: 'w-16 h-16 rounded-2xl',
       iconSize: 28,
-      iconClass: variant === 'gold' ? 'text-[#c8a55a]/50' : 'text-[#555]',
+      iconClass: variant === 'gold' ? 'text-champagne/50' : 'text-[#555]',
       titleClass: 'text-sm',
       subtitleClass: 'text-xs',
     },
   }[size];
 
   const iconBg = variant === 'gold'
-    ? 'bg-[#c8a55a]/5'
+    ? 'bg-champagne/5'
     : 'bg-[#0a0a0a] border border-[#1a1a1a]';
 
   return (
@@ -109,8 +109,8 @@ export default function PremiumEmptyState({
       {cta && onCta && (
         <button
           onClick={onCta}
-          className="mt-5 inline-flex items-center gap-2 text-[#c8a55a]/70 text-xs font-medium
-                     hover:text-[#c8a55a] transition-colors duration-300 touch-press"
+          className="mt-5 inline-flex items-center gap-2 text-champagne/70 text-xs font-medium
+                     hover:text-champagne transition-colors duration-300 touch-press"
         >
           {cta}
         </button>

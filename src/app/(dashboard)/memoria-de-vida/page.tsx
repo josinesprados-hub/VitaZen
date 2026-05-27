@@ -98,7 +98,7 @@ export default function EtapasPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20 sm:py-32">
         <div className="flex items-center justify-center">
-          <div className="h-2 w-2 rounded-full bg-[#c8a55a] gentle-pulse" />
+          <div className="h-2 w-2 rounded-full bg-champagne gentle-pulse" />
         </div>
       </div>
     );
@@ -116,7 +116,7 @@ export default function EtapasPage() {
       {/* Back */}
       <Link
         href="/dashboard"
-        className="flex items-center gap-2 text-[#555] hover:text-[#c8a55a] transition-colors text-xs mb-8 sm:mb-10"
+        className="flex items-center gap-2 text-[#555] hover:text-champagne transition-colors text-xs mb-8 sm:mb-10"
       >
         <ArrowLeft size={14} />
         Volver
@@ -163,7 +163,7 @@ export default function EtapasPage() {
                 {stage.monthLabel && (
                   <p className="text-[10px] text-[#333] mb-2 tracking-wide">{stage.monthLabel}</p>
                 )}
-                <p className="text-[#c8a55a]/60 text-base sm:text-lg italic leading-relaxed">
+                <p className="text-champagne/60 text-base sm:text-lg italic leading-relaxed">
                   {stage.text}
                 </p>
               </div>
@@ -234,7 +234,7 @@ export default function EtapasPage() {
           <div className="space-y-6 sm:space-y-8">
             {patterns.map((p) => (
               <div key={p.id}>
-                <p className="text-[#c8a55a]/60 text-sm sm:text-base italic leading-relaxed">{p.text}</p>
+                <p className="text-champagne/60 text-sm sm:text-base italic leading-relaxed">{p.text}</p>
                 {p.empires && p.empires.length > 1 && (
                   <div className="flex items-center gap-1.5 mt-2">
                     {p.empires.map((empire, i) => (
@@ -264,7 +264,7 @@ export default function EtapasPage() {
       {!isPremium && hasContent && (
         <div className="text-center mt-12">
           <p className="text-[10px] text-[#333] flex items-center justify-center gap-1">
-            <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+            <Circle size={3} fill="currentColor" className="text-champagne/40" />
             {FREE_LIMIT_MESSAGE}
           </p>
         </div>

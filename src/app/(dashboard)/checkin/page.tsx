@@ -78,7 +78,7 @@ const MiniBarChart = memo(function MiniBarChart({ data, metricKey }: { data: Tre
             title={`${val}/5`}
           >
             <div
-              className="w-full bg-[#c8a55a]/30 rounded-sm"
+              className="w-full bg-champagne/30 rounded-sm"
               style={{ height: `${pct}%` }}
             />
           </div>
@@ -266,12 +266,12 @@ export default function CheckinPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-5 sm:mb-7">
         <div className="flex items-center gap-2.5">
-          <Sunrise size={18} className="text-[#c8a55a]" />
+          <Sunrise size={18} className="text-champagne" />
           <h1 className="text-lg sm:text-xl font-bold text-white">Check-in Diario</h1>
         </div>
         <button
           onClick={() => { setEditingCheckin(null); setShowModal(true); }}
-          className="border border-[#c8a55a]/30 text-[#c8a55a] font-medium px-4 py-2 rounded-lg hover:bg-[#c8a55a]/8 transition-colors text-sm"
+          className="border border-champagne/30 text-champagne font-medium px-4 py-2 rounded-lg hover:bg-champagne/8 transition-colors text-sm"
         >
           {todayCheckin ? 'Editar hoy' : 'Check-in'}
         </button>
@@ -279,12 +279,12 @@ export default function CheckinPage() {
 
       {/* Today Summary */}
       {todayCheckin && (
-        <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-lg p-3 sm:p-4 mb-5 sm:mb-7">
+        <div className="bg-[#0a0a0a] border border-champagne/10 rounded-lg p-3 sm:p-4 mb-5 sm:mb-7">
           <div className="flex items-center gap-2.5 mb-3">
             <span className="text-lg">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
             <div>
               <p className="text-white font-medium text-xs">Tu check-in de hoy</p>
-              <p className="text-[#c8a55a]/80 text-xs italic">«{todayCheckin.intention}»</p>
+              <p className="text-champagne/80 text-xs italic">«{todayCheckin.intention}»</p>
             </div>
           </div>
           <div className="grid grid-cols-4 gap-2">
@@ -295,7 +295,7 @@ export default function CheckinPage() {
               { label: 'Estrés', val: todayCheckin.stress },
             ].map((item) => (
               <div key={item.label} className="text-center">
-                <p className="text-sm font-medium text-[#c8a55a]/70">{item.val}<span className="text-[10px] text-[#444]">/5</span></p>
+                <p className="text-sm font-medium text-champagne/70">{item.val}<span className="text-[10px] text-[#444]">/5</span></p>
                 <p className="text-[10px] text-[#444]">{item.label}</p>
               </div>
             ))}
@@ -310,7 +310,7 @@ export default function CheckinPage() {
       {trends && (
         <div className="mb-7">
           <div className="flex items-center gap-2 mb-3">
-            <TrendingUp size={16} className="text-[#c8a55a]/60" />
+            <TrendingUp size={16} className="text-champagne/60" />
             <h2 className="text-base font-semibold text-white">Tendencias</h2>
             <span className="text-[11px] text-[#555]">últimos {trends.totalDays} días</span>
           </div>
@@ -322,10 +322,10 @@ export default function CheckinPage() {
               return (
                 <div
                   key={metric.key}
-                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3 hover:border-[#c8a55a]/15 transition-colors touch-press"
+                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3 hover:border-champagne/15 transition-colors touch-press"
                 >
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Icon size={12} className="text-[#c8a55a]/60" />
+                    <Icon size={12} className="text-champagne/60" />
                     <span className="label-discrete">{metric.label}</span>
                   </div>
                   <p className="text-lg font-semibold text-white mb-1.5">{val.toFixed(1)}<span className="text-[10px] text-[#444]">/5</span></p>
@@ -341,7 +341,7 @@ export default function CheckinPage() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-[#c8a55a]/60" />
+            <Calendar size={16} className="text-champagne/60" />
             <h2 className="text-base font-semibold text-white">Historial</h2>
           </div>
           {checkins.length > 0 && (
@@ -366,13 +366,13 @@ export default function CheckinPage() {
                 className={`bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-3 group hover:border-[#222] transition-colors stagger-${Math.min(idx + 1, 6)}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-md bg-[#c8a55a]/8 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-md bg-champagne/8 flex items-center justify-center shrink-0">
                     <span className="text-sm">{c.emotion >= 4 ? '😊' : c.emotion >= 3 ? '😐' : '😔'}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] text-[#888]">{formatDate(c.date)}</span>
-                      <span className="text-[#c8a55a]/70 text-[11px] font-medium truncate">«{c.intention}»</span>
+                      <span className="text-champagne/70 text-[11px] font-medium truncate">«{c.intention}»</span>
                     </div>
                     <div className="flex gap-3 mt-0.5">
                       {[
@@ -382,14 +382,14 @@ export default function CheckinPage() {
                         { label: 'Estrés', val: c.stress },
                       ].map((item) => (
                         <span key={item.label} className="text-[10px] text-[#444]">
-                          {item.label} <span className="text-[#c8a55a]/60">{item.val}</span>
+                          {item.label} <span className="text-champagne/60">{item.val}</span>
                         </span>
                       ))}
                     </div>
                     {c.note && <p className="text-[10px] text-[#3a3a3a] mt-0.5 truncate">{c.note}</p>}
                   </div>
                   <div className="flex items-center gap-0.5 flex-shrink-0">
-                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-[#c8a55a]/8 text-[#444] hover:text-[#c8a55a] transition-all touch-press-sm" title="Editar">
+                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-champagne/8 text-[#444] hover:text-champagne transition-all touch-press-sm" title="Editar">
                       <Pencil size={13} />
                     </button>
                     <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/8 text-[#444] hover:text-red-400 transition-all touch-press-sm" title="Eliminar">

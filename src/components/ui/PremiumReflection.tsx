@@ -75,13 +75,13 @@ export default function PremiumReflection() {
 
   if (!loaded || !reflection) {
     // Minimal placeholder — silence, not a loading state
-    return <div className="py-2 sm:py-6 h-8 sm:h-12 flex items-center justify-center"><div className="h-2 w-16 rounded-full bg-[#c8a55a]/10 gentle-pulse" /></div>;
+    return <div className="py-2 sm:py-6 h-8 sm:h-12 flex items-center justify-center"><div className="h-2 w-16 rounded-full bg-champagne/10 gentle-pulse" /></div>;
   }
 
   return (
     <div className="flex justify-center py-3 sm:py-8">
       <p
-        className={`text-center text-[#c8a55a]/70 text-sm sm:text-lg font-light italic tracking-wide max-w-xl transition-opacity duration-700 px-4 select-none leading-relaxed ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`text-center text-champagne/70 text-sm sm:text-lg font-light italic tracking-wide max-w-xl transition-opacity duration-700 px-4 select-none leading-relaxed ${visible ? 'opacity-100' : 'opacity-0'}`}
       >
         «{reflection}»
       </p>

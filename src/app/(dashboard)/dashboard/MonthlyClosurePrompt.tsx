@@ -54,7 +54,7 @@ export function MonthlyClosurePrompt() {
         className="block py-3 hover:opacity-80 transition-all group touch-press"
       >
         <div className="flex items-center gap-3">
-          <Calendar size={13} className="text-[#c8a55a]/25 group-hover:text-[#c8a55a]/50 transition-colors shrink-0" />
+          <Calendar size={13} className="text-champagne/25 group-hover:text-champagne/50 transition-colors shrink-0" />
           <p className="text-[11px] text-[#555] group-hover:text-[#777] transition-colors flex-1">
             {message}
           </p>

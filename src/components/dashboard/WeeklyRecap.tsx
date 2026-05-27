@@ -116,7 +116,7 @@ function TrendBadge({ value, invert = false }: { value: number; invert?: boolean
   }
   if (negative) {
     return (
-      <span className="flex items-center gap-1 text-[11px] text-[#e8a849]">
+      <span className="flex items-center gap-1 text-[11px] text-champagne-warm">
         <TrendingDown size={11} /> {invert ? '↑' : '↓'}
       </span>
     );
@@ -131,8 +131,8 @@ function TrendBadge({ value, invert = false }: { value: number; invert?: boolean
 function getInsightBorderClass(type: string): string {
   switch (type) {
     case 'positive': return 'border-[#22c55e]/15 hover:border-[#22c55e]/30';
-    case 'warning': return 'border-[#e8a849]/15 hover:border-[#e8a849]/30';
-    case 'trend': return 'border-[#c8a55a]/15 hover:border-[#c8a55a]/30';
+    case 'warning': return 'border-champagne-warm/15 hover:border-champagne-warm/30';
+    case 'trend': return 'border-champagne/15 hover:border-champagne/30';
     default: return 'border-[#1a1a1a] hover:border-[#2a2a2a]';
   }
 }
@@ -255,8 +255,8 @@ export function WeeklyRecap() {
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden">
         <div className="px-4 py-4 sm:px-7 sm:py-7">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#c8a55a]/5 flex items-center justify-center">
-              <CalendarRange size={16} className="text-[#c8a55a]/30 sm:w-[20px] sm:h-[20px]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-champagne/5 flex items-center justify-center">
+              <CalendarRange size={16} className="text-champagne/30 sm:w-[20px] sm:h-[20px]" />
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu semana</h2>
@@ -297,20 +297,20 @@ export function WeeklyRecap() {
 
   return (
     <div className="recap-fade-in">
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden hover:border-[#c8a55a]/15 transition-colors duration-300">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden hover:border-champagne/15 transition-colors duration-300">
         {/* Header */}
         <div className="px-4 pt-4 pb-3 sm:px-7 sm:pt-7 sm:pb-5 sm:border-b sm:border-[#1a1a1a]/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-                <CalendarRange size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-champagne/10 flex items-center justify-center">
+                <CalendarRange size={16} className="text-champagne sm:w-[20px] sm:h-[20px]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-semibold text-white">Tu semana</h2>
                   {isPremium && (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
-                      <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50">
+                      <Circle size={3} fill="currentColor" className="text-champagne/40" />
                       Élite
                     </span>
                   )}
@@ -321,13 +321,13 @@ export function WeeklyRecap() {
             <div className="flex items-center gap-2 sm:gap-3">
               {!isPremium && (
                 <span className="text-[10px] text-[#555] items-center gap-1 hidden sm:flex">
-                  <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
+                  <Circle size={3} fill="currentColor" className="text-champagne/30" />
                   Hay más aquí con el tiempo
                 </span>
               )}
               <Link
                 href="/insights"
-                className="text-[10px] sm:text-[11px] text-[#c8a55a] hover:underline flex items-center gap-1 transition-colors"
+                className="text-[10px] sm:text-[11px] text-champagne hover:underline flex items-center gap-1 transition-colors"
               >
                 Ver todo <ArrowRight size={11} />
               </Link>
@@ -358,7 +358,7 @@ export function WeeklyRecap() {
             </div>
             <Link
               href="/insights"
-              className="text-[10px] text-[#c8a55a] hover:underline flex items-center gap-1 transition-colors"
+              className="text-[10px] text-champagne hover:underline flex items-center gap-1 transition-colors"
             >
               Ver resumen <ArrowRight size={10} />
             </Link>
@@ -370,7 +370,7 @@ export function WeeklyRecap() {
           {/* Row 1: Score + Emotional State */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
             {/* Wellness Score — clickable to insights */}
-            <Link href="/insights" className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 flex items-center gap-3 sm:gap-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press">
+            <Link href="/insights" className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 flex items-center gap-3 sm:gap-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press">
               <div className="relative w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
                 <svg className="absolute inset-0 -rotate-90" viewBox="0 0 96 96">
                   <circle
@@ -396,7 +396,7 @@ export function WeeklyRecap() {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-[#c8a55a] transition-colors">Tu semana</p>
+                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-champagne transition-colors">Tu semana</p>
                 <p className="text-[11px] sm:text-[13px] mb-1.5 sm:mb-3" style={{ color: scoreColor }}>
                   {data.scoreLabel}
                 </p>
@@ -407,7 +407,7 @@ export function WeeklyRecap() {
                   </span>
                 </div>
               </div>
-              <ArrowRight size={14} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0" />
+              <ArrowRight size={14} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0" />
             </Link>
 
             {/* Emotional State — PREMIUM details */}
@@ -415,10 +415,10 @@ export function WeeklyRecap() {
               <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
                 <div className="flex items-center justify-between mb-2 sm:mb-4">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Heart size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
+                    <Heart size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                     <p className="text-xs sm:text-sm font-semibold text-white">Estado emocional</p>
                   </div>
-                  <span className="text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-full bg-[#c8a55a]/10 text-[#c8a55a] border border-[#c8a55a]/20">
+                  <span className="text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-full bg-champagne/10 text-champagne border border-champagne/20">
                     {data.emotionalState.statusLabel}
                   </span>
                 </div>
@@ -456,7 +456,7 @@ export function WeeklyRecap() {
             {/* Weekly Progress */}
             <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
-                <Flame size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
+                <Flame size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                 <p className="text-xs sm:text-sm font-semibold text-white">Tu actividad</p>
               </div>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -466,10 +466,10 @@ export function WeeklyRecap() {
                     <Link
                       key={item.label}
                       href={item.href}
-                      className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group"
+                      className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group"
                     >
                       <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
-                        <Icon size={10} className="text-[#c8a55a] sm:w-[12px] sm:h-[12px]" />
+                        <Icon size={10} className="text-champagne sm:w-[12px] sm:h-[12px]" />
                   <p className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider label-discrete">{item.label}</p>
                       </div>
                       <p className="text-lg sm:text-xl font-bold text-white">{item.value}</p>
@@ -483,7 +483,7 @@ export function WeeklyRecap() {
             {/* Top Habits */}
             <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
-                <CheckCircle size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
+                <CheckCircle size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                 <p className="text-xs sm:text-sm font-semibold text-white">Hábitos más consistentes</p>
               </div>
               {data.topHabits.length > 0 ? (
@@ -492,21 +492,21 @@ export function WeeklyRecap() {
                     <Link
                       key={habit.name}
                       href="/imperio/disciplina"
-                      className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3.5 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group"
+                      className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3.5 hover:border-champagne/15 transition-colors cursor-pointer group"
                     >
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                        <span className="text-[10px] sm:text-[11px] font-bold text-[#c8a55a]">{idx + 1}</span>
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+                        <span className="text-[10px] sm:text-[11px] font-bold text-champagne">{idx + 1}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] sm:text-[13px] text-white font-medium truncate">{habit.name}</p>
                         <p className="text-[9px] sm:text-[10px] text-[#666]">
-                          <Flame size={8} className="inline mr-0.5 text-[#c8a55a] sm:w-[9px] sm:h-[9px]" />
+                          <Flame size={8} className="inline mr-0.5 text-champagne sm:w-[9px] sm:h-[9px]" />
                           {habit.streak}d racha
                         </p>
                       </div>
                       <div className="w-8 sm:w-10 h-1 sm:h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
                         <div
-                          className="h-1 sm:h-1.5 rounded-full bg-[#c8a55a] recap-bar-transition"
+                          className="h-1 sm:h-1.5 rounded-full bg-champagne recap-bar-transition"
                           style={{ width: `${Math.min((habit.streak / 14) * 100, 100)}%` }}
                         />
                       </div>
@@ -527,13 +527,13 @@ export function WeeklyRecap() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
             {/* Evolution vs Previous Week — PremiumGate */}
             <PremiumGate isPremium={isPremium} intensity="medium" label="Evolución semanal">
-              <div className="bg-[#000000] border border-[#c8a55a]/10 rounded-xl p-3 sm:p-6 hover:border-[#c8a55a]/20 transition-colors">
+              <div className="bg-[#000000] border border-champagne/10 rounded-xl p-3 sm:p-6 hover:border-champagne/20 transition-colors">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
-                  <TrendingUp size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
+                  <TrendingUp size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                   <p className="text-xs sm:text-sm font-semibold text-white">Evolución vs. semana anterior</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                  <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Emociones</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
@@ -542,7 +542,7 @@ export function WeeklyRecap() {
                       {data.evolution && <TrendBadge value={data.evolution.emotionTrend} />}
                     </div>
                   </Link>
-                  <Link href="/imperio/energia" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                  <Link href="/imperio/energia" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
@@ -551,7 +551,7 @@ export function WeeklyRecap() {
                       {data.evolution && <TrendBadge value={data.evolution.energyTrend} />}
                     </div>
                   </Link>
-                  <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                  <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Estrés</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
@@ -560,7 +560,7 @@ export function WeeklyRecap() {
                       {data.evolution && <TrendBadge value={data.evolution.stressTrend} invert />}
                     </div>
                   </Link>
-                  <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-[#c8a55a]/15 transition-colors cursor-pointer group touch-press">
+                  <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Actividad</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
@@ -576,11 +576,11 @@ export function WeeklyRecap() {
             {/* Main Insight — clickable to relevant section */}
             <Link
               href={data.mainInsight ? getCategoryHref(data.mainInsight.category) : '/insights'}
-              className="block bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#c8a55a]/20 transition-all duration-200 cursor-pointer group touch-press"
+              className="block bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press"
             >
               <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
-                <Sparkles size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
-                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#c8a55a] transition-colors">Lo que destaca</p>
+                <Sparkles size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-champagne transition-colors">Lo que destaca</p>
               </div>
               {data.mainInsight ? (
                 <div
@@ -597,7 +597,7 @@ export function WeeklyRecap() {
                       </div>
                       <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed line-clamp-2 sm:line-clamp-none">{data.mainInsight.description}</p>
                     </div>
-                    <ArrowRight size={12} className="text-[#333] group-hover:text-[#c8a55a]/50 transition-colors shrink-0 mt-1" />
+                    <ArrowRight size={12} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0 mt-1" />
                   </div>
                 </div>
               ) : (
@@ -610,7 +610,7 @@ export function WeeklyRecap() {
           </div>
 
           {/* Row 4: Mentor Recommendation — FREE gets truncated, PREMIUM full */}
-          <Link href="/imperio/mentor" className="block bg-gradient-to-r from-[#c8a55a]/5 via-[#0a0a0a] to-[#0a0a0a] border border-[#c8a55a]/10 rounded-xl p-3 sm:p-6 relative overflow-hidden hover:border-[#c8a55a]/20 transition-colors cursor-pointer group">
+          <Link href="/imperio/mentor" className="block bg-gradient-to-r from-champagne/5 via-[#0a0a0a] to-[#0a0a0a] border border-champagne/10 rounded-xl p-3 sm:p-6 relative overflow-hidden hover:border-champagne/20 transition-colors cursor-pointer group">
             {/* Subtle glow */}
             <div
               className="absolute inset-0 rounded-xl pointer-events-none"
@@ -618,7 +618,7 @@ export function WeeklyRecap() {
             />
             <div className="relative z-10">
               <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                <Lightbulb size={13} className="text-[#c8a55a] sm:w-[15px] sm:h-[15px]" />
+                <Lightbulb size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                 <p className="text-xs sm:text-sm font-semibold text-white">Observación</p>
                 <PremiumInlineBadge
                   isPremium={isPremium}
@@ -626,15 +626,15 @@ export function WeeklyRecap() {
                   premiumLabel="Completo"
                 />
               </div>
-              <p className={`text-[11px] sm:text-[13px] text-[#c8a55a]/90 font-light italic leading-relaxed max-w-2xl ${
+              <p className={`text-[11px] sm:text-[13px] text-champagne/90 font-light italic leading-relaxed max-w-2xl ${
                 isPremium ? '' : 'line-clamp-2'
               }`}>
                 {data.mentorRecommendation}
               </p>
               {!isPremium && data.mentorRecommendation.length > 100 && (
                 <div className="mt-2 flex items-center gap-1.5">
-                  <span className="text-[9px] sm:text-[10px] text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors flex items-center gap-1">
-                    <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" /> Las conexiones aparecen con el tiempo
+                  <span className="text-[9px] sm:text-[10px] text-champagne/60 group-hover:text-champagne transition-colors flex items-center gap-1">
+                    <Circle size={3} fill="currentColor" className="text-champagne/30" /> Las conexiones aparecen con el tiempo
                   </span>
                 </div>
               )}
@@ -646,9 +646,9 @@ export function WeeklyRecap() {
             <button
               onMouseEnter={() => setEmailHover(true)}
               onMouseLeave={() => setEmailHover(false)}
-              className="hidden sm:flex items-center gap-2 text-[11px] text-[#555] hover:text-[#c8a55a] transition-colors duration-300 group cursor-default"
+              className="hidden sm:flex items-center gap-2 text-[11px] text-[#555] hover:text-champagne transition-colors duration-300 group cursor-default"
             >
-              <Mail size={12} className={`transition-colors duration-300 ${emailHover ? 'text-[#c8a55a]' : 'text-[#444]'}`} />
+              <Mail size={12} className={`transition-colors duration-300 ${emailHover ? 'text-champagne' : 'text-[#444]'}`} />
               <span>Resumen semanal por email próximamente</span>
             </button>
           </div>

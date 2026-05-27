@@ -47,7 +47,7 @@ const COLORS = {
   textTertiary:  '#5A5666',   // Very subtle, for branding
 
   // Accent (PREMIUM only)
-  accentGold:    '#C4A882',   // Warm gold — calm luxury, not flashy
+  accentChampagne: '#b8995e',  // Champagne-soft — calm luxury, not flashy
   accentSage:    '#7B9E87',   // Sage green — natural calm
   accentRose:    '#B08E9E',   // Muted rose — soft warmth
 
@@ -62,14 +62,14 @@ const COLORS = {
 // These are intentionally muted — not saturated.
 
 const CATEGORY_ACCENTS: Record<string, string> = {
-  disciplina:    COLORS.accentGold,
+  disciplina:    COLORS.accentChampagne,
   claridad:      COLORS.accentSage,
   presencia:     COLORS.accentRose,
-  enfoque:       COLORS.accentGold,
+  enfoque:       COLORS.accentChampagne,
   'propósito':   COLORS.accentSage,
   crecimiento:   COLORS.accentRose,
   bienestar:     COLORS.accentSage,
-  mente:         COLORS.accentGold,
+  mente:         COLORS.accentChampagne,
 };
 
 // ─── Typography ─────────────────────────────
@@ -158,7 +158,7 @@ function generateBaseCSS(): string {
       width: 60%;
       height: 60%;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(196, 168, 130, 0.03) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(184, 153, 94, 0.03) 0%, transparent 70%);
       pointer-events: none;
     }
 

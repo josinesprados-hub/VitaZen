@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════
 // WEEKLY RECAP EMAIL TEMPLATE
-// Premium dark/gold design, transactional-first
-// Black background, V logo, gold accents
+// Premium dark/champagne design, transactional-first
+// Black background, V logo, champagne accents
 // Optimized for Gmail/Outlook/Apple Mail
 // Anti-dark-mode: color-scheme light-only
 // ═══════════════════════════════════════════
@@ -31,7 +31,7 @@ const ANTI_DARK_MODE_STYLES = `
     /* ====== GMAIL DARK MODE OVERRIDES (defense layer 2) ====== */
     u + .email-body .email-bg { background-color:#080808 !important; }
     u + .email-body .content-cell { background-color:#080808 !important; }
-    u + .email-body .gold-text { color:#c8a55a !important; }
+    u + .email-body .champagne-text { color:#c8a55a !important; }
     u + .email-body .white-text { color:#ffffff !important; }
     u + .email-body .heading-text { color:#ffffff !important; }
     u + .email-body .body-text { color:#d4d4d4 !important; }
@@ -41,7 +41,7 @@ const ANTI_DARK_MODE_STYLES = `
     u + .email-body .subtle-text { color:#555555 !important; }
     u + .email-body .cta-cell { background-color:#c8a55a !important; }
     u + .email-body .cta-link { color:#0a0a0a !important; }
-    u + .email-body .divider-gold { background-color:#c8a55a !important; }
+    u + .email-body .divider-champagne { background-color:#c8a55a !important; }
     u + .email-body .divider-subtle { background-color:#333333 !important; }
     u + .email-body .logo-img { filter:none !important; -webkit-filter:none !important; }
 
@@ -96,7 +96,7 @@ function metricRow(label: string, value: string): string {
 }
 
 function sectionLabel(text: string): string {
-  return `<p class="gold-text" style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:${FONT_STACK_CSS};">${text}</p>`;
+  return `<p class="champagne-text" style="color:#c8a55a;font-size:10px;letter-spacing:3px;margin:0 0 8px;font-weight:500;font-family:${FONT_STACK_CSS};">${text}</p>`;
 }
 
 // ─── Main template ───
@@ -178,14 +178,14 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <!-- Brand Name -->
           <tr>
             <td class="content-cell" style="padding:0 40px 24px;text-align:center;background-color:#080808;" bgcolor="#080808">
-              <p class="gold-text" style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
+              <p class="champagne-text" style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
             </td>
           </tr>
 
-          <!-- Gold Accent Line -->
+          <!-- Champagne Accent Line -->
           <tr>
             <td class="content-cell" style="padding:0 40px 0;background-color:#080808;" bgcolor="#080808">
-              <div class="divider-gold" style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;font-size:1px;line-height:1px;">&nbsp;</div>
+              <div class="divider-champagne" style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;font-size:1px;line-height:1px;">&nbsp;</div>
             </td>
           </tr>
 
@@ -203,7 +203,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
             <td class="content-cell" style="padding:28px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('BIENESTAR')}
               <p style="color:#ffffff;font-size:32px;font-weight:300;margin:0;line-height:1;font-family:${FONT_STACK_CSS};">
-                <span class="white-text">${data.score}</span><span class="muted-text" style="color:#666;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};"> / 100 · </span><span class="gold-text" style="color:#c8a55a;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};">${data.scoreLabel}</span>
+                <span class="white-text">${data.score}</span><span class="muted-text" style="color:#666;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};"> / 100 · </span><span class="champagne-text" style="color:#c8a55a;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};">${data.scoreLabel}</span>
               </p>
             </td>
           </tr>
@@ -271,7 +271,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           </tr>
           <tr>
             <td class="content-cell" style="padding:0 40px;text-align:center;background-color:#080808;" bgcolor="#080808">
-              <p class="gold-text" style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
+              <p class="champagne-text" style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
               <p class="subtle-text" style="color:#555;font-size:11px;margin:0 0 8px;font-family:${FONT_STACK_CSS};">vitazen.cc</p>
               <p style="color:#555;font-size:11px;margin:0;font-family:${FONT_STACK_CSS};"><a href="${APP_URL}/perfil" class="muted-text" style="color:#666;text-decoration:underline;font-family:${FONT_STACK_CSS};">Desactivar resumen semanal</a></p>
             </td>

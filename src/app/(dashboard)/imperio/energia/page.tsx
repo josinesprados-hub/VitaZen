@@ -41,7 +41,7 @@ function RatingInput({ value, onChange, label }: { value: number; onChange: (v: 
       <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} onClick={() => onChange(n)}
-            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-[#c8a55a] border-[#c8a55a] text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-[#c8a55a]'}`}>
+            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-champagne'}`}>
             {n}
           </button>
         ))}
@@ -239,8 +239,8 @@ export default function EnergiaPage() {
       {editingWellness && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingWellness(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Pencil size={20} className="text-[#c8a55a]" />
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-champagne" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar bienestar</h3>
             <div className="space-y-4">
@@ -249,11 +249,11 @@ export default function EnergiaPage() {
               <RatingInput label="Sueño" value={editWellnessForm.sleep} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, sleep: v })} />
               <RatingInput label="Estrés" value={editWellnessForm.stress} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, stress: v })} />
               <textarea placeholder="Notas (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666] h-20 resize-none" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => setEditingWellness(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEditWellness} disabled={editWellnessSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editWellnessSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={saveEditWellness} disabled={editWellnessSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editWellnessSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -263,29 +263,29 @@ export default function EnergiaPage() {
       {editingNutrition && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingNutrition(null)}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Pencil size={20} className="text-[#c8a55a]" />
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-champagne" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar nutrición</h3>
             <div className="space-y-3">
               <textarea placeholder="Comidas del día" value={editNutritionForm.meals} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, meals: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666] h-20 resize-none" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
                   <NumericInput value={editNutritionForm.water} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
                 </div>
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
                   <NumericInput value={editNutritionForm.calories} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
                 </div>
               </div>
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => setEditingNutrition(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEditNutrition} disabled={editNutritionSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editNutritionSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={saveEditNutrition} disabled={editNutritionSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editNutritionSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -309,8 +309,8 @@ export default function EnergiaPage() {
       )}
 
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-          <Zap size={28} className="text-[#c8a55a]" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+          <Zap size={28} className="text-champagne" />
         </div>
         <div>
           <h1 className="title-page">Energía</h1>
@@ -322,7 +322,7 @@ export default function EnergiaPage() {
       <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
-          <button onClick={() => setShowWellness(!showWellness)} className="touch-press text-sm text-[#c8a55a] hover:text-[#d4b468]">
+          <button onClick={() => setShowWellness(!showWellness)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
             + Registrar hoy
           </button>
         </div>
@@ -336,7 +336,7 @@ export default function EnergiaPage() {
             <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
             <div className="flex gap-2">
-              <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
               <button onClick={() => setShowWellness(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
@@ -347,14 +347,14 @@ export default function EnergiaPage() {
               <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                      <Heart size={16} className="text-[#c8a55a]" />
+                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+                      <Heart size={16} className="text-champagne" />
                     </div>
                     <div>
                       <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
-                        <span className="text-[#c8a55a]">Ánimo: {log.mood}</span>
-                        <span className="text-[#c8a55a]">Energía: {log.energy}</span>
-                        <span className="text-[#c8a55a]">Sueño: {log.sleep}</span>
+                        <span className="text-champagne">Ánimo: {log.mood}</span>
+                        <span className="text-champagne">Energía: {log.energy}</span>
+                        <span className="text-champagne">Sueño: {log.sleep}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -364,7 +364,7 @@ export default function EnergiaPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
                     <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                   </div>
                 </div>
@@ -391,7 +391,7 @@ export default function EnergiaPage() {
       <div className="section-enter-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
-          <button onClick={() => setShowNutrition(!showNutrition)} className="touch-press text-sm text-[#c8a55a] hover:text-[#d4b468]">
+          <button onClick={() => setShowNutrition(!showNutrition)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
             + Registrar hoy
           </button>
         </div>
@@ -413,7 +413,7 @@ export default function EnergiaPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={submitNutrition} disabled={submittingNutrition} className="touch-press bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] disabled:opacity-50 disabled:cursor-not-allowed">{submittingNutrition ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={submitNutrition} disabled={submittingNutrition} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingNutrition ? 'Guardando...' : 'Guardar'}</button>
               <button onClick={() => setShowNutrition(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
           </div>
@@ -424,13 +424,13 @@ export default function EnergiaPage() {
               <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                      <Apple size={16} className="text-[#c8a55a]" />
+                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+                      <Apple size={16} className="text-champagne" />
                     </div>
                     <div>
                       <div className="flex gap-2 text-xs mb-1">
-                        <span className="flex items-center gap-1 text-[#c8a55a]"><Droplets size={12} /> {log.water}</span>
-                        <span className="text-[#c8a55a]">{log.calories || 0} kcal</span>
+                        <span className="flex items-center gap-1 text-champagne"><Droplets size={12} /> {log.water}</span>
+                        <span className="text-champagne">{log.calories || 0} kcal</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -440,7 +440,7 @@ export default function EnergiaPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
                     <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                   </div>
                 </div>

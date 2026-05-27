@@ -30,7 +30,7 @@ export default function PremiumBlur({ children }: PremiumBlurProps) {
       <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg depth-gate-overlay">
         <div className="flex flex-col items-center gap-3 px-6 text-center">
           {/* Small gold dot — presence, not royalty */}
-          <Circle size={5} className="text-[#c8a55a]/40" fill="currentColor" />
+          <Circle size={5} className="text-champagne/40" fill="currentColor" />
 
           {/* Whisper — not a sales pitch */}
           <div>
@@ -42,7 +42,7 @@ export default function PremiumBlur({ children }: PremiumBlurProps) {
           {/* Quiet link — not a button */}
           <Link
             href="/elite"
-            className="text-[#c8a55a]/40 hover:text-[#c8a55a]/70 transition-colors text-[10px]"
+            className="text-champagne/40 hover:text-champagne/70 transition-colors text-[10px]"
           >
             Conocer Élite
           </Link>

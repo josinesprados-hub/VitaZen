@@ -80,7 +80,7 @@ export default function ResetPasswordClient() {
         {/* Logo */}
         <div className="text-center mb-8">
           <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4 rounded-[20%]" />
-          <h1 className="text-[#c8a55a] text-3xl font-bold tracking-widest">VITAZEN</h1>
+          <h1 className="text-champagne text-3xl font-bold tracking-widest">VITAZEN</h1>
         </div>
 
         {/* Form Card */}
@@ -91,7 +91,7 @@ export default function ResetPasswordClient() {
               <p className="text-[#999] text-sm mb-6">{error || 'Este enlace ha expirado o no es válido.'}</p>
               <Link
                 href="/forgot-password"
-                className="block text-center w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
+                className="block text-center w-full bg-champagne text-[#000000] font-semibold py-3 rounded-lg hover:bg-champagne-hover transition-colors"
               >
                 Solicitar uno nuevo
               </Link>
@@ -104,7 +104,7 @@ export default function ResetPasswordClient() {
               </p>
               <Link
                 href="/login"
-                className="block text-center w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors"
+                className="block text-center w-full bg-champagne text-[#000000] font-semibold py-3 rounded-lg hover:bg-champagne-hover transition-colors"
               >
                 Iniciar sesión
               </Link>
@@ -132,13 +132,13 @@ export default function ResetPasswordClient() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors"
+                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                       placeholder="Mínimo 6 caracteres"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c8a55a] hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-champagne hover:text-white transition-colors"
                     >
                       {showPassword ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -158,13 +158,13 @@ export default function ResetPasswordClient() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors"
+                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                       placeholder="Repite tu contraseña"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c8a55a] hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-champagne hover:text-white transition-colors"
                     >
                       {showConfirm ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -178,14 +178,14 @@ export default function ResetPasswordClient() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-champagne text-[#000000] font-semibold py-3 rounded-lg hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Actualizando...' : 'Actualizar contraseña'}
                 </button>
               </form>
 
               <div className="mt-6 text-center">
-                <Link href="/login" className="text-[#c8a55a] hover:underline text-sm">
+                <Link href="/login" className="text-champagne hover:underline text-sm">
                   Volver al inicio de sesión
                 </Link>
               </div>

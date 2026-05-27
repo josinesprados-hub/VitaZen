@@ -15,8 +15,8 @@ export default function TermsPage() {
     <main className="min-h-screen bg-black text-white">
       <div className="max-w-3xl mx-auto px-6 py-16">
         {/* Header */}
-        <header className="mb-12 border-b border-[#c8a55a]/30 pb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#c8a55a] mb-3">
+        <header className="mb-12 border-b border-champagne/30 pb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-champagne mb-3">
             Términos y Condiciones
           </h1>
           <p className="text-sm text-gray-400">
@@ -37,7 +37,7 @@ export default function TermsPage() {
 
         {/* 1. Aceptación de los términos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             1. Aceptación de los términos
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -57,7 +57,7 @@ export default function TermsPage() {
 
         {/* 2. Uso de VitaZen */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             2. Uso de VitaZen
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -82,7 +82,7 @@ export default function TermsPage() {
 
         {/* 3. Suscripciones Élite */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             3. Plan Élite
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -108,7 +108,7 @@ export default function TermsPage() {
 
         {/* 4. Facturación y renovaciones */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             4. Facturación y renovaciones
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -135,7 +135,7 @@ export default function TermsPage() {
 
         {/* 5. Política de cancelación */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             5. Política de cancelación
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -163,7 +163,7 @@ export default function TermsPage() {
 
         {/* 6. Responsabilidades del usuario */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             6. Responsabilidades del usuario
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -189,7 +189,7 @@ export default function TermsPage() {
 
         {/* 7. Descargo de bienestar y mindfulness */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             7. Descargo de bienestar y mindfulness
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -215,7 +215,7 @@ export default function TermsPage() {
 
         {/* 8. Propiedad intelectual */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             8. Propiedad intelectual
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -241,7 +241,7 @@ export default function TermsPage() {
 
         {/* 9. Limitación de responsabilidad */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             9. Limitación de responsabilidad
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -269,12 +269,12 @@ export default function TermsPage() {
 
         {/* 10. Referencia a privacidad */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             10. Privacidad
           </h2>
           <p className="text-gray-300 leading-relaxed">
             El tratamiento de tus datos personales se rige por nuestra{' '}
-            <Link href="/privacy" className="text-[#c8a55a] underline underline-offset-2 hover:text-[#d4b468] transition-colors">
+            <Link href="/privacy" className="text-champagne underline underline-offset-2 hover:text-champagne-hover transition-colors">
               Política de Privacidad
             </Link>
             , que forma parte integral de estos Términos y Condiciones. Al aceptar estos
@@ -286,22 +286,22 @@ export default function TermsPage() {
 
         {/* 11. Información de contacto */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             11. Información de contacto
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
             Si tienes preguntas, sugerencias o reclamaciones relacionadas con estos Términos y
             Condiciones o con el uso de VitaZen, puedes contactarnos a través de:
           </p>
-          <div className="mt-4 p-5 bg-white/5 border border-[#c8a55a]/20 rounded-lg">
+          <div className="mt-4 p-5 bg-white/5 border border-champagne/20 rounded-lg">
             <p className="text-white font-medium mb-2">VitaZen — Soporte</p>
             <p className="text-gray-300">
               Correo electrónico:
-              <span className="text-[#c8a55a] font-medium"> soportevitazen@gmail.com</span>
+              <span className="text-champagne font-medium"> soportevitazen@gmail.com</span>
             </p>
             <p className="text-gray-300 mt-1">
               Sitio web:
-              <span className="text-[#c8a55a] font-medium"> https://vitazen.cc</span>
+              <span className="text-champagne font-medium"> https://vitazen.cc</span>
             </p>
           </div>
           <p className="text-gray-300 leading-relaxed mt-4">
@@ -312,7 +312,7 @@ export default function TermsPage() {
 
         {/* 12. Actualizaciones de los términos */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-[#c8a55a] mb-4">
+          <h2 className="text-xl font-semibold text-champagne mb-4">
             12. Actualizaciones de los términos
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
@@ -332,7 +332,7 @@ export default function TermsPage() {
         </section>
 
         {/* Footer */}
-        <footer className="pt-8 border-t border-[#c8a55a]/20 text-center">
+        <footer className="pt-8 border-t border-champagne/20 text-center">
           <p className="text-sm text-gray-500">
             VitaZen — Ecosistema de desarrollo personal
           </p>
@@ -343,14 +343,14 @@ export default function TermsPage() {
           <div className="flex items-center justify-center gap-4 mt-4">
             <Link
               href="/privacy"
-              className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
+              className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2"
             >
               Política de Privacidad
             </Link>
             <span className="text-gray-600">|</span>
             <Link
               href="/terms"
-              className="text-xs text-[#c8a55a] hover:text-[#d4b468] transition-colors underline underline-offset-2"
+              className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2"
             >
               Términos y Condiciones
             </Link>

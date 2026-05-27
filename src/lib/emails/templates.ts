@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════
 // VITAZEN EMAIL TEMPLATES
-// Premium dark/gold design, transactional-first
-// Black background, V logo, gold accents
+// Premium dark/champagne design, transactional-first
+// Black background, V logo, champagne accents
 // Optimized for Gmail/Outlook/Apple Mail
 // Anti-dark-mode: color-scheme light-only
 // ═══════════════════════════════════════════
@@ -48,7 +48,7 @@ const ANTI_DARK_MODE_STYLES = `
     /* Primary defense is the color-scheme meta tag above */
     u + .email-body .email-bg { background-color:#080808 !important; }
     u + .email-body .content-cell { background-color:#080808 !important; }
-    u + .email-body .gold-text { color:#c8a55a !important; }
+    u + .email-body .champagne-text { color:#c8a55a !important; }
     u + .email-body .white-text { color:#ffffff !important; }
     u + .email-body .heading-text { color:#ffffff !important; }
     u + .email-body .body-text { color:#d4d4d4 !important; }
@@ -58,7 +58,7 @@ const ANTI_DARK_MODE_STYLES = `
     u + .email-body .subtle-text { color:#555555 !important; }
     u + .email-body .cta-cell { background-color:#c8a55a !important; }
     u + .email-body .cta-link { color:#0a0a0a !important; }
-    u + .email-body .divider-gold { background-color:#c8a55a !important; }
+    u + .email-body .divider-champagne { background-color:#c8a55a !important; }
     u + .email-body .divider-subtle { background-color:#333333 !important; }
     u + .email-body .logo-img { filter:none !important; -webkit-filter:none !important; }
 
@@ -75,7 +75,7 @@ const ANTI_DARK_MODE_STYLES = `
   <![endif]-->
 `;
 
-// ─── Premium dark wrapper: black bg, V logo, gold brand ───
+// ─── Premium dark wrapper: black bg, V logo, champagne brand ───
 
 function emailWrapper(content: string, preheaderText: string): string {
   return `
@@ -123,14 +123,14 @@ function emailWrapper(content: string, preheaderText: string): string {
           <!-- Brand Name -->
           <tr>
             <td class="content-cell" style="padding:0 40px 24px;text-align:center;background-color:#080808;" bgcolor="#080808">
-              <p class="gold-text" style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
+              <p class="champagne-text" style="color:#c8a55a;font-size:12px;letter-spacing:6px;margin:0;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
             </td>
           </tr>
 
-          <!-- Gold Accent Line -->
+          <!-- Champagne Accent Line -->
           <tr>
             <td class="content-cell" style="padding:0 40px 0;background-color:#080808;" bgcolor="#080808">
-              <div class="divider-gold" style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;font-size:1px;line-height:1px;">&nbsp;</div>
+              <div class="divider-champagne" style="width:40px;height:1px;background-color:#c8a55a;margin:0 auto;font-size:1px;line-height:1px;">&nbsp;</div>
             </td>
           </tr>
 
@@ -152,7 +152,7 @@ function emailWrapper(content: string, preheaderText: string): string {
           </tr>
           <tr>
             <td class="content-cell" style="padding:0 40px;text-align:center;background-color:#080808;" bgcolor="#080808">
-              <p class="gold-text" style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
+              <p class="champagne-text" style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
               <p class="subtle-text" style="color:#555;font-size:11px;margin:0;font-family:${FONT_STACK_CSS};">vitazen.cc</p>
             </td>
           </tr>
@@ -164,7 +164,7 @@ function emailWrapper(content: string, preheaderText: string): string {
 </html>`;
 }
 
-// ─── Bulletproof gold CTA button (Outlook-safe) ───
+// ─── Bulletproof champagne CTA button (Outlook-safe) ───
 
 function ctaButton(link: string, text: string): string {
   return `<div style="padding:28px 0 0;text-align:center;">

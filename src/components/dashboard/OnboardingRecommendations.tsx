@@ -102,7 +102,7 @@ export function OnboardingRecommendations() {
 
   return (
     <div className="hero-fade-in">
-      <div className="bg-[#0a0a0a] border border-[#c8a55a]/15 rounded-xl p-3 sm:p-6 relative overflow-hidden">
+      <div className="bg-[#0a0a0a] border border-champagne/15 rounded-xl p-3 sm:p-6 relative overflow-hidden">
         {/* Subtle glow */}
         <div
           className="absolute inset-0 rounded-xl pointer-events-none"
@@ -113,8 +113,8 @@ export function OnboardingRecommendations() {
           {/* Header */}
           <div className="flex items-start justify-between mb-3 sm:mb-5">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-                <Sparkles size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-champagne/10 flex items-center justify-center">
+                <Sparkles size={16} className="text-champagne sm:w-[20px] sm:h-[20px]" />
               </div>
               <div>
                 <h3 className="text-xs sm:text-sm font-semibold text-white">Tu ritmo</h3>
@@ -132,18 +132,18 @@ export function OnboardingRecommendations() {
           {/* Primary Focus Card */}
           <Link
             href={focusConfig.href}
-            className="flex items-center gap-3 sm:gap-4 bg-[#000000] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-4 mb-3 sm:mb-4 hover:border-[#c8a55a]/30 transition-all group"
+            className="flex items-center gap-3 sm:gap-4 bg-[#000000] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-4 mb-3 sm:mb-4 hover:border-champagne/30 transition-all group"
           >
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-              <Icon size={16} className="text-[#c8a55a] sm:w-[20px] sm:h-[20px]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+              <Icon size={16} className="text-champagne sm:w-[20px] sm:h-[20px]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-medium text-white group-hover:text-[#c8a55a] transition-colors">
+              <p className="text-xs sm:text-sm font-medium text-white group-hover:text-champagne transition-colors">
                 {focusConfig.name}
               </p>
               <p className="text-[10px] sm:text-[11px] text-[#666] line-clamp-1">{focusConfig.tip}</p>
             </div>
-            <ArrowRight size={12} className="text-[#555] group-hover:text-[#c8a55a] transition-colors sm:w-[14px] sm:h-[14px]" />
+            <ArrowRight size={12} className="text-[#555] group-hover:text-champagne transition-colors sm:w-[14px] sm:h-[14px]" />
           </Link>
 
           {/* Tips */}
@@ -151,7 +151,7 @@ export function OnboardingRecommendations() {
             <div className="space-y-1.5 sm:space-y-2.5">
               {tips.slice(1).map((tip, idx) => (
                 <p key={idx} className="text-[10px] sm:text-[12px] text-[#999] flex items-start gap-1.5 sm:gap-2">
-                  <span className="text-[#c8a55a] text-[7px] sm:text-[8px] mt-1 sm:mt-1.5 shrink-0">●</span>
+                  <span className="text-champagne text-[7px] sm:text-[8px] mt-1 sm:mt-1.5 shrink-0">●</span>
                   {tip}
                 </p>
               ))}

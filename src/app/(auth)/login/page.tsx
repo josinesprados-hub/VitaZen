@@ -132,8 +132,8 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4 rounded-[20%]" />
-          <h1 className="text-[#c8a55a] text-3xl font-bold tracking-widest">VITAZEN</h1>
-          <p className="text-[#c8a55a]/80 mt-3 text-base tracking-wide font-light italic">Un espacio para notar</p>
+          <h1 className="text-champagne text-3xl font-bold tracking-widest">VITAZEN</h1>
+          <p className="text-champagne/80 mt-3 text-base tracking-wide font-light italic">Un espacio para notar</p>
         </div>
 
         {/* Form Card */}
@@ -142,14 +142,14 @@ export default function LoginPage() {
 
           {/* Provider mismatch error — after failed auth attempt */}
           {error && (
-            <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/20 rounded-lg p-4 mb-4">
-              <p className="text-[#c8a55a] text-sm leading-relaxed">{error}</p>
+            <div className="bg-champagne/5 border border-champagne/20 rounded-lg p-4 mb-4">
+              <p className="text-champagne text-sm leading-relaxed">{error}</p>
               {providerHint === 'google' && (
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={loading}
-                  className="mt-3 w-full flex items-center justify-center gap-2 bg-[#c8a55a] text-[#000000] font-semibold py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="mt-3 w-full flex items-center justify-center gap-2 bg-champagne text-[#000000] font-semibold py-2.5 rounded-lg hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   <GoogleIcon />
                   Continuar con Google
@@ -159,7 +159,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setError(''); setProviderHint(null); }}
-                  className="mt-3 w-full bg-[#c8a55a] text-[#000000] font-semibold py-2.5 rounded-lg hover:bg-[#d4b468] transition-colors text-sm"
+                  className="mt-3 w-full bg-champagne text-[#000000] font-semibold py-2.5 rounded-lg hover:bg-champagne-hover transition-colors text-sm"
                 >
                   Usar correo y contraseña
                 </button>
@@ -176,21 +176,21 @@ export default function LoginPage() {
                 onChange={(e) => handleEmailChange(e.target.value)}
                 onBlur={handleEmailBlur}
                 required
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
               />
               {/* Proactive inline hint — appears on email blur if provider mismatch detected */}
               {emailHint && emailHint.provider && (
                 <div className="mt-2 flex items-start gap-2">
-                  <svg className="w-4 h-4 text-[#c8a55a]/60 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <svg className="w-4 h-4 text-champagne/60 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
                   </svg>
-                  <p className="text-[#c8a55a]/70 text-xs leading-relaxed">{emailHint.message}</p>
+                  <p className="text-champagne/70 text-xs leading-relaxed">{emailHint.message}</p>
                   {emailHint.provider === 'google' && (
                     <button
                       type="button"
                       onClick={handleGoogleLogin}
-                      className="text-[#c8a55a] text-xs underline underline-offset-2 hover:text-[#c8a55a]/90 shrink-0"
+                      className="text-champagne text-xs underline underline-offset-2 hover:text-champagne/90 shrink-0"
                     >
                       Usar Google
                     </button>
@@ -199,7 +199,7 @@ export default function LoginPage() {
               )}
               {checkingEmail && (
                 <div className="mt-2 flex items-center gap-1.5">
-                  <div className="w-3 h-3 border border-[#c8a55a]/30 border-t-[#c8a55a]/70 rounded-full animate-spin" />
+                  <div className="w-3 h-3 border border-champagne/30 border-t-champagne/70 rounded-full animate-spin" />
                   <span className="text-[#666] text-xs">Verificando...</span>
                 </div>
               )}
@@ -213,13 +213,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-[#c8a55a] transition-colors"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c8a55a] hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-champagne hover:text-white transition-colors"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -233,7 +233,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#c8a55a] text-[#000000] font-semibold py-3 rounded-lg hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-champagne text-[#000000] font-semibold py-3 rounded-lg hover:bg-champagne-hover transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -256,14 +256,14 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-transparent border border-[#c8a55a] text-[#c8a55a] font-semibold py-3 rounded-lg hover:bg-[#c8a55a]/10 transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 bg-transparent border border-champagne text-champagne font-semibold py-3 rounded-lg hover:bg-champagne/10 transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Continuar con Google
           </button>
 
           <div className="mt-4 text-center">
-            <Link href="/forgot-password" className="text-[#999] text-sm hover:text-[#c8a55a] transition-colors">
+            <Link href="/forgot-password" className="text-[#999] text-sm hover:text-champagne transition-colors">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
@@ -271,7 +271,7 @@ export default function LoginPage() {
           <div className="mt-4 text-center">
             <p className="text-[#999] text-sm">
               ¿Aún no tienes cuenta?{' '}
-              <Link href="/register" className="text-[#c8a55a] hover:underline">
+              <Link href="/register" className="text-champagne hover:underline">
                 Crea tu cuenta
               </Link>
             </p>

@@ -67,12 +67,12 @@ export function SubscriptionManager() {
         {/* Depth status card */}
         <div className="flex items-center gap-3">
           <div className="icon-sm">
-            <Circle size={5} fill="currentColor" className="text-[#c8a55a]/50" />
+            <Circle size={5} fill="currentColor" className="text-champagne/50" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm text-white font-medium">Élite</p>
-              <span className="text-[9px] font-medium text-[#c8a55a]/40 bg-[#c8a55a]/5 border border-[#c8a55a]/10 px-2 py-0.5 rounded-full">Activo</span>
+              <span className="text-[9px] font-medium text-champagne/40 bg-champagne/5 border border-champagne/10 px-2 py-0.5 rounded-full">Activo</span>
             </div>
             {subscription?.cancelAtPeriodEnd ? (
               <p className="text-xs text-[#e8a040] mt-0.5">
@@ -98,7 +98,7 @@ export function SubscriptionManager() {
         >
           <div className="flex items-center gap-3">
             <div className="icon-sm">
-              <CreditCard size={14} className="text-[#c8a55a]/50" />
+              <CreditCard size={14} className="text-champagne/50" />
             </div>
             <div className="text-left">
               <p className="text-sm text-white font-medium">Gestionar suscripci&oacute;n</p>
@@ -107,9 +107,9 @@ export function SubscriptionManager() {
           </div>
           <div className="flex items-center gap-1">
             {loading ? (
-              <Loader2 size={16} className="animate-spin text-[#c8a55a]" />
+              <Loader2 size={16} className="animate-spin text-champagne" />
             ) : (
-              <ChevronRight size={16} className="text-[#555] group-hover:text-[#c8a55a] transition-colors" />
+              <ChevronRight size={16} className="text-[#555] group-hover:text-champagne transition-colors" />
             )}
           </div>
         </button>
@@ -139,16 +139,16 @@ export function SubscriptionManager() {
       {/* Depth invitation — not upgrade CTA */}
       <button
         onClick={handleUpgrade}
-        className="flex items-center gap-3 w-full py-3 text-[#c8a55a]/60 hover:text-[#c8a55a] transition-colors touch-press"
+        className="flex items-center gap-3 w-full py-3 text-champagne/60 hover:text-champagne transition-colors touch-press"
       >
         <div className="icon-sm">
-          <Circle size={5} fill="currentColor" className="text-[#c8a55a]/40" />
+          <Circle size={5} fill="currentColor" className="text-champagne/40" />
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-medium">Más conexiones con Élite</p>
           <p className="text-xs text-[#777]">Más contexto entre lo que vives</p>
         </div>
-        <ChevronRight size={16} className="text-[#444] group-hover:text-[#c8a55a] transition-colors" />
+        <ChevronRight size={16} className="text-[#444] group-hover:text-champagne transition-colors" />
       </button>
     </div>
   );

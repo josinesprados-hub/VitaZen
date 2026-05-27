@@ -269,7 +269,7 @@ function IntentionSelector({ value, onChange }: { value: string; onChange: (v: s
             onClick={() => onChange(value === i.value ? '' : i.value)}
             className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
               value === i.value
-                ? 'bg-[#c8a55a]/10 border-[#c8a55a]/25 text-[#c8a55a]/90'
+                ? 'bg-champagne/10 border-champagne/25 text-champagne/90'
                 : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
             }`}
           >
@@ -291,7 +291,7 @@ function CategoryChips({ categories, value, onChange }: { categories: string[]; 
           onClick={() => onChange(value === cat ? '' : cat)}
           className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
             value === cat
-              ? 'bg-[#c8a55a]/10 border-[#c8a55a]/25 text-[#c8a55a]/90'
+              ? 'bg-champagne/10 border-champagne/25 text-champagne/90'
               : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
           }`}
         >
@@ -332,7 +332,7 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
             </div>
             <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#c8a55a]/25 transition-all duration-700"
+                className="h-full rounded-full bg-champagne/25 transition-all duration-700"
                 style={{ width: `${Math.max(barWidth, 0)}%` }}
               />
             </div>
@@ -351,7 +351,7 @@ function SaveToast({ show, message }: { show: boolean; message: string }) {
         show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
-      <div className="bg-[#c8a55a] text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg shadow-[#c8a55a]/20">
+      <div className="bg-champagne text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg shadow-champagne/20">
         <Check size={14} />
         {message}
       </div>
@@ -407,7 +407,7 @@ function QuickCapture({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Café 3,50 · Taxi 14 · Nómina 1250"
-          className="w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3.5 text-white text-base placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/40 transition-colors"
+          className="w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3.5 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/40 transition-colors"
           autoFocus
           inputMode="text"
           autoComplete="off"
@@ -417,20 +417,20 @@ function QuickCapture({
       {parsed && parsed.amount > 0 ? (
         <div className="mt-2 flex items-center justify-between px-0.5">
           <div className="flex items-center gap-1.5">
-            <span className={`text-[11px] font-medium ${parsed.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400/70'}`}>
+            <span className={`text-[11px] font-medium ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? 'Ingreso' : 'Gasto'}
             </span>
             <span className="text-[#222] text-[11px]">·</span>
             <span className="text-[11px] text-[#666]">{parsed.category}</span>
             <span className="text-[#222] text-[11px]">·</span>
-            <span className={`text-[11px] font-medium tabular-nums ${parsed.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400/70'}`}>
+            <span className={`text-[11px] font-medium tabular-nums ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? '+' : '-'}{formatCurrency(parsed.amount)}
             </span>
           </div>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="bg-[#c8a55a] text-black px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[#d4b468] active:scale-95 transition-all disabled:opacity-50"
+            className="bg-champagne text-black px-3 py-1 rounded-lg text-xs font-semibold hover:bg-champagne-hover active:scale-95 transition-all disabled:opacity-50"
           >
             {submitting ? '...' : 'OK'}
           </button>
@@ -445,7 +445,7 @@ function QuickCapture({
           value={contexto}
           onChange={(e) => setContexto(e.target.value)}
           placeholder="¿Qué pasó? (opcional)"
-          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-[12px] text-[#888] placeholder-[#333] focus:outline-none focus:border-[#c8a55a]/25 transition-colors italic"
+          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-[12px] text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
           autoComplete="off"
         />
       </div>
@@ -817,14 +817,14 @@ export default function RiquezaPage() {
       {editingLog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
           <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Pencil size={20} className="text-[#c8a55a]" />
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-champagne" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar registro</h3>
             <div className="space-y-3">
               <div className="flex gap-2">
                 <button onClick={() => setEditForm({ ...editForm, type: 'income' })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
                   Ingreso
                 </button>
                 <button onClick={() => setEditForm({ ...editForm, type: 'expense' })}
@@ -833,24 +833,24 @@ export default function RiquezaPage() {
                 </button>
               </div>
               <input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
               <div>
                 <input type="text" placeholder="Categoría" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
                 <CategoryChips categories={userCategories} value={editForm.category} onChange={(v) => setEditForm({ ...editForm, category: v })} />
               </div>
               <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <input type="text" placeholder="¿Qué pasó? (opcional)" value={editForm.contexto} onChange={(e) => setEditForm({ ...editForm, contexto: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors placeholder-[#444] italic" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#444] italic" />
               <IntentionSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
               {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
               <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEdit} disabled={editSaving} className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+              <button onClick={saveEdit} disabled={editSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
           </div>
         </div>
@@ -876,8 +876,8 @@ export default function RiquezaPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-5">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-            <Gem size={30} className="text-[#c8a55a] sm:w-[34px] sm:h-[34px]" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-champagne/10 flex items-center justify-center">
+            <Gem size={30} className="text-champagne sm:w-[34px] sm:h-[34px]" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
@@ -899,17 +899,17 @@ export default function RiquezaPage() {
 
       {/* ── Month Navigation — always present ── */}
       <div className="flex items-center justify-between">
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-2">
-          <CalendarDays size={15} className="text-[#c8a55a]/60" />
+          <CalendarDays size={15} className="text-champagne/60" />
           <h2 className="text-sm sm:text-base font-medium text-white capitalize tracking-wide">{monthLabel}</h2>
           {!isCurrentMonth && (
-            <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-[#c8a55a]/60 hover:text-[#c8a55a] ml-1 underline underline-offset-2">Hoy</button>
+            <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-champagne/60 hover:text-champagne ml-1 underline underline-offset-2">Hoy</button>
           )}
         </div>
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-[#c8a55a]">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
           <ChevronRight size={18} />
         </button>
       </div>
@@ -942,7 +942,7 @@ export default function RiquezaPage() {
       {!isEmpty && currentMonthLogs.length > 0 && (
         <div className="py-1">
           <div className="flex items-baseline gap-3">
-            <span className={`text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums tracking-tight ${cmBalance >= 0 ? 'text-white' : 'text-amber-400'}`}>
+            <span className={`text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums tracking-tight ${cmBalance >= 0 ? 'text-white' : 'text-champagne-warm'}`}>
               {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
             </span>
           </div>
@@ -956,8 +956,8 @@ export default function RiquezaPage() {
 
       {/* ── 3. Insight — reserved space, only visible when meaningful ── */}
       {!isEmpty && dominantIntention && currentMonthLogs.length >= 5 && (
-        <div className="bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-2xl p-5 sm:p-6 lg:p-7">
-          <p className="text-[#c8a55a]/80 text-sm sm:text-base italic leading-relaxed">
+        <div className="bg-champagne/5 border border-champagne/15 rounded-2xl p-5 sm:p-6 lg:p-7">
+          <p className="text-champagne/80 text-sm sm:text-base italic leading-relaxed">
             La mayor parte de tu energía fue hacia {dominantIntention.label.toLowerCase()}.
           </p>
         </div>
@@ -968,7 +968,7 @@ export default function RiquezaPage() {
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-5 sm:p-6 lg:p-8">
         <div className="flex items-center justify-between mb-5 sm:mb-6">
           <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">Movimientos</h2>
-          <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-[#c8a55a] hover:text-[#d4b468] touch-press transition-colors">
+          <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-champagne hover:text-champagne-hover touch-press transition-colors">
             <Plus size={16} /> <span className="hidden sm:inline">Añadir</span>
           </button>
         </div>
@@ -987,21 +987,21 @@ export default function RiquezaPage() {
             ) : (
               <div className="space-y-3">
                 <div className="flex gap-2">
-                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
                   <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
                 </div>
                 <div>
-                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
                   <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
                 </div>
-                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
+                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
                 <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                 {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                 <div className="flex gap-2 pt-1">
-                  <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-[#d4b468] touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-[#c8a55a] transition-colors">Captura rápida</button>
+                  <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-champagne transition-colors">Captura rápida</button>
                 </div>
               </div>
             )}
@@ -1022,7 +1022,7 @@ export default function RiquezaPage() {
                 onClick={() => setPeriod(p.key)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border whitespace-nowrap ${
                   period === p.key
-                    ? 'bg-[#c8a55a]/15 border-[#c8a55a]/30 text-[#c8a55a]'
+                    ? 'bg-champagne/15 border-champagne/30 text-champagne'
                     : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:text-[#999] hover:border-[#333]'
                 }`}
               >
@@ -1043,7 +1043,7 @@ export default function RiquezaPage() {
                   <div className="flex items-center justify-between mb-2.5">
                     <span className="text-[11px] font-medium text-[#555] uppercase tracking-wider">{dateLabel}</span>
                     <span className="text-[11px] text-[#333]">
-                      {dayIncome > 0 && <span className="text-[#c8a55a]/40">+{formatCurrency(dayIncome)}</span>}
+                      {dayIncome > 0 && <span className="text-champagne/40">+{formatCurrency(dayIncome)}</span>}
                       {dayIncome > 0 && dayExpense > 0 && <span className="text-[#1a1a1a] mx-1.5">·</span>}
                       {dayExpense > 0 && <span className="text-red-400/40">{formatCurrency(dayExpense)}</span>}
                     </span>
@@ -1053,7 +1053,7 @@ export default function RiquezaPage() {
                       const moodInfo = getIntentionLabel(log.mood);
                       return (
                         <div key={log.id} className="flex items-center gap-3 bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
-                          <div className={`w-1 h-8 rounded-full flex-shrink-0 ${log.type === 'income' ? 'bg-[#c8a55a]/40' : 'bg-red-400/30'}`} />
+                          <div className={`w-1 h-8 rounded-full flex-shrink-0 ${log.type === 'income' ? 'bg-champagne/40' : 'bg-red-400/30'}`} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-white font-medium">{log.category}</span>
@@ -1069,11 +1069,11 @@ export default function RiquezaPage() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-[#c8a55a]' : 'text-red-400'}`}>
+                            <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-champagne' : 'text-red-400'}`}>
                               {log.type === 'income' ? '+' : '-'}{formatCurrency(log.amount)}
                             </p>
                             <div className="flex items-center gap-1 flex-shrink-0">
-                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
                               <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                             </div>
                           </div>
@@ -1113,21 +1113,21 @@ export default function RiquezaPage() {
           ) : (
             <div className="space-y-3">
               <div className="flex gap-2">
-                <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+                <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
                 <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
               </div>
               <div>
-                <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
                 <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
               </div>
-              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-              <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-              <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
+              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+              <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+              <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
               <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
               {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
               <div className="flex gap-2 pt-1">
-                <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">Captura rápida</button>
+                <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+                <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
               </div>
             </div>
           )}
@@ -1139,7 +1139,7 @@ export default function RiquezaPage() {
       {!editingLog && !pendingDeleteId && (
         <button
           onClick={() => { setQuickMode(true); setShowAdd(true); }}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#c8a55a] text-black rounded-2xl shadow-lg shadow-[#c8a55a]/25 flex items-center justify-center hover:bg-[#d4b468] active:scale-95 transition-all touch-press"
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-champagne text-black rounded-2xl shadow-lg shadow-champagne/25 flex items-center justify-center hover:bg-champagne-hover active:scale-95 transition-all touch-press"
           title="Añadir movimiento"
         >
           <Plus size={24} />
@@ -1161,21 +1161,21 @@ export default function RiquezaPage() {
             ) : (
               <div className="space-y-3">
                 <div className="flex gap-2">
-                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-[#c8a55a] text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
                   <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
                 </div>
                 <div>
-                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
+                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
                   <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
                 </div>
-                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-[#c8a55a]/50 transition-colors" />
-                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-[#c8a55a]/50 transition-colors italic" />
+                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
                 <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                 {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
                 <div className="flex gap-2 pt-1">
-                  <button onClick={submitFinance} disabled={submitting} className="bg-[#c8a55a] text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-[#c8a55a] transition-colors">Captura rápida</button>
+                  <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
                 </div>
               </div>
             )}

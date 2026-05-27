@@ -166,11 +166,11 @@ function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
   if (isNatural) {
     return (
       <div className="flex items-center justify-center gap-3 py-3">
-        <div className="w-12 h-12 rounded-full border border-[#c8a55a]/30 flex items-center justify-center">
-          <Wind size={18} className="text-[#c8a55a]" />
+        <div className="w-12 h-12 rounded-full border border-champagne/30 flex items-center justify-center">
+          <Wind size={18} className="text-champagne" />
         </div>
         <div>
-          <p className="text-[#c8a55a] text-sm font-medium">Ritmo natural</p>
+          <p className="text-champagne text-sm font-medium">Ritmo natural</p>
           <p className="text-[#666] text-xs">Sin patrón fijo</p>
         </div>
       </div>
@@ -184,10 +184,10 @@ function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
           <div className="flex flex-col items-center">
             <div className={`w-10 h-10 rounded-full border flex items-center justify-center ${
               phase.label.includes('Mantén')
-                ? 'border-[#c8a55a]/35 bg-[#c8a55a]/8'
-                : 'border-[#c8a55a]/50 bg-[#c8a55a]/12'
+                ? 'border-champagne/35 bg-champagne/8'
+                : 'border-champagne/50 bg-champagne/12'
             }`}>
-              <span className="text-[#c8a55a] text-xs font-semibold">{phase.seconds}s</span>
+              <span className="text-champagne text-xs font-semibold">{phase.seconds}s</span>
             </div>
             <span className="text-[10px] text-[#666] mt-1.5 whitespace-nowrap">{phase.label}</span>
           </div>
@@ -381,11 +381,11 @@ export default function MentePage() {
             className="breathing-complete-content p-6 sm:p-10 max-w-md w-full flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-16 h-16 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mb-5 shrink-0">
-              <CheckCircle size={32} className="text-[#c8a55a]" />
+            <div className="w-16 h-16 rounded-full bg-champagne/10 flex items-center justify-center mb-5 shrink-0">
+              <CheckCircle size={32} className="text-champagne" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2 text-center">Sesión completada</h3>
-            <p className="text-[#c8a55a] text-sm font-medium capitalize mb-4 text-center">{completedSession.type.replace('_', ' ')}</p>
+            <p className="text-champagne text-sm font-medium capitalize mb-4 text-center">{completedSession.type.replace('_', ' ')}</p>
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="flex items-center gap-1.5 text-xs text-[#999]">
                 <Timer size={13} />
@@ -398,7 +398,7 @@ export default function MentePage() {
             </div>
             <button
               onClick={() => setCompletedSession(null)}
-              className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-colors touch-press shrink-0"
+              className="bg-champagne text-black font-semibold px-8 py-3 rounded-xl hover:bg-champagne-hover transition-colors touch-press shrink-0"
             >
               Cerrar
             </button>
@@ -416,8 +416,8 @@ export default function MentePage() {
             className="modal-content p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-12 rounded-full bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <Pencil size={20} className="text-[#c8a55a]" />
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <Pencil size={20} className="text-champagne" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar sesión</h3>
 
@@ -430,7 +430,7 @@ export default function MentePage() {
                   inputMode="numeric"
                   allowDecimal={false}
                   min={1}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors"
                 />
               </div>
 
@@ -439,7 +439,7 @@ export default function MentePage() {
                 <select
                   value={editType}
                   onChange={(e) => setEditType(e.target.value)}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-[#c8a55a]/50 transition-colors appearance-none"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors appearance-none"
                 >
                   {BREATHING_TECHNIQUES.map((tech) => (
                     <option key={tech.type} value={tech.type}>{tech.label}</option>
@@ -458,7 +458,7 @@ export default function MentePage() {
               <button
                 onClick={saveEdit}
                 disabled={editSaving}
-                className="bg-[#c8a55a] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#d4b468] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {editSaving ? 'Guardando...' : 'Guardar'}
               </button>
@@ -502,8 +502,8 @@ export default function MentePage() {
 
       {/* ─── Header ─── */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#c8a55a]/10 flex items-center justify-center">
-          <Brain size={28} className="text-[#c8a55a]" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+          <Brain size={28} className="text-champagne" />
         </div>
         <div>
           <h1 className="title-page">Mente</h1>
@@ -514,7 +514,7 @@ export default function MentePage() {
       {/* ─── Breathing Section ─── */}
       <div ref={breathingSectionRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">
         <div className="flex items-center gap-3 mb-5">
-          <Wind size={20} className="text-[#c8a55a]" />
+          <Wind size={20} className="text-champagne" />
           <div>
             <h2 className="text-lg font-semibold text-white">Sesión de Respiración</h2>
             <p className="text-[#666] text-xs mt-0.5">Elige una técnica y practica</p>
@@ -524,20 +524,20 @@ export default function MentePage() {
         {/* ── Active Timer ── */}
         {meditating && (
           <div className={`text-center py-10 ${!paused ? 'breathing-ring' : ''}`}>
-            <p className="text-xs text-[#c8a55a] uppercase tracking-widest mb-2">{selectedType.label}</p>
-            <p className={`text-5xl font-bold mb-1 font-mono text-[#c8a55a] ${!paused ? 'breathing-counter' : ''}`}>{formatTime(timer)}</p>
-            {paused && <p className="text-[#c8a55a] text-xs uppercase tracking-widest mb-1">En pausa</p>}
+            <p className="text-xs text-champagne uppercase tracking-widest mb-2">{selectedType.label}</p>
+            <p className={`text-5xl font-bold mb-1 font-mono text-champagne ${!paused ? 'breathing-counter' : ''}`}>{formatTime(timer)}</p>
+            {paused && <p className="text-champagne text-xs uppercase tracking-widest mb-1">En pausa</p>}
             <p className="text-[#666] text-sm mb-8">Objetivo: {selectedType.duration} min</p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setPaused(!paused)}
-                className={`flex items-center gap-2 bg-[#000000] border text-[#c8a55a] font-semibold px-6 py-3 rounded-xl hover:bg-[#c8a55a]/10 transition-colors ${!paused ? 'breathing-btn-outline border-[#c8a55a]/30' : 'border-[#c8a55a]/30'}`}
+                className={`flex items-center gap-2 bg-[#000000] border text-champagne font-semibold px-6 py-3 rounded-xl hover:bg-champagne/10 transition-colors ${!paused ? 'breathing-btn-outline border-champagne/30' : 'border-champagne/30'}`}
               >
                 {paused ? <><Play size={16} /> Continuar</> : <><Pause size={16} /> Pausar</>}
               </button>
               <button
                 onClick={endMeditation}
-                className="bg-[#c8a55a] text-black font-semibold px-6 py-3 rounded-xl hover:bg-[#d4b468] transition-colors"
+                className="bg-champagne text-black font-semibold px-6 py-3 rounded-xl hover:bg-champagne-hover transition-colors"
               >
                 Finalizar
               </button>
@@ -551,7 +551,7 @@ export default function MentePage() {
             {/* Back to techniques */}
             <button
               onClick={() => setViewingGuide(null)}
-              className="flex items-center gap-2 text-[#666] text-sm hover:text-[#c8a55a] transition-colors mb-5"
+              className="flex items-center gap-2 text-[#666] text-sm hover:text-champagne transition-colors mb-5"
             >
               <ArrowLeft size={15} />
               <span>Técnicas</span>
@@ -559,8 +559,8 @@ export default function MentePage() {
 
             {/* Technique header */}
             <div className="text-center mb-5">
-              <div className="w-14 h-14 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center mx-auto mb-3">
-                <Wind size={24} className="text-[#c8a55a]" />
+              <div className="w-14 h-14 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-3">
+                <Wind size={24} className="text-champagne" />
               </div>
               <h3 className="text-xl font-bold text-white">{guideTechnique.label}</h3>
               <p className="text-[#666] text-sm mt-1">{guideTechnique.subtitle} · {guideTechnique.duration} min</p>
@@ -575,18 +575,18 @@ export default function MentePage() {
             <div className="space-y-5">
               {/* Qué es */}
               <div>
-                <p className="text-[#c8a55a] text-[10px] uppercase tracking-[2px] font-semibold mb-2">Qué es</p>
+                <p className="text-champagne text-[10px] uppercase tracking-[2px] font-semibold mb-2">Qué es</p>
                 <p className="text-[#aaa] text-sm leading-relaxed">{guideTechnique.what}</p>
               </div>
 
               {/* Cómo practicarla */}
               <div>
-                <p className="text-[#c8a55a] text-[10px] uppercase tracking-[2px] font-semibold mb-3">Cómo practicarla</p>
+                <p className="text-champagne text-[10px] uppercase tracking-[2px] font-semibold mb-3">Cómo practicarla</p>
                 <div className="space-y-2.5">
                   {guideTechnique.steps.map((step, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full border border-[#c8a55a]/40 flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-[#c8a55a] text-[10px] font-semibold">{i + 1}</span>
+                      <div className="w-5 h-5 rounded-full border border-champagne/40 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-champagne text-[10px] font-semibold">{i + 1}</span>
                       </div>
                       <p className="text-[#aaa] text-sm leading-relaxed">{step}</p>
                     </div>
@@ -596,11 +596,11 @@ export default function MentePage() {
 
               {/* Beneficios */}
               <div>
-                <p className="text-[#c8a55a] text-[10px] uppercase tracking-[2px] font-semibold mb-3">Beneficios</p>
+                <p className="text-champagne text-[10px] uppercase tracking-[2px] font-semibold mb-3">Beneficios</p>
                 <div className="space-y-2">
                   {guideTechnique.benefitsList.map((benefit, i) => (
                     <div key={i} className="flex items-center gap-2.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] shrink-0" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-champagne shrink-0" />
                       <p className="text-[#aaa] text-sm">{benefit}</p>
                     </div>
                   ))}
@@ -609,9 +609,9 @@ export default function MentePage() {
 
               {/* Recomendación */}
               <div>
-                <div className="inline-flex items-center gap-2.5 bg-[#c8a55a]/8 border border-[#c8a55a]/20 rounded-lg px-3.5 py-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#c8a55a] shrink-0" />
-                  <p className="text-[#c8a55a] text-xs font-medium">{guideTechnique.recommendation}</p>
+                <div className="inline-flex items-center gap-2.5 bg-champagne/8 border border-champagne/20 rounded-lg px-3.5 py-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-champagne shrink-0" />
+                  <p className="text-champagne text-xs font-medium">{guideTechnique.recommendation}</p>
                 </div>
               </div>
             </div>
@@ -622,7 +622,7 @@ export default function MentePage() {
                 startMeditation(guideTechnique);
                 setViewingGuide(null);
               }}
-              className="flex items-center justify-center gap-2 w-full bg-[#c8a55a] text-black font-semibold px-6 py-3.5 rounded-xl hover:bg-[#d4b468] transition-colors mt-6 touch-press"
+              className="flex items-center justify-center gap-2 w-full bg-champagne text-black font-semibold px-6 py-3.5 rounded-xl hover:bg-champagne-hover transition-colors mt-6 touch-press"
             >
               <Play size={16} />
               Comenzar sesión
@@ -637,16 +637,16 @@ export default function MentePage() {
               <button
                 key={tech.type}
                 onClick={() => setViewingGuide(tech.type)}
-                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-left hover:border-[#c8a55a]/50 transition-all group touch-press"
+                className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 text-left hover:border-champagne/50 transition-all group touch-press"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-white text-sm font-medium group-hover:text-[#c8a55a] transition-colors">{tech.label}</p>
-                  <ChevronRight size={14} className="text-[#555] group-hover:text-[#c8a55a] transition-colors shrink-0" />
+                  <p className="text-white text-sm font-medium group-hover:text-champagne transition-colors">{tech.label}</p>
+                  <ChevronRight size={14} className="text-[#555] group-hover:text-champagne transition-colors shrink-0" />
                 </div>
                 <p className="text-[#666] text-xs mb-2.5">{tech.subtitle} · {tech.duration} min</p>
-                <div className="inline-flex items-center gap-1.5 bg-[#c8a55a]/8 border border-[#c8a55a]/20 rounded px-2 py-0.5">
-                  <div className="w-1 h-1 rounded-full bg-[#c8a55a]" />
-                  <p className="text-[#c8a55a] text-[10px]">{tech.recommendation}</p>
+                <div className="inline-flex items-center gap-1.5 bg-champagne/8 border border-champagne/20 rounded px-2 py-0.5">
+                  <div className="w-1 h-1 rounded-full bg-champagne" />
+                  <p className="text-champagne text-[10px]">{tech.recommendation}</p>
                 </div>
               </button>
             ))}
@@ -658,7 +658,7 @@ export default function MentePage() {
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-2">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <Clock size={20} className="text-[#c8a55a]" />
+            <Clock size={20} className="text-champagne" />
             <div>
               <h2 className="text-lg font-semibold text-white">Historial de Sesiones</h2>
               <p className="text-[#666] text-xs mt-0.5">Tu evolución en la práctica</p>
@@ -684,8 +684,8 @@ export default function MentePage() {
               return (
                 <div key={session.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
                   <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center shrink-0">
-                      <Wind size={16} className="text-[#c8a55a]" />
+                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+                      <Wind size={16} className="text-champagne" />
                     </div>
                     <div>
                       <p className="text-white text-sm font-medium">{tech?.label ?? session.type.replace('_', ' ')}</p>
@@ -701,7 +701,7 @@ export default function MentePage() {
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={() => startEdit(session)}
-                      className="p-2.5 rounded-lg hover:bg-[#c8a55a]/10 text-[#666] hover:text-[#c8a55a] transition-all touch-press"
+                      className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press"
                       title="Editar sesión"
                     >
                       <Pencil size={14} />

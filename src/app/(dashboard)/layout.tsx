@@ -134,8 +134,8 @@ export default function DashboardLayout({
       <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
+            <div className="h-2 w-2 rounded-full bg-champagne animate-pulse" />
+            <p className="text-champagne/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
           </div>
         </div>
       </div>
@@ -149,8 +149,8 @@ export default function DashboardLayout({
       return (
         <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
           <div className="text-center px-6 max-w-sm">
-            <div className="w-14 h-14 rounded-2xl bg-[#c8a55a]/5 border border-[#c8a55a]/10 flex items-center justify-center mx-auto mb-5">
-              <WifiOff size={22} className="text-[#c8a55a]/50" />
+            <div className="w-14 h-14 rounded-2xl bg-champagne/5 border border-champagne/10 flex items-center justify-center mx-auto mb-5">
+              <WifiOff size={22} className="text-champagne/50" />
             </div>
             <p className="text-sm text-[#888] font-medium mb-1.5">
               {isOffline ? 'Sin conexión' : 'Cargando tu espacio'}
@@ -162,9 +162,9 @@ export default function DashboardLayout({
             </p>
             <button
               onClick={handleRetry}
-              className="inline-flex items-center gap-2 text-[#c8a55a] text-xs font-medium
-                         bg-[#c8a55a]/5 border border-[#c8a55a]/15 rounded-lg px-4 py-2
-                         hover:bg-[#c8a55a]/10 hover:border-[#c8a55a]/25
+              className="inline-flex items-center gap-2 text-champagne text-xs font-medium
+                         bg-champagne/5 border border-champagne/15 rounded-lg px-4 py-2
+                         hover:bg-champagne/10 hover:border-champagne/25
                          transition-all duration-200 active:scale-[0.97] touch-press"
             >
               <RefreshCw size={12} />
@@ -179,8 +179,8 @@ export default function DashboardLayout({
       <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
+            <div className="h-2 w-2 rounded-full bg-champagne animate-pulse" />
+            <p className="text-champagne/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
           </div>
         </div>
       </div>
@@ -194,8 +194,8 @@ export default function DashboardLayout({
       <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] animate-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Preparando</p>
+            <div className="h-2 w-2 rounded-full bg-champagne animate-pulse" />
+            <p className="text-champagne/60 text-xs tracking-widest uppercase font-medium">Preparando</p>
           </div>
         </div>
       </div>
@@ -211,7 +211,7 @@ export default function DashboardLayout({
           routeTransition ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div className="h-full bg-[#c8a55a] route-progress-bar" />
+        <div className="h-full bg-champagne route-progress-bar" />
       </div>
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

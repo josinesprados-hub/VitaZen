@@ -21,7 +21,7 @@ function getMomentumColor(level: string): string {
 }
 
 function getMomentumBarColor(level: string): string {
-  if (level === 'fuerte') return 'bg-[#c8a55a]';
+  if (level === 'fuerte') return 'bg-champagne';
   if (level === 'estable') return 'bg-[#999]';
   return 'bg-[#555]';
 }
@@ -67,8 +67,8 @@ export function MomentumCard() {
     return (
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/5 flex items-center justify-center">
-            <Activity size={14} className="text-[#c8a55a]/30 sm:w-[18px] sm:h-[18px]" />
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-champagne/5 flex items-center justify-center">
+            <Activity size={14} className="text-champagne/30 sm:w-[18px] sm:h-[18px]" />
           </div>
           <div>
             <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu ritmo</h2>
@@ -83,11 +83,11 @@ export function MomentumCard() {
   const barColor = getMomentumBarColor(data.level);
 
   return (
-    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 card-enter hover:border-[#c8a55a]/15 transition-colors">
+    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-3 sm:p-5 card-enter hover:border-champagne/15 transition-colors">
       <div className="flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-            <Activity size={14} className="text-[#c8a55a] sm:w-[18px] sm:h-[18px]" />
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-champagne/10 flex items-center justify-center">
+            <Activity size={14} className="text-champagne sm:w-[18px] sm:h-[18px]" />
           </div>
           <div>
             <h2 className="text-sm sm:text-base font-semibold text-white">Tu ritmo</h2>
@@ -105,7 +105,7 @@ export function MomentumCard() {
           >
             {getLevelLabel(data.level)}
           </span>
-          {data.trend === 'up' && <TrendingUp size={12} className="text-[#c8a55a]" />}
+          {data.trend === 'up' && <TrendingUp size={12} className="text-champagne" />}
           {data.trend === 'down' && <TrendingDown size={12} className="text-[#666]" />}
           {data.trend === 'stable' && <Minus size={12} className="text-[#555]" />}
         </div>
@@ -122,7 +122,7 @@ export function MomentumCard() {
       <div className="flex items-center justify-between">
         <p className="text-[10px] sm:text-xs text-[#999]">{data.description}</p>
         {data.currentStreak > 0 && (
-          <span className="text-[10px] sm:text-xs text-[#c8a55a] flex items-center gap-1">
+          <span className="text-[10px] sm:text-xs text-champagne flex items-center gap-1">
             {data.currentStreak}d
           </span>
         )}

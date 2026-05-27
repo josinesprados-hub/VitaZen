@@ -29,10 +29,10 @@ import type { EmotionalState, EmotionalStatus } from '@/lib/emotional-state';
 // When there's no data: silence, not a loading state.
 
 const STATUS_INDICATOR: Record<EmotionalStatus, { dot: string; pulse: string }> = {
-  estable: { dot: 'bg-[#c8a55a]/60', pulse: '' },
-  en_progreso: { dot: 'bg-[#c8a55a]/80', pulse: 'hero-pulse-gold' },
-  sobrecargado: { dot: 'bg-[#8b6f3a]/70', pulse: 'hero-pulse-warm' },
-  enfocado: { dot: 'bg-[#c8a55a]', pulse: 'hero-pulse-gold' },
+  estable: { dot: 'bg-champagne/60', pulse: '' },
+  en_progreso: { dot: 'bg-champagne/80', pulse: 'hero-pulse-gold' },
+  sobrecargado: { dot: 'bg-champagne-deep/70', pulse: 'hero-pulse-warm' },
+  enfocado: { dot: 'bg-champagne', pulse: 'hero-pulse-gold' },
 };
 
 export function EmotionalHero() {
@@ -113,7 +113,7 @@ export function EmotionalHero() {
 
         {/* Summary — when there's something worth noting */}
         {state.summary && (
-          <p className="text-sm sm:text-base text-[#c8a55a]/60 font-light italic mt-2 sm:mt-3 leading-relaxed">
+          <p className="text-sm sm:text-base text-champagne/60 font-light italic mt-2 sm:mt-3 leading-relaxed">
             {state.summary}
           </p>
         )}

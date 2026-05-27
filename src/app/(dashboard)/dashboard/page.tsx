@@ -195,7 +195,7 @@ export default function DashboardPage() {
           {/* 1. Greeting — human, not UI */}
           <div className="dash-section-enter dash-section-delay-1 pt-2 sm:pt-4">
             <h1 className="title-page">
-              {timeGreeting}, <span className="text-[#c8a55a]">{displayUser?.name || ''}</span>
+              {timeGreeting}, <span className="text-champagne">{displayUser?.name || ''}</span>
             </h1>
             <SilentMemory />
           </div>
@@ -216,15 +216,15 @@ export default function DashboardPage() {
               <div className="flex items-center gap-3 py-1">
                 <span className="text-sm">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
                 <p className="text-xs text-[#555] truncate flex-1">«{todayCheckin.intention}»</p>
-                <Link href="/checkin" className="text-[10px] text-[#444] hover:text-[#c8a55a] transition-colors shrink-0">Historial</Link>
+                <Link href="/checkin" className="text-[10px] text-[#444] hover:text-champagne transition-colors shrink-0">Historial</Link>
               </div>
             ) : (
               <button
                 onClick={() => setShowCheckinModal(true)}
                 className="flex items-center gap-3 group touch-press"
               >
-                <div className="w-9 h-9 rounded-lg bg-[#c8a55a]/8 flex items-center justify-center group-hover:bg-[#c8a55a]/15 transition-colors">
-                  <Sunrise size={15} className="text-[#c8a55a]/60 group-hover:text-[#c8a55a] transition-colors" />
+                <div className="w-9 h-9 rounded-lg bg-champagne/8 flex items-center justify-center group-hover:bg-champagne/15 transition-colors">
+                  <Sunrise size={15} className="text-champagne/60 group-hover:text-champagne transition-colors" />
                 </div>
                 <span className="text-sm text-[#555] group-hover:text-[#888] transition-colors">Check-in</span>
               </button>
@@ -254,8 +254,8 @@ export default function DashboardPage() {
                     href={`/imperio/${key}`}
                     className="flex items-center gap-3 py-2.5 sm:py-3 px-2 hover:bg-[#0a0a0a] rounded-lg transition-all duration-300 group touch-press"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[#c8a55a]/6 flex items-center justify-center shrink-0 group-hover:bg-[#c8a55a]/12 transition-colors">
-                      <Icon size={14} className="text-[#c8a55a]/40 group-hover:text-[#c8a55a]/70 transition-colors" />
+                    <div className="w-8 h-8 rounded-lg bg-champagne/6 flex items-center justify-center shrink-0 group-hover:bg-champagne/12 transition-colors">
+                      <Icon size={14} className="text-champagne/40 group-hover:text-champagne/70 transition-colors" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                       {progress > 0 && (
                         <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full">
                           <div
-                            className="h-full bg-[#c8a55a]/15 rounded-full transition-all duration-700"
+                            className="h-full bg-champagne/15 rounded-full transition-all duration-700"
                             style={{ width: `${progress}%` }}
                           />
                         </div>

@@ -151,8 +151,8 @@ export default function PerfilPage() {
       {!user ? (
         <div className="flex items-center justify-center min-h-[40vh]">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#c8a55a] gentle-pulse" />
-            <p className="text-[#c8a55a]/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
+            <div className="h-2 w-2 rounded-full bg-champagne gentle-pulse" />
+            <p className="text-champagne/60 text-xs tracking-widest uppercase font-medium">Cargando</p>
           </div>
         </div>
       ) : (
@@ -166,7 +166,7 @@ export default function PerfilPage() {
         {!screenshotMode && !editing ? (
           <button
             onClick={() => setEditing(true)}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#c8a55a] bg-[#c8a55a]/10 border border-[#c8a55a]/20 rounded-lg hover:bg-[#c8a55a]/20 transition-colors touch-press"
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-champagne bg-champagne/10 border border-champagne/20 rounded-lg hover:bg-champagne/20 transition-colors touch-press"
           >
             <Pencil size={16} />
             Editar
@@ -216,9 +216,9 @@ export default function PerfilPage() {
         <div className="flex flex-col sm:flex-row items-center gap-6">
           {/* Avatar */}
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-[#c8a55a]/10 border-2 border-[#1a1a1a] flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-champagne/10 border-2 border-[#1a1a1a] flex items-center justify-center">
               {processingAvatar ? (
-                <Loader2 size={24} className="text-[#c8a55a] animate-spin" />
+                <Loader2 size={24} className="text-champagne animate-spin" />
               ) : form.avatarUrl ? (
                 <img
                   src={form.avatarUrl}
@@ -226,7 +226,7 @@ export default function PerfilPage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-3xl font-bold text-[#c8a55a]">
+                <span className="text-3xl font-bold text-champagne">
                   {displayUser?.name?.charAt(0)?.toUpperCase() || 'V'}
                 </span>
               )}
@@ -262,7 +262,7 @@ export default function PerfilPage() {
                     onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Tu nombre"
                     maxLength={100}
-                    className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11"
+                    className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11"
                   />
                 </div>
               </div>
@@ -271,8 +271,8 @@ export default function PerfilPage() {
                 <h2 className="text-lg font-semibold text-white">{displayUser?.name || 'Sin nombre'}</h2>
                 <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
                   {displayUser?.plan === 'PREMIUM' ? (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#c8a55a]/50">
-                      <Circle size={3} fill="currentColor" className="text-[#c8a55a]/40" />
+                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50">
+                      <Circle size={3} fill="currentColor" className="text-champagne/40" />
                       Élite
                     </span>
                   ) : (
@@ -287,7 +287,7 @@ export default function PerfilPage() {
 
       {/* Profile Fields */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest">Información personal</h3>
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest">Información personal</h3>
 
         {/* Location fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -302,7 +302,7 @@ export default function PerfilPage() {
                 onChange={(e) => setForm(prev => ({ ...prev, country: e.target.value }))}
                 placeholder="Ej: España"
                 maxLength={80}
-                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11"
+                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11"
               />
             ) : (
               <p className="text-white text-sm mt-1">{displayUser?.country || '—'}</p>
@@ -319,7 +319,7 @@ export default function PerfilPage() {
                 onChange={(e) => setForm(prev => ({ ...prev, city: e.target.value }))}
                 placeholder="Ej: Madrid"
                 maxLength={80}
-                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11"
+                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11"
               />
             ) : (
               <p className="text-white text-sm mt-1">{displayUser?.city || '—'}</p>
@@ -342,7 +342,7 @@ export default function PerfilPage() {
               allowDecimal={false}
               min={1}
               max={150}
-              className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] h-11 w-32 rounded-md border px-3 py-2 text-sm"
+              className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11 w-32 rounded-md border px-3 py-2 text-sm"
             />
           ) : (
             <p className="text-white text-sm mt-1">{displayUser?.age ? `${displayUser.age} años` : '—'}</p>
@@ -360,7 +360,7 @@ export default function PerfilPage() {
                 placeholder="Cuéntanos algo sobre ti..."
                 maxLength={300}
                 rows={3}
-                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-[#c8a55a] resize-none"
+                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne resize-none"
               />
               <p className="text-[#555] text-xs mt-1">{form.bio.length}/300</p>
             </>
@@ -372,12 +372,12 @@ export default function PerfilPage() {
 
       {/* Account Info (read-only) */}
       <div className="card-primary p-6 sm:p-8 space-y-4">
-        <h3 className="text-sm font-semibold text-[#c8a55a] uppercase tracking-widest">Cuenta</h3>
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest">Cuenta</h3>
 
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="icon-sm">
-              <Mail size={14} className="text-[#c8a55a]" />
+              <Mail size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-[#999] text-xs">Email</p>
@@ -388,9 +388,9 @@ export default function PerfilPage() {
           <div className="flex items-center gap-3">
             <div className="icon-sm">
               {isPremium ? (
-                <Circle size={5} fill="currentColor" className="text-[#c8a55a]/50" />
+                <Circle size={5} fill="currentColor" className="text-champagne/50" />
               ) : (
-                <User size={14} className="text-[#c8a55a]" />
+                <User size={14} className="text-champagne" />
               )}
             </div>
             <div>
@@ -398,7 +398,7 @@ export default function PerfilPage() {
               <div className="flex items-center gap-2">
                 <p className="text-white text-sm">{planLabel}</p>
                 {displayUser?.plan === 'PREMIUM' && (
-                  <span className="text-[8px] font-medium text-[#c8a55a]/40">Activo</span>
+                  <span className="text-[8px] font-medium text-champagne/40">Activo</span>
                 )}
               </div>
             </div>
@@ -406,7 +406,7 @@ export default function PerfilPage() {
 
           <div className="flex items-center gap-3">
             <div className="icon-sm">
-              <Calendar size={14} className="text-[#c8a55a]" />
+              <Calendar size={14} className="text-champagne" />
             </div>
             <div>
               <p className="text-[#999] text-xs">Miembro desde</p>

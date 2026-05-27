@@ -104,8 +104,8 @@ export default function ElitePage() {
       <div className="text-center mb-14 sm:mb-20">
         {/* Élite brand mark — gold dot, quiet presence */}
         <div className="flex items-center justify-center gap-2.5 mb-6">
-          <Circle size={4} fill="currentColor" className="text-[#c8a55a]/50" />
-          <p className="text-[#c8a55a]/60 text-[10px] uppercase tracking-[0.3em] font-semibold">
+          <Circle size={4} fill="currentColor" className="text-champagne/50" />
+          <p className="text-champagne/60 text-[10px] uppercase tracking-[0.3em] font-semibold">
             VitaZen Élite
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function ElitePage() {
       {/* ─── What changes with Élite ─── */}
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <Circle size={3} className="text-[#c8a55a]/25" fill="currentColor" />
+          <Circle size={3} className="text-champagne/25" fill="currentColor" />
           <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
             Qué cambia con Élite
           </p>
@@ -132,8 +132,8 @@ export default function ElitePage() {
           {/* Depth 1: Time */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-7">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/6 flex items-center justify-center shrink-0 mt-0.5">
-                <Clock size={18} className="text-[#c8a55a]/40" />
+              <div className="w-10 h-10 rounded-xl bg-champagne/6 flex items-center justify-center shrink-0 mt-0.5">
+                <Clock size={18} className="text-champagne/40" />
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
@@ -151,8 +151,8 @@ export default function ElitePage() {
           {/* Depth 2: Connections */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-7">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/6 flex items-center justify-center shrink-0 mt-0.5">
-                <Link2 size={18} className="text-[#c8a55a]/40" />
+              <div className="w-10 h-10 rounded-xl bg-champagne/6 flex items-center justify-center shrink-0 mt-0.5">
+                <Link2 size={18} className="text-champagne/40" />
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
@@ -171,8 +171,8 @@ export default function ElitePage() {
           {/* Depth 3: Sensitivity */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-7">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/6 flex items-center justify-center shrink-0 mt-0.5">
-                <Brain size={18} className="text-[#c8a55a]/40" />
+              <div className="w-10 h-10 rounded-xl bg-champagne/6 flex items-center justify-center shrink-0 mt-0.5">
+                <Brain size={18} className="text-champagne/40" />
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
@@ -190,8 +190,8 @@ export default function ElitePage() {
           {/* Depth 4: Rhythm */}
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-7">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#c8a55a]/6 flex items-center justify-center shrink-0 mt-0.5">
-                <Heart size={18} className="text-[#c8a55a]/40" />
+              <div className="w-10 h-10 rounded-xl bg-champagne/6 flex items-center justify-center shrink-0 mt-0.5">
+                <Heart size={18} className="text-champagne/40" />
               </div>
               <div>
                 <h3 className="text-white font-semibold text-base mb-1.5">
@@ -211,7 +211,7 @@ export default function ElitePage() {
       {/* ─── What depth feels like — real examples ─── */}
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <Sparkles size={12} className="text-[#c8a55a]/25" />
+          <Sparkles size={12} className="text-champagne/25" />
           <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
             Ejemplos
           </p>
@@ -236,7 +236,7 @@ export default function ElitePage() {
               key={i}
               className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5"
             >
-              <p className="text-[#c8a55a]/60 text-sm italic leading-relaxed mb-3">
+              <p className="text-champagne/60 text-sm italic leading-relaxed mb-3">
                 &ldquo;{example.text}&rdquo;
               </p>
               <p className="text-[10px] text-[#2a2a2a] tracking-wide">{example.empires}</p>
@@ -248,7 +248,7 @@ export default function ElitePage() {
       {/* ─── Free vs Élite — human, not SaaS ─── */}
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <Eye size={12} className="text-[#c8a55a]/25" />
+          <Eye size={12} className="text-champagne/25" />
           <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
             Dos planes
           </p>
@@ -294,19 +294,19 @@ export default function ElitePage() {
           </div>
 
           {/* Élite — Premium */}
-          <div className="bg-[#0a0a0a] border border-[#c8a55a]/10 rounded-2xl p-7 relative">
+          <div className="bg-[#0a0a0a] border border-champagne/10 rounded-2xl p-7 relative">
             {/* Subtle gold presence */}
             <div className="absolute top-4 right-4">
-              <Circle size={3} className="text-[#c8a55a]/30" fill="currentColor" />
+              <Circle size={3} className="text-champagne/30" fill="currentColor" />
             </div>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-[#c8a55a]/6 flex items-center justify-center">
-                <Circle size={5} fill="currentColor" className="text-[#c8a55a]/50" />
+              <div className="w-9 h-9 rounded-xl bg-champagne/6 flex items-center justify-center">
+                <Circle size={5} fill="currentColor" className="text-champagne/50" />
               </div>
               <div>
                 <h3 className="text-white font-semibold">Élite</h3>
-                <p className="text-[#c8a55a]/40 text-[10px]">5€/mes</p>
+                <p className="text-champagne/40 text-[10px]">5€/mes</p>
               </div>
             </div>
 
@@ -315,8 +315,8 @@ export default function ElitePage() {
               Más contexto, más memoria, más conexiones entre lo que vives.
             </p>
 
-            <div className="border-t border-[#c8a55a]/8 pt-4">
-              <p className="text-[#c8a55a]/25 text-[10px] uppercase tracking-wider font-medium mb-3">
+            <div className="border-t border-champagne/8 pt-4">
+              <p className="text-champagne/25 text-[10px] uppercase tracking-wider font-medium mb-3">
                 Lo que cambia con Élite
               </p>
               <ul className="space-y-2">
@@ -331,7 +331,7 @@ export default function ElitePage() {
                   'Cierres mensuales con evolución',
                 ].map((item) => (
                   <li key={item} className="text-[#aaa] text-xs flex items-start gap-2">
-                    <span className="text-[#c8a55a]/40 mt-0.5">·</span>
+                    <span className="text-champagne/40 mt-0.5">·</span>
                     {item}
                   </li>
                 ))}
@@ -356,16 +356,16 @@ export default function ElitePage() {
       {/* ─── CTA — only after understanding ─── */}
       {isPremium ? (
         <div className="text-center pb-6">
-          <p className="text-[#c8a55a]/40 text-xs mb-4">Ya formas parte de Élite</p>
+          <p className="text-champagne/40 text-xs mb-4">Ya formas parte de Élite</p>
           <button
             onClick={handleManage}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-6 py-3 text-sm text-[#999] hover:text-[#c8a55a] border border-[#1a1a1a] hover:border-[#c8a55a]/15 rounded-xl transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm text-[#999] hover:text-champagne border border-[#1a1a1a] hover:border-champagne/15 rounded-xl transition-colors disabled:opacity-50"
           >
             {loading ? (
               <Loader2 size={14} className="animate-spin" />
             ) : (
-              <Circle size={4} fill="currentColor" className="text-[#c8a55a]/30" />
+              <Circle size={4} fill="currentColor" className="text-champagne/30" />
             )}
             Gestionar suscripción
           </button>
@@ -376,7 +376,7 @@ export default function ElitePage() {
             <button
               onClick={handleUpgrade}
               disabled={loading}
-              className="w-full bg-[#c8a55a]/8 border border-[#c8a55a]/15 text-[#c8a55a] font-medium py-3.5 rounded-xl hover:bg-[#c8a55a]/12 transition-colors disabled:opacity-50 text-sm flex items-center justify-center gap-2"
+              className="w-full bg-champagne/8 border border-champagne/15 text-champagne font-medium py-3.5 rounded-xl hover:bg-champagne/12 transition-colors disabled:opacity-50 text-sm flex items-center justify-center gap-2"
             >
               {loading ? (
                 <Loader2 size={14} className="animate-spin" />

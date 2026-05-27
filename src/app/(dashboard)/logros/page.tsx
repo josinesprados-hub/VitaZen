@@ -235,7 +235,7 @@ export default function LogrosPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Trophy size={24} className="text-[#c8a55a]" />
+          <Trophy size={24} className="text-champagne" />
           <h1 className="text-2xl font-bold text-white">Logros</h1>
         </div>
         <p className="subtitle-silent">Cada paso que has dado</p>
@@ -245,24 +245,24 @@ export default function LogrosPage() {
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#c8a55a]/10 flex items-center justify-center">
-              <Crown size={20} className="text-[#c8a55a]" />
+            <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center">
+              <Crown size={20} className="text-champagne" />
             </div>
             <div>
               <p className="text-white font-semibold">Camino</p>
               <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} momentos recordados</p>
             </div>
           </div>
-          <span className="text-2xl font-bold text-[#c8a55a]">{data.stats.percent}%</span>
+          <span className="text-2xl font-bold text-champagne">{data.stats.percent}%</span>
         </div>
         <div className="w-full bg-[#1a1a1a] rounded-full h-3 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-[#c8a55a] to-[#d4b468] h-3 rounded-full transition-all duration-1000 ease-out"
+            className="bg-gradient-to-r from-champagne to-champagne-hover h-3 rounded-full transition-all duration-1000 ease-out"
             style={{ width: `${data.stats.percent}%` }}
           />
         </div>
         <p className="text-[10px] text-[#555] flex items-center gap-1 mt-3">
-          <Circle size={3} fill="currentColor" className="text-[#c8a55a]/30" />
+          <Circle size={3} fill="currentColor" className="text-champagne/30" />
           Más con el tiempo
         </p>
       </div>
@@ -278,8 +278,8 @@ export default function LogrosPage() {
               onClick={() => setActiveFilter(cat.key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                 isActive
-                  ? 'bg-[#c8a55a] text-[#000000]'
-                  : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-[#c8a55a]/30 hover:text-[#c8a55a]'
+                  ? 'bg-champagne text-[#000000]'
+                  : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-champagne/30 hover:text-champagne'
               }`}
             >
               <Icon size={14} />
@@ -293,8 +293,8 @@ export default function LogrosPage() {
       {unlockedList.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-5">
-            <Circle size={8} fill="currentColor" className="text-[#c8a55a]" />
-            <h2 className="label-discrete" style={{ color: '#c8a55a' }}>Recordado</h2>
+            <Circle size={8} fill="currentColor" className="text-champagne" />
+            <h2 className="label-discrete text-champagne">Recordado</h2>
             <span className="text-xs text-[#666] ml-1">({unlockedList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -309,7 +309,7 @@ export default function LogrosPage() {
       {mysteryList.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-5">
-            <Eye size={16} className="text-[#c8a55a]/40" />
+            <Eye size={16} className="text-champagne/40" />
             <h2 className="label-discrete" style={{ color: 'rgba(200,165,90,0.5)' }}>Cerca de aparecer</h2>
             <span className="text-xs text-[#444] ml-1">({mysteryList.length})</span>
           </div>
@@ -362,7 +362,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
     <div
       className={`relative rounded-xl p-5 transition-all duration-300 group animate-in ${
         isUnlocked
-          ? 'bg-[#0a0a0a] border border-[#c8a55a]/20 hover:border-[#c8a55a]/40 hover:bg-[#0d0d0d]'
+          ? 'bg-[#0a0a0a] border border-champagne/20 hover:border-champagne/40 hover:bg-[#0d0d0d]'
           : 'bg-[#080808] border border-[#1a1a1a] hover:border-[#1a1a1a]'
       }`}
       style={{ animationDelay: `${index * 60}ms` }}
@@ -372,14 +372,14 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
         <div
           className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
             isUnlocked
-              ? 'bg-[#c8a55a]/15 border border-[#c8a55a]/30'
+              ? 'bg-champagne/15 border border-champagne/30'
               : 'bg-[#111] border border-[#1a1a1a]'
           }`}
         >
           <Icon
             size={22}
             className={`transition-colors duration-300 ${
-              isUnlocked ? 'text-[#c8a55a]' : 'text-[#333]'
+              isUnlocked ? 'text-champagne' : 'text-[#333]'
             }`}
           />
         </div>
@@ -391,7 +391,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
               {CATEGORY_LABELS[achievement.category] || achievement.category}
             </span>
             {isUnlocked && (
-              <Circle size={5} fill="currentColor" className="text-[#c8a55a]" />
+              <Circle size={5} fill="currentColor" className="text-champagne" />
             )}
           </div>
           <h3
@@ -415,14 +415,14 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
               <span className="text-[10px] text-[#555]">
                 {achievement.current}/{achievement.target}
               </span>
-              <span className={`text-[10px] font-semibold ${isUnlocked ? 'text-[#c8a55a]' : 'text-[#444]'}`}>
+              <span className={`text-[10px] font-semibold ${isUnlocked ? 'text-champagne' : 'text-[#444]'}`}>
                 {achievement.percent}%
               </span>
             </div>
             <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
               <div
                 className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
-                  isUnlocked ? 'bg-[#c8a55a]' : 'bg-[#333]'
+                  isUnlocked ? 'bg-champagne' : 'bg-[#333]'
                 }`}
                 style={{ width: `${achievement.percent}%` }}
               />
@@ -450,13 +450,13 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
 
   return (
     <div
-      className="relative rounded-xl p-5 bg-[#080808] border border-[#c8a55a]/10 hover:border-[#c8a55a]/20 transition-all duration-300 group animate-in"
+      className="relative rounded-xl p-5 bg-[#080808] border border-champagne/10 hover:border-champagne/20 transition-all duration-300 group animate-in"
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="flex items-start gap-4">
         {/* Mysterious icon */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-[#c8a55a]/5 border border-[#c8a55a]/15">
-          <Icon size={22} className="text-[#c8a55a]/30" />
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-champagne/5 border border-champagne/15">
+          <Icon size={22} className="text-champagne/30" />
         </div>
 
         {/* Content — title and description hidden */}
@@ -466,7 +466,7 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
               {CATEGORY_LABELS[achievement.category] || achievement.category}
             </span>
           </div>
-          <h3 className="font-semibold text-sm text-[#c8a55a]/40 italic">
+          <h3 className="font-semibold text-sm text-champagne/40 italic">
             ???
           </h3>
           <p className="text-xs mt-0.5 text-[#555] italic">
@@ -479,13 +479,13 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
               <span className="text-[10px] text-[#555]">
                 {achievement.current}/{achievement.target}
               </span>
-              <span className="text-[10px] font-semibold text-[#c8a55a]/50">
+              <span className="text-[10px] font-semibold text-champagne/50">
                 {achievement.percent}%
               </span>
             </div>
             <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
               <div
-                className="h-1.5 rounded-full bg-[#c8a55a]/30 transition-all duration-700 ease-out"
+                className="h-1.5 rounded-full bg-champagne/30 transition-all duration-700 ease-out"
                 style={{ width: `${achievement.percent}%` }}
               />
             </div>

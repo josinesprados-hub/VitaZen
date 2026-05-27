@@ -142,13 +142,13 @@ export default function VerifyEmailClient() {
         {/* Logo */}
         <div className="mb-10">
           <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-14 h-14 mx-auto mb-4 opacity-90 rounded-[20%]" />
-          <p className="text-[#c8a55a] text-xs tracking-[8px] font-light">VITAZEN</p>
+          <p className="text-champagne text-xs tracking-[8px] font-light">VITAZEN</p>
         </div>
 
         {status === 'loading' && (
           <div className="flex flex-col items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center">
-              <Loader2 size={28} className="text-[#c8a55a] animate-spin" />
+            <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center">
+              <Loader2 size={28} className="text-champagne animate-spin" />
             </div>
             <div>
               <p className="text-white text-lg font-light">Verificando tu email</p>
@@ -159,8 +159,8 @@ export default function VerifyEmailClient() {
 
         {status === 'success' && (
           <div className="flex flex-col items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center">
-              <CheckCircle size={28} className="text-[#c8a55a]" />
+            <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center">
+              <CheckCircle size={28} className="text-champagne" />
             </div>
             <div>
               <p className="text-white text-xl font-light">Email verificado</p>
@@ -170,7 +170,7 @@ export default function VerifyEmailClient() {
             </div>
             <button
               onClick={() => router.replace('/dashboard')}
-              className="mt-4 bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] text-sm tracking-wide"
+              className="mt-4 bg-champagne text-black font-semibold px-8 py-3 rounded-xl hover:bg-champagne-hover transition-all duration-200 active:scale-[0.97] text-sm tracking-wide"
             >
               Continuar
             </button>
@@ -179,8 +179,8 @@ export default function VerifyEmailClient() {
 
         {status === 'already' && (
           <div className="flex flex-col items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center">
-              <CheckCircle size={28} className="text-[#c8a55a]" />
+            <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center">
+              <CheckCircle size={28} className="text-champagne" />
             </div>
             <div>
               <p className="text-white text-xl font-light">Ya estaba verificado</p>
@@ -188,7 +188,7 @@ export default function VerifyEmailClient() {
             </div>
             <button
               onClick={() => router.replace('/dashboard')}
-              className="mt-4 bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] text-sm tracking-wide"
+              className="mt-4 bg-champagne text-black font-semibold px-8 py-3 rounded-xl hover:bg-champagne-hover transition-all duration-200 active:scale-[0.97] text-sm tracking-wide"
             >
               Continuar
             </button>
@@ -197,8 +197,8 @@ export default function VerifyEmailClient() {
 
         {status === 'resent' && (
           <div className="flex flex-col items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-[#c8a55a]/10 flex items-center justify-center">
-              <Mail size={28} className="text-[#c8a55a]" />
+            <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center">
+              <Mail size={28} className="text-champagne" />
             </div>
             <div>
               <p className="text-white text-xl font-light">Email reenviado</p>
@@ -231,7 +231,7 @@ export default function VerifyEmailClient() {
                   setStatus('error');
                 }
               }}
-              className="mt-2 text-[#c8a55a] text-sm hover:underline"
+              className="mt-2 text-champagne text-sm hover:underline"
             >
               Ya verifiqué mi email
             </button>
@@ -257,7 +257,7 @@ export default function VerifyEmailClient() {
               <button
                 onClick={handleResend}
                 disabled={resendLoading}
-                className="bg-[#c8a55a] text-black font-semibold px-8 py-3 rounded-xl hover:bg-[#d4b468] transition-all duration-200 active:scale-[0.97] text-sm tracking-wide disabled:opacity-50"
+                className="bg-champagne text-black font-semibold px-8 py-3 rounded-xl hover:bg-champagne-hover transition-all duration-200 active:scale-[0.97] text-sm tracking-wide disabled:opacity-50"
               >
                 {resendLoading ? 'Enviando...' : 'Reenviar email de verificación'}
               </button>
@@ -283,7 +283,7 @@ export default function VerifyEmailClient() {
                     setErrorMessage('Error al verificar. Inténtalo de nuevo.');
                   }
                 }}
-                className="text-[#c8a55a] text-sm hover:underline"
+                className="text-champagne text-sm hover:underline"
               >
                 Ya verifiqué mi email
               </button>
