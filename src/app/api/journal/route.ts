@@ -6,30 +6,20 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onJournalChange } from '@/lib/widgets/triggers';
 
 export async function GET(request: NextRequest) {
-  // [DEBUG] Temporary diagnostic logging
-  console.log('[DEBUG:journal] GET /api/journal called');
   try {
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.warn('[DEBUG:journal] No Bearer token');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
-    if (!user) {
-      console.warn('[DEBUG:journal] getAuthUserBasic returned null');
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-    console.log('[DEBUG:journal] user resolved, id:', user.id);
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const entries = await db.journalEntry.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
-    console.log('[DEBUG:journal] entries found:', entries.length);
 
     return NextResponse.json({ entries });
   } catch (error) {
-    console.error('[DEBUG:journal] GET FAILED:', error);
+    console.error('Journal GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

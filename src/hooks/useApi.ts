@@ -248,20 +248,7 @@ export function useApi() {
       res = await fetchPromise;
     } catch (fetchErr) {
       // Should not happen — executeWithRetry always returns a Response
-      console.error('[DEBUG:useApi] fetchPromise threw unexpectedly for', path, fetchErr);
       return new Response(JSON.stringify({ error: 'Unexpected error' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
-    }
-
-    // [DEBUG] Log the response status for key endpoints
-    if (path.startsWith('/api/achievements') || path.startsWith('/api/journal')) {
-      console.log(`[DEBUG:useApi] ${path} → status ${res.status} ok=${res.ok}`);
-      if (!res.ok) {
-        try {
-          const cloned = res.clone();
-          const text = await cloned.text();
-          console.warn(`[DEBUG:useApi] ${path} error body:`, text.substring(0, 200));
-        } catch { /* ignore */ }
-      }
     }
 
     // ─── 401 handling (preserved from original) ───

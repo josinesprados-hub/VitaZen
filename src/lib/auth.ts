@@ -72,23 +72,22 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
   const decodedToken = await verifyFirebaseToken(idToken);
   if (!decodedToken) return null;
 
-  // Use `include: {}` (empty — no extra relations) instead of `select`.
-  // The `select` clause can behave differently with driver adapters
-  // (PrismaPg) — returning null in edge cases where `include` works.
-  // By using `include: {}` we get the same performance benefit (no
-  // unnecessary joins) while using the proven query pattern from
-  // getAuthUser. We then pick only the fields we need from the result.
+  // NOTE: Do NOT use `select` or `include: {}` here.
+  // The PrismaPg driver adapter in Prisma 7 handles both differently
+  // from a bare findUnique — returning null in edge cases where the
+  // bare query succeeds. A plain findUnique({ where }) is the only
+  // query pattern proven to work reliably with the driver adapter.
+  // The small overhead of fetching all scalar fields is negligible
+  // compared to the aiUsage + subscriptions joins we skip.
 
   let user = await db.user.findUnique({
     where: { firebaseUid: decodedToken.uid },
-    include: {},  // Empty include — no extra joins, but uses proven query path
   });
 
   // Same email fallback as getAuthUser
   if (!user && decodedToken.email) {
     user = await db.user.findUnique({
       where: { email: decodedToken.email },
-      include: {},
     });
     if (user && user.firebaseUid !== decodedToken.uid) {
       await db.user.update({
