@@ -7,7 +7,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from './db';
-import { generateWeeklyInsights } from './insights';
+import { generateWeeklyInsights, gatherData } from './insights';
 import { getEmotionalState } from './emotional-state';
 import { weeklyRecapEmail, type WeeklyRecapEmailData } from './emails/weekly-recap';
 import { resend } from './resend';
@@ -69,10 +69,15 @@ function getScoreLabel(score: number): string {
 
 async function generateRecapData(userId: string, plan: string): Promise<WeeklyRecapEmailData | null> {
   try {
-    // Reuse existing engines
+    // PERFORMANCE: Fetch raw data ONCE and share with both engines.
+    // Without this, generateWeeklyInsights + getEmotionalState each call
+    // gatherData() internally — 14+14 = 28 DB queries per user.
+    // With shared data: 14 queries total. Critical when processing many users.
+    const data = await gatherData(userId);
+
     const [insightsResult, emotionalResult] = await Promise.all([
-      generateWeeklyInsights(userId, plan),
-      getEmotionalState(userId, plan),
+      generateWeeklyInsights(userId, plan, data),
+      getEmotionalState(userId, plan, data),
     ]);
 
     const { summary, insights } = insightsResult;
@@ -237,7 +242,8 @@ export async function sendWeeklyRecaps(): Promise<WeeklyRecapResult> {
     }
 
     // Small delay between emails (200ms) to respect Resend rate limits
-    if (sent % 5 === 0 && sent > 0) {
+    // Applied every 5 emails to stay within 10 req/s on Resend free tier
+    if ((sent + errors) % 5 === 0 && (sent + errors) > 0) {
       await new Promise(resolve => setTimeout(resolve, 200));
     }
   }
