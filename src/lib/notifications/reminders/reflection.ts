@@ -20,7 +20,7 @@
 
 import { db } from '@/lib/db';
 import { sendNotification } from '../service';
-import { canSendNotification, isInQuietHours } from '../scheduler';
+import { canSendNotification, isInQuietHours, getUserTodayStart } from '../scheduler';
 
 // ─── Configuration ──────────────────────────
 
@@ -90,20 +90,27 @@ function isInReflectionWindow(timezone: string): boolean {
 /**
  * Did the user already check in today?
  * A check-in IS a form of reflection — no need to nudge again.
+ *
+ * Uses timezone-aware midnight to match the user's perceived "today".
  */
-async function hasCheckedInToday(userId: string): Promise<boolean> {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+async function hasCheckedInToday(userId: string, timezone: string): Promise<boolean> {
+  const todayStart = getUserTodayStart(timezone);
 
-  const checkin = await db.dailyCheckin.findUnique({
-    where: { userId_date: { userId, date: today } },
+  // Look for a check-in whose date is >= today's start in the user's timezone.
+  // The DailyCheckin unique index is (userId, date) where date is a DateTime.
+  // We search by createdAt range instead of the date field to avoid
+  // the UTC midnight mismatch.
+  const checkin = await db.dailyCheckin.findFirst({
+    where: {
+      userId,
+      createdAt: { gte: todayStart },
+    },
     select: { id: true, createdAt: true },
   });
 
   if (!checkin) return false;
 
-  // If they checked in very recently (within 2h), definitely skip.
-  // If they checked in earlier today, also skip — they've reflected.
+  // If they checked in today, they've reflected — no need to nudge.
   return true;
 }
 
@@ -182,7 +189,7 @@ export async function checkReflectionEligibility(
   }
 
   // ── 4. Already checked in today? (semantic check — they reflected) ──
-  const checkedIn = await hasCheckedInToday(userId);
+  const checkedIn = await hasCheckedInToday(userId, prefs.timezone);
   if (checkedIn) {
     return { eligible: false, reason: 'already_checked_in_today' };
   }

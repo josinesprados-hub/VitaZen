@@ -13,6 +13,76 @@ import {
 } from './types';
 
 /**
+ * Compute the start of "today" in the user's timezone as a UTC Date.
+ *
+ * BUG FIX: Previously used setHours(0,0,0,0) which always gives UTC midnight.
+ * This caused the daily cap window to be misaligned by the timezone offset:
+ *   - Madrid winter (UTC+1): cap window ran 01:00→01:00 instead of 00:00→00:00
+ *   - Madrid summer (UTC+2): cap window ran 02:00→02:00 instead of 00:00→00:00
+ *
+ * Now computes midnight in the user's timezone, then converts to UTC.
+ * For Madrid winter: 2025-01-16T00:00:00+01:00 → 2025-01-15T23:00:00Z
+ */
+export function getUserTodayStart(timezone: string): Date {
+  const now = new Date();
+
+  try {
+    // Get today's date in the user's timezone
+    const dateFormatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    // en-CA locale gives YYYY-MM-DD format
+    const dateStr = dateFormatter.format(now);
+
+    // Parse as midnight in the user's timezone
+    // Format: "2025-01-16" → we need to know the offset at that time
+    // Use Intl to get the offset for that specific date+time
+    const offsetFormatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      timeZoneName: 'shortOffset',
+    });
+
+    // Create a date at midnight UTC for the target date, then adjust
+    const targetMidnightUTC = new Date(`${dateStr}T00:00:00Z`);
+
+    // Get the offset at approximately that time
+    // Format the reference date to extract offset like "GMT+1"
+    const offsetParts = offsetFormatter.formatToParts(targetMidnightUTC);
+    const offsetPart = offsetParts.find(p => p.type === 'timeZoneName');
+
+    if (offsetPart) {
+      const offsetStr = offsetPart.value; // e.g., "GMT+1" or "GMT+5:30" or "GMT"
+      const offsetMatch = offsetStr.match(/GMT([+-]?\d{1,2})(?::(\d{2}))?/);
+      if (offsetMatch) {
+        const offsetHours = parseInt(offsetMatch[1], 10);
+        const offsetMinutes = offsetMatch[2] ? parseInt(offsetMatch[2], 10) : 0;
+        // If offset is +1, then midnight local = 23:00 UTC previous day
+        const totalOffsetMs = (offsetHours * 60 + (offsetHours < 0 ? -offsetMinutes : offsetMinutes)) * 60 * 1000;
+        return new Date(targetMidnightUTC.getTime() - totalOffsetMs);
+      }
+    }
+
+    // Fallback: if offset parsing fails, use a simple approach
+    // Get the difference between UTC and the timezone right now
+    const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+    const tzStr = now.toLocaleString('en-US', { timeZone: timezone });
+    const diffMs = new Date(utcStr).getTime() - new Date(tzStr).getTime();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    return new Date(today.getTime() - diffMs);
+  } catch {
+    // If timezone is invalid, fall back to UTC (same as old behavior)
+    console.warn('[Scheduler] Invalid timezone for todayStart, using UTC:', timezone);
+    const fallback = new Date();
+    fallback.setHours(0, 0, 0, 0);
+    return fallback;
+  }
+}
+
+/**
  * Master gate: can a notification of `type` be sent to `userId` right now?
  *
  * Checks (in order):
@@ -73,9 +143,10 @@ export async function canSendNotification(
   }
 
   // ── 4. Daily cap ──
+  // Uses timezone-aware midnight: a user in Madrid at 23:30 should have
+  // their daily cap reset at Madrid midnight, not UTC midnight.
   const maxDaily = prefs.maxDailyNotifications || DEFAULT_MAX_DAILY;
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+  const todayStart = getUserTodayStart(prefs.timezone);
 
   const todayCount = await db.notificationLog.count({
     where: {

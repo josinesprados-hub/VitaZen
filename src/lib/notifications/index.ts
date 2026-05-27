@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════
 
 export { sendNotification, deferNotification, getTodayNotificationCount } from './service';
-export { canSendNotification, isInQuietHours, isDuplicateNotification } from './scheduler';
+export { canSendNotification, isInQuietHours, isDuplicateNotification, getUserTodayStart } from './scheduler';
 export { getTemplate } from './templates';
 export {
   checkReflectionEligibility,

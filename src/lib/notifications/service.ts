@@ -12,7 +12,7 @@ import {
   NotificationTemplate,
   ScheduleGateResult,
 } from './types';
-import { canSendNotification, isDuplicateNotification } from './scheduler';
+import { canSendNotification, isDuplicateNotification, getUserTodayStart } from './scheduler';
 import { getTemplate } from './templates';
 import { trackFCMSendFailure, trackFCMInvalidTokens, trackNoActiveTokens } from '@/lib/observability/notification-tracking';
 
@@ -178,9 +178,11 @@ export function deferNotification(
  * Get the number of notifications sent to a user today.
  * Useful for UI display ("X de Y notificaciones hoy").
  */
-export async function getTodayNotificationCount(userId: string): Promise<number> {
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+export async function getTodayNotificationCount(
+  userId: string,
+  timezone: string = 'Europe/Madrid',
+): Promise<number> {
+  const todayStart = getUserTodayStart(timezone);
 
   return db.notificationLog.count({
     where: {
