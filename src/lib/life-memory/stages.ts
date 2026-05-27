@@ -96,7 +96,7 @@ async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggr
     }),
     db.dailyCheckin.findMany({
       where: { userId, date: { gte: start, lt: end } },
-      select: { stress: true, energy: true, emotion: true },
+      select: { stress: true, energy: true, emotion: true, intention: true },
     }),
     db.financeLog.findMany({
       where: { userId, date: { gte: start, lt: end }, mood: { not: null } },
@@ -118,14 +118,26 @@ async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggr
 
   const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
 
-  // Intention balance
-  const intentionBalance = { tranquility: 0, growth: 0, necessity: 0, enjoyment: 0, total: finances.length };
+  // Intention balance — from finance logs AND checkin intentions
+  const intentionBalance = { tranquility: 0, growth: 0, necessity: 0, enjoyment: 0, total: 0 };
   for (const f of finances) {
     const m = f.mood?.toLowerCase();
     if (m === 'tranquility' || m === 'calm') intentionBalance.tranquility++;
     else if (m === 'growth' || m === 'conscious') intentionBalance.growth++;
     else if (m === 'necessity' || m === 'necessary') intentionBalance.necessity++;
     else if (m === 'enjoyment' || m === 'impulse') intentionBalance.enjoyment++;
+    else intentionBalance.tranquility++; // Default: calm/tranquil spending
+    intentionBalance.total++;
+  }
+  for (const c of checkins) {
+    const intent = c.intention?.toLowerCase();
+    if (!intent) continue;
+    if (intent.includes('calma') || intent.includes('tranquil') || intent.includes('reposo') || intent.includes('descans')) intentionBalance.tranquility++;
+    else if (intent.includes('creci') || intent.includes('movimiento') || intent.includes('aprend') || intent.includes('mejor') || intent.includes('progres')) intentionBalance.growth++;
+    else if (intent.includes('necesid') || intent.includes('oblig') || intent.includes('deber') || intent.includes('trabaj')) intentionBalance.necessity++;
+    else if (intent.includes('disfrut') || intent.includes('placer') || intent.includes('gust')) intentionBalance.enjoyment++;
+    else intentionBalance.tranquility++; // Default: calm intention
+    intentionBalance.total++;
   }
 
   return {

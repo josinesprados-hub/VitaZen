@@ -33,7 +33,7 @@ export interface HighlightedMemory {
 
 export function observationsFromStages(stages: LifeStage[]): LifeMemoryObservation[] {
   return stages
-    .filter(s => s.dataPoints >= 3) // Need minimum data to be meaningful
+    .filter(s => s.dataPoints >= 1) // Any data is meaningful — "quiet" stages (dataPoints < 3) are valid
     .map(s => ({
       id: `stage-${s.month}`,
       text: s.observation,
