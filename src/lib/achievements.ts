@@ -146,14 +146,6 @@ function fulfilled<T>(result: Settled<T>, fallback: T): T {
   return fallback;
 }
 
-const _QUERY_NAMES = [
-  'meditationCount', 'journalCount', 'wellnessCount', 'habitsCount',
-  'maxStreak', 'nutritionCount', 'financeGroupBy', 'userData',
-  'checkinCount', 'monthlyClosureCount', 'empireActive', 'gratitudeCount',
-  'financeContextCount', 'meditationTypes', 'wellnessMoods',
-  'empireHighLevel', 'recentCheckins',
-];
-
 export async function calculateProgress(userId: string): Promise<Record<string, number>> {
   const results = await Promise.allSettled([
     // 1. Meditation sessions
@@ -233,24 +225,6 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
       take: 60,
     }),
   ]);
-
-  // ╔══════════════════════════════════════════════════╗
-  // ║  TEMPORAL DEBUG — REMOVE AFTER FIXING            ║
-  // ╚══════════════════════════════════════════════════╝
-  const _failedQueries: string[] = [];
-  const _nullButFulfilled: string[] = [];
-  results.forEach((r, i) => {
-    const name = _QUERY_NAMES[i] || `query_${i}`;
-    if (r.status === 'rejected') {
-      const reason = r.reason instanceof Error ? r.reason.message : String(r.reason);
-      _failedQueries.push(`${name}: ${reason}`);
-    } else if (r.value === null || r.value === undefined) {
-      _nullButFulfilled.push(name);
-    }
-  });
-  if (_failedQueries.length > 0 || _nullButFulfilled.length > 0) {
-    console.error(JSON.stringify({ vz_dbg: true, fn: 'calculateProgress', userId, _failedQueries, _nullButFulfilled, ts: new Date().toISOString() }));
-  }
 
   const meditationCount     = fulfilled(results[0],  0);
   const journalCount        = fulfilled(results[1],  0);
@@ -432,27 +406,15 @@ export interface UnlockResult {
 export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
   // NOTE: No `select` on findMany — PrismaPg driver adapter can return
   // null for queries with select, which crashes Promise.all (not allSettled).
-  let unlocked: any;
-  let progressData: any;
-  try {
-    [unlocked, progressData] = await Promise.all([
-      db.achievement.findMany({
-        where: { userId },
-      }),
-      calculateProgress(userId),
-    ]);
-  } catch (paErr: any) {
-    // ╔══════════════════════════════════════════════════╗
-    // ║  TEMPORAL DEBUG — REMOVE AFTER FIXING            ║
-    // ╚══════════════════════════════════════════════════╝
-    console.error(JSON.stringify({ vz_dbg: true, fn: 'checkAndUnlock', step: 'Promise.all_FAILED', errMsg: paErr?.message, errName: paErr?.constructor?.name, prismaCode: (paErr as any)?.code, errStack: paErr?.stack?.slice(0, 500), ts: new Date().toISOString() }));
-    throw paErr;
-  }
+  const [unlocked, progressData] = await Promise.all([
+    db.achievement.findMany({
+      where: { userId },
+    }),
+    calculateProgress(userId),
+  ]);
 
   // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
   if (!unlocked) {
-    // TEMPORAL DEBUG
-    console.error(JSON.stringify({ vz_dbg: true, fn: 'checkAndUnlock', step: 'findMany_null', ts: new Date().toISOString() }));
     throw new Error('PrismaPg adapter returned null for achievement.findMany in checkAndUnlock — userId: ' + userId);
   }
 

@@ -198,6 +198,23 @@ export default function LogrosPage() {
     };
   }, [apiFetch, screenshotMode, firebaseUser]);
 
+  // Memoize filtered lists BEFORE any early returns.
+  // React hooks must be called in the same order on every render.
+  // Placing useMemo after early returns caused "Rendered fewer hooks
+  // than expected" (React error #310) when the component returned
+  // early during loading/error states.
+  const { unlockedList, lockedVisibleList, mysteryList } = useMemo(() => {
+    if (!data) return { unlockedList: [], lockedVisibleList: [], mysteryList: [] };
+    const filteredAchievements = activeFilter === 'all'
+      ? data.achievements
+      : data.achievements.filter((a) => a.category === activeFilter);
+    return {
+      unlockedList: filteredAchievements.filter((a) => a.unlocked),
+      lockedVisibleList: filteredAchievements.filter((a) => !a.unlocked && !a.hidden),
+      mysteryList: filteredAchievements.filter((a) => !a.unlocked && a.hidden),
+    };
+  }, [data, activeFilter]);
+
   if (loading) {
     return <LogrosSkeleton />;
   }
@@ -217,18 +234,6 @@ export default function LogrosPage() {
   }
 
   if (!data) return null;
-
-  // Memoize filtered lists to avoid 3× .filter() on every render
-  const { unlockedList, lockedVisibleList, mysteryList } = useMemo(() => {
-    const filteredAchievements = activeFilter === 'all'
-      ? data.achievements
-      : data.achievements.filter((a) => a.category === activeFilter);
-    return {
-      unlockedList: filteredAchievements.filter((a) => a.unlocked),
-      lockedVisibleList: filteredAchievements.filter((a) => !a.unlocked && !a.hidden),
-      mysteryList: filteredAchievements.filter((a) => !a.unlocked && a.hidden),
-    };
-  }, [data.achievements, activeFilter]);
 
   return (
     <div className="max-w-5xl mx-auto">

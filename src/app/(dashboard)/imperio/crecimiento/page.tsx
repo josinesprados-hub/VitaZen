@@ -213,6 +213,13 @@ export default function CrecimientoPage() {
 
   // ─── Loading / Error states ──────────────────
 
+  // useMemo MUST be called before any early returns.
+  // React hooks must be called in the same order on every render.
+  // Placing useMemo after early returns caused "Rendered fewer hooks
+  // than expected" (React error #310) when the component returned
+  // early during loading/error states.
+  const grouped = useMemo(() => groupEntriesByDate(entries), [entries]);
+
   if (loading) {
     return <EmpireSkeleton message="Preparando tu diario..." />;
   }
@@ -229,8 +236,6 @@ export default function CrecimientoPage() {
       </div>
     );
   }
-
-  const grouped = useMemo(() => groupEntriesByDate(entries), [entries]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">

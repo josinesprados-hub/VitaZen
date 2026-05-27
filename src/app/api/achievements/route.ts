@@ -25,44 +25,20 @@ async function handler(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ╔══════════════════════════════════════════════════╗
-    // ║  TEMPORAL DEBUG — REMOVE AFTER FIXING            ║
-    // ╚══════════════════════════════════════════════════╝
-    const _dbg = (step: string, data?: any) => {
-      console.error(JSON.stringify({ vz_dbg: true, route: 'achievements', step, ...data, ts: new Date().toISOString() }));
-    };
-    _dbg('start');
-
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) {
-      _dbg('auth_failed', { reason: 'getAuthUserBasic returned null' });
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    _dbg('auth_ok', { userId: user.id, plan: user.plan });
 
     // Auto-unlock achievements that meet their target.
-    let checkResult: any;
-    try {
-      checkResult = await checkAndUnlock(user.id);
-      _dbg('checkAndUnlock_ok', { newlyUnlocked: checkResult.newlyUnlocked?.length, unlockedKeys: checkResult.unlockedKeys?.size });
-    } catch (cuErr: any) {
-      _dbg('checkAndUnlock_FAILED', { errMsg: cuErr?.message, errName: cuErr?.constructor?.name, errStack: cuErr?.stack?.slice(0, 500) });
-      throw cuErr;
-    }
-    const { newlyUnlocked, progressData, unlockedKeys } = checkResult;
+    // checkAndUnlock returns progressData + unlockedKeys so we
+    // don't need to recalculate — eliminates a duplicate set of
+    // ~19 DB queries that was causing timeouts and failures.
+    const { newlyUnlocked, progressData, unlockedKeys } = await checkAndUnlock(user.id);
 
     // Fetch unlockedAt timestamps (lightweight — only the unlocked records)
-    let unlocked: any;
-    try {
-      unlocked = await db.achievement.findMany({ where: { userId: user.id } });
-      _dbg('findMany_ok', { count: unlocked?.length, isNull: unlocked === null, type: typeof unlocked });
-    } catch (fmErr: any) {
-      _dbg('findMany_FAILED', { errMsg: fmErr?.message, errName: fmErr?.constructor?.name, prismaCode: (fmErr as any)?.code });
-      throw fmErr;
-    }
-
+    const unlocked = await db.achievement.findMany({ where: { userId: user.id } });
     if (!unlocked) {
-      _dbg('findMany_null_guard');
       throw new Error('PrismaPg adapter returned null for achievement.findMany — userId: ' + user.id);
     }
     const unlockedAtMap = new Map(unlocked.map(a => [a.key, a.unlockedAt.toISOString()]));
@@ -80,8 +56,6 @@ async function handler(request: NextRequest) {
     const totalVisible = visibleAchievements.length;
     const unlockedVisible = visibleAchievements.filter(a => unlockedKeys.has(a.key)).length;
 
-    _dbg('success', { achievementCount: achievements?.length, totalVisible, unlockedVisible });
-
     return NextResponse.json({
       achievements,
       newlyUnlocked,
@@ -97,10 +71,8 @@ async function handler(request: NextRequest) {
     // visible in server logs without hiding behind a generic message.
     const message = error instanceof Error ? error.message : String(error);
     const code = (error as any)?.code || (error as any)?.prismaCode || 'UNKNOWN';
-    const stack = error instanceof Error ? error.stack?.slice(0, 800) : undefined;
     serverLog.apiError('api/achievements', 'GET', 500, error, { prismaCode: code, errorMessage: message });
-    // TEMPORAL: include debug info in response body for network tab inspection
-    return NextResponse.json({ error: 'Internal server error', _dbg: { message, code, stack } }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
