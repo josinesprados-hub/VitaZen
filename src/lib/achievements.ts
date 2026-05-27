@@ -143,10 +143,18 @@ function fulfilled<T>(result: Settled<T>, fallback: T): T {
   // with select/include), fall through to the fallback. This prevents
   // TypeError when accessing properties on null (e.g. null[0].field).
   if (result.status === 'fulfilled' && result.value != null) return result.value;
+  if (result.status === 'rejected') {
+    const reason = result.reason;
+    console.error(JSON.stringify({ vz_debug: true, fn: 'fulfilled', step: 'rejected', error: reason instanceof Error ? reason.message : String(reason), code: reason?.code }));
+  } else if (result.status === 'fulfilled' && result.value == null) {
+    console.error(JSON.stringify({ vz_debug: true, fn: 'fulfilled', step: 'nullValue' }));
+  }
   return fallback;
 }
 
 export async function calculateProgress(userId: string): Promise<Record<string, number>> {
+  console.log(JSON.stringify({ vz_debug: true, fn: 'calculateProgress', step: 'start', userId }));
+  const t0 = Date.now();
   const results = await Promise.allSettled([
     // 1. Meditation sessions
     db.meditationSession.count({ where: { userId } }),
@@ -231,6 +239,15 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
       take: 60,
     }),
   ]);
+
+  // Log each result status for debugging
+  const resultSummary = results.map((r, i) => ({
+    idx: i,
+    status: r.status,
+    isNull: r.status === 'fulfilled' && r.value == null,
+    error: r.status === 'rejected' ? (r.reason instanceof Error ? r.reason.message : String(r.reason)) : undefined,
+  }));
+  console.log(JSON.stringify({ vz_debug: true, fn: 'calculateProgress', step: 'settled', durationMs: Date.now() - t0, results: resultSummary }));
 
   const meditationCount     = fulfilled(results[0],  0);
   const journalCount        = fulfilled(results[1],  0);
@@ -410,6 +427,8 @@ export interface UnlockResult {
 }
 
 export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
+  console.log(JSON.stringify({ vz_debug: true, fn: 'checkAndUnlock', step: 'start', userId }));
+  const t0 = Date.now();
   // NOTE: No `select` on findMany — PrismaPg driver adapter can return
   // null for queries with select, which crashes Promise.all (not allSettled).
   const [unlocked, progressData] = await Promise.all([
@@ -419,11 +438,9 @@ export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
     calculateProgress(userId),
   ]);
 
+  console.log(JSON.stringify({ vz_debug: true, fn: 'checkAndUnlock', step: 'queriesComplete', unlockedNull: unlocked === null, unlockedIsArray: Array.isArray(unlocked), unlockedCount: Array.isArray(unlocked) ? unlocked.length : 'N/A', progressKeysCount: Object.keys(progressData).length, durationMs: Date.now() - t0 }));
+
   // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
-  // Without this check, unlocked.map() would throw a cryptic TypeError that
-  // propagates through Promise.all and ends up as a generic dashboard error
-  // boundary message ("No se pudieron cargar los datos") instead of a
-  // descriptive server error.
   if (!unlocked) {
     throw new Error('PrismaPg adapter returned null for achievement.findMany in checkAndUnlock — userId: ' + userId);
   }

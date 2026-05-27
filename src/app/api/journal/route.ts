@@ -6,29 +6,40 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onJournalChange } from '@/lib/widgets/triggers';
 
 export async function GET(request: NextRequest) {
+  const endpoint = 'api/journal';
   try {
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'noAuthHeader' }));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!user) {
+      console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'userNotFound' }));
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'authOk', userId: user.id }));
 
+    const t0 = Date.now();
     const entries = await db.journalEntry.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'journalFindMany', isNull: entries === null, isArray: Array.isArray(entries), count: Array.isArray(entries) ? entries.length : 'N/A', durationMs: Date.now() - t0 }));
 
     // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
-    // A null here would cause the Crecimiento page to crash with a cryptic
-    // TypeError ("Cannot read properties of null") that the dashboard error
-    // boundary catches as "No se pudieron cargar los datos".
     if (!entries) {
       throw new Error('PrismaPg adapter returned null for journalEntry.findMany — userId: ' + user.id);
     }
 
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'returning200', entriesCount: entries.length }));
     return NextResponse.json({ entries });
   } catch (error) {
-    console.error('Journal GET error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    const code = (error as any)?.code || (error as any)?.prismaCode || 'UNKNOWN';
+    const stack = error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' | ') : undefined;
+    console.error(JSON.stringify({ vz_debug: true, endpoint, step: 'CATCH', error: message, prismaCode: code, stack }));
+    return NextResponse.json({ error: 'Internal server error', debug: message, prismaCode: code }, { status: 500 });
   }
 }
 

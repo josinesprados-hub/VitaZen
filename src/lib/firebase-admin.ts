@@ -8,6 +8,8 @@ function getFirebaseAdminApp() {
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
+  console.log(JSON.stringify({ vz_debug: true, fn: 'getFirebaseAdminApp', step: 'init', hasProjectId: !!projectId, hasClientEmail: !!clientEmail, hasPrivateKey: !!privateKey, privateKeyLength: privateKey?.length }));
+
   if (!clientEmail || !privateKey) {
     throw new Error(
       'FIREBASE_ADMIN_CLIENT_EMAIL and FIREBASE_ADMIN_PRIVATE_KEY are required. ' +

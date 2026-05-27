@@ -4,9 +4,10 @@ import { db } from './db';
 export async function verifyFirebaseToken(idToken: string) {
   try {
     const decodedToken = await adminAuth.verifyIdToken(idToken);
+    console.log(JSON.stringify({ vz_debug: true, fn: 'verifyFirebaseToken', step: 'success', uid: decodedToken.uid, email: decodedToken.email }));
     return decodedToken;
   } catch (error) {
-    console.error('Error verifying Firebase token:', error);
+    console.error(JSON.stringify({ vz_debug: true, fn: 'verifyFirebaseToken', step: 'failed', error: error instanceof Error ? error.message : String(error), code: (error as any)?.code }));
     return null;
   }
 }
@@ -70,7 +71,10 @@ export async function getAuthUser(idToken: string) {
 
 export async function getAuthUserBasic(idToken: string): Promise<{ id: string; plan: string; firebaseUid: string; email: string } | null> {
   const decodedToken = await verifyFirebaseToken(idToken);
-  if (!decodedToken) return null;
+  if (!decodedToken) {
+    console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'noDecodedToken' }));
+    return null;
+  }
 
   // NOTE: Do NOT use `select` or `include: {}` here.
   // The PrismaPg driver adapter in Prisma 7 handles both differently
@@ -80,15 +84,19 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
   // The small overhead of fetching all scalar fields is negligible
   // compared to the aiUsage + subscriptions joins we skip.
 
+  const t0 = Date.now();
   let user = await db.user.findUnique({
     where: { firebaseUid: decodedToken.uid },
   });
+  console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'findByUid', uid: decodedToken.uid, found: !!user, isNull: user === null, durationMs: Date.now() - t0 }));
 
   // Same email fallback as getAuthUser
   if (!user && decodedToken.email) {
+    const t1 = Date.now();
     user = await db.user.findUnique({
       where: { email: decodedToken.email },
     });
+    console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'findByEmail', email: decodedToken.email, found: !!user, isNull: user === null, durationMs: Date.now() - t1 }));
     if (user && user.firebaseUid !== decodedToken.uid) {
       await db.user.update({
         where: { id: user.id },
@@ -97,8 +105,12 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
     }
   }
 
-  if (!user) return null;
+  if (!user) {
+    console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'userNotFound', uid: decodedToken.uid, email: decodedToken.email }));
+    return null;
+  }
 
+  console.log(JSON.stringify({ vz_debug: true, fn: 'getAuthUserBasic', step: 'success', userId: user.id, plan: user.plan }));
   return {
     id: user.id,
     plan: user.plan,

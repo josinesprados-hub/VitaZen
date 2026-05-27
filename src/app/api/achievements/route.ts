@@ -19,30 +19,31 @@ import { serverLog } from '@/lib/observability/server-logger';
 // ═══════════════════════════════════════════
 
 async function handler(request: NextRequest) {
+  const endpoint = 'api/achievements';
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
+      console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'noAuthHeader' }));
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) {
+      console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'userNotFound' }));
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'authOk', userId: user.id }));
 
     // Auto-unlock achievements that meet their target.
-    // checkAndUnlock returns progressData + unlockedKeys so we
-    // don't need to recalculate — eliminates a duplicate set of
-    // ~19 DB queries that was causing timeouts and failures.
+    const t0 = Date.now();
     const { newlyUnlocked, progressData, unlockedKeys } = await checkAndUnlock(user.id);
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'checkAndUnlockOk', durationMs: Date.now() - t0, newlyUnlockedCount: newlyUnlocked.length, unlockedKeysCount: unlockedKeys.size, progressKeysCount: Object.keys(progressData).length }));
 
     // Fetch unlockedAt timestamps (lightweight — only the unlocked records)
+    const t1 = Date.now();
     const unlocked = await db.achievement.findMany({ where: { userId: user.id } });
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'achievementFindMany', isNull: unlocked === null, isArray: Array.isArray(unlocked), count: Array.isArray(unlocked) ? unlocked.length : 'N/A', durationMs: Date.now() - t1 }));
     // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
-    // A cryptic TypeError here ("Cannot read properties of null") would bypass
-    // the route handler's catch and trigger the dashboard error boundary,
-    // showing a generic "No se pudieron cargar los datos" to the user.
-    // Throw a descriptive error so the 500 response includes the real cause.
     if (!unlocked) {
       throw new Error('PrismaPg adapter returned null for achievement.findMany — userId: ' + user.id);
     }
@@ -61,6 +62,7 @@ async function handler(request: NextRequest) {
     const totalVisible = visibleAchievements.length;
     const unlockedVisible = visibleAchievements.filter(a => unlockedKeys.has(a.key)).length;
 
+    console.log(JSON.stringify({ vz_debug: true, endpoint, step: 'returning200', achievementsCount: achievements.length, statsTotal: totalVisible, statsUnlocked: unlockedVisible }));
     return NextResponse.json({
       achievements,
       newlyUnlocked,
@@ -76,8 +78,10 @@ async function handler(request: NextRequest) {
     // visible in server logs without hiding behind a generic message.
     const message = error instanceof Error ? error.message : String(error);
     const code = (error as any)?.code || (error as any)?.prismaCode || 'UNKNOWN';
+    const stack = error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' | ') : undefined;
+    console.error(JSON.stringify({ vz_debug: true, endpoint, step: 'CATCH', error: message, prismaCode: code, stack }));
     serverLog.apiError('api/achievements', 'GET', 500, error, { prismaCode: code, errorMessage: message });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', debug: message, prismaCode: code }, { status: 500 });
   }
 }
 

@@ -29,7 +29,9 @@ const globalForPrisma = globalThis as unknown as {
 const SLOW_QUERY_THRESHOLD_MS = 1_000;
 
 function createPrismaClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+  const dbUrl = process.env.DATABASE_URL;
+  console.log(JSON.stringify({ vz_debug: true, fn: 'createPrismaClient', step: 'init', hasDbUrl: !!dbUrl, dbUrlPrefix: dbUrl ? dbUrl.substring(0, 30) + '...' : 'MISSING', nodeEnv: process.env.NODE_ENV }));
+  const adapter = new PrismaPg({ connectionString: dbUrl })
   return new PrismaClient({
     adapter,
     log: [
