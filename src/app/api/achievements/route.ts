@@ -38,6 +38,14 @@ async function handler(request: NextRequest) {
 
     // Fetch unlockedAt timestamps (lightweight — only the unlocked records)
     const unlocked = await db.achievement.findMany({ where: { userId: user.id } });
+    // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
+    // A cryptic TypeError here ("Cannot read properties of null") would bypass
+    // the route handler's catch and trigger the dashboard error boundary,
+    // showing a generic "No se pudieron cargar los datos" to the user.
+    // Throw a descriptive error so the 500 response includes the real cause.
+    if (!unlocked) {
+      throw new Error('PrismaPg adapter returned null for achievement.findMany — userId: ' + user.id);
+    }
     const unlockedAtMap = new Map(unlocked.map(a => [a.key, a.unlockedAt.toISOString()]));
 
     // Build response with hidden achievement logic

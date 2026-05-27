@@ -419,6 +419,15 @@ export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
     calculateProgress(userId),
   ]);
 
+  // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
+  // Without this check, unlocked.map() would throw a cryptic TypeError that
+  // propagates through Promise.all and ends up as a generic dashboard error
+  // boundary message ("No se pudieron cargar los datos") instead of a
+  // descriptive server error.
+  if (!unlocked) {
+    throw new Error('PrismaPg adapter returned null for achievement.findMany in checkAndUnlock — userId: ' + userId);
+  }
+
   const unlockedKeys = new Set(unlocked.map(a => a.key));
   const newlyUnlocked: string[] = [];
 

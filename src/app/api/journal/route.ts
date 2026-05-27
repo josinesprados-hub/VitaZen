@@ -17,6 +17,14 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
+    // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
+    // A null here would cause the Crecimiento page to crash with a cryptic
+    // TypeError ("Cannot read properties of null") that the dashboard error
+    // boundary catches as "No se pudieron cargar los datos".
+    if (!entries) {
+      throw new Error('PrismaPg adapter returned null for journalEntry.findMany — userId: ' + user.id);
+    }
+
     return NextResponse.json({ entries });
   } catch (error) {
     console.error('Journal GET error:', error);
