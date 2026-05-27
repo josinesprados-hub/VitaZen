@@ -9,26 +9,48 @@ export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // ╔══════════════════════════════════════════════════╗
+    // ║  TEMPORAL DEBUG — REMOVE AFTER FIXING            ║
+    // ╚══════════════════════════════════════════════════╝
+    const _dbg = (step: string, data?: any) => {
+      console.error(JSON.stringify({ vz_dbg: true, route: 'journal', step, ...data, ts: new Date().toISOString() }));
+    };
+    _dbg('start');
+
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!user) {
+      _dbg('auth_failed', { reason: 'getAuthUserBasic returned null' });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    _dbg('auth_ok', { userId: user.id, plan: user.plan });
 
-    const entries = await db.journalEntry.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
-    });
+    let entries: any;
+    try {
+      entries = await db.journalEntry.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+      });
+      _dbg('findMany_ok', { count: entries?.length, isNull: entries === null, type: typeof entries });
+    } catch (fmErr: any) {
+      _dbg('findMany_FAILED', { errMsg: fmErr?.message, errName: fmErr?.constructor?.name, prismaCode: (fmErr as any)?.code, errStack: fmErr?.stack?.slice(0, 500) });
+      throw fmErr;
+    }
 
-    // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
-    // A null here would cause the Crecimiento page to crash with a cryptic
-    // TypeError ("Cannot read properties of null") that the dashboard error
-    // boundary catches as "No se pudieron cargar los datos".
     if (!entries) {
+      _dbg('findMany_null_guard');
       throw new Error('PrismaPg adapter returned null for journalEntry.findMany — userId: ' + user.id);
     }
 
+    _dbg('success', { entryCount: entries.length });
     return NextResponse.json({ entries });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Journal GET error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    const code = (error as any)?.code || (error as any)?.prismaCode || 'UNKNOWN';
+    const stack = error instanceof Error ? error.stack?.slice(0, 800) : undefined;
+    // TEMPORAL: include debug info in response body for network tab inspection
+    return NextResponse.json({ error: 'Internal server error', _dbg: { message, code, stack } }, { status: 500 });
   }
 }
 
