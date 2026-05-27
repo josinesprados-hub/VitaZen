@@ -99,7 +99,6 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
 
   if (!user) return null;
 
-  // Return only the fields the caller needs
   return {
     id: user.id,
     plan: user.plan,

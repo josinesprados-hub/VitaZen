@@ -139,7 +139,11 @@ export function getHiddenAchievements(): AchievementDef[] {
 type Settled<T> = PromiseFulfilledResult<T> | PromiseRejectedResult;
 
 function fulfilled<T>(result: Settled<T>, fallback: T): T {
-  return result.status === 'fulfilled' ? result.value : fallback;
+  // If PrismaPg returns null for a "fulfilled" query (driver adapter bug
+  // with select/include), fall through to the fallback. This prevents
+  // TypeError when accessing properties on null (e.g. null[0].field).
+  if (result.status === 'fulfilled' && result.value != null) return result.value;
+  return fallback;
 }
 
 export async function calculateProgress(userId: string): Promise<Record<string, number>> {
@@ -157,9 +161,10 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     db.habitLog.count({ where: { userId } }),
 
     // 5. Max habit streak
+    // NOTE: No `select` — PrismaPg driver adapter in Prisma 7 can return
+    // null/empty for queries with select, just like findUnique + select.
     db.habitLog.findMany({
       where: { userId },
-      select: { streak: true },
       orderBy: { streak: 'desc' },
       take: 1,
     }),
@@ -177,7 +182,9 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     }),
 
     // 10. User data (createdAt)
-    db.user.findUnique({ where: { id: userId }, select: { createdAt: true } }),
+    // NOTE: No `select` — PrismaPg driver adapter returns null for
+    // findUnique + select (same bug as getAuthUserBasic had with include:{}).
+    db.user.findUnique({ where: { id: userId } }),
 
     // 11. Daily check-ins
     db.dailyCheckin.count({ where: { userId } }),
@@ -188,7 +195,6 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     // 13. Empires with activity (xp > 0)
     db.empireProgress.findMany({
       where: { userId, xp: { gt: 0 } },
-      select: { empire: true },
     }),
 
     // 14. Journal entries with gratitude
@@ -204,21 +210,18 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     // 16. Distinct meditation types
     db.meditationSession.findMany({
       where: { userId },
-      select: { type: true },
       distinct: ['type'],
     }),
 
     // 17. Distinct wellness moods
     db.wellnessLog.findMany({
       where: { userId },
-      select: { mood: true },
       distinct: ['mood'],
     }),
 
     // 18. Empires with level >= 5
     db.empireProgress.findMany({
       where: { userId, level: { gte: 5 } },
-      select: { empire: true },
     }),
 
     // 19. Recent check-ins for comeback & streak detection
@@ -226,7 +229,6 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
       where: { userId },
       orderBy: { date: 'desc' },
       take: 60,
-      select: { date: true },
     }),
   ]);
 
@@ -408,10 +410,11 @@ export interface UnlockResult {
 }
 
 export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
+  // NOTE: No `select` on findMany — PrismaPg driver adapter can return
+  // null for queries with select, which crashes Promise.all (not allSettled).
   const [unlocked, progressData] = await Promise.all([
     db.achievement.findMany({
       where: { userId },
-      select: { key: true },
     }),
     calculateProgress(userId),
   ]);
