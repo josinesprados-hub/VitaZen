@@ -49,6 +49,12 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { weeklyEmailSummary, dailyReminders, privacyStatsVisible } = body;
 
+    // AUDIT NOTE (settings):
+    //   weeklyEmailSummary → CONSUMED by weekly-recap-sender.ts (cron)
+    //   dailyReminders     → PLACEBO: stored but NEVER read by any backend logic
+    //   privacyStatsVisible → PLACEBO: stored but NEVER read by any backend logic
+    //   No comparison/social feature exists that reads privacyStatsVisible.
+
     // Only accept boolean values for settings
     const data: Record<string, boolean> = {};
     if (typeof weeklyEmailSummary === 'boolean') data.weeklyEmailSummary = weeklyEmailSummary;

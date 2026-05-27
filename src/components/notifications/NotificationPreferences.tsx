@@ -240,6 +240,10 @@ export function NotificationPreferences() {
       </div>
 
       {/* Reminder types */}
+      {/* AUDIT NOTE: Only 'Reflexión diaria' (reflection) has an actual trigger (cron at 18:00 UTC).
+          The other 3 toggles (Check-in, Resumen semanal, Te echamos de menos) persist state
+          and pass gate checks, but NO code ever calls sendNotification() for those types.
+          They are effectively PLACEBO — users can toggle them, but no push is ever sent. */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Heart size={14} />

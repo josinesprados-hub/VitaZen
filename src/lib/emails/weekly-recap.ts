@@ -273,7 +273,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
             <td class="content-cell" style="padding:0 40px;text-align:center;background-color:#080808;" bgcolor="#080808">
               <p class="champagne-text" style="color:#c8a55a;font-size:11px;letter-spacing:4px;margin:0 0 4px;font-weight:500;font-family:${FONT_STACK_CSS};">VITAZEN</p>
               <p class="subtle-text" style="color:#555;font-size:11px;margin:0 0 8px;font-family:${FONT_STACK_CSS};">vitazen.cc</p>
-              <p style="color:#555;font-size:11px;margin:0;font-family:${FONT_STACK_CSS};"><a href="${APP_URL}/perfil" class="muted-text" style="color:#666;text-decoration:underline;font-family:${FONT_STACK_CSS};">Desactivar resumen semanal</a></p>
+              <p style="color:#555;font-size:11px;margin:0;font-family:${FONT_STACK_CSS};"><a href="${APP_URL}/ajustes" class="muted-text" style="color:#666;text-decoration:underline;font-family:${FONT_STACK_CSS};">Desactivar resumen semanal</a></p>
             </td>
           </tr>
         </table>
@@ -316,7 +316,7 @@ Recomendación: ${data.mentorRecommendation}
 
 Acceder: ${APP_URL}/dashboard
 
-Desactivar resumen semanal: ${APP_URL}/perfil
+Desactivar resumen semanal: ${APP_URL}/ajustes
 
 VitaZen · vitazen.cc`;
 

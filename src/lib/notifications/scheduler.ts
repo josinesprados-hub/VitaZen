@@ -108,6 +108,11 @@ export async function canSendNotification(
   }
 
   // ── 2. Type-specific toggle ──
+  // AUDIT NOTE: Only 'reflection' has a trigger (cron at 18:00 UTC).
+  // 'checkin', 'weekly_recap' (push), and 'comeback' have gate checks
+  // here but NO code ever calls sendNotification() for these types.
+  // These toggles are effectively PLACEBO in the UI — users can toggle
+  // them, the state persists, but no notification is ever sent.
   const typeToggleMap: Record<NotificationType, boolean> = {
     checkin:        prefs.checkinReminders,
     weekly_recap:   prefs.weeklyRecap,

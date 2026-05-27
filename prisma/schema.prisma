@@ -20,9 +20,9 @@ model User {
   city              String?
   age               Int?
   bio               String?
-  weeklyEmailSummary Boolean @default(true)
-  dailyReminders    Boolean @default(false)
-  privacyStatsVisible Boolean @default(false)
+  weeklyEmailSummary Boolean @default(true)    // REAL: consumed by weekly-recap-sender cron
+  dailyReminders    Boolean @default(false)   // PLACEBO: stored but never consumed by any backend logic
+  privacyStatsVisible Boolean @default(false) // PLACEBO: stored but never consumed by any backend logic (no social/comparison feature exists)
   plan              String   @default("FREE") // FREE | PREMIUM
   stripeCustomerId  String?  @unique
   emailVerified     Boolean  @default(false)
@@ -383,7 +383,7 @@ model NotificationPreference {
   userId                String   @unique
   pushEnabled           Boolean  @default(false)
   checkinReminders      Boolean  @default(true)
-  streakReminders       Boolean  @default(true)
+  streakReminders       Boolean  @default(true) // DEPRECATED: removed from UI and API. Kept for DB backward compat only. No code reads this.
   weeklyRecap           Boolean  @default(true)
   comebackReminders     Boolean  @default(true)
   reflectionReminders   Boolean  @default(true)
@@ -401,7 +401,7 @@ model NotificationPreference {
 model NotificationLog {
   id          String   @id @default(cuid())
   userId      String
-  type        String   // checkin | streak | weekly_recap | comeback | reflection
+  type        String   // checkin | weekly_recap | comeback | reflection  (streak removed)
   title       String
   body        String
   sentAt      DateTime @default(now())
