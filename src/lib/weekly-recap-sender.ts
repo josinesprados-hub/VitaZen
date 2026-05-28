@@ -4,6 +4,13 @@
 // each eligible user and sends the email.
 // Reuses existing insights + emotional engines.
 // No AI. No invented data.
+//
+// IDEMPOTENCY: Claim-first pattern.
+// Before sending, we atomically "claim" the
+// (userId, weekKey) slot via WeeklyEmailLog.
+// Unique constraint prevents duplicate claims.
+// On send failure, we release the claim so
+// the next cron run can retry.
 // ═══════════════════════════════════════════
 
 import { db } from './db';
@@ -14,6 +21,64 @@ import { resend } from './resend';
 
 const FROM_EMAIL = 'VitaZen <hola@vitazen.cc>';
 const REPLY_TO = 'hola@vitazen.cc';
+
+// ─────────────────────────────────────────
+// IDEMPOTENCY: Week Key Calculation
+// Deterministic, timezone-aware ISO week.
+// Format: "2026-W22"
+// Uses Europe/Madrid timezone to match the
+// app's timezone standard (getTodayDateKey).
+// ═══════════════════════════════════════════
+
+export function getWeekKey(timezone: string = 'Europe/Madrid'): string {
+  const now = new Date();
+
+  // Get current date components in the target timezone
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+
+  const year = Number(parts.find(p => p.type === 'year')!.value);
+  const month = Number(parts.find(p => p.type === 'month')!.value);
+  const day = Number(parts.find(p => p.type === 'day')!.value);
+
+  // ISO 8601 week number calculation
+  // Step 1: Create a UTC date matching the local date
+  const d = new Date(Date.UTC(year, month - 1, day));
+
+  // Step 2: Adjust to nearest Thursday (ISO weeks start Monday,
+  // and the week containing Jan 4 is always week 1)
+  const dayOfWeek = d.getUTCDay() || 7; // Sunday = 7
+  d.setUTCDate(d.getUTCDate() + 4 - dayOfWeek);
+
+  // Step 3: Get the year of the Thursday (ISO week year)
+  const isoYear = d.getUTCFullYear();
+
+  // Step 4: Calculate days from Jan 1 of that year to the Thursday
+  const jan1 = new Date(Date.UTC(isoYear, 0, 1));
+  const dayOfYear = Math.floor((d.getTime() - jan1.getTime()) / 86400000) + 1;
+
+  // Step 5: Week number = ceil(dayOfYear / 7)
+  const weekNo = Math.ceil(dayOfYear / 7);
+
+  return `${isoYear}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+// ─────────────────────────────────────────
+// Prisma unique constraint error detection
+// ═══════════════════════════════════════════
+
+function isUniqueConstraintError(error: unknown): boolean {
+  if (error && typeof error === 'object') {
+    const e = error as { code?: string; meta?: { target?: string[] } };
+    // Prisma unique constraint violation: P2002
+    return e.code === 'P2002';
+  }
+  return false;
+}
 
 // ─────────────────────────────────────────
 // Eligibility: only active users with
@@ -155,12 +220,57 @@ function generateEmailRecommendation(
 
 // ─────────────────────────────────────────
 // Send weekly recap to a single user
-// ─────────────────────────────────────────
+// IDEMPOTENCY: claim-first pattern.
+//
+// Flow:
+// 1. Try to create WeeklyEmailLog (userId, weekKey)
+//    → Unique constraint = already sent → skip
+// 2. Generate recap data
+//    → No activity → release claim + skip
+// 3. Send via Resend
+//    → Failure → release claim so retry works
+//    → Success → claim persists, next run skips
+// ═══════════════════════════════════════════
 
-async function sendWeeklyRecapToUser(user: EligibleUser): Promise<{ sent: boolean; error?: string }> {
+async function releaseClaim(userId: string, weekKey: string, reason: string): void {
+  try {
+    await db.weeklyEmailLog.deleteMany({
+      where: { userId, weekKey },
+    });
+    console.log(`[WEEKLY-RECAP] Released claim for ${userId}/${weekKey}: ${reason}`);
+  } catch (err) {
+    // Best-effort cleanup — don't let this mask the original error
+    console.error(`[WEEKLY-RECAP] Failed to release claim for ${userId}/${weekKey}:`, err);
+  }
+}
+
+async function sendWeeklyRecapToUser(user: EligibleUser, weekKey: string): Promise<{ sent: boolean; error?: string }> {
+  // ── STEP 1: Claim this (userId, weekKey) slot atomically ──
+  try {
+    await db.weeklyEmailLog.create({
+      data: {
+        userId: user.id,
+        weekKey,
+      },
+    });
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      // Already claimed/sent this week → clean skip
+      console.log(`[WEEKLY-RECAP] Idempotent skip: ${user.email} already has log for ${weekKey}`);
+      return { sent: false, error: 'Already sent this week' };
+    }
+    // Unexpected DB error — don't proceed, but don't crash the whole batch
+    console.error(`[WEEKLY-RECAP] Unexpected DB error claiming slot for ${user.email}:`, error);
+    return { sent: false, error: 'DB claim error' };
+  }
+
+  // ── STEP 2: Generate personalized data ──
   const recapData = await generateRecapData(user.id, user.plan);
 
   if (!recapData) {
+    // No meaningful activity — release claim so the slot isn't wasted,
+    // but this is still a "skip" (not an error)
+    await releaseClaim(user.id, weekKey, 'No meaningful activity');
     return { sent: false, error: 'No meaningful activity this week' };
   }
 
@@ -170,6 +280,7 @@ async function sendWeeklyRecapToUser(user: EligibleUser): Promise<{ sent: boolea
   const { html, text, subject } = weeklyRecapEmail(recapData);
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
+  // ── STEP 3: Send via Resend ──
   try {
     const result = await resend.emails.send({
       from: FROM_EMAIL,
@@ -185,16 +296,22 @@ async function sendWeeklyRecapToUser(user: EligibleUser): Promise<{ sent: boolea
     });
 
     if (result?.data?.id) {
-      console.log(`[WEEKLY-RECAP] Sent to ${user.email}. ID: ${result.data.id}`);
+      console.log(`[WEEKLY-RECAP] Sent to ${user.email}. ID: ${result.data.id}. Week: ${weekKey}`);
       return { sent: true };
     } else if (result?.error) {
+      // Resend returned an error → release claim for retry
+      await releaseClaim(user.id, weekKey, `Resend error: ${JSON.stringify(result.error)}`);
       console.error(`[WEEKLY-RECAP] Resend error for ${user.email}:`, JSON.stringify(result.error));
       return { sent: false, error: String(result.error) };
     }
 
+    // Unknown response → release claim for retry
+    await releaseClaim(user.id, weekKey, 'Unknown Resend response');
     return { sent: false, error: 'Unknown Resend response' };
   } catch (error) {
+    // Exception during send → release claim for retry
     const msg = error instanceof Error ? error.message : String(error);
+    await releaseClaim(user.id, weekKey, `Exception: ${msg}`);
     console.error(`[WEEKLY-RECAP] Exception sending to ${user.email}:`, msg);
     return { sent: false, error: msg };
   }
@@ -209,28 +326,34 @@ export interface WeeklyRecapResult {
   totalEligible: number;
   sent: number;
   skipped: number;
+  idempotentSkips: number;
   errors: number;
   duration: number;
+  weekKey: string;
 }
 
 export async function sendWeeklyRecaps(): Promise<WeeklyRecapResult> {
   const startTime = Date.now();
-  console.log('[WEEKLY-RECAP] Starting weekly recap send...');
+  const weekKey = getWeekKey();
+  console.log(`[WEEKLY-RECAP] Starting weekly recap send for week ${weekKey}...`);
 
   const users = await getEligibleUsers();
-  console.log(`[WEEKLY-RECAP] Found ${users.length} eligible users.`);
+  console.log(`[WEEKLY-RECAP] Found ${users.length} eligible users for week ${weekKey}.`);
 
   let sent = 0;
   let skipped = 0;
+  let idempotentSkips = 0;
   let errors = 0;
 
   // Process users sequentially with a small delay between each
   // to avoid rate limits and DB overload
   for (const user of users) {
     try {
-      const result = await sendWeeklyRecapToUser(user);
+      const result = await sendWeeklyRecapToUser(user, weekKey);
       if (result.sent) {
         sent++;
+      } else if (result.error === 'Already sent this week') {
+        idempotentSkips++;
       } else if (result.error === 'No meaningful activity this week') {
         skipped++;
       } else {
@@ -249,13 +372,18 @@ export async function sendWeeklyRecaps(): Promise<WeeklyRecapResult> {
   }
 
   const duration = Date.now() - startTime;
-  console.log(`[WEEKLY-RECAP] Done. Sent: ${sent}, Skipped: ${skipped}, Errors: ${errors}, Duration: ${duration}ms`);
+  console.log(
+    `[WEEKLY-RECAP] Done. Week: ${weekKey}, Sent: ${sent}, Skipped: ${skipped}, ` +
+    `Idempotent skips: ${idempotentSkips}, Errors: ${errors}, Duration: ${duration}ms`
+  );
 
   return {
     totalEligible: users.length,
     sent,
     skipped,
+    idempotentSkips,
     errors,
     duration,
+    weekKey,
   };
 }

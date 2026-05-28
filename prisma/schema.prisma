@@ -52,6 +52,7 @@ model User {
   notificationLog   NotificationLog[]
   widgetSnapshots        WidgetSnapshot[]
   monthlyClosures        MonthlyClosure[]
+  weeklyEmailLogs        WeeklyEmailLog[]
   emotionalDashboardState EmotionalDashboardState?
 }
 
@@ -494,6 +495,26 @@ model EmotionalDashboardState {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ═══════════════════════════════════════════
+// WEEKLY EMAIL IDEMPOTENCY
+// Prevents duplicate weekly recap emails.
+// Claim-first pattern: create log before sending,
+// delete on failure. Unique constraint on
+// (userId, weekKey) is the atomic guard.
+// ═══════════════════════════════════════════
+
+model WeeklyEmailLog {
+  id        String   @id @default(cuid())
+  userId    String
+  weekKey   String   // ISO week: "2026-W22" (timezone-aware, deterministic)
+  sentAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekKey])
+  @@index([weekKey])
 }
 
 // ═══════════════════════════════════════════
