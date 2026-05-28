@@ -93,7 +93,7 @@ function isInReflectionWindow(timezone: string): boolean {
  *
  * Uses timezone-aware midnight to match the user's perceived "today".
  */
-async function hasCheckedInToday(userId: string, timezone: string): Promise<boolean> {
+export async function hasCheckedInToday(userId: string, timezone: string): Promise<boolean> {
   const todayStart = getUserTodayStart(timezone);
 
   // Look for a check-in whose date is >= today's start in the user's timezone.
@@ -120,7 +120,7 @@ async function hasCheckedInToday(userId: string, timezone: string): Promise<bool
  * If ANY event was logged within the threshold, the user is likely
  * looking at the app right now — don't interrupt with a push.
  */
-async function isUserCurrentlyActive(userId: string): Promise<boolean> {
+export async function isUserCurrentlyActive(userId: string): Promise<boolean> {
   const threshold = new Date(Date.now() - ACTIVE_USER_THRESHOLD_MS);
 
   const recentEvent = await db.analyticsEvent.findFirst({

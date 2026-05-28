@@ -12,7 +12,8 @@
  *  Each type has its own cooldown, frequency cap, and template set.
  *  Adding a new type here automatically makes it available everywhere. */
 export type NotificationType =
-  | 'checkin'         // "Tu check-in te espera" — gentle daily nudge
+  | 'checkin'         // "Tu check-in te espera" — gentle morning nudge
+  | 'daily'           // "Un momento" — calm presence reminder (midday)
   | 'weekly_recap'    // "Tu semana en VitaZen" — summary
   | 'comeback'        // "Sin prisa" — after inactivity
   | 'reflection';     // "Un momento para ti" — evening reflection
@@ -20,6 +21,7 @@ export type NotificationType =
 /** Full list for iteration — avoids magic arrays scattered in code */
 export const NOTIFICATION_TYPES: NotificationType[] = [
   'checkin',
+  'daily',
   'weekly_recap',
   'comeback',
   'reflection',
@@ -30,6 +32,7 @@ export const NOTIFICATION_TYPES: NotificationType[] = [
  *  This is the PRIMARY anti-spam mechanism. */
 export const TYPE_COOLDOWNS_MS: Record<NotificationType, number> = {
   checkin:        8 * 60 * 60 * 1000,  // 8 hours — max 1 check-in nudge per half-day
+  daily:          24 * 60 * 60 * 1000,  // 24 hours — once per day
   weekly_recap:   7 * 24 * 60 * 60 * 1000, // 7 days — once per week
   comeback:       72 * 60 * 60 * 1000,  // 72 hours — 3 days minimum between comeback
   reflection:     24 * 60 * 60 * 1000,  // 24 hours — once per day
@@ -44,6 +47,7 @@ export const TYPE_COOLDOWNS_MS: Record<NotificationType, number> = {
  */
 export const TYPE_WEEKLY_CAPS: Record<NotificationType, number> = {
   checkin:        3,   // at most 3 check-in nudges per week
+  daily:          5,   // at most 5 daily reminders per week (weekdays)
   weekly_recap:   1,   // once per week (hard cap)
   comeback:       1,   // at most 1 comeback per week
   reflection:     2,   // at most 2 reflections per week

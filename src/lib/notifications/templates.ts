@@ -146,8 +146,50 @@ const REFLECTION_TEMPLATES: NotificationTemplate[] = [
   },
 ];
 
+// Daily reminders: calm, emotional, presence-oriented.
+// NOT about doing something — about being here.
+// Midday context: the day is happening, pause for a breath.
+const DAILY_TEMPLATES: NotificationTemplate[] = [
+  {
+    title: 'Un momento',
+    body: 'Aquí estás. Eso basta.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Presencia',
+    body: 'No tienes que hacer nada. Solo notar.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Aquí y ahora',
+    body: 'Un segundo de quietud.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Simplemente',
+    body: 'Estar es suficiente.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Respira',
+    body: 'Un instante. Nada más.',
+    url: '/dashboard',
+  },
+  {
+    title: 'Pausa',
+    body: 'El día sigue. Tú también.',
+    url: '/dashboard',
+  },
+  {
+    title: 'En medio',
+    body: 'Del ruido, un silencio pequeño.',
+    url: '/dashboard',
+  },
+];
+
 const TEMPLATE_MAP: Record<NotificationType, NotificationTemplate[]> = {
   checkin:      CHECKIN_TEMPLATES,
+  daily:        DAILY_TEMPLATES,
   weekly_recap: WEEKLY_RECAP_TEMPLATES,
   comeback:     COMEBACK_TEMPLATES,
   reflection:   REFLECTION_TEMPLATES,

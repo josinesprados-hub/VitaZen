@@ -10,5 +10,17 @@ export {
   checkReflectionEligibility,
   sendReflectionReminder,
   processReflectionBatch,
+  hasCheckedInToday,
+  isUserCurrentlyActive,
 } from './reminders/reflection';
+export {
+  checkCheckinEligibility,
+  sendCheckinReminder,
+  processCheckinBatch,
+} from './reminders/checkin';
+export {
+  checkDailyEligibility,
+  sendDailyReminder,
+  processDailyBatch,
+} from './reminders/daily';
 export * from './types';

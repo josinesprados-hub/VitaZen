@@ -5,6 +5,14 @@
       "schedule": "0 8 * * 1"
     },
     {
+      "path": "/api/cron/checkin-reminder",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/daily-reminder",
+      "schedule": "0 11 * * *"
+    },
+    {
       "path": "/api/cron/reflection-reminder",
       "schedule": "0 18 * * *"
     },
