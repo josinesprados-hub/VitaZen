@@ -12,6 +12,7 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { MicroReward } from '@/components/ui/MicroReward';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 interface Habit {
   id: string;
@@ -353,7 +354,7 @@ export default function DisciplinaPage() {
                 <div className="flex items-center gap-1.5">
                   {habit.streak > 0 && (
                     <span className="flex items-center gap-1 text-champagne text-xs mr-1">
-                      <Flame size={14} /> {habit.streak}
+                      <Flame size={14} /> <PrivacyMask compact>{habit.streak}</PrivacyMask>
                     </span>
                   )}
                   <div className="flex items-center gap-1 flex-shrink-0">

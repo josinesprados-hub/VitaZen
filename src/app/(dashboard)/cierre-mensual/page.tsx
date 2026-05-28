@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
 import { Circle, ArrowLeft } from 'lucide-react';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
 import {
@@ -311,20 +312,22 @@ export default function CierreMensualPage() {
         <div className="mt-6">
           <h2 className="text-[11px] text-[#444] mb-2 tracking-wide">{RHYTHM_TITLE}</h2>
           <p className="text-[#888] text-sm italic">{digest.rhythm.rhythmLabel}</p>
-          <div className="flex flex-wrap gap-3 mt-2">
-            {digest.rhythm.checkinDays > 0 && (
-              <span className="text-[9px] text-[#444]">{digest.rhythm.checkinDays} check-ins</span>
-            )}
-            {digest.rhythm.financeLogs > 0 && (
-              <span className="text-[9px] text-[#444]">{digest.rhythm.financeLogs} registros financieros</span>
-            )}
-            {digest.rhythm.journalEntries > 0 && (
-              <span className="text-[9px] text-[#444]">{digest.rhythm.journalEntries} entradas</span>
-            )}
-            {digest.rhythm.meditationSessions > 0 && (
-              <span className="text-[9px] text-[#444]">{digest.rhythm.meditationSessions} meditaciones</span>
-            )}
-          </div>
+          <PrivacyMask compact>
+            <div className="flex flex-wrap gap-3 mt-2">
+              {digest.rhythm.checkinDays > 0 && (
+                <span className="text-[9px] text-[#444]">{digest.rhythm.checkinDays} check-ins</span>
+              )}
+              {digest.rhythm.financeLogs > 0 && (
+                <span className="text-[9px] text-[#444]">{digest.rhythm.financeLogs} registros financieros</span>
+              )}
+              {digest.rhythm.journalEntries > 0 && (
+                <span className="text-[9px] text-[#444]">{digest.rhythm.journalEntries} entradas</span>
+              )}
+              {digest.rhythm.meditationSessions > 0 && (
+                <span className="text-[9px] text-[#444]">{digest.rhythm.meditationSessions} meditaciones</span>
+              )}
+            </div>
+          </PrivacyMask>
         </div>
       )}
 
@@ -364,35 +367,37 @@ function IntentionBar({ balance }: { balance: IntentionBalance }) {
 
   return (
     <div>
-      {/* Bar */}
-      <div className="flex h-2 rounded-full overflow-hidden bg-[#111] gap-px">
-        {segments.map(seg => (
-          <div
-            key={seg.key}
-            className="rounded-full transition-all duration-500"
-            style={{
-              width: `${(seg.value / total) * 100}%`,
-              backgroundColor: INTENTION_LABELS[seg.key]?.color || '#555',
-              opacity: 0.7,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Labels */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
-        {segments.map(seg => (
-          <div key={seg.key} className="flex items-center gap-1.5">
+      <PrivacyMask compact>
+        {/* Bar */}
+        <div className="flex h-2 rounded-full overflow-hidden bg-[#111] gap-px">
+          {segments.map(seg => (
             <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: INTENTION_LABELS[seg.key]?.color || '#555', opacity: 0.7 }}
+              key={seg.key}
+              className="rounded-full transition-all duration-500"
+              style={{
+                width: `${(seg.value / total) * 100}%`,
+                backgroundColor: INTENTION_LABELS[seg.key]?.color || '#555',
+                opacity: 0.7,
+              }}
             />
-            <span className="text-[10px] text-[#666]">
-              {INTENTION_LABELS[seg.key]?.label || seg.key} · {seg.value}
-            </span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+
+        {/* Labels */}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+          {segments.map(seg => (
+            <div key={seg.key} className="flex items-center gap-1.5">
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: INTENTION_LABELS[seg.key]?.color || '#555', opacity: 0.7 }}
+              />
+              <span className="text-[10px] text-[#666]">
+                {INTENTION_LABELS[seg.key]?.label || seg.key} · {seg.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </PrivacyMask>
     </div>
   );
 }
@@ -410,40 +415,42 @@ function FinancialDisplay({ financial }: { financial: FinancialSummary }) {
 
   return (
     <div>
-      {/* Balance */}
-      <div className="flex items-baseline justify-between mb-4">
-        <span className="text-[#666] text-xs">Balance</span>
-        <span className={`text-lg font-light ${financial.balance >= 0 ? 'text-white' : 'text-white/70'}`}>
-          {fmt(financial.balance)}
-        </span>
-      </div>
-
-      {/* Income / Expenses */}
-      <div className="flex gap-6 mb-4">
-        <div>
-          <p className="text-[10px] text-[#555] mb-0.5">Ingresos</p>
-          <p className="text-sm text-white/80">{fmt(financial.income)}</p>
+      <PrivacyMask compact>
+        {/* Balance */}
+        <div className="flex items-baseline justify-between mb-4">
+          <span className="text-[#666] text-xs">Balance</span>
+          <span className={`text-lg font-light ${financial.balance >= 0 ? 'text-white' : 'text-white/70'}`}>
+            {fmt(financial.balance)}
+          </span>
         </div>
-        <div>
-          <p className="text-[10px] text-[#555] mb-0.5">Gastos</p>
-          <p className="text-sm text-white/80">{fmt(financial.expenses)}</p>
-        </div>
-      </div>
 
-      {/* Top categories — calm, not ranked */}
-      {financial.topCategories.length > 0 && (
-        <div className="border-t border-[#1a1a1a] pt-3 mt-3">
-          <p className="text-[10px] text-[#444] mb-2">Categorías con más movimiento</p>
-          <div className="space-y-1.5">
-            {financial.topCategories.slice(0, 3).map((cat, i) => (
-              <div key={i} className="flex items-center justify-between">
-                <span className="text-xs text-[#777]">{cat.category}</span>
-                <span className="text-xs text-[#555]">{fmt(cat.amount)}</span>
-              </div>
-            ))}
+        {/* Income / Expenses */}
+        <div className="flex gap-6 mb-4">
+          <div>
+            <p className="text-[10px] text-[#555] mb-0.5">Ingresos</p>
+            <p className="text-sm text-white/80">{fmt(financial.income)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-[#555] mb-0.5">Gastos</p>
+            <p className="text-sm text-white/80">{fmt(financial.expenses)}</p>
           </div>
         </div>
-      )}
+
+        {/* Top categories — calm, not ranked */}
+        {financial.topCategories.length > 0 && (
+          <div className="border-t border-[#1a1a1a] pt-3 mt-3">
+            <p className="text-[10px] text-[#444] mb-2">Categorías con más movimiento</p>
+            <div className="space-y-1.5">
+              {financial.topCategories.slice(0, 3).map((cat, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <span className="text-xs text-[#777]">{cat.category}</span>
+                  <span className="text-xs text-[#555]">{fmt(cat.amount)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </PrivacyMask>
     </div>
   );
 }

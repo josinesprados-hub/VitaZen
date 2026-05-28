@@ -15,6 +15,7 @@ import PremiumReflection from '@/components/ui/PremiumReflection';
 import { MonthlyClosurePrompt } from './MonthlyClosurePrompt';
 
 import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise, Calendar } from 'lucide-react';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 interface EmpireData {
   empire: string;
@@ -260,16 +261,20 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm text-[#666] group-hover:text-[#999] transition-colors">{config.name}</h3>
-                        <span className="text-[10px] text-[#333]">Nivel {level}</span>
+                        <PrivacyMask compact>
+                          <span className="text-[10px] text-[#333]">Nivel {level}</span>
+                        </PrivacyMask>
                       </div>
                       {/* Subtle progress — presence, not performance */}
                       {progress > 0 && (
-                        <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full">
-                          <div
-                            className="h-full bg-champagne/15 rounded-full transition-all duration-700"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
+                        <PrivacyMask compact>
+                          <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full">
+                            <div
+                              className="h-full bg-champagne/15 rounded-full transition-all duration-700"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        </PrivacyMask>
                       )}
                     </div>
                   </Link>

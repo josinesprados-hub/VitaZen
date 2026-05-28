@@ -18,6 +18,7 @@ import {
   Pencil,
   Trash2,
 } from 'lucide-react';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -287,19 +288,21 @@ export default function CheckinPage() {
               <p className="text-champagne/80 text-xs italic">«{todayCheckin.intention}»</p>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { label: 'Emoción', val: todayCheckin.emotion },
-              { label: 'Energía', val: todayCheckin.energy },
-              { label: 'Enfoque', val: todayCheckin.focus },
-              { label: 'Estrés', val: todayCheckin.stress },
-            ].map((item) => (
-              <div key={item.label} className="text-center">
-                <p className="text-sm font-medium text-champagne/70">{item.val}<span className="text-[10px] text-[#444]">/5</span></p>
-                <p className="text-[10px] text-[#444]">{item.label}</p>
-              </div>
-            ))}
-          </div>
+          <PrivacyMask compact>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { label: 'Emoción', val: todayCheckin.emotion },
+                { label: 'Energía', val: todayCheckin.energy },
+                { label: 'Enfoque', val: todayCheckin.focus },
+                { label: 'Estrés', val: todayCheckin.stress },
+              ].map((item) => (
+                <div key={item.label} className="text-center">
+                  <p className="text-sm font-medium text-champagne/70">{item.val}<span className="text-[10px] text-[#444]">/5</span></p>
+                  <p className="text-[10px] text-[#444]">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </PrivacyMask>
           {todayCheckin.note && (
             <p className="text-[11px] text-[#555] mt-2.5 border-t border-[#1a1a1a] pt-2.5">{todayCheckin.note}</p>
           )}
@@ -315,25 +318,27 @@ export default function CheckinPage() {
             <span className="text-[11px] text-[#555]">últimos {trends.totalDays} días</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {METRIC_CONFIG.map((metric) => {
-              const Icon = metric.icon;
-              const val = (trends as any)[metric.key] as number;
-              return (
-                <div
-                  key={metric.key}
-                  className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3 hover:border-champagne/15 transition-colors touch-press"
-                >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Icon size={12} className="text-champagne/60" />
-                    <span className="label-discrete">{metric.label}</span>
+          <PrivacyMask compact>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {METRIC_CONFIG.map((metric) => {
+                const Icon = metric.icon;
+                const val = (trends as any)[metric.key] as number;
+                return (
+                  <div
+                    key={metric.key}
+                    className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3 hover:border-champagne/15 transition-colors touch-press"
+                  >
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Icon size={12} className="text-champagne/60" />
+                      <span className="label-discrete">{metric.label}</span>
+                    </div>
+                    <p className="text-lg font-semibold text-white mb-1.5">{val.toFixed(1)}<span className="text-[10px] text-[#444]">/5</span></p>
+                    <MiniBarChart data={trends.daily} metricKey={metric.key} />
                   </div>
-                  <p className="text-lg font-semibold text-white mb-1.5">{val.toFixed(1)}<span className="text-[10px] text-[#444]">/5</span></p>
-                  <MiniBarChart data={trends.daily} metricKey={metric.key} />
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </PrivacyMask>
         </div>
       )}
 
@@ -374,18 +379,20 @@ export default function CheckinPage() {
                       <span className="text-[11px] text-[#888]">{formatDate(c.date)}</span>
                       <span className="text-champagne/70 text-[11px] font-medium truncate">«{c.intention}»</span>
                     </div>
-                    <div className="flex gap-3 mt-0.5">
-                      {[
-                        { label: 'Emoción', val: c.emotion },
-                        { label: 'Energía', val: c.energy },
-                        { label: 'Enfoque', val: c.focus },
-                        { label: 'Estrés', val: c.stress },
-                      ].map((item) => (
-                        <span key={item.label} className="text-[10px] text-[#444]">
-                          {item.label} <span className="text-champagne/60">{item.val}</span>
-                        </span>
-                      ))}
-                    </div>
+                    <PrivacyMask compact>
+                      <div className="flex gap-3 mt-0.5">
+                        {[
+                          { label: 'Emoción', val: c.emotion },
+                          { label: 'Energía', val: c.energy },
+                          { label: 'Enfoque', val: c.focus },
+                          { label: 'Estrés', val: c.stress },
+                        ].map((item) => (
+                          <span key={item.label} className="text-[10px] text-[#444]">
+                            {item.label} <span className="text-champagne/60">{item.val}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </PrivacyMask>
                     {c.note && <p className="text-[10px] text-[#3a3a3a] mt-0.5 truncate">{c.note}</p>}
                   </div>
                   <div className="flex items-center gap-0.5 flex-shrink-0">

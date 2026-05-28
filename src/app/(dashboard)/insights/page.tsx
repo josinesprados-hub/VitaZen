@@ -12,6 +12,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import { formatCurrency } from '@/lib/utils';
 import ContextualHelp from '@/components/ui/ContextualHelp';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 import {
   SCREENSHOT_INSIGHTS_SUMMARY,
   SCREENSHOT_INSIGHTS_LIST,
@@ -260,6 +261,7 @@ export default function InsightsPage() {
 
       {/* Wellness Score Card — clickable to checkin */}
       <div onClick={() => router.push('/checkin')} className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press">
+        <PrivacyMask>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Activity size={22} className="text-champagne" />
@@ -309,6 +311,7 @@ export default function InsightsPage() {
             </Link>
           ))}
         </div>
+        </PrivacyMask>
       </div>
 
       {/* Weekly Comparison — PREMIUM gated with blur, each trend card navigates */}
@@ -319,6 +322,7 @@ export default function InsightsPage() {
             <h2 className="title-section">Semana a semana</h2>
             <span className="text-[10px] text-champagne/60">vs. semana anterior</span>
           </div>
+          <PrivacyMask compact>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <Link href="/checkin" className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
               <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Emociones</p>
@@ -345,6 +349,7 @@ export default function InsightsPage() {
               <TrendIndicator value={comparison?.habitTrend ?? 0} label={`${(comparison?.habitTrend ?? 0) > 0 ? '+' : ''}${comparison?.habitTrend ?? 0}`} />
             </Link>
           </div>
+          </PrivacyMask>
         </div>
       </PremiumGate>
 
@@ -403,6 +408,7 @@ export default function InsightsPage() {
             premiumLabel="Más detalle"
           />
         </div>
+        <PrivacyMask compact>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Check-ins */}
           <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-champagne/20 transition-colors cursor-pointer group">
@@ -551,6 +557,7 @@ export default function InsightsPage() {
             <p className="text-[10px] text-[#555] mt-1">acciones totales esta semana</p>
           </Link>
         </div>
+        </PrivacyMask>
       </div>
 
       {/* Subtle Premium CTA for FREE users — hidden in screenshot mode */}

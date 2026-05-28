@@ -50,10 +50,11 @@ export async function PUT(request: NextRequest) {
     const { weeklyEmailSummary, dailyReminders, privacyStatsVisible } = body;
 
     // AUDIT NOTE (settings):
-    //   weeklyEmailSummary → CONSUMED by weekly-recap-sender.ts (cron)
-    //   dailyReminders     → PLACEBO: stored but NEVER read by any backend logic
-    //   privacyStatsVisible → PLACEBO: stored but NEVER read by any backend logic
-    //   No comparison/social feature exists that reads privacyStatsVisible.
+    //   weeklyEmailSummary  → CONSUMED by weekly-recap-sender.ts (cron)
+    //   dailyReminders      → PLACEBO: stored but NEVER read by any backend logic
+    //   privacyStatsVisible → CONSUMED by usePrivacy() hook → <PrivacyMask> component
+    //     Controls visual masking of personal metrics (scores, streaks, counts, balances).
+    //     When false (= private), sensitive numbers are gently blurred in the UI.
 
     // Only accept boolean values for settings
     const data: Record<string, boolean> = {};

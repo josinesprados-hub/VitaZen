@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_MOMENTUM } from '@/lib/screenshot-data';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 interface MomentumData {
   score: number;
@@ -112,20 +113,24 @@ export function MomentumCard() {
       </div>
 
       {/* Score bar */}
-      <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2 overflow-hidden mb-1.5 sm:mb-2">
-        <div
-          className={`h-1.5 sm:h-2 rounded-full transition-all duration-1000 ease-out ${barColor}`}
-          style={{ width: `${data.score}%` }}
-        />
-      </div>
+      <PrivacyMask compact>
+        <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 sm:h-2 overflow-hidden mb-1.5 sm:mb-2">
+          <div
+            className={`h-1.5 sm:h-2 rounded-full transition-all duration-1000 ease-out ${barColor}`}
+            style={{ width: `${data.score}%` }}
+          />
+        </div>
+      </PrivacyMask>
 
       <div className="flex items-center justify-between">
         <p className="text-[10px] sm:text-xs text-[#999]">{data.description}</p>
-        {data.currentStreak > 0 && (
-          <span className="text-[10px] sm:text-xs text-champagne flex items-center gap-1">
-            {data.currentStreak}d
-          </span>
-        )}
+        <PrivacyMask compact>
+          {data.currentStreak > 0 && (
+            <span className="text-[10px] sm:text-xs text-champagne flex items-center gap-1">
+              {data.currentStreak}d
+            </span>
+          )}
+        </PrivacyMask>
       </div>
     </div>
   );

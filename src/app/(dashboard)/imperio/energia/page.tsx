@@ -9,6 +9,7 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 interface WellnessLog {
   id: string;
@@ -352,9 +353,9 @@ export default function EnergiaPage() {
                     </div>
                     <div>
                       <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
-                        <span className="text-champagne">Ánimo: {log.mood}</span>
-                        <span className="text-champagne">Energía: {log.energy}</span>
-                        <span className="text-champagne">Sueño: {log.sleep}</span>
+                        <span className="text-champagne">Ánimo: <PrivacyMask compact>{log.mood}</PrivacyMask></span>
+                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+                        <span className="text-champagne">Sueño: <PrivacyMask compact>{log.sleep}</PrivacyMask></span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -429,8 +430,8 @@ export default function EnergiaPage() {
                     </div>
                     <div>
                       <div className="flex gap-2 text-xs mb-1">
-                        <span className="flex items-center gap-1 text-champagne"><Droplets size={12} /> {log.water}</span>
-                        <span className="text-champagne">{log.calories || 0} kcal</span>
+                        <span className="flex items-center gap-1 text-champagne"><Droplets size={12} /> <PrivacyMask compact>{log.water}</PrivacyMask></span>
+                        <span className="text-champagne"><PrivacyMask compact>{log.calories || 0}</PrivacyMask> kcal</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>

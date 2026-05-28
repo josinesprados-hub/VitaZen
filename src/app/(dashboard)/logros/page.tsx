@@ -37,6 +37,7 @@ import {
   RotateCcw,
   Zap,
 } from 'lucide-react';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -248,28 +249,30 @@ export default function LogrosPage() {
 
       {/* Stats Bar */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-6 mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center">
-              <Crown size={20} className="text-champagne" />
+        <PrivacyMask>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center">
+                <Crown size={20} className="text-champagne" />
+              </div>
+              <div>
+                <p className="text-white font-semibold">Camino</p>
+                <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} momentos recordados</p>
+              </div>
             </div>
-            <div>
-              <p className="text-white font-semibold">Camino</p>
-              <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} momentos recordados</p>
-            </div>
+            <span className="text-2xl font-bold text-champagne">{data.stats.percent}%</span>
           </div>
-          <span className="text-2xl font-bold text-champagne">{data.stats.percent}%</span>
-        </div>
-        <div className="w-full bg-[#1a1a1a] rounded-full h-3 overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-champagne to-champagne-hover h-3 rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${data.stats.percent}%` }}
-          />
-        </div>
-        <p className="text-[10px] text-[#555] flex items-center gap-1 mt-3">
-          <Circle size={3} fill="currentColor" className="text-champagne/30" />
-          Más con el tiempo
-        </p>
+          <div className="w-full bg-[#1a1a1a] rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-champagne to-champagne-hover h-3 rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${data.stats.percent}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-[#555] flex items-center gap-1 mt-3">
+            <Circle size={3} fill="currentColor" className="text-champagne/30" />
+            Más con el tiempo
+          </p>
+        </PrivacyMask>
       </div>
 
       {/* Filters */}
@@ -415,24 +418,26 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
           </p>
 
           {/* Progress */}
-          <div className="mt-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] text-[#555]">
-                {achievement.current}/{achievement.target}
-              </span>
-              <span className={`text-[10px] font-semibold ${isUnlocked ? 'text-champagne' : 'text-[#444]'}`}>
-                {achievement.percent}%
-              </span>
+          <PrivacyMask compact>
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] text-[#555]">
+                  {achievement.current}/{achievement.target}
+                </span>
+                <span className={`text-[10px] font-semibold ${isUnlocked ? 'text-champagne' : 'text-[#444]'}`}>
+                  {achievement.percent}%
+                </span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
+                <div
+                  className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
+                    isUnlocked ? 'bg-champagne' : 'bg-[#333]'
+                  }`}
+                  style={{ width: `${achievement.percent}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
-              <div
-                className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
-                  isUnlocked ? 'bg-champagne' : 'bg-[#333]'
-                }`}
-                style={{ width: `${achievement.percent}%` }}
-              />
-            </div>
-          </div>
+          </PrivacyMask>
 
           {/* Unlocked date — subtle, like a memory */}
           {isUnlocked && achievement.unlockedAt && (
@@ -479,22 +484,24 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
           </p>
 
           {/* Progress — shows it's real, not imaginary */}
-          <div className="mt-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] text-[#555]">
-                {achievement.current}/{achievement.target}
-              </span>
-              <span className="text-[10px] font-semibold text-champagne/50">
-                {achievement.percent}%
-              </span>
+          <PrivacyMask compact>
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] text-[#555]">
+                  {achievement.current}/{achievement.target}
+                </span>
+                <span className="text-[10px] font-semibold text-champagne/50">
+                  {achievement.percent}%
+                </span>
+              </div>
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-1.5 rounded-full bg-champagne/30 transition-all duration-700 ease-out"
+                  style={{ width: `${achievement.percent}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
-              <div
-                className="h-1.5 rounded-full bg-champagne/30 transition-all duration-700 ease-out"
-                style={{ width: `${achievement.percent}%` }}
-              />
-            </div>
-          </div>
+          </PrivacyMask>
         </div>
       </div>
     </div>

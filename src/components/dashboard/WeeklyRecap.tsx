@@ -25,6 +25,7 @@ import {
   Circle,
 } from 'lucide-react';
 import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 
 // ─────────────────────────────────────────
 // Types (match API response)
@@ -336,6 +337,7 @@ export function WeeklyRecap() {
 
           {/* Mobile: compact score row — only visible on mobile */}
           <div className="flex sm:hidden items-center gap-3 mt-3 pt-3 border-t border-[#1a1a1a]/60">
+            <PrivacyMask compact>
             <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
               <svg className="absolute inset-0 -rotate-90" viewBox="0 0 48 48">
                 <circle cx="24" cy="24" r={mobileScoreRadius} fill="none" stroke="#1a1a1a" strokeWidth="3" />
@@ -356,6 +358,7 @@ export function WeeklyRecap() {
               <p className="text-xs text-white font-medium">{data.scoreLabel}</p>
               <p className="text-[10px] text-[#666]">{data.progress.totalActivities} acciones</p>
             </div>
+            </PrivacyMask>
             <Link
               href="/insights"
               className="text-[10px] text-champagne hover:underline flex items-center gap-1 transition-colors"
@@ -371,6 +374,7 @@ export function WeeklyRecap() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
             {/* Wellness Score — clickable to insights */}
             <Link href="/insights" className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 flex items-center gap-3 sm:gap-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press">
+            <PrivacyMask>
               <div className="relative w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
                 <svg className="absolute inset-0 -rotate-90" viewBox="0 0 96 96">
                   <circle
@@ -408,6 +412,7 @@ export function WeeklyRecap() {
                 </div>
               </div>
               <ArrowRight size={14} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0" />
+            </PrivacyMask>
             </Link>
 
             {/* Emotional State — PREMIUM details */}
@@ -425,6 +430,7 @@ export function WeeklyRecap() {
                 <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                   {data.emotionalState.statusDescription}
                 </p>
+                <PrivacyMask compact>
                 <div className="space-y-2 sm:space-y-3">
                   {emotionalMetrics.map((metric) => {
                     const Icon = metric.icon;
@@ -447,6 +453,7 @@ export function WeeklyRecap() {
                     );
                   })}
                 </div>
+                </PrivacyMask>
               </div>
             </PremiumGate>
           </div>
@@ -459,6 +466,7 @@ export function WeeklyRecap() {
                 <Flame size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                 <p className="text-xs sm:text-sm font-semibold text-white">Tu actividad</p>
               </div>
+              <PrivacyMask compact>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {progressItems.map((item) => {
                   const Icon = item.icon;
@@ -478,6 +486,7 @@ export function WeeklyRecap() {
                   );
                 })}
               </div>
+              </PrivacyMask>
             </div>
 
             {/* Top Habits */}
@@ -487,6 +496,7 @@ export function WeeklyRecap() {
                 <p className="text-xs sm:text-sm font-semibold text-white">Hábitos más consistentes</p>
               </div>
               {data.topHabits.length > 0 ? (
+                <PrivacyMask compact>
                 <div className="space-y-2 sm:space-y-3">
                   {data.topHabits.map((habit, idx) => (
                     <Link
@@ -513,6 +523,7 @@ export function WeeklyRecap() {
                     </Link>
                   ))}
                 </div>
+                </PrivacyMask>
               ) : (
                 <div className="text-center py-4 sm:py-6">
                   <CheckCircle size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
@@ -532,6 +543,7 @@ export function WeeklyRecap() {
                   <TrendingUp size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
                   <p className="text-xs sm:text-sm font-semibold text-white">Evolución vs. semana anterior</p>
                 </div>
+                <PrivacyMask compact>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
                     <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Emociones</p>
@@ -570,6 +582,7 @@ export function WeeklyRecap() {
                     </div>
                   </Link>
                 </div>
+                </PrivacyMask>
               </div>
             </PremiumGate>
 

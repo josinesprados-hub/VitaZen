@@ -22,7 +22,7 @@ model User {
   bio               String?
   weeklyEmailSummary Boolean @default(true)    // REAL: consumed by weekly-recap-sender cron
   dailyReminders    Boolean @default(false)   // PLACEBO: stored but never consumed by any backend logic
-  privacyStatsVisible Boolean @default(false) // PLACEBO: stored but never consumed by any backend logic (no social/comparison feature exists)
+  privacyStatsVisible Boolean @default(false) // REAL: controls visual masking of personal metrics (scores, streaks, counts, balances) via <PrivacyMask>
   plan              String   @default("FREE") // FREE | PREMIUM
   stripeCustomerId  String?  @unique
   emailVerified     Boolean  @default(false)

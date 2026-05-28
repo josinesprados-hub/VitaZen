@@ -213,8 +213,9 @@ export default function AjustesPage() {
       <NotificationPreferences />
 
       {/* Privacy Section */}
-      {/* AUDIT NOTE: 'Mostrar estadísticas' is PLACEBO — stored in DB but never read by any
-          backend logic. No comparison/social feature exists that uses privacyStatsVisible. */}
+      {/* REAL: privacyStatsVisible now controls whether personal metrics (scores, streaks,
+          counts, balances) are visually masked in the UI. When false (= private), sensitive
+          numbers are gently blurred via <PrivacyMask>. Emotional content stays visible. */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Shield size={14} />
@@ -230,7 +231,7 @@ export default function AjustesPage() {
             <div>
               <p className="text-sm text-white font-medium">Mostrar estadísticas</p>
               <p className="text-xs text-[#999] mt-0.5">
-                Tus datos visibles en comparaciones
+                Muestra métricas, puntuaciones y rachas
               </p>
             </div>
           </div>

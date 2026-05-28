@@ -12,6 +12,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 import { formatCurrency } from '@/lib/utils';
 
 // ═══════════════════════════════════════════
@@ -320,26 +321,28 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
   if (!hasData) return null;
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {flows.map((flow) => {
-        if (flow.amount <= 0) return null;
-        const barWidth = maxAmount > 0 ? (flow.amount / maxAmount) * 100 : 0;
-        return (
-          <div key={flow.intention} className="space-y-2">
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm sm:text-base text-[#aaa] tracking-wide">{flow.label}</span>
-              <span className="text-xs sm:text-sm text-[#666] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
+    <PrivacyMask compact>
+      <div className="space-y-5 sm:space-y-6">
+        {flows.map((flow) => {
+          if (flow.amount <= 0) return null;
+          const barWidth = maxAmount > 0 ? (flow.amount / maxAmount) * 100 : 0;
+          return (
+            <div key={flow.intention} className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm sm:text-base text-[#aaa] tracking-wide">{flow.label}</span>
+                <span className="text-xs sm:text-sm text-[#666] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
+              </div>
+              <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-champagne/25 transition-all duration-700"
+                  style={{ width: `${Math.max(barWidth, 0)}%` }}
+                />
+              </div>
             </div>
-            <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-champagne/25 transition-all duration-700"
-                style={{ width: `${Math.max(barWidth, 0)}%` }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </PrivacyMask>
   );
 }
 
@@ -941,16 +944,18 @@ export default function RiquezaPage() {
       {/* ── 2. Saldo neto — reserved space, invisible when empty ── */}
       {!isEmpty && currentMonthLogs.length > 0 && (
         <div className="py-1">
-          <div className="flex items-baseline gap-3">
-            <span className={`text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums tracking-tight ${cmBalance >= 0 ? 'text-white' : 'text-champagne-warm'}`}>
-              {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
-            </span>
-          </div>
-          <div className="flex items-center gap-3 mt-2">
-            {cmIncome > 0 && <span className="text-xs sm:text-sm text-[#777]">+{formatCurrency(cmIncome)} ingresos</span>}
-            {cmIncome > 0 && cmExpense > 0 && <span className="text-[#222] text-xs">·</span>}
-            {cmExpense > 0 && <span className="text-xs sm:text-sm text-[#777]">{formatCurrency(cmExpense)} gastos</span>}
-          </div>
+          <PrivacyMask compact>
+            <div className="flex items-baseline gap-3">
+              <span className={`text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums tracking-tight ${cmBalance >= 0 ? 'text-white' : 'text-champagne-warm'}`}>
+                {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mt-2">
+              {cmIncome > 0 && <span className="text-xs sm:text-sm text-[#777]">+{formatCurrency(cmIncome)} ingresos</span>}
+              {cmIncome > 0 && cmExpense > 0 && <span className="text-[#222] text-xs">·</span>}
+              {cmExpense > 0 && <span className="text-xs sm:text-sm text-[#777]">{formatCurrency(cmExpense)} gastos</span>}
+            </div>
+          </PrivacyMask>
         </div>
       )}
 
@@ -1069,9 +1074,11 @@ export default function RiquezaPage() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-champagne' : 'text-red-400'}`}>
-                              {log.type === 'income' ? '+' : '-'}{formatCurrency(log.amount)}
-                            </p>
+                            <PrivacyMask compact>
+                              <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-champagne' : 'text-red-400'}`}>
+                                {log.type === 'income' ? '+' : '-'}{formatCurrency(log.amount)}
+                              </p>
+                            </PrivacyMask>
                             <div className="flex items-center gap-1 flex-shrink-0">
                               <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
                               <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>

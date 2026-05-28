@@ -8,6 +8,7 @@ import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
+import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import {
@@ -368,12 +369,12 @@ export default function TimelinePage() {
                                 <span className={`text-[11px] font-medium ${
                                   item.meta.financeType === 'income' ? 'text-[#8bc78b]/70' : 'text-red-400/70'
                                 }`}>
-                                  {item.meta.financeType === 'income' ? '+' : '-'}{formatCurrency(Number(item.meta.amount))}
+                                  {item.meta.financeType === 'income' ? '+' : '-'}<PrivacyMask compact>{formatCurrency(Number(item.meta.amount))}</PrivacyMask>
                                 </span>
                               )}
                               {item.type === 'habits' && item.meta.streak > 0 && (
                                 <span className="text-[10px] text-[#c7a98b]/50">
-                                  {item.meta.streak}d
+                                  <PrivacyMask compact>{item.meta.streak}</PrivacyMask>d
                                 </span>
                               )}
                             </div>
@@ -407,7 +408,7 @@ export default function TimelinePage() {
                                 <span className={`inline-flex items-center mt-2 text-xs font-medium ${
                                   item.meta.financeType === 'income' ? 'text-[#8bc78b]/80' : 'text-red-400/80'
                                 }`}>
-                                  {item.meta.financeType === 'income' ? '+' : '-'}{formatCurrency(Number(item.meta.amount))}
+                                  {item.meta.financeType === 'income' ? '+' : '-'}<PrivacyMask compact>{formatCurrency(Number(item.meta.amount))}</PrivacyMask>
                                 </span>
                               )}
 
@@ -421,7 +422,7 @@ export default function TimelinePage() {
                                     { label: 'Estrés', val: item.meta.stress },
                                   ].map(({ label, val }) => (
                                     <span key={label} className="text-[10px] text-[#444]">
-                                      {label} <span className="text-[#666]">{val}</span>
+                                      {label} <span className="text-[#666]"><PrivacyMask compact>{val}</PrivacyMask></span>
                                     </span>
                                   ))}
                                 </div>
