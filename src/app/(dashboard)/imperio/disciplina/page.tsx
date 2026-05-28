@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
@@ -47,6 +47,14 @@ export default function DisciplinaPage() {
   const [fetchError, setFetchError] = useState(false);
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
+  const justCompletedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
+    };
+  }, []);
 
   // Lock body scroll when any modal is open — save/restore scroll position
   useEffect(() => {
@@ -117,7 +125,8 @@ export default function DisciplinaPage() {
         setHabits(prev => prev.map(h => h.id === habitId ? data.habit : h));
         setJustCompletedId(habitId);
         setShowReward(true);
-        setTimeout(() => setJustCompletedId(null), 600);
+        if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
+        justCompletedTimerRef.current = setTimeout(() => setJustCompletedId(null), 600);
       }
     } catch (error) {
       console.error('Error completing habit:', error);

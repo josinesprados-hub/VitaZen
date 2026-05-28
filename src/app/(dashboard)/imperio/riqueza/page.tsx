@@ -487,6 +487,14 @@ export default function RiquezaPage() {
   const [toast, setToast] = useState({ show: false, message: '' });
   const [quickMode, setQuickMode] = useState(true);
   const addFormRef = useRef<HTMLDivElement>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup toast timer on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   // Hydration guard — only render date-dependent content after mount
   useEffect(() => {
@@ -495,8 +503,12 @@ export default function RiquezaPage() {
   }, []);
 
   const showToast = useCallback((message: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ show: true, message });
-    setTimeout(() => setToast({ show: false, message: '' }), 2000);
+    toastTimerRef.current = setTimeout(() => {
+      setToast({ show: false, message: '' });
+      toastTimerRef.current = null;
+    }, 2000);
   }, []);
 
   useEffect(() => {

@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onHabitChange } from '@/lib/widgets/triggers';
+import { getTodayDateKey } from '@/lib/deterministic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,15 +71,22 @@ export async function PATCH(request: NextRequest) {
     const habit = await db.habitLog.findFirst({ where: { id: habitId, userId: user.id } });
     if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
 
-    const today = new Date();
+    // Use Europe/Madrid timezone for day boundary calculation.
+    // Without this, a user completing a habit at 00:30 Madrid (23:30 UTC)
+    // would be considered "same day" as yesterday, breaking streak logic.
+    const todayDateKey = getTodayDateKey();
     const lastCompleted = habit.lastCompletedAt;
     let newStreak = habit.streak;
 
     if (lastCompleted) {
-      const diffDays = Math.floor((today.getTime() - new Date(lastCompleted).getTime()) / (1000 * 60 * 60 * 24));
-      if (diffDays === 0) {
+      const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
+      if (lastDateKey === todayDateKey) {
         return NextResponse.json({ error: 'Already completed today' }, { status: 400 });
       }
+      // Compute day diff using date keys (timezone-aware)
+      const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
+      const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
+      const diffDays = Math.round((todayMs - lastMs) / 86400000);
       newStreak = diffDays === 1 ? habit.streak + 1 : 1;
     } else {
       newStreak = 1;
@@ -86,7 +94,7 @@ export async function PATCH(request: NextRequest) {
 
     const updated = await db.habitLog.update({
       where: { id: habitId },
-      data: { streak: newStreak, lastCompletedAt: today },
+      data: { streak: newStreak, lastCompletedAt: new Date() },
     });
 
     // Track habit completion

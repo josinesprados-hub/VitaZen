@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { startOfDay } from 'date-fns';
+import { getTodayDateKey } from '@/lib/deterministic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const today = startOfDay(new Date());
+    const today = new Date(getTodayDateKey() + 'T00:00:00');
 
     // Check if user already has a challenge for today
     let userChallenge = await db.userChallenge.findFirst({
