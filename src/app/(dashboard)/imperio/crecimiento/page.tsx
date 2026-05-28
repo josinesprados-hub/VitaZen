@@ -7,6 +7,7 @@ import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_JOURNAL_ENTRIES } from '@/lib/screenshot-data';
 import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock, X, Check } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -307,6 +308,13 @@ export default function CrecimientoPage() {
           <p className="subtitle-silent mt-1">Reflexión y evolución</p>
         </div>
       </div>
+
+      {/* Contextual Help — progressive disclosure */}
+      <ContextualHelp
+        storageKey="vitazen_help_crecimiento"
+        title="Crecimiento"
+        text="Escribe en tu diario personal, refleja tu estado de ánimo y agradece. Tu evolución se construye día a día."
+      />
 
       {/* ═══ Journal Section ═══ */}
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">

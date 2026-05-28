@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Brain, Play, Pause, Clock, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil, ArrowLeft, ChevronRight } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -510,6 +511,13 @@ export default function MentePage() {
           <p className="subtitle-silent mt-1">Calma y respiración consciente</p>
         </div>
       </div>
+
+      {/* Contextual Help — progressive disclosure */}
+      <ContextualHelp
+        storageKey="vitazen_help_mente"
+        title="Mente"
+        text="Practica respiración consciente para calmar la mente. Elige una técnica, revisa la guía y empieza tu sesión."
+      />
 
       {/* ─── Breathing Section ─── */}
       <div ref={breathingSectionRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 section-enter-1">

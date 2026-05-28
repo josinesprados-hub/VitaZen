@@ -8,6 +8,7 @@ import {
   ChevronLeft, ChevronRight, CalendarDays, X, Check
 } from 'lucide-react';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
@@ -900,6 +901,13 @@ export default function RiquezaPage() {
           </div>
         </div>
       </div>
+
+      {/* Contextual Help — progressive disclosure */}
+      <ContextualHelp
+        storageKey="vitazen_help_riqueza"
+        title="Finanzas"
+        text="Registra gastos e ingresos con intención. Usa la captura rápida o el formulario completo, y observa cómo fluye tu dinero."
+      />
 
       {/* ═══════════════════════════════════════════
           SINGLE STABLE LAYOUT

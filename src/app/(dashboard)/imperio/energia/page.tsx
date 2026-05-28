@@ -5,6 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { Zap, Droplets, Flame, Apple, Heart, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
+import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
@@ -318,6 +319,13 @@ export default function EnergiaPage() {
           <p className="subtitle-silent mt-1">Cuerpo y vitalidad</p>
         </div>
       </div>
+
+      {/* Contextual Help — progressive disclosure */}
+      <ContextualHelp
+        storageKey="vitazen_help_energia"
+        title="Energía"
+        text="Registra tu bienestar físico y nutrición diaria. Ánimo, energía, sueño y estrés, junto con tus comidas y agua."
+      />
 
       {/* Wellness Log */}
       <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
