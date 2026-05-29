@@ -471,7 +471,7 @@ async function computeSnapshot(
   };
 }
 
-// ─── Tips: Server-Side Deterministic Date-Based Rotation ─
+// ─── Tips: Exhaustive Deterministic Rotation ─
 //
 // The position is computed from the date — NOT stored in DB state.
 // This eliminates all rotation bugs caused by:
@@ -479,15 +479,18 @@ async function computeSnapshot(
 //   - Lost state (server restarts, DB errors, corrupted JSON)
 //   - cycleStart drift (timezone, server clock differences)
 //
-// How it works:
+// How it works (exhaustive rotation):
 //   - cycleIndex = floor(daysSinceEpoch / 3) — changes every 3 days
-//   - For each cycleIndex, a deterministic shuffle is produced
-//     from seed = userId:empire:cycleIndex
-//   - FREE position = (cycleIndex * 2) % freeCount within that shuffle
-//   - PREMIUM position = cycleIndex % premiumCount within that shuffle
+//   - A "round" is one full sweep through the entire battery.
+//   - The shuffle is generated ONCE per round (not per cycle).
+//   - Within a round, tips are walked sequentially — NO repetition.
+//   - When the round is exhausted, a new round begins with a fresh shuffle.
+//
+//   FREE:  50 tips ÷ 2 per cycle = 25 cycles per round = 75 days
+//   PREMIUM: 60 tips ÷ 1 per cycle = 60 cycles per round = 180 days
 //
 // Same userId + same date = same tips everywhere. No state needed for position.
-// State is only persisted for recentFree/recentPremium (avoid-recent tracking).
+// Every tip is guaranteed to appear once before any tip repeats.
 
 // Reference epoch: 2025-01-01 (a fixed date so cycleIndex is predictable)
 const TIPS_EPOCH = new Date('2025-01-01T00:00:00Z').getTime();
@@ -515,23 +518,30 @@ export async function getDeterministicTips(
   const daysSinceEpoch = Math.floor((todayMs - TIPS_EPOCH) / 86400000);
   const cycleIndex = Math.floor(daysSinceEpoch / CYCLE_DAYS);
 
-  // ─── Deterministic shuffle for this cycle ───
-  // Each cycleIndex produces a unique shuffle order.
-  // With 50 FREE tips and 3-day cycles, we get 25 unique cycles
-  // before wrapping — enough variety for 75 days before repeating.
-  const freeOrder = deterministicShuffle(freeCount, `${userId}:${empire}:${cycleIndex}:free`);
-  const premiumOrder = deterministicShuffle(premiumCount, `${userId}:${empire}:${cycleIndex}:premium`);
+  // ─── Exhaustive rotation: shuffle once per round ───
+  // A "round" is one complete sweep through the battery.
+  // The shuffle seed is based on the round number, not the cycle,
+  // so the order stays stable for the entire round.
+  // This guarantees: every tip appears exactly once before any repeats.
 
   // ─── Select FREE tips — ALWAYS exactly 2 ───
-  // Position within the shuffled order: advances 2 per cycle.
-  // Wraps around when it reaches the end.
+  // round = which full sweep of the battery we're in
+  // positionInRound = which step within that sweep
   const selectedFree: typeof allTips = [];
   if (freeCount > 0) {
-    const basePosition = (cycleIndex * FREE_TIPS_VISIBLE) % freeCount;
-    const needed = Math.min(FREE_TIPS_VISIBLE, freeCount);
+    const cyclesPerFreeRound = Math.ceil(freeCount / FREE_TIPS_VISIBLE);
+    const round = Math.floor(cycleIndex / cyclesPerFreeRound);
+    const positionInRound = cycleIndex % cyclesPerFreeRound;
+
+    // Shuffle is stable for the entire round — seed includes round number
+    const freeOrder = deterministicShuffle(freeCount, `${userId}:${empire}:${round}:free`);
+
+    // Walk sequentially through the shuffled order (2 tips per step)
+    const start = positionInRound * FREE_TIPS_VISIBLE;
+    const remaining = freeCount - start;
+    const needed = Math.min(FREE_TIPS_VISIBLE, remaining);
     for (let i = 0; i < needed; i++) {
-      const pos = (basePosition + i) % freeCount;
-      const idx = freeOrder[pos];
+      const idx = freeOrder[start + i];
       if (idx !== undefined && freeTipsAll[idx]) {
         selectedFree.push(freeTipsAll[idx]);
       }
@@ -540,11 +550,18 @@ export async function getDeterministicTips(
 
   // ─── Select PREMIUM tip — ALWAYS exactly 1 ───
   // From the ÉLITE-only battery. Never mixed with FREE.
-  // Advances 1 per cycle.
+  // Same exhaustive logic: one full sweep, then reshuffle.
   const selectedPremium: typeof allTips = [];
   if (premiumCount > 0) {
-    const pos = cycleIndex % premiumCount;
-    const idx = premiumOrder[pos];
+    const cyclesPerPremiumRound = premiumCount; // 1 tip per cycle
+    const round = Math.floor(cycleIndex / cyclesPerPremiumRound);
+    const positionInRound = cycleIndex % cyclesPerPremiumRound;
+
+    // Shuffle is stable for the entire round
+    const premiumOrder = deterministicShuffle(premiumCount, `${userId}:${empire}:${round}:premium`);
+
+    // Walk sequentially (1 tip per step)
+    const idx = premiumOrder[positionInRound];
     if (idx !== undefined && premiumTipsAll[idx]) {
       selectedPremium.push(premiumTipsAll[idx]);
     }
