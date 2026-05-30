@@ -82,12 +82,6 @@ export default function ContextualHelp({ storageKey, title, text }: ContextualHe
         {hovering && (
           <div className="absolute left-0 top-8 z-20 w-56 bg-[#111] border border-[#222] rounded-lg px-3 py-2 shadow-lg animate-in pointer-events-none">
             <p className="text-[11px] text-[#888] leading-relaxed">{text}</p>
-            <button
-              onClick={(e) => { e.stopPropagation(); dismiss(); }}
-              className="text-[9px] text-[#444] hover:text-[#666] mt-1.5 transition-colors"
-            >
-              No mostrar más
-            </button>
           </div>
         )}
       </div>
