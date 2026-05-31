@@ -7,6 +7,61 @@ import { trackEvent } from '@/lib/analytics-server';
 import { serverLog } from '@/lib/observability/server-logger';
 import Stripe from 'stripe';
 
+// ─── Error serialization for observability ──────────────────────────
+// Extracts detailed error information without altering the error
+// handling flow. Designed for Prisma, Stripe, and generic errors.
+// ONLY used for logging — never changes behavior.
+
+function serializeWebhookError(error: unknown): Record<string, unknown> {
+  const details: Record<string, unknown> = {};
+
+  // Constructor name + message + stack for Error instances
+  if (error instanceof Error) {
+    details.errorConstructor = error.constructor.name;
+    details.errorMessage = error.message;
+    details.errorStack = error.stack;
+  } else {
+    details.errorConstructor = typeof error;
+    try {
+      details.errorRaw = String(error);
+    } catch {
+      details.errorRaw = '[unstringifiable]';
+    }
+  }
+
+  // Prisma-specific: P2002 (unique constraint), P2025 (not found), P2003 (FK), etc.
+  if (error && typeof error === 'object' && 'code' in error) {
+    const prismaLike = error as { code?: string; meta?: unknown; clientVersion?: string };
+    if (typeof prismaLike.code === 'string' && /^P\d{4}$/.test(prismaLike.code)) {
+      details.prismaCode = prismaLike.code;
+      try {
+        details.prismaMeta = JSON.stringify(prismaLike.meta);
+      } catch {
+        details.prismaMeta = String(prismaLike.meta);
+      }
+      details.prismaClientVersion = prismaLike.clientVersion;
+    }
+  }
+
+  // Stripe-specific: Stripe.errors.* (identified by rawType property)
+  if (error && typeof error === 'object' && 'rawType' in error) {
+    const stripeLike = error as { type?: string; code?: string; requestId?: string; statusCode?: number };
+    details.stripeErrorType = stripeLike.type;
+    details.stripeErrorCode = stripeLike.code;
+    details.stripeRequestId = stripeLike.requestId;
+    details.stripeStatusCode = stripeLike.statusCode;
+  }
+
+  // Safe serialization fallback — captures all own properties
+  try {
+    details.errorSerialized = JSON.stringify(error, Object.getOwnPropertyNames(error));
+  } catch {
+    details.errorSerialized = '[not serializable]';
+  }
+
+  return details;
+}
+
 // ─── Idempotency: prevent duplicate event processing ─────────────────
 // Stripe retries webhooks on 500 responses or connection drops.
 // Without dedup, a single event could:
@@ -107,6 +162,7 @@ export async function POST(request: NextRequest) {
   const start = Date.now();
   let eventType = 'unknown';
   let eventId = 'unknown';
+  let checkoutSessionContext: Record<string, unknown> | null = null;
 
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
@@ -146,6 +202,14 @@ export async function POST(request: NextRequest) {
           customerId: customerId || 'null',
           eventId,
         });
+
+        // Store context for error observability in outer catch
+        checkoutSessionContext = {
+          userId,
+          customerId: customerId || null,
+          subscriptionId: session.subscription ?? null,
+          sessionId: session.id,
+        };
 
         if (!userId) {
           serverLog.error('webhook/stripe', 'CANNOT resolve userId — customer paid but will NOT get premium. Manual intervention required.', undefined, {
@@ -471,10 +535,13 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     const durationMs = Date.now() - start;
+    const errorDetails = serializeWebhookError(error);
     serverLog.error('webhook/stripe', 'Webhook handler error', error, {
       eventType,
       eventId,
       durationMs,
+      ...(checkoutSessionContext && { checkout: checkoutSessionContext }),
+      ...errorDetails,
     });
     // DON'T mark as processed — Stripe will retry, which is correct
     // because the handler failed. If the error is persistent, we need
