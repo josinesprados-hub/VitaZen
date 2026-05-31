@@ -227,6 +227,8 @@ export async function POST(request: NextRequest) {
         const stripePriceId = lineItems.data[0]?.price?.id || '';
 
         // Get subscription period dates if available
+        // Stripe Basil/Dahlia: current_period_start/end moved from Subscription
+        // to SubscriptionItem. Fallback to defaults if unavailable.
         const subscriptionId = session.subscription as string;
         let periodStart = new Date();
         let periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -234,8 +236,18 @@ export async function POST(request: NextRequest) {
         if (subscriptionId) {
           try {
             const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-            periodStart = new Date(subscription.current_period_start * 1000);
-            periodEnd = new Date(subscription.current_period_end * 1000);
+            const firstItem = subscription.items.data[0];
+            if (firstItem && typeof firstItem.current_period_start === 'number' && typeof firstItem.current_period_end === 'number') {
+              periodStart = new Date(firstItem.current_period_start * 1000);
+              periodEnd = new Date(firstItem.current_period_end * 1000);
+            } else {
+              serverLog.error('webhook/stripe', 'Subscription item missing period dates — using defaults', undefined, {
+                subscriptionId,
+                hasItems: !!firstItem,
+                itemStartType: typeof firstItem?.current_period_start,
+                itemEndType: typeof firstItem?.current_period_end,
+              });
+            }
           } catch (e) {
             serverLog.error('webhook/stripe', 'Could not retrieve subscription details', e, {
               subscriptionId,
@@ -374,7 +386,22 @@ export async function POST(request: NextRequest) {
         }
 
         // Update subscription record
+        // Stripe Basil/Dahlia: current_period_start/end moved from Subscription
+        // to SubscriptionItem. Use items.data[0] with defensive validation.
         try {
+          const firstItem = subscription.items.data[0];
+          const itemPeriodStart = firstItem?.current_period_start;
+          const itemPeriodEnd = firstItem?.current_period_end;
+
+          if (!firstItem || typeof itemPeriodStart !== 'number' || typeof itemPeriodEnd !== 'number') {
+            serverLog.error('webhook/stripe', 'Subscription update — item missing period dates, skipping period update', undefined, {
+              subId: subscription.id,
+              hasItems: !!firstItem,
+              itemStartType: typeof itemPeriodStart,
+              itemEndType: typeof itemPeriodEnd,
+            });
+          }
+
           await db.subscription.upsert({
             where: { stripeSubscriptionId: subscription.id },
             create: {
@@ -382,14 +409,14 @@ export async function POST(request: NextRequest) {
               stripeSubscriptionId: subscription.id,
               stripePriceId: subscription.items.data[0]?.price.id || '',
               status: subscription.status,
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodStart: typeof itemPeriodStart === 'number' ? new Date(itemPeriodStart * 1000) : new Date(),
+              currentPeriodEnd: typeof itemPeriodEnd === 'number' ? new Date(itemPeriodEnd * 1000) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
             },
             update: {
               status: subscription.status,
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              ...(typeof itemPeriodEnd === 'number' ? { currentPeriodEnd: new Date(itemPeriodEnd * 1000) } : {}),
             },
           });
         } catch (e) {
