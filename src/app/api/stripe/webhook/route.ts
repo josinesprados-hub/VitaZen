@@ -177,11 +177,27 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
     eventType = event.type;
     eventId = event.id;
-  } catch (err) {
-    serverLog.error('webhook/stripe', 'Webhook signature verification failed', err, {
-      eventType,
-    });
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  } catch (liveErr) {
+    // Live secret failed — try Test secret if available
+    const testSecret = process.env.STRIPE_TEST_WEBHOOK_SECRET;
+    if (testSecret) {
+      try {
+        event = stripe.webhooks.constructEvent(body, signature, testSecret);
+        eventType = event.type;
+        eventId = event.id;
+        serverLog.info('webhook/stripe', 'Webhook verified with Test secret', { eventType, eventId });
+      } catch (testErr) {
+        serverLog.error('webhook/stripe', 'Webhook signature verification failed (both secrets)', testErr, {
+          eventType,
+        });
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+      }
+    } else {
+      serverLog.error('webhook/stripe', 'Webhook signature verification failed', liveErr, {
+        eventType,
+      });
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    }
   }
 
   // ─── Idempotency check ──────────────────────────────────────────
