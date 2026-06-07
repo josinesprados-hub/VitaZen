@@ -314,7 +314,7 @@
   {
     "empire": "energia",
     "title": "Despertar agotado",
-    "content": "El cuerpo te da energía natural al despertar. Si te levantas agotado a pesar de haber dormido, algo en tu ritmo está desalineado. El cortisol matinal debería darte un empuje — si no lo hace, revisa tu sueño.",
+    "content": "El cuerpo te da energía natural al despertar. Si te levantas agotado a pesar de haber dormido, algo no está encajando — el sueño, el estrés, o algo que merece revisar.",
     "plan": "PREMIUM"
   },
   {
@@ -398,7 +398,7 @@
   {
     "empire": "energia",
     "title": "Vitamina D y fatiga",
-    "content": "Niveles bajos de vitamina D se asocian con fatiga persistente y menor rendimiento muscular. No es suplementación mágica — es corregir un déficit real que mucha gente tiene sin saberlo.",
+    "content": "Niveles bajos de vitamina D se asocian con fatiga persistente y menor rendimiento muscular. No es suplementación mágica — si te sientes así, merece la pena comprobarlo.",
     "plan": "PREMIUM"
   },
   {
@@ -463,8 +463,8 @@
   },
   {
     "empire": "energia",
-    "title": "La hora de la pastilla",
-    "content": "El cuerpo no procesa igual un medicamento por la mañana que por la noche. La hora a la que lo tomas puede cambiar su efecto.",
+    "title": "Ritmo y procesamiento",
+    "content": "El cuerpo no funciona igual por la mañana que por la noche. Su ritmo interno afecta cómo procesa todo — desde la comida hasta la cafeína. Si tomas algo con horario fijo, pregunta a tu médico si el momento importa.",
     "plan": "PREMIUM"
   },
   {
@@ -476,7 +476,7 @@
   {
     "empire": "energia",
     "title": "Magnesio silencioso",
-    "content": "El magnesio participa en más de trescientas reacciones en el cuerpo, incluyendo la relajación muscular y el sueño. Mucha gente tiene poco sin saberlo.",
+    "content": "El magnesio participa en cientos de reacciones en el cuerpo, incluyendo cómo se relajan los músculos y cómo descansas. Mucha gente toma poco sin darse cuenta.",
     "plan": "PREMIUM"
   },
   {
@@ -530,7 +530,7 @@
   {
     "empire": "energia",
     "title": "La proteína justa",
-    "content": "El cuerpo necesita un mínimo de proteína para no perder músculo. Menos de un gramo por kilo al día y empieza a recurrir al músculo como reserva. La investigación en sarcopenia lo tiene claro.",
+    "content": "El cuerpo necesita un mínimo de proteína para no perder músculo. Por debajo de un gramo por kilo al día, el riesgo aumenta — sobre todo con los años. La investigación en sarcopenia lo señala como un umbral importante.",
     "plan": "PREMIUM"
   },
   {
@@ -572,7 +572,7 @@
   {
     "empire": "energia",
     "title": "Músculo que protege",
-    "content": "El músculo no es estética — es reserva de salud. Mantiene activo el metabolismo y protege contra varias enfermedades. Cuanto más tienes, más respaldo tienes.",
+    "content": "El músculo no es estética — es reserva de salud. Mantiene activo el metabolismo y protege contra varias enfermedades. Tener suficiente es tener un respaldo real.",
     "plan": "PREMIUM"
   },
   {
@@ -584,7 +584,7 @@
   {
     "empire": "energia",
     "title": "Vitamina C y estrés",
-    "content": "La vitamina C ayuda al cuerpo a gestionar el estrés. Las glándulas suprarrenales la consumen más cuando las demandas son altas. No es un calmante — es un apoyo real.",
+    "content": "Las glándulas suprarrenales consumen más vitamina C cuando las demandas son altas. No es un calmante — es parte de cómo el cuerpo responde cuando le exiges más.",
     "plan": "PREMIUM"
   },
   {
@@ -620,7 +620,7 @@
   {
     "empire": "energia",
     "title": "La vitamina del sol",
-    "content": "La vitamina D se forma con el sol. Si te falta, se resienten los huesos, los músculos, el ánimo y las defensas. No es opcional — es infraestructura que mucha gente tiene por debajo de lo necesario.",
+    "content": "La vitamina D se forma con el sol. Si te falta, se resienten los huesos, los músculos y las defensas. El ánimo también puede notarlo. Es infraestructura que mucha gente tiene por debajo de lo necesario.",
     "plan": "PREMIUM"
   },
   {
