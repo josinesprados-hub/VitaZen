@@ -205,8 +205,8 @@
   },
   {
     "empire": "mente",
-    "title": "Las decisiones agotan",
-    "content": "Cada decisión que tomas consume un poco de tu capacidad para decidir bien después. Se llama fatiga de decidir y se acumula.",
+    "title": "Fatiga de decisión: cambio motivacional",
+    "content": "Tras esfuerzo sostenido, no se 'agota' tu voluntad. Lo que cambia es tu motivación: de 'tengo que' a 'quiero'. No es un recurso limitado; es un cambio de prioridades que puedes anticipar y diseñar. Las decisiones tempranas del día merecen más atención no porque después estés vacío, sino porque después tu motivación habrá cambiado.",
     "plan": "FREE"
   },
   {
@@ -219,18 +219,6 @@
     "empire": "mente",
     "title": "Las opciones paralizan",
     "content": "Más de cuatro o cinco opciones similares hacen que decidas peor o no decidas. Menos opciones facilitan la acción.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "mente",
-    "title": "Lo importante primero",
-    "content": "Usa tu mejor energía temprano para las decisiones que más importan. Al final del día, decidir bien cuesta más.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "mente",
-    "title": "Cansancio sesga",
-    "content": "Cuando estás cansado de decidir, tiendes a elegir lo más conservador o lo que evita pérdida. No es cobardía — es cerebro agotado.",
     "plan": "FREE"
   },
   {
@@ -253,12 +241,6 @@
   },
   {
     "empire": "mente",
-    "title": "Cambia de perspectiva",
-    "content": "Preguntarte cómo vería esto alguien distinto activa un pensamiento más flexible que seguir dentro de la misma narrativa.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "mente",
     "title": "La pregunta cambia todo",
     "content": "La forma en que formulaste el problema limita las soluciones que puedes ver. Reformular la pregunta a veces resuelve lo que la respuesta no podía.",
     "plan": "FREE"
@@ -273,12 +255,6 @@
     "empire": "mente",
     "title": "Puntos ciegos",
     "content": "Hay brechas entre cómo te percibes y cómo te perciben los demás. Pedir feedback específico revela lo que tu introspección no alcanza.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "mente",
-    "title": "Todo parece urgente",
-    "content": "Bajo estrés, todo adquiere un peso de urgencia. Preguntar qué pasa si esto no se hace hoy suele revelar que la mayoría no es urgente.",
     "plan": "FREE"
   },
   {
@@ -331,8 +307,8 @@
   },
   {
     "empire": "mente",
-    "title": "Lo que encontraste antes",
-    "content": "Lo que encuentras justo antes de una tarea influye en cómo la abordas, sin que lo notes. El contexto reciente sesga tu pensamiento de forma invisible.",
+    "title": "Accesibilidad cognitiva",
+    "content": "Experiencias recientes hacen ciertos conceptos más disponibles mentalmente. Lo que encontraste antes influye en cómo piensas ahora, no porque te manipule, sino porque está más accesible. La accesibilidad es el mecanismo válido; la influencia conductual directa es la parte desacreditada.",
     "plan": "PREMIUM"
   },
   {
@@ -345,12 +321,6 @@
     "empire": "mente",
     "title": "Detalle y contexto",
     "content": "No puedes atender el detalle y el contexto al mismo tiempo. Cambiar entre ambos cuesta, y ese costo se acumula.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "mente",
-    "title": "La emoción dura poco",
-    "content": "Una emoción sin alimentación se disipa en unos 90 segundos. Lo que dura más es la rumiación que la mantiene activa, no la emoción misma.",
     "plan": "PREMIUM"
   },
   {
@@ -439,12 +409,6 @@
   },
   {
     "empire": "mente",
-    "title": "El cuerpo como señal",
-    "content": "Las sensaciones físicas — tensión, peso, temperatura — te dicen cosas sobre tu estado antes de que la mente lo nombre. Aprender a leerlas es información gratuita.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "mente",
     "title": "Observar al observador",
     "content": "Notar que estás notando tus pensamientos añade una capa de distancia que reduce la identificación con ellos. No eres lo que observas.",
     "plan": "PREMIUM"
@@ -511,20 +475,8 @@
   },
   {
     "empire": "mente",
-    "title": "Elegir entre muchos cansa",
-    "content": "La satisfacción con una decisión disminuye cuantas más opciones descartaste. Saber que había alternativas mejores hipotéticas pesa después de elegir.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "mente",
     "title": "Lo mejor es enemigo",
     "content": "Quien busca la mejor opción en todo invierte más tiempo y energía decidiendo, y termina menos satisfecho que quien se conforma con lo suficiente.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "mente",
-    "title": "Decisiones reversibles",
-    "content": "Si una decisión se puede deshacer, decídela rápido. Si no, dale más tiempo y análisis. No toda decisión merece el mismo peso.",
     "plan": "PREMIUM"
   },
   {
@@ -547,12 +499,6 @@
   },
   {
     "empire": "mente",
-    "title": "Estrés y lo que recuerdas",
-    "content": "El estrés hace que recuerdes cómo te sentiste, pero no lo que pasó. Los detalles neutros se pierden; la emoción se queda. Es la memoria emocional selectiva.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "mente",
     "title": "Recuperar es rendir",
     "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse — es parte del rendimiento.",
     "plan": "PREMIUM"
@@ -567,12 +513,6 @@
     "empire": "mente",
     "title": "El estrés cambia el cerebro",
     "content": "El estrés prolongado no solo se siente — cambia cómo funciona el cerebro. La memoria y la regulación emocional son las primeras que se resienten.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "mente",
-    "title": "Estrés crónico amenaza",
-    "content": "Bajo estrés crónico, el cerebro interpreta cosas inocentes como amenazas. No es que el mundo sea más peligroso — es que tu alarma está calibrada para sonar con cualquier cosa.",
     "plan": "PREMIUM"
   },
   {
@@ -657,6 +597,66 @@
     "empire": "mente",
     "title": "Profecía autocumplida",
     "content": "La profecía autocumplida es real: creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice — puede causar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Creer que puedes",
+    "content": "Autoeficacia: la creencia en tu capacidad para ejecutar acciones necesarias influye directamente en si las intentas, cuánto te esfuerzas y cuánto persistes ante obstáculos. No es optimismo ciego; es calibración de capacidad basada en experiencia.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Aprendizaje autorregulado",
+    "content": "El aprendizaje autorregulado tiene tres fases: planificación (establecer metas y estrategias), ejecución (monitorear el progreso y ajustar), y reflexión (evaluar resultados y adaptar). Quienes regulan su propio aprendizaje no solo estudian más; estudian mejor.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Construcción de autoeficacia",
+    "content": "La autoeficacia se construye: observar a alguien similar lograr una meta aumenta tu creencia de que tú también puedes. La experiencia directa de dominio es la fuente más potente, pero la vicaria — ver a otros — es la segunda más poderosa.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "El mecanismo de la autoeficacia",
+    "content": "Las cuatro fuentes de autoeficacia: experiencias de dominio (la más potente), experiencia vicaria (ver a otros lograrlo), persuasión social (feedback creíble) y estados fisiológicos (interpretar activación como capacidad, no amenaza). Comprender el mecanismo permite diseñar intervenciones.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Autoeficacia vicaria y modelado",
+    "content": "Ver a un semejante dominar una habilidad produce un aumento mayor en autoeficacia que ver a un experto. La similitud con el modelo importa más que su nivel de habilidad. Por eso los modelos cercanos son más efectivos que los distantes.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Heurísticos rápido y frugales",
+    "content": "Los heurísticos no son solo fuentes de error. Son herramientas adaptativas que funcionan sorprendentemente bien con poca información. Reconocer una sola buena razón puede superar a analizar veinte variables.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "mente",
+    "title": "Ruido en las decisiones",
+    "content": "Además del sesgo sistemático, existe variabilidad aleatoria en juicios profesionales: el mismo caso evaluado por expertos diferentes produce veredictos distintos. Este 'ruido' es tan costoso como el sesgo y más fácil de ignorar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Pensamiento probabilístico",
+    "content": "Pensar en probabilidades en vez de certezas: reemplazar 'va a pasar' por 'hay un X% de probabilidad'. Las frecuencias naturales (3 de cada 10) se procesan mejor que porcentajes abstractos. Entender incertidumbre no es paralizante; es más preciso que la falsa certeza.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Superpredicción",
+    "content": "Algunas personas predicen eventos futuros sistemáticamente mejor que otras. Los superpredicciones no son videntes; combinan pensamiento probabilístico, actualización de creencias y descomposición de problemas. La buena noticia: estas habilidades se pueden entrenar.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "mente",
+    "title": "Probabilidad subjetiva y sesgo de confianza",
+    "content": "Las personas sistemáticamente sobreestiman la precisión de sus juicios probabilísticos. Estar muy seguro no es lo mismo que estar en lo cierto. La calibración — alinear certeza con precisión — es una habilidad medible y mejorable que distingue a los mejores tomadores de decisiones.",
     "plan": "PREMIUM"
   }
 ]
