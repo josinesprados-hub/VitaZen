@@ -8,13 +8,13 @@
   {
     "empire": "energia",
     "title": "Cada hora, muévete",
-    "content": "Cinco minutos de movimiento cada hora. No es ejercicio. Es recordar que tienes cuerpo.",
+    "content": "Cinco minutos de movimiento cada hora. No es ejercicio — es recordar que tienes cuerpo. Seis veces al día son treinta minutos acumulados. Es más sostenible que una hora que nunca haces y el cuerpo lo registra como movimiento real. Poco pero seguido funciona mejor que mucho pero nunca.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "Luz temprana",
-    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. No es tendencia — es la señal más fuerte que tiene el cuerpo para saber qué hora es.",
+    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. Es la señal más fuerte que tiene el cuerpo para saber qué hora es. La luz por la mañana y la oscuridad por la noche son las dos señales que más estabilizan tu ritmo. La luz natural también influye en cómo te sientes durante el día — cambia el estado de ánimo a través del mismo mecanismo circadiano.",
     "plan": "FREE"
   },
   {
@@ -38,7 +38,7 @@
   {
     "empire": "energia",
     "title": "Mismo horario",
-    "content": "Acostarse y levantarse a la misma hora importa más que cuántas horas duermes. La consistencia construye el ritmo.",
+    "content": "Acostarse y levantarse a la misma hora importa más que cuántas horas duermes. La consistencia construye el ritmo. Poner la alarma a la misma hora cada día —incluidos los fines de semana— evita el jet lag social que desajusta todo el lunes. El cuerpo no distingue entre semana y fin de semana: cada inconsistencia horaria confunde el reloj circadiano y cuesta días recuperarlo.",
     "plan": "FREE"
   },
   {
@@ -103,14 +103,8 @@
   },
   {
     "empire": "energia",
-    "title": "Ventana y reloj",
-    "content": "La luz por la ventana por la mañana y la oscuridad por la noche son las dos señales que más estabilizan tu ritmo.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Comer lento",
-    "content": "Comer rápido hace que llegues a la saciedad tarde. El cerebro tarda unos veinte minutos en registrar que ya es suficiente.",
+    "title": "Comer despacio",
+    "content": "Comer rápido hace que llegues a la saciedad tarde. El cerebro tarda unos veinte minutos en registrar que ya es suficiente. Masticar más tiempo también mejora la digestión y la absorción de nutrientes — el estómago no tiene dientes, el trabajo empieza en la boca. La velocidad de la comida cambia cuánto comes, cuánto aprovechas y cómo te sientes después.",
     "plan": "FREE"
   },
   {
@@ -121,20 +115,14 @@
   },
   {
     "empire": "energia",
-    "title": "La temperatura del agua",
-    "content": "Una ducha fría de treinta segundos al final te despierta. No es extremo — es estimulación simple.",
+    "title": "Estímulo frío matutino",
+    "content": "Una ducha fría de treinta segundos al final te despierta. Beber agua fría por la mañana activa una respuesta de alerta similar. Ambas son formas de estimulación simpática simple — no es extremo, es dar al cuerpo una señal clara de que el día ha empezado. El frío activa el sistema nervioso simpático y eleva temporalmente la noradrenalina, mejorando el estado de alerta sin necesidad de cafeína.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
-    "title": "La comida que pesa",
-    "content": "Las comidas pesadas al mediodía generan letargo por la tarde. Comer ligero mantiene más estable la energía.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Pantano del sofá",
-    "content": "Llegar a casa y tirarse al sofá es una trampa. Si necesitas descansar, mejor una siesta corta que el sofá infinito.",
+    "title": "Descanso activo",
+    "content": "Llegar a casa y tirarse al sofá reduce el tono vagal y hace más difícil reactivarse. Si necesitas descansar, una siesta corta de veinte minutos mantiene el ritmo ultradiano y te reanima. El descanso pasivo prolongado no recupera — estanca. El cuerpo se recupera mejor con pausas activas que con inactividad extendida: caminar, estirar o cambiar de postura mantiene el tono vagal y facilita la transición de vuelta a la actividad.",
     "plan": "FREE"
   },
   {
@@ -145,8 +133,8 @@
   },
   {
     "empire": "energia",
-    "title": "Aire real",
-    "content": "Pasar todo el día en espacios cerrados reduce la oxigenación y el estado de alerta. Salir aunque sea cinco minutos cambia algo.",
+    "title": "Aire y cerebro",
+    "content": "Pasar todo el día en espacios cerrados eleva el CO2 por encima de 1000 partes por millón. A ese nivel, la función cognitiva se reduce casi un cincuenta por ciento — decisiones peores, concentración más baja, más fatiga. Allen et al. (2016, Harvard T.H. Chan) demostraron que ventilar o salir al exterior restaura la capacidad de decisión y concentración. No es impresión — es química del aire que respiras.",
     "plan": "FREE"
   },
   {
@@ -169,14 +157,8 @@
   },
   {
     "empire": "energia",
-    "title": "Sol y ánimo",
-    "content": "La luz natural no solo te ayuda a dormir mejor. También cambia cómo te sientes durante el día. La luz de la mañana hace más de lo que parece.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Fibra y estabilidad",
-    "content": "Los alimentos con fibra liberan su energía de forma gradual. El cuerpo humano no fue diseñado para picos constantes de glucosa.",
+    "title": "Fibra: energía y saciedad",
+    "content": "Los alimentos con fibra liberan su energía de forma gradual y prolongan la saciedad. El cuerpo no fue diseñado para picos constantes de glucosa. La fibra evita que la energía se vaya en picos y ayuda a que te sientas lleno más tiempo con la misma comida. Absorción lenta de glucosa y saciedad prolongada son las dos caras del mismo mecanismo: la fibra ralentiza la digestión y estabiliza la energía disponible.",
     "plan": "FREE"
   },
   {
@@ -187,38 +169,20 @@
   },
   {
     "empire": "energia",
-    "title": "La alarma consistente",
-    "content": "Cambiar la hora de la alarma cada día confunde el reloj interno. Lo mismo los fines de semana que entre semana estabiliza todo.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
     "title": "Música y ritmo",
     "content": "La música con tempo rápido aumenta temporalmente la energía y reduce la percepción de esfuerzo físico. No es magia — es ritmo compartido.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
-    "title": "Fibra y saciedad",
-    "content": "Comer fibra no solo ayuda a la digestión. Prolonga la saciedad y evita que la energía se vaya en picos.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Poco pero seguido",
-    "content": "Cinco minutos de movimiento seis veces al día suman treinta minutos. Es más sostenible que una hora que nunca haces.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "La noche construye el día",
-    "content": "Lo que haces las dos horas antes de dormir define cómo vas a estar al despertar. La energía de mañana empieza esta noche.",
+    "title": "Preparar la noche",
+    "content": "Lo que haces las dos horas antes de dormir define cómo vas a estar al despertar. La energía de mañana empieza esta noche. El cuerpo necesita señales de cierre: reducir la luz, evitar comidas pesadas y aparatar las pantallas. No es solo no hacer cosas — es activar la transición del reloj circadiano a modo nocturno de forma gradual. La reducción progresiva de estímulos facilita la caída de temperatura y la secreción de melatonina que preparan el sueño.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "El peso del almuerzo",
-    "content": "Un almuerzo pesado pide siesta. Un almuerzo moderado permite seguir. La cantidad importa tanto como la calidad.",
+    "content": "Un almuerzo pesado desvía sangre al sistema digestivo y genera letargo por la tarde. Un almuerzo moderado permite seguir. La cantidad importa tanto como la calidad. Las comidas pesadas al mediodía son la causa más común de la caída de energía de la tarde — no siempre es el ritmo circadiano, a veces es simplemente lo que comiste y cuánto.",
     "plan": "FREE"
   },
   {
@@ -229,8 +193,8 @@
   },
   {
     "empire": "energia",
-    "title": "Despertar natural",
-    "content": "Despertar con luz gradual es menos brusco que con una alarma. Si puedes, deja que la luz entre antes del sonido.",
+    "title": "Inercia del sueño",
+    "content": "La transición de sueño a vigilia no es instantánea. La inercia del sueño —esa neblina al despertar— dura entre quince y treinta minutos, y puede extenderse más si te despiertan de sueño profundo. Jewett et al. (1999) documentaron que la severidad depende de la fase del ciclo de sueño en la que ocurre el despertar. La luz gradual al amanecer reduce la inercia porque el cerebro inicia la transición antes. Una alarma fuerte en medio del sueño profundo amplifica la desorientación.",
     "plan": "FREE"
   },
   {
@@ -259,12 +223,6 @@
   },
   {
     "empire": "energia",
-    "title": "El fin de semana cuenta",
-    "content": "Cambiar el horario del sueño los fines de semana te desajusta como si viajaras de huso horario. El lunes te cobra la inconsistencia.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
     "title": "Azúcar oculta",
     "content": "Mucho de lo que parece salado o neutral tiene azúcar añadido. Leer etiquetas revela que la energía falsa está en todas partes.",
     "plan": "FREE"
@@ -277,26 +235,68 @@
   },
   {
     "empire": "energia",
-    "title": "Agua fría temprano",
-    "content": "Beber agua fría por la mañana activa una respuesta de alerta en el cuerpo. No es dramático — pero nota la diferencia.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Lo básico primero",
-    "content": "Antes de buscar suplementos o rutinas raras: duerme bien, muévete, come real, bebe agua. Lo básico resuelve el ochenta por ciento.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "energia",
-    "title": "Masticar lento",
-    "content": "Masticar más tiempo mejora la digestión y la absorción de nutrientes. El estómago no tiene dientes — el trabajo empieza en la boca.",
+    "title": "La jerarquía funciona",
+    "content": "Antes de buscar suplementos o rutinas raras: duerme bien, muévete, come real, bebe agua. El sueño resuelve entre el cuarenta y el cincuenta por ciento del rendimiento cognitivo. El ejercicio añade otro veinte a treinta por ciento. La nutrición cubre un quince a veinte. La suplementación aporta menos de un cinco por ciento si no hay deficiencia. Cada capa depende de la anterior: no tiene sentido optimizar la nutrición si duermes mal, ni tomar suplementos si lo básico no está cubierto.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "Ritmo de comidas",
     "content": "Comer a horas regulares ayuda a que el cuerpo sepa cuándo esperar energía. Los horarios irregulares confunden más que el contenido.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La sustancia del cansancio",
+    "content": "Mientras estás despierto, la adenosina se acumula en el cerebro como mecanismo homeostático del cansancio. Cada hora sin dormir, más adenosina en los receptores. Por eso el cansancio crece de forma predecible a lo largo del día. Y por eso la cafeína solo lo esconde — bloquea la señal, pero la adenosina sigue ahí acumulándose. Cuando pasa el efecto, el cansancio vuelve con lo que postergaste. Solo el sueño real limpia la adenosina del cerebro. Basheer y Porkka-Heiskanen documentaron este mecanismo como la presión homeostática del sueño.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Tu reloj responde a la hora de la luz",
+    "content": "La luz no siempre tiene el mismo efecto sobre tu reloj interno. Por la mañana lo adelanta — te prepara para el día. Por la noche lo retrasa — te prepara para dormir. No es solo luz buena o mala: depende de cuándo la recibes. Czeisler y Khalsa mapearon la curva de respuesta de fase circadiana: la luz antes de la temperatura mínima corporal retrasa el reloj, y después la adelanta. Quince minutos de luz natural al despertar y oscuridad a la hora de dormir es la combinación más efectiva porque trabaja con la curva, no contra ella.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El límite sostenible",
+    "content": "Hay un punto donde el esfuerzo deja de ser sostenible y se convierte en deuda. Se llama umbral láctico — la transición del metabolismo aeróbico al anaeróbico. Entrenar justo por debajo de ese límite es lo que más mejora tu resistencia sin agotarte. Por encima, el cuerpo genera ácido láctico más rápido de lo que puede procesar y la duración se reduce drásticamente. Faude y Svedahl definieron este umbral como el punto de referencia para planificar intensidades de ejercicio. Conocer tu límite no es rendir menos — es rendir más tiempo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "La neblina de la mañana",
+    "content": "Despertar no es instantáneo. La inercia del sueño —esa neblina de la mañana— dura entre quince y treinta minutos, y puede extenderse más si te despiertan de sueño profundo. Jewett y Silva-Duffy documentaron que la severidad de la inercia depende de la fase del sueño en la que ocurre el despertar: es peor al salir de sueño profundo que de sueño ligero. Darle tiempo y luz al cuerpo al despertar acelera la transición. No es pereza: es tu cerebro cambiando de modo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Tu reloj genético",
+    "content": "Tu genética influye en si rindes mejor por la mañana o por la noche. Los cronotipos no son preferencias — son configuraciones del reloj interno determinadas genéticamente. Roenneberg y Walker documentaron que forzar un horario que no va con tu cronotipo cuesta energía real y reduce el rendimiento. No es pereza levantarse tarde si tu cuerpo está programado para ello. Lo inteligente es alinear tu vida con tu reloj, no contra él. Las mismas horas de sueño rinden distinto según tu cronotipo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El pico de la mañana",
+    "content": "El cuerpo produce un pico de cortisol al despertar que te da energía natural. Se llama respuesta de cortisol al despertar —CAR por sus siglas en inglés— y es un mecanismo de activación matutina. Clow y Fries documentaron que si duermes mal, ese pico es más bajo y te levantas más cansado. No es solo cuántas horas duermes — es cómo funciona tu hormona de la mañana. Proteger el sueño protege ese pico que te arranca el día.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Azúcar en sangre y cerebro",
+    "content": "El cerebro necesita glucosa para funcionar, pero ni demasiada ni muy poca. Owens y Sunram-Lea demostraron que existe un rango óptimo de glucemia para el rendimiento cognitivo: los picos dan energía falsa y las caídas nublan el pensamiento. Lo que mantiene la cabeza clara no es más azúcar — es glucosa estable. La fibra, la proteína y las grasas ayudan a mantenerla en el rango adecuado. El cerebro no necesita picos —  necesita estabilidad.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "Un poco más cada vez",
+    "content": "Para mejorar, el cuerpo necesita un estímulo un poco mayor que antes. Si siempre haces lo mismo, el cuerpo se adapta y deja de progresar. Una sobrecarga progresiva —un poco más de esfuerzo, de forma gradual— es lo que genera adaptación real. Kraemer y la posición oficial del American College of Sports Medicine establecen la sobrecarga progresiva como principio fundamental del entrenamiento. No se trata de hacer más siempre, sino de hacer un poco más que la última vez.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "energia",
+    "title": "El cerebro practica de noche",
+    "content": "Mientras duermes, el cerebro repite los movimientos que aprendiste de día. Son los husos de sueño —pequeños ritmos eléctricos en la fase dos que consolidan la habilidad motora. Walker y Fogel-Smith documentaron que los husos de sueño transfieren la práctica diurna a memoria procedural. Si recortas el sueño, recortas la práctica nocturna. Aprender algo nuevo y dormir bien después no es perder tiempo — es doble entrenamiento.",
     "plan": "FREE"
   },
   {
@@ -313,14 +313,8 @@
   },
   {
     "empire": "energia",
-    "title": "Despertar agotado",
-    "content": "El cuerpo te da energía natural al despertar. Si te levantas agotado a pesar de haber dormido, algo no está encajando — el sueño, el estrés, o algo que merece revisar.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "Cafeína y cuerpo",
-    "content": "Algunas personas notan la cafeína durante muchas más horas de lo que parece. Un café a las tres puede afectar el sueño incluso si no lo sientes. La vida media de la cafeína varía mucho entre personas.",
+    "title": "Despertar agotado con razón",
+    "content": "Si te levantas agotado a pesar de haber dormido suficientes horas, el problema no es la cantidad — es la arquitectura del sueño. Los microdespertares no percibidos fragmentan el descanso sin que lo recuerdes. La falta de sueño profundo (N3) impide la recuperación física. La apnea del sueño interrumpe la respiración decenas de veces por noche. Cada causa tiene una solución distinta: si duermes ocho horas y despiertas agotado, merece una evaluación médica del sueño para identificar si el problema es fragmentación, falta de N3 o apnea.",
     "plan": "PREMIUM"
   },
   {
@@ -343,20 +337,14 @@
   },
   {
     "empire": "energia",
-    "title": "El cuerpo pide descanso",
-    "content": "Hay señales claras de que necesitas descansar: rendimiento que no sube, sueño que no repara, irritabilidad que no corresponde a lo que pasa. Ignorarlas no las hace desaparecer.",
+    "title": "Las señales del sobreentrenamiento",
+    "content": "Hay señales objetivas de que necesitas descansar: variabilidad cardíaca reducida (HRV baja), cortisol matutino elevado, rendimiento estancado más de dos semanas, sueño fragmentado. La HRV es el marcador más temprano y accesible — Plews et al. (2013) validaron las mediciones matutinas consistentes como indicador para ajustar la intensidad del entrenamiento antes de que aparezcan síntomas. No esperes a lesionarte: el cuerpo avisa antes de que se rompa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Más de un reloj",
-    "content": "El cerebro marca el ritmo, pero el cuerpo también tiene los suyos. La hora a la que comes afecta cómo digieres, independientemente de lo que comas.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "El orden en el plato",
-    "content": "El orden en que comes cambia más de lo que parece. Empezar por la verdura, luego la proteína y al final los carbohidratos hace que la energía suba más despacio.",
+    "content": "El cerebro marca el ritmo, pero el cuerpo también tiene los suyos. La hora a la que comes afecta cómo digieres, independientemente de lo que comas. Tu intestino tiene su propio reloj — comer a horas irregulares lo altera. Los relojes periféricos del hígado, el páncreas y el intestino se sincronizan con la comida, no solo con la luz. Alinear horarios de comida con tu ritmo mejora más que optimizar solo la iluminación.",
     "plan": "PREMIUM"
   },
   {
@@ -373,12 +361,6 @@
   },
   {
     "empire": "energia",
-    "title": "El intestino tiene ritmo",
-    "content": "Tu digestión tiene ritmo propio. Comer a horas irregulares la altera, independientemente de lo que comas. Los horarios importan más de lo que parece — el intestino tiene su propio reloj.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
     "title": "El ciclo cambia todo",
     "content": "El ciclo menstrual cambia la energía, el sueño y lo que puedes exigirte. Entrenar igual todo el mes ignora cómo funciona el cuerpo. La investigación en fases menstruales lo tiene claro.",
     "plan": "PREMIUM"
@@ -391,20 +373,20 @@
   },
   {
     "empire": "energia",
-    "title": "Dormir mal envejece",
-    "content": "Dormir mal hace en el cuerpo algo parecido a comer demasiado azúcar. No se ve, pero el efecto es real y se acumula. La falta de sueño crónica acelera el desgaste celular.",
+    "title": "Dormir mal desgasta",
+    "content": "Dormir mal no solo cansa — acelera el desgaste celular. La falta de sueño crónica acorta los telómeros (Cappuccio et al. 2010), reduce la secreción de hormona del crecimiento (Van Cauter 2000), eleva el cortisol nocturno e impide la limpieza de proteínas dañinas en el cerebro a través del sistema glinfático. El efecto no se ve, pero se acumula. No es una analogía — es mecanismo documentado: cada noche mal dormida deja rastro medible.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Vitamina D y fatiga",
-    "content": "Niveles bajos de vitamina D se asocian con fatiga persistente y menor rendimiento muscular. No es suplementación mágica — si te sientes así, merece la pena comprobarlo.",
+    "content": "La vitamina D se forma en la piel con la exposición al sol y afecta huesos, músculos, defensas y estado de ánimo. Su deficiencia está asociada con fatiga y menor rendimiento muscular. Los niveles bajos son comunes en personas que pasan poco tiempo al aire libre. Comprobar los niveles es sencillo y la suplementación, cuando se necesita, tiene un impacto medible en la energía. No todos necesitan suplemento — pero sí saber dónde están.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "No todos absorben igual",
-    "content": "Dos personas pueden comer lo mismo y obtener distinta energía de ello. Lo que vive en tu intestino influye más de lo que imaginas.",
+    "title": "Tu metabolismo es tuyo",
+    "content": "Dos personas pueden comer lo mismo y obtener distinta energía. La diversidad bacteriana intestinal determina la eficiencia de extracción calórica (Turnbaugh et al. 2006). El gen CYP1A2 determina si metabolizas la cafeína rápido o lento — y cambia su efecto por horas. La absorción de hierro y vitamina D varía según genética y estado fisiológico. No existen prescripciones universales: lo que funciona para uno puede ser ineficaz o contraproducente para otro. Conocer tu metabolismo individual es más útil que seguir reglas generales.",
     "plan": "PREMIUM"
   },
   {
@@ -439,8 +421,8 @@
   },
   {
     "empire": "energia",
-    "title": "Cerebro sin combustible",
-    "content": "El cerebro necesita energía para decidir bien. Cuando llevas horas sin comer, decidir se vuelve más difícil. No es debilidad — es falta de combustible.",
+    "title": "Glucosa y decisiones",
+    "content": "La corteza prefrontal consume aproximadamente un veinte por ciento de la glucosa total del cerebro. Cuando la glucemia baja, la función ejecutiva —planificación, control de impulsos, decisiones— se deteriora primero. Owens et al. (1994) demostraron que la glucosa optimiza el rendimiento en tareas de atención sostenida y función ejecutiva. No es impresión: decidir se vuelve más difícil cuando el cerebro no tiene combustible. El cansancio mental tiene base metabólica real.",
     "plan": "PREMIUM"
   },
   {
@@ -459,12 +441,6 @@
     "empire": "energia",
     "title": "La semana suave",
     "content": "Después de semanas esforzándote, el cuerpo necesita una semana más ligera para asimilar el trabajo. Sin ella, el progreso se estanca.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "Ritmo y procesamiento",
-    "content": "El cuerpo no funciona igual por la mañana que por la noche. Su ritmo interno afecta cómo procesa todo — desde la comida hasta la cafeína. Si tomas algo con horario fijo, pregunta a tu médico si el momento importa.",
     "plan": "PREMIUM"
   },
   {
@@ -499,8 +475,8 @@
   },
   {
     "empire": "energia",
-    "title": "El desgaste silencioso",
-    "content": "El estrés crónico desgasta sin que lo notes hasta que el cuerpo dice basta. Dormir bien y moverse son las dos cosas que más lo reducen.",
+    "title": "El eje del estrés crónico",
+    "content": "El estrés crónico activa el eje HPA (hipotálamo-hipófisis-adrenal) de forma sostenida. El cortisol elevado crónicamente suprime el sueño profundo, reduce la variabilidad cardíaca y eleva la proteína C reactiva. Las señales concretas: despertar a las tres o cuatro de la mañana, dificultad para recuperar peso a pesar de comer, infecciones frecuentes. Meeusen (2013) estableció la relación entre sobreentrenamiento y disfunción del eje HPA. El estrés no es solo mental — tiene un mecanismo hormonal que se puede medir y gestionar.",
     "plan": "PREMIUM"
   },
   {
@@ -511,8 +487,8 @@
   },
   {
     "empire": "energia",
-    "title": "El cerebro y la energía alternativa",
-    "content": "El cerebro puede usar otros combustibles además de la glucosa habitual. Algunas personas notan más claridad mental con ciertos cambios de alimentación, pero no funciona igual para todos.",
+    "title": "Cetosis: combustible alternativo",
+    "content": "El cerebro puede usar cuerpos cetónicos —beta-hidroxibutirato— cuando la glucosa escasea. Estudios en epilepsia (Neal et al. 2008) mostraron eficacia clínica de la cetosis nutricional. Sin embargo, en personas sanas los resultados sobre rendimiento cognitivo son mixtos. La adaptación requiere dos a cuatro semanas y el rendimiento de alta intensidad puede disminuir. No funciona igual para todos. La cetosis es una herramienta metabólica con evidencia en contextos específicos, no una solución universal para la energía.",
     "plan": "PREMIUM"
   },
   {
@@ -547,8 +523,8 @@
   },
   {
     "empire": "energia",
-    "title": "Más no siempre es más",
-    "content": "Hay un punto donde esforzarte más no te hace mejor — te hace peor. Cuando el cuerpo no progresa, suele necesitar descanso, no más esfuerzo.",
+    "title": "La ley del esfuerzo decreciente",
+    "content": "La primera hora de ejercicio aporta aproximadamente el setenta por ciento del beneficio. La segunda añade un veinte. La tercera, un siete. Es la ley de los rendimientos decrecientes. Kuipers (1998) documentó que el sobreentrenamiento ocurre cuando la carga supera la capacidad de recuperación durante más de dos semanas. Más allá del punto de inflexión, cada minuto adicional no suma — resta. Entrenar menos pero mejor supera a entrenar más sin descansar.",
     "plan": "PREMIUM"
   },
   {
@@ -559,26 +535,20 @@
   },
   {
     "empire": "energia",
-    "title": "Respirar te equilibra",
-    "content": "Respirar rápido y superficial te desestabiliza. Respirar lento y profundo te calma. No es solo aire — es cómo tu cuerpo se regula.",
+    "title": "El nervio que te calma",
+    "content": "La respiración diafragmática lenta —aproximadamente cinco coma cinco respiraciones por minuto— activa el nervio vago, que estimula el sistema nervioso parasimpático. Esto reduce la frecuencia cardíaca y el cortisol. Gerritsen y Band (2018) demostraron que la respiración lenta aumenta la variabilidad cardíaca y mejora la regulación emocional. No es solo aire — es una vía directa entre la respiración y el sistema nervioso autónomo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "La bajada real",
-    "content": "La caída de energía a media tarde no es solo la comida — es un ritmo natural del cuerpo. Una siesta corta o caminar un rato funciona mejor que otro café.",
+    "title": "Músculo: reserva y metabolismo",
+    "content": "El músculo no es estética — es reserva de salud. Mantiene activo el metabolismo y protege contra varias enfermedades. El músculo gasta más energía en reposo que la grasa, lo que significa que cuanta más masa muscular tengas, más calorías quemas sin hacer nada. La sarcopenia —pérdida muscular con la edad— reduce la independencia y la capacidad metabólica. Mantener músculo no es vanidad, es inversión a largo plazo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Músculo que protege",
-    "content": "El músculo no es estética — es reserva de salud. Mantiene activo el metabolismo y protege contra varias enfermedades. Tener suficiente es tener un respaldo real.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "La postura del sueño",
-    "content": "Dormir de lado con las piernas flexionadas es la posición que menos presión pone en la columna. Boca abajo es la peor para la mayoría.",
+    "title": "Posición y limpieza cerebral",
+    "content": "Durante el sueño, el sistema glinfático limpia los desechos metabólicos del cerebro —incluyendo beta-amiloide— y es hasta diez veces más activo que durante la vigilia. Lee et al. (2015, Journal of Neuroscience) encontraron que la posición lateral facilita este drenaje más que boca abajo. Dormir de lado con las piernas flexionadas es la posición que menos presión pone en la columna y la que mejor permite la limpieza nocturna. Limitación: la evidencia principal es en modelos animales, con extrapolación a humanos.",
     "plan": "PREMIUM"
   },
   {
@@ -589,14 +559,8 @@
   },
   {
     "empire": "energia",
-    "title": "El sueño del atleta",
-    "content": "Quien más rinde, más duerme. No es lujo — es necesidad. El rendimiento alto exige recuperación alta.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "El costo de la pantalla",
-    "content": "La luz de las pantallas por la noche dificulta que el cuerpo prepare el sueño. No es solo insomnio — es sueño de peor calidad que no se siente hasta el día siguiente.",
+    "title": "Ejercicio y sueño: relación bidireccional",
+    "content": "Quien más rinde, más duerme. No es lujo — es necesidad. El rendimiento alto exige recuperación alta. Y a la inversa: el ejercicio regular mejora la eficiencia del sueño. Quien se mueve necesita menos tiempo en cama para obtener la misma recuperación. La relación es bidireccional: el ejercicio mejora la arquitectura del sueño y el sueño potencia la recuperación del ejercicio. Moverse bien y dormir bien se refuerzan mutuamente.",
     "plan": "PREMIUM"
   },
   {
@@ -607,26 +571,14 @@
   },
   {
     "empire": "energia",
-    "title": "El ritmo del hambre",
-    "content": "El hambre tiene su propio ritmo. Si comes a horas fijas, el hambre aparece antes de comer — no como emergencia, sino como expectativa.",
+    "title": "Las hormonas del hambre",
+    "content": "El hambre tiene su propio ritmo hormonal. La ghrelina sigue un patrón circadiano con picos antes de las comidas habituales. Si comes a horas fijas, el pico de ghrelina aparece como expectativa fisiológica, no como emergencia. La leptina, que señala saciedad, se sincroniza con el reloj hepático. Comer a horas irregulares desincroniza ambas hormonas y convierte el hambre en urgencia. La regularidad horaria no es disciplina — es sincronización hormonal.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Mejorar descansando",
-    "content": "Cuando te esfuerzas y descansas bien, el cuerpo no vuelve al nivel anterior — sube un poco más. Es así como funciona el progreso.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "La vitamina del sol",
-    "content": "La vitamina D se forma con el sol. Si te falta, se resienten los huesos, los músculos y las defensas. El ánimo también puede notarlo. Es infraestructura que mucha gente tiene por debajo de lo necesario.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "El sueño del deportista",
-    "content": "El ejercicio regular mejora la eficiencia del sueño. Quien se mueve necesita menos tiempo en cama para obtener la misma recuperación. Moverse bien y dormir bien se refuerzan.",
+    "title": "Supercompensación",
+    "content": "El progreso no ocurre durante el esfuerzo — ocurre durante el descanso que le sigue. Fase uno: el esfuerzo genera un estímulo y microdaño muscular. Fase dos: el cuerpo se repara al nivel anterior. Fase tres: se reconstruye por encima del nivel previo para estar preparado —es la supercompensación. Zatsiorsky (1995) describió este modelo de tres fases. Sin descanso suficiente, nunca se alcanza la fase tres. El progreso no se entrena — se recupera.",
     "plan": "PREMIUM"
   },
   {
@@ -637,26 +589,74 @@
   },
   {
     "empire": "energia",
-    "title": "El músculo que quema",
-    "content": "El músculo en reposo gasta más que la grasa. No mucho más, pero suficiente para que importe a largo plazo. El tejido muscular es metabólicamente activo incluso cuando no haces nada.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
-    "title": "Pantallas de noche",
-    "content": "Las pantallas por la noche no solo dificultan dormir — también reducen la calidad del sueño profundo. La luz azul engaña al cerebro y el cuerpo no prepara la melatonina que necesita.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "energia",
     "title": "Sed que no se siente",
     "content": "Perder muy poco agua ya afecta cómo rindes física y mentalmente. No necesitas sentir sed para estar menos hidratado de lo conveniente. La sed es una señal tardía.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "La temperatura del sueño",
-    "content": "El cuerpo se enfría al dormir. Una habitación a 18-20 grados le facilita ese descenso. Cuanto más cálida, más cuesta conciliar.",
+    "title": "Adenosina y presión de sueño",
+    "content": "La adenosina se acumula en el cerebro de forma proporcional durante cada hora de vigilia, uniéndose a receptores que inhiben la activación neuronal. Este mecanismo homeostático es la presión de sueño: cuanta más adenosina, más presión por dormir. La cafeína bloquea los receptores de adenosina pero no reduce su concentración — por eso el efecto es temporal y el cansancio regresa amplificado. Solo el sueño profundo aclara la adenosina del cerebro. Basheer (2004) y Porkka-Heiskanen (1997) establecieron este mecanismo como el pilar del modelo de regulación del sueño. Aplicación: entender por qué la siesta de veinte minutos reduce la presión pero no la elimina — y por qué la cafeína posterga, no resuelve. Limitación: la sensibilidad a la adenosina varía entre individuos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "La curva de fase circadiana",
+    "content": "El efecto de la luz sobre tu reloj interno depende de cuándo la recibes. Czeisler y Khalsa mapearon la curva de respuesta de fase: la luz antes de la temperatura mínima corporal retrasa el reloj, y después la adelanta. La sensibilidad máxima ocurre en las horas previas al pico de melatonina. Esto tiene aplicaciones de cronoterapia: la misma luz que te adelanta por la mañana te retrasa por la noche. Para viajeros y turniculares, saber en qué punto de la curva están permite ajustar el reloj de forma dirigida en vez de aleatoria. Limitación: la curva varía según cronotipo — los vespertinos tienen su temperatura mínima más tarde.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Melatonina y luz azul",
+    "content": "La luz de longitud de onda entre 460 y 480 nanómetros suprime la producción de melatonina de forma aguda y dependiente de la intensidad. Brainard demostró que la luz de 460 nanómetros es el doble de efectiva suprimiendo melatonina que la de 555. Incluso quince minutos de pantalla pueden retrasar el inicio de melatonina. Filtros de luz cálida por encima de 530 nanómetros reducen significativamente la supresión. Chang (2015) cuantificó el efecto de dispositivos electrónicos en condiciones controladas. Aplicación: usar filtros nocturnos o lamparas cálidas de mesa después de las nueve de la noche. Limitación: la sensibilidad varía con la edad — los adolescentes son más susceptibles.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "HRV: tu marcador de recuperación",
+    "content": "La variabilidad de la frecuencia cardíaca refleja el balance entre el sistema simpático y el parasimpático. Una HRV alta indica buena recuperación; una HRV reducida sugiere estrés acumulado o sobreentrenamiento. Plews (2013) validó la HRV como indicador de recuperación en atletas: mediciones matutinas consistentes permiten ajustar la intensidad del entrenamiento antes de que aparezcan síntomas. Buchheit (2014) estableció protocolos de medición estandarizados. Aplicación: medir HRV cada mañana al despertar y comparar con tu línea base personal. Limitación: los valores varían entre individuos — no se comparan con otros, se comparan contigo mismo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Mitocondrias y ejercicio",
+    "content": "El ejercicio estimula la creación de nuevas mitocondrias a través de la activación de PGC-1alfa, aumentando la capacidad de producción de ATP —la energía celular—. Hood y Safdar demostraron que el ejercicio regular transforma la infraestructura energética celular: más mitocondrias significa más capacidad de producir energía de forma eficiente. El detraining revierte estas adaptaciones en semanas. Aplicación: la mejora energética del ejercicio no es solo cardiovascular — ocurre dentro de cada célula. Limitación: la biogénesis mitocondrial requiere consistencia — el efecto desaparece con la inactividad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Insulina y reloj circadiano",
+    "content": "La sensibilidad a la insulina es mayor por la mañana y menor por la noche, independientemente de lo que comas. Van Cauter demostró una caída del treinta al cuarenta por ciento en la sensibilidad insulínica vespertina. Panda mostró que comer fuera de la ventana biológica aumenta la resistencia a la insulina y el almacenamiento de grasa, incluso con las mismas calorías. Aplicación: la comida nocturna se procesa peor no por lo que es, sino por cuándo llega. Limitación: los trabajadores nocturnos pueden beneficiarse de ajustar su ventana alimentaria a su horario activo.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "BDNF: el fertilizante cerebral",
+    "content": "Treinta minutos de ejercicio moderado duplican el BDNF circulante —factor neurotrófico derivado del cerebro—, promoviendo neurogénesis y plasticidad sináptica. Ratey y Cotman documentaron que el BDNF es el enlace mecanístico entre ejercicio y energía cognitiva: no solo te sientes más despierto — tu cerebro crea nuevas conexiones y fortalece las existentes. El BDNF mejora el aprendizaje, la memoria y la capacidad de adaptación. Aplicación: el ejercicio no solo da energía física — fertiliza el cerebro. Limitación: los niveles de BDNF dependen de la intensidad y la regularidad del ejercicio.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Pantallas y melatonina",
+    "content": "La exposición a pantallas en las dos horas previas al sueño suprime la melatonina más de un cincuenta por ciento y reduce la fase REM. Esto produce un sueño de peor calidad que no siempre se percibe como insomnio pero sí como fatiga al día siguiente. Chang cuantificó este efecto en condiciones controladas: los lectores de pantalla tardan más en dormirse y tienen menos sueño REM que los de libro físico. Brainard estableció que la longitud de onda 460-480nm es la más supresora. Aplicación: cambiar pantallas por lectura o lampara cálida después de las nueve. Limitación: la susceptibilidad individual varía significativamente.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Hormona del crecimiento nocturna",
+    "content": "La hormona del crecimiento se secreta principalmente durante el sueño profundo de la primera mitad de la noche. Van Cauter demostró que dormir mal puede reducir la secreción de GH hasta un setenta por ciento. La GH es esencial para la reparación de tejidos, el mantenimiento muscular y la regeneración celular. Perder sueño profundo no es solo perder descanso — es perder la ventana crítica de reparación. Aplicación: proteger las primeras horas de sueño es especialmente importante para quien entrena o se recupera de lesión. Limitación: la secreción de GH disminuye naturalmente con la edad.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Glinfático: limpieza nocturna",
+    "content": "El sistema glinfático es hasta diez veces más activo durante el sueño que durante la vigilia, limpiando desechos metabólicos del cerebro —incluyendo beta-amiloide. Iliff y Lee (2015, Journal of Neuroscience) encontraron que la posición lateral facilita el drenaje glinfático más que boca abajo. Rash caracterizó el sistema como análogo al linfático periférico pero exclusivo del sistema nervioso central. Aplicación: dormir de lado facilita la limpieza cerebral nocturna. Limitación: la evidencia principal proviene de modelos animales y la extrapolación a humanos es parcial.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "energia",
+    "title": "Sobreentrenamiento",
+    "content": "El síndrome de sobreentrenamiento ocurre cuando el estrés acumulado —físico y psicológico— supera la capacidad de recuperación. Meeusen (2013) estableció criterios diagnósticos: rendimiento estancado más de dos semanas, variabilidad cardíaca reducida, sueño fragmentado, irritabilidad creciente. La línea entre entrenamiento óptimo y sobreentrenamiento es individual y se mueve. Aplicación: periodizar el esfuerzo con semanas de descarga cada tres o cuatro, y monitorizar la HRV como señal temprana. Limitación: no existe un marcador único — el diagnóstico requiere evaluar varias señales juntas.",
     "plan": "PREMIUM"
   }
 ]
