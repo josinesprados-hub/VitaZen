@@ -124,6 +124,10 @@ async function main() {
     ...(crecimientoTips as TipInput[]),
   ];
 
+  // ─── Clean slate: remove stale rows before seeding ───
+  // Prevents orphan rows when titles change between reestructurations.
+  await prisma.empireTip.deleteMany({});
+
   for (const tip of tips) {
     await prisma.empireTip.upsert({
       where: { id: `${tip.empire}-${tip.title.slice(0, 30).replace(/\s+/g, '-').toLowerCase()}` },
