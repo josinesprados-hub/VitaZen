@@ -2,7 +2,7 @@
   {
     "empire": "crecimiento",
     "title": "Un poco cada día",
-    "content": "Veinte minutos diarios superan a tres horas los domingos. La repetición espaciada consolida más que la concentración esporádica. La frecuencia le dice al cerebro que esto importa.",
+    "content": "Veinte minutos diarios superan a tres horas los domingos. Quince minutos seis días superan a noventa minutos uno — la frecuencia le dice al cerebro que esto importa. Repasa hoy, en tres días y en una semana: el espacio entre repeticiones es donde se consolida. La repetición espaciada funciona desde hace décadas.",
     "plan": "FREE"
   },
   {
@@ -14,7 +14,7 @@
   {
     "empire": "crecimiento",
     "title": "Lo que no funcionó",
-    "content": "Lo que sale mal suele enseñar más que lo que sale bien — si se mira sin juicio. Los errores contienen información que el éxito oculta. Revisar sin castigar es donde está el dato.",
+    "content": "Lo que sale mal suele enseñar más que lo que sale bien — si se mira sin juicio. Los errores contienen información que el éxito oculta. Revisar sin castigar es donde está el dato — y la calidad del error importa tanto como la del acierto: no todo error enseña igual.",
     "plan": "FREE"
   },
   {
@@ -50,7 +50,7 @@
   {
     "empire": "crecimiento",
     "title": "Escribir para pensar",
-    "content": "Escribir lo que aprendiste obliga a ordenarlo. Lo que no puedes escribir claro probablemente aún no lo tienes claro. Escribir es pensar despacio — y el pensamiento lento es donde se entiende.",
+    "content": "Escribir lo que aprendiste obliga a ordenarlo. Lo que no puedes escribir claro probablemente aún no lo tienes claro. Escribir es pensar despacio — y el pensamiento lento es donde se entiende. Al final del día, escribir una cosa que aprendiste hace que el cerebro la marque como importante: lo que se anota se retiene más, porque la escritura es un acto de selección — y lo seleccionado se fija.",
     "plan": "FREE"
   },
   {
@@ -67,20 +67,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Lo que ya sabes",
-    "content": "Conectar lo nuevo con lo que ya sabes hace que se recuerde mejor. El cerebro no guarda información suelta — la ancla a lo existente. La conexión es lo que hace que algo se quede.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
     "title": "El error como dato",
-    "content": "Cada error contiene información sobre lo que no funciona. Tratarlo como dato en vez de como fracaso cambia la relación con el aprendizaje. La diferencia entre fracasar y aprender está en lo que haces con la información.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "Repetir espaciado",
-    "content": "Repasar hoy, en tres días y en una semana fija más que repasar diez veces seguidas. El espacio entre repeticiones es donde se consolida. La repetición espaciada funciona desde hace décadas.",
+    "content": "Cada error contiene información sobre lo que no funciona. Tratarlo como dato en vez de como fracaso cambia la relación con el aprendizaje. La diferencia entre fracasar y aprender está en lo que haces con la información — y la calidad del error importa tanto como la del acierto.",
     "plan": "FREE"
   },
   {
@@ -92,7 +80,7 @@
   {
     "empire": "crecimiento",
     "title": "Hacer vs aprender",
-    "content": "Hay una diferencia entre saber cómo se hace y poder hacerlo. Solo la práctica real cierra esa distancia. Ver no es hacer. Leer no es saber.",
+    "content": "Hay una diferencia entre saber cómo se hace y poder hacerlo. Solo la práctica real cierra esa distancia. Ver no es hacer. Leer no es saber. El mapa no es el terreno — la teoría sin práctica es una foto del lugar sin haber ido.",
     "plan": "FREE"
   },
   {
@@ -110,7 +98,7 @@
   {
     "empire": "crecimiento",
     "title": "El descanso procesa",
-    "content": "El cerebro sigue procesando lo que aprendiste después de parar. Una pausa no es interrumpir — es dejar que el cerebro consolide. El descanso es parte del proceso, no su interrupción.",
+    "content": "El cerebro sigue procesando lo que aprendiste después de parar. Una pausa no es interrumpir — es dejar que el cerebro consolide. El sueño no es pausa — es procesamiento: lo que aprendes de día se consolida de noche. Y descansar entre sesiones de práctica no es perder tiempo; es darle al cerebro la oportunidad de consolidar lo que acaba de procesar. Dormir menos no es ganar tiempo, es perderlo.",
     "plan": "FREE"
   },
   {
@@ -139,38 +127,14 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El retroceso es real",
-    "content": "Volver a donde estabas tras mejorar no es fracaso. Es parte del ciclo. La curva de aprendizaje no es recta — tiene saltos, mesetas y retrocesos. Esperar linealidad genera frustración innecesaria.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "Menos, más frecuente",
-    "content": "Practicar quince minutos seis días supera a practicar noventa minutos uno. La frecuencia le dice al cerebro que esto importa. La práctica distribuida supera a la masiva en casi todo.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
     "title": "La opinión de quien sabe",
     "content": "La retroalimentación funciona mejor cuando llega pronto y viene de alguien que sabe. La opinión genérica no cuenta igual. La calidad del feedback es tan importante como la cantidad de práctica.",
     "plan": "FREE"
   },
   {
     "empire": "crecimiento",
-    "title": "Escribir lo aprendido",
-    "content": "Al final del día, escribir una cosa que aprendiste hace que el cerebro la marque como importante. Lo que se anota se retiene más. La escritura es un acto de selección — y lo seleccionado se fija.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
     "title": "Pensar en voz alta",
     "content": "Pensar en voz alta sobre un problema revela atajos que el pensamiento silencioso salta. Oír tu propio proceso cambia el proceso. Lo que suena distinto se piensa distinto.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "El prójimo enseña",
-    "content": "Enseñar lo que sabes refuerza tu propio aprendizaje. El que más aprende de una explicación suele ser quien la da. Explicar es la prueba definitiva de comprensión.",
     "plan": "FREE"
   },
   {
@@ -229,20 +193,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Intercalar temas",
-    "content": "Alternar entre temas distintos en una sesión mejora la retención a largo plazo. Mezclar practica la discriminación, no solo la repetición.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
     "title": "Lo que te distrae",
     "content": "Lo que te distrae mientras aprendes puede ser una señal de que el cerebro está saturado. La distracción a veces es el cuerpo pidiendo pausa. No siempre es falta de atención — a veces es exceso de carga.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "El mapa y el terreno",
-    "content": "Leer sobre algo no es lo mismo que hacerlo. El mapa no es el terreno. La teoría sin práctica es una foto del lugar sin haber ido.",
     "plan": "FREE"
   },
   {
@@ -255,12 +207,6 @@
     "empire": "crecimiento",
     "title": "La gente que te rodea",
     "content": "Las personas con las que pasas tiempo influyen en lo que consideras normal. Rodearte de quien aprende hace que aprender se sienta normal.",
-    "plan": "FREE"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "Dormir consolida",
-    "content": "El sueño no es pausa — es procesamiento. Lo que aprendes de día se consolida de noche. Dormir menos no es ganar tiempo, es perderlo.",
     "plan": "FREE"
   },
   {
@@ -289,20 +235,74 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El descanso entre",
-    "content": "Descansar entre sesiones de práctica no es perder tiempo. Es darle al cerebro la oportunidad de consolidar lo que acaba de procesar.",
+    "title": "Práctica con propósito",
+    "content": "La mejora no viene de repetir. Viene de practicar con un objetivo concreto, prestando atención a lo que falla y corrigiéndolo. La práctica deliberada tiene estructura: objetivo, atención, corrección. Sin esa estructura, repetir es solo hacer otra vez lo mismo.",
     "plan": "FREE"
   },
   {
     "empire": "crecimiento",
-    "title": "Un buen error",
-    "content": "Un error que te enseña algo nuevo vale más que un éxito que no te dice nada. La calidad del error importa tanto como la del acierto.",
+    "title": "La dificultad que enseña",
+    "content": "Lo que se siente difícil al practicar suele ser lo que más se recuerda después. Las dificultades deseables hacen que el aprendizaje cueste más durante la práctica pero dure más a largo plazo. Siempre que puedas, elige la versión que te cuesta — es la que más te queda.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Tu capacidad crece",
+    "content": "Pensar que puedes mejorar cambia cómo enfrentas los obstáculos. La inteligencia no es fija: se desarrolla con esfuerzo y estrategia. Quien cree que puede crecer busca retos; quien cree que no, los evita. La creencia no es mágica — cambia las acciones, y las acciones cambian los resultados.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Dibuja lo que lees",
+    "content": "Combinar palabras con imágenes ayuda a recordar más que usar solo palabras. Si puedes hacer un esquema o dibujo de lo que lees, lo retienes mejor. Dos canales superan a uno — y no necesitas ser buen dibujante, solo necesitar que el dibujo tenga sentido para ti.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Pregúntate por qué",
+    "content": "En vez de aceptar un hecho, pregúntate por qué es así. La interrogación elaborativa genera conexiones más profundas que la lectura pasiva. Cada «por qué» es un ancla que conecta lo nuevo con lo que ya sabes — y lo anclado no se olvida tan fácilmente.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Explícate a ti mismo",
+    "content": "Explicarse uno mismo cada paso de un problema mejora la comprensión más que solo leer la solución. Si no puedes explicártelo, hay algo que no entiendes todavía. El autoexamen revela los huecos que la lectura cómoda disimula.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Falla antes de aprender",
+    "content": "Intentar responder una pregunta antes de estudiar el tema mejora lo que aprendes después. Incluso si fallas, el intento prepara el cerebro para absorber la respuesta correcta. El error previo crea un gancho donde la información correcta se ancla con más fuerza.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "¿Seguro que lo sabes?",
+    "content": "Tendemos a sobreestimar lo que sabemos. Si no puedes usarlo sin mirar, no lo sabes de verdad. La ilusión de competencia es el enemigo del aprendizaje real. La prueba no es si te suena — es si puedes hacerlo solo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Practica como vas a usar",
+    "content": "Aprender algo de una forma y usarlo de otra cuesta. Cuanto más parecida sea la práctica al uso real, mejor se transfiere. No estudies de una forma si vas a aplicar de otra. La práctica que imita la aplicación real es la que mejor prepara.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Un ejemplo vale más",
+    "content": "Los conceptos abstractos se entienden mejor con ejemplos concretos. Un buen ejemplo ancla la teoría en algo real. Sin ejemplo, la idea flota. Si no puedes dar un ejemplo, probablemente aún no lo entiendes del todo.",
+    "plan": "FREE"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Aprender con otros",
+    "content": "Aprender con otros genera perspectivas que la práctica sola no produce. Pero no todo grupo aprende igual: la colaboración funciona cuando hay interdependencia y responsabilidad individual. El que explica aprende dos veces — y el que escucha gana una perspectiva que solo no tendría.",
     "plan": "FREE"
   },
   {
     "empire": "crecimiento",
     "title": "La zona de Vygotsky",
-    "content": "Aprendes más en la zona donde algo es difícil pero no imposible. Vygotsky la llamó zona de desarrollo próximo: demasiado fácil no estimula, demasiado difícil frustra. El medio es donde creces.",
+    "content": "Aprendes más en la zona donde algo es difícil pero no imposible. Vygotsky la llamó zona de desarrollo próximo: demasiado fácil no estimula, demasiado difícil frustra. El medio es donde creces — y la zona de crecimiento no es cómoda. Practicar lo que se te da bien no es practicar de verdad; lo que te empuja justo al límite de tu capacidad es lo que mejora.",
     "plan": "PREMIUM"
   },
   {
@@ -362,7 +362,7 @@
   {
     "empire": "crecimiento",
     "title": "Quién, no qué",
-    "content": "Las metas sin identidad son deseos. La identidad sin metas es fantasía. Primero: quién quieres ser. Luego: qué haría esa persona.",
+    "content": "Las metas sin identidad son deseos. La identidad sin metas es fantasía. Primero: quién quieres ser. Luego: qué haría esa persona. La identidad es el motor lento que no se apaga: pasar de «quiero hacer esto» a «soy alguien que hace esto» es el cambio que sostiene cuando la motivación inicial se apaga.",
     "plan": "PREMIUM"
   },
   {
@@ -374,7 +374,7 @@
   {
     "empire": "crecimiento",
     "title": "La curva de Ebbinghaus",
-    "content": "Olvidar es natural. Ebbinghaus lo midió hace más de un siglo: lo que no se repasa se pierde rápido. La solución no es memorizar más — es repasar mejor, con espacio entre repeticiones.",
+    "content": "Olvidar es natural. Ebbinghaus lo midió hace más de un siglo: lo que no se repasa se pierde rápido. La solución no es memorizar más — es repasar mejor, con espacio entre repeticiones. La práctica distribuida en el tiempo supera a la masiva en casi todos los dominios: no es cuánto practicas en un día, sino cuántos días practicas.",
     "plan": "PREMIUM"
   },
   {
@@ -387,12 +387,6 @@
     "empire": "crecimiento",
     "title": "El contexto de la prueba",
     "content": "Recordas mejor en el contexto donde aprendiste. Si siempre estudias en el mismo sitio, cambiar de sitio al usar lo aprendido puede costar más.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "La motivación que dura",
-    "content": "La motivación inicial es emoción. La que dura es identidad. Pasar de «quiero hacer esto» a «soy alguien que hace esto» es el cambio que sostiene. La identidad es el motor lento que no se apaga.",
     "plan": "PREMIUM"
   },
   {
@@ -416,7 +410,7 @@
   {
     "empire": "crecimiento",
     "title": "El tiempo de la consolidación",
-    "content": "El cerebro no consolida lo aprendido al instante. Necesita horas y noches. Lo que parece aprendido hoy se pierde mañana sin el espacio adecuado. El sueño es donde se fija lo que el día procesó.",
+    "content": "El cerebro no consolida lo aprendido al instante. Necesita horas y noches. Lo que parece aprendido hoy se pierde mañana sin el espacio adecuado. El sueño es donde se fija lo que el día procesó. Pero el crecimiento no ocurre solo durante el esfuerzo — ocurre durante la recuperación posterior. Sin recuperación, el esfuerzo se desgasta.",
     "plan": "PREMIUM"
   },
   {
@@ -439,12 +433,6 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El pre-mortem",
-    "content": "Antes de empezar algo, imagina que ya fracasaste y pregúntate por qué. Este ejercicio revela riesgos que el optimismo oculta. Es más útil que hacer una lista de cosas que pueden salir bien.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
     "title": "La reversión a la media",
     "content": "Los cambios extremos suelen revertir. Los graduales se mantienen. Si mejoraste mucho de golpe, parte de eso volverá — y eso es normal. Es la reversión a la media, y ocurre en casi todo.",
     "plan": "PREMIUM"
@@ -452,7 +440,7 @@
   {
     "empire": "crecimiento",
     "title": "Pensamiento inverso",
-    "content": "En lugar de pensar cómo tener éxito, piensa cómo garantizar el fracaso. Las respuestas invertidas suelen ser más claras y más prácticas.",
+    "content": "En lugar de pensar cómo tener éxito, piensa cómo garantizar el fracaso. Las respuestas invertidas suelen ser más claras y más prácticas. Y antes de empezar algo, imagina que ya fracasaste y pregúntate por qué — este pre-mortem revela riesgos que el optimismo oculta, y es más útil que hacer una lista de cosas que pueden salir bien.",
     "plan": "PREMIUM"
   },
   {
@@ -475,20 +463,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Sabiduría vs información",
-    "content": "La información se acumula. La sabiduría se destila. No necesitas saber más — necesitas entender mejor lo que ya sabes. La profundidad suele estar en conectar, no en añadir.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
     "title": "El costo de cambiar",
     "content": "Cambiar de dirección tiene un costo: lo invertido en la dirección anterior. Pero quedarse por ese costo es seguir pagando por algo que ya no funciona.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "La conversación difícil",
-    "content": "Evitar la conversación que necesitas tener no la hace desaparecer. La hace crecer en tu cabeza. Decirla suele ser más simple de lo que imaginas.",
     "plan": "PREMIUM"
   },
   {
@@ -511,26 +487,14 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El valor del reposo",
-    "content": "El crecimiento no ocurre solo durante el esfuerzo. Ocurre durante la recuperación posterior. Sin recuperación, el esfuerzo se desgasta.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "Practicar al borde",
-    "content": "Practicar lo que se te da bien no es practicar de verdad. Lo que te empuja justo al límite de tu capacidad es lo que mejora. No se siente bien — funciona. La zona de crecimiento no es cómoda.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
     "title": "El experto y lo obvio",
     "content": "Un experto hace que lo difícil parezca simple. Pero lo simple para el experto sigue siendo difícil para el principiante. No confundas simple con fácil.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Esfuerzo sin estrategia",
-    "content": "Esfuerzo sin estrategia es solo cansancio. La estrategia sin esfuerzo es solo teoría. Se necesitan ambas, y en orden.",
+    "title": "Práctica Deliberada",
+    "content": "La práctica deliberada requiere 4 condiciones: (1) objetivo específico y medible, (2) atención plena durante la ejecución, (3) feedback inmediato e informativo, (4) empujar sistemáticamente más allá de la zona de comodidad. Mecanismo: la mejora requiere representaciones mentales cada vez más refinadas que solo se desarrollan bajo estas condiciones. Ericsson, Krampe y Tesch-Römer (1993) sobre violinistas. Limite: solo aplicable en dominios con método establecido; no funciona para creatividad abierta.",
     "plan": "PREMIUM"
   },
   {
@@ -547,20 +511,14 @@
   },
   {
     "empire": "crecimiento",
-    "title": "La paciencia del sistema",
-    "content": "Los sistemas complejos —como una persona creciendo— cambian lento y luego de golpe. La paciencia no es esperar — es seguir mientras llega el cambio.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "Lo que repites lo eres",
-    "content": "Cada repetición es un voto por quién eres. No importa lo que digas una vez — importa lo que hagas consistentemente.",
+    "title": "Curvas de aprendizaje no lineales",
+    "content": "La mejora sigue patrones en forma de escalera donde las mesetas son periodos de consolidación, no estancamiento. Las mesetas reflejan reorganización cognitiva, no falta de progreso. Newell y Rosenbloom (ley de potencia del aprendizaje): la tasa de mejora decrece con la práctica, pero el rendimiento sigue aumentando. Entender que el progreso no es lineal previene la frustración y permite mantener el esfuerzo cuando parece que no avanzas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
     "title": "La inoculación mental",
-    "content": "Imaginar obstáculos antes de que pasen —no para preocuparte, sino para prepararte— reduce su impacto cuando llegan.",
+    "content": "Imaginar obstáculos antes de que pasen — no para preocuparte, sino para prepararte — reduce su impacto cuando llegan. Antes de una situación difícil, imaginar cómo quieres responder entrena la respuesta real: no es visualización mágica, es ensayo mental que prepara las rutas de acción.",
     "plan": "PREMIUM"
   },
   {
@@ -571,14 +529,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El filtro de lo útil",
-    "content": "No todo lo que se puede aprender vale la pena. Aprender a filtrar por utilidad real es una habilidad que libera tiempo y profundiza lo que importa.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
-    "title": "La señal del aburrimiento",
-    "content": "El aburrimiento a veces es señal de que ya dominas algo. Otras veces es resistencia a lo que aún te cuesta. Saber cuál es cuál importa — y la forma de saberlo es probando el nivel siguiente.",
+    "title": "Aburrimiento y dominio",
+    "content": "El aburrimiento indica desajuste entre habilidad y desafío. Cuando la habilidad excede el desafío, aparece el aburrimiento; cuando el desafío excede la habilidad, la ansiedad. El flujo ocurre en el equilibrio. Csikszentmihalyi (1990): la experiencia óptima ocurre cuando habilidad y desafío están alineados en nivel alto. Solución al aburrimiento: aumentar el desafío al nivel siguiente, no abandonar.",
     "plan": "PREMIUM"
   },
   {
@@ -613,12 +565,6 @@
   },
   {
     "empire": "crecimiento",
-    "title": "La anticipación como práctica",
-    "content": "Antes de una situación difícil, imaginar cómo quieres responder entrena la respuesta real. No es visualización mágica — es ensayo mental.",
-    "plan": "PREMIUM"
-  },
-  {
-    "empire": "crecimiento",
     "title": "La zona del maestro",
     "content": "El maestro no es quien más sabe — es quien mejor sabe qué no sabe. La conciencia de los propios límites es señal de profundidad.",
     "plan": "PREMIUM"
@@ -631,32 +577,86 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El momento de dejar ir",
-    "content": "Saber cuándo dejar ir una estrategia que ya no funciona es tan importante como saber cuándo persistir. La flexibilidad no es debilidad.",
+    "title": "Elaborative Interrogation",
+    "content": "Preguntarse «por qué» y «cómo» sobre los hechos y conceptos estudiados produce aprendizajes más profundos y duraderos. Mecanismo: la interrogación fuerza la integración con conocimiento previo y genera múltiples rutas de acceso. Pressley et al. (1987). Diferencia con autoexplicación: la interrogación se centra en «por qué es así» vs «cómo funciona paso a paso». Aplicación: para cada concepto, generar al menos una pregunta «por qué» y una respuesta. Limite: requiere conocimiento previo relevante para generar explicaciones significativas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Energía y aprendizaje",
-    "content": "El aprendizaje intencional consume energía mental. Intentar aprender cuando estás agotado es ineficiente. Aprende cuando la energía está alta.",
+    "title": "Modulación emocional del aprendizaje",
+    "content": "La amígdala modula la consolidación de memorias según la carga emocional del evento. Los eventos emocionalmente significativos se codifican más fuertemente. Mecanismo: la liberación de noradrenalina durante eventos emocionales fortalece la consolidación hippocampal. McGaugh (2000, 2004). Limite: el aprendizaje procedimental no requiere carga emocional; la emoción excesiva puede interferir con la codificación de detalles.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "La pregunta mejor",
-    "content": "Una buena pregunta vale más que diez respuestas correctas. La calidad de lo que aprendes depende de la calidad de lo que preguntas.",
+    "title": "Cognitive Load Theory",
+    "content": "La memoria de trabajo tiene capacidad limitada: procesa entre 4 y 7 elementos nuevos simultáneamente. Sweller (1988) identificó tres tipos de carga: intrínseca (complejidad inherente del contenido), extrínseca (diseño deficiente de la instrucción) y relevante (procesamiento que construye esquemas mentales). Mecanismo: la carga extrínseca compite por los mismos recursos de memoria de trabajo que la carga relevante; reducir la primera libera recursos para la segunda. Sweller, Ayres y Kalyuga (2011): los ejemplos resueltos (worked examples) y el efecto de finalidad libre (goal-free effect) reducen carga extrínseca y mejoran el aprendizaje. Aplicación: al aprender algo nuevo, usar ejemplos resueltos antes de practicar solo, eliminar distracciones innecesarias y presentar un concepto nuevo a la vez. Limite: la teoría se aplica principalmente a dominios con estructura clara; en tareas de descubrimiento o creatividad, cierta carga extrínseca puede ser beneficiosa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Práctica distribuida",
-    "content": "La práctica distribuida en el tiempo supera a la masiva en casi todos los dominios. No es cuánto practicas en un día — es cuántos días practicas.",
+    "title": "Desirable Difficulties",
+    "content": "Las condiciones que hacen la práctica más difícil durante el aprendizaje (espaciado, intercalación, recuperación) producen mejor retención a largo plazo. Mecanismo: las dificultades durante la codificación generan procesos de elaboración y recuperación más profundos. Bjork y Bjork (2011): las condiciones que mejoran el rendimiento rápido suelen fallar en sostener la retención a largo plazo. Limite: las dificultades deben ser moduladas; dificultad excesiva produce frustración, no aprendizaje.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "La piel del aprendizaje",
-    "content": "Solo cuando algo te importa de verdad lo aprendes de verdad. La emoción no es distractora — es el pegamento del aprendizaje. Lo que no toca, no se queda.",
+    "title": "Growth Mindset",
+    "content": "Las creencias sobre la naturaleza de la inteligencia afectan directamente el comportamiento de aprendizaje. Quienes creen que la inteligencia es maleable (growth mindset) buscan desafíos, persisten tras fracasos y responden mejor al feedback. Quienes creen que es fija (fixed mindset) evitan retos y se rinden antes. Mecanismo: la creencia cambia la atribución del fracaso (de «no puedo» a «todavía no»). Dweck (2006). Limite: el growth mindset no basta sin estrategia; el «falso growth mindset» (creer sin actuar) no produce mejora.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Dual Coding",
+    "content": "La información codificada simultáneamente en formato verbal y visual se recuerda mejor que la codificada en un solo formato. Mecanismo: dos trazas de memoria independientes (verbal + imaginal) proporcionan rutas de recuperación redundantes. Paivio (1971, 1986). Aplicación: hacer diagramas, esquemas o dibujos mientras se estudia texto. Limite: solo funciona si ambos canales procesan el mismo concepto; imágenes irrelevantes no ayudan.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Self-Explanation",
+    "content": "Explicarse uno mismo los pasos de un problema o razonamiento mejora la comprensión más que simplemente leer la solución. Mecanismo: la autoexplicación genera inferencias que llenan lagunas en la representación mental y detecta inconsistencias. Chi et al. (1989, 1994): los estudiantes que se autoexplican superan a los que solo leen. Aplicación: tras cada paso de un problema, preguntarse «por qué este paso funciona». Limite: requiere conocimiento base previo para generar explicaciones significativas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Pretesting Effect",
+    "content": "Intentar responder preguntas antes de estudiar el material mejora el aprendizaje posterior, incluso cuando las respuestas iniciales son incorrectas. Mecanismo: el pretest activa conocimiento previo y crea puntos de anclaje que facilitan la codificación de la información correcta. Little y Bjork (2012). Diferencia con práctica de recuperación: el pretest ocurre antes del estudio, no después. Aplicación: antes de leer un capítulo, intentar responder sus preguntas clave. Limite: el efecto se reduce si el pretest es demasiado fácil o no relacionado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Perceptual Learning",
+    "content": "La capacidad de detectar, diferenciar y reconocer patrones en estímulos complejos mejora con la experiencia selectiva. Gibson (1969): el aprendizaje perceptual no requiere retroalimentación explícita — la exposición repetida a diferencias finas calibra la sensibilidad del sistema perceptual. Mecanismo: la atención se ajusta progresivamente a las dimensiones diagnósticas del estímulo, reduciendo la necesidad de procesamiento consciente. Aplicación: exponerse a múltiples ejemplos variados de un concepto entrena la discriminación sin necesidad de instrucción explícita. Limite: el aprendizaje perceptual es específico al dominio; la transferencia entre dominios perceptuales es limitada.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Metacognitive Accuracy",
+    "content": "La mayoría de las personas sobreestiman su nivel de comprensión real. La precisión metacognitiva es la correspondencia entre lo que crees saber y lo que realmente sabes. Mecanismo: la ilusión de fluidez (leer y sentir que entiendes) genera falsa competencia. Dunlosky y Rawson (2012): la calibración mejora con práctica de recuperación. Aplicación: tras estudiar, intentar recitar sin mirar antes de juzgar si dominas el tema. Limite: la calibración es una habilidad que requiere práctica; los novatos son sistemáticamente imprecisos.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Transfer-Appropriate Processing",
+    "content": "La retención depende de la similitud entre los procesos cognitivos usados durante el aprendizaje y los requeridos durante el uso. Mecanismo: la memoria no es copia pasiva sino reconstrucción que depende de las claves de recuperación disponibles. Morris, Bransford y Franks (1977): procesamiento apropiado para la transferencia. Aplicación: si el examen requiere aplicar conceptos, la práctica debe incluir aplicación, no solo memorización. Limite: la especificidad es relativa; cierta transferencia siempre ocurre.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Concrete Examples",
+    "content": "Los conceptos abstractos se comprenden y retienen mejor cuando se anclan en ejemplos concretos. Mecanismo: los ejemplos activan representaciones específicas que sirven como puente entre lo abstracto y lo aplicable. Rawson y Dunlosky (2011): la combinación de definición + múltiples ejemplos supera a la definición sola. Aplicación: para cada concepto, generar al menos dos ejemplos concretos de dominios distintos. Limite: los ejemplos superficiales sin conexión al principio generan conocimiento fragmentado.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Retrieval-Induced Forgetting",
+    "content": "La recuperación selectiva de cierta información puede inhibir la recuperación de información relacionada. Mecanismo: la recuperación exitosa fortalece lo recordado pero debilita lo competidor no recordado (inhibition-based account). Anderson (2003): olvido inducido por recuperación. Aplicación: al estudiar temas relacionados, alternar equilibradamente para evitar que la práctica de uno inhiba al otro. Limite: el efecto es pequeño pero robusto; se reduce con práctica espaciada de todos los temas.",
+    "plan": "PREMIUM"
+  },
+  {
+    "empire": "crecimiento",
+    "title": "Collaborative Learning",
+    "content": "El aprendizaje en grupo produce beneficios cuando se dan dos condiciones: interdependencia positiva (el éxito de uno depende del de otros) y responsabilidad individual (cada miembro debe rendir cuentas). Mecanismo: la explicación entre pares genera procesamiento más profundo; la exposición a perspectivas diversas amplía las representaciones. Slavin (1995), Johnson y Johnson (2009). Limite: sin responsabilidad individual, el «free riding» reduce el beneficio; los grupos homogéneos generan menos perspectivas diversas.",
     "plan": "PREMIUM"
   }
 ]
