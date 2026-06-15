@@ -218,7 +218,7 @@
   {
     "empire": "energia",
     "title": "Tu reloj responde a la hora de la luz",
-    "content": "La luz no siempre tiene el mismo efecto sobre tu reloj interno. Por la mañana lo adelanta — te prepara para el día. Por la noche lo retrasa — te prepara para dormir. No es solo luz buena o mala: depende de cuándo la recibes. Czeisler y Khalsa mapearon la curva de respuesta de fase circadiana: la luz antes de la temperatura mínima corporal retrasa el reloj, y después la adelanta. Quince minutos de luz natural al despertar y oscuridad a la hora de dormir es la combinación más efectiva porque trabaja con la curva, no contra ella.",
+    "content": "La luz adelanta o retrasa tu reloj según cuándo la recibes — curva de respuesta de fase (Czeisler y Khalsa). Quince minutos de luz al despertar y oscuridad al dormir: trabaja con la curva.",
     "plan": "FREE"
   },
   {
@@ -344,7 +344,7 @@
   {
     "empire": "energia",
     "title": "Las primeras horas",
-    "content": "Las primeras horas de sueño son las más reparadoras: es cuando se concentra el sueño profundo (fase 3 NREM), el pico de hormona del crecimiento y la actividad glinfática de limpieza cerebral. Dormirlas mal — por acostarse tarde, alcohol o interrupciones — acelera el desgaste celular y elimina el mayor pulso reparador del día. Y la deuda no se compensa: una noche larga después de varias cortas no recupera lo perdido. Van Dongen et al. (2003) demostraron que la deuda de sueño crónica produce deterioro cognitivo acumulativo que no se percibe subjetivamente. Las primeras horas no se recuperan.",
+    "content": "Las primeras horas concentran sueño profundo (fase 3 NREM), pico de hormona del crecimiento y limpieza glinfática. Dormirlas mal acelera el desgaste celular, y la deuda no se compensa: Van Dongen et al. (2003) mostraron deterioro cognitivo acumulativo que no percibes. No se recuperan.",
     "plan": "PREMIUM"
   },
   {
@@ -518,13 +518,13 @@
   {
     "empire": "energia",
     "title": "Ejercicio y sueño: bidireccional",
-    "content": "Nervio vago y tono parasimpático: Gerritsen et al. (2018) mostraron que el ejercicio crónico aumenta el tono vagal (medido por HRV), facilitando la transición a sueño profundo. A la inversa, el sueño deficiente reduce el tono vagal. El nervio vago es también la vía para la calma voluntaria: la respiración lenta y la exhalación prolongada activan el parasimpático a través del vago. Ciclo virtuoso o vicioso: ejercicio → HRV → sueño → HRV → ejercicio; y en cualquier punto, la activación vagal voluntaria es una herramienta de recuperación. El nervio vago es el puente bidireccional entre esfuerzo y descanso, y también la puerta de entrada a la calma voluntaria.",
+    "content": "El ejercicio crónico aumenta el tono vagal (HRV), facilitando el sueño profundo (Gerritsen et al., 2018); el sueño deficiente lo reduce. El nervio vago es el puente bidireccional: la respiración lenta y la exhalación prolongada activan el parasimpático a través del vago.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Las hormonas del hambre",
-    "content": "La grelina y la leptina regulan el hambre y la saciedad, y ambas están controladas por el reloj circadiano. La grelina sube cuando el cuerpo espera comer; la leptina sube cuando ha comido suficiente. Pero la sensibilidad a la insulina también varia según la hora del día: es mayor por la mañana y menor por la noche. Esto significa que la misma comida tiene distinto efecto metabólico según cuándo la comas. Las hormonas del hambre están sincronizadas con el reloj circadiano — comer contra el ritmo es luchar contra la biología.",
+    "content": "Grelina y leptina regulan hambre y saciedad según el reloj circadiano. La sensibilidad a la insulina también varía: mayor por la mañana, menor por la noche. La misma comida tiene distinto efecto metabólico según cuándo la comas. Comer contra el ritmo es luchar contra la biología.",
     "plan": "PREMIUM"
   },
   {
@@ -566,7 +566,7 @@
   {
     "empire": "energia",
     "title": "BDNF: el fertilizante cerebral",
-    "content": "Treinta minutos de ejercicio moderado duplican el BDNF circulante —factor neurotrófico derivado del cerebro—, promoviendo neurogénesis y plasticidad sináptica. Ratey y Cotman documentaron que el BDNF es el enlace mecanístico entre ejercicio y energía cognitiva: no solo te sientes más despierto — tu cerebro crea nuevas conexiones y fortalece las existentes. El BDNF mejora el aprendizaje, la memoria y la capacidad de adaptación. Aplicación: el ejercicio no solo da energía física — fertiliza el cerebro. Limitación: los niveles de BDNF dependen de la intensidad y la regularidad del ejercicio.",
+    "content": "Treinta minutos de ejercicio moderado duplican el BDNF —factor neurotrófico derivado del cerebro—, promoviendo neurogénesis y plasticidad sináptica. Ratey y Cotman lo identificaron como enlace entre ejercicio y cognición. Mejora aprendizaje, memoria y adaptación. Depende de intensidad y regularidad.",
     "plan": "PREMIUM"
   },
   {
@@ -614,7 +614,7 @@
   {
     "empire": "energia",
     "title": "Coenzima Q10 y cadena de transporte electrónico",
-    "content": "La CoQ10 es el transportador de electrones móvil en la cadena de transporte electrónico mitocondrial. Sin CoQ10, la producción de ATP se detiene. Crane (2001) y Hoppel et al. (2007) documentaron que los niveles de CoQ10 disminuyen con la edad y con las estatinas. La suplementación mejora la fatiga en deficiencias confirmadas, pero no en personas sanas con niveles normales. La CoQ10 es el eslabón móvil de la energía celular: sin ella, la cadena se rompe y la producción de ATP se detiene.",
+    "content": "La CoQ10 es el transportador móvil de electrones en la cadena mitocondrial: sin ella, la producción de ATP se detiene. Crane (2001) y Hoppel et al. (2007) documentaron que disminuye con la edad y las estatinas. La suplementación funciona solo en deficiencias confirmadas.",
     "plan": "PREMIUM"
   },
   {

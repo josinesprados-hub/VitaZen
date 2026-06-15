@@ -656,7 +656,7 @@
   {
     "empire": "disciplina",
     "title": "Error de predicción",
-    "content": "El cerebro predice la recompensa de una acción y compara la predicción con el resultado real. La diferencia es el error de predicción. Daw et al. (2005) modelaron cómo este error guía el aprendizaje: si la recompensa es mejor de lo esperado, el cerebro refuerza la conducta; si es peor, la debilita. Si siempre es exactamente lo esperado, no aprende nada nuevo. Un hábito que siempre da la misma recompensa se mantiene pero no se fortalece. La sorpresa positiva —una recompensa inesperada— es lo que más refuerza.",
+    "content": "El cerebro predice la recompensa y compara con el resultado: la diferencia es el error de predicción. Daw et al. (2005) modelaron que si es mejor de lo esperado refuerza la conducta; si es peor, la debilita; si es igual, no aprende. La sorpresa positiva refuerza más.",
     "plan": "PREMIUM"
   }
 ]
