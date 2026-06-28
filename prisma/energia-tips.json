@@ -38,7 +38,7 @@
   {
     "empire": "energia",
     "title": "Mismo horario",
-    "content": "Acostarse y levantarse a la misma hora estabiliza el reloj circadiano. La consistencia del horario es la señal más poderosa que tiene el cuerpo para saber cuándo dormir y cuándo estar alerta. Pero no basta con dormir bien: lo que comes en esas horas también importa. Las grasas saludables en la cena — aguacate, aceite de oliva, frutos secos — proporcionan energía sostenida durante la noche sin picos glucémicos. La energía no es solo cuántas horas duermes: es qué haces y qué comes en esas horas.",
+    "content": "Acostarse y levantarse a la misma hora estabiliza el reloj circadiano: es la señal más poderosa para saber cuándo dormir y cuándo estar alerta. Las grasas saludables en la cena —aguacate, aceite de oliva o frutos secos— proporcionan energía sostenida durante la noche sin picos glucémicos.",
     "plan": "FREE"
   },
   {
@@ -254,13 +254,13 @@
   {
     "empire": "energia",
     "title": "Umbral láctico",
-    "content": "El umbral láctico es la intensidad donde la producción de lactato supera su eliminación. Es el límite entre esfuerzo sostenible y deuda. Entrenar cerca de este umbral lo desplaza hacia arriba, permitiendo más intensidad sostenible. Brooks (1985) y Philp et al. (2005) documentaron que el lactato no es un residuo: es un combustible que el cuerpo recicla. Pero cuando se produce más de lo que se puede reciclar, aparece la fatiga. No es dolor: es dato. Conocer tu umbral te permite entrenar con precisión.",
+    "content": "El umbral láctico es la intensidad donde la producción de lactato supera su eliminación: el límite entre esfuerzo sostenible y deuda. Entrenar cerca lo desplaza hacia arriba. Brooks (1985) y Philp et al. (2005) documentaron que el lactato no es un residuo, sino un combustible reciclado. No es dolor: es dato. Conocer tu umbral permite entrenar con precisión.",
     "plan": "FREE"
   },
   {
     "empire": "energia",
     "title": "EPOC: exceso de oxígeno post-ejercicio",
-    "content": "Después del ejercicio intenso, el cuerpo consume más oxígeno de lo normal durante horas (EPOC). Es el afterburn: el metabolismo se mantiene elevado para restaurar ATP, limpiar lactato y reparar tejido. Gaesser y Brooks (1984) documentaron que el EPOC es mayor tras ejercicio intenso que tras moderado, pero la magnitud real es modesta (6-15% adicional). No es magia, pero explica por qué el ejercicio sigue quemando después de parar. Lo importante no es el EPOC: es que el ejercicio intenso da beneficios que el moderado no alcanza.",
+    "content": "Tras el ejercicio intenso, el cuerpo consume más oxígeno durante horas (EPOC, o afterburn): el metabolismo se mantiene elevado para restaurar ATP, limpiar lactato y reparar tejido. Gaesser y Brooks (1984) documentaron que el EPOC es mayor tras ejercicio intenso que moderado, pero modesto (6-15% adicional). Lo importante no es el EPOC: es que el ejercicio intenso da beneficios que el moderado no alcanza.",
     "plan": "FREE"
   },
   {
@@ -284,7 +284,7 @@
   {
     "empire": "energia",
     "title": "Sobrecarga progresiva",
-    "content": "El principio de sobrecarga progresiva: el cuerpo se adapta al estímulo repetido. Para mejorar, el estímulo debe incrementarse gradualmente en carga, volumen, densidad o complejidad. Kraemer et al. (2002) documentaron que sin progresión, el cuerpo se adapta y estanca. No se trata de hacer más siempre, sino de hacer un poco más que la última vez. El estancamiento no es falta de esfuerzo: es falta de progresión. Si llevas meses en el mismo nivel, el cuerpo ya se adaptó — necesita un nuevo estímulo.",
+    "content": "Sobrecarga progresiva: el cuerpo se adapta al estímulo repetido. Para mejorar, el estímulo debe incrementarse en carga, volumen, densidad o complejidad. Kraemer et al. (2002) documentaron que sin progresión el cuerpo se estanca. No se trata de hacer más siempre: es hacer un poco más que la última vez. El estancamiento no es falta de esfuerzo: es falta de progresión.",
     "plan": "FREE"
   },
   {
@@ -620,7 +620,7 @@
   {
     "empire": "energia",
     "title": "Pantallas y melatonina: profundización",
-    "content": "Chang et al. (2015) demostraron que 4 horas de iPad antes de dormir retrasa la melatonina 1.5h y reduce la fase REM. Los filtros de luz azul reducen la supresión un 50% pero no la eliminan. El umbral de efecto es tan bajo como 10 lux a 460nm. Hysing et al. (2015) confirmaron el efecto en adolescentes con datos poblacionales. La única solución completa es eliminar pantallas 2h antes de dormir. Los filtros ayudan pero no resuelven: la melatonina no negocia con la luz azul.",
+    "content": "Chang et al. (2015): 4h de iPad antes de dormir retrasa la melatonina 1.5h y reduce la fase REM. Filtros de luz azul: reducen la supresión un 50% pero no la eliminan (umbral: 10 lux a 460nm). Hysing et al. (2015) confirmaron el efecto en adolescentes. Solución completa: eliminar pantallas 2h antes. La melatonina no negocia con la luz azul.",
     "plan": "PREMIUM"
   },
   {
