@@ -194,7 +194,7 @@
   {
     "empire": "energia",
     "title": "La merienda que sostiene",
-    "content": "Índice glucémico y respuesta insulínica postprandial: una merienda con solo carbohidratos de alto índice glucémico genera un pico rápido de glucosa seguido de una caída (hipoglucemia reactiva) que amplifica la sensación de fatiga. La combinación de proteína y grasa con carbohidratos reduce la velocidad de absorción (índice glucémico de la comida completa), manteniendo la glucemia estable y previniendo la caída de energía de media tarde. Ludwig (2002) demostró que el índice glucémico de la comida completa predice la respuesta energética mejor que cualquier nutriente aislado. La merienda que sostiene no es la que te da un subidón: es la que mantiene estable la glucosa.",
+    "content": "Carbohidratos de alto índice glucémico solos generan pico y caída de glucosa (hipoglucemia reactiva = fatiga). Combinar con proteína y grasa reduce la absorción. Ludwig (2002): el índice glucémico de la comida completa predice la respuesta energética mejor que cualquier nutriente aislado. La merienda que sostiene no es la del subidón: es la que mantiene estable la glucosa.",
     "plan": "FREE"
   },
   {
@@ -506,7 +506,7 @@
   {
     "empire": "energia",
     "title": "Posición y limpieza cerebral",
-    "content": "El sistema glinfático limpia el cerebro durante el sueño, y la posición lateral es la más eficiente para esta limpieza (Lee et al. 2015). El mecanismo depende de la gravedad y la compresión torácica. Pero el cuerpo también tiene un sistema de limpieza: el sistema linfático, que se activa con el movimiento. Caminar, contraer músculos, moverse — todo eso bombea la linfa y limpia los tejidos. Dos sistemas de limpieza: el glinfático (cerebro, posición lateral) y el linfático (cuerpo, movimiento como bomba). Ambos necesitan condiciones distintas, pero ambos necesitan que te muevas y duermas bien.",
+    "content": "El glinfático limpia el cerebro durante el sueño: la posición lateral es la más eficiente (Lee et al. 2015), por gravedad y compresión torácica. El linfático limpia el cuerpo con el movimiento — caminar y contraer músculos bombea la linfa. Condiciones distintas, pero ambos necesitan que te muevas y duermas bien.",
     "plan": "PREMIUM"
   },
   {
@@ -548,13 +548,13 @@
   {
     "empire": "energia",
     "title": "La curva de fase circadiana",
-    "content": "El efecto de la luz sobre tu reloj interno depende de cuándo la recibes. Czeisler y Khalsa mapearon la curva de respuesta de fase: la luz antes de la temperatura mínima corporal retrasa el reloj, y después la adelanta. La sensibilidad máxima ocurre en las horas previas al pico de melatonina. Esto tiene aplicaciones de cronoterapia: la misma luz que te adelanta por la mañana te retrasa por la noche. Para viajeros y turniculares, saber en qué punto de la curva están permite ajustar el reloj de forma dirigida en vez de aleatoria. Limitación: la curva varía según cronotipo — los vespertinos tienen su temperatura mínima más tarde.",
+    "content": "Czeisler y Khalsa mapearon la curva de respuesta de fase circadiana: la luz antes de la temperatura mínima corporal retrasa el reloj, y después la adelanta. La sensibilidad máxima ocurre en las horas previas al pico de melatonina. Cronoterapia: la misma luz que adelanta por la mañana retrasa por la noche — saber tu punto en la curva permite ajustes dirigidos. Limitación: la curva varía según cronotipo; los vespertinos tienen su temperatura mínima más tarde.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Melatonina y luz azul",
-    "content": "La luz de 460-480nm suprime la melatonina a través de la melanopsina (fotorreceptor intrínseco en células ganglionares de la retina, Brainard et al. 2001, Thapan et al. 2001). La supresión es aguda y dependiente de la intensidad: 15 min de pantalla retrasa el inicio de melatonina. Chang (2015) cuantificó el efecto de dispositivos electrónicos en condiciones controladas: 4 horas de iPad antes de dormir retrasa la melatonina 1.5h y reduce la fase REM. Los filtros de luz azul reducen la supresión un 50% pero no la eliminan. La exposición a pantallas en las 2 horas previas al sueño suprime melatonina en más del 50%. La luz nocturna doméstica también afecta. La melatonina no se recupera fácilmente una vez suprimida. Tema exclusivo: fotobiología y melatonina.",
+    "content": "La luz de 460-480nm suprime la melatonina vía melanopsina —fotorreceptor retiniano— (Brainard et al. 2001, Thapan et al. 2001). La supresión depende de la intensidad: 15 min de pantalla retrasa el inicio; Chang (2015): 4h de iPad retrasan la melatonina 1.5h y reducen la fase REM. Pantallas en las 2h previas al sueño suprimen melatonina >50%; los filtros de luz azul reducen la supresión un 50% pero no la eliminan. La melatonina no se recupera fácilmente una vez suprimida.",
     "plan": "PREMIUM"
   },
   {

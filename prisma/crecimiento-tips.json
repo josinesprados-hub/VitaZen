@@ -590,7 +590,7 @@
   {
     "empire": "crecimiento",
     "title": "Cognitive Load Theory",
-    "content": "La memoria de trabajo tiene capacidad limitada: procesa entre 4 y 7 elementos nuevos simultáneamente. Sweller (1988) identificó tres tipos de carga: intrínseca (complejidad inherente del contenido), extrínseca (diseño deficiente de la instrucción) y relevante (procesamiento que construye esquemas mentales). Mecanismo: la carga extrínseca compite por los mismos recursos de memoria de trabajo que la carga relevante; reducir la primera libera recursos para la segunda. Sweller, Ayres y Kalyuga (2011): los ejemplos resueltos (worked examples) y el efecto de finalidad libre (goal-free effect) reducen carga extrínseca y mejoran el aprendizaje. Aplicación: al aprender algo nuevo, usar ejemplos resueltos antes de practicar solo, eliminar distracciones innecesarias y presentar un concepto nuevo a la vez. Limite: la teoría se aplica principalmente a dominios con estructura clara; en tareas de descubrimiento o creatividad, cierta carga extrínseca puede ser beneficiosa.",
+    "content": "La memoria de trabajo procesa 4-7 elementos nuevos a la vez. Sweller (1988) identificó tres cargas: intrínseca (complejidad del contenido), extrínseca (diseño deficiente) y relevante (construye esquemas mentales). Reducir la extrínseca libera recursos para la relevante. Sweller, Ayres y Kalyuga (2011): los ejemplos resueltos y el efecto goal-free reducen carga extrínseca y mejoran el aprendizaje. Aplicación: un concepto nuevo a la vez. Límite: en tareas de descubrimiento o creatividad, cierta carga extrínseca puede ser beneficiosa.",
     "plan": "PREMIUM"
   },
   {
