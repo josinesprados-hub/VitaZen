@@ -266,7 +266,7 @@
   {
     "empire": "energia",
     "title": "Reloj hepático y metabolismo",
-    "content": "El hígado tiene su propio reloj circadiano que regula la glucogenólisis, la gluconeogénesis y la desintoxicación. Cuando comes altera la fase del reloj hepático; cuando no comes, se desincroniza del reloj central. Stokkan et al. (2001) documentaron que esto explica por qué la misma comida tiene distinto efecto metabólico según la hora: no es solo el reloj central, es que el hígado también tiene hora. Tu hígado no procesa igual a las ocho de la mañana que a las diez de la noche — y eso no es opinión, es cronobiología.",
+    "content": "El hígado tiene reloj circadiano propio que regula glucogenólisis, gluconeogénesis y desintoxicación. Comer altera la fase del reloj hepático; no comer lo desincroniza del reloj central. Stokkan et al. (2001) documentaron que la misma comida tiene distinto efecto metabólico según la hora. Tu hígado no procesa igual por la mañana que por la noche.",
     "plan": "FREE"
   },
   {
@@ -482,7 +482,7 @@
   {
     "empire": "energia",
     "title": "Ritmo circadiano y comida",
-    "content": "El reloj circadiano regula no solo el sueño sino también la digestión y el metabolismo. La sensibilidad a la insulina, la producción de enzimas digestivas y la eficiencia de absorción varían según la hora del día. No solo qué comes sino cuándo: la ciencia circadiana explica por qué el timing importa. Una comida idéntica genera una respuesta glucémica diferente por la mañana y por la noche. Meeusen (2013) mostró que la alimentación es un zeitgeber secundario que sincroniza relojes periféricos. Comer alineado con el ritmo circadiano maximiza la energía; comer contra él, la desperdicia.",
+    "content": "El reloj circadiano regula sueño, digestión y metabolismo. La sensibilidad a la insulina, las enzimas digestivas y la absorción varían según la hora: una comida idéntica genera distinta respuesta glucémica por la mañana y por la noche. Meeusen (2013) mostró que la alimentación es un zeitgeber secundario que sincroniza relojes periféricos. Comer alineado con el ritmo maximiza la energía; comer contra él, la desperdicia.",
     "plan": "PREMIUM"
   },
   {
@@ -560,7 +560,7 @@
   {
     "empire": "energia",
     "title": "HRV: tu marcador de recuperación",
-    "content": "HRV como marcador de recuperación autonómica: la variabilidad de la frecuencia cardiaca refleja el balance entre sistema nervioso simpático y parasimpático. Plews et al. (2013) demostraron que la HRV solo es válida comparada con tu propia línea base de 7 días. rMSSD es la métrica más robusta. Una variación del 0.5-1.0x tu línea base indica normalidad; menor a 0.5x indica fatiga acumulada; mayor a 1.0x indica supercompensación (ver P#47 para el concepto de supercompensación). Limitación: la HRV tiene variabilidad inter-individual enorme y solo es útil comparándote contigo mismo.",
+    "content": "La variabilidad de la frecuencia cardiaca refleja el balance simpático-parasimpático. Plews et al. (2013) demostraron que la HRV solo es válida comparada con tu línea base de 7 días (rMSSD es la métrica más robusta). 0.5-1.0x tu base indica normalidad; <0.5x, fatiga acumulada; >1.0x, supercompensación (ver P#47). Variabilidad inter-individual enorme: solo útil comparándote contigo mismo.",
     "plan": "PREMIUM"
   },
   {
@@ -644,7 +644,7 @@
   {
     "empire": "energia",
     "title": "Termogénesis adaptativa",
-    "content": "Cuando el cuerpo pierde peso, reduce el gasto energético más de lo que la pérdida de masa predice: la termogénesis adaptativa. El metabolismo se ralentiza hasta un 15% por debajo de lo esperado para defender el peso anterior. Leibel et al. (1995) y Rosenbaum et al. (2008) documentaron que esto explica por qué recuperar peso es fácil y mantener la pérdida es difícil. El cuerpo no sabe que quieres estar más ligero: defiende su set point. No es falta de voluntad: es un mecanismo de supervivencia que hay que conocer para gestionarlo.",
+    "content": "La termogénesis adaptativa reduce el gasto energético hasta un 15% por debajo de lo que la pérdida de masa predice. Leibel et al. (1995) y Rosenbaum et al. (2008) documentaron que el cuerpo defiende su set point: recuperar peso es fácil, mantener la pérdida es difícil. No es falta de voluntad: es un mecanismo de supervivencia que hay que conocer para gestionarlo.",
     "plan": "PREMIUM"
   },
   {
@@ -656,7 +656,7 @@
   {
     "empire": "energia",
     "title": "NAD+ y declive energético con la edad",
-    "content": "El NAD+ (nicotinamida adenina dinucleótido) es una coenzima esencial para la producción de ATP y la función de las sirtuinas. Sus niveles disminuyen un 50% entre los 40 y los 60 años, reduciendo la capacidad energética celular. Imai y Guarente (2014) y Verdin (2015) documentaron que el ejercicio y la restricción calórica mantienen los niveles de NAD+. No es solo envejecer: es que las células pierden su batería. Lo que se pierde con la edad no es irrecuperable — el ejercicio y la restricción calórica pueden frenar el declive.",
+    "content": "El NAD+ (nicotinamida adenina dinucleótido) es una coenzima esencial para la producción de ATP y la función de las sirtuinas. Sus niveles disminuyen un 50% entre los 40 y los 60 años. Imai y Guarente (2014) y Verdin (2015) documentaron que el ejercicio y la restricción calórica mantienen los niveles de NAD+ y pueden frenar el declive. No es solo envejecer: es que las células pierden su batería.",
     "plan": "PREMIUM"
   }
 ]
