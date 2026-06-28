@@ -1,6 +1,7 @@
 'use client';
 
-import { Lightbulb, Circle } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
+import { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import Link from 'next/link';
 import { useEmpireTips, type Tip } from '@/hooks/useEmpireTips';
 
@@ -22,11 +23,24 @@ interface EmpireTipsSectionProps {
   subtitle: string;
 }
 
-function TipCard({ tip }: { tip: Tip }) {
+function TipCard({ tip, locked }: { tip: Tip; locked?: boolean }) {
   return (
     <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4">
-      <h3 className="text-champagne font-medium text-sm mb-1">{tip.title}</h3>
-      <p className="text-[#999] text-sm">{tip.content}</p>
+      {locked ? (
+        <>
+          <div className="mb-1">
+            <PremiumInlineBadge isPremium={true} freeLabel="" premiumLabel="Premium" />
+          </div>
+          <h3 className="text-champagne font-medium text-sm mb-3">{tip.title}</h3>
+          <p className="text-[#888] text-sm mb-3">🔒 Disponible con Élite</p>
+          <Link href="/elite" className="text-champagne/40 hover:text-champagne/70 transition-colors text-[10px]">Conocer Élite</Link>
+        </>
+      ) : (
+        <>
+          <h3 className="text-champagne font-medium text-sm mb-1">{tip.title}</h3>
+          <p className="text-[#999] text-sm">{tip.content}</p>
+        </>
+      )}
     </div>
   );
 }
@@ -66,31 +80,10 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
                   <TipCard key={tip.id} tip={tip} />
                 ))
               ) : (
-                // Free user: gentle dim + depth whisper
-                <div className="relative">
-                  {/* Dimmed preview — no blur */}
-                  <div className="opacity-30 select-none pointer-events-none space-y-3">
-                    {premiumTips.map((tip) => (
-                      <TipCard key={tip.id} tip={tip} />
-                    ))}
-                  </div>
-
-                  {/* Depth overlay — gradient fade */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg depth-gate-overlay">
-                    <div className="flex flex-col items-center gap-2 px-6 text-center">
-                      <Circle size={5} className="text-champagne/40" fill="currentColor" />
-                      <p className="text-[#888] text-xs leading-relaxed">
-                        Hay notas que solo aparecen con el tiempo
-                      </p>
-                      <Link
-                        href="/elite"
-                        className="text-champagne/40 hover:text-champagne/70 transition-colors text-[10px]"
-                      >
-                        Conocer Élite
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+                // Free user: locked — tip.content never in DOM
+                premiumTips.map((tip) => (
+                  <TipCard key={tip.id} tip={tip} locked />
+                ))
               )
             )}
           </>
