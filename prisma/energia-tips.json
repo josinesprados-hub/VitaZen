@@ -278,7 +278,7 @@
   {
     "empire": "energia",
     "title": "NEAT: termogénesis sin ejercicio",
-    "content": "La termogénesis por actividad no ejercicio (NEAT) es la energía que gastas en movimientos espontáneos: gesticular, caminar, mantener la postura, dar vueltas. Levine (2002) documentó que es la componente más variable del gasto energético diario (100-800 kcal) y explica gran parte de las diferencias individuales. No necesitas gimnasio para quemar más: necesitas moverte más en la vida diaria. La persona que se mueve todo el día puede gastar más que la que hace una hora de gimnasio y luego se sienta ocho horas.",
+    "content": "La termogénesis por actividad no ejercicio (NEAT) es la energía en movimientos espontáneos: gesticular, caminar, mantener la postura. Levine (2002) documentó que es la componente más variable del gasto diario (100-800 kcal). Quien se mueve todo el día puede gastar más que quien hace una hora de gimnasio y luego se sienta ocho horas.",
     "plan": "FREE"
   },
   {
@@ -626,7 +626,7 @@
   {
     "empire": "energia",
     "title": "GH nocturna",
-    "content": "La hormona del crecimiento (GH) se secreta en pulsos durante el sueño profundo (fase 3 NREM) de la primera mitad de la noche. El pico ocurre 30-70 min después de dormir. Van Cauter et al. (2000) y Steiger (2003) documentaron que la supresión de sueño profundo (alcohol, calor, ruido) elimina el mayor pulso de GH del día. La GH es crítica para reparación tisular, metabolismo lipídico y síntesis proteica. No hay suplemento que reemplace lo que el sueño profundo produce de forma natural.",
+    "content": "La hormona del crecimiento (GH) se secreta en sueño profundo (fase 3 NREM) de la primera mitad de la noche; pico a los 30-70 min. Van Cauter et al. (2000) y Steiger (2003) documentaron que suprimir sueño profundo (alcohol, calor, ruido) elimina el mayor pulso de GH del día — crítico para reparación tisular, metabolismo lipídico y síntesis proteica. No hay suplemento que lo reemplace.",
     "plan": "PREMIUM"
   },
   {

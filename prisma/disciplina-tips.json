@@ -2,7 +2,7 @@
   {
     "empire": "disciplina",
     "title": "Anclar",
-    "content": "Conectar un hábito nuevo a uno que ya haces sin pensar cuesta menos que empezar desde cero. Es la técnica de anclaje: usa una rutina existente como trampolín. Pero también puedes anclar a un evento que ya ocurre en tu día — como «después de cenar» o «al llegar a casa»—. Un evento que ya existe sirve como señal automática sin que tengas que recordarla. El anclaje funciona con acciones y con eventos: lo importante es que la señal ya esté ahí.",
+    "content": "Anclar un hábito nuevo a una rutina existente cuesta menos que empezar desde cero. También puedes anclarlo a un evento del día —como «después de cenar» o «al llegar a casa»—. Funciona con acciones y con eventos: lo importante es que la señal ya esté ahí.",
     "plan": "FREE"
   },
   {
@@ -314,7 +314,7 @@
   {
     "empire": "disciplina",
     "title": "Contexto y hábito viajan juntos",
-    "content": "Un hábito atado a un contexto se activa ahí. Cambiar de contexto puede desactivarlo — por eso los viajes rompen rutinas. El contexto es parte del hábito. Y tu entorno es más amplio de lo que piensas: la gente con la que convives influye en tus hábitos sin que lo notes. Incluso las personas que no conoces directamente pero que rodean a quien te rodea afectan lo que te parece normal. Tu contexto no es solo tu escritorio — es tu red completa.",
+    "content": "Un hábito atado a un contexto se activa ahí; cambiar de contexto puede desactivarlo — por eso los viajes rompen rutinas. La gente con la que convives influye en tus hábitos sin que lo notes. Incluso las personas que rodean a quien te rodea afectan lo que te parece normal. Tu contexto no es solo tu escritorio: es tu red completa.",
     "plan": "PREMIUM"
   },
   {
@@ -350,7 +350,7 @@
   {
     "empire": "disciplina",
     "title": "El mito de los 21 días",
-    "content": "Un hábito simple puede tomar 21 días. Uno complejo puede tomar 254. Lally et al. (2010) encontraron que el promedio real está alrededor de 66 días, con una variación enorme entre personas y hábitos. El mito de los 21 días viene de una simplificación de los trabajos de Maxwell Maltz. Esperar que un hábito se forme en tres semanas y frustrarse cuando no pasa es culpa del mito, no de tu disciplina. La automatización toma lo que toma — y eso es normal.",
+    "content": "Lally et al. (2010): el promedio real para formar un hábito es 66 días, con variación enorme — desde 21 hasta 254. El mito de los 21 días viene de una simplificación de Maxwell Maltz. Frustrarse cuando no se forma en tres semanas es culpa del mito, no de tu disciplina. La automatización toma lo que toma.",
     "plan": "PREMIUM"
   },
   {
