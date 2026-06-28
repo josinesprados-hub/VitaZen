@@ -626,7 +626,7 @@
   {
     "empire": "crecimiento",
     "title": "Perceptual Learning",
-    "content": "La capacidad de detectar, diferenciar y reconocer patrones en estímulos complejos mejora con la experiencia selectiva. Gibson (1969): el aprendizaje perceptual no requiere retroalimentación explícita — la exposición repetida a diferencias finas calibra la sensibilidad del sistema perceptual. Mecanismo: la atención se ajusta progresivamente a las dimensiones diagnósticas del estímulo, reduciendo la necesidad de procesamiento consciente. Aplicación: exponerse a múltiples ejemplos variados de un concepto entrena la discriminación sin necesidad de instrucción explícita. Limite: el aprendizaje perceptual es específico al dominio; la transferencia entre dominios perceptuales es limitada.",
+    "content": "Gibson (1969): el aprendizaje perceptual no requiere retroalimentación explícita — la exposición repetida a diferencias finas calibra la sensibilidad del sistema. La atención se ajusta a las dimensiones diagnósticas del estímulo, reduciendo el procesamiento consciente. Aplicación: exponerse a múltiples ejemplos variados entrena la discriminación. Limitación: es específico al dominio; la transferencia entre dominios es limitada.",
     "plan": "PREMIUM"
   },
   {

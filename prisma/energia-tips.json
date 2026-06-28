@@ -182,7 +182,7 @@
   {
     "empire": "energia",
     "title": "Un vaso antes",
-    "content": "Beber un vaso de agua antes de comer activa los mecanismos de saciedad y reduce la cantidad que necesitas ingerir. Lo que consumes antes de comer (agua) y antes de dormir (cena ligera) modula la saciedad y la calidad del sueño. Una cena ligera — sin grasas pesadas ni azúcar — facilita la digestión nocturna y evita que el sueño se fragmente por el trabajo digestivo. El agua antes de comer y la cena ligera antes de dormir son dos palancas sencillas que no requieren esfuerzo extra.",
+    "content": "Beber un vaso de agua antes de comer activa la saciedad y reduce la cantidad ingerida. Una cena ligera — sin grasas pesadas ni azúcar — facilita la digestión nocturna y evita que el sueño se fragmente. Dos palancas sencillas que no requieren esfuerzo extra.",
     "plan": "FREE"
   },
   {
@@ -212,7 +212,7 @@
   {
     "empire": "energia",
     "title": "La sustancia del cansancio",
-    "content": "Mientras estás despierto, la adenosina se acumula en el cerebro como mecanismo homeostático del cansancio. Cada hora sin dormir, más adenosina en los receptores. Por eso el cansancio crece de forma predecible a lo largo del día. Y por eso la cafeína solo lo esconde — bloquea la señal, pero la adenosina sigue ahí acumulándose. Cuando pasa el efecto, el cansancio vuelve con lo que postergaste. Solo el sueño real limpia la adenosina del cerebro. Basheer y Porkka-Heiskanen documentaron este mecanismo como la presión homeostática del sueño.",
+    "content": "La adenosina se acumula en el cerebro como mecanismo homeostático del cansancio: cada hora sin dormir, más adenosina en los receptores. La cafeína solo bloquea la señal — la adenosina sigue acumulándose y el cansancio vuelve al pasar el efecto. Solo el sueño real limpia la adenosina. Basheer y Porkka-Heiskanen documentaron este mecanismo como la presión homeostática del sueño.",
     "plan": "FREE"
   },
   {
@@ -242,7 +242,7 @@
   {
     "empire": "energia",
     "title": "Mioquinas y energía",
-    "content": "El músculo esquelético funciona como un órgano endocrino: durante el ejercicio, secreta mioquinas (irisina, IL-6, BDNF) que comunican con el hígado, el cerebro y el tejido adiposo. La IL-6 muscular reduce la inflamación sistémica y mejora la sensibilidad a la insulina. Pedersen y Febbraio (2012) documentaron que el ejercicio no solo quema calorías: reprograma tu metabolismo a través de las mioquinas. El músculo no es un órgano pasivo — es un intermediario químico que transforma el movimiento en señales que mejoran la energía de todo el cuerpo.",
+    "content": "El músculo esquelético funciona como órgano endocrino: durante el ejercicio secreta mioquinas (irisina, IL-6, BDNF) que comunican con hígado, cerebro y tejido adiposo. La IL-6 muscular reduce la inflamación sistémica y mejora la sensibilidad a la insulina. El músculo no es un órgano pasivo: Pedersen y Febbraio (2012) documentaron que el ejercicio no solo quema calorías, sino que reprograma el metabolismo a través de las mioquinas.",
     "plan": "FREE"
   },
   {
@@ -632,7 +632,7 @@
   {
     "empire": "energia",
     "title": "Resistencia a la insulina y fatiga crónica",
-    "content": "La resistencia a la insulina es una causa oculta de fatiga crónica: las células no responden bien a la insulina, la glucosa no entra eficientemente, y el cerebro recibe menos combustible a pesar de niveles altos de glucosa en sangre. Reaven (1988) y Floyd et al. (2013) documentaron que el resultado es fatiga postprandial, somnolencia y niebla mental. Se detecta con HbA1c y HOMA-IR. No es diabetes: es el paso anterior, y es reversible con ejercicio y dieta. La fatiga que no mejora puede tener una explicación metabólica.",
+    "content": "La resistencia a la insulina es una causa oculta de fatiga: las células no responden a la insulina y el cerebro recibe menos combustible a pesar de la glucosa alta en sangre. Reaven (1988) y Floyd et al. (2013) documentaron fatiga postprandial, somnolencia y niebla mental. Se detecta con HbA1c y HOMA-IR. Es el paso anterior a la diabetes, y es reversible con ejercicio y dieta.",
     "plan": "PREMIUM"
   },
   {
