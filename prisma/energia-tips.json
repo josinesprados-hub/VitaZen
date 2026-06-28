@@ -8,7 +8,7 @@
   {
     "empire": "energia",
     "title": "Cada hora, muévete",
-    "content": "Cinco minutos de movimiento cada hora. No es ejercicio — es recordar que tienes cuerpo. Seis veces al día son treinta minutos acumulados. Es más sostenible que una hora que nunca haces. Además del movimiento, el orden en que comes también afecta tu energía: empezar por las verduras y proteínas antes que los carbohidratos reduce el pico glucémico y mantiene la energía estable. Dos palancas de energía que no requieren más tiempo ni más esfuerzo: muévete con frecuencia y ordena tu plato.",
+    "content": "Cinco minutos de movimiento cada hora no son ejercicio — es recordar que tienes cuerpo. Seis veces al día suman treinta minutos, más sostenibles que una hora que nunca haces. Y el orden en que comes importa: empezar por verduras y proteínas antes que carbohidratos reduce el pico glucémico y mantiene la energía estable.",
     "plan": "FREE"
   },
   {
@@ -170,7 +170,7 @@
   {
     "empire": "energia",
     "title": "Inercia del sueño",
-    "content": "La transición de sueño a vigilia no es instantánea. La inercia del sueño —esa neblina al despertar— dura entre quince y treinta minutos, y puede extenderse más si te despiertan de sueño profundo. Jewett et al. (1999) documentaron que la severidad depende de la fase del ciclo de sueño en la que ocurre el despertar. La luz gradual al amanecer reduce la inercia porque el cerebro inicia la transición antes. Una alarma fuerte en medio del sueño profundo amplifica la desorientación.",
+    "content": "La transición de sueño a vigilia no es instantánea. La inercia del sueño —neblina al despertar— dura quince a treinta minutos. Jewett et al. (1999) documentaron que la severidad depende de la fase del ciclo de sueño: una alarma en sueño profundo amplifica la desorientación. La luz gradual al amanecer reduce la inercia porque el cerebro inicia la transición antes.",
     "plan": "FREE"
   },
   {
@@ -272,7 +272,7 @@
   {
     "empire": "energia",
     "title": "Cortisol al despertar (CAR)",
-    "content": "La Respuesta de Cortisol al Despertar (CAR) es un pico de cortisol 30-45 minutos después de despertar que da energía natural. Pruessner et al. (1997) documentaron que suprimirlo — quedarse en la cama, pantallas inmediatas — desperdicia esta ventana. El CAR es el motor de la mañana: hay que usarlo, no apagarlo. Levantarse y exponerse a la luz natural potencia el CAR; quedarse en la cama con el teléfono lo amortigua. Esa energía matutina no es casual: es cortisol haciendo su trabajo.",
+    "content": "La Respuesta de Cortisol al Despertar (CAR) es un pico de cortisol 30-45 minutos tras despertar. Pruessner et al. (1997): suprimirlo —quedarse en la cama, pantallas inmediatas— desperdicia esta ventana. El CAR es el motor de la mañana: luz natural lo potencia, la cama y el teléfono lo amortigua.",
     "plan": "FREE"
   },
   {
@@ -368,7 +368,7 @@
   {
     "empire": "energia",
     "title": "Tu metabolismo es tuyo",
-    "content": "Dos personas pueden comer lo mismo y obtener distinta energía. La diversidad bacteriana intestinal determina la eficiencia de extracción calórica (Turnbaugh et al. 2006). El gen CYP1A2 determina si metabolizas la cafeína rápido o lento — y cambia su efecto por horas. La absorción de hierro y vitamina D varía según genética y estado fisiológico. No existen prescripciones universales: lo que funciona para uno puede ser ineficaz o contraproducente para otro. Conocer tu metabolismo individual es más útil que seguir reglas generales.",
+    "content": "Dos personas pueden comer lo mismo y obtener distinta energía. La diversidad bacteriana intestinal determina la eficiencia de extracción calórica (Turnbaugh et al. 2006). El gen CYP1A2 determina si metabolizas la cafeína rápido o lento — y cambia su efecto por horas. La absorción de hierro y vitamina D varía según genética y estado fisiológico. Conocer tu metabolismo individual es más útil que seguir reglas generales.",
     "plan": "PREMIUM"
   },
   {
@@ -638,7 +638,7 @@
   {
     "empire": "energia",
     "title": "Fatiga central y serotonina",
-    "content": "La hipótesis de la fatiga central propone que el cerebro limita el esfuerzo antes de que el cuerpo falle. La serotonina central aumenta durante el ejercicio prolongado, generando sensación de cansancio y reduciendo la activación motora. Meeusen y De Meirleir (1995) y Davis y Bailey (1996) documentaron que no es que los músculos no puedan más: es que el cerebro los apaga para protegerlos. La fatiga es una decisión del cerebro, no un límite del músculo. Entender esto cambia cómo entrenas: no siempre es el cuerpo el que dice basta.",
+    "content": "La fatiga central propone que el cerebro limita el esfuerzo antes de que el cuerpo falle. La serotonina central aumenta en ejercicio prolongado, generando cansancio y reduciendo la activación motora. Meeusen y De Meirleir (1995) y Davis y Bailey (1996): no es que los músculos no puedan más — el cerebro los apaga para protegerlos. Entender esto cambia cómo entrenas.",
     "plan": "PREMIUM"
   },
   {
