@@ -14,7 +14,7 @@
   {
     "empire": "energia",
     "title": "Luz temprana",
-    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. Es la señal más fuerte que tiene el cuerpo para saber qué hora es. La luz por la mañana y la oscuridad por la noche son las dos señales que más estabilizan tu ritmo. Otros estímulos actúan como señales secundarias: comer despacio permite que las hormonas de saciedad actúen antes de que hayas comido de más, y la música con ritmo adecuado puede modular el estado de alerta. Pero la luz natural es la señal maestra — las demás se alinean con ella.",
+    "content": "Quince minutos de luz natural por la mañana ajustan el reloj interno. Luz matutina y oscuridad nocturna estabilizan el ritmo; otros estímulos son secundarios. La luz natural es la señal circadiana dominante — el resto se sincroniza con ella.",
     "plan": "FREE"
   },
   {
@@ -530,7 +530,7 @@
   {
     "empire": "energia",
     "title": "Supercompensación",
-    "content": "Zatsiorsky (1995): tras un estímulo que genera fatiga, el cuerpo no solo recupera sino que supera (supercompensación). Ventana temporal de 12-36 horas. Si el siguiente estímulo llega dentro de esta ventana, el progreso se acumula. Si llega demasiado pronto, se acumula fatiga. Pero si el estrés supera sistemáticamente la capacidad de recuperación, el cuerpo entra en sobreentrenamiento: cortisol crónicamente elevado, HRV deprimida, rendimiento estancado o en descenso, y fatiga persistente. La línea entre supercompensación y sobreentrenamiento es fina: el estímulo debe ser suficiente para adaptarse, pero no tan continuo que el cuerpo no pueda recuperarse.",
+    "content": "Zatsiorsky (1995): tras un estímulo, el cuerpo supera su nivel previo (supercompensación) en 12-36 horas. A tiempo: progreso acumulado. Demasiado pronto: fatiga a corto plazo. Si el estrés supera sistemáticamente la recuperación, se produce sobreentrenamiento: cortisol elevado, HRV deprimida, fatiga persistente. Estímulo suficiente para adaptarse, no tan continuo que impida recuperar.",
     "plan": "PREMIUM"
   },
   {
@@ -584,7 +584,7 @@
   {
     "empire": "energia",
     "title": "Óxido nítrico y flujo sanguíneo",
-    "content": "El óxido nítrico (NO) es un vasodilatador producido por el endotelio vascular que regula el flujo sanguíneo. El ejercicio aumenta la producción de NO, mejorando la entrega de oxígeno y nutrientes a músculos y cerebro. Moncada y Higgs (1993) y Bescos et al. (2012) documentaron que los nitratos dietéticos (remolacha, espinacas) potencian esta vía. El NO es la razón por la que el ejercicio mejora la energía de forma aguda: más flujo, más combustible. Sin NO, los vasos se contraen y la energía se reduce.",
+    "content": "El óxido nítrico (NO), producido por el endotelio vascular, regula el flujo sanguíneo. El ejercicio aumenta la producción de NO, mejorando la entrega de oxígeno y nutrientes. Moncada y Higgs (1993) y Bescos et al. (2012) documentaron que los nitratos dietéticos (remolacha, espinacas) potencian esta vía. Más flujo, más combustible: sin NO los vasos se contraen y la energía cae.",
     "plan": "PREMIUM"
   },
   {
