@@ -200,7 +200,7 @@
   {
     "empire": "energia",
     "title": "La jerarquía funciona",
-    "content": "Antes de buscar suplementos o rutinas raras: duerme bien, muévete, come real, bebe agua. El sueño resuelve entre el cuarenta y el cincuenta por ciento del rendimiento cognitivo. El ejercicio añade otro veinte a treinta por ciento. La nutrición cubre un quince a veinte. La suplementación aporta menos de un cinco por ciento si no hay deficiencia. Cada capa depende de la anterior: no tiene sentido optimizar la nutrición si duermes mal, ni tomar suplementos si lo básico no está cubierto.",
+    "content": "Antes de buscar suplementos o rutinas raras: duerme bien, muévete, come real, bebe agua. El sueño resuelve entre el cuarenta y el cincuenta por ciento del rendimiento cognitivo. El ejercicio añade otro veinte a treinta por ciento. La nutrición cubre un quince a veinte. La suplementación aporta menos de un cinco por ciento sin deficiencia. Cada capa depende de la anterior.",
     "plan": "FREE"
   },
   {
@@ -440,7 +440,7 @@
   {
     "empire": "energia",
     "title": "El eje del estrés crónico",
-    "content": "El estrés crónico activa el eje HPA (hipotálamo-hipófisis-adrenal) de forma sostenida. El cortisol elevado crónicamente suprime el sueño profundo, reduce la variabilidad cardíaca y eleva la proteína C reactiva. Las señales concretas: despertar a las tres o cuatro de la mañana, dificultad para recuperar peso a pesar de comer, infecciones frecuentes. Meeusen (2013) estableció la relación entre sobreentrenamiento y disfunción del eje HPA. El estrés no es solo mental — tiene un mecanismo hormonal que se puede medir y gestionar.",
+    "content": "El estrés crónico activa el eje HPA (hipotálamo-hipófisis-adrenal) de forma sostenida. El cortisol elevado suprime el sueño profundo, reduce la variabilidad cardíaca y eleva la proteína C reactiva. Señales: despertar a las tres o cuatro de la mañana, dificultad para recuperar peso, infecciones frecuentes. Meeusen (2013) estableció la relación entre sobreentrenamiento y disfunción del eje HPA. El estrés tiene un mecanismo medible y gestionable.",
     "plan": "PREMIUM"
   },
   {
@@ -572,7 +572,7 @@
   {
     "empire": "energia",
     "title": "Glinfático: limpieza nocturna",
-    "content": "El sistema glinfático es hasta diez veces más activo durante el sueño que durante la vigilia, limpiando desechos metabólicos del cerebro —incluyendo beta-amiloide. Iliff y Lee (2015, Journal of Neuroscience) encontraron que la posición lateral facilita el drenaje glinfático más que boca abajo. Rash caracterizó el sistema como análogo al linfático periférico pero exclusivo del sistema nervioso central. Aplicación: dormir de lado facilita la limpieza cerebral nocturna. Limitación: la evidencia principal proviene de modelos animales y la extrapolación a humanos es parcial.",
+    "content": "El sistema glinfático es hasta diez veces más activo durante el sueño que durante la vigilia, limpiando desechos metabólicos del cerebro —incluyendo beta-amiloide. Iliff y Lee (2015, Journal of Neuroscience) encontraron que la posición lateral facilita el drenaje glinfático más que boca abajo. Rash lo caracterizó como análogo al linfático periférico pero exclusivo del SNC. Limitación: la evidencia principal proviene de modelos animales; la extrapolación a humanos es parcial.",
     "plan": "PREMIUM"
   },
   {
@@ -596,7 +596,7 @@
   {
     "empire": "energia",
     "title": "Testosterona, ejercicio y recuperación",
-    "content": "La testosterona responde al ejercicio de resistencia con un pico agudo que facilita la síntesis proteica y la recuperación. Los niveles crónicamente bajos se asocian con fatiga, pérdida muscular y baja motivación. Kraemer y Ratamess (2005) documentaron que el sueño deficiente reduce la testosterona en un 10-15% tras una semana. La testosterona no es solo fuerza: es el motor de la recuperación masculina. Sin sueño, la testosterona cae; sin testosterona, la recuperación se deteriora. Es otro ciclo virtuoso que el sueño sostiene.",
+    "content": "La testosterona responde al ejercicio de resistencia con un pico agudo que facilita la síntesis proteica y la recuperación. Niveles bajos crónicos se asocian con fatiga, pérdida muscular y baja motivación. Kraemer y Ratamess (2005): el sueño deficiente reduce la testosterona en un 10-15% tras una semana. La testosterona no es solo fuerza — es el motor de la recuperación masculina.",
     "plan": "PREMIUM"
   },
   {
