@@ -614,7 +614,7 @@
   {
     "empire": "crecimiento",
     "title": "Self-Explanation",
-    "content": "Explicarse uno mismo los pasos de un problema o razonamiento mejora la comprensión más que simplemente leer la solución. Mecanismo: la autoexplicación genera inferencias que llenan lagunas en la representación mental y detecta inconsistencias. Chi et al. (1989, 1994): los estudiantes que se autoexplican superan a los que solo leen. Aplicación: tras cada paso de un problema, preguntarse «por qué este paso funciona». Limite: requiere conocimiento base previo para generar explicaciones significativas.",
+    "content": "Explicarse los pasos de un problema mejora la comprensión más que leer la solución. Mecanismo: la autoexplicación genera inferencias que llenan lagunas en la representación mental y detecta inconsistencias. Chi et al. (1989, 1994) lo confirmaron: los estudiantes que se autoexplican superan a los que solo leen. Aplicación: tras cada paso, preguntarse «por qué este paso funciona». Limitación: requiere conocimiento base previo para generar explicaciones significativas.",
     "plan": "PREMIUM"
   },
   {
