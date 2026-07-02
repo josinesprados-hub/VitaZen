@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'habit').catch(() => {});
+    tryAutoCompleteChallenge(user.id, 'habit', name).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);
@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'habit').catch(() => {});
+    tryAutoCompleteChallenge(user.id, 'habit', habit.name).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);

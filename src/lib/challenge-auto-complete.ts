@@ -8,8 +8,14 @@
  *   disciplina  → habit (create or complete a habit)
  *   habitos     → habit (create or complete a habit)
  *   mentalidad  → meditation OR journal
- *   productividad → journal
+ *   productividad → journal OR habit (exact title match)
  *   salud       → checkin OR meditation
+ *
+ * For habit actions, if the category doesn't match, an additional check is
+ * performed: if the habit name exactly matches the challenge title
+ * (after trim + toLowerCase), the challenge is also auto-completed.
+ * This allows challenges like "Limpia tu espacio de trabajo" (productividad)
+ * to be completed when a habit with the same name is performed.
  */
 
 import { db } from '@/lib/db';
@@ -30,7 +36,8 @@ const ACTION_CATEGORIES: Record<string, string[]> = {
  */
 export async function tryAutoCompleteChallenge(
   userId: string,
-  action: keyof typeof ACTION_CATEGORIES
+  action: keyof typeof ACTION_CATEGORIES,
+  habitName?: string
 ): Promise<void> {
   try {
     const today = startOfDay(new Date());
@@ -51,7 +58,19 @@ export async function tryAutoCompleteChallenge(
 
     // Check if the challenge category matches the action
     const challengeCategory = userChallenge.challenge.category.toLowerCase();
-    if (!categories.includes(challengeCategory)) return;
+    const categoryMatch = categories.includes(challengeCategory);
+
+    // For habit actions: if category doesn't match, also check exact title match
+    // (normalized: trim + toLowerCase). This allows a habit named exactly
+    // like the challenge title to auto-complete it regardless of category.
+    let titleMatch = false;
+    if (!categoryMatch && action === 'habit' && habitName) {
+      const normalizedHabitName = habitName.trim().toLowerCase();
+      const normalizedChallengeTitle = userChallenge.challenge.title.trim().toLowerCase();
+      titleMatch = normalizedHabitName === normalizedChallengeTitle;
+    }
+
+    if (!categoryMatch && !titleMatch) return;
 
     // Auto-complete the challenge
     await db.userChallenge.update({
@@ -66,7 +85,8 @@ export async function tryAutoCompleteChallenge(
       create: { userId, empire: 'disciplina', xp: 25 },
     });
 
-    console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action}`);
+    const matchReason = categoryMatch ? 'category' : 'title';
+    console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason})`);
   } catch (error) {
     // Never fail the parent action if auto-completion fails
     console.error('[Challenge] Auto-complete error (non-blocking):', error);
