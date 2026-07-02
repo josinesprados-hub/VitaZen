@@ -35,10 +35,12 @@ export default function PremiumGate({
   isPremium,
   intensity: _intensity,
   compact = false,
-  label: _label,
+  label,
   children,
 }: PremiumGateProps) {
   if (isPremium) return <>{children}</>;
+
+  const displayLabel = label || '';
 
   return (
     <div className="relative group/depth-gate">
@@ -50,7 +52,7 @@ export default function PremiumGate({
       {/* Gentle depth overlay — gradient fade, not hard wall */}
       <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl depth-gate-overlay">
         <div
-          className={`flex flex-col items-center gap-2 ${
+          className={`flex flex-col items-center gap-2.5 ${
             compact ? 'scale-90' : ''
           }`}
         >
@@ -60,13 +62,20 @@ export default function PremiumGate({
             className="text-champagne/40"
             fill="currentColor"
           />
+          {displayLabel && (
+            <p className={`text-[#444] text-center leading-snug ${
+              compact ? 'text-[9px]' : 'text-[10px]'
+            }`}>
+              {displayLabel}
+            </p>
+          )}
           <Link
             href="/elite"
             className={`text-champagne/50 hover:text-champagne/80 transition-colors text-center leading-snug ${
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}
           >
-            Hay más aquí · Élite
+            Descubre más · Élite
           </Link>
         </div>
       </div>

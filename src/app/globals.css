@@ -1575,6 +1575,78 @@ body.scroll-locked {
   animation: observationEnter 0.5s ease-out forwards;
 }
 
+/* ═══════════════════════════════════════════
+   Etapas — Contemplative Timeline
+   ═══════════════════════════════════════════ */
+
+/* Header gradient accent — editorial presence */
+.etapas-header {
+  position: relative;
+}
+.etapas-header::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(200, 165, 90, 0.25), transparent);
+}
+
+/* Stage card — glassmorphism whisper */
+.etapas-stage-card {
+  opacity: 0;
+  animation: etapasStageEnter 0.5s ease-out forwards;
+}
+@keyframes etapasStageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Transition item — gentle fade */
+.etapas-transition-item {
+  opacity: 0;
+  animation: etapasSubtleEnter 0.4s ease-out forwards;
+}
+
+/* Memory item — gentle fade */
+.etapas-memory-item {
+  opacity: 0;
+  animation: etapasSubtleEnter 0.4s ease-out forwards;
+}
+
+/* Pattern item — gentle fade */
+.etapas-pattern-item {
+  opacity: 0;
+  animation: etapasSubtleEnter 0.4s ease-out forwards;
+}
+
+@keyframes etapasSubtleEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Respect reduced motion for Etapas animations */
+@media (prefers-reduced-motion: reduce) {
+  .etapas-stage-card,
+  .etapas-transition-item,
+  .etapas-memory-item,
+  .etapas-pattern-item {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* Rating button feedback — tactile press for 1-5 selectors */
 @media (hover: none) and (pointer: coarse) {
   .rating-btn:active {
