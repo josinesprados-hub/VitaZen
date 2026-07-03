@@ -298,11 +298,11 @@ function generateRecommendation(
     if (energy <= 35) {
       return 'Sin prisa.';
     }
-    return 'Día con tensión.';
+    return 'Un día a la vez.';
   }
 
   if (energy <= 35) {
-    return 'Cansancio.';
+    return 'Hoy, lo esencial.';
   }
 
   if (focus >= 70 && energy >= 60) {
@@ -379,7 +379,7 @@ function generateSummary(
   }
 
   if (progress >= 30) {
-    return 'A tu ritmo.';
+    return 'Va avanzando.';
   }
 
   // No data
