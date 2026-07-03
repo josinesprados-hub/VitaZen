@@ -39,6 +39,7 @@ interface UserContext {
   }[];
   recentJournals: {
     title: string;
+    content: string;
     mood: number | null;
     createdAt: Date;
   }[];
@@ -170,11 +171,12 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }),
 
     // Recent journal entries: FREE gets 1, PREMIUM gets 3
+    // Content included for PREMIUM intelligent fragment extraction
     db.journalEntry.findMany({
       where: { userId, createdAt: { gte: thirtyDaysAgo } },
       orderBy: { createdAt: 'desc' },
       take: isPremium ? 3 : 1,
-      select: { title: true, mood: true, createdAt: true },
+      select: { title: true, content: true, mood: true, createdAt: true },
     }),
 
     // Recent conversation threads: FREE gets 1, PREMIUM gets 3
@@ -510,6 +512,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     })),
     recentJournals: recentJournals.map(j => ({
       title: j.title,
+      content: j.content,
       mood: j.mood,
       createdAt: j.createdAt,
     })),
@@ -634,6 +637,56 @@ function daysAgo(date: Date): number {
 function toDateKey(date: Date): string {
   const d = new Date(date);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Extract a fragment from journal content for the mentor context.
+ * Returns null if the content doesn't add information beyond the title.
+ *
+ * Rules:
+ * - Max 180 characters
+ * - Never cut words
+ * - Remove line breaks and repeated spaces
+ * - End with "…" when truncated
+ * - No summarization, no reinterpretation — exact user text only
+ * - Skip if content only repeats what the title already says
+ */
+function extractJournalFragment(title: string, content: string): string | null {
+  // Clean content: remove line breaks, collapse repeated spaces, trim
+  const cleaned = content
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleaned) return null;
+
+  // Normalize title for comparison (lowercase, no punctuation, collapsed spaces)
+  const normalizeForComparison = (s: string) =>
+    s.toLowerCase().replace(/[^\wáéíóúñü]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const normalizedTitle = normalizeForComparison(title);
+  const normalizedCleaned = normalizeForComparison(cleaned);
+
+  // If content starts with the title (user often repeats title as first line),
+  // strip the title prefix from content for comparison
+  let contentForComparison = normalizedCleaned;
+  if (normalizedCleaned.startsWith(normalizedTitle)) {
+    contentForComparison = normalizedCleaned.slice(normalizedTitle.length).trim();
+  }
+
+  // If what remains is empty or too short, content doesn't add information
+  if (contentForComparison.length < 10) return null;
+
+  // Truncate to 180 chars without cutting words
+  const MAX_LEN = 180;
+  if (cleaned.length <= MAX_LEN) return cleaned;
+
+  // Find the last space before the limit
+  const truncated = cleaned.slice(0, MAX_LEN);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace <= 0) return cleaned.slice(0, MAX_LEN) + '…';
+
+  return truncated.slice(0, lastSpace) + '…';
 }
 
 /**
@@ -939,6 +992,35 @@ function formatAdvancedContext(ctx: UserContext): string {
       return `"${title}"${moodStr} ${when}`;
     });
     lines.push(`Reflexiones recientes en su diario: ${journalParts.join(', ')}.`);
+
+    // Intelligent content fragment from the most recent journal (PREMIUM only)
+    // Only adds a fragment when the content provides information beyond the title.
+    // No AI, no summarization, no reinterpretation — exact user text.
+    const lastJournal = ctx.recentJournals[0];
+    if (lastJournal.content) {
+      const fragment = extractJournalFragment(lastJournal.title, lastJournal.content);
+      if (fragment) {
+        // Deduplication: check if the fragment's core content is already covered
+        // by existing context blocks. Compare significant words (≥4 chars) against
+        // what the mentor already knows.
+        const existingContext = lines.join(' ').toLowerCase();
+
+        // Extract significant words from the fragment (≥4 chars, lowercase)
+        const fragmentWords = fragment
+          .toLowerCase()
+          .replace(/[^\wáéíóúñü]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length >= 4);
+
+        // Count how many significant fragment words are NOT in existing context
+        const newWords = fragmentWords.filter(w => !existingContext.includes(w));
+
+        // If less than 30% of significant words are new, the fragment is redundant
+        if (fragmentWords.length > 0 && newWords.length / fragmentWords.length >= 0.3) {
+          lines.push(`En su última reflexión escribió: «${fragment}»`);
+        }
+      }
+    }
   }
 
   // Recent conversation topics
