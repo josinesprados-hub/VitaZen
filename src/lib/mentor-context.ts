@@ -66,6 +66,13 @@ interface UserContext {
     focusLevel: number | null;
     initialHabits: string[];
   } | null;
+  wellnessLogs: {
+    date: Date;
+    sleep: number;
+    mood: number;
+    stress: number;
+    notes: string | null;
+  }[];
 }
 
 /**
@@ -97,6 +104,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     prevWeekCheckins,
     user,
     onboardingRow,
+    wellnessLogRows,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -190,6 +198,16 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           },
         })
       : Promise.resolve(null),
+
+    // Wellness logs: PREMIUM only — sleep quality + notes (dedup: mood/energy/stress already in DailyCheckin)
+    isPremium
+      ? db.wellnessLog.findMany({
+          where: { userId, date: { gte: fourteenDaysAgo } },
+          orderBy: { date: 'desc' },
+          take: 7,
+          select: { date: true, sleep: true, mood: true, stress: true, notes: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   // Derive counts from date arrays (for weeklyActivity display)
@@ -291,6 +309,13 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       trend,
     },
     onboardingData,
+    wellnessLogs: wellnessLogRows.map(w => ({
+      date: w.date,
+      sleep: w.sleep,
+      mood: w.mood,
+      stress: w.stress,
+      notes: w.notes,
+    })),
   };
 }
 
@@ -457,6 +482,46 @@ function formatAdvancedContext(ctx: UserContext): string {
       if (trends.length > 0) {
         lines.push(`Tendencia reciente: ${trends.join(', ')}.`);
       }
+    }
+  }
+
+  // Wellness log — sleep quality + notes (mood/energy/stress intentionally skipped: already in DailyCheckin)
+  if (ctx.wellnessLogs.length > 0) {
+    const SLEEP_LABELS: Record<number, string> = {
+      1: 'muy mala',
+      2: 'mala',
+      3: 'normal',
+      4: 'buena',
+      5: 'excelente',
+    };
+
+    const logs = ctx.wellnessLogs;
+
+    // Sleep trend: compare recent half vs older half
+    if (logs.length >= 3) {
+      const mid = Math.floor(logs.length / 2);
+      const recentSleep = logs.slice(0, mid).reduce((s, l) => s + l.sleep, 0) / mid;
+      const olderSleep = logs.slice(mid).reduce((s, l) => s + l.sleep, 0) / (logs.length - mid);
+      const diff = recentSleep - olderSleep;
+      if (diff > 0.5) {
+        lines.push(`En los últimos días ha descansado mejor.`);
+      } else if (diff < -0.5) {
+        lines.push(`Su descanso ha sido irregular últimamente.`);
+      }
+    }
+
+    // Latest sleep quality
+    const latest = logs[0];
+    const latestLabel = SLEEP_LABELS[latest.sleep] || `${latest.sleep}/5`;
+    const days = daysAgo(latest.date);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    lines.push(`Calidad del descanso ${when}: ${latestLabel}.`);
+
+    // One brief note reference if it adds unique context
+    const noteLog = logs.find(l => l.notes && l.notes.trim().length > 0);
+    if (noteLog && noteLog.notes) {
+      const snippet = noteLog.notes.length > 60 ? noteLog.notes.slice(0, 57) + '...' : noteLog.notes;
+      lines.push(`Ha anotado sobre su bienestar: "${snippet}".`);
     }
   }
 
