@@ -2,6 +2,7 @@ import { db } from './db';
 import { getEmotionalState, type EmotionalState } from './emotional-state';
 import { detectPatterns } from './patterns/detector';
 import type { CrossEmpireData } from './patterns/types';
+import { detectLifeStages, getPastMonths, type LifeStage, type StageTransition, type StageFlavor } from './life-memory/stages';
 
 // ═══════════════════════════════════════════
 // MENTOR CONTEXT BUILDER
@@ -97,6 +98,13 @@ interface UserContext {
     empires: string[];
     weight: string;
   }[] | null;
+  lifeStage: {
+    flavor: StageFlavor;
+    label: string;
+    observation: string;
+    monthLabel: string;
+    transition: string | null;
+  } | null;
 }
 
 /**
@@ -314,6 +322,39 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }
   }
 
+  // Life stage detection: consume the official engine result (PREMIUM only; null for FREE)
+  // No recalculation, no inference — the engine is the single source of truth for life stages.
+  let lifeStage: UserContext['lifeStage'] = null;
+  if (isPremium) {
+    try {
+      const months = getPastMonths(3); // last 3 months
+      const { stages, transitions } = await detectLifeStages(userId, months);
+      if (stages.length > 0) {
+        const current = stages[stages.length - 1]; // most recent month
+        const STAGE_FLAVOR_LABELS: Record<StageFlavor, string> = {
+          calm: 'Calma',
+          growth: 'Crecimiento',
+          intensity: 'Intensidad',
+          dispersion: 'Dispersión',
+          exhaustion: 'Agotamiento',
+          quiet: 'Silencio',
+          stability: 'Estabilidad',
+        };
+        // Find the most recent transition (if any)
+        const latestTransition = transitions.length > 0 ? transitions[transitions.length - 1] : null;
+        lifeStage = {
+          flavor: current.flavor,
+          label: STAGE_FLAVOR_LABELS[current.flavor] || current.flavor,
+          observation: current.observation,
+          monthLabel: current.monthLabel,
+          transition: latestTransition ? latestTransition.observation : null,
+        };
+      }
+    } catch {
+      // Non-blocking: if life stage detection fails, continue without it
+    }
+  }
+
   // Pattern detection: consume the official engine result (PREMIUM only; null for FREE)
   // No recalculation, no cross-referencing — the engine is the single source of truth.
   let patternObservations: UserContext['patternObservations'] = null;
@@ -463,6 +504,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     })),
     emotionalState,
     patternObservations,
+    lifeStage,
   };
 }
 
@@ -577,6 +619,42 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
     if (es.recommendation) {
       lines.push(es.recommendation);
+    }
+  }
+
+  // Life stage — the official stage detection from the Life Stage Engine
+  // Complements the ESE (which captures the current emotional state) with
+  // the broader life stage context. Deduplicated: if the ESE already
+  // describes the same quality, we only add the temporal perspective.
+  const ls = ctx.lifeStage;
+  if (ls) {
+    // Dedup: if ESE statusLabel already matches the stage flavor, don't restate it
+    const ESE_STAGE_OVERLAP: Record<string, string[]> = {
+      calm: ['Calma', 'Tranquilidad', 'Serenidad'],
+      growth: ['Crecimiento', 'Progreso', 'Mejora'],
+      intensity: ['Intensidad', 'Estrés', 'Presión'],
+      exhaustion: ['Agotamiento', 'Burnout', 'Desgaste'],
+      stability: ['Estabilidad', 'Equilibrio', 'Consistencia'],
+      dispersion: ['Dispersión', 'Inestabilidad', 'Inconsistencia'],
+      quiet: ['Silencio', 'Inactividad', 'Reposo'],
+    };
+    const overlapLabels = ESE_STAGE_OVERLAP[ls.flavor] || [];
+    const esAlreadyCoversStage = es?.statusLabel
+      ? overlapLabels.some(l => es.statusLabel.includes(l))
+      : false;
+
+    if (!esAlreadyCoversStage) {
+      lines.push(`Actualmente atraviesa una etapa de ${ls.label.toLowerCase()}.`);
+    }
+
+    // Always add the engine's observation — it provides nuance beyond the label
+    if (ls.observation && ls.observation.trim().length > 0) {
+      lines.push(ls.observation);
+    }
+
+    // Transition: only if recent — adds temporal evolution the ESE doesn't cover
+    if (ls.transition) {
+      lines.push(ls.transition);
     }
   }
 
