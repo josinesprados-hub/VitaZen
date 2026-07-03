@@ -69,12 +69,14 @@ async function handler(request: NextRequest) {
     });
 
     // Get conversation history: FREE last 10 messages, PREMIUM last 30
+    // Fetch most recent first, then reverse for chronological order
     const historyLimit = isPremium ? 30 : 10;
-    const history = await db.aIMessage.findMany({
+    const recentHistory = await db.aIMessage.findMany({
       where: { threadId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
       take: historyLimit,
     });
+    const history = recentHistory.reverse();
 
     // Build contextual system prompt with user's recent activity
     const basePrompt = isPremium ? SYSTEM_PROMPTS.PREMIUM : SYSTEM_PROMPTS.FREE;

@@ -137,22 +137,23 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       ? db.empireProgress.findMany({ where: { userId } })
       : Promise.resolve([]),
 
-    // Weekly meditation count: PREMIUM only
+    // Weekly meditation dates: PREMIUM only (for distinct-day counting)
     isPremium
-      ? db.meditationSession.count({ where: { userId, completedAt: { gte: sevenDaysAgo } } })
-      : Promise.resolve(0),
+      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: sevenDaysAgo } }, select: { completedAt: true } })
+      : Promise.resolve([] as { completedAt: Date }[]),
 
-    // Weekly journal count: PREMIUM only
+    // Weekly journal dates: PREMIUM only (for distinct-day counting)
     isPremium
-      ? db.journalEntry.count({ where: { userId, createdAt: { gte: sevenDaysAgo } } })
-      : Promise.resolve(0),
+      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } })
+      : Promise.resolve([] as { createdAt: Date }[]),
 
-    // Weekly checkin count: both tiers (for consistency)
-    db.dailyCheckin.count({ where: { userId, date: { gte: sevenDaysAgo } } }),
+    // Weekly checkin dates: both tiers (for consistency + distinct-day counting)
+    db.dailyCheckin.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } }),
 
-    // Weekly habit logs with completion in last 7 days
-    db.habitLog.count({
+    // Weekly habit log dates: last 7 days (for distinct-day counting)
+    db.habitLog.findMany({
       where: { userId, lastCompletedAt: { gte: sevenDaysAgo } },
+      select: { lastCompletedAt: true },
     }),
 
     // Previous week checkin count (for trend): both tiers
@@ -167,22 +168,36 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }),
   ]);
 
+  // Derive counts from date arrays (for weeklyActivity display)
+  const weeklyMeditationCount = weeklyMeditations.length;
+  const weeklyJournalCount = weeklyJournals.length;
+  const weeklyCheckinCount = weeklyCheckins.length;
+  const weeklyHabitLogCount = weeklyHabitLogs.length;
+
   // Weekly habit completions (PREMIUM only for display, but count for consistency)
   const weeklyHabits = isPremium
     ? habitStreaks.filter(h => {
         if (!h.lastCompletedAt) return false;
         return h.lastCompletedAt >= sevenDaysAgo;
       }).length
-    : weeklyHabitLogs;
+    : weeklyHabitLogCount;
 
-  // Compute consistency signal
-  const activeDaysThisWeek = Math.min(weeklyCheckins + (weeklyHabitLogs > 0 ? 1 : 0) + (weeklyMeditations > 0 ? 1 : 0) + (weeklyJournals > 0 ? 1 : 0), 7);
+  // Compute consistency signal: count DISTINCT days with any activity
+  const activeDaySet = new Set<string>();
+  for (const c of weeklyCheckins) activeDaySet.add(toDateKey(c.date));
+  for (const h of weeklyHabitLogs) {
+    if (h.lastCompletedAt) activeDaySet.add(toDateKey(h.lastCompletedAt));
+  }
+  for (const m of weeklyMeditations) activeDaySet.add(toDateKey(m.completedAt));
+  for (const j of weeklyJournals) activeDaySet.add(toDateKey(j.createdAt));
+  const activeDaysThisWeek = Math.min(activeDaySet.size, 7);
+
   let trend: 'improving' | 'stable' | 'declining' | 'starting' = 'stable';
-  if (weeklyCheckins <= 1 && prevWeekCheckins <= 1) {
+  if (weeklyCheckinCount <= 1 && prevWeekCheckins <= 1) {
     trend = 'starting';
-  } else if (weeklyCheckins > prevWeekCheckins + 1) {
+  } else if (weeklyCheckinCount > prevWeekCheckins + 1) {
     trend = 'improving';
-  } else if (weeklyCheckins < prevWeekCheckins - 1) {
+  } else if (weeklyCheckinCount < prevWeekCheckins - 1) {
     trend = 'declining';
   }
 
@@ -225,10 +240,10 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       streak: e.streak,
     })),
     weeklyActivity: {
-      meditations: weeklyMeditations,
+      meditations: weeklyMeditationCount,
       habits: weeklyHabits,
-      journals: weeklyJournals,
-      checkins: weeklyCheckins,
+      journals: weeklyJournalCount,
+      checkins: weeklyCheckinCount,
     },
     consistency: {
       activeDaysThisWeek,
@@ -262,6 +277,12 @@ const EMOTION_LABELS: Record<number, string> = {
 
 function daysAgo(date: Date): number {
   return Math.floor((Date.now() - date.getTime()) / 86400000);
+}
+
+/** Normalize a Date to a YYYY-MM-DD string for day-level comparison. */
+function toDateKey(date: Date): string {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 /**
