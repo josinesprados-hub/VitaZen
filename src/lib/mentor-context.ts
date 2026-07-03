@@ -1,4 +1,5 @@
 import { db } from './db';
+import { getEmotionalState, type EmotionalState } from './emotional-state';
 
 // ═══════════════════════════════════════════
 // MENTOR CONTEXT BUILDER
@@ -80,6 +81,13 @@ interface UserContext {
     contexto: string | null;
     date: Date;
   }[];
+  emotionalState: {
+    status: string;
+    statusLabel: string;
+    statusDescription: string;
+    summary: string;
+    recommendation: string;
+  } | null;
 }
 
 /**
@@ -278,6 +286,24 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     };
   }
 
+  // Fetch emotional state from the official engine (PREMIUM only; null for FREE)
+  // This is the single source of truth — no recalculation, no duplication.
+  let emotionalState: UserContext['emotionalState'] = null;
+  if (isPremium) {
+    try {
+      const es = await getEmotionalState(userId, plan);
+      emotionalState = {
+        status: es.status,
+        statusLabel: es.statusLabel,
+        statusDescription: es.statusDescription,
+        summary: es.summary,
+        recommendation: es.recommendation,
+      };
+    } catch {
+      // Non-blocking: if emotional state fails, continue without it
+    }
+  }
+
   return {
     userName: user?.name || null,
     plan: user?.plan || 'FREE',
@@ -341,6 +367,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       contexto: f.contexto,
       date: f.date,
     })),
+    emotionalState,
   };
 }
 
@@ -440,6 +467,24 @@ function formatAdvancedContext(ctx: UserContext): string {
     lines.push(`Se llama ${ctx.userName}.`);
   }
 
+  // Emotional state — the single source of truth from the engine
+  // This replaces any ad-hoc status inference with the official computed state.
+  const es = ctx.emotionalState;
+  if (es) {
+    if (es.statusLabel) {
+      lines.push(`Actualmente se encuentra en un estado ${es.statusLabel}.`);
+    }
+    if (es.statusDescription) {
+      lines.push(es.statusDescription);
+    }
+    if (es.summary) {
+      lines.push(es.summary);
+    }
+    if (es.recommendation) {
+      lines.push(es.recommendation);
+    }
+  }
+
   // Onboarding origin context — why they came, what they want
   const ob = ctx.onboardingData;
   if (ob) {
@@ -496,7 +541,9 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
 
     // Trend: compare latest vs previous
-    if (ctx.recentCheckins.length >= 2) {
+    // Skip raw trend when Emotional State Engine is active — its summary
+    // already provides the authoritative synthesized trend.
+    if (!es && ctx.recentCheckins.length >= 2) {
       const prev = ctx.recentCheckins[1];
       const trends: string[] = [];
       if (latest.stress - prev.stress > 0) trends.push('el estrés ha subido');
@@ -664,10 +711,11 @@ function formatAdvancedContext(ctx: UserContext): string {
   }
 
   // Consistency evolution signal — compact, natural
+  // Skip when ESE is active — its summary already provides the authoritative signal.
   const c = ctx.consistency;
-  if (c.trend === 'improving') {
+  if (!es && c.trend === 'improving') {
     lines.push(`Viene siendo más constante últimamente.`);
-  } else if (c.trend === 'declining') {
+  } else if (!es && c.trend === 'declining') {
     lines.push(`Últimamente menos activo/a que la semana pasada.`);
   } else if (c.trend === 'starting' && totalActivity <= 2) {
     lines.push(`Está empezando a usar la app.`);
