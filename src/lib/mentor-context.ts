@@ -105,6 +105,12 @@ interface UserContext {
     monthLabel: string;
     transition: string | null;
   } | null;
+  monthlyClosures: {
+    month: string;
+    hasReflection: boolean;
+    reflectedAt: Date | null;
+    summaryViewedAt: Date | null;
+  }[];
 }
 
 /**
@@ -322,6 +328,22 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }
   }
 
+  // Monthly closure records: consume existing closure records (PREMIUM only; empty for FREE)
+  // No recalculation, no summaries — just the fact that closures exist.
+  const recentClosures = isPremium
+    ? await db.monthlyClosure.findMany({
+        where: { userId },
+        select: {
+          month: true,
+          reflection: true,
+          reflectedAt: true,
+          summaryViewedAt: true,
+        },
+        orderBy: { month: 'desc' },
+        take: 3,
+      })
+    : [];
+
   // Life stage detection: consume the official engine result (PREMIUM only; null for FREE)
   // No recalculation, no inference — the engine is the single source of truth for life stages.
   let lifeStage: UserContext['lifeStage'] = null;
@@ -505,6 +527,12 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     emotionalState,
     patternObservations,
     lifeStage,
+    monthlyClosures: recentClosures.map(c => ({
+      month: c.month,
+      hasReflection: !!c.reflection,
+      reflectedAt: c.reflectedAt,
+      summaryViewedAt: c.summaryViewedAt,
+    })),
   };
 }
 
@@ -892,6 +920,41 @@ function formatAdvancedContext(ctx: UserContext): string {
     lines.push(`Últimamente menos activo/a que la semana pasada.`);
   } else if (c.trend === 'starting' && totalActivity <= 2) {
     lines.push(`Está empezando a usar la app.`);
+  }
+
+  // Monthly closure signals — whether the user practices monthly reflection
+  // Only signals from existing closure records. No recalculation, no summaries.
+  if (ctx.monthlyClosures.length > 0) {
+    const closures = ctx.monthlyClosures;
+    const latest = closures[0]; // already sorted desc by month
+
+    // How many months ago was the latest closure?
+    const [cYear, cMonth] = latest.month.split('-').map(Number);
+    const now = new Date();
+    const monthsAgo = (now.getFullYear() - cYear) * 12 + (now.getMonth() + 1 - cMonth);
+
+    const reflectionsCount = closures.filter(cl => cl.hasReflection).length;
+
+    if (monthsAgo <= 1) {
+      // Recent closure — user is engaged
+      if (reflectionsCount >= 2) {
+        lines.push(`Viene realizando cierres personales con regularidad.`);
+      } else if (latest.hasReflection) {
+        lines.push(`Su última reflexión mensual fue reciente.`);
+      } else {
+        lines.push(`Revisó su cierre mensual recientemente.`);
+      }
+    } else if (monthsAgo <= 3) {
+      // Not too long ago
+      if (reflectionsCount >= 2) {
+        lines.push(`Suele reflexionar sobre su evolución cada mes.`);
+      } else {
+        lines.push(`Hace poco revisó cómo le fue en un mes.`);
+      }
+    } else {
+      // A while since last closure
+      lines.push(`Hace tiempo que no realiza un cierre mensual.`);
+    }
   }
 
   // Pattern observations — official cross-domain connections from the Pattern Detection Engine
