@@ -743,17 +743,94 @@ function formatBasicContext(ctx: UserContext): string {
 
 /**
  * Format context for PREMIUM users — full context with continuity and evolution signals.
+ *
+ * Context ordering follows cognitive priority for LLM consumption:
+ *
+ *   LAYER 1 — IDENTITY: Who this person is
+ *     Name + Onboarding origin (goals, focus, initial state)
+ *
+ *   LAYER 2 — HIGH-LEVEL SIGNALS: Computed insights that frame everything else
+ *     Emotional State Engine → Life Stage → Pattern Detection → Silent Memories
+ *     These are ordered by recency scope (ESE=this week → Life Stage=this month →
+ *     Patterns=90 days → Silent Memories=lifetime milestones)
+ *
+ *   LAYER 3 — LIVED EXPERIENCE: What the person is going through lately
+ *     Check-ins → Wellness → Journal + fragment → Finance → Monthly Closure
+ *     Ordered by emotional proximity (most visceral first)
+ *
+ *   LAYER 4 — BEHAVIORAL PATTERNS: What the person does habitually
+ *     Habits → Meditations → Activity + Consistency → Empire Progress
+ *     These are more stable/situational, less defining for a response
+ *
+ *   LAYER 5 — CONVERSATIONAL MEMORY: What was discussed before
+ *     Threads
+ *     Last because: continuity matters, but shouldn't override current state
  */
 function formatAdvancedContext(ctx: UserContext): string {
   const lines: string[] = [];
+
+  // ═══════════════════════════════════════════
+  // LAYER 1 — IDENTITY
+  // ═══════════════════════════════════════════
 
   // User name
   if (ctx.userName) {
     lines.push(`Se llama ${ctx.userName}.`);
   }
 
+  // Onboarding origin context — why they came, what they want
+  // Placed right after the name: the model needs to know WHO this person is
+  // and WHAT they want before interpreting any other signal.
+  const ob = ctx.onboardingData;
+  if (ob) {
+    const LEVEL_LABELS: Record<number, string> = {
+      1: 'muy bajo',
+      2: 'bajo',
+      3: 'neutral',
+      4: 'bueno',
+      5: 'alto',
+    };
+    const FOCUS_NAMES: Record<string, string> = {
+      mente: 'Mente',
+      disciplina: 'Disciplina',
+      energia: 'Energía',
+      riqueza: 'Finanzas',
+    };
+
+    if (ob.goals.length > 0) {
+      const goalsStr = ob.goals.length <= 3
+        ? ob.goals.join(' y ')
+        : ob.goals.slice(0, 3).join(', ') + ' y más';
+      lines.push(`Comenzó VitaZen con el objetivo de ${goalsStr}.`);
+    }
+    if (ob.primaryFocus) {
+      const focusName = FOCUS_NAMES[ob.primaryFocus] || ob.primaryFocus;
+      lines.push(`Su foco principal es ${focusName}.`);
+    }
+    if (ob.energyLevel != null) {
+      lines.push(`Al comenzar describía su energía como ${LEVEL_LABELS[ob.energyLevel] || ob.energyLevel}/5.`);
+    }
+    if (ob.stressLevel != null) {
+      lines.push(`Su nivel de estrés inicial era ${LEVEL_LABELS[ob.stressLevel] || ob.stressLevel}/5.`);
+    }
+    if (ob.focusLevel != null) {
+      lines.push(`Su capacidad de enfoque inicial era ${LEVEL_LABELS[ob.focusLevel] || ob.focusLevel}/5.`);
+    }
+    if (ob.initialHabits.length > 0) {
+      const habitsStr = ob.initialHabits.length <= 3
+        ? ob.initialHabits.join(', ')
+        : ob.initialHabits.slice(0, 3).join(', ') + ' y otros';
+      lines.push(`Los hábitos que quería construir: ${habitsStr}.`);
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // LAYER 2 — HIGH-LEVEL SIGNALS
+  // ═══════════════════════════════════════════
+
   // Emotional state — the single source of truth from the engine
   // This replaces any ad-hoc status inference with the official computed state.
+  // First high-level signal: frames how to interpret everything that follows.
   const es = ctx.emotionalState;
   if (es) {
     if (es.statusLabel) {
@@ -806,51 +883,93 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
   }
 
-  // Onboarding origin context — why they came, what they want
-  const ob = ctx.onboardingData;
-  if (ob) {
-    const LEVEL_LABELS: Record<number, string> = {
-      1: 'muy bajo',
-      2: 'bajo',
-      3: 'neutral',
-      4: 'bueno',
-      5: 'alto',
-    };
-    const FOCUS_NAMES: Record<string, string> = {
-      mente: 'Mente',
-      disciplina: 'Disciplina',
-      energia: 'Energía',
-      riqueza: 'Finanzas',
-    };
+  // Pattern observations — official cross-domain connections from the Pattern Detection Engine
+  // Only surface what the engine has detected. No recalculation, no new correlations.
+  // Maximum 2 patterns (enforced by the engine). Deduplicate against ESE and other blocks.
+  // Placed after Life Stage: patterns connect domains across time, building on the
+  // emotional and stage context already established above.
+  if (ctx.patternObservations && ctx.patternObservations.length > 0) {
+    const esText = es
+      ? `${es.summary ?? ''} ${es.recommendation ?? ''} ${es.statusDescription ?? ''}`.toLowerCase()
+      : '';
 
-    if (ob.goals.length > 0) {
-      const goalsStr = ob.goals.length <= 3
-        ? ob.goals.join(' y ')
-        : ob.goals.slice(0, 3).join(', ') + ' y más';
-      lines.push(`Comenzó VitaZen con el objetivo de ${goalsStr}.`);
-    }
-    if (ob.primaryFocus) {
-      const focusName = FOCUS_NAMES[ob.primaryFocus] || ob.primaryFocus;
-      lines.push(`Su foco principal es ${focusName}.`);
-    }
-    if (ob.energyLevel != null) {
-      lines.push(`Al comenzar describía su energía como ${LEVEL_LABELS[ob.energyLevel] || ob.energyLevel}/5.`);
-    }
-    if (ob.stressLevel != null) {
-      lines.push(`Su nivel de estrés inicial era ${LEVEL_LABELS[ob.stressLevel] || ob.stressLevel}/5.`);
-    }
-    if (ob.focusLevel != null) {
-      lines.push(`Su capacidad de enfoque inicial era ${LEVEL_LABELS[ob.focusLevel] || ob.focusLevel}/5.`);
-    }
-    if (ob.initialHabits.length > 0) {
-      const habitsStr = ob.initialHabits.length <= 3
-        ? ob.initialHabits.join(', ')
-        : ob.initialHabits.slice(0, 3).join(', ') + ' y otros';
-      lines.push(`Los hábitos que quería construir: ${habitsStr}.`);
+    for (const obs of ctx.patternObservations) {
+      // Dedup: skip if ESE already explicitly connects the same two domains
+      const domainKeywordPairs: Record<string, [string[], string[]]> = {
+        'finanzas-energia': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['energía', 'descanso', 'sueño', 'cansancio']],
+        'finanzas-mente': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['mente', 'meditación', 'práctica', 'mental']],
+        'finanzas-estres': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['estrés', 'presión', 'tensión', 'agobio']],
+        'finanzas-sueno': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['descanso', 'sueño', 'dormir', 'noche']],
+      };
+      if (esText) {
+        const pair = domainKeywordPairs[obs.connection];
+        if (pair) {
+          const hasA = pair[0].some(k => esText.includes(k));
+          const hasB = pair[1].some(k => esText.includes(k));
+          if (hasA && hasB) continue; // ESE already connects both domains — skip
+        }
+      }
+
+      // Format as natural cross-domain observation using the engine's official text
+      const empireLabels = obs.empires.join(' y ');
+      lines.push(`VitaZen ha detectado una conexión entre ${empireLabels}: ${obs.text}`);
     }
   }
 
+  // Silent Memories — official observations from VitaZen's observation engine
+  // Consume only what the engine has already generated and shown (shown[] in memoryState).
+  // No recalculation. No side effects. PREMIUM only.
+  // Placed last in high-level signals: these are lifetime/persistent observations
+  // that provide deep temporal context, complementing the shorter-range signals above.
+  if (ctx.silentMemories.length > 0) {
+    // Step 1: Map observation texts to their metadata (type + rarity)
+    const candidates: { observation: string; type: SilentMemoryType; rarity: 'rare' | 'very_rare' }[] = [];
+    // Iterate in reverse (most recent first) and keep only the latest per type
+    const seenTypes = new Set<SilentMemoryType>();
+    for (let i = ctx.silentMemories.length - 1; i >= 0; i--) {
+      const obs = ctx.silentMemories[i];
+      const meta = OBSERVATION_META[obs];
+      if (meta && !seenTypes.has(meta.type)) {
+        candidates.push({ observation: obs, type: meta.type, rarity: meta.rarity });
+        seenTypes.add(meta.type);
+      }
+    }
+
+    // Step 2: Deduplication — skip observations already covered by other context blocks
+    const deduped = candidates.filter(c => {
+      // Shift observations: already covered by ESE (energy/stress trends) + check-in trends
+      // If ESE is active, shift adds nothing new.
+      if (c.type === 'shift' && es) return false;
+
+      // Presence observations: the milestone (30/365 days) is unique — not covered
+      // by consistency trend which only says "improving/declining".
+      // Recurrence observations: temporal echo is unique — not covered by ESE or patterns.
+      // Return observations: absence/return signal is unique.
+      // Temporal observations: time-since-start milestone is unique.
+      return true;
+    });
+
+    // Step 3: Prioritization — score by persistence × rarity, take top 2
+    const scored = deduped.map(c => ({
+      ...c,
+      score: TYPE_PRIORITY[c.type] * RARITY_MULTIPLIER[c.rarity],
+    }));
+    scored.sort((a, b) => b.score - a.score);
+
+    const selected = scored.slice(0, 2);
+
+    // Step 4: Format as natural observations — the texts are already poetic and brief
+    for (const mem of selected) {
+      lines.push(mem.observation);
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // LAYER 3 — LIVED EXPERIENCE
+  // ═══════════════════════════════════════════
+
   // Recent emotional check-ins with trends
+  // First lived-experience signal: the most direct self-report from the user.
   if (ctx.recentCheckins.length > 0) {
     const latest = ctx.recentCheckins[0];
     const days = daysAgo(latest.date);
@@ -918,6 +1037,47 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
   }
 
+  // Recent journal entries — what the user has been reflecting on
+  if (ctx.recentJournals.length > 0) {
+    const journalParts = ctx.recentJournals.map(j => {
+      const days = daysAgo(j.createdAt);
+      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+      const title = j.title || 'sin título';
+      const moodStr = j.mood ? ` (ánimo ${j.mood}/5)` : '';
+      return `"${title}"${moodStr} ${when}`;
+    });
+    lines.push(`Reflexiones recientes en su diario: ${journalParts.join(', ')}.`);
+
+    // Intelligent content fragment from the most recent journal (PREMIUM only)
+    // Only adds a fragment when the content provides information beyond the title.
+    // No AI, no summarization, no reinterpretation — exact user text.
+    const lastJournal = ctx.recentJournals[0];
+    if (lastJournal.content) {
+      const fragment = extractJournalFragment(lastJournal.title, lastJournal.content);
+      if (fragment) {
+        // Deduplication: check if the fragment's core content is already covered
+        // by existing context blocks. Compare significant words (≥4 chars) against
+        // what the mentor already knows.
+        const existingContext = lines.join(' ').toLowerCase();
+
+        // Extract significant words from the fragment (≥4 chars, lowercase)
+        const fragmentWords = fragment
+          .toLowerCase()
+          .replace(/[^\wáéíóúñü]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length >= 4);
+
+        // Count how many significant fragment words are NOT in existing context
+        const newWords = fragmentWords.filter(w => !existingContext.includes(w));
+
+        // If less than 30% of significant words are new, the fragment is redundant
+        if (fragmentWords.length > 0 && newWords.length / fragmentWords.length >= 0.3) {
+          lines.push(`En su última reflexión escribió: «${fragment}»`);
+        }
+      }
+    }
+  }
+
   // Finance context — spending patterns, not financial advice
   if (ctx.financeLogs.length >= 3) {
     const FINANCE_MOOD_LABELS: Record<string, string> = {
@@ -964,113 +1124,6 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
   }
 
-  // Habit streaks with detail
-  if (ctx.habitStreaks.length > 0) {
-    const habitParts = ctx.habitStreaks.slice(0, 5).map(h => {
-      const daysSince = h.lastCompletedAt ? daysAgo(h.lastCompletedAt) : null;
-      const status = daysSince === 0 ? 'hecho hoy' : daysSince === 1 ? 'hecho ayer' : daysSince !== null ? `último hace ${daysSince} días` : '';
-      return `${h.name}: racha ${h.streak} días${status ? ` (${status})` : ''}`;
-    });
-    lines.push(`Hábitos activos: ${habitParts.join('. ')}.`);
-  }
-
-  // Recent meditations
-  if (ctx.recentMeditations.length > 0) {
-    const last = ctx.recentMeditations[0];
-    const days = daysAgo(last.completedAt);
-    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
-    lines.push(`Última meditación: ${last.duration} min de ${last.type.replace('_', ' ')} ${when}. ${ctx.recentMeditations.length} sesiones recientes.`);
-  }
-
-  // Recent journal entries — what the user has been reflecting on
-  if (ctx.recentJournals.length > 0) {
-    const journalParts = ctx.recentJournals.map(j => {
-      const days = daysAgo(j.createdAt);
-      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
-      const title = j.title || 'sin título';
-      const moodStr = j.mood ? ` (ánimo ${j.mood}/5)` : '';
-      return `"${title}"${moodStr} ${when}`;
-    });
-    lines.push(`Reflexiones recientes en su diario: ${journalParts.join(', ')}.`);
-
-    // Intelligent content fragment from the most recent journal (PREMIUM only)
-    // Only adds a fragment when the content provides information beyond the title.
-    // No AI, no summarization, no reinterpretation — exact user text.
-    const lastJournal = ctx.recentJournals[0];
-    if (lastJournal.content) {
-      const fragment = extractJournalFragment(lastJournal.title, lastJournal.content);
-      if (fragment) {
-        // Deduplication: check if the fragment's core content is already covered
-        // by existing context blocks. Compare significant words (≥4 chars) against
-        // what the mentor already knows.
-        const existingContext = lines.join(' ').toLowerCase();
-
-        // Extract significant words from the fragment (≥4 chars, lowercase)
-        const fragmentWords = fragment
-          .toLowerCase()
-          .replace(/[^\wáéíóúñü]/g, ' ')
-          .split(/\s+/)
-          .filter(w => w.length >= 4);
-
-        // Count how many significant fragment words are NOT in existing context
-        const newWords = fragmentWords.filter(w => !existingContext.includes(w));
-
-        // If less than 30% of significant words are new, the fragment is redundant
-        if (fragmentWords.length > 0 && newWords.length / fragmentWords.length >= 0.3) {
-          lines.push(`En su última reflexión escribió: «${fragment}»`);
-        }
-      }
-    }
-  }
-
-  // Recent conversation topics
-  const namedConversations = ctx.recentConversations.filter(c => c.title !== 'Nueva conversación');
-  if (namedConversations.length > 0) {
-    const topics = namedConversations.map(c => {
-      const days = daysAgo(c.updatedAt);
-      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
-      return `"${c.title}" (${when})`;
-    });
-    lines.push(`Temas recientes de conversación: ${topics.join(', ')}.`);
-  }
-
-  // Empire progress summary
-  const activeEmpires = ctx.empireProgress.filter(e => e.xp > 0 || e.streak > 0);
-  if (activeEmpires.length > 0) {
-    // Find the empire with most XP to signal focus area
-    const topEmpire = activeEmpires.reduce((a, b) => a.xp > b.xp ? a : b);
-    const topEmpireName = EMPIRE_NAMES[topEmpire.empire] || topEmpire.empire;
-
-    const empireParts = activeEmpires.map(e => {
-      const name = EMPIRE_NAMES[e.empire] || e.empire;
-      return `${name}: nivel ${e.level}, ${e.xp} XP${e.streak > 0 ? `, racha ${e.streak} días` : ''}`;
-    });
-    lines.push(`Progreso de imperios: ${empireParts.join('. ')}. Enfocado/a especialmente en ${topEmpireName}.`);
-  }
-
-  // Weekly activity summary + consistency signal
-  const wa = ctx.weeklyActivity;
-  const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins;
-  if (totalActivity > 0) {
-    const parts: string[] = [];
-    if (wa.meditations > 0) parts.push(`${wa.meditations} meditación${wa.meditations > 1 ? 'es' : ''}`);
-    if (wa.habits > 0) parts.push(`${wa.habits} hábito${wa.habits > 1 ? 's' : ''}`);
-    if (wa.journals > 0) parts.push(`${wa.journals} entrada${wa.journals > 1 ? 's' : ''} de diario`);
-    if (wa.checkins > 0) parts.push(`${wa.checkins} check-in${wa.checkins > 1 ? 's' : ''}`);
-    lines.push(`Esta semana: ${parts.join(', ')}.`);
-  }
-
-  // Consistency evolution signal — compact, natural
-  // Skip when ESE is active — its summary already provides the authoritative signal.
-  const c = ctx.consistency;
-  if (!es && c.trend === 'improving') {
-    lines.push(`Viene siendo más constante últimamente.`);
-  } else if (!es && c.trend === 'declining') {
-    lines.push(`Últimamente menos activo/a que la semana pasada.`);
-  } else if (c.trend === 'starting' && totalActivity <= 2) {
-    lines.push(`Está empezando a usar la app.`);
-  }
-
   // Monthly closure signals — whether the user practices monthly reflection
   // Only signals from existing closure records. No recalculation, no summaries.
   if (ctx.monthlyClosures.length > 0) {
@@ -1106,81 +1159,80 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
   }
 
-  // Pattern observations — official cross-domain connections from the Pattern Detection Engine
-  // Only surface what the engine has detected. No recalculation, no new correlations.
-  // Maximum 2 patterns (enforced by the engine). Deduplicate against ESE and other blocks.
-  if (ctx.patternObservations && ctx.patternObservations.length > 0) {
-    const esText = es
-      ? `${es.summary ?? ''} ${es.recommendation ?? ''} ${es.statusDescription ?? ''}`.toLowerCase()
-      : '';
+  // ═══════════════════════════════════════════
+  // LAYER 4 — BEHAVIORAL PATTERNS
+  // ═══════════════════════════════════════════
 
-    for (const obs of ctx.patternObservations) {
-      // Dedup: skip if ESE already explicitly connects the same two domains
-      const domainKeywordPairs: Record<string, [string[], string[]]> = {
-        'finanzas-energia': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['energía', 'descanso', 'sueño', 'cansancio']],
-        'finanzas-mente': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['mente', 'meditación', 'práctica', 'mental']],
-        'finanzas-estres': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['estrés', 'presión', 'tensión', 'agobio']],
-        'finanzas-sueno': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['descanso', 'sueño', 'dormir', 'noche']],
-      };
-      if (esText) {
-        const pair = domainKeywordPairs[obs.connection];
-        if (pair) {
-          const hasA = pair[0].some(k => esText.includes(k));
-          const hasB = pair[1].some(k => esText.includes(k));
-          if (hasA && hasB) continue; // ESE already connects both domains — skip
-        }
-      }
-
-      // Format as natural cross-domain observation using the engine's official text
-      const empireLabels = obs.empires.join(' y ');
-      lines.push(`VitaZen ha detectado una conexión entre ${empireLabels}: ${obs.text}`);
-    }
+  // Habit streaks with detail
+  if (ctx.habitStreaks.length > 0) {
+    const habitParts = ctx.habitStreaks.slice(0, 5).map(h => {
+      const daysSince = h.lastCompletedAt ? daysAgo(h.lastCompletedAt) : null;
+      const status = daysSince === 0 ? 'hecho hoy' : daysSince === 1 ? 'hecho ayer' : daysSince !== null ? `último hace ${daysSince} días` : '';
+      return `${h.name}: racha ${h.streak} días${status ? ` (${status})` : ''}`;
+    });
+    lines.push(`Hábitos activos: ${habitParts.join('. ')}.`);
   }
 
-  // Silent Memories — official observations from VitaZen's observation engine
-  // Consume only what the engine has already generated and shown (shown[] in memoryState).
-  // No recalculation. No side effects. PREMIUM only.
-  if (ctx.silentMemories.length > 0) {
-    // Step 1: Map observation texts to their metadata (type + rarity)
-    const candidates: { observation: string; type: SilentMemoryType; rarity: 'rare' | 'very_rare' }[] = [];
-    // Iterate in reverse (most recent first) and keep only the latest per type
-    const seenTypes = new Set<SilentMemoryType>();
-    for (let i = ctx.silentMemories.length - 1; i >= 0; i--) {
-      const obs = ctx.silentMemories[i];
-      const meta = OBSERVATION_META[obs];
-      if (meta && !seenTypes.has(meta.type)) {
-        candidates.push({ observation: obs, type: meta.type, rarity: meta.rarity });
-        seenTypes.add(meta.type);
-      }
-    }
+  // Recent meditations
+  if (ctx.recentMeditations.length > 0) {
+    const last = ctx.recentMeditations[0];
+    const days = daysAgo(last.completedAt);
+    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+    lines.push(`Última meditación: ${last.duration} min de ${last.type.replace('_', ' ')} ${when}. ${ctx.recentMeditations.length} sesiones recientes.`);
+  }
 
-    // Step 2: Deduplication — skip observations already covered by other context blocks
-    const deduped = candidates.filter(c => {
-      // Shift observations: already covered by ESE (energy/stress trends) + check-in trends
-      // If ESE is active, shift adds nothing new.
-      if (c.type === 'shift' && es) return false;
+  // Weekly activity summary + consistency signal
+  const wa = ctx.weeklyActivity;
+  const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins;
+  if (totalActivity > 0) {
+    const parts: string[] = [];
+    if (wa.meditations > 0) parts.push(`${wa.meditations} meditación${wa.meditations > 1 ? 'es' : ''}`);
+    if (wa.habits > 0) parts.push(`${wa.habits} hábito${wa.habits > 1 ? 's' : ''}`);
+    if (wa.journals > 0) parts.push(`${wa.journals} entrada${wa.journals > 1 ? 's' : ''} de diario`);
+    if (wa.checkins > 0) parts.push(`${wa.checkins} check-in${wa.checkins > 1 ? 's' : ''}`);
+    lines.push(`Esta semana: ${parts.join(', ')}.`);
+  }
 
-      // Presence observations: the milestone (30/365 days) is unique — not covered
-      // by consistency trend which only says "improving/declining".
-      // Recurrence observations: temporal echo is unique — not covered by ESE or patterns.
-      // Return observations: absence/return signal is unique.
-      // Temporal observations: time-since-start milestone is unique.
-      return true;
+  // Consistency evolution signal — compact, natural
+  // Skip when ESE is active — its summary already provides the authoritative signal.
+  const c = ctx.consistency;
+  if (!es && c.trend === 'improving') {
+    lines.push(`Viene siendo más constante últimamente.`);
+  } else if (!es && c.trend === 'declining') {
+    lines.push(`Últimamente menos activo/a que la semana pasada.`);
+  } else if (c.trend === 'starting' && totalActivity <= 2) {
+    lines.push(`Está empezando a usar la app.`);
+  }
+
+  // Empire progress summary
+  const activeEmpires = ctx.empireProgress.filter(e => e.xp > 0 || e.streak > 0);
+  if (activeEmpires.length > 0) {
+    // Find the empire with most XP to signal focus area
+    const topEmpire = activeEmpires.reduce((a, b) => a.xp > b.xp ? a : b);
+    const topEmpireName = EMPIRE_NAMES[topEmpire.empire] || topEmpire.empire;
+
+    const empireParts = activeEmpires.map(e => {
+      const name = EMPIRE_NAMES[e.empire] || e.empire;
+      return `${name}: nivel ${e.level}, ${e.xp} XP${e.streak > 0 ? `, racha ${e.streak} días` : ''}`;
     });
+    lines.push(`Progreso de imperios: ${empireParts.join('. ')}. Enfocado/a especialmente en ${topEmpireName}.`);
+  }
 
-    // Step 3: Prioritization — score by persistence × rarity, take top 2
-    const scored = deduped.map(c => ({
-      ...c,
-      score: TYPE_PRIORITY[c.type] * RARITY_MULTIPLIER[c.rarity],
-    }));
-    scored.sort((a, b) => b.score - a.score);
+  // ═══════════════════════════════════════════
+  // LAYER 5 — CONVERSATIONAL MEMORY
+  // ═══════════════════════════════════════════
 
-    const selected = scored.slice(0, 2);
-
-    // Step 4: Format as natural observations — the texts are already poetic and brief
-    for (const mem of selected) {
-      lines.push(mem.observation);
-    }
+  // Recent conversation topics
+  // Last layer: continuity between sessions matters, but the model should
+  // prioritize current state over past conversations when they conflict.
+  const namedConversations = ctx.recentConversations.filter(c => c.title !== 'Nueva conversación');
+  if (namedConversations.length > 0) {
+    const topics = namedConversations.map(c => {
+      const days = daysAgo(c.updatedAt);
+      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+      return `"${c.title}" (${when})`;
+    });
+    lines.push(`Temas recientes de conversación: ${topics.join(', ')}.`);
   }
 
   return lines.join('\n');
