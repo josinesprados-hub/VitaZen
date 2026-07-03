@@ -302,7 +302,7 @@ function generateRecommendation(
   }
 
   if (energy <= 35) {
-    return 'Hoy, lo esencial.';
+    return 'Hoy, poco a poco.';
   }
 
   if (focus >= 70 && energy >= 60) {
@@ -371,7 +371,7 @@ function generateSummary(
   }
 
   if (status === 'enfocado') {
-    return 'Sin fricción estos días.';
+    return 'Estos días van solos.';
   }
 
   if (progress >= 60) {
