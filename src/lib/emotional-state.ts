@@ -256,7 +256,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'estable',
       label: 'Estable',
-      description: 'Ritmo razonable.',
+      description: 'Días en equilibrio.',
     };
   }
 
@@ -296,7 +296,7 @@ function generateRecommendation(
 
   if (stress <= 30) {
     if (energy <= 35) {
-      return 'Poca energía, mucho peso.';
+      return 'Sin prisa.';
     }
     return 'Día con tensión.';
   }
@@ -306,7 +306,7 @@ function generateRecommendation(
   }
 
   if (focus >= 70 && energy >= 60) {
-    return 'Claridad.';
+    return 'Sin forzar.';
   }
 
   if (consistency >= 70) {
@@ -314,11 +314,11 @@ function generateRecommendation(
   }
 
   if (status === 'enfocado') {
-    return 'Claridad. Lo que hagas con ella es tuyo.';
+    return 'Este ritmo se sostiene solo.';
   }
 
   if (status === 'en_progreso') {
-    return 'Va tomando forma.';
+    return 'A su tiempo.';
   }
 
   // Low activity
@@ -363,7 +363,7 @@ function generateSummary(
   }
 
   if (consistency >= 70) {
-    return 'Ritmo estable estos días.';
+    return 'Constancia estos días.';
   }
 
   if (status === 'sobrecargado') {
@@ -371,7 +371,7 @@ function generateSummary(
   }
 
   if (status === 'enfocado') {
-    return 'Claridad.';
+    return 'Sin fricción estos días.';
   }
 
   if (progress >= 60) {
