@@ -3,6 +3,7 @@ import { getEmotionalState, type EmotionalState } from './emotional-state';
 import { detectPatterns } from './patterns/detector';
 import type { CrossEmpireData } from './patterns/types';
 import { detectLifeStages, getPastMonths, type LifeStage, type StageTransition, type StageFlavor } from './life-memory/stages';
+import type { SilentMemoryType } from './silent-memories/shared';
 
 // ═══════════════════════════════════════════
 // MENTOR CONTEXT BUILDER
@@ -111,6 +112,7 @@ interface UserContext {
     reflectedAt: Date | null;
     summaryViewedAt: Date | null;
   }[];
+  silentMemories: string[];
 }
 
 /**
@@ -461,6 +463,29 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }
   }
 
+  // Silent Memories: consume official observations (PREMIUM only; empty for FREE)
+  // Read from EmotionalDashboardState.memoryState.shown[] — no recalculation, no side effects.
+  // These are observations that the Silent Memories engine has already generated
+  // and displayed to the user on the dashboard. The mentor only consumes them.
+  let silentMemories: string[] = [];
+  if (isPremium) {
+    try {
+      const dashboardState = await db.emotionalDashboardState.findUnique({
+        where: { userId },
+        select: { memoryState: true },
+      });
+      if (dashboardState?.memoryState) {
+        const memState = JSON.parse(dashboardState.memoryState);
+        if (Array.isArray(memState.shown)) {
+          // shown[] is chronological (oldest first). We want the most recent.
+          silentMemories = memState.shown;
+        }
+      }
+    } catch {
+      // Non-blocking: if silent memories aren't available, continue without them
+    }
+  }
+
   return {
     userName: user?.name || null,
     plan: user?.plan || 'FREE',
@@ -533,6 +558,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       reflectedAt: c.reflectedAt,
       summaryViewedAt: c.summaryViewedAt,
     })),
+    silentMemories,
   };
 }
 
@@ -557,6 +583,47 @@ const EMOTION_LABELS: Record<number, string> = {
   3: 'neutral',
   4: 'bien',
   5: 'excelente',
+};
+
+// ─── Silent Memories: observation → meta lookup ───
+// Maps each fixed observation text to its type and rarity.
+// Derived from the observer functions in silent-memories/shared.ts.
+// Used for deduplication and prioritization in the mentor context.
+
+const OBSERVATION_META: Record<string, { type: SilentMemoryType; rarity: 'rare' | 'very_rare' }> = {
+  // Return after silence
+  'Hacía unos días.': { type: 'return', rarity: 'rare' },
+  'Vuelves después de un tiempo.': { type: 'return', rarity: 'rare' },
+  'Aquí estás de nuevo.': { type: 'return', rarity: 'very_rare' },
+  'Hacía mucho.': { type: 'return', rarity: 'very_rare' },
+  // Recurring pattern
+  'Este ritmo ya te había acompañado antes.': { type: 'recurrence', rarity: 'very_rare' },
+  'Ya habías estado así.': { type: 'recurrence', rarity: 'rare' },
+  // Stage shift
+  'La energía cambió estas semanas.': { type: 'shift', rarity: 'rare' },
+  'Menos energía últimamente.': { type: 'shift', rarity: 'rare' },
+  'Menos peso últimamente.': { type: 'shift', rarity: 'rare' },
+  // Presence milestone
+  'Un mes así.': { type: 'presence', rarity: 'very_rare' },
+  'Un año así.': { type: 'presence', rarity: 'very_rare' },
+  // Temporal milestone
+  'Ya tres meses.': { type: 'temporal', rarity: 'very_rare' },
+  'Medio año.': { type: 'temporal', rarity: 'very_rare' },
+  'Un año.': { type: 'temporal', rarity: 'very_rare' },
+};
+
+// Priority by type: higher = more persistent, deeper, more useful for the mentor
+const TYPE_PRIORITY: Record<SilentMemoryType, number> = {
+  temporal: 5,    // Longest persistence (months), marks life chapters
+  presence: 4,    // Milestone persistence (30/365 days), unique signal
+  return: 3,      // Temporal continuity signal, unique
+  recurrence: 2,  // Temporal echo, partially overlaps with ESE
+  shift: 1,       // Short-lived, already covered by ESE + check-in trends
+};
+
+const RARITY_MULTIPLIER: Record<'rare' | 'very_rare', number> = {
+  rare: 1,
+  very_rare: 2,
 };
 
 function daysAgo(date: Date): number {
@@ -985,6 +1052,52 @@ function formatAdvancedContext(ctx: UserContext): string {
       // Format as natural cross-domain observation using the engine's official text
       const empireLabels = obs.empires.join(' y ');
       lines.push(`VitaZen ha detectado una conexión entre ${empireLabels}: ${obs.text}`);
+    }
+  }
+
+  // Silent Memories — official observations from VitaZen's observation engine
+  // Consume only what the engine has already generated and shown (shown[] in memoryState).
+  // No recalculation. No side effects. PREMIUM only.
+  if (ctx.silentMemories.length > 0) {
+    // Step 1: Map observation texts to their metadata (type + rarity)
+    const candidates: { observation: string; type: SilentMemoryType; rarity: 'rare' | 'very_rare' }[] = [];
+    // Iterate in reverse (most recent first) and keep only the latest per type
+    const seenTypes = new Set<SilentMemoryType>();
+    for (let i = ctx.silentMemories.length - 1; i >= 0; i--) {
+      const obs = ctx.silentMemories[i];
+      const meta = OBSERVATION_META[obs];
+      if (meta && !seenTypes.has(meta.type)) {
+        candidates.push({ observation: obs, type: meta.type, rarity: meta.rarity });
+        seenTypes.add(meta.type);
+      }
+    }
+
+    // Step 2: Deduplication — skip observations already covered by other context blocks
+    const deduped = candidates.filter(c => {
+      // Shift observations: already covered by ESE (energy/stress trends) + check-in trends
+      // If ESE is active, shift adds nothing new.
+      if (c.type === 'shift' && es) return false;
+
+      // Presence observations: the milestone (30/365 days) is unique — not covered
+      // by consistency trend which only says "improving/declining".
+      // Recurrence observations: temporal echo is unique — not covered by ESE or patterns.
+      // Return observations: absence/return signal is unique.
+      // Temporal observations: time-since-start milestone is unique.
+      return true;
+    });
+
+    // Step 3: Prioritization — score by persistence × rarity, take top 2
+    const scored = deduped.map(c => ({
+      ...c,
+      score: TYPE_PRIORITY[c.type] * RARITY_MULTIPLIER[c.rarity],
+    }));
+    scored.sort((a, b) => b.score - a.score);
+
+    const selected = scored.slice(0, 2);
+
+    // Step 4: Format as natural observations — the texts are already poetic and brief
+    for (const mem of selected) {
+      lines.push(mem.observation);
     }
   }
 
