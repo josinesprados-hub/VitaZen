@@ -58,6 +58,14 @@ interface UserContext {
     activeDaysThisWeek: number;
     trend: 'improving' | 'stable' | 'declining' | 'starting';
   };
+  onboardingData: {
+    goals: string[];
+    primaryFocus: string | null;
+    stressLevel: number | null;
+    energyLevel: number | null;
+    focusLevel: number | null;
+    initialHabits: string[];
+  } | null;
 }
 
 /**
@@ -88,6 +96,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     weeklyHabitLogs,
     prevWeekCheckins,
     user,
+    onboardingRow,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -166,6 +175,21 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       where: { id: userId },
       select: { name: true, plan: true },
     }),
+
+    // Onboarding data: PREMIUM only
+    isPremium
+      ? db.onboardingData.findUnique({
+          where: { userId },
+          select: {
+            goals: true,
+            primaryFocus: true,
+            stressLevel: true,
+            energyLevel: true,
+            focusLevel: true,
+            initialHabits: true,
+          },
+        })
+      : Promise.resolve(null),
   ]);
 
   // Derive counts from date arrays (for weeklyActivity display)
@@ -199,6 +223,23 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     trend = 'improving';
   } else if (weeklyCheckinCount < prevWeekCheckins - 1) {
     trend = 'declining';
+  }
+
+  // Parse onboarding data safely (PREMIUM only; null for FREE)
+  let onboardingData: UserContext['onboardingData'] = null;
+  if (onboardingRow) {
+    let parsedGoals: string[] = [];
+    try { parsedGoals = JSON.parse(onboardingRow.goals); } catch { /* keep empty */ }
+    let parsedHabits: string[] = [];
+    try { parsedHabits = JSON.parse(onboardingRow.initialHabits); } catch { /* keep empty */ }
+    onboardingData = {
+      goals: Array.isArray(parsedGoals) ? parsedGoals : [],
+      primaryFocus: onboardingRow.primaryFocus || null,
+      stressLevel: onboardingRow.stressLevel,
+      energyLevel: onboardingRow.energyLevel,
+      focusLevel: onboardingRow.focusLevel,
+      initialHabits: Array.isArray(parsedHabits) ? parsedHabits : [],
+    };
   }
 
   return {
@@ -249,6 +290,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       activeDaysThisWeek,
       trend,
     },
+    onboardingData,
   };
 }
 
@@ -346,6 +388,50 @@ function formatAdvancedContext(ctx: UserContext): string {
   // User name
   if (ctx.userName) {
     lines.push(`Se llama ${ctx.userName}.`);
+  }
+
+  // Onboarding origin context — why they came, what they want
+  const ob = ctx.onboardingData;
+  if (ob) {
+    const LEVEL_LABELS: Record<number, string> = {
+      1: 'muy bajo',
+      2: 'bajo',
+      3: 'neutral',
+      4: 'bueno',
+      5: 'alto',
+    };
+    const FOCUS_NAMES: Record<string, string> = {
+      mente: 'Mente',
+      disciplina: 'Disciplina',
+      energia: 'Energía',
+      riqueza: 'Finanzas',
+    };
+
+    if (ob.goals.length > 0) {
+      const goalsStr = ob.goals.length <= 3
+        ? ob.goals.join(' y ')
+        : ob.goals.slice(0, 3).join(', ') + ' y más';
+      lines.push(`Comenzó VitaZen con el objetivo de ${goalsStr}.`);
+    }
+    if (ob.primaryFocus) {
+      const focusName = FOCUS_NAMES[ob.primaryFocus] || ob.primaryFocus;
+      lines.push(`Su foco principal es ${focusName}.`);
+    }
+    if (ob.energyLevel != null) {
+      lines.push(`Al comenzar describía su energía como ${LEVEL_LABELS[ob.energyLevel] || ob.energyLevel}/5.`);
+    }
+    if (ob.stressLevel != null) {
+      lines.push(`Su nivel de estrés inicial era ${LEVEL_LABELS[ob.stressLevel] || ob.stressLevel}/5.`);
+    }
+    if (ob.focusLevel != null) {
+      lines.push(`Su capacidad de enfoque inicial era ${LEVEL_LABELS[ob.focusLevel] || ob.focusLevel}/5.`);
+    }
+    if (ob.initialHabits.length > 0) {
+      const habitsStr = ob.initialHabits.length <= 3
+        ? ob.initialHabits.join(', ')
+        : ob.initialHabits.slice(0, 3).join(', ') + ' y otros';
+      lines.push(`Los hábitos que quería construir: ${habitsStr}.`);
+    }
   }
 
   // Recent emotional check-ins with trends
