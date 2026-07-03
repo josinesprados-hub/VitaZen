@@ -133,7 +133,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4 rounded-[20%]" />
           <h1 className="text-champagne text-3xl font-bold tracking-widest">VITAZEN</h1>
-          <p className="text-champagne/80 mt-3 text-base tracking-wide font-light italic">Un espacio para notar</p>
+          <p className="text-champagne/80 mt-3 text-base tracking-wide font-light italic">Muévete, desconecta y vive sin límites.</p>
         </div>
 
         {/* Form Card */}
