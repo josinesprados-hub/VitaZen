@@ -73,6 +73,13 @@ interface UserContext {
     stress: number;
     notes: string | null;
   }[];
+  financeLogs: {
+    type: string;
+    category: string;
+    mood: string | null;
+    contexto: string | null;
+    date: Date;
+  }[];
 }
 
 /**
@@ -105,6 +112,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     user,
     onboardingRow,
     wellnessLogRows,
+    financeLogRows,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -206,6 +214,16 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           orderBy: { date: 'desc' },
           take: 7,
           select: { date: true, sleep: true, mood: true, stress: true, notes: true },
+        })
+      : Promise.resolve([]),
+
+    // Finance logs: PREMIUM only — spending mood patterns + contexto
+    isPremium
+      ? db.financeLog.findMany({
+          where: { userId, date: { gte: thirtyDaysAgo }, type: 'expense' },
+          orderBy: { date: 'desc' },
+          take: 15,
+          select: { type: true, category: true, mood: true, contexto: true, date: true },
         })
       : Promise.resolve([]),
   ]);
@@ -315,6 +333,13 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       mood: w.mood,
       stress: w.stress,
       notes: w.notes,
+    })),
+    financeLogs: financeLogRows.map(f => ({
+      type: f.type,
+      category: f.category,
+      mood: f.mood,
+      contexto: f.contexto,
+      date: f.date,
     })),
   };
 }
@@ -522,6 +547,52 @@ function formatAdvancedContext(ctx: UserContext): string {
     if (noteLog && noteLog.notes) {
       const snippet = noteLog.notes.length > 60 ? noteLog.notes.slice(0, 57) + '...' : noteLog.notes;
       lines.push(`Ha anotado sobre su bienestar: "${snippet}".`);
+    }
+  }
+
+  // Finance context — spending patterns, not financial advice
+  if (ctx.financeLogs.length >= 3) {
+    const FINANCE_MOOD_LABELS: Record<string, string> = {
+      necessity: 'necesidad',
+      enjoyment: 'disfrute',
+      growth: 'crecimiento',
+      tranquility: 'tranquilidad',
+    };
+
+    const logs = ctx.financeLogs;
+
+    // Find predominant spending mood
+    const moodCounts: Record<string, number> = {};
+    for (const l of logs) {
+      if (l.mood) {
+        moodCounts[l.mood] = (moodCounts[l.mood] || 0) + 1;
+      }
+    }
+    const moods = Object.entries(moodCounts);
+    if (moods.length > 0) {
+      const [topMood, topCount] = moods.reduce((a, b) => a[1] >= b[1] ? a : b);
+      const ratio = topCount / logs.length;
+      const moodLabel = FINANCE_MOOD_LABELS[topMood] || topMood;
+      if (ratio >= 0.5) {
+        if (topMood === 'necessity') {
+          lines.push(`Últimamente la mayoría de sus gastos han estado relacionados con necesidades.`);
+        } else if (topMood === 'growth') {
+          lines.push(`Ha registrado varias decisiones enfocadas al crecimiento.`);
+        } else if (topMood === 'enjoyment') {
+          lines.push(`Sus gastos recientes reflejan una etapa orientada al disfrute.`);
+        } else if (topMood === 'tranquility') {
+          lines.push(`Se aprecia una etapa de mayor prudencia en sus decisiones.`);
+        } else {
+          lines.push(`Sus gastos recientes tienen como intención predominante ${moodLabel}.`);
+        }
+      }
+    }
+
+    // One brief contexto reference — human context behind a transaction
+    const ctxLog = logs.find(l => l.contexto && l.contexto.trim().length > 0);
+    if (ctxLog && ctxLog.contexto) {
+      const snippet = ctxLog.contexto.length > 60 ? ctxLog.contexto.slice(0, 57) + '...' : ctxLog.contexto;
+      lines.push(`Ha explicado que un gasto estaba relacionado con: "${snippet}".`);
     }
   }
 
