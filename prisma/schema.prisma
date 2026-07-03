@@ -489,6 +489,10 @@ model EmotionalDashboardState {
   // { lastShown: { [type]: ISO date }, shown: string[] }
   memoryState     String   @default("{}")
 
+  // Daily quote rotation state (JSON)
+  // { currentIndex, cycleNumber, lastDateKey, collectionLength }
+  quoteState      String   @default("{}")
+
   // Last dashboard visit — for cross-device visit tracking
   lastVisitAt     DateTime @default(now())
 
