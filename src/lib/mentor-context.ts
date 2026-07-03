@@ -1,5 +1,7 @@
 import { db } from './db';
 import { getEmotionalState, type EmotionalState } from './emotional-state';
+import { detectPatterns } from './patterns/detector';
+import type { CrossEmpireData } from './patterns/types';
 
 // ═══════════════════════════════════════════
 // MENTOR CONTEXT BUILDER
@@ -88,6 +90,13 @@ interface UserContext {
     summary: string;
     recommendation: string;
   } | null;
+  patternObservations: {
+    id: string;
+    connection: string;
+    text: string;
+    empires: string[];
+    weight: string;
+  }[] | null;
 }
 
 /**
@@ -100,6 +109,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
+  const ninetyDaysAgo = new Date(now.getTime() - 90 * 86400000);
 
   // Previous week window for trend comparison
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);
@@ -304,6 +314,90 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }
   }
 
+  // Pattern detection: consume the official engine result (PREMIUM only; null for FREE)
+  // No recalculation, no cross-referencing — the engine is the single source of truth.
+  let patternObservations: UserContext['patternObservations'] = null;
+  if (isPremium) {
+    try {
+      const [
+        pFinance,
+        pWellness,
+        pMeditation,
+        pHabits,
+        pCheckins,
+        pJournals,
+      ] = await Promise.all([
+        db.financeLog.findMany({
+          where: { userId, date: { gte: ninetyDaysAgo } },
+          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+          orderBy: { date: 'desc' },
+        }),
+        db.wellnessLog.findMany({
+          where: { userId, date: { gte: ninetyDaysAgo } },
+          select: { date: true, mood: true, energy: true, sleep: true, stress: true },
+          orderBy: { date: 'desc' },
+        }),
+        db.meditationSession.findMany({
+          where: { userId, completedAt: { gte: ninetyDaysAgo } },
+          select: { duration: true, type: true, completedAt: true },
+          orderBy: { completedAt: 'desc' },
+        }),
+        db.habitLog.findMany({
+          where: { userId },
+          select: { name: true, streak: true, lastCompletedAt: true },
+        }),
+        db.dailyCheckin.findMany({
+          where: { userId, date: { gte: ninetyDaysAgo } },
+          select: { date: true, emotion: true, energy: true, focus: true, stress: true },
+          orderBy: { date: 'desc' },
+        }),
+        db.journalEntry.findMany({
+          where: { userId, createdAt: { gte: ninetyDaysAgo } },
+          select: { content: true, mood: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
+
+      const crossEmpireData: CrossEmpireData = {
+        financeLogs: pFinance.map(l => ({
+          date: l.date.toISOString(), type: l.type, category: l.category,
+          amount: l.amount, mood: l.mood, contexto: l.contexto,
+        })),
+        wellnessLogs: pWellness.map(l => ({
+          date: l.date.toISOString(), mood: l.mood, energy: l.energy,
+          sleep: l.sleep, stress: l.stress,
+        })),
+        meditationSessions: pMeditation.map(s => ({
+          duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
+        })),
+        habitLogs: pHabits.map(h => ({
+          name: h.name, streak: h.streak,
+          lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
+        })),
+        checkins: pCheckins.map(c => ({
+          date: c.date.toISOString(), emotion: c.emotion, energy: c.energy,
+          focus: c.focus, stress: c.stress,
+        })),
+        journalEntries: pJournals.map(j => ({
+          content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString(),
+        })),
+      };
+
+      const result = detectPatterns(crossEmpireData);
+      if (result.observations.length > 0) {
+        patternObservations = result.observations.map(o => ({
+          id: o.id,
+          connection: o.connection,
+          text: o.text,
+          empires: o.empires,
+          weight: o.weight,
+        }));
+      }
+    } catch {
+      // Non-blocking: if pattern detection fails, continue without it
+    }
+  }
+
   return {
     userName: user?.name || null,
     plan: user?.plan || 'FREE',
@@ -368,6 +462,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       date: f.date,
     })),
     emotionalState,
+    patternObservations,
   };
 }
 
@@ -719,6 +814,37 @@ function formatAdvancedContext(ctx: UserContext): string {
     lines.push(`Últimamente menos activo/a que la semana pasada.`);
   } else if (c.trend === 'starting' && totalActivity <= 2) {
     lines.push(`Está empezando a usar la app.`);
+  }
+
+  // Pattern observations — official cross-domain connections from the Pattern Detection Engine
+  // Only surface what the engine has detected. No recalculation, no new correlations.
+  // Maximum 2 patterns (enforced by the engine). Deduplicate against ESE and other blocks.
+  if (ctx.patternObservations && ctx.patternObservations.length > 0) {
+    const esText = es
+      ? `${es.summary ?? ''} ${es.recommendation ?? ''} ${es.statusDescription ?? ''}`.toLowerCase()
+      : '';
+
+    for (const obs of ctx.patternObservations) {
+      // Dedup: skip if ESE already explicitly connects the same two domains
+      const domainKeywordPairs: Record<string, [string[], string[]]> = {
+        'finanzas-energia': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['energía', 'descanso', 'sueño', 'cansancio']],
+        'finanzas-mente': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['mente', 'meditación', 'práctica', 'mental']],
+        'finanzas-estres': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['estrés', 'presión', 'tensión', 'agobio']],
+        'finanzas-sueno': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['descanso', 'sueño', 'dormir', 'noche']],
+      };
+      if (esText) {
+        const pair = domainKeywordPairs[obs.connection];
+        if (pair) {
+          const hasA = pair[0].some(k => esText.includes(k));
+          const hasB = pair[1].some(k => esText.includes(k));
+          if (hasA && hasB) continue; // ESE already connects both domains — skip
+        }
+      }
+
+      // Format as natural cross-domain observation using the engine's official text
+      const empireLabels = obs.empires.join(' y ');
+      lines.push(`VitaZen ha detectado una conexión entre ${empireLabels}: ${obs.text}`);
+    }
   }
 
   return lines.join('\n');
