@@ -32,18 +32,24 @@ export async function POST(request: NextRequest) {
 
     const { date, meals, water, calories, notes } = await request.json();
 
+    const existing = await db.nutritionLog.findUnique({
+      where: { userId_date: { userId: user.id, date: new Date(date) } },
+    });
+
     const log = await db.nutritionLog.upsert({
       where: { userId_date: { userId: user.id, date: new Date(date) } },
       update: { meals, water, calories, notes },
       create: { userId: user.id, date: new Date(date), meals, water, calories, notes },
     });
 
-    // Award XP and streak to energia empire
-    await db.empireProgress.upsert({
-      where: { userId_empire: { userId: user.id, empire: 'energia' } },
-      update: { xp: { increment: 10 }, streak: { increment: 1 } },
-      create: { userId: user.id, empire: 'energia', xp: 10, streak: 1 },
-    });
+    // Award XP and streak to energia empire only on first log of the day
+    if (!existing) {
+      await db.empireProgress.upsert({
+        where: { userId_empire: { userId: user.id, empire: 'energia' } },
+        update: { xp: { increment: 10 }, streak: { increment: 1 } },
+        create: { userId: user.id, empire: 'energia', xp: 10, streak: 1 },
+      });
+    }
 
     return NextResponse.json({ log });
   } catch (error) {
