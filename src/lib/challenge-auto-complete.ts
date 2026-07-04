@@ -9,7 +9,7 @@
  *   habitos     → habit (create or complete a habit)
  *   mentalidad  → meditation OR journal
  *   productividad → journal OR habit (exact title match)
- *   salud       → checkin OR meditation
+ *   salud       → checkin OR meditation OR wellness OR nutrition
  *
  * For habit actions, if the category doesn't match, an additional check is
  * performed: if the habit name exactly matches the challenge title
@@ -27,6 +27,8 @@ const ACTION_CATEGORIES: Record<string, string[]> = {
   habit: ['disciplina', 'habitos'],
   meditation: ['mentalidad', 'salud'],
   journal: ['mentalidad', 'productividad'],
+  wellness: ['salud'],
+  nutrition: ['salud'],
 };
 
 /**
