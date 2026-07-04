@@ -1,4 +1,5 @@
 import { db } from './db';
+import { getMadridDateKey, getTodayDateKey } from './deterministic';
 import { getEmotionalState, type EmotionalState } from './emotional-state';
 import { detectPatterns } from './patterns/detector';
 import type { CrossEmpireData } from './patterns/types';
@@ -630,13 +631,16 @@ const RARITY_MULTIPLIER: Record<'rare' | 'very_rare', number> = {
 };
 
 function daysAgo(date: Date): number {
-  return Math.floor((Date.now() - date.getTime()) / 86400000);
+  const todayKey = getTodayDateKey();
+  const dateKey = getMadridDateKey(date);
+  const todayMs = new Date(todayKey + 'T00:00:00').getTime();
+  const dateMs = new Date(dateKey + 'T00:00:00').getTime();
+  return Math.round((todayMs - dateMs) / 86400000);
 }
 
-/** Normalize a Date to a YYYY-MM-DD string for day-level comparison. */
+/** Normalize a Date to a YYYY-MM-DD string for day-level comparison using Europe/Madrid timezone. */
 function toDateKey(date: Date): string {
-  const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return getMadridDateKey(date);
 }
 
 /**
@@ -1132,8 +1136,9 @@ function formatAdvancedContext(ctx: UserContext): string {
 
     // How many months ago was the latest closure?
     const [cYear, cMonth] = latest.month.split('-').map(Number);
-    const now = new Date();
-    const monthsAgo = (now.getFullYear() - cYear) * 12 + (now.getMonth() + 1 - cMonth);
+    const nowStr = getTodayDateKey();
+    const [nowYear, nowMonth] = nowStr.split('-').map(Number);
+    const monthsAgo = (nowYear - cYear) * 12 + (nowMonth - cMonth);
 
     const reflectionsCount = closures.filter(cl => cl.hasReflection).length;
 
