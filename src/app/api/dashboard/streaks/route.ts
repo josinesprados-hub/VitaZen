@@ -2,33 +2,35 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { getMadridDateKey } from '@/lib/deterministic';
 
 function calcStreak(dates: Date[]): number {
   if (dates.length === 0) return 0;
 
-  // Normalize to unique YYYY-MM-DD strings
+  // Normalize to unique YYYY-MM-DD strings in Europe/Madrid timezone.
+  // Uses the same getMadridDateKey() as the rest of VitaZen so that
+  // streak boundaries align with the user's perceived day, not UTC midnight.
   const uniqueDays = new Set<string>();
   for (const d of dates) {
-    const day = new Date(d);
-    uniqueDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+    uniqueDays.add(getMadridDateKey(new Date(d)));
   }
 
-  // Start from today; if no activity today, start from yesterday
-  const now = new Date();
-  let checkDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const todayStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
+  // Start from today (Madrid); if no activity today, start from yesterday
+  const todayStr = getMadridDateKey(new Date());
+  let checkDateStr = todayStr;
 
   if (!uniqueDays.has(todayStr)) {
     // No activity today, check from yesterday — graceful: today still counts if yesterday was active
-    checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+    const todayMs = new Date(todayStr + 'T12:00:00Z').getTime();
+    checkDateStr = getMadridDateKey(new Date(todayMs - 86400000));
   }
 
   let streak = 0;
   while (true) {
-    const dateStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
-    if (uniqueDays.has(dateStr)) {
+    if (uniqueDays.has(checkDateStr)) {
       streak++;
-      checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+      const checkMs = new Date(checkDateStr + 'T12:00:00Z').getTime();
+      checkDateStr = getMadridDateKey(new Date(checkMs - 86400000));
     } else {
       break;
     }
@@ -105,13 +107,13 @@ export async function GET(request: NextRequest) {
     const generalStreak = calcStreak(allDates);
 
     // Check if user was active yesterday (for message context)
-    const now = new Date();
-    const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - 24 * 60 * 60 * 1000);
-    const yesterdayStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${yesterday.getUTCDate().padStart(2, '0')}`;
+    // Use Europe/Madrid timezone — same as calcStreak and the rest of VitaZen.
+    const todayStr = getMadridDateKey(new Date());
+    const todayMs = new Date(todayStr + 'T12:00:00Z').getTime();
+    const yesterdayStr = getMadridDateKey(new Date(todayMs - 86400000));
     const uniqueAllDays = new Set<string>();
     for (const d of allDates) {
-      const day = new Date(d);
-      uniqueAllDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+      uniqueAllDays.add(getMadridDateKey(new Date(d)));
     }
     const wasActiveYesterday = uniqueAllDays.has(yesterdayStr);
 
