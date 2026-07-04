@@ -92,6 +92,17 @@ export async function DELETE(request: NextRequest) {
 
     await db.nutritionLog.delete({ where: { id: logId } });
 
+    // Revert XP for energia empire (never below 0, don't create if missing)
+    const energiaProgress = await db.empireProgress.findUnique({
+      where: { userId_empire: { userId: user.id, empire: 'energia' } },
+    });
+    if (energiaProgress) {
+      await db.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'energia' } },
+        data: { xp: Math.max(0, energiaProgress.xp - 10) },
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Nutrition DELETE error:', error);
