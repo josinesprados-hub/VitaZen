@@ -87,13 +87,18 @@ export function deterministicWeightedSelect(weights: number[], seed: string): nu
 // (typically UTC), causing the daily emotional reset to happen
 // at a different time than the user's day boundary.
 
+export function getMadridDateKey(date: Date): string {
+  // Format any Date as YYYY-MM-DD in Europe/Madrid timezone.
+  // Works in both Node.js (server) and modern browsers (client).
+  // Uses the sv-SE locale which natively produces YYYY-MM-DD format.
+  const madridStr = date.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  return madridStr.split(' ')[0]; // Extract date part
+}
+
 export function getTodayDateKey(): string {
-  // Format date in Europe/Madrid timezone.
+  // Format current date in Europe/Madrid timezone.
   // This produces YYYY-MM-DD in the user's perceived "today".
   // Even if the server is in UTC, the dateKey will match
   // what a Spanish user considers "today".
-  const now = new Date();
-  const madridStr = now.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-  // sv-SE locale gives YYYY-MM-DD format natively
-  return madridStr.split(' ')[0]; // Extract date part
+  return getMadridDateKey(new Date());
 }

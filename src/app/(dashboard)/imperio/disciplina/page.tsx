@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { getMadridDateKey } from '@/lib/deterministic';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_HABITS, SCREENSHOT_CHALLENGE as SCREENSHOT_HABIT_CHALLENGE } from '@/lib/screenshot-data';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
@@ -35,6 +36,14 @@ export default function DisciplinaPage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
   const { isActive: screenshotMode } = useScreenshotMode();
+
+  // Check if a habit was completed today using Europe/Madrid timezone,
+  // matching the server-side criterion in PATCH /api/habits.
+  const isCompletedToday = (lastCompletedAt: string | null) => {
+    if (!lastCompletedAt) return false;
+    return getMadridDateKey(new Date(lastCompletedAt)) === getMadridDateKey(new Date());
+  };
+
   const [habits, setHabits] = useState<Habit[]>([]);
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -357,12 +366,12 @@ export default function DisciplinaPage() {
                     className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all touch-press ${
                       justCompletedId === habit.id ? 'check-pop' : ''
                     } ${
-                      habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString()
+                      isCompletedToday(habit.lastCompletedAt)
                         ? 'bg-champagne border-champagne scale-100'
                         : 'border-[#333] hover:border-champagne hover:bg-champagne/10'
                     }`}
                   >
-                    <Check size={16} className={habit.lastCompletedAt && new Date(habit.lastCompletedAt).toDateString() === new Date().toDateString() ? 'text-black' : 'text-champagne'} />
+                    <Check size={16} className={isCompletedToday(habit.lastCompletedAt) ? 'text-black' : 'text-champagne'} />
                   </button>
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
