@@ -87,11 +87,11 @@ export async function POST(request: NextRequest) {
       data: { userId: user.id, duration, type },
     });
 
-    // Award XP to mente empire
+    // Award XP and streak to mente empire
     await db.empireProgress.upsert({
       where: { userId_empire: { userId: user.id, empire: 'mente' } },
-      update: { xp: { increment: 15 } },
-      create: { userId: user.id, empire: 'mente', xp: 15 },
+      update: { xp: { increment: 15 }, streak: { increment: 1 } },
+      create: { userId: user.id, empire: 'mente', xp: 15, streak: 1 },
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
