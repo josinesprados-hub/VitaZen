@@ -42,18 +42,46 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Wellness: distinct days this week (target 7, one per day via @@unique)
+    const wellnessLogs = await db.wellnessLog.findMany({
+      where: {
+        userId: user.id,
+        date: { gte: weekAgo },
+      },
+      select: { date: true },
+    });
+    const wellnessCount = new Set(
+      wellnessLogs.map(w => getMadridDateKey(new Date(w.date)))
+    ).size;
+
+    // Nutrition: distinct days this week (target 7, one per day via @@unique)
+    const nutritionLogs = await db.nutritionLog.findMany({
+      where: {
+        userId: user.id,
+        date: { gte: weekAgo },
+      },
+      select: { date: true },
+    });
+    const nutritionCount = new Set(
+      nutritionLogs.map(n => getMadridDateKey(new Date(n.date)))
+    ).size;
+
     // Calculate percentages (capped at 100)
     const meditationPercent = Math.min(Math.round((meditationCount / 7) * 100), 100);
     const habitsPercent = Math.min(Math.round((habitActiveDays / 7) * 100), 100);
     const journalPercent = Math.min(Math.round((journalCount / 3) * 100), 100);
+    const wellnessPercent = Math.min(Math.round((wellnessCount / 7) * 100), 100);
+    const nutritionPercent = Math.min(Math.round((nutritionCount / 7) * 100), 100);
 
-    // Total progress (average of three)
-    const totalPercent = Math.round((meditationPercent + habitsPercent + journalPercent) / 3);
+    // Total progress (average of five)
+    const totalPercent = Math.round((meditationPercent + habitsPercent + journalPercent + wellnessPercent + nutritionPercent) / 5);
 
     return NextResponse.json({
       meditation: { count: meditationCount, target: 7, percent: meditationPercent },
       habits: { count: habitActiveDays, target: 7, percent: habitsPercent },
       journal: { count: journalCount, target: 3, percent: journalPercent },
+      wellness: { count: wellnessCount, target: 7, percent: wellnessPercent },
+      nutrition: { count: nutritionCount, target: 7, percent: nutritionPercent },
       totalPercent,
     });
   } catch (error) {
