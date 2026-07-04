@@ -523,7 +523,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     })),
     empireProgress: empireProgress.map(e => ({
       empire: e.empire,
-      level: e.level,
+      level: Math.floor(e.xp / 100) + 1,
       xp: e.xp,
       streak: e.streak,
     })),
