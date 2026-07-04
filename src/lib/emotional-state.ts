@@ -184,13 +184,15 @@ function computeActivity(data: RawData): { value: number; prevValue: number } {
   const recentCheckins = data.thisWeekCheckins.filter((c: any) => new Date(c.date) >= threeDaysAgo).length;
   const recentMeditations = data.thisWeekMeditations.filter((m: any) => new Date(m.completedAt) >= threeDaysAgo).length;
   const recentJournals = data.thisWeekJournals.filter((j: any) => new Date(j.createdAt) >= threeDaysAgo).length;
+  const recentWellness = data.thisWeekWellness.filter((w: any) => new Date(w.date) >= threeDaysAgo).length;
+  const recentNutrition = data.thisWeekNutrition.filter((n: any) => new Date(n.date) >= threeDaysAgo).length;
 
-  const recentTotal = recentCheckins + recentMeditations + recentJournals;
-  const value = Math.min(Math.round((recentTotal / 9) * 100), 100); // 3 activities/day * 3 days = 9
+  const recentTotal = recentCheckins + recentMeditations + recentJournals + recentWellness + recentNutrition;
+  const value = Math.min(Math.round((recentTotal / 15) * 100), 100); // 5 activities/day * 3 days = 15
 
   // Full week as comparison baseline
-  const weeklyTotal = data.thisWeekCheckins.length + data.thisWeekMeditations.length + data.thisWeekJournals.length;
-  const prevValue = Math.min(Math.round((weeklyTotal / 15) * 100), 100);
+  const weeklyTotal = data.thisWeekCheckins.length + data.thisWeekMeditations.length + data.thisWeekJournals.length + data.thisWeekWellness.length + data.thisWeekNutrition.length;
+  const prevValue = Math.min(Math.round((weeklyTotal / 25) * 100), 100);
 
   return { value, prevValue };
 }
