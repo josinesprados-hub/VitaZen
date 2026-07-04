@@ -186,7 +186,7 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     // 12. Monthly closures
     db.monthlyClosure.count({ where: { userId } }),
 
-    // 13. Empires with activity (xp > 0)
+    // 13. Empires with activity (xp > 0) — also used to derive level for hidden_empire_balance
     db.empireProgress.findMany({
       where: { userId, xp: { gt: 0 } },
     }),
@@ -213,10 +213,9 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
       distinct: ['mood'],
     }),
 
-    // 18. Empires with level >= 5
-    db.empireProgress.findMany({
-      where: { userId, level: { gte: 5 } },
-    }),
+    // 18. REMOVED — empire level is now derived from XP (query #13) using the
+    // same formula as GET /api/empire: Math.floor(xp / 100) + 1.
+    // The stored `level` field was never updated, making the old query always return 0.
 
     // 19. Recent check-ins for comeback & streak detection
     db.dailyCheckin.findMany({
@@ -236,13 +235,16 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   const userData            = fulfilled(results[7],  null as { createdAt: Date } | null);
   const checkinCount        = fulfilled(results[8],  0);
   const monthlyClosureCount = fulfilled(results[9],  0);
-  const empireActiveResult  = fulfilled(results[10], [] as { empire: string }[]);
+  const empireActiveResult  = fulfilled(results[10], [] as { empire: string; xp: number }[]);
   const gratitudeCount      = fulfilled(results[11], 0);
   const financeContextCount = fulfilled(results[12], 0);
   const meditationTypeResult = fulfilled(results[13], [] as { type: string }[]);
   const wellnessMoodResult  = fulfilled(results[14], [] as { mood: number }[]);
-  const empireHighLevelResult = fulfilled(results[15], [] as { empire: string }[]);
-  const recentCheckins      = fulfilled(results[16], [] as { date: Date }[]);
+  // Derive empires with level >= 5 from XP, using the same formula as GET /api/empire.
+  // This replaces the old query #18 which checked the stored `level` field (never updated).
+  const XP_PER_LEVEL = 100;
+  const empireHighLevelResult = empireActiveResult.filter(ep => Math.floor(ep.xp / XP_PER_LEVEL) + 1 >= 5);
+  const recentCheckins      = fulfilled(results[15], [] as { date: Date }[]);
 
   // Extract finance counts from groupBy result (was 3 separate queries)
   let financeCount = 0;
