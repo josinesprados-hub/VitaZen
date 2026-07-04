@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { onEnergiaChange } from '@/lib/widgets/triggers';
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,6 +52,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Trigger widget snapshot refresh (non-blocking)
+    onEnergiaChange(user.id, user.plan);
+
     return NextResponse.json({ log });
   } catch (error) {
     console.error('Nutrition POST error:', error);
@@ -75,6 +79,9 @@ export async function PUT(request: NextRequest) {
       where: { id: logId },
       data: { meals, water, calories, notes },
     });
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onEnergiaChange(user.id, user.plan);
 
     return NextResponse.json({ log: updated });
   } catch (error) {
@@ -108,6 +115,9 @@ export async function DELETE(request: NextRequest) {
         data: { xp: Math.max(0, energiaProgress.xp - 10) },
       });
     }
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onEnergiaChange(user.id, user.plan);
 
     return NextResponse.json({ success: true });
   } catch (error) {
