@@ -58,22 +58,30 @@ export async function GET(request: NextRequest) {
       journalEntries,
       checkins,
       challengesCompleted,
+      wellnessEntries,
+      nutritionEntries,
       // 14-day counts (for trend)
       prevMeditation,
       prevHabits,
       prevJournal,
       prevCheckins,
       prevChallenges,
+      prevWellness,
+      prevNutrition,
       // 7-day date lookups (for active days)
       medDates,
       habDates,
       jouDates,
       checkDates,
+      wellDates,
+      nutDates,
       // Bounded streak data (60 days, not ALL TIME)
       streakMed,
       streakHab,
       streakJou,
       streakCheck,
+      streakWell,
+      streakNut,
     ] = await Promise.all([
       // ─── 7-day activity counts ───
       db.meditationSession.count({
@@ -91,6 +99,12 @@ export async function GET(request: NextRequest) {
       db.userChallenge.count({
         where: { userId: user.id, completed: true, completedAt: { gte: sevenDaysAgo } },
       }),
+      db.wellnessLog.count({
+        where: { userId: user.id, date: { gte: sevenDaysAgo } },
+      }),
+      db.nutritionLog.count({
+        where: { userId: user.id, date: { gte: sevenDaysAgo } },
+      }),
       // ─── 14-day activity for trend comparison ───
       db.meditationSession.count({
         where: { userId: user.id, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
@@ -107,6 +121,12 @@ export async function GET(request: NextRequest) {
       db.userChallenge.count({
         where: { userId: user.id, completed: true, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
       }),
+      db.wellnessLog.count({
+        where: { userId: user.id, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+      }),
+      db.nutritionLog.count({
+        where: { userId: user.id, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+      }),
       // ─── 7-day date lookups for active days ───
       db.meditationSession.findMany({
         where: { userId: user.id, completedAt: { gte: sevenDaysAgo } },
@@ -121,6 +141,14 @@ export async function GET(request: NextRequest) {
         select: { createdAt: true },
       }),
       db.dailyCheckin.findMany({
+        where: { userId: user.id, date: { gte: sevenDaysAgo } },
+        select: { date: true },
+      }),
+      db.wellnessLog.findMany({
+        where: { userId: user.id, date: { gte: sevenDaysAgo } },
+        select: { date: true },
+      }),
+      db.nutritionLog.findMany({
         where: { userId: user.id, date: { gte: sevenDaysAgo } },
         select: { date: true },
       }),
@@ -145,6 +173,16 @@ export async function GET(request: NextRequest) {
         select: { date: true },
         orderBy: { date: 'desc' },
       }),
+      db.wellnessLog.findMany({
+        where: { userId: user.id, date: { gte: sixtyDaysAgo } },
+        select: { date: true },
+        orderBy: { date: 'desc' },
+      }),
+      db.nutritionLog.findMany({
+        where: { userId: user.id, date: { gte: sixtyDaysAgo } },
+        select: { date: true },
+        orderBy: { date: 'desc' },
+      }),
     ]);
 
     // ─── Calculate active days ───
@@ -159,6 +197,8 @@ export async function GET(request: NextRequest) {
     addDates(habDates.map(h => h.lastCompletedAt!));
     addDates(jouDates.map(j => j.createdAt));
     addDates(checkDates.map(c => c.date));
+    addDates(wellDates.map(w => w.date));
+    addDates(nutDates.map(n => n.date));
 
     const activeDays = allRecentDates.size;
 
@@ -169,6 +209,8 @@ export async function GET(request: NextRequest) {
       ...streakHab.map(h => h.lastCompletedAt!),
       ...streakJou.map(j => j.createdAt),
       ...streakCheck.map(c => c.date),
+      ...streakWell.map(w => w.date),
+      ...streakNut.map(n => n.date),
     ]) {
       streakDays.add(getMadridDateKey(new Date(d)));
     }
@@ -203,8 +245,8 @@ export async function GET(request: NextRequest) {
     const totalScore = Math.min(100, activityScore + habitScore + checkinScore + meditationScore + journalScore + challengeScore + streakBonus);
 
     // ─── Calculate Trend ───
-    const currentWeekTotal = meditationSessions + habitCompletions + journalEntries + checkins + challengesCompleted;
-    const prevWeekTotal = prevMeditation + prevHabits + prevJournal + prevCheckins + prevChallenges;
+    const currentWeekTotal = meditationSessions + habitCompletions + journalEntries + checkins + challengesCompleted + wellnessEntries + nutritionEntries;
+    const prevWeekTotal = prevMeditation + prevHabits + prevJournal + prevCheckins + prevChallenges + prevWellness + prevNutrition;
 
     let trend: 'up' | 'down' | 'stable' = 'stable';
     if (currentWeekTotal > prevWeekTotal + 2) trend = 'up';

@@ -98,6 +98,8 @@ export async function shapeMomentumPayload(
     journalEntries,
     checkins,
     challengesCompleted,
+    wellnessEntries,
+    nutritionEntries,
   ] = await Promise.all([
     db.meditationSession.count({
       where: { userId, completedAt: { gte: sevenDaysAgo } },
@@ -114,11 +116,17 @@ export async function shapeMomentumPayload(
     db.userChallenge.count({
       where: { userId, completed: true, completedAt: { gte: sevenDaysAgo } },
     }),
+    db.wellnessLog.count({
+      where: { userId, date: { gte: sevenDaysAgo } },
+    }),
+    db.nutritionLog.count({
+      where: { userId, date: { gte: sevenDaysAgo } },
+    }),
   ]);
 
   // Fetch previous week for trend
   const [
-    prevMeditation, prevHabits, prevJournal, prevCheckins, prevChallenges,
+    prevMeditation, prevHabits, prevJournal, prevCheckins, prevChallenges, prevWellness, prevNutrition,
   ] = await Promise.all([
     db.meditationSession.count({
       where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
@@ -135,10 +143,16 @@ export async function shapeMomentumPayload(
     db.userChallenge.count({
       where: { userId, completed: true, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
     }),
+    db.wellnessLog.count({
+      where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+    }),
+    db.nutritionLog.count({
+      where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+    }),
   ]);
 
   // Count unique active days (lightweight — only dates, not full records)
-  const [medDates, habDates, jouDates, checkDates] = await Promise.all([
+  const [medDates, habDates, jouDates, checkDates, wellDates, nutDates] = await Promise.all([
     db.meditationSession.findMany({
       where: { userId, completedAt: { gte: sevenDaysAgo } },
       select: { completedAt: true },
@@ -155,6 +169,14 @@ export async function shapeMomentumPayload(
       where: { userId, date: { gte: sevenDaysAgo } },
       select: { date: true },
     }),
+    db.wellnessLog.findMany({
+      where: { userId, date: { gte: sevenDaysAgo } },
+      select: { date: true },
+    }),
+    db.nutritionLog.findMany({
+      where: { userId, date: { gte: sevenDaysAgo } },
+      select: { date: true },
+    }),
   ]);
 
   const allRecentDates = new Set<string>();
@@ -167,11 +189,13 @@ export async function shapeMomentumPayload(
   addDates(habDates.map(h => h.lastCompletedAt!));
   addDates(jouDates.map(j => j.createdAt));
   addDates(checkDates.map(c => c.date));
+  addDates(wellDates.map(w => w.date));
+  addDates(nutDates.map(n => n.date));
 
   const activeDays = allRecentDates.size;
 
   // Calculate streak (simplified — look backwards from today)
-  const [allMed, allHab, allJou, allCheck] = await Promise.all([
+  const [allMed, allHab, allJou, allCheck, allWell, allNut] = await Promise.all([
     db.meditationSession.findMany({
       where: { userId },
       select: { completedAt: true },
@@ -196,10 +220,22 @@ export async function shapeMomentumPayload(
       orderBy: { date: 'desc' },
       take: 30,
     }),
+    db.wellnessLog.findMany({
+      where: { userId },
+      select: { date: true },
+      orderBy: { date: 'desc' },
+      take: 30,
+    }),
+    db.nutritionLog.findMany({
+      where: { userId },
+      select: { date: true },
+      orderBy: { date: 'desc' },
+      take: 30,
+    }),
   ]);
 
   const uniqueDays = new Set<string>();
-  for (const d of [...allMed.map(m => m.completedAt), ...allHab.map(h => h.lastCompletedAt!), ...allJou.map(j => j.createdAt), ...allCheck.map(c => c.date)]) {
+  for (const d of [...allMed.map(m => m.completedAt), ...allHab.map(h => h.lastCompletedAt!), ...allJou.map(j => j.createdAt), ...allCheck.map(c => c.date), ...allWell.map(w => w.date), ...allNut.map(n => n.date)]) {
     uniqueDays.add(getMadridDateKey(new Date(d)));
   }
 
@@ -233,8 +269,8 @@ export async function shapeMomentumPayload(
   const score = Math.min(100, activityScore + habitScore + checkinScore + meditationScore + journalScore + challengeScore + streakBonus);
 
   // ─── Calculate Trend ───
-  const currentWeekTotal = meditationSessions + habitCompletions + journalEntries + checkins + challengesCompleted;
-  const prevWeekTotal = prevMeditation + prevHabits + prevJournal + prevCheckins + prevChallenges;
+  const currentWeekTotal = meditationSessions + habitCompletions + journalEntries + checkins + challengesCompleted + wellnessEntries + nutritionEntries;
+  const prevWeekTotal = prevMeditation + prevHabits + prevJournal + prevCheckins + prevChallenges + prevWellness + prevNutrition;
 
   let trend: 'up' | 'down' | 'stable' = 'stable';
   if (currentWeekTotal > prevWeekTotal + 2) trend = 'up';

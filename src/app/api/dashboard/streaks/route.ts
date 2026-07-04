@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
 
     // Fetch dates for each category (bounded)
-    const [meditationDates, habitDates, journalDates, checkinDates] = await Promise.all([
+    const [meditationDates, habitDates, journalDates, checkinDates, wellnessDates, nutritionDates] = await Promise.all([
       db.meditationSession.findMany({
         where: { userId: user.id, completedAt: { gte: sixtyDaysAgo } },
         select: { completedAt: true },
@@ -90,19 +90,33 @@ export async function GET(request: NextRequest) {
         select: { date: true },
         orderBy: { date: 'desc' },
       }),
+      db.wellnessLog.findMany({
+        where: { userId: user.id, date: { gte: sixtyDaysAgo } },
+        select: { date: true },
+        orderBy: { date: 'desc' },
+      }),
+      db.nutritionLog.findMany({
+        where: { userId: user.id, date: { gte: sixtyDaysAgo } },
+        select: { date: true },
+        orderBy: { date: 'desc' },
+      }),
     ]);
 
     const meditationStreak = calcStreak(meditationDates.map(m => m.completedAt));
     const habitStreak = calcStreak(habitDates.map(h => h.lastCompletedAt!));
     const journalStreak = calcStreak(journalDates.map(j => j.createdAt));
     const checkinStreak = calcStreak(checkinDates.map(c => c.date));
+    const wellnessStreak = calcStreak(wellnessDates.map(w => w.date));
+    const nutritionStreak = calcStreak(nutritionDates.map(n => n.date));
 
-    // General streak: any activity (meditation, habit, journal, or checkin)
+    // General streak: any activity (meditation, habit, journal, checkin, wellness, nutrition)
     const allDates = [
       ...meditationDates.map(m => m.completedAt),
       ...habitDates.map(h => h.lastCompletedAt!),
       ...journalDates.map(j => j.createdAt),
       ...checkinDates.map(c => c.date),
+      ...wellnessDates.map(w => w.date),
+      ...nutritionDates.map(n => n.date),
     ];
     const generalStreak = calcStreak(allDates);
 
@@ -124,6 +138,8 @@ export async function GET(request: NextRequest) {
       habitStreak,
       journalStreak,
       checkinStreak,
+      wellnessStreak,
+      nutritionStreak,
       generalStreak,
       streakMessage,
     });
