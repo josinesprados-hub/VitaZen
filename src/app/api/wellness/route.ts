@@ -41,11 +41,11 @@ export async function POST(request: NextRequest) {
       create: { userId: user.id, date: new Date(date), mood, energy, sleep, stress, notes },
     });
 
-    // Award XP to energia empire
+    // Award XP and streak to energia empire
     await db.empireProgress.upsert({
       where: { userId_empire: { userId: user.id, empire: 'energia' } },
-      update: { xp: { increment: 10 } },
-      create: { userId: user.id, empire: 'energia', xp: 10 },
+      update: { xp: { increment: 10 }, streak: { increment: 1 } },
+      create: { userId: user.id, empire: 'energia', xp: 10, streak: 1 },
     });
 
     return NextResponse.json({ log });
