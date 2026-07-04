@@ -35,13 +35,7 @@ function getDailyIndex(dateKey: string, arrayLength: number): number {
   return Math.abs(hash) % arrayLength;
 }
 
-import { getTodayDateKey as getDateKeyMadrid } from '@/lib/deterministic';
-
-// Re-export with the standard timezone-aware implementation
-// (Europe/Madrid, matching all other date calculations in the app)
-function getTodayDateKey(): string {
-  return getDateKeyMadrid();
-}
+import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 
 // ─── Reflection Widget ──────────────────────
 //
@@ -166,8 +160,7 @@ export async function shapeMomentumPayload(
   const allRecentDates = new Set<string>();
   const addDates = (dates: Date[]) => {
     for (const d of dates) {
-      const day = new Date(d);
-      allRecentDates.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+      allRecentDates.add(getMadridDateKey(new Date(d)));
     }
   };
   addDates(medDates.map(m => m.completedAt));
@@ -207,22 +200,22 @@ export async function shapeMomentumPayload(
 
   const uniqueDays = new Set<string>();
   for (const d of [...allMed.map(m => m.completedAt), ...allHab.map(h => h.lastCompletedAt!), ...allJou.map(j => j.createdAt), ...allCheck.map(c => c.date)]) {
-    const day = new Date(d);
-    uniqueDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+    uniqueDays.add(getMadridDateKey(new Date(d)));
   }
 
-  let checkDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const todayStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
+  const todayStr = getTodayDateKey();
+  let checkDateStr = todayStr;
   if (!uniqueDays.has(todayStr)) {
-    checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+    const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+    checkDateStr = getMadridDateKey(yesterday);
   }
 
   let streak = 0;
   while (true) {
-    const dateStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
-    if (uniqueDays.has(dateStr)) {
+    if (uniqueDays.has(checkDateStr)) {
       streak++;
-      checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+      const prev = new Date(new Date(checkDateStr + 'T00:00:00').getTime() - 24 * 60 * 60 * 1000);
+      checkDateStr = getMadridDateKey(prev);
     } else {
       break;
     }

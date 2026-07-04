@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ═══════════════════════════════════════════
 // Momentum Score — consistency-based metric
@@ -150,8 +151,7 @@ export async function GET(request: NextRequest) {
     const allRecentDates = new Set<string>();
     const addDates = (dates: Date[]) => {
       for (const d of dates) {
-        const day = new Date(d);
-        allRecentDates.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+        allRecentDates.add(getMadridDateKey(new Date(d)));
       }
     };
 
@@ -170,22 +170,22 @@ export async function GET(request: NextRequest) {
       ...streakJou.map(j => j.createdAt),
       ...streakCheck.map(c => c.date),
     ]) {
-      const day = new Date(d);
-      streakDays.add(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, '0')}-${String(day.getUTCDate()).padStart(2, '0')}`);
+      streakDays.add(getMadridDateKey(new Date(d)));
     }
 
-    let checkDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    const todayStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
+    const todayStr = getTodayDateKey();
+    let checkDateStr = todayStr;
     if (!streakDays.has(todayStr)) {
-      checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+      const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+      checkDateStr = getMadridDateKey(yesterday);
     }
 
     let currentStreak = 0;
     while (true) {
-      const dateStr = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, '0')}-${String(checkDate.getUTCDate()).padStart(2, '0')}`;
-      if (streakDays.has(dateStr)) {
+      if (streakDays.has(checkDateStr)) {
         currentStreak++;
-        checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+        const prev = new Date(new Date(checkDateStr + 'T00:00:00').getTime() - 24 * 60 * 60 * 1000);
+        checkDateStr = getMadridDateKey(prev);
       } else {
         break;
       }

@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { getMadridDateKey } from '@/lib/deterministic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,10 +31,7 @@ export async function GET(request: NextRequest) {
       select: { lastCompletedAt: true },
     });
     const habitActiveDays = new Set(
-      habitLogs.map(h => {
-        const d = new Date(h.lastCompletedAt!);
-        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-      })
+      habitLogs.map(h => getMadridDateKey(new Date(h.lastCompletedAt!)))
     ).size;
 
     // Journal: entries this week (target 3)
