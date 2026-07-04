@@ -242,7 +242,7 @@ model HabitLog {
   userId          String
   name            String
   description     String?
-  frequency       String    @default("daily") // daily | weekly | custom
+  frequency       String    @default("daily") // daily | weekly | monthly
   streak          Int       @default(0)
   lastCompletedAt DateTime?
   createdAt       DateTime  @default(now())
