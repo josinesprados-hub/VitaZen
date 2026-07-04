@@ -66,7 +66,14 @@ export async function GET(request: NextRequest) {
         take: limit,
       }).then((sessions) => {
         for (const s of sessions) {
-          const typeLabel = s.type === 'guided' ? 'guiada' : s.type === 'breathing' ? 'respiración' : s.type === 'body_scan' ? 'body scan' : 'mindfulness';
+          const MEDITATION_LABELS: Record<string, string> = {
+            diaphragmatic: 'diafragmática',
+            coherence: 'coherente',
+            mindfulness: 'mindfulness',
+            nadi_shodhana: 'alterna',
+            box: 'box',
+          };
+          const typeLabel = MEDITATION_LABELS[s.type] || s.type;
           items.push({
             id: s.id,
             type: 'meditation',
