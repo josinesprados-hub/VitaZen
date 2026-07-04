@@ -60,6 +60,8 @@ interface UserContext {
     habits: number;
     journals: number;
     checkins: number;
+    wellness: number;
+    nutrition: number;
   };
   consistency: {
     activeDaysThisWeek: number;
@@ -149,6 +151,8 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     onboardingRow,
     wellnessLogRows,
     financeLogRows,
+    weeklyWellnessLogs,
+    weeklyNutritionLogs,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -263,6 +267,16 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           select: { type: true, category: true, mood: true, contexto: true, date: true },
         })
       : Promise.resolve([]),
+
+    // Weekly wellness log dates: PREMIUM only (for distinct-day counting)
+    isPremium
+      ? db.wellnessLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
+      : Promise.resolve([] as { date: Date }[]),
+
+    // Weekly nutrition log dates: PREMIUM only (for distinct-day counting)
+    isPremium
+      ? db.nutritionLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
+      : Promise.resolve([] as { date: Date }[]),
   ]);
 
   // Derive counts from date arrays (for weeklyActivity display)
@@ -270,6 +284,8 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   const weeklyJournalCount = weeklyJournals.length;
   const weeklyCheckinCount = weeklyCheckins.length;
   const weeklyHabitLogCount = weeklyHabitLogs.length;
+  const weeklyWellnessCount = weeklyWellnessLogs.length;
+  const weeklyNutritionCount = weeklyNutritionLogs.length;
 
   // Weekly habit completions (PREMIUM only for display, but count for consistency)
   const weeklyHabits = isPremium
@@ -287,6 +303,8 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   }
   for (const m of weeklyMeditations) activeDaySet.add(toDateKey(m.completedAt));
   for (const j of weeklyJournals) activeDaySet.add(toDateKey(j.createdAt));
+  for (const w of weeklyWellnessLogs) activeDaySet.add(toDateKey(w.date));
+  for (const n of weeklyNutritionLogs) activeDaySet.add(toDateKey(n.date));
   const activeDaysThisWeek = Math.min(activeDaySet.size, 7);
 
   let trend: 'improving' | 'stable' | 'declining' | 'starting' = 'stable';
@@ -533,6 +551,8 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       habits: weeklyHabits,
       journals: weeklyJournalCount,
       checkins: weeklyCheckinCount,
+      wellness: weeklyWellnessCount,
+      nutrition: weeklyNutritionCount,
     },
     consistency: {
       activeDaysThisWeek,
@@ -1188,13 +1208,15 @@ function formatAdvancedContext(ctx: UserContext): string {
 
   // Weekly activity summary + consistency signal
   const wa = ctx.weeklyActivity;
-  const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins;
+  const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins + wa.wellness + wa.nutrition;
   if (totalActivity > 0) {
     const parts: string[] = [];
     if (wa.meditations > 0) parts.push(`${wa.meditations} meditación${wa.meditations > 1 ? 'es' : ''}`);
     if (wa.habits > 0) parts.push(`${wa.habits} hábito${wa.habits > 1 ? 's' : ''}`);
     if (wa.journals > 0) parts.push(`${wa.journals} entrada${wa.journals > 1 ? 's' : ''} de diario`);
     if (wa.checkins > 0) parts.push(`${wa.checkins} check-in${wa.checkins > 1 ? 's' : ''}`);
+    if (wa.wellness > 0) parts.push(`${wa.wellness} registro${wa.wellness > 1 ? 's' : ''} de bienestar`);
+    if (wa.nutrition > 0) parts.push(`${wa.nutrition} registro${wa.nutrition > 1 ? 's' : ''} de nutrición`);
     lines.push(`Esta semana: ${parts.join(', ')}.`);
   }
 
