@@ -268,8 +268,7 @@ export async function shapeCheckinPayload(
   userId: string,
   _plan: string,
 ): Promise<CheckinWidgetPayload> {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date(getTodayDateKey() + 'T00:00:00');
 
   const checkin = await db.dailyCheckin.findUnique({
     where: { userId_date: { userId, date: today } },
