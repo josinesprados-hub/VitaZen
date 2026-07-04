@@ -96,6 +96,18 @@ export default function DisciplinaPage() {
     fetchData();
   }, [fetchData]);
 
+  // Refresh only the challenge state from the server.
+  // Used after actions that may auto-complete the challenge (habit create/complete)
+  // so the UI reflects the new state without a full page reload.
+  const refreshChallenge = useCallback(async () => {
+    try {
+      const chRes = await apiFetch('/api/challenges');
+      if (chRes.ok) { const d = await chRes.json(); setChallenge(d.challenge); }
+    } catch {
+      // Silent — never disrupt the parent action
+    }
+  }, [apiFetch]);
+
   const addHabit = async () => {
     if (!newHabit.name.trim()) return;
     try {
@@ -108,6 +120,7 @@ export default function DisciplinaPage() {
         setHabits(prev => [data.habit, ...prev]);
         setNewHabit({ name: '', description: '', frequency: 'daily' });
         setShowAddHabit(false);
+        refreshChallenge(); // Creating a habit may auto-complete today's challenge
       }
     } catch (error) {
       console.error('Error adding habit:', error);
@@ -127,6 +140,7 @@ export default function DisciplinaPage() {
         setShowReward(true);
         if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
         justCompletedTimerRef.current = setTimeout(() => setJustCompletedId(null), 600);
+        refreshChallenge(); // Completing a habit may auto-complete today's challenge
       }
     } catch (error) {
       console.error('Error completing habit:', error);
