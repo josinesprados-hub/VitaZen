@@ -210,7 +210,7 @@ model MeditationSession {
   id          String   @id @default(cuid())
   userId      String
   duration    Int      // minutes
-  type        String   // guided | breathing | body_scan | mindfulness
+  type        String   // diaphragmatic | coherence | mindfulness | nadi_shodhana | box
   completedAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
