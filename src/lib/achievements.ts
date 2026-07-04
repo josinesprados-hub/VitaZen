@@ -13,6 +13,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -356,32 +357,25 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   progress['hidden_comeback'] = hasComeback ? 1 : 0;
 
   // Siete Mañanas: 7 consecutive check-ins
-  // Check if the last 7 days (including today) all have check-ins
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Uses getMadridDateKey() for timezone-safe date normalization — same
+  // source of truth as Dashboard, Momentum, Mentor, Silent Memories, Challenges.
   let consecutiveDays = 0;
   if (recentCheckins.length > 0) {
-    const sortedDates = recentCheckins
-      .map(c => {
-        const d = new Date(c.date);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-      })
-      .sort((a, b) => b - a); // desc
+    const uniqueDays = new Set(
+      recentCheckins.map(c => getMadridDateKey(new Date(c.date)))
+    );
 
-    // Check from today (or most recent checkin) backwards
-    const startDate = sortedDates[0];
-    const todayTime = today.getTime();
+    // Start from today (Madrid); if no activity today, start from yesterday
+    let checkDateStr = getTodayDateKey();
+    if (!uniqueDays.has(checkDateStr)) {
+      const todayMs = new Date(checkDateStr + 'T12:00:00Z').getTime();
+      checkDateStr = getMadridDateKey(new Date(todayMs - 86400000));
+    }
 
-    // Only count if most recent checkin is today or yesterday
-    const diffFromToday = Math.floor((todayTime - startDate) / 86400000);
-    if (diffFromToday <= 1) {
-      const dateSet = new Set(sortedDates);
-      let checkDate = startDate;
-      while (dateSet.has(checkDate)) {
-        consecutiveDays++;
-        checkDate -= 86400000; // go back one day
-      }
+    while (uniqueDays.has(checkDateStr)) {
+      consecutiveDays++;
+      const checkMs = new Date(checkDateStr + 'T12:00:00Z').getTime();
+      checkDateStr = getMadridDateKey(new Date(checkMs - 86400000));
     }
   }
   progress['hidden_streak_7_checkin'] = Math.min(consecutiveDays, 7);
