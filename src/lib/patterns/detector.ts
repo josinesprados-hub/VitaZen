@@ -27,6 +27,7 @@ import {
   passesPhilosophicalFilter,
   computeWeight,
 } from './validation';
+import { getMadridDateKey } from '@/lib/deterministic';
 
 // ─── Configuration ───
 
@@ -56,8 +57,11 @@ const SOCIAL_KEYWORDS = /\b(amigos|amiga|amigo|social|cumple|fiesta|cena con|que
 // ─── Week Helpers ───
 
 function getWeekKey(date: Date): string {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
+  // Normalize to Madrid date first, then compute ISO week from that date.
+  // This ensures the week boundary matches the user's perceived day,
+  // not UTC midnight — same source of truth as Dashboard, Momentum, etc.
+  const madridDateStr = getMadridDateKey(date); // "YYYY-MM-DD"
+  const d = new Date(madridDateStr + 'T12:00:00Z'); // noon UTC avoids any day-boundary issue
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
   const week1 = new Date(d.getFullYear(), 0, 4);
   return `${d.getFullYear()}-W${1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)}`;
