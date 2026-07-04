@@ -12,6 +12,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 import type { SilentMemoryData } from '@/lib/silent-memories/shared';
 
 // ─── Helper ───
@@ -98,10 +99,7 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
   const recentDays = new Set<string>();
 
   const addDay = (d: Date) => {
-    const day = new Date(d);
-    recentDays.add(
-      `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
-    );
+    recentDays.add(getMadridDateKey(d));
   };
 
   checkins.forEach((c) => addDay(c.date));
@@ -110,12 +108,12 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
   });
   wellness.forEach((w) => addDay(w.date));
 
-  // Count consecutive days backwards from today
+  // Count consecutive days backwards from today (Europe/Madrid)
   let consecutiveDays = 0;
-  const today = new Date();
+  const todayStr = getTodayDateKey();
   for (let i = 0; i < 30; i++) {
-    const checkDate = new Date(today.getTime() - i * 86400000);
-    const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+    const checkDate = new Date(new Date(todayStr + 'T00:00:00').getTime() - i * 86400000);
+    const dateStr = getMadridDateKey(checkDate);
     if (recentDays.has(dateStr)) {
       consecutiveDays++;
     } else {
