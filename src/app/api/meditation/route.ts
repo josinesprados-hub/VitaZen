@@ -47,6 +47,20 @@ export async function DELETE(request: NextRequest) {
 
     await db.meditationSession.delete({ where: { id: sessionId } });
 
+    // Revert XP for mente empire (never below 0, don't create if missing)
+    const menteProgress = await db.empireProgress.findUnique({
+      where: { userId_empire: { userId: user.id, empire: 'mente' } },
+    });
+    if (menteProgress) {
+      await db.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'mente' } },
+        data: { xp: Math.max(0, menteProgress.xp - 15) },
+      });
+    }
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onMeditationChange(user.id, user.plan);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Meditation DELETE error:', error);
