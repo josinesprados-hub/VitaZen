@@ -64,6 +64,9 @@ interface MonthAggregation {
   checkins: number;
   wellnessLogs: number;
   journalEntries: number;
+  meditationSessions: number;
+  habitLogs: number;
+  nutritionLogs: number;
 }
 
 function getMonthRange(yyyyMM: string) {
@@ -89,7 +92,7 @@ function formatMonthLabel(yyyyMM: string): string {
 async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggregation | null> {
   const { start, end } = getMonthRange(yyyyMM);
 
-  const [wellness, checkins, finances, journals] = await Promise.all([
+  const [wellness, checkins, finances, journals, meditations, habits, nutritions] = await Promise.all([
     db.wellnessLog.findMany({
       where: { userId, date: { gte: start, lt: end } },
       select: { stress: true, energy: true, sleep: true, mood: true },
@@ -105,10 +108,22 @@ async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggr
     db.journalEntry.count({
       where: { userId, createdAt: { gte: start, lt: end } },
     }),
+    db.meditationSession.count({
+      where: { userId, completedAt: { gte: start, lt: end } },
+    }),
+    db.habitLog.count({
+      where: { userId, lastCompletedAt: { gte: start, lt: end } },
+    }),
+    db.nutritionLog.count({
+      where: { userId, date: { gte: start, lt: end } },
+    }),
   ]);
 
+  const meditationCount = meditations;
+  const habitCount = habits;
+  const nutritionCount = nutritions;
   const totalLogs = wellness.length + checkins.length + finances.length;
-  if (totalLogs === 0 && journals === 0) return null;
+  if (totalLogs === 0 && journals === 0 && meditationCount === 0 && habitCount === 0 && nutritionCount === 0) return null;
 
   // Average metrics from all available sources
   const allStress = [...wellness.map(w => w.stress), ...checkins.map(c => c.stress)];
@@ -147,11 +162,14 @@ async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggr
     avgSleep: avg(allSleep),
     avgMood: avg(allMood),
     intentionBalance,
-    totalActivity: totalLogs + journals,
+    totalActivity: totalLogs + journals + meditationCount + habitCount + nutritionCount,
     financeLogs: finances.length,
     checkins: checkins.length,
     wellnessLogs: wellness.length,
     journalEntries: journals,
+    meditationSessions: meditationCount,
+    habitLogs: habitCount,
+    nutritionLogs: nutritionCount,
   };
 }
 
