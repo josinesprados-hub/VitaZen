@@ -11,6 +11,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import PrivacyMask from '@/components/ui/PrivacyMask';
+import { getTodayDateKey } from '@/lib/deterministic';
 
 interface WellnessLog {
   id: string;
@@ -109,7 +110,7 @@ export default function EnergiaPage() {
     try {
       const res = await apiFetch('/api/wellness', {
         method: 'POST',
-        body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...wellnessForm }),
+        body: JSON.stringify({ date: getTodayDateKey(), ...wellnessForm }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -130,7 +131,7 @@ export default function EnergiaPage() {
     try {
       const res = await apiFetch('/api/nutrition', {
         method: 'POST',
-        body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...nutritionForm }),
+        body: JSON.stringify({ date: getTodayDateKey(), ...nutritionForm }),
       });
       if (res.ok) {
         const data = await res.json();
