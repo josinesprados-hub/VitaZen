@@ -73,6 +73,17 @@ export async function DELETE(request: NextRequest) {
 
     await db.financeLog.delete({ where: { id: logId } });
 
+    // Revert XP for riqueza empire (never below 0, don't create if missing)
+    const riquezaProgress = await db.empireProgress.findUnique({
+      where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
+    });
+    if (riquezaProgress) {
+      await db.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
+        data: { xp: Math.max(0, riquezaProgress.xp - 10) },
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Finance DELETE error:', error);
