@@ -434,6 +434,7 @@ export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
           data: { userId, key: def.key },
         });
         newlyUnlocked.push(def.key);
+        unlockedKeys.add(def.key);
       } catch {
         // Unique constraint violation — already unlocked by concurrent request
         // Silently ignore
