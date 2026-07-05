@@ -177,6 +177,20 @@ export async function DELETE(request: NextRequest) {
 
     await db.dailyCheckin.delete({ where: { id: checkinId } });
 
+    // Revert XP for mente empire (never below 0, don't create if missing)
+    const menteProgress = await db.empireProgress.findUnique({
+      where: { userId_empire: { userId: user.id, empire: 'mente' } },
+    });
+    if (menteProgress) {
+      await db.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'mente' } },
+        data: { xp: Math.max(0, menteProgress.xp - 10) },
+      });
+    }
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onCheckinChange(user.id, user.plan);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Checkin DELETE error:', error);
