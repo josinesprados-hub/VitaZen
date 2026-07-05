@@ -1,6 +1,7 @@
 import { db } from './db';
 import { getMadridDateKey, getTodayDateKey } from './deterministic';
-import { getEmotionalState, type EmotionalState } from './emotional-state';
+import { getEmotionalState } from './emotional-state';
+import type { RawData } from './insights';
 import { detectPatterns } from './patterns/detector';
 import type { CrossEmpireData } from './patterns/types';
 import { detectLifeStages, getPastMonths, type LifeStage, type StageTransition, type StageFlavor } from './life-memory/stages';
@@ -153,6 +154,10 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     financeLogRows,
     weeklyWellnessLogs,
     weeklyNutritionLogs,
+    prevWeekHabitLogs,
+    prevWeekMeditations,
+    prevWeekJournals,
+    prevWeekNutritionLogs,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -213,8 +218,8 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } })
       : Promise.resolve([] as { createdAt: Date }[]),
 
-    // Weekly checkin dates: both tiers (for consistency + distinct-day counting)
-    db.dailyCheckin.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } }),
+    // Weekly checkins: both tiers (for consistency + distinct-day counting + emotional state)
+    db.dailyCheckin.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true, emotion: true, energy: true, focus: true, stress: true } }),
 
     // Weekly habit log dates: last 7 days (for distinct-day counting)
     db.habitLog.findMany({
@@ -222,9 +227,10 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       select: { lastCompletedAt: true },
     }),
 
-    // Previous week checkin count (for trend): both tiers
-    db.dailyCheckin.count({
+    // Previous week checkins (for trend + emotional state): both tiers
+    db.dailyCheckin.findMany({
       where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+      select: { date: true, emotion: true, energy: true, focus: true, stress: true },
     }),
 
     // User data
@@ -249,11 +255,11 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       : Promise.resolve(null),
 
     // Wellness logs: PREMIUM only — sleep quality + notes (dedup: mood/energy/stress already in DailyCheckin)
+    // No take limit: full 14-day data needed for emotional state; display is sliced to 7 later
     isPremium
       ? db.wellnessLog.findMany({
           where: { userId, date: { gte: fourteenDaysAgo } },
           orderBy: { date: 'desc' },
-          take: 7,
           select: { date: true, sleep: true, mood: true, stress: true, notes: true },
         })
       : Promise.resolve([]),
@@ -276,6 +282,26 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     // Weekly nutrition log dates: PREMIUM only (for distinct-day counting)
     isPremium
       ? db.nutritionLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
+      : Promise.resolve([] as { date: Date }[]),
+
+    // Previous week habit logs: PREMIUM only (for emotional state prevWeekHabits)
+    isPremium
+      ? db.habitLog.findMany({ where: { userId, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { lastCompletedAt: true } })
+      : Promise.resolve([] as { lastCompletedAt: Date | null }[]),
+
+    // Previous week meditations: PREMIUM only (for emotional state prevWeekMeditations)
+    isPremium
+      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { completedAt: true } })
+      : Promise.resolve([] as { completedAt: Date }[]),
+
+    // Previous week journals: PREMIUM only (for emotional state prevWeekJournals)
+    isPremium
+      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { createdAt: true } })
+      : Promise.resolve([] as { createdAt: Date }[]),
+
+    // Previous week nutrition logs: PREMIUM only (for emotional state prevWeekNutrition)
+    isPremium
+      ? db.nutritionLog.findMany({ where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { date: true } })
       : Promise.resolve([] as { date: Date }[]),
   ]);
 
@@ -307,12 +333,14 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   for (const n of weeklyNutritionLogs) activeDaySet.add(toDateKey(n.date));
   const activeDaysThisWeek = Math.min(activeDaySet.size, 7);
 
+  const prevWeekCheckinCount = prevWeekCheckins.length;
+
   let trend: 'improving' | 'stable' | 'declining' | 'starting' = 'stable';
-  if (weeklyCheckinCount <= 1 && prevWeekCheckins <= 1) {
+  if (weeklyCheckinCount <= 1 && prevWeekCheckinCount <= 1) {
     trend = 'starting';
-  } else if (weeklyCheckinCount > prevWeekCheckins + 1) {
+  } else if (weeklyCheckinCount > prevWeekCheckinCount + 1) {
     trend = 'improving';
-  } else if (weeklyCheckinCount < prevWeekCheckins - 1) {
+  } else if (weeklyCheckinCount < prevWeekCheckinCount - 1) {
     trend = 'declining';
   }
 
@@ -335,10 +363,31 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
 
   // Fetch emotional state from the official engine (PREMIUM only; null for FREE)
   // This is the single source of truth — no recalculation, no duplication.
+  // M-6: Reuse data already fetched in this Promise.all to avoid redundant gatherData() call.
   let emotionalState: UserContext['emotionalState'] = null;
   if (isPremium) {
     try {
-      const es = await getEmotionalState(userId, plan);
+      // Build RawData from already-fetched queries — no extra DB access
+      const rawDataForEmotionalState: RawData = {
+        thisWeekCheckins: weeklyCheckins,
+        prevWeekCheckins,
+        thisWeekHabits: weeklyHabitLogs,
+        prevWeekHabits: prevWeekHabitLogs,
+        allHabits: [],
+        thisWeekMeditations: weeklyMeditations,
+        prevWeekMeditations,
+        thisWeekJournals: weeklyJournals,
+        prevWeekJournals,
+        thisWeekWellness: wellnessLogRows.filter(w => w.date >= sevenDaysAgo),
+        prevWeekWellness: wellnessLogRows.filter(w => w.date < sevenDaysAgo),
+        thisWeekNutrition: weeklyNutritionLogs,
+        prevWeekNutrition: prevWeekNutritionLogs,
+        thisWeekFinance: [],
+        prevWeekFinance: [],
+        empireProgress: [],
+      };
+
+      const es = await getEmotionalState(userId, plan, rawDataForEmotionalState);
       emotionalState = {
         status: es.status,
         statusLabel: es.statusLabel,
@@ -566,7 +615,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       trend,
     },
     onboardingData,
-    wellnessLogs: wellnessLogRows.map(w => ({
+    wellnessLogs: wellnessLogRows.slice(0, 7).map(w => ({
       date: w.date,
       sleep: w.sleep,
       mood: w.mood,
