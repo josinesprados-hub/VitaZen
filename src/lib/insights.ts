@@ -68,6 +68,7 @@ export interface RawData {
   thisWeekWellness: any[];
   prevWeekWellness: any[];
   thisWeekNutrition: any[];
+  prevWeekNutrition: any[];
   thisWeekFinance: any[];
   prevWeekFinance: any[];
   empireProgress: any[];
@@ -91,6 +92,7 @@ export async function gatherData(userId: string): Promise<RawData> {
     thisWeekWellness,
     prevWeekWellness,
     thisWeekNutrition,
+    prevWeekNutrition,
     thisWeekFinance,
     prevWeekFinance,
     empireProgress,
@@ -136,6 +138,9 @@ export async function gatherData(userId: string): Promise<RawData> {
     db.nutritionLog.findMany({
       where: { userId, date: { gte: sevenDaysAgo } },
     }),
+    db.nutritionLog.findMany({
+      where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+    }),
     db.financeLog.findMany({
       where: { userId, date: { gte: sevenDaysAgo } },
       select: { type: true, amount: true },
@@ -162,6 +167,7 @@ export async function gatherData(userId: string): Promise<RawData> {
     thisWeekWellness,
     prevWeekWellness,
     thisWeekNutrition,
+    prevWeekNutrition,
     thisWeekFinance,
     prevWeekFinance,
     empireProgress,
@@ -313,13 +319,16 @@ function buildComparison(data: RawData): WeeklyComparison {
     data.thisWeekHabits.length +
     data.thisWeekMeditations.length +
     data.thisWeekJournals.length +
-    data.thisWeekWellness.length;
+    data.thisWeekWellness.length +
+    data.thisWeekNutrition.length;
 
   const prevActivity =
     data.prevWeekCheckins.length +
+    data.prevWeekHabits.length +
     data.prevWeekMeditations.length +
     data.prevWeekJournals.length +
-    data.prevWeekWellness.length;
+    data.prevWeekWellness.length +
+    data.prevWeekNutrition.length;
 
   return {
     emotionTrend: Math.round((thisEmotion - prevEmotion) * 10) / 10,
@@ -327,7 +336,7 @@ function buildComparison(data: RawData): WeeklyComparison {
     stressTrend: Math.round((prevStress - thisStress) * 10) / 10, // positive = stress reduced = good
     activityTrend: thisActivity - prevActivity,
     meditationTrend: data.thisWeekMeditations.length - data.prevWeekMeditations.length,
-    habitTrend: 0, // prevWeekHabits not fetched — neutral trend until data available
+    habitTrend: data.thisWeekHabits.length - data.prevWeekHabits.length,
   };
 }
 
