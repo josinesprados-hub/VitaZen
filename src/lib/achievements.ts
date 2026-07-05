@@ -218,11 +218,21 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     // same formula as GET /api/empire: Math.floor(xp / 100) + 1.
     // The stored `level` field was never updated, making the old query always return 0.
 
-    // 19. Recent check-ins for comeback & streak detection
+    // 19. Recent check-ins for streak detection (take: 60 is sufficient for 7-day streak)
     db.dailyCheckin.findMany({
       where: { userId },
       orderBy: { date: 'desc' },
       take: 60,
+    }),
+
+    // 20. All check-in dates for comeback & distinct month detection
+    // No take limit — hidden_comeback must detect gaps anywhere in history,
+    // and hidden_six_months_present must count all distinct months.
+    // select: { date: true } avoids transferring heavy fields (intention, note).
+    db.dailyCheckin.findMany({
+      where: { userId },
+      select: { date: true },
+      orderBy: { date: 'desc' },
     }),
   ]);
 
@@ -246,6 +256,7 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   const XP_PER_LEVEL = 100;
   const empireHighLevelResult = empireActiveResult.filter(ep => Math.floor(ep.xp / XP_PER_LEVEL) + 1 >= 5);
   const recentCheckins      = fulfilled(results[15], [] as { date: Date }[]);
+  const allCheckinDates     = fulfilled(results[16], [] as { date: Date }[]);
 
   // Extract finance counts from groupBy result (was 3 separate queries)
   let financeCount = 0;
@@ -316,9 +327,11 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     progress['hidden_one_year'] = 0;
   }
 
-  // Distinct months with check-ins — use Madrid calendar to avoid UTC drift near midnight
+  // Distinct months with check-ins — uses allCheckinDates (no take limit) so months
+  // aren't truncated by the take: 60 cap on recentCheckins.
+  // Madrid calendar avoids UTC drift near midnight.
   const distinctMonths = new Set(
-    recentCheckins.map(c => getMadridDateKey(new Date(c.date)).slice(0, 7))
+    allCheckinDates.map(c => getMadridDateKey(new Date(c.date)).slice(0, 7))
   );
   progress['hidden_six_months_present'] = Math.min(distinctMonths.size, 6);
 
@@ -344,12 +357,14 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   progress['hidden_empire_balance'] = Math.min(empireHighLevelResult.length, 3);
 
   // Regreso: detect gap of 7+ days between consecutive check-ins
+  // Uses allCheckinDates (no take limit) so the gap can be anywhere in history,
+  // not just within the last 60 check-ins.
   // Uses getMadridDateKey() for calendar-day comparison — avoids ±1 day drift
   let hasComeback = false;
-  if (recentCheckins.length >= 2) {
-    for (let i = 0; i < recentCheckins.length - 1; i++) {
-      const currentKey = getMadridDateKey(new Date(recentCheckins[i].date));
-      const previousKey = getMadridDateKey(new Date(recentCheckins[i + 1].date));
+  if (allCheckinDates.length >= 2) {
+    for (let i = 0; i < allCheckinDates.length - 1; i++) {
+      const currentKey = getMadridDateKey(new Date(allCheckinDates[i].date));
+      const previousKey = getMadridDateKey(new Date(allCheckinDates[i + 1].date));
       const [curY, curM, curD] = currentKey.split('-').map(Number);
       const [prevY, prevM, prevD] = previousKey.split('-').map(Number);
       const curDate = new Date(curY, curM - 1, curD);
