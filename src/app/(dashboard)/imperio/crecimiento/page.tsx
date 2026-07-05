@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_JOURNAL_ENTRIES } from '@/lib/screenshot-data';
 import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock, X, Check } from 'lucide-react';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -26,16 +27,22 @@ interface JournalEntry {
 // ─── Date grouping ────────────────────────────────
 
 function dateGroupLabel(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffDay = Math.floor(diffMs / 86400000);
+  const entryKey = getMadridDateKey(new Date(dateStr));
+  const todayKey = getTodayDateKey();
 
-  if (diffDay === 0) return 'Hoy';
+  if (entryKey === todayKey) return 'Hoy';
+
+  // Calculate calendar-day difference using Madrid-normalized dates
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const [tY, tM, tD] = todayKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
+  const todayDate = new Date(tY, tM - 1, tD);
+  const diffDay = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+
   if (diffDay === 1) return 'Ayer';
   if (diffDay < 7) return 'Esta semana';
   if (diffDay < 14) return 'Hace 2 semanas';
-  return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  return entryDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
 }
 
 function formatDate(dateStr: string): string {
