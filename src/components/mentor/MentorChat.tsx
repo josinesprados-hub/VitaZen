@@ -38,6 +38,7 @@ import {
 import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ─────────────────────────────────────────
 // Types
@@ -69,27 +70,41 @@ function getRelativeDate(dateStr: string): string {
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'Ahora';
-  if (diffMins < 60) return `Hace ${diffMins} min`;
-  if (diffHours < 24) return `Hace ${diffHours}h`;
+  // Calendar-day difference using Madrid-normalized dates
+  const entryKey = getMadridDateKey(date);
+  const todayKey = getTodayDateKey();
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const [tY, tM, tD] = todayKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
+  const todayDate = new Date(tY, tM - 1, tD);
+  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+
+  if (diffMins < 1 && diffDays === 0) return 'Ahora';
+  if (diffMins < 60 && diffDays === 0) return `Hace ${diffMins} min`;
+  if (diffHours < 24 && diffDays === 0) return `Hace ${diffHours}h`;
   if (diffDays === 1) return 'Ayer';
   if (diffDays < 7) return `Hace ${diffDays} días`;
   if (diffDays < 30) {
     const weeks = Math.floor(diffDays / 7);
     return weeks === 1 ? 'Hace 1 semana' : `Hace ${weeks} semanas`;
   }
-  return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  return entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
 function getDateGroup(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / 86400000);
+  // Calendar-day difference using Madrid-normalized dates
+  const entryKey = getMadridDateKey(new Date(dateStr));
+  const todayKey = getTodayDateKey();
 
-  if (diffDays < 1) return 'Hoy';
+  if (entryKey === todayKey) return 'Hoy';
+
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const [tY, tM, tD] = todayKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
+  const todayDate = new Date(tY, tM - 1, tD);
+  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+
   if (diffDays === 1) return 'Ayer';
   if (diffDays < 7) return 'Esta semana';
   if (diffDays < 30) return 'Este mes';
