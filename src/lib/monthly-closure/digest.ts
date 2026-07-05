@@ -11,6 +11,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
+import { getTodayDateKey } from '@/lib/deterministic';
 import {
   formatMonthLabel,
   INTENTION_BALANCE_EMPTY,
@@ -410,15 +411,20 @@ export async function generateMonthlyDigest(
 // ─── Check if previous month needs closure ───
 
 export function getPreviousMonthForClosure(): string {
-  const now = new Date();
-  // If it's the first 7 days of a new month, the previous month is available for closure
-  const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-  const month = now.getMonth() === 0 ? 12 : now.getMonth();
-  return `${year}-${String(month).padStart(2, '0')}`;
+  // Use Madrid calendar — avoids UTC drift near midnight on Vercel
+  const todayKey = getTodayDateKey(); // YYYY-MM-DD
+  const [yearStr, monthStr] = todayKey.split('-');
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+  // Previous month: if January, wrap to December of prior year
+  if (month === 1) return `${year - 1}-12`;
+  return `${year}-${String(month - 1).padStart(2, '0')}`;
 }
 
 export function isClosurePeriod(): boolean {
-  const now = new Date();
+  // Use Madrid calendar — avoids UTC drift near midnight on Vercel
+  const todayKey = getTodayDateKey(); // YYYY-MM-DD
+  const dayOfMonth = parseInt(todayKey.split('-')[2], 10);
   // First 7 days of the month — gentle window for closure
-  return now.getDate() <= 7;
+  return dayOfMonth <= 7;
 }
