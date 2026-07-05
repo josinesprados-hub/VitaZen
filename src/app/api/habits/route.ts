@@ -154,7 +154,24 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
     const { habitId } = body;
-    await db.habitLog.deleteMany({ where: { id: habitId, userId: user.id } });
+    const habit = await db.habitLog.findFirst({ where: { id: habitId, userId: user.id } });
+    if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
+
+    await db.habitLog.delete({ where: { id: habitId } });
+
+    // Revert XP for disciplina empire (only the +5 from creation, not completion XP)
+    const disciplinaProgress = await db.empireProgress.findUnique({
+      where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+    });
+    if (disciplinaProgress) {
+      await db.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+        data: { xp: Math.max(0, disciplinaProgress.xp - 5) },
+      });
+    }
+
+    // Trigger widget snapshot refresh (non-blocking)
+    onHabitChange(user.id, user.plan);
 
     return NextResponse.json({ success: true });
   } catch (error) {
