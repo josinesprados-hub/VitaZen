@@ -112,6 +112,17 @@ export async function DELETE(request: NextRequest) {
 
     await db.journalEntry.delete({ where: { id: entryId } });
 
+    // Revert XP for crecimiento empire (never below 0, don't create if missing)
+    const crecimientoProgress = await db.empireProgress.findUnique({
+      where: { userId_empire: { userId: user.id, empire: 'crecimiento' } },
+    });
+    if (crecimientoProgress) {
+      await db.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'crecimiento' } },
+        data: { xp: Math.max(0, crecimientoProgress.xp - 20) },
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Journal DELETE error:', error);
