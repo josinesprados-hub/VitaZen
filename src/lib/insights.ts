@@ -252,7 +252,7 @@ function buildSummary(data: RawData): WeeklySummary {
     bestEmpireName: bestEmpire ? EMPIRE_NAMES[bestEmpire.empire] || bestEmpire.empire : null,
   };
 
-  const totalActivities = checkins.count + habits.completed + meditation.sessions + journal.entries + wellness.logs;
+  const totalActivities = checkins.count + habits.completed + meditation.sessions + journal.entries + wellness.logs + nutrition.logs;
   const score = calculateWellnessScore(checkins, habits, meditation, journal, wellness);
 
   const now = new Date();
