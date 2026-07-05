@@ -303,7 +303,14 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
 
   // ─── Hidden: Tiempo ───────────────────────
   if (userData) {
-    const daysSince = Math.floor((Date.now() - userData.createdAt.getTime()) / 86400000);
+    // Use Madrid calendar days, not raw ms — avoids ±1 day drift from DST/timezone
+    const createdKey = getMadridDateKey(new Date(userData.createdAt.getTime()));
+    const todayKey = getTodayDateKey();
+    const [cY, cM, cD] = createdKey.split('-').map(Number);
+    const [tY, tM, tD] = todayKey.split('-').map(Number);
+    const createdDate = new Date(cY, cM - 1, cD);
+    const todayDate = new Date(tY, tM - 1, tD);
+    const daysSince = Math.round((todayDate.getTime() - createdDate.getTime()) / 86400000);
     progress['hidden_one_year'] = Math.min(daysSince, 365);
   } else {
     progress['hidden_one_year'] = 0;
@@ -340,14 +347,17 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   progress['hidden_empire_balance'] = Math.min(empireHighLevelResult.length, 3);
 
   // Regreso: detect gap of 7+ days between consecutive check-ins
+  // Uses getMadridDateKey() for calendar-day comparison — avoids ±1 day drift
   let hasComeback = false;
   if (recentCheckins.length >= 2) {
     for (let i = 0; i < recentCheckins.length - 1; i++) {
-      const current = new Date(recentCheckins[i].date);
-      const previous = new Date(recentCheckins[i + 1].date);
-      const gapDays = Math.floor(
-        (current.getTime() - previous.getTime()) / 86400000
-      );
+      const currentKey = getMadridDateKey(new Date(recentCheckins[i].date));
+      const previousKey = getMadridDateKey(new Date(recentCheckins[i + 1].date));
+      const [curY, curM, curD] = currentKey.split('-').map(Number);
+      const [prevY, prevM, prevD] = previousKey.split('-').map(Number);
+      const curDate = new Date(curY, curM - 1, curD);
+      const prevDate = new Date(prevY, prevM - 1, prevD);
+      const gapDays = Math.round((curDate.getTime() - prevDate.getTime()) / 86400000);
       if (gapDays >= 7) {
         hasComeback = true;
         break;
