@@ -50,13 +50,13 @@ async function handler(request: NextRequest) {
       return NextResponse.json({ error: 'Message too long (max 4000 characters)' }, { status: 400 });
     }
 
-    // Verify thread belongs to user
+    // Verify thread belongs to user and is not archived
     const thread = await db.aIThread.findFirst({
-      where: { id: threadId, userId: user.id },
+      where: { id: threadId, userId: user.id, archived: false },
     });
 
     if (!thread) {
-      return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Thread not found or archived' }, { status: 404 });
     }
 
     // Get conversation history: FREE last 10 messages, PREMIUM last 30

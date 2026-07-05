@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
+import { getMadridDateKey } from '@/lib/deterministic';
 
 // ─── Types ───
 
@@ -71,9 +72,30 @@ interface MonthAggregation {
 
 function getMonthRange(yyyyMM: string) {
   const [year, month] = yyyyMM.split('-').map(Number);
-  const start = new Date(year, month - 1, 1);
-  const end = new Date(year, month, 1);
-  return { start, end };
+  // Use Date.UTC to avoid server-local timezone interpretation.
+  // Month boundaries must align with Madrid midnight, not server-local midnight.
+  // Since Prisma compares dates as UTC timestamps, we shift the UTC midnight
+  // by the Madrid offset so the DB query covers the correct Madrid-day range.
+  const startUTC = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+  const endUTC = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+  // Compute Madrid offset at noon on the 15th of the respective month (avoids DST edge cases)
+  const startOffset = getMadridOffsetMs(startUTC);
+  const endOffset = getMadridOffsetMs(endUTC);
+  return {
+    start: new Date(startUTC.getTime() - startOffset),
+    end: new Date(endUTC.getTime() - endOffset),
+  };
+}
+
+/**
+ * Compute the Madrid timezone offset in milliseconds at a given UTC time.
+ * Positive offset means Madrid is ahead of UTC (CET = +1h, CEST = +2h).
+ * Uses the same technique as getMadridStartOfNextDay() in limits.ts.
+ */
+function getMadridOffsetMs(utcDate: Date): number {
+  const madridStr = utcDate.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  const madridDate = new Date(madridStr.replace(' ', 'T'));
+  return madridDate.getTime() - utcDate.getTime();
 }
 
 const MONTH_NAMES: Record<number, string> = {
@@ -330,10 +352,16 @@ export async function detectLifeStages(userId: string, months: string[]): Promis
 
 export function getPastMonths(count: number = 6): string[] {
   const months: string[] = [];
-  const now = new Date();
+  // Use Madrid timezone to determine the current month — same source of truth
+  // as the rest of the system (deterministic.ts, limits.ts, mentor-context.ts).
+  // Without this, a UTC server at 23:30 Madrid time could compute the wrong month.
+  const todayKey = getMadridDateKey(new Date());
+  const [currentYear, currentMonth] = todayKey.split('-').map(Number);
   for (let i = 1; i <= count; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    const monthIndex = currentMonth - i;
+    const year = currentYear + Math.floor((monthIndex - 1) / 12);
+    const month = ((monthIndex - 1) % 12 + 12) % 12 + 1;
+    months.push(`${year}-${String(month).padStart(2, '0')}`);
   }
   return months.reverse(); // oldest first
 }

@@ -146,11 +146,13 @@ function computeConsistency(data: RawData): { value: number; prevValue: number }
   value += habitRatio * 100 * 0.35;
   value += medRatio * 100 * 0.3;
 
-  // Previous week approximation
+  // Previous week — same weights as current week for fair comparison
   const prevCheckinRatio = Math.min(data.prevWeekCheckins.length / 5, 1);
+  const prevHabitRatio = Math.min(data.prevWeekHabits.length / 7, 1);
   const prevMedRatio = Math.min(data.prevWeekMeditations.length / 4, 1);
-  let prevValue = prevCheckinRatio * 100 * 0.5;
-  prevValue += prevMedRatio * 100 * 0.5;
+  let prevValue = prevCheckinRatio * 100 * 0.35;
+  prevValue += prevHabitRatio * 100 * 0.35;
+  prevValue += prevMedRatio * 100 * 0.3;
 
   return { value: Math.round(value), prevValue: Math.round(prevValue) };
 }
@@ -181,21 +183,23 @@ function computeProgress(data: RawData): { value: number; prevValue: number } {
 }
 
 function computeActivity(data: RawData): { value: number; prevValue: number } {
-  // Activity from last 3 days vs previous 3 days
+  // Activity from last 3 days vs full week baseline
+  // Includes all 6 activity types for consistency with computeProgress and computeConsistency
   const threeDaysAgo = new Date(Date.now() - 3 * 86400000);
 
   const recentCheckins = data.thisWeekCheckins.filter((c: any) => new Date(c.date) >= threeDaysAgo).length;
+  const recentHabits = data.thisWeekHabits.filter((h: any) => h.lastCompletedAt && new Date(h.lastCompletedAt) >= threeDaysAgo).length;
   const recentMeditations = data.thisWeekMeditations.filter((m: any) => new Date(m.completedAt) >= threeDaysAgo).length;
   const recentJournals = data.thisWeekJournals.filter((j: any) => new Date(j.createdAt) >= threeDaysAgo).length;
   const recentWellness = data.thisWeekWellness.filter((w: any) => new Date(w.date) >= threeDaysAgo).length;
   const recentNutrition = data.thisWeekNutrition.filter((n: any) => new Date(n.date) >= threeDaysAgo).length;
 
-  const recentTotal = recentCheckins + recentMeditations + recentJournals + recentWellness + recentNutrition;
-  const value = Math.min(Math.round((recentTotal / 15) * 100), 100); // 5 activities/day * 3 days = 15
+  const recentTotal = recentCheckins + recentHabits + recentMeditations + recentJournals + recentWellness + recentNutrition;
+  const value = Math.min(Math.round((recentTotal / 18) * 100), 100); // 6 activities/day * 3 days = 18
 
   // Full week as comparison baseline
-  const weeklyTotal = data.thisWeekCheckins.length + data.thisWeekMeditations.length + data.thisWeekJournals.length + data.thisWeekWellness.length + data.thisWeekNutrition.length;
-  const prevValue = Math.min(Math.round((weeklyTotal / 25) * 100), 100);
+  const weeklyTotal = data.thisWeekCheckins.length + data.thisWeekHabits.length + data.thisWeekMeditations.length + data.thisWeekJournals.length + data.thisWeekWellness.length + data.thisWeekNutrition.length;
+  const prevValue = Math.min(Math.round((weeklyTotal / 42) * 100), 100); // 6 activities/day * 7 days = 42
 
   return { value, prevValue };
 }
