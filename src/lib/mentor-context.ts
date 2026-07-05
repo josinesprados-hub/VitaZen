@@ -335,13 +335,38 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
 
   const prevWeekCheckinCount = prevWeekCheckins.length;
 
+  // M-7: Compute trend based on aggregate activity, not just check-ins.
+  // PREMIUM has full prev-week data → compare activeDaysThisWeek vs activeDaysPrevWeek.
+  // FREE only has prev-week checkins → keep checkin-based trend (no other prev-week data available).
   let trend: 'improving' | 'stable' | 'declining' | 'starting' = 'stable';
-  if (weeklyCheckinCount <= 1 && prevWeekCheckinCount <= 1) {
-    trend = 'starting';
-  } else if (weeklyCheckinCount > prevWeekCheckinCount + 1) {
-    trend = 'improving';
-  } else if (weeklyCheckinCount < prevWeekCheckinCount - 1) {
-    trend = 'declining';
+  if (isPremium) {
+    const prevActiveDaySet = new Set<string>();
+    for (const c of prevWeekCheckins) prevActiveDaySet.add(toDateKey(c.date));
+    for (const h of prevWeekHabitLogs) {
+      if (h.lastCompletedAt) prevActiveDaySet.add(toDateKey(h.lastCompletedAt));
+    }
+    for (const m of prevWeekMeditations) prevActiveDaySet.add(toDateKey(m.completedAt));
+    for (const j of prevWeekJournals) prevActiveDaySet.add(toDateKey(j.createdAt));
+    const prevWeekWellnessEntries = wellnessLogRows.filter(w => w.date < sevenDaysAgo);
+    for (const w of prevWeekWellnessEntries) prevActiveDaySet.add(toDateKey(w.date));
+    for (const n of prevWeekNutritionLogs) prevActiveDaySet.add(toDateKey(n.date));
+    const activeDaysPrevWeek = Math.min(prevActiveDaySet.size, 7);
+
+    if (activeDaysThisWeek <= 1 && activeDaysPrevWeek <= 1) {
+      trend = 'starting';
+    } else if (activeDaysThisWeek > activeDaysPrevWeek + 1) {
+      trend = 'improving';
+    } else if (activeDaysThisWeek < activeDaysPrevWeek - 1) {
+      trend = 'declining';
+    }
+  } else {
+    if (weeklyCheckinCount <= 1 && prevWeekCheckinCount <= 1) {
+      trend = 'starting';
+    } else if (weeklyCheckinCount > prevWeekCheckinCount + 1) {
+      trend = 'improving';
+    } else if (weeklyCheckinCount < prevWeekCheckinCount - 1) {
+      trend = 'declining';
+    }
   }
 
   // Parse onboarding data safely (PREMIUM only; null for FREE)
