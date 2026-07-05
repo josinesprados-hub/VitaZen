@@ -23,11 +23,11 @@ async function handler(request: NextRequest) {
       },
     });
 
-    // Habits completed (with streak > 0 means completed at least once)
+    // Habits completed this week (consistent with /dashboard/progress and /dashboard/momentum)
     const habitsCompleted = await db.habitLog.count({
       where: {
         userId: user.id,
-        lastCompletedAt: { gte: weekAgo },
+        lastCompletedAt: { gte: weekAgo, not: null },
       },
     });
 

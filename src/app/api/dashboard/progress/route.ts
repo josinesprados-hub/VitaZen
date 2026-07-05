@@ -22,17 +22,20 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Habits: distinct active days this week (target 7)
-    const habitLogs = await db.habitLog.findMany({
+    // Habits: count of habits completed this week (target 7)
+    // H-4 FIX: Previously used distinct active days (findMany + Set), which was
+    // semantically inconsistent with /dashboard/metrics (raw count) and
+    // /dashboard/momentum (raw count). Also, distinct days from lastCompletedAt
+    // is bounded by the number of habits — a user with 3 habits can never show
+    // more than 3 active days even if they completed habits on all 7 days.
+    // Source of truth: raw count (habits completed at least once this week),
+    // consistent with metrics and momentum endpoints.
+    const habitsCompleted = await db.habitLog.count({
       where: {
         userId: user.id,
-        lastCompletedAt: { gte: weekAgo },
+        lastCompletedAt: { gte: weekAgo, not: null },
       },
-      select: { lastCompletedAt: true },
     });
-    const habitActiveDays = new Set(
-      habitLogs.map(h => getMadridDateKey(new Date(h.lastCompletedAt!)))
-    ).size;
 
     // Journal: entries this week (target 3)
     const journalCount = await db.journalEntry.count({
@@ -68,7 +71,7 @@ export async function GET(request: NextRequest) {
 
     // Calculate percentages (capped at 100)
     const meditationPercent = Math.min(Math.round((meditationCount / 7) * 100), 100);
-    const habitsPercent = Math.min(Math.round((habitActiveDays / 7) * 100), 100);
+    const habitsPercent = Math.min(Math.round((habitsCompleted / 7) * 100), 100);
     const journalPercent = Math.min(Math.round((journalCount / 3) * 100), 100);
     const wellnessPercent = Math.min(Math.round((wellnessCount / 7) * 100), 100);
     const nutritionPercent = Math.min(Math.round((nutritionCount / 7) * 100), 100);
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       meditation: { count: meditationCount, target: 7, percent: meditationPercent },
-      habits: { count: habitActiveDays, target: 7, percent: habitsPercent },
+      habits: { count: habitsCompleted, target: 7, percent: habitsPercent },
       journal: { count: journalCount, target: 3, percent: journalPercent },
       wellness: { count: wellnessCount, target: 7, percent: wellnessPercent },
       nutrition: { count: nutritionCount, target: 7, percent: nutritionPercent },
