@@ -134,7 +134,16 @@ export async function PATCH(request: NextRequest) {
         if (diffDays < threshold) {
           return { status: 'already_completed' as const };
         }
-        newStreak = diffDays <= threshold ? habit.streak + 1 : 1;
+        // H-8 FIX: Streak continuation window must span the next valid period.
+        // Previously used diffDays <= threshold, which for weekly/monthly habits
+        // meant the streak only continued on the EXACT boundary day (diffDays=7 or 30).
+        // Any deviation — even one day late — reset the streak to 1.
+        // Correct logic: streak continues if completed within the next valid period
+        // (i.e. diffDays < threshold * 2). A missed full period resets the streak.
+        //   daily=1:  diffDays < 2  → same as before (yesterday continues streak)
+        //   weekly=7: diffDays < 14 → days 7-13 continue streak (any day in next week)
+        //   monthly=30: diffDays < 60 → days 30-59 continue streak (any day in next month)
+        newStreak = diffDays < threshold * 2 ? habit.streak + 1 : 1;
       } else {
         newStreak = 1;
       }
