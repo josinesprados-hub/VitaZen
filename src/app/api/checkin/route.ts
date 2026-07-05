@@ -104,6 +104,11 @@ export async function POST(request: NextRequest) {
     // new Date() at 00:30 Madrid = 23:30 UTC = wrong day.
     const today = new Date(getTodayDateKey() + 'T00:00:00');
 
+    // Check if a checkin already exists for today — prevents duplicate XP on update
+    const existingCheckin = await db.dailyCheckin.findUnique({
+      where: { userId_date: { userId: user.id, date: today } },
+    });
+
     const checkin = await db.dailyCheckin.upsert({
       where: { userId_date: { userId: user.id, date: today } },
       update: { emotion, energy, focus, stress, intention, note },
@@ -113,15 +118,17 @@ export async function POST(request: NextRequest) {
     // Track checkin event
     trackEvent({ event: 'checkin_created', userId: user.id, properties: { emotion, energy, focus, stress } });
 
-    // Auto-complete today's challenge if it matches (non-blocking)
+    // Auto-complete today's challenge if it matches (non-blocking, idempotent)
     tryAutoCompleteChallenge(user.id, 'checkin').catch(() => {});
 
-    // Award XP to mente empire
-    await db.empireProgress.upsert({
-      where: { userId_empire: { userId: user.id, empire: 'mente' } },
-      update: { xp: { increment: 10 } },
-      create: { userId: user.id, empire: 'mente', xp: 10 },
-    });
+    // Award XP to mente empire ONLY on first creation (not on updates)
+    if (!existingCheckin) {
+      await db.empireProgress.upsert({
+        where: { userId_empire: { userId: user.id, empire: 'mente' } },
+        update: { xp: { increment: 10 } },
+        create: { userId: user.id, empire: 'mente', xp: 10 },
+      });
+    }
 
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);
