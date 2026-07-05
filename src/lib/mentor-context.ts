@@ -417,30 +417,37 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           where: { userId, date: { gte: ninetyDaysAgo } },
           select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
           orderBy: { date: 'desc' },
+          take: 200,
         }),
         db.wellnessLog.findMany({
           where: { userId, date: { gte: ninetyDaysAgo } },
           select: { date: true, mood: true, energy: true, sleep: true, stress: true },
           orderBy: { date: 'desc' },
+          take: 90,
         }),
         db.meditationSession.findMany({
           where: { userId, completedAt: { gte: ninetyDaysAgo } },
           select: { duration: true, type: true, completedAt: true },
           orderBy: { completedAt: 'desc' },
+          take: 90,
         }),
         db.habitLog.findMany({
           where: { userId },
           select: { name: true, streak: true, lastCompletedAt: true },
+          orderBy: { lastCompletedAt: 'desc' },
+          take: 50,
         }),
         db.dailyCheckin.findMany({
           where: { userId, date: { gte: ninetyDaysAgo } },
           select: { date: true, emotion: true, energy: true, focus: true, stress: true },
           orderBy: { date: 'desc' },
+          take: 90,
         }),
         db.journalEntry.findMany({
           where: { userId, createdAt: { gte: ninetyDaysAgo } },
           select: { content: true, mood: true, createdAt: true },
           orderBy: { createdAt: 'desc' },
+          take: 90,
         }),
       ]);
 
