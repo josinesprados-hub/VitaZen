@@ -19,6 +19,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -53,13 +54,21 @@ const METRIC_CONFIG = [
 ] as const;
 
 function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const diff = Math.floor((today.getTime() - new Date(d).setHours(0, 0, 0, 0)) / 86400000);
-  if (diff === 0) return 'Hoy';
+  const checkinKey = getMadridDateKey(new Date(dateStr));
+  const todayKey = getTodayDateKey();
+
+  if (checkinKey === todayKey) return 'Hoy';
+
+  // Calculate calendar-day difference using Madrid-normalized dates
+  const [cY, cM, cD] = checkinKey.split('-').map(Number);
+  const [tY, tM, tD] = todayKey.split('-').map(Number);
+  const checkinDate = new Date(cY, cM - 1, cD);
+  const todayDate = new Date(tY, tM - 1, tD);
+  const diff = Math.round((todayDate.getTime() - checkinDate.getTime()) / 86400000);
+
   if (diff === 1) return 'Ayer';
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+
+  return checkinDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
 // ─── Mini Bar Chart ──────────────────────────────────────
