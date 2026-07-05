@@ -117,16 +117,24 @@ export async function PATCH(request: NextRequest) {
 
       if (lastCompleted) {
         const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
-        if (lastDateKey === todayDateKey) {
-          return { status: 'already_completed' as const };
-        }
         // Compute day diff using date keys (timezone-aware)
         const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
         const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
         const diffDays = Math.round((todayMs - lastMs) / 86400000);
-        // Respect frequency: daily=1 day, weekly=7 days, monthly=30 days
+        // H-7 FIX: Completion guard respects frequency.
+        // Before this fix, the guard only checked lastDateKey === todayDateKey (daily logic),
+        // allowing weekly/monthly habits to be completed every day. Each daily completion
+        // granted +10 XP and +1 empire streak, inflating progress.
+        // Now: block if diffDays < threshold (within the same frequency period).
+        //   daily=1: diffDays < 1 means same day → block (unchanged behavior)
+        //   weekly=7: diffDays < 7 means same week → block
+        //   monthly=30: diffDays < 30 means same month → block
         const streakThreshold: Record<string, number> = { daily: 1, weekly: 7, monthly: 30 };
-        newStreak = diffDays <= (streakThreshold[habit.frequency] || 1) ? habit.streak + 1 : 1;
+        const threshold = streakThreshold[habit.frequency] || 1;
+        if (diffDays < threshold) {
+          return { status: 'already_completed' as const };
+        }
+        newStreak = diffDays <= threshold ? habit.streak + 1 : 1;
       } else {
         newStreak = 1;
       }

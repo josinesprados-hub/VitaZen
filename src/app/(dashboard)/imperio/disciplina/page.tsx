@@ -37,11 +37,20 @@ export default function DisciplinaPage() {
   const { user } = useAuth();
   const { isActive: screenshotMode } = useScreenshotMode();
 
-  // Check if a habit was completed today using Europe/Madrid timezone,
-  // matching the server-side criterion in PATCH /api/habits.
-  const isCompletedToday = (lastCompletedAt: string | null) => {
-    if (!lastCompletedAt) return false;
-    return getMadridDateKey(new Date(lastCompletedAt)) === getMadridDateKey(new Date());
+  // Check if a habit was completed within its current frequency period,
+  // matching the server-side criterion in PATCH /api/habits (H-7 fix).
+  // daily: completed today; weekly: completed within last 7 days; monthly: within last 30 days.
+  const isCompletedInPeriod = (habit: Habit) => {
+    if (!habit.lastCompletedAt) return false;
+    const lastDate = getMadridDateKey(new Date(habit.lastCompletedAt));
+    const today = getMadridDateKey(new Date());
+    if (habit.frequency === 'daily') return lastDate === today;
+    const todayMs = new Date(today + 'T00:00:00').getTime();
+    const lastMs = new Date(lastDate + 'T00:00:00').getTime();
+    const diffDays = Math.round((todayMs - lastMs) / 86400000);
+    if (habit.frequency === 'weekly') return diffDays < 7;
+    if (habit.frequency === 'monthly') return diffDays < 30;
+    return lastDate === today;
   };
 
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -366,12 +375,12 @@ export default function DisciplinaPage() {
                     className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all touch-press ${
                       justCompletedId === habit.id ? 'check-pop' : ''
                     } ${
-                      isCompletedToday(habit.lastCompletedAt)
+                      isCompletedInPeriod(habit)
                         ? 'bg-champagne border-champagne scale-100'
                         : 'border-[#333] hover:border-champagne hover:bg-champagne/10'
                     }`}
                   >
-                    <Check size={16} className={isCompletedToday(habit.lastCompletedAt) ? 'text-black' : 'text-champagne'} />
+                    <Check size={16} className={isCompletedInPeriod(habit) ? 'text-black' : 'text-champagne'} />
                   </button>
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
