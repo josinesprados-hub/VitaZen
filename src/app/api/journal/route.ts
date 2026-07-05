@@ -123,6 +123,9 @@ export async function DELETE(request: NextRequest) {
       });
     }
 
+    // Trigger widget snapshot refresh (non-blocking)
+    onJournalChange(user.id, user.plan);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Journal DELETE error:', error);
