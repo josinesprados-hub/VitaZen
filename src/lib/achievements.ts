@@ -316,12 +316,9 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     progress['hidden_one_year'] = 0;
   }
 
-  // Distinct months with check-ins
+  // Distinct months with check-ins — use Madrid calendar to avoid UTC drift near midnight
   const distinctMonths = new Set(
-    recentCheckins.map(c => {
-      const d = new Date(c.date);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    })
+    recentCheckins.map(c => getMadridDateKey(new Date(c.date)).slice(0, 7))
   );
   progress['hidden_six_months_present'] = Math.min(distinctMonths.size, 6);
 
