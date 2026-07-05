@@ -54,7 +54,7 @@ export async function DELETE(request: NextRequest) {
     if (menteProgress) {
       await db.empireProgress.update({
         where: { userId_empire: { userId: user.id, empire: 'mente' } },
-        data: { xp: Math.max(0, menteProgress.xp - 15) },
+        data: { xp: Math.max(0, menteProgress.xp - 15), streak: Math.max(0, menteProgress.streak - 1) },
       });
     }
 
