@@ -23,6 +23,7 @@
 //  - Calm, inviting, human, varied
 
 import { NotificationType, NotificationTemplate } from './types';
+import { deterministicHash, getTodayDateKey } from '@/lib/deterministic';
 
 const CHECKIN_TEMPLATES: NotificationTemplate[] = [
   {
@@ -208,9 +209,9 @@ export function getTemplate(
   vars?: Record<string, string | number>,
 ): NotificationTemplate {
   const templates = TEMPLATE_MAP[type];
-  // Sequential rotation based on current day — same template all day,
-  // different each day. Deterministic, not random.
-  const dayIndex = Math.floor(Date.now() / 86400000);
+  // Sequential rotation based on current Madrid calendar day — same template all day,
+  // different each day. Deterministic, not random. Uses Madrid calendar, not UTC epoch.
+  const dayIndex = deterministicHash(getTodayDateKey());
   const template = templates[dayIndex % templates.length];
 
   // Interpolate variables
