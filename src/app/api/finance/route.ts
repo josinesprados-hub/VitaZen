@@ -80,7 +80,7 @@ export async function DELETE(request: NextRequest) {
     if (riquezaProgress) {
       await db.empireProgress.update({
         where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
-        data: { xp: Math.max(0, riquezaProgress.xp - 10) },
+        data: { xp: Math.max(0, riquezaProgress.xp - 10), streak: Math.max(0, riquezaProgress.streak - 1) },
       });
     }
 
