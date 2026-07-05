@@ -166,6 +166,7 @@ function computeProgress(data: RawData): { value: number; prevValue: number } {
 
   const prevTotal =
     data.prevWeekCheckins.length +
+    data.prevWeekHabits.length +
     data.prevWeekMeditations.length +
     data.prevWeekJournals.length +
     data.prevWeekWellness.length;

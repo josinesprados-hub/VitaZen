@@ -59,6 +59,7 @@ export interface RawData {
   thisWeekCheckins: any[];
   prevWeekCheckins: any[];
   thisWeekHabits: any[];
+  prevWeekHabits: any[];
   allHabits: any[];
   thisWeekMeditations: any[];
   prevWeekMeditations: any[];
@@ -81,6 +82,7 @@ export async function gatherData(userId: string): Promise<RawData> {
     thisWeekCheckins,
     prevWeekCheckins,
     thisWeekHabits,
+    prevWeekHabits,
     allHabits,
     thisWeekMeditations,
     prevWeekMeditations,
@@ -103,6 +105,9 @@ export async function gatherData(userId: string): Promise<RawData> {
     }),
     db.habitLog.findMany({
       where: { userId, lastCompletedAt: { gte: sevenDaysAgo } },
+    }),
+    db.habitLog.findMany({
+      where: { userId, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
     }),
     db.habitLog.findMany({
       where: { userId, streak: { gt: 0 } },
@@ -148,6 +153,7 @@ export async function gatherData(userId: string): Promise<RawData> {
     thisWeekCheckins,
     prevWeekCheckins,
     thisWeekHabits,
+    prevWeekHabits,
     allHabits,
     thisWeekMeditations,
     prevWeekMeditations,
