@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { checkAILimit, getDailyLimit } from '@/lib/limits';
+import { getAIUsageRemaining } from '@/lib/limits';
 
 const MAX_THREADS_FREE = 20;
 const MAX_THREADS_PREMIUM = 100;
@@ -24,8 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     const isPremium = user.plan === 'PREMIUM';
-    const dailyLimit = getDailyLimit(user.plan);
-    const limitCheck = await checkAILimit(user.id, user.plan);
+    const usageInfo = await getAIUsageRemaining(user.id, user.plan);
 
     // Support ?archived=true|false filter
     const { searchParams } = new URL(request.url);
@@ -57,8 +56,8 @@ export async function GET(request: NextRequest) {
       threads,
       historyLimited: !isPremium,
       historyLimit: HISTORY_LIMIT_FREE,
-      remaining: limitCheck.remaining,
-      limit: dailyLimit,
+      remaining: usageInfo.remaining,
+      limit: usageInfo.limit,
     });
   } catch (error) {
     console.error('Get threads error:', error);

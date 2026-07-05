@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
-import { checkAILimit, incrementAIUsage, getDailyLimit } from '@/lib/limits';
+import { checkAILimit, getDailyLimit } from '@/lib/limits';
 import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
 import { trackEvent } from '@/lib/analytics-server';
 import { withTiming } from '@/lib/observability/api-timing';
@@ -119,10 +119,7 @@ async function handler(request: NextRequest) {
       }),
     ]);
 
-    // Increment usage for FREE users
-    if (!isPremium) {
-      await incrementAIUsage(user.id);
-    }
+    // Usage was already incremented atomically inside checkAILimit()
 
     // Track mentor usage (privacy-first, no message content stored)
     trackEvent({ event: 'mentor_used', userId: user.id, properties: { plan: user.plan, threadId } });
@@ -169,11 +166,9 @@ async function handler(request: NextRequest) {
       data: { updatedAt: new Date() },
     });
 
-    const newLimitCheck = await checkAILimit(user.id, user.plan);
-
     return NextResponse.json({
       message: assistantContent,
-      remaining: newLimitCheck.remaining,
+      remaining: limitCheck.remaining,
       limit: dailyLimit,
       contextual: true,
       plan: user.plan,

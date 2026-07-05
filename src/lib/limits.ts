@@ -40,48 +40,101 @@ function getMadridStartOfNextDay(): Date {
   return new Date(midnightUTCTomorrow - offsetMs);
 }
 
+/**
+ * Read-only check of AI usage remaining count.
+ * Does NOT increment or modify the counter.
+ * Use this for display purposes (e.g. thread list UI).
+ * For sending messages, use checkAILimit() which atomically checks + increments.
+ */
+export async function getAIUsageRemaining(userId: string, plan: string): Promise<{ remaining: number; limit: number }> {
+  if (plan === 'PREMIUM') {
+    return { remaining: Infinity, limit: Infinity };
+  }
+
+  const usage = await db.aIUsage.findUnique({ where: { userId } });
+  const now = new Date();
+
+  if (!usage || now > usage.resetAt) {
+    return { remaining: FREE_DAILY_LIMIT, limit: FREE_DAILY_LIMIT };
+  }
+
+  return {
+    remaining: Math.max(0, FREE_DAILY_LIMIT - usage.count),
+    limit: FREE_DAILY_LIMIT,
+  };
+}
+
+/**
+ * Atomically check the daily AI limit and reserve one message slot.
+ *
+ * Uses a single conditional UPDATE to eliminate the race condition
+ * that existed when check + increment were separate operations.
+ *
+ * Flow:
+ * 1. PREMIUM users → always allowed, no DB write.
+ * 2. No usage record yet → create one (count=1), allowed.
+ * 3. Usage expired (past resetAt) → reset and count=1, allowed.
+ * 4. Under limit → atomic count+1 via conditional UPDATE, allowed.
+ * 5. At/over limit → UPDATE matches 0 rows, denied.
+ *
+ * The conditional UPDATE (`WHERE count < LIMIT`) guarantees that
+ * two concurrent requests cannot both pass the check: PostgreSQL
+ * row-level locking ensures only one can increment past the limit.
+ */
 export async function checkAILimit(userId: string, plan: string): Promise<{ allowed: boolean; remaining: number }> {
   if (plan === 'PREMIUM') {
     return { allowed: true, remaining: Infinity };
   }
 
-  const usage = await db.aIUsage.findUnique({
-    where: { userId },
-  });
-
   const now = new Date();
 
+  // Try to upsert a fresh record for users with no usage or expired usage
+  const usage = await db.aIUsage.findUnique({ where: { userId } });
+
   if (!usage || now > usage.resetAt) {
-    // Reset or create usage record
+    // No record or expired → create/reset with count=1 (consuming this request's slot)
     const resetAt = getMadridStartOfNextDay();
     await db.aIUsage.upsert({
       where: { userId },
       update: {
-        count: 0,
+        count: 1,
         resetAt,
       },
       create: {
         userId,
-        count: 0,
+        count: 1,
         resetAt,
       },
     });
-    return { allowed: true, remaining: FREE_DAILY_LIMIT };
+    return { allowed: true, remaining: FREE_DAILY_LIMIT - 1 };
   }
 
-  if (usage.count >= FREE_DAILY_LIMIT) {
+  // Record exists and is current — atomic conditional increment
+  // Only succeeds if count < limit, guaranteeing no race condition
+  const result = await db.$executeRaw`
+    UPDATE "AIUsage"
+    SET count = count + 1, "updatedAt" = NOW()
+    WHERE "userId" = ${userId}
+      AND count < ${FREE_DAILY_LIMIT}
+      AND "resetAt" > ${now}
+  `;
+
+  if (result === 0) {
+    // UPDATE matched 0 rows → limit already reached
     return { allowed: false, remaining: 0 };
   }
 
-  return { allowed: true, remaining: FREE_DAILY_LIMIT - usage.count };
+  // Read the count after increment to compute remaining
+  const updated = await db.aIUsage.findUnique({ where: { userId } });
+  const newCount = updated?.count ?? FREE_DAILY_LIMIT;
+
+  return { allowed: true, remaining: FREE_DAILY_LIMIT - newCount };
 }
 
+/**
+ * @deprecated Increment is now handled atomically inside checkAILimit().
+ * This function is kept as a no-op for API compatibility.
+ */
 export async function incrementAIUsage(userId: string): Promise<void> {
-  const usage = await db.aIUsage.findUnique({ where: { userId } });
-  if (!usage) return;
-
-  await db.aIUsage.update({
-    where: { userId },
-    data: { count: { increment: 1 } },
-  });
+  // No-op: the increment is now atomic within checkAILimit()
 }
