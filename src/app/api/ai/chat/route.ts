@@ -59,22 +59,14 @@ async function handler(request: NextRequest) {
       return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
 
-    // Save user message
-    await db.aIMessage.create({
-      data: {
-        threadId,
-        role: 'user',
-        content,
-      },
-    });
-
     // Get conversation history: FREE last 10 messages, PREMIUM last 30
     // Fetch most recent first, then reverse for chronological order
+    // Reserve 1 slot for the current user message (appended manually to groqMessages)
     const historyLimit = isPremium ? 30 : 10;
     const recentHistory = await db.aIMessage.findMany({
       where: { threadId },
       orderBy: { createdAt: 'desc' },
-      take: historyLimit,
+      take: historyLimit - 1,
     });
     const history = recentHistory.reverse();
 
@@ -96,6 +88,7 @@ async function handler(request: NextRequest) {
         role: msg.role as 'user' | 'assistant',
         content: msg.content,
       })),
+      { role: 'user' as const, content },
     ];
 
     // Call Groq API — PREMIUM gets more tokens and creativity
@@ -108,14 +101,23 @@ async function handler(request: NextRequest) {
 
     const assistantContent = completion.choices[0]?.message?.content || 'Lo siento, no pude generar una respuesta.';
 
-    // Save assistant message
-    await db.aIMessage.create({
-      data: {
-        threadId,
-        role: 'assistant',
-        content: assistantContent,
-      },
-    });
+    // Save user and assistant messages atomically — prevents orphans if DB fails mid-save
+    await db.$transaction([
+      db.aIMessage.create({
+        data: {
+          threadId,
+          role: 'user',
+          content,
+        },
+      }),
+      db.aIMessage.create({
+        data: {
+          threadId,
+          role: 'assistant',
+          content: assistantContent,
+        },
+      }),
+    ]);
 
     // Increment usage for FREE users
     if (!isPremium) {
