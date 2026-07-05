@@ -68,39 +68,84 @@ export async function PATCH(request: NextRequest) {
 
     const { habitId } = await request.json();
 
-    const habit = await db.habitLog.findFirst({ where: { id: habitId, userId: user.id } });
-    if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
+    // ── H-3 FIX: Race condition during habit completion ──
+    // The original code performed a read (findFirst) → compute → write (update)
+    // without any locking. Two concurrent PATCH requests for the same habitId
+    // could both read the same stale data, both pass the "already completed
+    // today" check, and both increment the streak — causing a lost update.
+    //
+    // Fix: wrap the read-compute-write cycle in an interactive transaction
+    // with SELECT FOR UPDATE to acquire a row-level exclusive lock. This
+    // ensures that concurrent requests are serialized: the second request
+    // blocks at SELECT FOR UPDATE until the first transaction commits, then
+    // sees the updated lastCompletedAt and correctly returns 400.
+    //
+    // Alternatives discarded:
+    //  A) Prisma $transaction without FOR UPDATE: does NOT prevent the race.
+    //     PostgreSQL READ COMMITTED allows both transactions to read the same
+    //     row concurrently before either writes — same TOCTOU vulnerability.
+    //  B) Single atomic SQL UPDATE with CASE: possible but moves all streak
+    //     logic into raw SQL, bypasses Prisma's type system, and can't
+    //     cleanly return the "already completed today" error.
+    //  C) Schema-level unique constraint on (userId, date): would prevent
+    //     duplicates but requires schema changes — explicitly forbidden.
+    const txResult = await db.$transaction(async (tx) => {
+      // SELECT FOR UPDATE acquires a row-level exclusive lock.
+      // Concurrent PATCH requests for the same habitId will block here
+      // until this transaction commits or rolls back.
+      const habits = await tx.$queryRaw<Array<{
+        id: string;
+        userId: string;
+        name: string;
+        description: string | null;
+        frequency: string;
+        streak: number;
+        lastCompletedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+      }>>`SELECT * FROM "HabitLog" WHERE "id" = ${habitId} AND "userId" = ${user.id} FOR UPDATE`;
 
-    // Use Europe/Madrid timezone for day boundary calculation.
-    // Without this, a user completing a habit at 00:30 Madrid (23:30 UTC)
-    // would be considered "same day" as yesterday, breaking streak logic.
-    const todayDateKey = getTodayDateKey();
-    const lastCompleted = habit.lastCompletedAt;
-    let newStreak = habit.streak;
+      const habit = habits[0];
+      if (!habit) return { status: 'not_found' as const };
 
-    if (lastCompleted) {
-      const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
-      if (lastDateKey === todayDateKey) {
-        return NextResponse.json({ error: 'Already completed today' }, { status: 400 });
+      // Use Europe/Madrid timezone for day boundary calculation.
+      // Without this, a user completing a habit at 00:30 Madrid (23:30 UTC)
+      // would be considered "same day" as yesterday, breaking streak logic.
+      const todayDateKey = getTodayDateKey();
+      const lastCompleted = habit.lastCompletedAt;
+      let newStreak = habit.streak;
+
+      if (lastCompleted) {
+        const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
+        if (lastDateKey === todayDateKey) {
+          return { status: 'already_completed' as const };
+        }
+        // Compute day diff using date keys (timezone-aware)
+        const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
+        const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
+        const diffDays = Math.round((todayMs - lastMs) / 86400000);
+        // Respect frequency: daily=1 day, weekly=7 days, monthly=30 days
+        const streakThreshold: Record<string, number> = { daily: 1, weekly: 7, monthly: 30 };
+        newStreak = diffDays <= (streakThreshold[habit.frequency] || 1) ? habit.streak + 1 : 1;
+      } else {
+        newStreak = 1;
       }
-      // Compute day diff using date keys (timezone-aware)
-      const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
-      const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
-      const diffDays = Math.round((todayMs - lastMs) / 86400000);
-      // Respect frequency: daily=1 day, weekly=7 days, monthly=30 days
-      const streakThreshold: Record<string, number> = { daily: 1, weekly: 7, monthly: 30 };
-      newStreak = diffDays <= (streakThreshold[habit.frequency] || 1) ? habit.streak + 1 : 1;
-    } else {
-      newStreak = 1;
-    }
 
-    const updated = await db.habitLog.update({
-      where: { id: habitId },
-      data: { streak: newStreak, lastCompletedAt: new Date() },
+      const updated = await tx.habitLog.update({
+        where: { id: habitId },
+        data: { streak: newStreak, lastCompletedAt: new Date() },
+      });
+
+      return { status: 'ok' as const, habit: updated };
     });
 
+    if (txResult.status === 'not_found') return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
+    if (txResult.status === 'already_completed') return NextResponse.json({ error: 'Already completed today' }, { status: 400 });
+
+    const updated = txResult.habit;
+
     // Track habit completion
-    trackEvent({ event: 'habit_completed', userId: user.id, properties: { habitId, streak: newStreak } });
+    trackEvent({ event: 'habit_completed', userId: user.id, properties: { habitId, streak: updated.streak } });
 
     // Award XP to disciplina empire
     await db.empireProgress.upsert({
@@ -110,7 +155,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'habit', habit.name).catch(() => {});
+    tryAutoCompleteChallenge(user.id, 'habit', updated.name).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);
