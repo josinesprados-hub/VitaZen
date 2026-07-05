@@ -162,14 +162,16 @@ function computeProgress(data: RawData): { value: number; prevValue: number } {
     data.thisWeekHabits.length +
     data.thisWeekMeditations.length +
     data.thisWeekJournals.length +
-    data.thisWeekWellness.length;
+    data.thisWeekWellness.length +
+    data.thisWeekNutrition.length;
 
   const prevTotal =
     data.prevWeekCheckins.length +
     data.prevWeekHabits.length +
     data.prevWeekMeditations.length +
     data.prevWeekJournals.length +
-    data.prevWeekWellness.length;
+    data.prevWeekWellness.length +
+    data.prevWeekNutrition.length;
 
   // Target: ~20 activities per week is "100%"
   const value = Math.min(Math.round((thisTotal / 20) * 100), 100);
