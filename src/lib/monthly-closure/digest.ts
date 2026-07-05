@@ -52,6 +52,7 @@ export interface RhythmData {
   habitCompletions: number;
   meditationSessions: number;
   wellnessLogs: number;
+  nutritionLogs: number;
   financeLogs: number;
   totalActivity: number;
   rhythmLabel: string;
@@ -192,7 +193,7 @@ async function computeRhythm(
 ): Promise<RhythmData | null> {
   const { start, end } = getMonthRange(yyyyMM);
 
-  const [checkins, journals, habits, meditations, wellness, finances] =
+  const [checkins, journals, habits, meditations, wellness, nutrition, finances] =
     await Promise.all([
       db.dailyCheckin.count({
         where: { userId, date: { gte: start, lt: end } },
@@ -218,13 +219,16 @@ async function computeRhythm(
       db.wellnessLog.count({
         where: { userId, date: { gte: start, lt: end } },
       }),
+      db.nutritionLog.count({
+        where: { userId, date: { gte: start, lt: end } },
+      }),
       db.financeLog.count({
         where: { userId, date: { gte: start, lt: end } },
       }),
     ]);
 
   const totalActivity =
-    checkins + journals + habits + meditations + wellness + finances;
+    checkins + journals + habits + meditations + wellness + nutrition + finances;
 
   if (totalActivity === 0) return null;
 
@@ -240,6 +244,7 @@ async function computeRhythm(
     habitCompletions: habits,
     meditationSessions: meditations,
     wellnessLogs: wellness,
+    nutritionLogs: nutrition,
     financeLogs: finances,
     totalActivity,
     rhythmLabel,
