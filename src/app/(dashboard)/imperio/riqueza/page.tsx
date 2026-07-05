@@ -15,6 +15,7 @@ import { NumericInput } from '@/components/ui/NumericInput';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { formatCurrency } from '@/lib/utils';
+import { getTodayDateKey } from '@/lib/deterministic';
 
 // ═══════════════════════════════════════════
 // Types
@@ -676,7 +677,7 @@ export default function RiquezaPage() {
       const res = await apiFetch('/api/finance', {
         method: 'POST',
         body: JSON.stringify({
-          date: new Date().toISOString().split('T')[0],
+          date: getTodayDateKey(),
           type: form.type,
           category: form.category.trim(),
           amount: form.amount,
@@ -708,7 +709,7 @@ export default function RiquezaPage() {
       const res = await apiFetch('/api/finance', {
         method: 'POST',
         body: JSON.stringify({
-          date: new Date().toISOString().split('T')[0],
+          date: getTodayDateKey(),
           type: data.type,
           category: data.category,
           amount: data.amount,
