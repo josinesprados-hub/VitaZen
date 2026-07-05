@@ -24,6 +24,7 @@ import {
   Target,
   Gem,
 } from 'lucide-react';
+import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -118,20 +119,26 @@ const FILTERS = [
 // ─── Date Grouping ───────────────────────────────────────
 
 function dayKey(dateStr: string): string {
-  return new Date(dateStr).toISOString().slice(0, 10);
+  return getMadridDateKey(new Date(dateStr));
 }
 
 function dayLabel(dateStr: string): { label: string; sublabel?: string } {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffDay = Math.floor(diffMs / 86400000);
+  const entryKey = getMadridDateKey(new Date(dateStr));
+  const todayKey = getTodayDateKey();
 
-  if (diffDay === 0) return { label: 'Hoy' };
+  if (entryKey === todayKey) return { label: 'Hoy' };
+
+  // Calculate calendar-day difference using Madrid-normalized dates
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const [tY, tM, tD] = todayKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
+  const todayDate = new Date(tY, tM - 1, tD);
+  const diffDay = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+
   if (diffDay === 1) return { label: 'Ayer' };
 
-  const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
-  const dateStr2 = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+  const dayName = entryDate.toLocaleDateString('es-ES', { weekday: 'long' });
+  const dateStr2 = entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 
   if (diffDay < 7) return { label: dateStr2, sublabel: dayName };
   return { label: dateStr2 };
