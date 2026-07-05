@@ -87,7 +87,9 @@ export async function PATCH(request: NextRequest) {
       const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
       const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
       const diffDays = Math.round((todayMs - lastMs) / 86400000);
-      newStreak = diffDays === 1 ? habit.streak + 1 : 1;
+      // Respect frequency: daily=1 day, weekly=7 days, monthly=30 days
+      const streakThreshold: Record<string, number> = { daily: 1, weekly: 7, monthly: 30 };
+      newStreak = diffDays <= (streakThreshold[habit.frequency] || 1) ? habit.streak + 1 : 1;
     } else {
       newStreak = 1;
     }
