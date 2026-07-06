@@ -4,6 +4,23 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
+import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
+
+// E-1/E-2 helper: compute the UTC instants that bound the Madrid calendar day
+// for the given Madrid date key (YYYY-MM-DD). Used by POST and DELETE so the
+// "first energia log today" check aligns with the user's perceived day boundary
+// (same approach as startOfMadridDay in insights.ts, the H-11 fix in habits,
+// and the M-1/M-2 fixes in meditation).
+function madridDayBoundaries(todayDateKey: string): { todayStart: Date; todayEnd: Date } {
+  const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
+  const parts = madridNoonUtc
+    .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
+    .split(' ')[1].split(':').map(Number);
+  const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
+  const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
+  const todayEnd = new Date(todayStart.getTime() + 86400000);
+  return { todayStart, todayEnd };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,24 +54,91 @@ export async function POST(request: NextRequest) {
 
     const { date, mood, energy, sleep, stress, notes } = await request.json();
 
-    const existing = await db.wellnessLog.findUnique({
-      where: { userId_date: { userId: user.id, date: new Date(date) } },
-    });
+    // E-3 FIX (race condition + double streak from wellness+nutrition).
+    // The original code did `findUnique(date) → upsert → if (!existing) award
+    // XP+streak` as three separate operations with no transaction. Two
+    // concurrent POSTs could both pass the findUnique check (both see null),
+    // both succeed on the upsert (ON CONFLICT DO UPDATE), and BOTH award +10
+    // XP and +1 streak — inflating energia progress. This is the same race
+    // class as M-3 (checkin) and H-3 (habits).
+    //
+    // Additionally, even without concurrency, wellness and nutrition POSTs
+    // BOTH independently increment energia.streak when their respective log
+    // type is first-of-day. A user logging wellness today (+1 streak) AND
+    // nutrition today (+1 streak) got energia.streak = 2 for a single Madrid
+    // day. This contradicts the Disciplina H-10 fix ("streak must only
+    // increment once per active day, not once per habit completion") and the
+    // Mente M-1 fix ("streak per active day, not per session").
+    //
+    // Fix: acquire a transaction-scoped advisory lock keyed on (userId, today)
+    // BEFORE reading or writing. Then check if ANY energia log (wellness OR
+    // nutrition) already exists for today. Only increment streak if none
+    // exists. XP still increments per log (wellness +10, nutrition +10).
+    // The advisory lock serializes concurrent wellness POSTs, concurrent
+    // nutrition POSTs, AND cross-type races (wellness POST racing with
+    // nutrition POST) — all share the same (userId, today) key.
+    //
+    // The date stored is the Madrid date key provided by the client (frontend
+    // sends getTodayDateKey()). We compute the Madrid day window from this key
+    // so the "first log today" check matches the user's perceived day.
+    const todayDateKey = getTodayDateKey();
+    const logDate = new Date(date);
+    const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
 
-    const log = await db.wellnessLog.upsert({
-      where: { userId_date: { userId: user.id, date: new Date(date) } },
-      update: { mood, energy, sleep, stress, notes },
-      create: { userId: user.id, date: new Date(date), mood, energy, sleep, stress, notes },
-    });
+    const log = await db.$transaction(async (tx) => {
+      // Acquire transaction-scoped advisory lock on (userId, today).
+      // Key is derived from md5(userId || '|' || dateKey) — first 8 bytes as a
+      // bigint. Collisions are acceptable (worst case: two unrelated users
+      // serialize unnecessarily).
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${user.id} || '|energia|' || ${todayDateKey}), 1, 16))::bit(64)::bigint
+        )`;
 
-    // Award XP and streak to energia empire only on first log of the day
-    if (!existing) {
-      await db.empireProgress.upsert({
-        where: { userId_empire: { userId: user.id, empire: 'energia' } },
-        update: { xp: { increment: 10 }, streak: { increment: 1 } },
-        create: { userId: user.id, empire: 'energia', xp: 10, streak: 1 },
+      const existing = await tx.wellnessLog.findUnique({
+        where: { userId_date: { userId: user.id, date: logDate } },
       });
-    }
+
+      const result = await tx.wellnessLog.upsert({
+        where: { userId_date: { userId: user.id, date: logDate } },
+        update: { mood, energy, sleep, stress, notes },
+        create: { userId: user.id, date: logDate, mood, energy, sleep, stress, notes },
+      });
+
+      // Award XP and streak to energia empire only on first creation (not on
+      // updates). The streak is only incremented if no OTHER energia log
+      // (wellness OR nutrition) exists for today — so the first log of either
+      // type triggers the streak, and the second type only adds XP.
+      if (!existing) {
+        const otherEnergiaLogToday = await tx.wellnessLog.findFirst({
+          where: {
+            userId: user.id,
+            id: { not: result.id },
+            date: { gte: todayStart, lt: todayEnd },
+          },
+          select: { id: true },
+        });
+        const otherNutritionLogToday = !otherEnergiaLogToday ? await tx.nutritionLog.findFirst({
+          where: {
+            userId: user.id,
+            date: { gte: todayStart, lt: todayEnd },
+          },
+          select: { id: true },
+        }) : null;
+        const isFirstEnergiaLogToday = !otherEnergiaLogToday && !otherNutritionLogToday;
+
+        await tx.empireProgress.upsert({
+          where: { userId_empire: { userId: user.id, empire: 'energia' } },
+          update: {
+            xp: { increment: 10 },
+            ...(isFirstEnergiaLogToday ? { streak: { increment: 1 } } : {}),
+          },
+          create: { userId: user.id, empire: 'energia', xp: 10, streak: 1 },
+        });
+      }
+
+      return result;
+    });
 
     // Auto-complete today's challenge if it matches (non-blocking)
     tryAutoCompleteChallenge(user.id, 'wellness').catch(() => {});
@@ -110,18 +194,65 @@ export async function DELETE(request: NextRequest) {
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    await db.wellnessLog.delete({ where: { id: logId } });
+    // E-1/E-2 FIX: Only revert the energia streak when the deleted log was the
+    // one that triggered today's streak increment.
+    // The POST fix (E-3) only increments the streak on the first energia log
+    // (wellness OR nutrition) of each Madrid day. When a log from today is
+    // deleted, we must check whether any OTHER energia log (wellness OR
+    // nutrition) still exists for today. If yes, today was still an active day
+    // (the streak should remain). If no, this log was the sole trigger for
+    // today's increment — decrement the streak. Logs from previous days never
+    // affect today's streak.
+    //
+    // The previous code always did `streak: max(0, streak - 1)` on every
+    // DELETE, regardless of which day the log belonged to. Combined with the
+    // double-increment from wellness+nutrition, the energia streak was a
+    // meaningless number that drifted in both directions.
+    //
+    // The whole operation (delete + XP/streak revert) runs inside a transaction
+    // so partial failures cannot leave inconsistent state (E-2).
+    const todayDateKey = getTodayDateKey();
+    await db.$transaction(async (tx) => {
+      await tx.wellnessLog.delete({ where: { id: logId } });
 
-    // Revert XP for energia empire (never below 0, don't create if missing)
-    const energiaProgress = await db.empireProgress.findUnique({
-      where: { userId_empire: { userId: user.id, empire: 'energia' } },
-    });
-    if (energiaProgress) {
-      await db.empireProgress.update({
+      const energiaProgress = await tx.empireProgress.findUnique({
         where: { userId_empire: { userId: user.id, empire: 'energia' } },
-        data: { xp: Math.max(0, energiaProgress.xp - 10), streak: Math.max(0, energiaProgress.streak - 1) },
       });
-    }
+      if (!energiaProgress) return;
+
+      // Determine whether the deleted log was for today (Madrid) and, if so,
+      // whether any other energia log (wellness OR nutrition) still exists for
+      // today.
+      let decrementStreak = false;
+      const logDateKey = getMadridDateKey(log.date);
+      if (logDateKey === todayDateKey) {
+        const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+        const otherWellnessToday = await tx.wellnessLog.findFirst({
+          where: {
+            userId: user.id,
+            id: { not: logId },
+            date: { gte: todayStart, lt: todayEnd },
+          },
+          select: { id: true },
+        });
+        const otherNutritionToday = !otherWellnessToday ? await tx.nutritionLog.findFirst({
+          where: {
+            userId: user.id,
+            date: { gte: todayStart, lt: todayEnd },
+          },
+          select: { id: true },
+        }) : null;
+        decrementStreak = !otherWellnessToday && !otherNutritionToday;
+      }
+
+      await tx.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'energia' } },
+        data: {
+          xp: Math.max(0, energiaProgress.xp - 10),
+          ...(decrementStreak ? { streak: Math.max(0, energiaProgress.streak - 1) } : {}),
+        },
+      });
+    });
 
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);
