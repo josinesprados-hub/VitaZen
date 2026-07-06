@@ -1,5 +1,6 @@
 import { db } from './db';
 import { formatCurrency } from './utils';
+import { getMadridDateKey } from './deterministic';
 
 // ═══════════════════════════════════════════
 // WEEKLY INSIGHTS ENGINE
@@ -75,9 +76,21 @@ export interface RawData {
 }
 
 export async function gatherData(userId: string): Promise<RawData> {
+  // I-1 FIX: Use Madrid timezone for week boundaries.
+  // Previously used raw new Date() arithmetic, producing UTC-based rolling
+  // windows instead of Madrid-calendar-aligned day boundaries. This caused
+  // same-day activities to be split across "this week" and "previous week"
+  // windows, and data misalignment with the rest of VitaZen.
+  //
+  // Now: compute Madrid date keys and convert to UTC midnight boundaries,
+  // consistent with habits, streaks, achievements, widgets, mentor, etc.
   const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
-  const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);
+  const todayKey = getMadridDateKey(now);
+  const todayNoon = new Date(todayKey + 'T12:00:00Z');
+  const sevenDaysAgoKey = getMadridDateKey(new Date(todayNoon.getTime() - 7 * 86400000));
+  const fourteenDaysAgoKey = getMadridDateKey(new Date(todayNoon.getTime() - 14 * 86400000));
+  const sevenDaysAgo = startOfMadridDay(sevenDaysAgoKey);
+  const fourteenDaysAgo = startOfMadridDay(fourteenDaysAgoKey);
 
   const [
     thisWeekCheckins,
@@ -178,6 +191,38 @@ export async function gatherData(userId: string): Promise<RawData> {
 // Helper functions
 // ─────────────────────────────────────────
 
+/**
+ * Convert a Madrid date key (YYYY-MM-DD) to a UTC Date at midnight Madrid time.
+ * Used for DB query boundaries so that date ranges align with the user's
+ * perceived day boundary in Europe/Madrid — not UTC midnight.
+ *
+ * Every other module in VitaZen (habits, streaks, achievements, widgets,
+ * mentor, check-in, challenges, finance, monthly closure) uses
+ * getMadridDateKey() for timezone consistency. This helper brings the
+ * insights engine into alignment by computing the exact UTC instant
+ * when a given Madrid calendar day begins.
+ */
+function startOfMadridDay(dateKey: string): Date {
+  // Create a reference point at noon UTC on the given date.
+  // Noon UTC is guaranteed to fall on the same calendar date in Madrid
+  // (Madrid is at most UTC+2, so noon UTC = 14:00 Madrid at latest).
+  const noonUtc = new Date(dateKey + 'T12:00:00Z');
+
+  // Determine what time it is in Madrid at noon UTC.
+  // Uses the same sv-SE locale trick as getMadridDateKey().
+  const madridTimeStr = noonUtc.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  // e.g., "2026-07-06 14:00:00" (CEST, UTC+2)
+
+  // Parse the hours, minutes, seconds in Madrid
+  const timePart = madridTimeStr.split(' ')[1]; // "14:00:00"
+  const [hours, minutes, seconds] = timePart.split(':').map(Number);
+
+  // Midnight in Madrid is (h*3600 + m*60 + s) milliseconds before noonUtc
+  const msSinceMidnight = (hours * 3600 + minutes * 60 + seconds) * 1000;
+
+  return new Date(noonUtc.getTime() - msSinceMidnight);
+}
+
 function avg(arr: number[]): number {
   if (arr.length === 0) return 0;
   return arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -255,9 +300,16 @@ function buildSummary(data: RawData): WeeklySummary {
   const totalActivities = checkins.count + habits.completed + meditation.sessions + journal.entries + wellness.logs + nutrition.logs;
   const score = calculateWellnessScore(checkins, habits, meditation, journal, wellness);
 
+  // I-1 FIX: Use Madrid timezone for week label.
+  // Previously used toLocaleDateString without timeZone option, which
+  // formats in the server's local timezone (typically UTC in production).
+  // Now explicitly uses Europe/Madrid, consistent with gatherData() boundaries.
   const now = new Date();
-  const weekStart = new Date(now.getTime() - 7 * 86400000);
-  const weekLabel = `${weekStart.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} — ${now.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`;
+  const todayKey = getMadridDateKey(now);
+  const todayNoon = new Date(todayKey + 'T12:00:00Z');
+  const weekAgoKey = getMadridDateKey(new Date(todayNoon.getTime() - 7 * 86400000));
+  const madridDateOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', timeZone: 'Europe/Madrid' };
+  const weekLabel = `${startOfMadridDay(weekAgoKey).toLocaleDateString('es-ES', madridDateOpts)} — ${now.toLocaleDateString('es-ES', madridDateOpts)}`;
 
   return {
     weekLabel,
