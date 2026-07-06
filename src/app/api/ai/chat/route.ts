@@ -113,12 +113,16 @@ async function handler(request: NextRequest) {
     const history = recentHistory.reverse();
 
     // Build contextual system prompt with user's recent activity
+    // L-8 FIX: Track whether context was successfully built so the response
+    // accurately reflects whether the mentor had user context.
     const basePrompt = isPremium ? SYSTEM_PROMPTS.PREMIUM : SYSTEM_PROMPTS.FREE;
     let systemPrompt: string = basePrompt;
+    let contextBuilt = false;
 
     try {
       const userContext = await buildMentorContext(user.id, user.plan);
       systemPrompt = buildContextualSystemPrompt(basePrompt, userContext);
+      contextBuilt = true;
     } catch (ctxError) {
       // If context building fails, fall back to base prompt — never block the chat
       serverLog.error('api/ai/chat', 'Context build error (non-blocking)', ctxError);
@@ -141,7 +145,14 @@ async function handler(request: NextRequest) {
       max_tokens: isPremium ? 2048 : 800,
     });
 
-    const assistantContent = completion.choices[0]?.message?.content || 'Lo siento, no pude generar una respuesta.';
+    // L-10 FIX: Treat an empty Groq response as an error, not a fallback.
+    // Previously, an empty response was replaced with a fallback string,
+    // saved to DB, and consumed a credit. Now we throw to trigger the
+    // catch block, which rolls back the credit and returns a 500.
+    const assistantContent = completion.choices[0]?.message?.content;
+    if (!assistantContent || !assistantContent.trim()) {
+      throw new Error('Groq returned an empty response');
+    }
 
     // Save user and assistant messages atomically — prevents orphans if DB fails mid-save
     await db.$transaction([
@@ -221,7 +232,7 @@ async function handler(request: NextRequest) {
       message: assistantContent,
       remaining: limitCheck.remaining,
       limit: dailyLimit,
-      contextual: true,
+      contextual: contextBuilt,
       plan: user.plan,
     });
   } catch (error) {

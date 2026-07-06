@@ -158,9 +158,15 @@ export async function incrementAIUsage(userId: string): Promise<void> {
 export async function rollbackAILimit(userId: string, plan: string): Promise<void> {
   if (plan === 'PREMIUM') return;
 
+  // L-1 FIX: Only rollback if the usage record belongs to the CURRENT period.
+  // Without the resetAt guard, a Groq call that started before midnight Madrid
+  // but fails after midnight would decrement the NEW day's counter (which was
+  // just reset to 1 by checkAILimit), giving the user an extra message.
+  const now = new Date();
   await db.$executeRaw`
     UPDATE "AIUsage"
     SET count = GREATEST(0, count - 1), "updatedAt" = NOW()
     WHERE "userId" = ${userId}
+      AND "resetAt" > ${now}
   `;
 }

@@ -48,7 +48,6 @@ interface UserContext {
   recentConversations: {
     title: string;
     updatedAt: Date;
-    lastMessage: string;
   }[];
   empireProgress: {
     empire: string;
@@ -181,26 +180,26 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }),
 
     // Recent journal entries: FREE gets 1, PREMIUM gets 3
-    // Content included for PREMIUM intelligent fragment extraction
+    // M-5 FIX: FREE users don't need 'content' — formatBasicContext only uses 'title'.
+    // Only PREMIUM loads 'content' for intelligent fragment extraction.
     db.journalEntry.findMany({
       where: { userId, createdAt: { gte: thirtyDaysAgo } },
       orderBy: { createdAt: 'desc' },
       take: isPremium ? 3 : 1,
-      select: { title: true, content: true, mood: true, createdAt: true },
+      select: isPremium
+        ? { title: true, content: true, mood: true, createdAt: true }
+        : { title: true, mood: true, createdAt: true },
     }),
 
     // Recent conversation threads: FREE gets 1, PREMIUM gets 3
+    // L-7 FIX: Removed 'include: { messages: ... }' — lastMessage was fetched
+    // but never used in any context formatter. The join was wasted DB work
+    // on every chat message.
     db.aIThread.findMany({
       where: { userId, archived: false },
       orderBy: { updatedAt: 'desc' },
       take: isPremium ? 3 : 1,
-      include: {
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          where: { role: 'user' },
-        },
-      },
+      select: { id: true, title: true, updatedAt: true, archived: true },
     }),
 
     // Empire progress: PREMIUM only
@@ -610,16 +609,18 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       type: m.type,
       completedAt: m.completedAt,
     })),
+    // M-5 FIX: 'content' may not exist for FREE users (excluded from select).
+    // Use optional access — formatBasicContext only uses 'title' for FREE.
     recentJournals: recentJournals.map(j => ({
       title: j.title,
-      content: j.content,
+      content: ('content' in j ? String(j.content) : ''),
       mood: j.mood,
       createdAt: j.createdAt,
     })),
+    // L-7 FIX: lastMessage removed — was never used by any context formatter.
     recentConversations: recentThreads.map(t => ({
       title: t.title,
       updatedAt: t.updatedAt,
-      lastMessage: t.messages[0]?.content?.slice(0, 100) || '',
     })),
     empireProgress: empireProgress.map(e => ({
       empire: e.empire,

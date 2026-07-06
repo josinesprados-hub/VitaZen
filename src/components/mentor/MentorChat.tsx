@@ -556,6 +556,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         setDailyLimit(data.limit || 15);
         // Remove the optimistic user message since it was blocked
         setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+        // L-4 FIX: Restore the input text so the user doesn't lose their message.
+        // Previously the input was cleared (line 547) and never restored on 403.
+        setInput(content);
         return;
       }
 
