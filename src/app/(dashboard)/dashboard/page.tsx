@@ -44,6 +44,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [todayCheckin, setTodayCheckin] = useState<any | null>(null);
   const [showCheckinModal, setShowCheckinModal] = useState(false);
+  const [emotionalRefreshKey, setEmotionalRefreshKey] = useState(0); // DASH-5: trigger EmotionalHero refetch after check-in
 
   const onboardingConfirmed = user?.onboardingCompleted === true;
 
@@ -154,16 +155,42 @@ export default function DashboardPage() {
     };
   }, [user, onboardingConfirmed, apiFetch, screenshotMode]);
 
-  const handleCheckinSave = useCallback(async (data: any) => {
+  const handleCheckinSave = useCallback(async (data: any): Promise<{ xpAwarded: number }> => {
+    // DASH-7: Throw on API error so the modal shows the error state instead of
+    // false success ("Anotado ✓"). Previously, non-ok responses were silently
+    // swallowed and the modal advanced to step 2, making the user believe their
+    // check-in was saved when it wasn't.
     const res = await apiFetch('/api/checkin', {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    if (res.ok) {
-      const result = await res.json();
-      setTodayCheckin(result.checkin);
+    if (!res.ok) {
+      throw new Error(`Check-in save failed: ${res.status}`);
     }
-  }, [apiFetch]);
+    const result = await res.json();
+    const wasFirstCheckin = !todayCheckin;
+    setTodayCheckin(result.checkin);
+
+    // DASH-5: Refresh empire data so the grid immediately reflects the +10 XP
+    // awarded to the mente empire on first check-in of the day. Without this,
+    // the empire grid stays stale until the user navigates away and back.
+    // Also trigger EmotionalHero to refetch (its state is derived from
+    // check-ins, so it may change after a new check-in).
+    if (wasFirstCheckin) {
+      setEmotionalRefreshKey(k => k + 1);
+      try {
+        const empRes = await apiFetch('/api/empire');
+        if (empRes.ok) {
+          const empData = await empRes.json();
+          setEmpires(empData.empires);
+        }
+      } catch {
+        // Non-blocking — empire grid will update on next dashboard load
+      }
+      return { xpAwarded: 10 }; // DASH-38: +10 XP to mente on first check-in
+    }
+    return { xpAwarded: 0 }; // Edit of existing check-in — no XP awarded
+  }, [apiFetch, todayCheckin]);
 
   if (!screenshotMode && !onboardingConfirmed) {
     return null;
@@ -203,7 +230,7 @@ export default function DashboardPage() {
 
           {/* 2. Emotional State — "how does life feel right now" */}
           <div className="dash-section-enter dash-section-delay-2">
-            <EmotionalHero />
+            <EmotionalHero refreshKey={emotionalRefreshKey} />
           </div>
 
           {/* 3. Reflection — contemplative pause */}

@@ -35,7 +35,7 @@ const STATUS_INDICATOR: Record<EmotionalStatus, { dot: string; pulse: string }> 
   enfocado: { dot: 'bg-champagne', pulse: 'hero-pulse-gold' },
 };
 
-export function EmotionalHero() {
+export function EmotionalHero({ refreshKey }: { refreshKey?: number }) {
   const { apiFetch } = useApi();
   const { isActive: screenshotMode } = useScreenshotMode();
   const [state, setState] = useState<EmotionalState | null>(null);
@@ -72,7 +72,7 @@ export function EmotionalHero() {
     const controller = new AbortController();
     fetchState(controller.signal);
     return () => controller.abort();
-  }, [fetchState]);
+  }, [fetchState, refreshKey]);
 
   // Loading: calm, not frantic
   if (loading) {

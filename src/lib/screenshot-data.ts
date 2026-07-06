@@ -132,6 +132,7 @@ export const SCREENSHOT_MOMENTUM = {
 
 export const SCREENSHOT_EMOTIONAL_STATE: EmotionalState = {
   status: 'enfocado',
+  statusLabel: 'Enfocado',
   statusDescription: 'Claridad con algo de cansancio.',
   summary: 'Buena dirección. Algún bajón normal.',
   recommendation: 'La energía no es siempre alta. Lo importante es la dirección.',
@@ -140,31 +141,37 @@ export const SCREENSHOT_EMOTIONAL_STATE: EmotionalState = {
     energy: {
       value: 62,
       label: 'Energía',
+      level: 'medio',
       trend: 'stable' as const,
     },
     focus: {
       value: 78,
       label: 'Enfoque',
+      level: 'alto',
       trend: 'up' as const,
     },
     stress: {
       value: 35,
       label: 'Estrés',
+      level: 'medio',
       trend: 'down' as const,
     },
     consistency: {
       value: 68,
       label: 'Consistencia',
+      level: 'alto',
       trend: 'stable' as const,
     },
     progress: {
       value: 58,
       label: 'Progreso',
+      level: 'medio',
       trend: 'up' as const,
     },
     activity: {
       value: 65,
       label: 'Actividad',
+      level: 'alto',
       trend: 'stable' as const,
     },
   },

@@ -90,7 +90,7 @@ interface CheckInModalProps {
     stress: number;
     intention: string;
     note?: string;
-  }) => Promise<void>;
+  }) => Promise<{ xpAwarded: number }>;
   initialData?: {
     emotion?: number;
     energy?: number;
@@ -113,6 +113,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [step, setStep] = useState(1); // Skip intro — go directly to form
+  const [xpAwarded, setXpAwarded] = useState(0); // DASH-38: XP feedback after save
 
   // Lock body scroll when modal is open.
   // Save scroll position before locking (position:fixed on body resets it),
@@ -129,7 +130,10 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
     setSaving(true);
     setSaveError(false);
     try {
-      await onSave({ emotion, energy, focus, stress, intention: intention.trim(), note: note.trim() || undefined });
+      // DASH-7: onSave now throws on API error, so this catch block is reached.
+      // DASH-38: onSave returns { xpAwarded } so we can show XP feedback.
+      const result = await onSave({ emotion, energy, focus, stress, intention: intention.trim(), note: note.trim() || undefined });
+      setXpAwarded(result.xpAwarded);
       setStep(2);
     } catch (err) {
       console.error('[CHECKIN] Error saving:', err);
@@ -230,6 +234,12 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               <span className="text-3xl">✓</span>
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Anotado</h2>
+            {/* DASH-38: Discreet XP feedback — only shown when XP was actually awarded (first check-in of the day) */}
+            {xpAwarded > 0 && (
+              <p className="text-xs text-champagne/60 mb-2">
+                +{xpAwarded} XP Mente
+              </p>
+            )}
             <p className="text-sm text-[#999] leading-relaxed mb-2">
               Tu intención para hoy:
             </p>
