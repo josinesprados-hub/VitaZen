@@ -21,11 +21,6 @@ import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
 // Changes at Madrid midnight. Never repeats until
 // the full battery is exhausted, then a new cycle
 // begins with a different deterministic shuffle.
-//
-// This component previously consumed /api/emotional-snapshot
-// (reflections — emotional, visit-based rotation). It now
-// consumes /api/daily-quote (personal development quotes,
-// day-based rotation). The visual design is unchanged.
 
 export default function PremiumReflection() {
   const { apiFetch } = useApi();

@@ -15,10 +15,12 @@ import { useApi } from '@/hooks/useApi';
 // Rarity is still preserved — it's tracked
 // server-side with the same interval rules.
 //
-// IMPORTANT: This component now shares the
-// /api/emotional-snapshot response with
-// PremiumReflection via the shared context
-// in EmotionalHero. No duplicate API calls.
+// This component calls /api/silent-memory directly.
+// The old fetchSnapshot helper (which called
+// /api/emotional-snapshot for both reflection and
+// silent memory) has been removed along with the
+// reflections system. The daily quote is now served
+// by /api/daily-quote, consumed by PremiumReflection.
 
 interface SilentMemoryData {
   observation: string;
@@ -26,32 +28,11 @@ interface SilentMemoryData {
   rarity: 'rare' | 'very_rare';
 }
 
-// Shared cache: prevents duplicate /api/emotional-snapshot calls
-// when both PremiumReflection and SilentMemory mount simultaneously.
-// The first component to call fetchSnapshot() wins; the second
-// reuses the in-flight promise.
+// Shared cache: prevents duplicate /api/silent-memory calls
+// when the component re-mounts rapidly.
 let snapshotPromise: Promise<any> | null = null;
 let snapshotTimestamp = 0;
 const SNAPSHOT_CACHE_TTL = 30000; // 30s cache — prevents rapid re-fetches
-
-export function fetchSnapshot(apiFetch: (path: string, options?: RequestInit) => Promise<Response>): Promise<any> {
-  const now = Date.now();
-  if (snapshotPromise && now - snapshotTimestamp < SNAPSHOT_CACHE_TTL) {
-    return snapshotPromise;
-  }
-  snapshotTimestamp = now;
-  snapshotPromise = apiFetch('/api/emotional-snapshot')
-    .then(res => {
-      if (!res.ok) throw new Error('Snapshot fetch failed');
-      return res.json();
-    })
-    .catch(() => ({ reflection: null, silentMemory: null }))
-    .finally(() => {
-      // Clear promise reference after cache TTL so next fetch is fresh
-      setTimeout(() => { snapshotPromise = null; }, SNAPSHOT_CACHE_TTL);
-    });
-  return snapshotPromise;
-}
 
 export function SilentMemory() {
   const { apiFetch } = useApi();
@@ -64,7 +45,22 @@ export function SilentMemory() {
 
     async function observe() {
       try {
-        const data = await fetchSnapshot(apiFetch);
+        // Use cached promise if within TTL
+        const now = Date.now();
+        if (!snapshotPromise || now - snapshotTimestamp >= SNAPSHOT_CACHE_TTL) {
+          snapshotTimestamp = now;
+          snapshotPromise = apiFetch('/api/silent-memory')
+            .then(res => {
+              if (!res.ok) throw new Error('Snapshot fetch failed');
+              return res.json();
+            })
+            .catch(() => ({ silentMemory: null }))
+            .finally(() => {
+              setTimeout(() => { snapshotPromise = null; }, SNAPSHOT_CACHE_TTL);
+            });
+        }
+
+        const data = await snapshotPromise;
         if (cancelled) return;
 
         if (data.silentMemory) {

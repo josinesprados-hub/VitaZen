@@ -12,7 +12,7 @@
 // NOT on every widget read. This is what makes reads O(1).
 
 import { db } from '@/lib/db';
-import { REFLECTIONS } from '@/lib/reflections';
+import { DAILY_QUOTES } from '@/lib/daily-quotes';
 import {
   ReflectionWidgetPayload,
   MomentumWidgetPayload,
@@ -39,8 +39,8 @@ import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 
 // ─── Reflection Widget ──────────────────────
 //
-// Selects a daily reflection using deterministic hashing.
-// Same reflection shown all day, different each day.
+// Selects a daily quote from DAILY_QUOTES using deterministic hashing.
+// Same quote shown all day, different each day.
 // PREMIUM users get category info for themed rendering.
 
 const REFLECTION_CATEGORIES = [
@@ -53,13 +53,13 @@ export async function shapeReflectionPayload(
   _plan: string,
 ): Promise<ReflectionWidgetPayload> {
   const dateKey = getTodayDateKey();
-  const index = getDailyIndex(dateKey + userId, REFLECTIONS.length);
-  const text = REFLECTIONS[index].text;
+  const index = getDailyIndex(dateKey + userId, DAILY_QUOTES.length);
+  const text = DAILY_QUOTES[index].text;
   const categoryIndex = getDailyIndex(dateKey, REFLECTION_CATEGORIES.length);
 
   const payload: ReflectionWidgetPayload = {
     text,
-    label: 'Reflexión del día',
+    label: 'Frase del día',
     dateKey,
   };
 
@@ -397,7 +397,7 @@ export async function shapeDailyFocusPayload(
 // ─── Calm Quote Widget ──────────────────────
 //
 // Shows a daily premium calm quote. Same quote all day.
-// Uses the same REFLECTIONS collection but framed as a quote widget.
+// Uses the same DAILY_QUOTES collection but framed as a quote widget.
 
 const QUOTE_CATEGORIES = [
   'Ritmo',
@@ -420,15 +420,15 @@ export async function shapeCalmQuotePayload(
 
   // Use a different seed AND offset from the reflection index
   // to ensure the quote and reflection are different each day
-  const reflectionIndex = getDailyIndex(dateKey + userId, REFLECTIONS.length);
-  let quoteIndex = getDailyIndex(dateKey + userId + '_quote', REFLECTIONS.length);
+  const reflectionIndex = getDailyIndex(dateKey + userId, DAILY_QUOTES.length);
+  let quoteIndex = getDailyIndex(dateKey + userId + '_quote', DAILY_QUOTES.length);
 
   // Avoid showing the same reflection as the quote
-  if (quoteIndex === reflectionIndex && REFLECTIONS.length > 1) {
-    quoteIndex = (quoteIndex + 1) % REFLECTIONS.length;
+  if (quoteIndex === reflectionIndex && DAILY_QUOTES.length > 1) {
+    quoteIndex = (quoteIndex + 1) % DAILY_QUOTES.length;
   }
 
-  const quote = REFLECTIONS[quoteIndex].text;
+  const quote = DAILY_QUOTES[quoteIndex].text;
   const categoryIndex = getDailyIndex(dateKey + '_cat', QUOTE_CATEGORIES.length);
 
   return {

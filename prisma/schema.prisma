@@ -477,8 +477,10 @@ model EmotionalDashboardState {
   id        String   @id @default(cuid())
   userId    String   @unique
 
-  // Reflection rotation state (JSON)
-  // { currentIndex, visitCount, shown[], recent[], visitTotal }
+  // DEPRECATED: Reflection rotation state (JSON).
+  // The reflections system has been removed. This column is kept
+  // in the database to avoid a migration, but no code reads or
+  // writes it. Safe to remove in a future migration.
   reflectionState String   @default("{}")
 
   // Tips rotation state per empire (JSON)

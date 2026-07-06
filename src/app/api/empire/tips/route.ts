@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { getDeterministicTips } from '@/lib/server/emotional-dashboard-state';
+import { getDeterministicTips } from '@/lib/server/tips-server';
 
 export async function GET(request: NextRequest) {
   try {
