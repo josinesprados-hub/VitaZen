@@ -87,48 +87,51 @@ export async function checkAILimit(userId: string, plan: string): Promise<{ allo
   }
 
   const now = new Date();
+  const resetAt = getMadridStartOfNextDay();
 
-  // Try to upsert a fresh record for users with no usage or expired usage
-  const usage = await db.aIUsage.findUnique({ where: { userId } });
+  // C-1 FIX: Wrap the entire check+increment cycle in a transaction with
+  // pg_advisory_xact_lock keyed on the userId. This eliminates the race
+  // condition that existed in the upsert path (findUnique → upsert with
+  // count: 1 instead of count + 1). Concurrent requests for the same user
+  // are now serialized — the second request blocks until the first commits,
+  // then sees the updated count and is correctly denied if the limit is
+  // reached.
+  //
+  // The lock is transaction-scoped: it auto-releases on commit/rollback,
+  // so it never blocks future legitimate requests.
+  return db.$transaction(async (tx) => {
+    // Acquire transaction-scoped advisory lock on this user.
+    const lockSeed = 'ai_limit|' + userId;
+    await tx.$executeRaw`
+      SELECT pg_advisory_xact_lock(
+        ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+      )`;
 
-  if (!usage || now > usage.resetAt) {
-    // No record or expired → create/reset with count=1 (consuming this request's slot)
-    const resetAt = getMadridStartOfNextDay();
-    await db.aIUsage.upsert({
+    const usage = await tx.aIUsage.findUnique({ where: { userId } });
+
+    // Case 1: No record or expired → create/reset with count=1
+    if (!usage || now > usage.resetAt) {
+      await tx.aIUsage.upsert({
+        where: { userId },
+        update: { count: 1, resetAt },
+        create: { userId, count: 1, resetAt },
+      });
+      return { allowed: true, remaining: FREE_DAILY_LIMIT - 1 };
+    }
+
+    // Case 2: Record exists and is current — check limit before incrementing
+    if (usage.count >= FREE_DAILY_LIMIT) {
+      return { allowed: false, remaining: 0 };
+    }
+
+    // Atomic increment — safe because we hold the advisory lock
+    await tx.aIUsage.update({
       where: { userId },
-      update: {
-        count: 1,
-        resetAt,
-      },
-      create: {
-        userId,
-        count: 1,
-        resetAt,
-      },
+      data: { count: { increment: 1 } },
     });
-    return { allowed: true, remaining: FREE_DAILY_LIMIT - 1 };
-  }
 
-  // Record exists and is current — atomic conditional increment
-  // Only succeeds if count < limit, guaranteeing no race condition
-  const result = await db.$executeRaw`
-    UPDATE "AIUsage"
-    SET count = count + 1, "updatedAt" = NOW()
-    WHERE "userId" = ${userId}
-      AND count < ${FREE_DAILY_LIMIT}
-      AND "resetAt" > ${now}
-  `;
-
-  if (result === 0) {
-    // UPDATE matched 0 rows → limit already reached
-    return { allowed: false, remaining: 0 };
-  }
-
-  // Read the count after increment to compute remaining
-  const updated = await db.aIUsage.findUnique({ where: { userId } });
-  const newCount = updated?.count ?? FREE_DAILY_LIMIT;
-
-  return { allowed: true, remaining: FREE_DAILY_LIMIT - newCount };
+    return { allowed: true, remaining: FREE_DAILY_LIMIT - (usage.count + 1) };
+  });
 }
 
 /**

@@ -18,6 +18,7 @@ async function handler(request: NextRequest) {
   let limitConsumed = false;
   let userId: string | null = null;
   let userPlan: string | null = null;
+  let threadLockKey: bigint | null = null;
 
   try {
     const authHeader = request.headers.get('Authorization');
@@ -51,8 +52,11 @@ async function handler(request: NextRequest) {
       );
     }
 
-    // Limit was consumed — any failure after this point must roll it back.
-    limitConsumed = true;
+    // H-1 FIX: limitConsumed is set AFTER all validations pass, not before.
+    // Previously it was set right after checkAILimit, but returns for invalid
+    // threadId/content/thread would leave the credit consumed without rollback
+    // (return inside try does NOT trigger catch). Now the credit is only
+    // consumed when we're committed to calling Groq.
 
     const { threadId, content } = await request.json();
 
@@ -72,6 +76,29 @@ async function handler(request: NextRequest) {
 
     if (!thread) {
       return NextResponse.json({ error: 'Thread not found or archived' }, { status: 404 });
+    }
+
+    // All validations passed — credit is now committed. Any failure after this
+    // point (Groq error, DB save error) will trigger rollback in the catch block.
+    limitConsumed = true;
+
+    // H-2 FIX: Acquire a session-level advisory lock keyed on the threadId
+    // before reading history and calling Groq. This prevents two concurrent
+    // sends to the same thread from reading the same history and saving
+    // interleaved messages (userA, userB, assistantA, assistantB). Different
+    // threads are NOT blocked — only sends to the SAME thread are serialized.
+    //
+    // We use pg_advisory_lock (session-level, not transaction-level) because
+    // the Groq API call takes 2-5 seconds and must NOT hold a DB transaction
+    // open during that time. The lock is released in the finally block below
+    // via pg_advisory_unlock.
+    const threadLockSeed = 'ai_thread|' + threadId;
+    const threadLockKeyResult = await db.$queryRaw<Array<{ key: bigint }>>`
+      SELECT ('x' || substring(md5(${threadLockSeed}), 1, 16))::bit(64)::bigint AS key
+    `;
+    threadLockKey = threadLockKeyResult[0]?.key ?? null;
+    if (threadLockKey !== null) {
+      await db.$executeRaw`SELECT pg_advisory_lock(${threadLockKey})`;
     }
 
     // Get conversation history: FREE last 10 messages, PREMIUM last 30
@@ -204,6 +231,16 @@ async function handler(request: NextRequest) {
     }
     serverLog.apiError('api/ai/chat', 'POST', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } finally {
+    // H-2 FIX: Release the per-thread advisory lock.
+    // This runs on both success and error paths.
+    if (threadLockKey !== null) {
+      try {
+        await db.$executeRaw`SELECT pg_advisory_unlock(${threadLockKey})`;
+      } catch {
+        // Non-blocking — lock will auto-expire when the connection is returned to the pool
+      }
+    }
   }
 }
 
