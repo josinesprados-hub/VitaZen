@@ -153,6 +153,34 @@ export async function PATCH(request: NextRequest) {
         data: { streak: newStreak, lastCompletedAt: new Date() },
       });
 
+      // H-10 FIX: Award XP + empire streak inside the transaction.
+      // The empire streak must only increment once per active day, not once
+      // per habit completion. A user with 3 daily habits completing all 3
+      // on the same day should get streak=1 (one active day), not streak=3.
+      // Check if any OTHER habit for this user was already completed today
+      // (in Madrid timezone). If so, the empire streak was already incremented
+      // for today — only increment XP.
+      const todayStart = new Date(todayDateKey + 'T00:00:00');
+      const todayEnd = new Date(todayStart.getTime() + 86400000);
+      const otherCompletedToday = await tx.habitLog.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: habitId },
+          lastCompletedAt: { gte: todayStart, lt: todayEnd },
+        },
+        select: { id: true },
+      });
+      const isFirstCompletionToday = !otherCompletedToday;
+
+      await tx.empireProgress.upsert({
+        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+        update: {
+          xp: { increment: 10 },
+          ...(isFirstCompletionToday ? { streak: { increment: 1 } } : {}),
+        },
+        create: { userId: user.id, empire: 'disciplina', xp: 10, streak: 1 },
+      });
+
       return { status: 'ok' as const, habit: updated };
     });
 
@@ -163,13 +191,6 @@ export async function PATCH(request: NextRequest) {
 
     // Track habit completion
     trackEvent({ event: 'habit_completed', userId: user.id, properties: { habitId, streak: updated.streak } });
-
-    // Award XP to disciplina empire
-    await db.empireProgress.upsert({
-      where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-      update: { xp: { increment: 10 }, streak: { increment: 1 } },
-      create: { userId: user.id, empire: 'disciplina', xp: 10, streak: 1 },
-    });
 
     // Auto-complete today's challenge if it matches (non-blocking)
     tryAutoCompleteChallenge(user.id, 'habit', updated.name).catch(() => {});
