@@ -359,12 +359,27 @@ function calculateWellnessScore(
 // ─────────────────────────────────────────
 
 function buildComparison(data: RawData): WeeklyComparison {
+  // I-2 FIX: Only compute trends when previous week has sufficient data.
+  // Without this guard, avg([]) returns 0, and comparing against 0 produces
+  // misleading trends (e.g., "improved" when there was simply no previous data).
+  // Now: trends are 0 (neutral/no comparable data) when previous week is empty.
+  const hasPrevCheckins = data.prevWeekCheckins.length > 0;
+  const hasPrevActivity =
+    data.prevWeekCheckins.length > 0 ||
+    data.prevWeekHabits.length > 0 ||
+    data.prevWeekMeditations.length > 0 ||
+    data.prevWeekJournals.length > 0 ||
+    data.prevWeekWellness.length > 0 ||
+    data.prevWeekNutrition.length > 0;
+  const hasPrevMeditations = data.prevWeekMeditations.length > 0;
+  const hasPrevHabits = data.prevWeekHabits.length > 0;
+
   const thisEmotion = avg(data.thisWeekCheckins.map((c: any) => c.emotion));
-  const prevEmotion = avg(data.prevWeekCheckins.map((c: any) => c.emotion));
+  const prevEmotion = hasPrevCheckins ? avg(data.prevWeekCheckins.map((c: any) => c.emotion)) : thisEmotion;
   const thisEnergy = avg(data.thisWeekCheckins.map((c: any) => c.energy));
-  const prevEnergy = avg(data.prevWeekCheckins.map((c: any) => c.energy));
+  const prevEnergy = hasPrevCheckins ? avg(data.prevWeekCheckins.map((c: any) => c.energy)) : thisEnergy;
   const thisStress = avg(data.thisWeekCheckins.map((c: any) => c.stress));
-  const prevStress = avg(data.prevWeekCheckins.map((c: any) => c.stress));
+  const prevStress = hasPrevCheckins ? avg(data.prevWeekCheckins.map((c: any) => c.stress)) : thisStress;
 
   const thisActivity =
     data.thisWeekCheckins.length +
@@ -374,21 +389,22 @@ function buildComparison(data: RawData): WeeklyComparison {
     data.thisWeekWellness.length +
     data.thisWeekNutrition.length;
 
-  const prevActivity =
-    data.prevWeekCheckins.length +
-    data.prevWeekHabits.length +
-    data.prevWeekMeditations.length +
-    data.prevWeekJournals.length +
-    data.prevWeekWellness.length +
-    data.prevWeekNutrition.length;
+  const prevActivity = hasPrevActivity
+    ? data.prevWeekCheckins.length +
+      data.prevWeekHabits.length +
+      data.prevWeekMeditations.length +
+      data.prevWeekJournals.length +
+      data.prevWeekWellness.length +
+      data.prevWeekNutrition.length
+    : thisActivity;
 
   return {
-    emotionTrend: Math.round((thisEmotion - prevEmotion) * 10) / 10,
-    energyTrend: Math.round((thisEnergy - prevEnergy) * 10) / 10,
-    stressTrend: Math.round((prevStress - thisStress) * 10) / 10, // positive = stress reduced = good
-    activityTrend: thisActivity - prevActivity,
-    meditationTrend: data.thisWeekMeditations.length - data.prevWeekMeditations.length,
-    habitTrend: data.thisWeekHabits.length - data.prevWeekHabits.length,
+    emotionTrend: hasPrevCheckins ? Math.round((thisEmotion - prevEmotion) * 10) / 10 : 0,
+    energyTrend: hasPrevCheckins ? Math.round((thisEnergy - prevEnergy) * 10) / 10 : 0,
+    stressTrend: hasPrevCheckins ? Math.round((prevStress - thisStress) * 10) / 10 : 0, // positive = stress reduced = good
+    activityTrend: hasPrevActivity ? thisActivity - prevActivity : 0,
+    meditationTrend: hasPrevMeditations ? data.thisWeekMeditations.length - data.prevWeekMeditations.length : 0,
+    habitTrend: hasPrevHabits ? data.thisWeekHabits.length - data.prevWeekHabits.length : 0,
   };
 }
 
