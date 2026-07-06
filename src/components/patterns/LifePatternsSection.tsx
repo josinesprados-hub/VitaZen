@@ -43,10 +43,16 @@ interface PatternsResponse {
 }
 
 // ─── Week helper ───
+// DASH-4: Must use Madrid timezone to match the server-side detector
+// (src/lib/patterns/detector.ts getWeekKey). Previously used browser-local
+// time, causing cache expiry drift for traveling users at week boundaries.
 
 function getISOWeekKey(): string {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
+  // Normalize to Madrid date first (same as server's getMadridDateKey)
+  const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  const madridDateKey = madridStr.split(' ')[0]; // YYYY-MM-DD
+  // Build a noon-UTC date from the Madrid date key to avoid day-boundary issues
+  const d = new Date(madridDateKey + 'T12:00:00Z');
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
   const week1 = new Date(d.getFullYear(), 0, 4);
   return `${d.getFullYear()}-W${1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)}`;

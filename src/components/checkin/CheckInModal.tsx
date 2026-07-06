@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Sunrise } from 'lucide-react';
 import { EMOTION_EMOJIS } from '@/lib/emotion-emojis';
 
@@ -41,23 +41,31 @@ const STRESS_LABELS: Record<number, { label: string }> = {
 };
 
 // ─── Slider Component ───────────────────────────────────
+// DASH-25: Uses role="radiogroup" + aria-label so screen readers announce
+// the dimension name and the selected value.
 
 function ValueSlider({
   label,
   value,
   onChange,
   labels,
+  sliderId,
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
   labels: Record<number, { label: string; emoji?: string }>;
+  sliderId: string;
 }) {
   return (
-    <div>
+    <div
+      role="radiogroup"
+      aria-label={label}
+      aria-describedby={`${sliderId}-value`}
+    >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs text-[#999] uppercase tracking-wider font-medium">{label}</span>
-        <span className="text-xs text-champagne font-semibold">
+        <span id={`${sliderId}-value`} className="text-xs text-champagne font-semibold">
           {labels[value]?.emoji && <span className="mr-1">{labels[value].emoji}</span>}
           {labels[value]?.label}
         </span>
@@ -67,6 +75,9 @@ function ValueSlider({
           <button
             key={v}
             type="button"
+            role="radio"
+            aria-checked={v === value}
+            aria-label={`${label}: ${v} — ${labels[v]?.label || ''}`}
             onClick={() => onChange(v)}
             className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all duration-200 value-btn ${
               v <= value
@@ -118,15 +129,68 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [step, setStep] = useState(1); // Skip intro — go directly to form
   const [xpAwarded, setXpAwarded] = useState(0); // DASH-38: XP feedback after save
 
+  // DASH-23/26: Focus management for accessibility.
+  // - dialogRef: the modal container (receives initial focus)
+  // - closeButtonRef: the close button (restored focus on close)
+  // - previouslyFocused: the element that had focus before the modal opened
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
+
   // Lock body scroll when modal is open.
-  // Save scroll position before locking (position:fixed on body resets it),
-  // then restore on cleanup.
   useEffect(() => {
     document.body.classList.add('scroll-locked');
     return () => {
       document.body.classList.remove('scroll-locked');
     };
   }, []);
+
+  // DASH-23: Escape key closes the modal.
+  // DASH-26: Focus is moved into the modal on open, trapped inside while open,
+  //          and restored to the trigger element on close.
+  useEffect(() => {
+    previouslyFocused.current = document.activeElement as HTMLElement;
+    // Move focus into the modal — focus the close button which is always visible
+    const focusTimer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      // Focus trap: Tab and Shift+Tab cycle within the modal
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handleKeyDown);
+      // Restore focus to the element that opened the modal
+      previouslyFocused.current?.focus();
+    };
+  }, [onClose]);
 
   const handleSave = async () => {
     if (!intention.trim()) return;
@@ -152,15 +216,23 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
       <div
         className="absolute inset-0 premium-modal-backdrop"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      {/* Modal */}
+      {/* DASH-26: Modal with role="dialog", aria-modal, aria-labelledby, aria-describedby */}
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkin-modal-title"
+        aria-describedby="checkin-modal-desc"
         className="relative w-full sm:max-w-md modal-content overflow-hidden keyboard-aware"
       >
-        {/* Close button */}
+        {/* Close button — DASH-24: aria-label added */}
         <button
+          ref={closeButtonRef}
           onClick={onClose}
+          aria-label="Cerrar"
           className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#555] hover:text-white hover:bg-[#1a1a1a] transition-colors z-10 close-btn"
         >
           <X size={16} />
@@ -170,14 +242,14 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
           /* Form Step */
           <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[75dvh] overflow-y-auto scroll-contain safe-bottom">
             <div className="text-center mb-2">
-              <h3 className="text-lg font-bold text-white">¿Cómo estás hoy?</h3>
-              <p className="text-xs text-[#666]">Sin juicio</p>
+              <h3 id="checkin-modal-title" className="text-lg font-bold text-white">¿Cómo estás hoy?</h3>
+              <p id="checkin-modal-desc" className="text-xs text-[#666]">Sin juicio</p>
             </div>
 
-            <ValueSlider label="Estado emocional" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} />
-            <ValueSlider label="Energía" value={energy} onChange={setEnergy} labels={ENERGY_LABELS} />
-            <ValueSlider label="Enfoque" value={focus} onChange={setFocus} labels={FOCUS_LABELS} />
-            <ValueSlider label="Estrés" value={stress} onChange={setStress} labels={STRESS_LABELS} />
+            <ValueSlider label="Estado emocional" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} sliderId="emotion" />
+            <ValueSlider label="Energía" value={energy} onChange={setEnergy} labels={ENERGY_LABELS} sliderId="energy" />
+            <ValueSlider label="Enfoque" value={focus} onChange={setFocus} labels={FOCUS_LABELS} sliderId="focus" />
+            <ValueSlider label="Estrés" value={stress} onChange={setStress} labels={STRESS_LABELS} sliderId="stress" />
 
             {/* Intention */}
             <div>
@@ -223,7 +295,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               Más tarde
             </button>
             {saveError && (
-              <p className="text-center text-xs text-red-400 mt-2">
+              <p role="alert" className="text-center text-xs text-red-400 mt-2">
                 No se pudo guardar. Inténtalo de nuevo.
               </p>
             )}

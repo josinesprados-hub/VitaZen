@@ -18,6 +18,19 @@ import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise, Calendar } from 'lucide-r
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { getEmotionEmoji } from '@/lib/emotion-emojis';
 
+// DASH-2: Greeting must use Madrid timezone, not browser-local.
+// The rest of the app uses getTodayDateKey() (Madrid) for "today" boundaries,
+// so the greeting must match.
+function getMadridGreeting(): string {
+  const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  // madridStr = "YYYY-MM-DD HH:MM:SS"
+  const hour = parseInt(madridStr.split(' ')[1].split(':')[0], 10);
+  if (hour < 6) return 'Buenas noches';
+  if (hour < 12) return 'Buenos días';
+  if (hour < 18) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
 interface EmpireData {
   empire: string;
   level: number;
@@ -201,8 +214,9 @@ export default function DashboardPage() {
     return <DashboardSkeleton />;
   }
 
-  const hour = new Date().getHours();
-  const timeGreeting = hour < 6 ? 'Buenas noches' : hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tardes' : 'Buenas noches';
+  const timeGreeting = getMadridGreeting();
+  // DASH-33: Avoid trailing comma when user name is null/empty
+  const userName = displayUser?.name?.trim() || '';
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -224,7 +238,12 @@ export default function DashboardPage() {
           {/* 1. Greeting — human, not UI */}
           <div className="dash-section-enter dash-section-delay-1 pt-2 sm:pt-4">
             <h1 className="title-page">
-              {timeGreeting}, <span className="text-champagne">{displayUser?.name || ''}</span>
+              {/* DASH-33: No trailing comma when name is empty */}
+              {userName ? (
+                <>{timeGreeting}, <span className="text-champagne">{userName}</span></>
+              ) : (
+                timeGreeting
+              )}
             </h1>
             <SilentMemory />
           </div>

@@ -527,39 +527,34 @@ export function CheckinSkeleton() {
   );
 }
 
-/** Emotional Hero skeleton — replaces inline skeleton in EmotionalHero component */
+/** Emotional Hero skeleton — DASH-32: matches the ACTUAL EmotionalHero layout.
+ *  Previously this was a complex card with 6 metric circles that didn't match
+ *  the real component (which is minimal text with a breathing dot). The layout
+ *  mismatch caused two visual jumps during loading. Now the skeleton mirrors
+ *  the real component's structure: dot + label row, observation text, summary,
+ *  recommendation. */
 export function EmotionalHeroSkeleton() {
   return (
-    <div className="hero-section-container skeleton-entrance">
-      <div className="hero-section-card">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-4 sm:mb-8">
-          <div className="flex items-start gap-2 sm:gap-4">
-            <SkeletonBlock className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl shrink-0" />
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <SkeletonLine width="100px" className="h-4 sm:h-5" />
-                <SkeletonBlock className="h-4 sm:h-5 w-14 sm:w-16 rounded-full" />
-              </div>
-              <SkeletonLine width="250px" className="h-2.5 sm:h-3" />
-              <SkeletonLine width="200px" className="h-2.5 sm:h-3" />
-            </div>
-          </div>
-          <div className="sm:text-right space-y-2 hidden sm:block">
-            <SkeletonLine width="200px" className="h-3 sm:ml-auto" />
-            <SkeletonLine width="160px" className="h-2.5 sm:ml-auto" />
-          </div>
+    <div className="hero-fade-in skeleton-entrance">
+      <div className="py-2 sm:py-4">
+        {/* Status indicator — dot + label (matches EmotionalHero line 102-105) */}
+        <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+          <SkeletonBlock className="w-2 h-2 rounded-full shrink-0" />
+          <SkeletonLine width="80px" className="h-3 sm:h-3.5" />
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex flex-col items-center gap-1 sm:gap-2">
-              <SkeletonCircle size={48} />
-              <SkeletonLine width="2.5rem" className="h-2 sm:h-2.5" />
-              <SkeletonLine width="1.5rem" className="h-2.5 sm:h-3" />
-            </div>
-          ))}
+
+        {/* Observation text (matches EmotionalHero line 108-112) */}
+        <SkeletonLine width="100%" className="h-5 sm:h-6 mb-2" />
+        <SkeletonLine width="85%" className="h-5 sm:h-6" />
+
+        {/* Summary (matches EmotionalHero line 115-119) */}
+        <div className="mt-2 sm:mt-3">
+          <SkeletonLine width="60%" className="h-4 sm:h-5" />
         </div>
-        <div className="mt-3 sm:mt-6 pt-2 sm:pt-4 border-t border-[#1a1a1a]/60">
-          <SkeletonLine width="140px" className="h-2 sm:h-2.5" />
+
+        {/* Recommendation (matches EmotionalHero line 122-126) */}
+        <div className="mt-3 sm:mt-4">
+          <SkeletonLine width="140px" className="h-2.5 sm:h-3" />
         </div>
       </div>
     </div>

@@ -62,9 +62,12 @@ export function MonthlyClosurePrompt() {
 
     const checkClosure = async () => {
       try {
-        // Only check in first 7 days of month
-        const now = new Date();
-        if (now.getDate() > 7) return;
+        // DASH-3: Use Madrid timezone for the day-of-month check, not browser-local.
+        // The server's isClosurePeriod() uses Madrid time, so the client gate
+        // must match to avoid premature hiding for traveling users.
+        const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+        const madridDay = parseInt(madridStr.split('-')[2], 10); // day-of-month
+        if (madridDay > 7) return;
 
         const res = await apiFetch('/api/monthly-closure');
         if (res.ok) {
