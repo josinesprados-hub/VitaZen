@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onHabitChange } from '@/lib/widgets/triggers';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -160,7 +160,25 @@ export async function PATCH(request: NextRequest) {
       // Check if any OTHER habit for this user was already completed today
       // (in Madrid timezone). If so, the empire streak was already incremented
       // for today — only increment XP.
-      const todayStart = new Date(todayDateKey + 'T00:00:00');
+      //
+      // H-11 FIX: Compute the Madrid day boundaries as UTC instants.
+      // `new Date(todayDateKey + 'T00:00:00')` (no Z suffix) is interpreted as
+      // server-local time. On a UTC server this equals 02:00 Madrid (CEST) or
+      // 01:00 Madrid (CET), NOT 00:00 Madrid. The query window was shifted 1-2
+      // hours from the real Madrid day, so a habit completed at 00:30 Madrid
+      // (= 22:30 UTC prev day) fell outside the window. If a second habit was
+      // completed after 02:00 Madrid, the check found no prior completion and
+      // incremented the streak again — double-incrementing the empire streak
+      // for a single Madrid day. Now: derive the exact UTC instant of Madrid
+      // midnight from the Madrid date key (same approach as startOfMadridDay
+      // in insights.ts), so the DB query window matches the real Madrid day.
+      const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
+      const madridNoonParts = madridNoonUtc
+        .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
+        .split(' ')[1].split(':').map(Number);
+      const msSinceMadridMidnight =
+        (madridNoonParts[0] * 3600 + madridNoonParts[1] * 60 + madridNoonParts[2]) * 1000;
+      const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
       const todayEnd = new Date(todayStart.getTime() + 86400000);
       const otherCompletedToday = await tx.habitLog.findFirst({
         where: {
@@ -257,18 +275,65 @@ export async function DELETE(request: NextRequest) {
     const habit = await db.habitLog.findFirst({ where: { id: habitId, userId: user.id } });
     if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
 
-    await db.habitLog.delete({ where: { id: habitId } });
+    const todayDateKey = getTodayDateKey();
 
-    // Revert XP for disciplina empire (only the +5 from creation, not completion XP)
-    const disciplinaProgress = await db.empireProgress.findUnique({
-      where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-    });
-    if (disciplinaProgress) {
-      await db.empireProgress.update({
+    // H-12 FIX: Revert the empire streak when the deleted habit was the one
+    // that triggered today's streak increment.
+    // The H-10 check (PATCH endpoint) only increments the empire streak if no
+    // OTHER habit was completed today. When a habit that was completed today is
+    // deleted, its row disappears from the DB. A subsequent habit completion
+    // would then see "no other habit completed today" and increment the streak
+    // again — allowing a user to inflate the empire streak by repeatedly
+    // creating + completing + deleting a habit on the same day.
+    //
+    // Fix: if the deleted habit was completed today (Madrid), check whether any
+    // other habit was also completed today. If not, this habit was the one that
+    // triggered today's streak increment — decrement the streak alongside the
+    // XP revert. The whole operation (delete + XP/streak revert) runs inside a
+    // transaction so partial failures cannot leave inconsistent state (M-4).
+    await db.$transaction(async (tx) => {
+      await tx.habitLog.delete({ where: { id: habitId } });
+
+      const disciplinaProgress = await tx.empireProgress.findUnique({
         where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-        data: { xp: Math.max(0, disciplinaProgress.xp - 5) },
       });
-    }
+      if (!disciplinaProgress) return;
+
+      // Determine whether the deleted habit was completed today (Madrid) and,
+      // if so, whether any other habit was also completed today.
+      let decrementStreak = false;
+      if (habit.lastCompletedAt) {
+        const habitDateKey = getMadridDateKey(habit.lastCompletedAt);
+        if (habitDateKey === todayDateKey) {
+          // Use the same Madrid-aware day boundaries as the H-10/H-11 fix.
+          const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
+          const madridNoonParts = madridNoonUtc
+            .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
+            .split(' ')[1].split(':').map(Number);
+          const msSinceMadridMidnight =
+            (madridNoonParts[0] * 3600 + madridNoonParts[1] * 60 + madridNoonParts[2]) * 1000;
+          const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
+          const todayEnd = new Date(todayStart.getTime() + 86400000);
+          const otherCompletedToday = await tx.habitLog.findFirst({
+            where: {
+              userId: user.id,
+              id: { not: habitId },
+              lastCompletedAt: { gte: todayStart, lt: todayEnd },
+            },
+            select: { id: true },
+          });
+          decrementStreak = !otherCompletedToday;
+        }
+      }
+
+      await tx.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+        data: {
+          xp: Math.max(0, disciplinaProgress.xp - 5),
+          ...(decrementStreak ? { streak: Math.max(0, disciplinaProgress.streak - 1) } : {}),
+        },
+      });
+    });
 
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);

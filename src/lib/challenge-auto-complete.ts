@@ -74,21 +74,39 @@ export async function tryAutoCompleteChallenge(
 
     if (!categoryMatch && !titleMatch) return;
 
-    // Auto-complete the challenge
-    await db.userChallenge.update({
-      where: { id: userChallenge.id },
-      data: { completed: true, completedAt: new Date() },
+    // D-1 FIX: Race condition during challenge auto-completion.
+    // The original code used `db.userChallenge.update({ where: { id } })` without
+    // `completed: false` in the WHERE clause, then unconditionally incremented XP.
+    // Two concurrent calls (e.g. completing a habit + a meditation in rapid
+    // succession, or two habits at once) could both pass the `findFirst` check
+    // (both see `completed: false`), both succeed on the `update` (the second is
+    // a silent no-op overwrite), and BOTH execute `xp: { increment: 25 }` —
+    // granting +50 XP for a single challenge.
+    //
+    // Fix: use a conditional `updateMany` with `completed: false` in the WHERE
+    // clause. Only the call that actually flips `completed` (count === 1) awards
+    // XP. Both operations run inside a transaction so the challenge completion
+    // and the XP grant are atomic — no partial state on failure.
+    const awarded = await db.$transaction(async (tx) => {
+      const result = await tx.userChallenge.updateMany({
+        where: { id: userChallenge.id, completed: false },
+        data: { completed: true, completedAt: new Date() },
+      });
+      if (result.count === 0) return false; // Already completed by a concurrent call
+
+      // Award XP to disciplina empire (same as manual completion did)
+      await tx.empireProgress.upsert({
+        where: { userId_empire: { userId, empire: 'disciplina' } },
+        update: { xp: { increment: 25 } },
+        create: { userId, empire: 'disciplina', xp: 25 },
+      });
+      return true;
     });
 
-    // Award XP to disciplina empire (same as manual completion did)
-    await db.empireProgress.upsert({
-      where: { userId_empire: { userId, empire: 'disciplina' } },
-      update: { xp: { increment: 25 } },
-      create: { userId, empire: 'disciplina', xp: 25 },
-    });
-
-    const matchReason = categoryMatch ? 'category' : 'title';
-    console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason})`);
+    if (awarded) {
+      const matchReason = categoryMatch ? 'category' : 'title';
+      console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason})`);
+    }
   } catch (error) {
     // Never fail the parent action if auto-completion fails
     console.error('[Challenge] Auto-complete error (non-blocking):', error);
