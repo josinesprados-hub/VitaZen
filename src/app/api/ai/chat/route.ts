@@ -161,6 +161,15 @@ async function handler(request: NextRequest) {
       }),
     ]);
 
+    // M-2 FIX: Messages are now persisted. The credit is definitively consumed.
+    // Set limitConsumed = false so that any failure AFTER this point (title
+    // generation, updatedAt update) does NOT trigger a rollback in the catch
+    // block. Previously, a title generation failure could propagate to the
+    // outer catch, which rolled back the credit — giving the user a free
+    // message (messages saved but credit refunded) and showing a 500 error
+    // for a request that actually succeeded.
+    limitConsumed = false;
+
     // Usage was already incremented atomically inside checkAILimit()
 
     // Track mentor usage (privacy-first, no message content stored)

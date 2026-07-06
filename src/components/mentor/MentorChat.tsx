@@ -380,6 +380,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   // Refresh data when app comes back to foreground (mobile resume)
   // Debounced to prevent race conditions from rapid visibility changes
+  // M-4 FIX: Skip the messages refetch if a message is currently in flight
+  // (sendingRef.current = true). Previously, the visibilitychange handler
+  // could overwrite the optimistic user message that hasn't been saved to
+  // the DB yet (messages are saved atomically with the assistant response
+  // AFTER Groq returns). Now we only refetch threads (which is safe) and
+  // skip fetchMessages when sending. We also check activeThreadRef.current
+  // to ensure we only refetch for the thread that's still active when the
+  // debounce fires — the user may have switched threads during the 1.5s delay.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && activeThread) {
@@ -389,7 +397,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         }
         // Debounce the refresh to avoid rapid re-fetches
         visibilityTimerRef.current = setTimeout(() => {
-          fetchMessages(activeThread);
+          // M-4 FIX: Only fetch messages if no message is in flight AND
+          // the active thread hasn't changed during the debounce delay.
+          if (!sendingRef.current && activeThreadRef.current === activeThread) {
+            fetchMessages(activeThread);
+          }
           fetchThreads();
         }, VISIBILITY_DEBOUNCE_MS);
       }
@@ -438,12 +450,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         body: JSON.stringify({ threadId }),
       });
       if (res.ok) {
-        let nextActiveId: string | null = null;
-        setThreads(prev => {
-          const remaining = prev.filter(t => t.id !== threadId);
-          nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
-          return remaining;
-        });
+        // M-3 FIX: Calculate nextActiveId from the CURRENT threads state
+        // BEFORE calling setThreads. Previously, nextActiveId was assigned
+        // inside the setThreads updater as a side effect, but React 19's
+        // automatic batching defers updater execution — the variable was
+        // read as null before the updater ran.
+        const remaining = threads.filter(t => t.id !== threadId);
+        const nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
+        setThreads(remaining);
         if (activeThread === threadId) {
           setActiveThread(nextActiveId);
           setMessages([]);
@@ -461,13 +475,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         body: JSON.stringify({ threadId, archived: true }),
       });
       if (res.ok) {
-        const data = await res.json();
-        let nextActiveId: string | null = null;
-        setThreads(prev => {
-          const updated = prev.map(t => t.id === threadId ? { ...t, archived: true } : t);
-          nextActiveId = updated.filter(t => !t.archived)[0]?.id ?? null;
-          return updated;
-        });
+        // M-3 FIX: Calculate nextActiveId from the CURRENT threads state
+        // BEFORE calling setThreads. Same fix as deleteThread.
+        const updated = threads.map(t => t.id === threadId ? { ...t, archived: true } : t);
+        const nextActiveId = updated.filter(t => !t.archived)[0]?.id ?? null;
+        setThreads(updated);
         // If the archived thread was active, switch to the next active one
         if (activeThread === threadId) {
           if (nextActiveId) {
