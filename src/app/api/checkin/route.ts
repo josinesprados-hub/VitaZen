@@ -104,15 +104,67 @@ export async function POST(request: NextRequest) {
     // new Date() at 00:30 Madrid = 23:30 UTC = wrong day.
     const today = new Date(getTodayDateKey() + 'T00:00:00');
 
-    // Check if a checkin already exists for today — prevents duplicate XP on update
-    const existingCheckin = await db.dailyCheckin.findUnique({
-      where: { userId_date: { userId: user.id, date: today } },
-    });
+    // M-3 FIX: Race condition during check-in creation.
+    // The original code did `findUnique(date) → upsert → if (!existingCheckin)
+    // award XP` as three separate operations. Two concurrent POSTs (mobile +
+    // desktop opening the app simultaneously, or a double-tap) could both pass
+    // the `findUnique` check (both see null), both succeed on the `upsert` (the
+    // second is a silent update via INSERT ... ON CONFLICT), and BOTH execute
+    // the `if (!existingCheckin)` branch — granting +20 XP for a single
+    // check-in. The dailyCheckin row was correctly deduplicated by the
+    // @@unique([userId, date]) constraint, but the mente XP was inflated.
+    //
+    // Fix: acquire a transaction-scoped advisory lock keyed on a stable hash of
+    // (userId, today) BEFORE reading or writing. `pg_advisory_xact_lock` blocks
+    // concurrent calls with the same key until this transaction commits, so
+    // only one POST at a time can run the read-then-write cycle. The second
+    // POST then sees the row created by the first and skips the XP award.
+    //
+    // We use pg_advisory_xact_lock (not SELECT FOR UPDATE) because the row may
+    // not exist yet on the first POST — SELECT FOR UPDATE on a non-existent
+    // row acquires no lock, so two first-of-day POSTs could both see null and
+    // both proceed to INSERT. The advisory lock works regardless of row
+    // existence.
+    //
+    // The key is a 64-bit int derived from hashing (userId + dateKey) via
+    // PostgreSQL's md5 + substring. We reuse the same hash approach elsewhere
+    // in VitaZen for deterministic keys.
+    const todayKey = getTodayDateKey();
+    const checkin = await db.$transaction(async (tx) => {
+      // Acquire transaction-scoped advisory lock on (userId, today).
+      // Key is derived from md5(userId || '|' || dateKey) — first 8 bytes as a
+      // bigint. Collisions are acceptable (worst case: two unrelated users
+      // serialize unnecessarily).
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${user.id} || '|' || ${todayKey}), 1, 16))::bit(64)::bigint
+        )`;
 
-    const checkin = await db.dailyCheckin.upsert({
-      where: { userId_date: { userId: user.id, date: today } },
-      update: { emotion, energy, focus, stress, intention, note },
-      create: { userId: user.id, date: today, emotion, energy, focus, stress, intention, note },
+      // Now safe to read — concurrent POSTs with the same key are blocked.
+      const existing = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT id FROM "DailyCheckin"
+        WHERE "userId" = ${user.id} AND "date" = ${today}
+        FOR UPDATE`;
+      const existingCheckin = existing[0] ?? null;
+
+      const result = await tx.dailyCheckin.upsert({
+        where: { userId_date: { userId: user.id, date: today } },
+        update: { emotion, energy, focus, stress, intention, note },
+        create: { userId: user.id, date: today, emotion, energy, focus, stress, intention, note },
+      });
+
+      // Award XP to mente empire ONLY on first creation (not on updates).
+      // The advisory lock + SELECT FOR UPDATE above ensure that if a concurrent
+      // transaction already created the row, we see it here and skip the award.
+      if (!existingCheckin) {
+        await tx.empireProgress.upsert({
+          where: { userId_empire: { userId: user.id, empire: 'mente' } },
+          update: { xp: { increment: 10 } },
+          create: { userId: user.id, empire: 'mente', xp: 10 },
+        });
+      }
+
+      return result;
     });
 
     // Track checkin event
@@ -120,15 +172,6 @@ export async function POST(request: NextRequest) {
 
     // Auto-complete today's challenge if it matches (non-blocking, idempotent)
     tryAutoCompleteChallenge(user.id, 'checkin').catch(() => {});
-
-    // Award XP to mente empire ONLY on first creation (not on updates)
-    if (!existingCheckin) {
-      await db.empireProgress.upsert({
-        where: { userId_empire: { userId: user.id, empire: 'mente' } },
-        update: { xp: { increment: 10 } },
-        create: { userId: user.id, empire: 'mente', xp: 10 },
-      });
-    }
 
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);
@@ -182,18 +225,23 @@ export async function DELETE(request: NextRequest) {
     if (!existing) return NextResponse.json({ error: 'Checkin not found' }, { status: 404 });
     if (existing.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    await db.dailyCheckin.delete({ where: { id: checkinId } });
+    // M-5 FIX: Wrap the delete + XP revert in a transaction so partial
+    // failures cannot leave inconsistent state. Previously, if the XP revert
+    // failed after the delete succeeded, the user lost the check-in but the
+    // mente empire kept the +10 XP — silent drift over time.
+    await db.$transaction(async (tx) => {
+      await tx.dailyCheckin.delete({ where: { id: checkinId } });
 
-    // Revert XP for mente empire (never below 0, don't create if missing)
-    const menteProgress = await db.empireProgress.findUnique({
-      where: { userId_empire: { userId: user.id, empire: 'mente' } },
-    });
-    if (menteProgress) {
-      await db.empireProgress.update({
+      const menteProgress = await tx.empireProgress.findUnique({
+        where: { userId_empire: { userId: user.id, empire: 'mente' } },
+      });
+      if (!menteProgress) return;
+
+      await tx.empireProgress.update({
         where: { userId_empire: { userId: user.id, empire: 'mente' } },
         data: { xp: Math.max(0, menteProgress.xp - 10) },
       });
-    }
+    });
 
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);
