@@ -74,6 +74,31 @@ export async function GET(request: NextRequest) {
       user.emailVerified = true;
     }
 
+    // BUG-B3 FIX: Sync email from Firebase if it changed and is verified.
+    // Previously, the DB email was never updated — only firebaseUid and
+    // emailVerified were synced. A user who changed their Firebase email
+    // had a stale DB email, causing transactional emails and Stripe
+    // receipts to go to the wrong address.
+    if (decodedToken.email_verified && decodedToken.email && user.email !== decodedToken.email) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { email: decodedToken.email },
+      });
+      user.email = decodedToken.email;
+
+      // Also update the Stripe customer email if the user has one
+      if (user.stripeCustomerId) {
+        try {
+          const { stripe } = await import('@/lib/stripe');
+          await stripe.customers.update(user.stripeCustomerId, {
+            email: decodedToken.email,
+          });
+        } catch {
+          // Non-blocking — Stripe email update failure should not prevent login
+        }
+      }
+    }
+
     return NextResponse.json({
       user: {
         id: user.id,

@@ -437,6 +437,11 @@ export async function POST(request: NextRequest) {
             update: {
               status: subscription.status,
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
+              // BUG-C3 FIX: Also update currentPeriodStart on renewal.
+              // Previously only currentPeriodEnd was updated, so the start
+              // date stayed at the original subscription creation date
+              // instead of reflecting the current billing period start.
+              ...(typeof itemPeriodStart === 'number' ? { currentPeriodStart: new Date(itemPeriodStart * 1000) } : {}),
               ...(typeof itemPeriodEnd === 'number' ? { currentPeriodEnd: new Date(itemPeriodEnd * 1000) } : {}),
             },
           });
@@ -447,7 +452,9 @@ export async function POST(request: NextRequest) {
         }
 
         // ─── Sync user.plan with subscription status ───────────────────
-        const keepPremiumStatuses = ['active', 'trialing', 'past_due', 'incomplete'];
+        // BUG-C5 FIX: Removed dead variable keepPremiumStatuses — it was
+        // declared but never referenced. The if-else branches below handle
+        // each status explicitly.
         const downgradeStatuses = ['canceled', 'unpaid', 'incomplete_expired'];
 
         if (downgradeStatuses.includes(subscription.status)) {

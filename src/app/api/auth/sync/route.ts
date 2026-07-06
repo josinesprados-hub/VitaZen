@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyFirebaseToken, syncUserToDatabase } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { stripe } from '@/lib/stripe';
 import { sendWelcomeEmail, sendVerifyEmail } from '@/lib/emails/sender';
 import { adminAuth } from '@/lib/firebase-admin';
 import { trackEvent } from '@/lib/analytics-server';
@@ -62,6 +63,34 @@ async function handler(request: NextRequest) {
           data: { emailVerified: true },
         });
         existingUser.emailVerified = true;
+      }
+
+      // BUG-B3 FIX: Sync email from Firebase if it changed and is verified.
+      // Previously, the DB email was never updated — only firebaseUid and
+      // emailVerified were synced. A user who changed their Firebase email
+      // had a stale DB email, causing transactional emails and Stripe
+      // receipts to go to the wrong address.
+      if (decodedToken.email_verified && decodedToken.email && existingUser.email !== decodedToken.email) {
+        serverLog.info('auth/sync', 'Email changed in Firebase — syncing to DB', {
+          oldEmail: existingUser.email,
+          newEmail: decodedToken.email,
+        });
+        await db.user.update({
+          where: { id: existingUser.id },
+          data: { email: decodedToken.email },
+        });
+        existingUser.email = decodedToken.email;
+
+        // Also update the Stripe customer email if the user has one
+        if (existingUser.stripeCustomerId) {
+          try {
+            await stripe.customers.update(existingUser.stripeCustomerId, {
+              email: decodedToken.email,
+            });
+          } catch (stripeErr) {
+            serverLog.error('auth/sync', 'Failed to update Stripe customer email', stripeErr);
+          }
+        }
       }
 
       // Sync firebaseUid if it doesn't match (e.g. user registered with email/password
