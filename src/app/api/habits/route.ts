@@ -197,9 +197,24 @@ export async function PUT(request: NextRequest) {
     if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
     if (habit.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    // H-9 FIX: Reset streak when frequency changes.
+    // The streak value is frequency-dependent — a streak of 5 with weekly
+    // frequency means "5 consecutive weekly completions", which is NOT
+    // equivalent to "5 consecutive daily completions". Without resetting,
+    // changing frequency from weekly to daily would preserve a streak earned
+    // under weekly rules, inflating the daily streak and potentially
+    // triggering achievements (habits_steady_14, hidden_habit_steady_30)
+    // that were not legitimately earned under the new frequency.
+    // lastCompletedAt is intentionally preserved: it prevents double-completion
+    // within the same period (the guard uses the new frequency threshold).
+    const data: Record<string, unknown> = { name, description, frequency };
+    if (habit.frequency !== frequency) {
+      data.streak = 0;
+    }
+
     const updated = await db.habitLog.update({
       where: { id: habitId },
-      data: { name, description, frequency },
+      data,
     });
 
     return NextResponse.json({ habit: updated });
