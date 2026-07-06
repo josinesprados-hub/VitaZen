@@ -29,7 +29,13 @@ export async function getAuthUser(idToken: string) {
   });
 
   // If not found by firebaseUid, search by email (same logic as /api/auth/sync)
-  if (!user && decodedToken.email) {
+  // BUG-A1 FIX: Only allow email fallback if the email is verified.
+  // Without this check, an attacker can create a Firebase account with the
+  // victim's email and overwrite their firebaseUid, taking over the account
+  // (including Premium subscription, data, and Stripe customer link).
+  // Verifying the ID token proves the caller controls a Firebase account,
+  // NOT that they own the email. email_verified is the proof of ownership.
+  if (!user && decodedToken.email && decodedToken.email_verified) {
     user = await db.user.findUnique({
       where: { email: decodedToken.email },
       include: {
@@ -85,7 +91,8 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
   });
 
   // Same email fallback as getAuthUser
-  if (!user && decodedToken.email) {
+  // BUG-A1 FIX: Only allow email fallback if the email is verified.
+  if (!user && decodedToken.email && decodedToken.email_verified) {
     user = await db.user.findUnique({
       where: { email: decodedToken.email },
     });
@@ -102,7 +109,9 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
   // /api/auth/sync failed or was interrupted — the user has a valid
   // Firebase account but no corresponding DB record, causing all
   // API routes that use getAuthUserBasic to return 404.
-  if (!user && decodedToken.email) {
+  // BUG-A1 FIX: Only auto-create if email is verified, to prevent
+  // account takeover via unverified email.
+  if (!user && decodedToken.email && decodedToken.email_verified) {
     try {
       user = await syncUserToDatabase(decodedToken.uid, decodedToken.email, decodedToken.name);
     } catch {

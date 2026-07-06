@@ -21,6 +21,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // BUG-A2 FIX: Restrict platform analytics to PREMIUM users only.
+    // Previously, any authenticated user (including FREE) could access
+    // platform-wide DAU, retention, conversion funnel, and feature usage.
+    // This is business intelligence that should not be publicly accessible.
+    // PREMIUM is used as the gate because the User model has no role field.
+    if (user.plan !== 'PREMIUM') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const days = Math.min(parseInt(searchParams.get('days') || '30'), 90);
 

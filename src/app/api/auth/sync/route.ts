@@ -37,7 +37,10 @@ async function handler(request: NextRequest) {
     });
 
     // If not found by firebaseUid, search by email to avoid P2002
-    if (!existingUser && decodedToken.email) {
+    // BUG-A1 FIX: Only allow email fallback if the email is verified.
+    // Without this check, an attacker can create a Firebase account with the
+    // victim's email and overwrite their firebaseUid, taking over the account.
+    if (!existingUser && decodedToken.email && decodedToken.email_verified) {
       existingUser = await db.user.findUnique({
         where: { email: decodedToken.email },
         include: {

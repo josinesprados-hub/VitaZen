@@ -35,7 +35,10 @@ export async function GET(request: NextRequest) {
 
     // Fallback: search by email if firebaseUid doesn't match
     // (same logic as getAuthUser, but without a second token verify)
-    if (!user && decodedToken.email) {
+    // BUG-A1 FIX: Only allow email fallback if the email is verified.
+    // Without this check, an attacker can create a Firebase account with the
+    // victim's email and overwrite their firebaseUid, taking over the account.
+    if (!user && decodedToken.email && decodedToken.email_verified) {
       user = await db.user.findUnique({
         where: { email: decodedToken.email },
         include: {

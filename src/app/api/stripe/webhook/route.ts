@@ -178,14 +178,19 @@ export async function POST(request: NextRequest) {
     eventType = event.type;
     eventId = event.id;
   } catch (liveErr) {
-    // Live secret failed — try Test secret if available
+    // Live secret failed — try Test secret if available, but ONLY in non-production.
+    // BUG-B1 FIX: In production, accepting test-secret-signed events allows anyone
+    // with the (less protected) test secret to forge webhook events and grant
+    // themselves Premium. The test secret fallback is now gated behind
+    // NODE_ENV !== 'production' so it only works in local development.
     const testSecret = process.env.STRIPE_TEST_WEBHOOK_SECRET;
-    if (testSecret) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (testSecret && !isProduction) {
       try {
         event = stripe.webhooks.constructEvent(body, signature, testSecret);
         eventType = event.type;
         eventId = event.id;
-        serverLog.info('webhook/stripe', 'Webhook verified with Test secret', { eventType, eventId });
+        serverLog.info('webhook/stripe', 'Webhook verified with Test secret (non-production)', { eventType, eventId });
       } catch (testErr) {
         serverLog.error('webhook/stripe', 'Webhook signature verification failed (both secrets)', testErr, {
           eventType,
