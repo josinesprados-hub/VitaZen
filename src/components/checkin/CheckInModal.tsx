@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { X, Sunrise } from 'lucide-react';
+import { EMOTION_EMOJIS } from '@/lib/emotion-emojis';
 
 // ─── Emotion Labels ─────────────────────────────────────
+// DASH-1: emojis now come from the shared single source of truth
+// (src/lib/emotion-emojis.ts) so the dashboard and modal always agree.
 
 const EMOTION_LABELS: Record<number, { label: string; emoji: string }> = {
-  1: { label: 'Muy bajo', emoji: '😞' },
-  2: { label: 'Bajo', emoji: '😔' },
-  3: { label: 'Neutral', emoji: '😐' },
-  4: { label: 'Bien', emoji: '🙂' },
-  5: { label: 'Excelente', emoji: '😊' },
+  1: { label: 'Muy bajo', emoji: EMOTION_EMOJIS[1] },
+  2: { label: 'Bajo', emoji: EMOTION_EMOJIS[2] },
+  3: { label: 'Neutral', emoji: EMOTION_EMOJIS[3] },
+  4: { label: 'Bien', emoji: EMOTION_EMOJIS[4] },
+  5: { label: 'Excelente', emoji: EMOTION_EMOJIS[5] },
 };
 
 const ENERGY_LABELS: Record<number, { label: string }> = {

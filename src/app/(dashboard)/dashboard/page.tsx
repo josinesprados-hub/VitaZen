@@ -16,6 +16,7 @@ import { MonthlyClosurePrompt } from './MonthlyClosurePrompt';
 
 import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise, Calendar } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
+import { getEmotionEmoji } from '@/lib/emotion-emojis';
 
 interface EmpireData {
   empire: string;
@@ -242,7 +243,8 @@ export default function DashboardPage() {
           <div className="dash-section-enter dash-section-delay-4">
             {todayCheckin ? (
               <div className="flex items-center gap-3 py-1">
-                <span className="text-sm">{todayCheckin.emotion >= 4 ? '😊' : todayCheckin.emotion >= 3 ? '😐' : '😔'}</span>
+                {/* DASH-1: emoji from shared single source of truth (same as CheckInModal) */}
+                <span className="text-sm">{getEmotionEmoji(todayCheckin.emotion)}</span>
                 <p className="text-xs text-[#555] truncate flex-1">«{todayCheckin.intention}»</p>
                 <Link href="/checkin" className="text-[10px] text-[#444] hover:text-champagne transition-colors shrink-0">Historial</Link>
               </div>
@@ -273,6 +275,8 @@ export default function DashboardPage() {
                 const empireData = empires.find((e) => e.empire === key);
                 const level = empireData?.level || 1;
                 const streak = empireData?.streak || 0;
+                const xp = empireData?.xp || 0;
+                const xpToNextLevel = empireData?.xpToNextLevel || 100;
                 const Icon = config.icon;
                 const progress = empireData?.progress || 0;
 
@@ -292,17 +296,24 @@ export default function DashboardPage() {
                           <span className="text-[10px] text-[#333]">Nivel {level}</span>
                         </PrivacyMask>
                       </div>
-                      {/* Subtle progress — presence, not performance */}
-                      {progress > 0 && (
-                        <PrivacyMask compact>
-                          <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full">
-                            <div
-                              className="h-full bg-champagne/15 rounded-full transition-all duration-700"
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                        </PrivacyMask>
-                      )}
+                      {/* DASH-34/35: Discreet streak + XP info */}
+                      <PrivacyMask compact>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {streak > 0 && (
+                            <span className="text-[9px] text-[#2a2a2a]">{streak}d</span>
+                          )}
+                          <span className="text-[9px] text-[#222]">{xp % 100}/{xpToNextLevel} XP</span>
+                        </div>
+                      </PrivacyMask>
+                      {/* DASH-31/37: Progress bar always visible (never disappears, even at level boundaries) */}
+                      <PrivacyMask compact>
+                        <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full">
+                          <div
+                            className="h-full bg-champagne/15 rounded-full transition-all duration-700"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                      </PrivacyMask>
                     </div>
                   </Link>
                 );

@@ -169,30 +169,31 @@ export default function CheckinPage() {
     // The save handler already updates state optimistically
   }, []);
 
-  const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }) => {
+  const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }): Promise<{ xpAwarded: number }> => {
     if (editingCheckin) {
-      // PUT - update existing checkin
+      // PUT - update existing checkin (no XP awarded on edit)
       const res = await apiFetch('/api/checkin', {
         method: 'PUT',
         body: JSON.stringify({ checkinId: editingCheckin.id, ...data }),
       });
-      if (res.ok) {
-        const result = await res.json();
-        setCheckins(prev => prev.map(c => c.id === editingCheckin.id ? result.checkin : c));
-        if (todayCheckin?.id === editingCheckin.id) {
-          setTodayCheckin(result.checkin);
-        }
+      if (!res.ok) throw new Error(`Check-in update failed: ${res.status}`);
+      const result = await res.json();
+      setCheckins(prev => prev.map(c => c.id === editingCheckin.id ? result.checkin : c));
+      if (todayCheckin?.id === editingCheckin.id) {
+        setTodayCheckin(result.checkin);
       }
+      return { xpAwarded: 0 };
     } else {
       // POST - create today's checkin
+      const wasFirstCheckin = !todayCheckin;
       const res = await apiFetch('/api/checkin', {
         method: 'POST',
         body: JSON.stringify(data),
       });
-      if (res.ok) {
-        const result = await res.json();
-        setTodayCheckin(result.checkin);
-      }
+      if (!res.ok) throw new Error(`Check-in save failed: ${res.status}`);
+      const result = await res.json();
+      setTodayCheckin(result.checkin);
+      return { xpAwarded: wasFirstCheckin ? 10 : 0 };
     }
   }, [apiFetch, editingCheckin, todayCheckin]);
 
