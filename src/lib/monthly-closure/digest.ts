@@ -29,6 +29,30 @@ import {
   NO_DATA_SUBTITLE,
 } from './copy';
 
+// T-3 FIX helper: compute the UTC instant of Madrid midnight on the first day
+// of a given month. `new Date(year, month - 1, 1)` (no Z suffix) is
+// interpreted as server-local midnight — on a UTC server (Vercel), this is
+// UTC midnight, NOT Madrid midnight. For October 2024 on a UTC server:
+//   start = 2024-10-01T00:00:00Z = 02:00 Madrid (CEST)
+//   end   = 2024-11-01T00:00:00Z = 02:00 Madrid (CET)
+// A checkin at Madrid 2024-10-01 00:30 (UTC 2024-09-30 22:30) was EXCLUDED
+// from October. A checkin at Madrid 2024-11-01 00:30 (UTC 2024-10-31 22:30)
+// was INCLUDED in October. This silently misattributed activities near month
+// boundaries to the wrong month.
+//
+// Fix: compute the Madrid midnight of the first day of the month by using
+// the same `madridNoonUtc → msSinceMadridMidnight` technique as
+// startOfMadridDay() in insights.ts and madridDayBoundaries() in
+// finance/wellness/meditation routes.
+function startOfMadridMonth(year: number, month1Based: number): Date {
+  const madridNoonUtc = new Date(Date.UTC(year, month1Based - 1, 1, 12, 0, 0));
+  const madridStr = madridNoonUtc.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  const timePart = madridStr.split(' ')[1];
+  const [hours, minutes, seconds] = timePart.split(':').map(Number);
+  const msSinceMadridMidnight = (hours * 3600 + minutes * 60 + seconds) * 1000;
+  return new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
+}
+
 // ─── Types ───
 
 export interface IntentionBalance {
@@ -87,8 +111,12 @@ export interface MonthlyDigest {
 
 function getMonthRange(yyyyMM: string) {
   const [year, month] = yyyyMM.split('-').map(Number);
-  const start = new Date(year, month - 1, 1);
-  const end = new Date(year, month, 1); // first day of next month
+  // T-3 FIX: use Madrid-aware month boundaries (not server-local midnight).
+  // startOfMadridMonth computes the UTC instant of Madrid midnight on the
+  // first day of the month, so queries correctly include activities near
+  // month boundaries in the user's perceived calendar month.
+  const start = startOfMadridMonth(year, month);
+  const end = startOfMadridMonth(year, month + 1); // first day of next month
   return { start, end };
 }
 

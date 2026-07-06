@@ -3,13 +3,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
-import { checkAILimit, getDailyLimit } from '@/lib/limits';
+import { checkAILimit, getDailyLimit, rollbackAILimit } from '@/lib/limits';
 import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
 import { trackEvent } from '@/lib/analytics-server';
 import { withTiming } from '@/lib/observability/api-timing';
 import { serverLog } from '@/lib/observability/server-logger';
 
 async function handler(request: NextRequest) {
+  // T-2 FIX: Track whether the AI limit was consumed so we can roll it back
+  // if the Groq call fails. checkAILimit() atomically increments the counter
+  // BEFORE the Groq API is called — if Groq fails, the credit must be
+  // returned to avoid permanently locking out FREE users after 15 failed
+  // retries.
+  let limitConsumed = false;
+  let userId: string | null = null;
+  let userPlan: string | null = null;
+
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -21,6 +30,9 @@ async function handler(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    userId = user.id;
+    userPlan = user.plan;
 
     const isPremium = user.plan === 'PREMIUM';
     const dailyLimit = getDailyLimit(user.plan);
@@ -38,6 +50,9 @@ async function handler(request: NextRequest) {
         { status: 403 }
       );
     }
+
+    // Limit was consumed — any failure after this point must roll it back.
+    limitConsumed = true;
 
     const { threadId, content } = await request.json();
 
@@ -174,6 +189,19 @@ async function handler(request: NextRequest) {
       plan: user.plan,
     });
   } catch (error) {
+    // T-2 FIX: If the AI limit was consumed (checkAILimit passed) but the
+    // request failed (Groq error, DB error, etc.), roll back the consumed
+    // credit so the user is not permanently penalized for a server-side
+    // failure. Without this, a FREE user who hit 15 failed retries would be
+    // locked out for the rest of the day without ever receiving a response.
+    if (limitConsumed && userId && userPlan) {
+      try {
+        await rollbackAILimit(userId, userPlan);
+      } catch (rollbackError) {
+        // Never let the rollback failure mask the original error
+        serverLog.error('api/ai/chat', 'AI limit rollback failed', rollbackError);
+      }
+    }
     serverLog.apiError('api/ai/chat', 'POST', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

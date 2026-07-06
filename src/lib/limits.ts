@@ -138,3 +138,26 @@ export async function checkAILimit(userId: string, plan: string): Promise<{ allo
 export async function incrementAIUsage(userId: string): Promise<void> {
   // No-op: the increment is now atomic within checkAILimit()
 }
+
+/**
+ * Rollback one AI usage credit after a failed Groq call.
+ *
+ * T-2 FIX: checkAILimit() atomically increments the counter BEFORE the Groq
+ * API is called. If Groq fails (network timeout, 5xx, malformed response),
+ * the catch block in /api/ai/chat returned 500 but never decremented the
+ * counter — the user permanently lost a message credit. After 15 failed
+ * retries, a FREE user was locked out for the rest of the day without ever
+ * receiving a response.
+ *
+ * This function decrements the counter (clamped to 0) so the credit is
+ * returned. It is a no-op for PREMIUM users (no limit, no counter to touch).
+ */
+export async function rollbackAILimit(userId: string, plan: string): Promise<void> {
+  if (plan === 'PREMIUM') return;
+
+  await db.$executeRaw`
+    UPDATE "AIUsage"
+    SET count = GREATEST(0, count - 1), "updatedAt" = NOW()
+    WHERE "userId" = ${userId}
+  `;
+}

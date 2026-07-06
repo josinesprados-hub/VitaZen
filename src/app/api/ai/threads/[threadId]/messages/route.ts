@@ -34,16 +34,38 @@ export async function GET(
 
     const isPremium = user.plan === 'PREMIUM';
 
-    // FREE users see limited messages, PREMIUM sees all
-    const messages = await db.aIMessage.findMany({
+    // FREE users see limited messages, PREMIUM sees all.
+    // T-1 FIX: Previously used `orderBy: asc + take: 50` which returned the
+    // OLDEST 50 messages (the first 50 in the thread). A FREE user with 80
+    // messages saw messages 1-50, missing messages 51-80 (the most recent,
+    // including the conversation they just had). The thread appeared "stuck"
+    // in the past.
+    //
+    // Fix: fetch the NEWEST 50 (orderBy: desc + take: 50), then reverse to
+    // chronological order for display. This matches the pattern used by
+    // /api/ai/chat (lines 66-71) which does the same desc+take+reverse.
+    if (isPremium) {
+      const messages = await db.aIMessage.findMany({
+        where: { threadId },
+        orderBy: { createdAt: 'asc' },
+      });
+      return NextResponse.json({
+        messages,
+        historyLimited: false,
+        historyLimit: MESSAGES_LIMIT_FREE,
+      });
+    }
+
+    const recentMessages = await db.aIMessage.findMany({
       where: { threadId },
-      orderBy: { createdAt: 'asc' },
-      ...(isPremium ? {} : { take: MESSAGES_LIMIT_FREE }),
+      orderBy: { createdAt: 'desc' },
+      take: MESSAGES_LIMIT_FREE,
     });
+    const messages = recentMessages.reverse(); // restore chronological order for display
 
     return NextResponse.json({
       messages,
-      historyLimited: !isPremium,
+      historyLimited: true,
       historyLimit: MESSAGES_LIMIT_FREE,
     });
   } catch (error) {

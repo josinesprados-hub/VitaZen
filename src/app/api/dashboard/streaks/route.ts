@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       }),
       db.habitLog.findMany({
         where: { userId: user.id, lastCompletedAt: { not: null, gte: sixtyDaysAgo } },
-        select: { lastCompletedAt: true },
+        select: { lastCompletedAt: true, streak: true },
         orderBy: { lastCompletedAt: 'desc' },
       }),
       db.journalEntry.findMany({
@@ -103,7 +103,24 @@ export async function GET(request: NextRequest) {
     ]);
 
     const meditationStreak = calcStreak(meditationDates.map(m => m.completedAt));
-    const habitStreak = calcStreak(habitDates.map(h => h.lastCompletedAt!));
+    // T-4 FIX: habitStreak previously used calcStreak(habitDates.map(h =>
+    // h.lastCompletedAt!)) — but HabitLog has ONE row per habit with
+    // lastCompletedAt as a SINGLE timestamp (the most recent completion),
+    // not a per-day completion log. So habitDates contained at most N
+    // timestamps (N = num habits), all from the most recent completion day(s).
+    // calcStreak could never see more days than there are habits, so for a
+    // user with 1 habit completed daily for 45 days, habitStreak was always 1
+    // (only today's lastCompletedAt was visible).
+    //
+    // Fix: use the authoritative HabitLog.streak field (updated atomically in
+    // habits/route.ts PATCH with the H-10/H-11 logic — per active Madrid day,
+    // Madrid-aware boundaries). habitStreak = max streak across all habits,
+    // which is the "best habit streak" the user has. This is consistent with
+    // how the disciplina page displays streak per habit, and how the insights
+    // engine uses topStreak = max(HabitLog.streak).
+    const habitStreak = habitDates.length > 0
+      ? Math.max(...habitDates.map(h => h.streak))
+      : 0;
     const journalStreak = calcStreak(journalDates.map(j => j.createdAt));
     const checkinStreak = calcStreak(checkinDates.map(c => c.date));
     const wellnessStreak = calcStreak(wellnessDates.map(w => w.date));
