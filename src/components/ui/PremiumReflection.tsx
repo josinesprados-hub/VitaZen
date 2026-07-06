@@ -4,33 +4,34 @@ import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_REFLECTION } from '@/lib/screenshot-data';
-import { fetchSnapshot } from './SilentMemory';
 
 // ═══════════════════════════════════════════
-// PremiumReflection — contemplative rotation
+// PremiumReflection — daily quote rotation
 // ═══════════════════════════════════════════
 //
 // Single source of truth: the server.
 // No Math.random(). No localStorage.
-// The server decides the reflection, all devices
-// show the same one.
+// The server decides the daily quote, all devices
+// show the same one for the entire Madrid day.
 //
-// Silence is still preserved — it's computed
-// server-side with the same visit-based rhythm.
-
-interface ReflectionSnapshot {
-  text: string;
-  isDeep: boolean;
-  isSilent: boolean;
-}
+// Source: src/lib/daily-quotes.ts (300 personal development quotes)
+// Endpoint: GET /api/daily-quote → src/lib/server/daily-quote.ts
+//
+// One quote per day. Persistent for the whole day.
+// Changes at Madrid midnight. Never repeats until
+// the full battery is exhausted, then a new cycle
+// begins with a different deterministic shuffle.
+//
+// This component previously consumed /api/emotional-snapshot
+// (reflections — emotional, visit-based rotation). It now
+// consumes /api/daily-quote (personal development quotes,
+// day-based rotation). The visual design is unchanged.
 
 export default function PremiumReflection() {
   const { apiFetch } = useApi();
   const { isActive: screenshotMode } = useScreenshotMode();
   const [visible, setVisible] = useState(false);
   const [reflection, setReflection] = useState('');
-  const [isDeep, setIsDeep] = useState(false);
-  const [isSilent, setIsSilent] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -43,18 +44,17 @@ export default function PremiumReflection() {
 
     let cancelled = false;
 
-    async function fetchReflection() {
+    async function fetchDailyQuote() {
       try {
-        const data = await fetchSnapshot(apiFetch);
+        const res = await apiFetch('/api/daily-quote');
+        if (cancelled) return;
+        if (!res.ok) return;
+        const data = await res.json();
         if (cancelled) return;
 
-        if (data.reflection && !data.reflection.isSilent) {
-          setReflection(data.reflection.text);
-          setIsDeep(data.reflection.isDeep);
+        if (data.text) {
+          setReflection(data.text);
           setVisible(true);
-        } else {
-          // Silent visit — the reflection space breathes empty
-          setIsSilent(true);
         }
       } catch {
         // Network error — silence is fine
@@ -63,15 +63,9 @@ export default function PremiumReflection() {
       }
     }
 
-    fetchReflection();
+    fetchDailyQuote();
     return () => { cancelled = true; };
   }, [apiFetch, screenshotMode]);
-
-  // Silent visit — the reflection space breathes empty.
-  // Not a bug. Not a missing feature. Intentional silence.
-  if (isSilent) {
-    return <div className="py-3 sm:py-8" />;
-  }
 
   if (!loaded || !reflection) {
     // Minimal placeholder — silence, not a loading state
