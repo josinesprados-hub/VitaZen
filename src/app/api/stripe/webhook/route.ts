@@ -480,6 +480,20 @@ export async function POST(request: NextRequest) {
             });
             serverLog.info('webhook/stripe', 'Subscription active — user restored to PREMIUM');
           }
+        } else if (subscription.status === 'trialing') {
+          // BUG-B4 FIX: Trialing subscriptions must also promote FREE → PREMIUM.
+          // Previously, 'trialing' fell through with no action because
+          // keepPremiumStatuses was declared but never used. If the
+          // checkout.session.completed webhook was lost/delayed, the user
+          // remained FREE during their trial. Now we ensure PREMIUM here too.
+          const user = await db.user.findUnique({ where: { id: userId } });
+          if (user && user.plan !== 'PREMIUM') {
+            await db.user.update({
+              where: { id: userId },
+              data: { plan: 'PREMIUM' },
+            });
+            serverLog.info('webhook/stripe', 'Subscription trialing — user promoted to PREMIUM');
+          }
         } else if (subscription.status === 'past_due') {
           serverLog.info('webhook/stripe', 'Subscription past_due — keeping PREMIUM during Stripe retry period');
         } else if (subscription.status === 'incomplete') {

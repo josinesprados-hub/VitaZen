@@ -27,6 +27,13 @@ export async function GET(request: NextRequest) {
       ],
     });
 
+    // BUG-B6 FIX: Filter out PREMIUM tips for FREE users.
+    // Previously, the endpoint returned ALL tips (FREE + PREMIUM content)
+    // to any authenticated user. FREE users could read PREMIUM tip content
+    // by inspecting the API response. Now, FREE users only receive FREE tips.
+    const isPremium = user.plan === 'PREMIUM';
+    const visibleTips = isPremium ? allTips : allTips.filter(t => t.plan !== 'PREMIUM');
+
     // Try server-side deterministic rotation. If it fails (e.g. DB error in
     // emotional dashboard state), fall back to returning raw tips so the
     // client can still display something. NEVER return empty if tips exist.
@@ -36,16 +43,16 @@ export async function GET(request: NextRequest) {
     try {
       const result = await getDeterministicTips(user.id, empire, allTips);
       rotatedFreeTips = result.freeTips;
-      rotatedPremiumTips = result.premiumTips;
+      rotatedPremiumTips = isPremium ? result.premiumTips : [];
     } catch (rotationError) {
       console.error('[Tips] Deterministic rotation failed — using raw fallback:', rotationError);
       // Fallback: return first 2 FREE and first 1 PREMIUM from raw tips
       rotatedFreeTips = allTips.filter(t => t.plan !== 'PREMIUM').slice(0, 2);
-      rotatedPremiumTips = allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1);
+      rotatedPremiumTips = isPremium ? allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1) : [];
     }
 
     return NextResponse.json({
-      tips: allTips,
+      tips: visibleTips,
       rotatedFreeTips,
       rotatedPremiumTips,
     });

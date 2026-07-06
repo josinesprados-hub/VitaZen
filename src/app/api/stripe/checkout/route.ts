@@ -39,11 +39,29 @@ export async function POST(request: NextRequest) {
     // a second one. This catches edge cases where:
     //   - User opens checkout in two tabs
     //   - Webhook hasn't processed yet but user tries again
-    const existingActiveSub = await db.subscription.findFirst({
-      where: {
-        userId: user.id,
-        status: { in: ['active', 'trialing'] },
-      },
+    //
+    // BUG-B5 FIX: The original check was a non-atomic read (findFirst).
+    // Two concurrent checkout requests could both pass the check before
+    // either created a subscription, resulting in double billing.
+    // Now wrapped in a transaction with pg_advisory_xact_lock keyed on
+    // the userId, so concurrent checkouts for the same user are serialized.
+    // The lock is transaction-scoped — it auto-releases on commit/rollback,
+    // so it never blocks future legitimate checkouts.
+    const existingActiveSub = await db.$transaction(async (tx) => {
+      // Acquire transaction-scoped advisory lock on this user.
+      // Key is derived from md5('checkout|' + userId) — first 8 bytes as bigint.
+      const lockSeed = 'checkout|' + user.id;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
+      return tx.subscription.findFirst({
+        where: {
+          userId: user.id,
+          status: { in: ['active', 'trialing'] },
+        },
+      });
     });
 
     if (existingActiveSub) {
