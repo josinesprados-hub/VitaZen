@@ -37,18 +37,41 @@ export async function GET(request: NextRequest) {
     // Try server-side deterministic rotation. If it fails (e.g. DB error in
     // emotional dashboard state), fall back to returning raw tips so the
     // client can still display something. NEVER return empty if tips exist.
-    let rotatedFreeTips: typeof allTips = [];
-    let rotatedPremiumTips: typeof allTips = [];
+    //
+    // B6-R1 FIX: For FREE users, rotatedPremiumTips must contain 1 Premium tip
+    // with its content stripped (only id, title, plan). This allows the frontend
+    // to render the locked Premium card (showing the title + lock + CTA) without
+    // leaking the Premium content. The rotation algorithm is unchanged — the
+    // same deterministic tip is selected; only the content field is stripped
+    // for FREE users.
+    let rotatedFreeTips: Array<{ id: string; title: string; content: string; plan: string; empire?: string; createdAt?: Date }> = [];
+    let rotatedPremiumTips: Array<{ id: string; title: string; content: string; plan: string; empire?: string; createdAt?: Date }> = [];
 
     try {
       const result = await getDeterministicTips(user.id, empire, allTips);
       rotatedFreeTips = result.freeTips;
-      rotatedPremiumTips = isPremium ? result.premiumTips : [];
+      if (isPremium) {
+        rotatedPremiumTips = result.premiumTips;
+      } else {
+        // FREE user: strip content from the Premium tip — only id/title/plan
+        // are needed to render the locked card. Content must never reach FREE.
+        rotatedPremiumTips = result.premiumTips.map(t => ({
+          ...t,
+          content: '',
+        }));
+      }
     } catch (rotationError) {
       console.error('[Tips] Deterministic rotation failed — using raw fallback:', rotationError);
       // Fallback: return first 2 FREE and first 1 PREMIUM from raw tips
       rotatedFreeTips = allTips.filter(t => t.plan !== 'PREMIUM').slice(0, 2);
-      rotatedPremiumTips = isPremium ? allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1) : [];
+      if (isPremium) {
+        rotatedPremiumTips = allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1);
+      } else {
+        rotatedPremiumTips = allTips.filter(t => t.plan === 'PREMIUM').slice(0, 1).map(t => ({
+          ...t,
+          content: '',
+        }));
+      }
     }
 
     return NextResponse.json({
