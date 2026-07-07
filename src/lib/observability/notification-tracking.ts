@@ -150,7 +150,7 @@ export function trackSWBackgroundMessageError(error: unknown): void {
 export function trackNotificationGateFailure(error: unknown): void {
   const message = error instanceof Error ? error.message : 'Gate check failed';
 
-  serverLog.warn('push_notification', `Notification gate check failed: ${message}`, error, { route: '/api/notifications' });
+  serverLog.warn('push_notification', `Notification gate check failed: ${message}`, { route: '/api/notifications', error: error instanceof Error ? error.message : String(error) });
 }
 
 /**
@@ -159,5 +159,5 @@ export function trackNotificationGateFailure(error: unknown): void {
 export function trackNotificationDedupFailure(error: unknown): void {
   const message = error instanceof Error ? error.message : 'Dedup check failed';
 
-  serverLog.warn('push_notification', `Notification dedup check failed: ${message}`, error, { route: '/api/notifications' });
+  serverLog.warn('push_notification', `Notification dedup check failed: ${message}`, { route: '/api/notifications', error: error instanceof Error ? error.message : String(error) });
 }

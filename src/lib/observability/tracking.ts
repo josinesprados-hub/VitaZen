@@ -60,7 +60,7 @@ export function trackWidgetCacheFailure(
 ): void {
   const message = error instanceof Error ? error.message : 'Cache operation failed';
 
-  serverLog.warn('widget_refresh', `Cache ${operation} failed: ${widgetType} — ${message}`, { widgetType });
+  serverLog.warn('widget_refresh', `Cache ${operation} failed: ${widgetType} — ${message}`, { widgetType, error: error instanceof Error ? error.message : String(error) });
 }
 
 /**
@@ -77,7 +77,7 @@ export function trackWidgetApiError(
   if (statusCode >= 500) {
     serverLog.error('widget_refresh', `Widget API error: ${widgetType} — ${statusCode} — ${message}`, error, { widgetType, route: '/api/widgets/[type]' });
   } else {
-    serverLog.warn('widget_refresh', `Widget API error: ${widgetType} — ${statusCode} — ${message}`, { widgetType, route: '/api/widgets/[type]' });
+    serverLog.warn('widget_refresh', `Widget API error: ${widgetType} — ${statusCode} — ${message}`, { widgetType, route: '/api/widgets/[type]', error: error instanceof Error ? error.message : undefined });
   }
 }
 
@@ -91,5 +91,5 @@ export function trackWidgetTriggerFailure(
 ): void {
   const message = error instanceof Error ? error.message : 'Trigger failed';
 
-  serverLog.warn('widget_refresh', `Trigger failed: ${trigger} — ${message}`, { trigger });
+  serverLog.warn('widget_refresh', `Trigger failed: ${trigger} — ${message}`, { trigger, error: error instanceof Error ? error.message : String(error) });
 }

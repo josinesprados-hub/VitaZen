@@ -22,6 +22,15 @@ import {
   Severity,
 } from './types';
 
+// GLOBAL-12 FIX: Auth token for the observability report endpoint.
+// Set by the AuthContext when the user logs in. When unset, reports are
+// silently dropped (the endpoint requires authentication).
+let authToken: string | null = null;
+
+export function setAuthToken(token: string | null): void {
+  authToken = token;
+}
+
 // ─── Message Hashing ────────────────────────
 //
 // Hash the error message so we can dedup without
@@ -168,17 +177,17 @@ export async function flush(): Promise<void> {
   };
 
   try {
-    // Use sendBeacon if available (most reliable on mobile, survives page unload)
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      const sent = navigator.sendBeacon('/api/observability/report', blob);
-      if (sent) return;
-    }
+    // GLOBAL-12 FIX: Send auth token with the report. If no token is available
+    // (user not logged in), skip the send — the endpoint requires authentication.
+    if (!authToken) return;
 
-    // Fallback to fetch with keepalive
+    // Use fetch with keepalive (survives page unload, supports custom headers)
     await fetch('/api/observability/report', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
       body: JSON.stringify(payload),
       keepalive: true,
       credentials: 'same-origin',

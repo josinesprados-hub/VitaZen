@@ -25,6 +25,7 @@ import {
   PerformanceReport,
 } from '@/lib/observability/types';
 import { serverLog } from '@/lib/observability/server-logger';
+import { getAuthUserBasic } from '@/lib/auth';
 
 // ─── Rate Limiting (in-memory) ──────────────
 //
@@ -115,6 +116,17 @@ function processPerformanceReport(report: PerformanceReport): void {
 
 export async function POST(request: NextRequest) {
   try {
+    // GLOBAL-12 FIX: Require authentication. Previously, the endpoint accepted
+    // unauthenticated POSTs — any internet user could spam fake error reports.
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ received: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
+    if (!user) {
+      return NextResponse.json({ received: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     // ── Parse body ──
     let body: BatchReportPayload;
 

@@ -14,6 +14,7 @@ import {
 } from 'firebase/auth';
 import { getAuthInstance } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
+import { setAuthToken } from '@/lib/observability';
 
 interface SubscriptionData {
   id: string;
@@ -123,6 +124,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // updated the callback closure.
   const firebaseUserRef = useRef<FirebaseUser | null>(firebaseUser);
   firebaseUserRef.current = firebaseUser;
+
+  // GLOBAL-12 FIX: Set the auth token for the observability logger when
+  // the Firebase user changes. This allows the client logger to send
+  // authenticated reports to /api/observability/report.
+  useEffect(() => {
+    if (firebaseUser) {
+      firebaseUser.getIdToken().then(setAuthToken).catch(() => {});
+    } else {
+      setAuthToken(null);
+    }
+  }, [firebaseUser]);
 
   const refreshUser = useCallback(async (options?: { reloadFirebase?: boolean }) => {
     const currentUser = firebaseUserRef.current;

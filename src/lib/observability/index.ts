@@ -86,6 +86,9 @@ export {
 // Server-side structured logging (for API routes, webhooks, cron)
 export { serverLog } from './server-logger';
 
+// GLOBAL-12: Auth token setter for the client logger
+export { setAuthToken } from './logger';
+
 // API route timing wrapper
 export { withTiming, timeOperation } from './api-timing';
 

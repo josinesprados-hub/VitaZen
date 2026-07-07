@@ -216,6 +216,7 @@ model MeditationSession {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, completedAt]) // GLOBAL-18: composite for widget/dashboard queries
 }
 
 model JournalEntry {
@@ -231,6 +232,7 @@ model JournalEntry {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, createdAt]) // GLOBAL-18: composite for widget/dashboard queries
 }
 
 // ═══════════════════════════════════════════
@@ -251,6 +253,7 @@ model HabitLog {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, lastCompletedAt]) // GLOBAL-18: composite for dashboard/streaks queries
 }
 
 model NutritionLog {
@@ -348,6 +351,7 @@ model DailyCheckin {
 
   @@unique([userId, date])
   @@index([userId])
+  @@index([userId, date]) // GLOBAL-18: composite for range queries (gte/lt on date)
 }
 
 // ═══════════════════════════════════════════

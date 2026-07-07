@@ -145,25 +145,45 @@ export async function sendNotification(
 }
 
 /**
- * Convenience: schedule a notification for later (quiet hours defer).
- * Currently stores intent; actual scheduling infrastructure (cron/queue)
- * will be added in a future iteration. For now, callers should retry
- * at `deferUntil`.
+ * GLOBAL-6 FIX: Documented limitation — deferred notifications are NOT delivered.
+ *
+ * The original deferNotification was designed to schedule a notification for
+ * later delivery after quiet hours end. However, the actual scheduling
+ * infrastructure (cron job, queue table) was never implemented. The function
+ * only created a NotificationLog entry with wasInQuietHours=true and returned
+ * { deferred: true }, but no caller ever retried delivery.
+ *
+ * This means notifications that fell during quiet hours were silently lost.
+ *
+ * Fix: The function now clearly documents this as a known limitation. The
+ * NotificationLog entry is still created (for observability — we can see
+ * which notifications were suppressed by quiet hours), but the return value
+ * no longer claims the notification will be delivered later.
+ *
+ * To fully fix this, a future iteration would need:
+ *   1. A new `DeferredNotification` table storing the pending notification.
+ *   2. A cron job that runs every 15 minutes, checks if quiet hours have
+ *      ended, and delivers deferred notifications.
+ *   3. Dedup logic to prevent re-delivering notifications that were already
+ *      delivered by a subsequent cron run.
+ *
+ * This is a architectural change that requires a new Prisma model and a new
+ * cron endpoint — beyond the scope of this sprint.
  */
 export function deferNotification(
   userId: string,
   type: NotificationType,
   deferUntil: Date,
   templateVars?: Record<string, string | number>,
-): { deferred: boolean; deferUntil: Date } {
+): { deferred: boolean; deferUntil: Date; willBeDelivered: false } {
   // Mark that this was attempted during quiet hours
   // Log the attempt so cooldowns still apply
   db.notificationLog.create({
     data: {
       userId,
       type,
-      title: `[DEFERRED] ${type}`,
-      body: `Scheduled for ${deferUntil.toISOString()}`,
+      title: `[SUPPRESSED — quiet hours] ${type}`,
+      body: `Was scheduled for ${deferUntil.toISOString()} but will NOT be delivered (deferred notification infrastructure not implemented)`,
       wasDelivered: false,
       wasInQuietHours: true,
     },
@@ -171,7 +191,7 @@ export function deferNotification(
     // Non-critical: just tracking
   });
 
-  return { deferred: true, deferUntil };
+  return { deferred: true, deferUntil, willBeDelivered: false };
 }
 
 /**

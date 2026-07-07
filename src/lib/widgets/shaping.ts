@@ -125,14 +125,18 @@ export async function shapeMomentumPayload(
   ]);
 
   // Fetch previous week for trend
+  // GLOBAL-7 FIX: prevHabits is always 0 because HabitLog.lastCompletedAt is
+  // a single timestamp updated on every completion. A habit completed both
+  // this week AND last week has lastCompletedAt in THIS week, so it's excluded
+  // from the previous-week count. This systematically biases the trend toward
+  // "down" for active users. Without a per-day completion log table, we cannot
+  // accurately count previous-week habit completions. We exclude habits from
+  // the trend calculation to avoid the systematic bias.
   const [
-    prevMeditation, prevHabits, prevJournal, prevCheckins, prevChallenges, prevWellness, prevNutrition,
+    prevMeditation, prevJournal, prevCheckins, prevChallenges, prevWellness, prevNutrition,
   ] = await Promise.all([
     db.meditationSession.count({
       where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
-    }),
-    db.habitLog.count({
-      where: { userId, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo, not: null } },
     }),
     db.journalEntry.count({
       where: { userId, createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
@@ -270,7 +274,10 @@ export async function shapeMomentumPayload(
 
   // ─── Calculate Trend ───
   const currentWeekTotal = meditationSessions + habitCompletions + journalEntries + checkins + challengesCompleted + wellnessEntries + nutritionEntries;
-  const prevWeekTotal = prevMeditation + prevHabits + prevJournal + prevCheckins + prevChallenges + prevWellness + prevNutrition;
+  // GLOBAL-7 FIX: prevHabits removed from trend (was always 0 — see above).
+  // currentWeekTotal still includes habitCompletions for the score, but the
+  // trend comparison excludes it to avoid the systematic "down" bias.
+  const prevWeekTotal = prevMeditation + prevJournal + prevCheckins + prevChallenges + prevWellness + prevNutrition;
 
   let trend: 'up' | 'down' | 'stable' = 'stable';
   if (currentWeekTotal > prevWeekTotal + 2) trend = 'up';

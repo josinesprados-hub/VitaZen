@@ -115,7 +115,6 @@ function aggregateFinanceWeekly(data: CrossEmpireData): Map<string, WeeklyFinanc
     }
 
     const w = weeks.get(weekKey)!;
-    const categories = new Set<string>();
 
     if (log.type === 'expense') {
       w.totalExpense += log.amount;
@@ -131,8 +130,17 @@ function aggregateFinanceWeekly(data: CrossEmpireData): Map<string, WeeklyFinanc
       if (SOCIAL_KEYWORDS.test(log.contexto)) w.socialCount++;
     }
 
-    categories.add(log.category);
-    w.categoryCount = categories.size;
+    // GLOBAL-8 FIX: Track categories per-week using a Set stored on the week
+    // object, not a local Set created fresh for each log entry. Previously,
+    // the Set was created inside the loop, so categories.size was always 1
+    // after adding a single category. Now the Set accumulates across all
+    // logs in the same week.
+    const wExt = w as unknown as Record<string, unknown>;
+    if (!wExt.categories) {
+      wExt.categories = new Set<string>();
+    }
+    (wExt.categories as Set<string>).add(log.category);
+    w.categoryCount = (wExt.categories as Set<string>).size;
   }
 
   for (const w of weeks.values()) {
