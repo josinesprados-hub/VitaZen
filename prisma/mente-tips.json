@@ -7,8 +7,8 @@
   },
   {
     "empire": "mente",
-    "title": "El foco se agota",
-    "content": "La atención se agota tras unos veinte minutos. Pausas breves la restauran; ignorarlo no lo elimina.",
+    "title": "La concentración se agota",
+    "content": "La atención se agota tras unos veinte minutos. Las pausas breves la restauran; ignorarlo no lo elimina.",
     "plan": "FREE"
   },
   {
@@ -20,7 +20,7 @@
   {
     "empire": "mente",
     "title": "Notificaciones fragmentan",
-    "content": "Cada interrupción, aunque sea breve, te saca y cuesta volver. Ese costo se acumula a lo largo del día.",
+    "content": "Cada interrupción, aunque sea breve, te saca y cuesta volver. Ese coste se acumula a lo largo del día.",
     "plan": "FREE"
   },
   {
@@ -38,7 +38,7 @@
   {
     "empire": "mente",
     "title": "Música con letra",
-    "content": "Escuchar canciones con letra mientras escribes suele empeorar el resultado. El cerebro no procesa bien lenguaje y escritura al mismo tiempo.",
+    "content": "Escuchar canciones con letra mientras escribes suele empeorar el resultado. El cerebro no procesa bien el lenguaje y la escritura al mismo tiempo.",
     "plan": "FREE"
   },
   {
@@ -109,14 +109,14 @@
   },
   {
     "empire": "mente",
-    "title": "Costo hundido",
+    "title": "Coste hundido",
     "content": "Seguir invirtiendo en algo que no funciona solo porque ya invertiste es un sesgo conocido. Lo invertido ya se fue. Seguir por lealtad al pasado no lo recupera.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
-    "title": "El default gana",
-    "content": "Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Es uno de los hallazgos más replicados: cambiar el default cambia el comportamiento más que la información.",
+    "title": "La opción por defecto gana",
+    "content": "Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Es uno de los hallazgos más replicados: cambiar la opción por defecto cambia el comportamiento más que la información.",
     "plan": "FREE"
   },
   {
@@ -134,7 +134,7 @@
   {
     "empire": "mente",
     "title": "Atención al presente",
-    "content": "La mente se va la mitad del tiempo. Volver al presente es la práctica, no la falla.",
+    "content": "La mente se va la mitad del tiempo. Volver al presente es la práctica, no el fallo.",
     "plan": "FREE"
   },
   {
@@ -157,14 +157,14 @@
   },
   {
     "empire": "mente",
-    "title": "Divagar no es falla",
+    "title": "Divagar no es fallo",
     "content": "La mente que divaga también planifica y crea. El problema no es divagar; es no notar que divagaste.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
-    "title": "Repetir espaciado",
-    "content": "Repasar información en intervalos crecientes la retiene mejor que repasar todo de una vez. La repetición espaciada lleva décadas funcionando — el tiempo entre repaso y repaso es parte del aprendizaje.",
+    "title": "Repetición espaciada",
+    "content": "Repasar información en intervalos crecientes la retiene mejor que repasar todo de una vez. La repetición espaciada lleva décadas funcionando: el tiempo entre repaso y repaso es parte del aprendizaje.",
     "plan": "FREE"
   },
   {
@@ -211,7 +211,7 @@
   },
   {
     "empire": "mente",
-    "title": "Suficiente bueno",
+    "title": "Lo suficientemente bueno",
     "content": "Buscar la opción óptima en todo gasta más energía sin necesariamente mejor resultado. Lo suficientemente bueno suele ser suficiente.",
     "plan": "FREE"
   },
@@ -229,7 +229,7 @@
   },
   {
     "empire": "mente",
-    "title": "Estrés agudo vs crónico",
+    "title": "Estrés agudo frente a crónico",
     "content": "Una respuesta de estrés corta te prepara para actuar. El problema no es el estrés en sí; es el estrés que no se apaga.",
     "plan": "FREE"
   },
@@ -254,7 +254,7 @@
   {
     "empire": "mente",
     "title": "Puntos ciegos",
-    "content": "Hay brechas entre cómo te percibes y cómo te perciben los demás. Pedir feedback específico revela lo que tu introspección no alcanza.",
+    "content": "Hay brechas entre cómo te percibes y cómo te perciben los demás. Pedir retroalimentación específica revela lo que tu introspección no alcanza.",
     "plan": "FREE"
   },
   {
@@ -272,7 +272,7 @@
   {
     "empire": "mente",
     "title": "El pre-mortem prevé",
-    "content": "Imaginar que algo ya falló antes de empezar te ayuda a identificar riesgos que la optimismo del momento te hace ignorar.",
+    "content": "Imaginar que algo ya falló antes de empezar te ayuda a identificar riesgos que el optimismo del momento te hace ignorar.",
     "plan": "FREE"
   },
   {
@@ -290,373 +290,373 @@
   {
     "empire": "mente",
     "title": "Cuando estás cargado",
-    "content": "Tu capacidad de ignorar distracciones depende de cuánto tienes ya en la cabeza, no solo de tu voluntad. Una mente ocupada se distrae más fácil.",
+    "content": "Tu capacidad de ignorar distracciones depende de cuánto tienes ya en la cabeza, no solo de tu voluntad. Una mente ocupada se distrae más fácilmente. Lavie (2010) formuló la teoría de la carga perceptiva: cuando la carga es alta, la capacidad de procesar distracciones se reduce; cuando es baja, las distracciones ocupan el espacio sobrante. La concentración no depende solo de la motivación: depende de cuánto estás procesando ya.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La ilusión de profundidad",
-    "content": "Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. Familiaridad no es comprensión.",
+    "content": "Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. La familiaridad no es comprensión. Kornell y Bjork (2008) mostraron que la relectura genera una fluidez ilusoria: sentir que el material te resulta familiar se confunde con haberlo comprendido. Para distinguir una de otra, cierra el material y trata de explicarlo con tus palabras. Si no puedes, lo que tenías era familiaridad, no comprensión.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El flujo tiene condiciones",
-    "content": "Lo que llamamos flujo ocurre cuando el desafío coincide con tu habilidad. Si es demasiado fácil, aburre; si es demasiado difícil, angustia. El balance es específico.",
+    "content": "Lo que llamamos flujo ocurre cuando el desafío coincide con tu habilidad. Si es demasiado fácil, aburre; si es demasiado difícil, angustia. El equilibrio es específico. Csikszentmihalyi (1990) describió el estado de flujo como atención concentrada, fusión entre acción y conciencia y pérdida de la noción del tiempo. La condición clave es el equilibrio entre desafío y habilidad: ni uno ni otro por separado producen flujo. Para entrar en él, ajusta la dificultad de la tarea a tu nivel actual, no a tu nivel deseado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Accesibilidad cognitiva",
-    "content": "Experiencias recientes hacen ciertos conceptos más disponibles mentalmente. Lo que encontraste antes influye en cómo piensas ahora, no porque te manipule, sino porque está más accesible. La accesibilidad es el mecanismo válido; la influencia conductual directa es la parte desacreditada.",
+    "content": "Las experiencias recientes hacen que ciertos conceptos estén más disponibles mentalmente. Lo que encontraste antes influye en cómo piensas ahora, no porque te manipule, sino porque está más accesible. Tversky y Kahneman (1973) llamaron a esto la heurística de disponibilidad: juzgamos la probabilidad de un evento por la facilidad con que nos vienen ejemplos a la mente. El mecanismo es real y útil; el sesgo aparece cuando la disponibilidad no refleja la frecuencia real. Lo que más recuerdas no es siempre lo más frecuente: a veces es solo lo más reciente o lo más vívido.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Dejas de ver lo constante",
-    "content": "Tu cerebro deja de registrar lo que siempre está ahí. Por eso no ves el desorden después de un rato. Lo constante desaparece de la atención.",
+    "content": "Tu cerebro deja de registrar lo que siempre está ahí. Por eso no ves el desorden después de un rato. Lo constante desaparece de la atención. Este fenómeno, llamado habituación, fue descrito por Sokolov (1963): las neuronas reducen su respuesta ante estímulos repetidos, lo que libera recursos para lo nuevo. La habituación es eficiente, pero te ciega a lo familiar. Para volver a ver tu entorno, míralo con ojos de recién llegado o cámbialo físicamente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Detalle y contexto",
-    "content": "No puedes atender el detalle y el contexto al mismo tiempo. Cambiar entre ambos cuesta, y ese costo se acumula.",
+    "content": "No puedes atender el detalle y el contexto al mismo tiempo. Cambiar entre ambos cuesta, y ese coste se acumula. Navon (1977) mostró que la percepción global precede a la local: el cerebro procesa primero la escena completa y después los detalles. Cambiar deliberadamente entre ambos niveles es una habilidad entrenable, pero cada cambio consume recursos atencionales. Para minimizar el coste, trabaja por bloques: primero el contexto completo, después los detalles, sin alternar en cada momento.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Reevaluación tardía",
-    "content": "Reinterpretar un evento emocional incluso horas después sigue reduciendo su carga. No tiene que ser instantáneo para funcionar. La reevaluación tiene ventana amplia.",
+    "content": "Reinterpretar un evento emocional incluso horas después sigue reduciendo su carga. No tiene que ser instantáneo para funcionar. La reevaluación tiene una ventana amplia. Gross (2015) mostró que la reevaluación cognitiva es una de las estrategias de regulación emocional más eficaces: cambia la respuesta emocional al cambiar el significado del evento. Su eficacia no decae de inmediato, lo que la hace útil cuando no pudiste regular en caliente. Volver a un evento difícil y reformularlo después es regulación, no rumiación: la diferencia está en si cambias el significado o solo lo repites.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Emociones mezcladas",
-    "content": "Sentir alegría y tristeza simultáneamente no es conflicto; es la experiencia emocional completa de eventos complejos. La ambivalencia es normal.",
+    "content": "Sentir alegría y tristeza simultáneamente no es conflicto: es la experiencia emocional completa de los eventos complejos. La ambivalencia es normal. Larsen et al. (2001) documentaron que las emociones positivas y negativas pueden coexistir sin anularse, especialmente ante eventos que mezclan ganancia y pérdida. La ambivalencia no indica confusión: indica complejidad. Querer resolverla obligando una sola emoción simplifica la experiencia y pierde información. La regulación emocional madura permite sostener ambas a la vez.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La gratitud cambia qué recuerdas",
-    "content": "Practicar la gratitud no es ser positivo por obligación — es cambiar qué recuerdas y qué dejas ir. Eso altera lo que se fija y lo que se desvanece.",
+    "content": "Practicar la gratitud no es ser positivo por obligación: es cambiar qué recuerdas y qué dejas ir. Eso altera lo que se fija y lo que se desvanece. Emmons y McCullough (2003) mostraron en varios estudios que llevar un diario de gratitud durante semanas mejora el bienestar subjetivo y reduce los síntomas físicos. El mecanismo no es mágico: dirige la atención hacia lo que fue bien, lo que cambia la memoria disponible para juzgar la propia vida. No niega lo malo: reequilibra el peso de lo bueno.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Vulnerabilidad compartida",
-    "content": "Expresar vulnerabilidad de forma específica reduce la intensidad emocional. Ventilar vagamente no siempre lo hace; nombrar con precisión sí.",
+    "content": "Expresar vulnerabilidad de forma específica reduce la intensidad emocional. Ventilar vagamente no siempre lo hace; nombrar con precisión sí. Pennebaker (1997) mostró en décadas de investigación que escribir sobre experiencias emocionales difíciles durante quince minutos al día, durante cuatro días, mejora indicadores de salud física y mental. El efecto depende de la concreción: nombrar el evento, las emociones y los pensamientos con precisión produce más alivio que describirlos de forma vaga. La etiqueta precisa, no el desahogo genérico, es lo que regula.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "El rechazo duele literal",
-    "content": "Que te rechacen duele de una forma que parece excesiva para lo que pasó. No es exageración — el cerebro lo procesa parecido al dolor físico.",
+    "title": "El rechazo duele literalmente",
+    "content": "Que te rechacen duele de una forma que parece excesiva para lo que pasó. No es exageración: el cerebro lo procesa de forma parecida al dolor físico. Kross et al. (2011) mostraron mediante resonancia magnética que la exclusión social activa regiones cerebrales solapadas con las del dolor físico (corteza cingulada anterior dorsal). La expresión «dolor emocional» no es solo metáfora: comparte sustrato neural con el dolor somático. Por eso el rechazo social duele tanto: no es una interpretación dramática, es la activación de un circuito que evolutivamente alerta sobre la amenaza de exclusión del grupo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La regulación se entrena",
-    "content": "La capacidad de regular emociones no es fija; se fortalece con práctica consistente. No partimos del mismo punto, pero todos podemos mejorar.",
+    "content": "La capacidad de regular emociones no es fija: se fortalece con práctica consistente. No partimos del mismo punto, pero todos podemos mejorar. Davidson et al. (2003) mostraron que la práctica prolongada de meditación produce cambios medibles en la actividad prefrontal izquierda, asociada a la regulación afectiva. La regulación emocional es, en parte, una habilidad entrenable, no un rasgo fijo. La condición es la consistencia: sesiones breves y diarias producen más cambio que sesiones largas y esporádicas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Sesgo del superviviente",
-    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. Es el sesgo del superviviente: la muestra visible nunca es la completa.",
+    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. Es el sesgo del superviviente: la muestra visible nunca es la completa. Taleb (2004) lo popularizó con el ejemplo de los bomberos: el que sobrevive cuenta su historia; el que no, no. El sesgo opera en inversiones, carreras y hábitos: ves a quien triunfo siguiendo cierto método y asumes que el método funciona, sin ver a los muchos que lo siguieron y no llegaron. Antes de imitar a un ganador, pregunta cuántos perdedores siguieron el mismo camino y por qué no los ves.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Juntos no es causa",
-    "content": "Tu cerebro busca causas automáticamente. Ver que dos cosas ocurren juntas no significa que una cause la otra.",
+    "title": "La correlación no es causalidad",
+    "content": "Tu cerebro busca causas automáticamente. Ver que dos cosas ocurren juntas no significa que una cause la otra. La correlación es estadística; la causalidad requiere diseño experimental, control de variables y dirección temporal. Confundir una con la otra lleva a decisiones equivocadas: atribuir el efecto a la variable visible cuando el causante real es un tercero no observado. Antes de aceptar que A causa B, pregunta si podría ser al revés, si ambos podrían compartir una causa común o si la asociación es casual.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El efecto Dunning-Kruger",
-    "content": "El efecto Dunning-Kruger aparece más de lo que creemos: quien menos sabe suele sentirse más seguro. Saber poco se siente como saber suficiente.",
+    "content": "El efecto Dunning-Kruger aparece más de lo que creemos: quien menos sabe suele sentirse más seguro. Saber poco se siente como saber suficiente. Kruger y Dunning (1999) mostraron que los individuos con menor competencia sobreestiman su nivel, mientras que los más competentes tienden a subestimarse. El mecanismo es doble: la competencia necesaria para hacer algo bien es la misma que se necesita para evaluar si se ha hecho bien. Quien no la tiene no detecta sus propios errores y, por tanto, no sabe que no sabe.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Sesgo retrospectivo",
-    "content": "El sesgo retrospectivo hace que todo parezca obvio después de que pasa. Mirar atrás distorsiona lo que realmente sabías en el momento.",
+    "content": "El sesgo retrospectivo hace que todo parezca obvio después de que sucede. Mirar atrás distorsiona lo que realmente sabías en el momento. Fischhoff (1975) lo documentó: una vez conocido el resultado, las personas reconstruyen su memoria de lo que sabían antes para ajustarla al desenlace. El sesgo erosiona el aprendizaje: si crees que sabías lo que iba a pasar, no identificas lo que te sorprendió. Para contrarrestarlo, anota tus predicciones antes de conocer el resultado y compáralas después. Lo que creías saber y lo que sabías rara vez coinciden.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Aversión a la pérdida",
-    "content": "Kahneman mostró que perder duele más de lo que alegra ganar lo mismo. Esto te inclina a conservar, incluso cuando arriesgar tendría ventajas.",
+    "content": "Kahneman y Tversky (1979) mostraron que perder duele más de lo que alegra ganar lo mismo. La asimetría es aproximadamente de 2 a 1: el disgusto de perder 100 euros supera al placer de ganar 100 euros. Esto te inclina a conservar, incluso cuando arriesgar tendría ventajas esperadas. La aversión a la pérdida explica desde la resistencia a vender inversiones en pérdida hasta la renuencia a cambiar de trabajo. No es irracionalidad pura: es una asimetría diseñada por evolución para priorizar la conservación. Conocerla te permite revisar tus decisiones cuando conservar ya no es lo más ventajoso.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Lo conocido se siente bien",
-    "content": "Preferimos cosas solo por ser familiares, no porque sean mejores. Lo conocido se siente seguro, y el cerebro confunde seguridad con calidad.",
+    "content": "Preferimos cosas solo por ser familiares, no porque sean mejores. Lo conocido se siente seguro, y el cerebro confunde seguridad con calidad. Zajonc (1968) llamó a esto el mero efecto de exposición: la repetición de un estímulo aumenta la preferencia hacia él, sin que medie argumento racional. El efecto opera incluso cuando no recuerdas haberlo visto antes. Es útil para aprender preferencias, pero peligroso para juzgar calidad: lo familiar parece bueno aunque no lo sea. Antes de elegir lo conocido, pregunta si lo preferirías si lo descubrieras hoy.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Quedarse es fácil",
-    "content": "Preferimos que las cosas sigan como están, incluso cuando cambiar tiene ventajas. La inercia no es decisión — es dejar pasar.",
+    "content": "Preferimos que las cosas sigan como están, incluso cuando cambiar tiene ventajas. La inercia no es decisión: es dejar pasar. Samuelson y Zeckhauser (1988) llamaron a esto sesgo de estatus quo: cuando hay varias opciones, la opción por defecto se elige con mucha más frecuencia de lo que justifica su calidad. El sesgo opera por ahorro de esfuerzo cognitivo y por miedo al arrepentimiento: cambiar y equivocarse duele más que no cambiar y perder la oportunidad. Diseñar las opciones por defecto a tu favor es más eficaz que pretender superar el sesgo con fuerza de voluntad.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La atención se entrena",
-    "content": "La atención sostenida mejora con práctica consistente, como un músculo. No es un rasgo fijo que tienes o no tienes.",
+    "content": "La atención sostenida mejora con práctica consistente, como un músculo. No es un rasgo fijo que tienes o no tienes. Posner y Petersen (1990) propusieron un modelo de redes atencionales (alerta, orientación, control ejecutivo) que se entrenan por separado. La práctica de meditación, los ejercicios de lectura prolongada y el entrenamiento en trabajo sin interrupciones mejoran medidas específicas de cada red. La condición es la consistencia: entrenamientos breves y diarios superan a sesiones largas y esporádicas. La atención que tienes hoy no es la que tendrás en seis meses si la entrenas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Observar al observador",
-    "content": "Notar que estás notando tus pensamientos añade una capa de distancia que reduce la identificación con ellos. No eres lo que observas.",
+    "content": "Notar que estás notando tus pensamientos añade una capa de distancia que reduce la identificación con ellos. No eres lo que observas. Teasdale et al. (2002) llamaron a esto metacognición consciente y mostraron que reduce la reactividad emocional y la rumiación en personas con depresión recurrente. El mecanismo es simple: cuando observas un pensamiento en lugar de vivirlo, dejas de tratarlo como un hecho. La pregunta no es si el pensamiento es verdadero, sino si te resulta útil. Si no lo es, déjalo pasar sin combatirlo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Presencia no es vacío",
-    "content": "Estar presente no significa mente en blanco. Significa notar lo que ocurre sin engancharse automáticamente con ello.",
+    "title": "La presencia no es vacío",
+    "content": "Estar presente no significa mente en blanco. Significa notar lo que ocurre sin engancharse automáticamente con ello. Kabat-Zinn (1994) definió la atención plena como la conciencia que surge al prestar atención, deliberadamente, al momento presente y sin juzgar. No es vaciar la mente, que es imposible mientras esta funcione: es cambiar la relación con lo que aparece. La diferencia entre vivir un pensamiento y observarlo es la diferencia entre ser arrastrado por una corriente y verla pasar desde la orilla.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Lo sensorial interrumpe",
-    "content": "La rumiación se alimenta de pensamiento abstracto. Volver a lo sensorial — texturas, sonidos, temperatura — la interrumpe de forma directa.",
+    "content": "La rumiación se alimenta de pensamiento abstracto. Volver a lo sensorial —texturas, sonidos, temperatura— la interrumpe de forma directa. Nolen-Hoeksema (1991) mostró que la rumiación (revisar las causas y consecuencias de un estado emocional negativo sin llegar a una solución) prolonga y agrava ese estado. La intervención sensorial no resuelve el problema, pero corta el bucle y devuelve el control. Sentir la textura del escritorio, escuchar tres sonidos del entorno o notar la temperatura del aire durante un minuto basta para interrumpir la rumiación el tiempo suficiente para elegir otra respuesta.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Aceptar no es resignarse",
-    "content": "Aceptar una emoción no es rendirse a ella. Es dejar de luchar contra ella para poder responder en vez de reaccionar.",
+    "content": "Aceptar una emoción no es rendirse a ella. Es dejar de luchar contra ella para poder responder en vez de reaccionar. Hayes et al. (2006), en la terapia de aceptación y compromiso, mostraron que la aceptación reduce la intensidad emocional más que la supresión, además de mejorar la capacidad de actutar según los propios valores. La diferencia entre aceptar y resignarse está en la acción: la aceptación deja pasar la emoción para actuar con claridad; la resignación deja pasar la emoción y también la acción.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Imaginar ayuda",
-    "content": "Imaginar que haces algo activa el cerebro de forma parecida a hacerlo. No reemplaza la práctica real, pero la complementa.",
+    "content": "Imaginar que haces algo activa el cerebro de forma parecida a hacerlo. No reemplaza la práctica real, pero la complementa. Jeannerod (1995) mostró que la imaginación motora activa las mismas áreas cerebrales que la ejecución, con menor intensidad. La práctica mental mejora el rendimiento especialmente cuando la práctica física no es posible, pero su efecto es mayor cuando se combina con ejecución real. La condición es la precisión: imaginar el movimiento con detalle y correctamente produce más transferencia que imaginarlo de forma vaga.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Lo que cuesta se fija",
-    "content": "Aprender se consolida mejor cuando cuesta un poco. Lo demasiado fácil no genera huella; la comodidad y el aprendizaje no siempre van juntos.",
+    "content": "Aprender se consolida mejor cuando cuesta un poco. Lo demasiado fácil no genera huella; la comodidad y el aprendizaje no siempre van juntos. Bjork y Bjork (2011) llamaron a esto dificultades deseables: condiciones que dificultan el aprendizaje durante la práctica pero mejoran la retención a largo plazo. Ejemplos son el repaso espaciado, la mezcla de temas y la recuperación activa. La condición es que la dificultad sea manejable: si supera la capacidad, genera frustración en vez de aprendizaje. La incomodidad productiva no es sufrimiento: es esfuerzo calibrado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El olvido es útil",
-    "content": "Olvidar no es fallo del sistema; es el cerebro priorizando lo que usas y debilitando lo que no. El olvido selectivo es parte de la memoria funcional.",
+    "content": "Olvidar no es un fallo del sistema: es el cerebro priorizando lo que usas y debilitando lo que no. El olvido selectivo es parte de la memoria funcional. Anderson (2003) mostró que suprimir voluntariamente ciertos recuerdos reduce su accesibilidad posterior, un fenómeno llamado olvido inducido por la recuperación. La memoria no está diseñada para retenerlo todo, sino para mantener accesible lo relevante. Olvidar lo que ya no usas libera recursos para lo que sí. Por eso el repaso espaciado funciona: marca al cerebro qué información sigue siendo relevante.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Recordar es reconstruir",
-    "content": "Cada vez que recuerdas algo, lo reconstruyes. No es una grabación fiel — es algo que puede cambiar sin que lo notes.",
+    "content": "Cada vez que recuerdas algo, lo reconstruyes. No es una grabación fiel: es algo que puede cambiar sin que lo notes. Schacter (1999) documentó que la memoria es reconstructiva, no reproductiva, y que cada recuperación puede introducir modificaciones que se integran en el recuerdo. Esto explica los falsos recuerdos y la formación de memorias de eventos que no ocurrieron tal como se relatan. La implicación práctica es que tu memoria no es un archivo: es una reconstrcción sujeta a edición. Anotar lo importante cuando ocurre reduce la deformación posterior.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El sueño que conecta",
-    "content": "Mientras duermes, el cerebro conecta ideas que parecían no tener relación. Por eso a veces despiertas con una idea que no tenías la noche anterior.",
+    "content": "Mientras duermes, el cerebro conecta ideas que parecían no tener relación. Por eso a veces despiertas con una idea que no tenías la noche anterior. Stickgold y Walker (2013) mostraron que el sueño REM facilita la integración de información aprendida en redes semánticas amplias, lo que permite resolver problemas que la vigilia no había resuelto. El sueño no es solo descanso: es procesamiento. Dormir sobre un problema no es evasión: es darle al cerebro el estado en el que mejor reorganiza lo que ya sabe.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La emoción fija",
-    "content": "Lo que aprendes cuando sientes algo se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción ayuda a que se fije.",
+    "content": "Lo que aprendes cuando sientes algo se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción ayuda a que se fija. McGaugh (2004) mostró que la activación emocional modula la consolidación de la memoria a través de la amígdala, que marca ciertos recuerdos como prioritarios. La emoción no es enemiga del aprendizaje: es su etiqueta de prioridad. La condición es la intensidad: la emoción moderada consolida; la emoción extrema interfiere, especialmente si se produce durante la codificación.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La intuición reconoce",
-    "content": "Lo que llamamos intuición es a menudo reconocimiento de patrones acumulado por experiencia. No es magia; es velocidad no consciente.",
+    "content": "Lo que llamamos intuición es a menudo reconocimiento de patrones acumulado por experiencia. No es magia: es velocidad no consciente. Klein (1998) estudió la toma de decisiones de expertos en situaciones de presión (bomberos, enfermería) y concluyó que reconocían patrones aprendidos sin necesidad de análisis deliberado. La intuición no es opuesta al raciocinio: es raciocinio comprimido por la experiencia. Su fiabilidad depende de la calidad y cantidad de experiencia en el dominio específico. Fuera de tu dominio, tu intuición no es intuición: es impresión.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Lo mejor es enemigo",
-    "content": "Quien busca la mejor opción en todo invierte más tiempo y energía decidiendo, y termina menos satisfecho que quien se conforma con lo suficiente.",
+    "title": "Lo mejor es enemigo de lo bueno",
+    "content": "Quien busca la mejor opción en todo invierte más tiempo y energía decidiendo, y termina menos satisfecho que quien se conforma con lo suficiente. Schwartz (2004) llamó maximizadores a quienes buscan la opción óptima y satisfactores a quienes eligen la primera que cumple sus criterios. Los maximizadores obtienen resultados objetivamente similares o peores y, sin embargo, están menos satisfechos con ellos. El coste no está solo en el tiempo de decisión: está en la comparación constante con las opciones descartadas. Elegir lo suficiente, cuando lo suficiente es bueno, libera energía para ejecutar la decisión.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "No decidir es decidir",
-    "content": "Quedarte con la opción por defecto ya es una decisión. Ser consciente de esto te devuelve la agencia sobre lo que dejas pasar.",
+    "content": "Quedarte con la opción por defecto ya es una decisión. Ser consciente de esto te devuelve la agencia sobre lo que dejas pasar. Thaler y Sunstein (2008) mostraron que las opciones por defecto moldean la conducta más que la información o la persuasión: en la donación de órganos, la participación supera el 90 % cuando el consentimiento es predefinido y no llega al 20 % cuando hay que activarlo. La diferencia no es moral: es de diseño. Revisar las opciones por defecto de tu vida —suscripciones, ahorro, notificaciones— te devuelve la agencia que dejaste pasar.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La emoción va primero",
-    "content": "La emoción precede a la razón en las decisiones. La justificación racional suele venir después, como narrativa, no como causa. Sin emoción, decidir es casi imposible.",
+    "content": "La emoción precede a la razón en las decisiones. La justificación racional suele venir después, como narrativa, no como causa. Sin emoción, decidir es casi imposible. Damasio (1994) estudió a pacientes con daño en la corteza prefrontal ventromedial que conservaban intacta la inteligencia lógica pero no podían tomar decisiones cotidianas. La hipótesis de las marcas somáticas propone que las emociones marcan las opciones con un valor que guía la elección antes del análisis consciente. La razón no sustituye a la emoción: la integra y la modula. Decidir bien no es decidir sin emoción: es decidir con emoción informada.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El efecto marco",
-    "content": "El efecto marco muestra que la misma decisión presentada como ganancia o como pérdida produce elecciones distintas, aunque el resultado sea idéntico.",
+    "content": "El efecto marco muestra que la misma decisión presentada como ganancia o como pérdida produce elecciones distintas, aunque el resultado sea idéntico. Tversky y Kahneman (1981) mostraron que una vacuna descrita como «salva al 90 %» se prefiere sobre otra descrita como «el 10 % muere», a pesar de ser equivalentes. El marco de ganancia activa preferencias de seguridad; el marco de pérdida, preferencias de riesgo. El efecto no es un defecto: es una característica del sistema. Antes de decidir, reformula el enunciado en términos de ganancia y de pérdida y observa si tu elección cambia. Si cambia, tu decisión no se basaba solo en los datos.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Recuperar es rendir",
-    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse — es parte del rendimiento.",
+    "title": "Recuperar es rendimiento",
+    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse: es parte del rendimiento. Erickson et al. (1993) mostraron que los expertos de élite no solo practican más horas: duermen más y hacen pausas deliberadas con más frecuencia. La recuperación no interrumpe el rendimiento: lo sostiene. La condición es la calidad: el descanso pasivo (desplazarse con el móvil) no recupera tanto como el descanso activo (caminar sin estímulos, dormir). El rendimiento sin recuperación se degrada; la recuperación sin rendimiento no produce mejora.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Dar vueltas mantiene el estrés",
-    "content": "Revisar mentalmente un evento estresante una y otra vez mantiene activo el cuerpo mucho después de que el evento terminó. La rumiación es un motor que no se apaga solo.",
+    "content": "Revisar mentalmente un evento estresante una y otra vez mantiene activo el cuerpo mucho después de que el evento haya terminado. La rumiación es un motor que no se apaga solo. Nolen-Hoeksema (1991) mostró que la rumiación prolonga el estado emocional negativo y predice la aparición y mantenimiento de la depresión. La diferencia entre pensar y rumiar está en el producto: pensar genera una conclusión o un plan; rumiar repite el problema sin avanzar. Si llevas más de diez minutos dando vueltas sin una salida, interrumpe con actividad sensorial o física: el bucle no se rompe pensando más.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "El estrés cambia el cerebro",
-    "content": "El estrés prolongado no solo se siente — cambia cómo funciona el cerebro. La memoria y la regulación emocional son las primeras que se resienten.",
+    "content": "El estrés prolongado no solo se siente: cambia cómo funciona el cerebro. La memoria y la regulación emocional son las primeras que se resienten. McEwen (2007) mostró que el estrés crónico produce cambios estructurales en el hipocampo (atrofia) y en la amígdala (hipertrofia), lo que deteriora la memoria y aumenta la reactividad emocional. Los efectos son parcialmente reversibles si el estrés cesa, pero la recuperación lleva tiempo. El estrés no es solo una sensación: es un agente biológico activo. Tratarlo como un problema de actitud permite que siga dañando el cerebro mientras lo ignoras.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Dos modos de pensar",
-    "content": "Hay momentos para buscar la respuesta correcta y momentos para generar muchas respuestas. Confundir estos modos bloquea tanto el rigor como la creatividad.",
+    "content": "Hay momentos para buscar la respuesta correcta y momentos para generar muchas respuestas. Confundir estos modos bloquea tanto el rigor como la creatividad. Guilford (1967) distinguió entre pensamiento convergente (encontrar la única respuesta correcta) y divergente (generar múltiples respuestas posibles). Los dos son útiles, pero requieren condiciones distintas: el convergente necesita concentración y restricción; el divergente necesita apertura y ausencia de juicio prematuro. Si te bloqueas buscando la respuesta correcta en un problema que requiere generar opciones, cambia de modo: escribe todas las ideas posibles sin filtrarlas, y solo después evalúa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Lo conocido explica lo nuevo",
-    "content": "Entender algo nuevo a través de algo familiar no es simplificar — es cómo el cerebro construye conocimiento. La analogía es una herramienta real.",
+    "content": "Entender algo nuevo a través de algo familiar no es simplificar: es cómo el cerebro construye conocimiento. La analogía es una herramienta real. Gentner y Smith (2012) mostraron que el razonamiento analógico transfiere estructura relacional de un dominio conocido a uno nuevo, lo que permite acceder a conceptos que la definición técnica sola no aclara. La condición es que la analogía conserve las relaciones estructurales, no solo las superficiales: una analogía que se parece pero no estructura igual, engaña. Cuando uses una analogía, verifica qué relaciones se conservan y cuáles no.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Dejar y volver",
-    "content": "Dejar un problema y volver después no es evitación. El cerebro sigue procesando en segundo plano, y a veces la solución aparece cuando dejas de forzarla.",
+    "content": "Dejar un problema y volver después no es evitación. El cerebro sigue procesando en segundo plano, y a veces la solución aparece cuando dejas de forzarla. Sio y Ormerod (2009) revisaron la evidencia sobre incubación y concluyeron que las pausas mejoran la resolución de problemas, especialmente los que requieren reorganizar la información. El mecanismo incluye el olvido parcial de pistas engañosas y la activación inconsciente de alternativas. La incubación no sustituye al trabajo deliberado: lo complementa. Trabaja concentrado, deja el problema y vuelve; el segundo intento suele encontrar lo que el primero no podía ver.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Perspectiva temporal",
-    "content": "Preguntar si esto importará en cinco años no siempre calma, pero sí revela la escala real del problema. Lo que parece inmenso hoy a menudo no lo es.",
+    "content": "Preguntar si esto importará en cinco años no siempre calma, pero sí revela la escala real del problema. Lo que parece inmenso hoy a menudo no lo es. Esta técnica, llamada perspectiva temporal, fue estudiada por Holman y Silver (1998), que mostraron que las personas con perspectiva temporal amplia se recuperan mejor de eventos estresantes. La pregunta no minimiza el problema: lo sitúa. Si lo que te preocupa hoy no importará en cinco años, no merece la pena que lo amplifiques en este momento; si sí importará, conviene empezar a actuar ahora y no solo a preocuparse.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Pensamiento lateral",
-    "content": "Si solo llegas a las mismas soluciones, prueba cambiar la pregunta en vez de buscar más respuestas. La pregunta define el espacio de lo posible.",
+    "content": "Si solo llegas a las mismas soluciones, prueba cambiar la pregunta en vez de buscar más respuestas. La pregunta define el espacio de lo posible. De Bono (1970) propuso el pensamiento lateral como método para reestructurar el problema en vez de buscar mejor la misma solución. Cambiar la pregunta no es evasión: es redirigir la búsqueda. Si llevas rato sin avanzar, reformula el problema con otra pregunta: de «¿cómo lo hago?» a «¿por qué lo hago?», o de «¿cómo lo resuelvo?» a «¿quién lo ha resuelto ya?». La calidad de la respuesta suele depender de la calidad de la pregunta.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Los incentivos dirigen",
-    "content": "Las personas responden a los incentivos que tienen, no a los que deberían tener. Entender los incentivos reales explica mucho comportamiento que parece irracional.",
+    "content": "Las personas responden a los incentivos que tienen, no a los que deberían tener. Entender los incentivos reales explica mucho del comportamiento que parece irracional. Kerr (1975) documentó en «On the Folly of Rewarding A, While Hoping for B» cómo las organizaciones premian sistemáticamente conductas distintas de las que declaran buscar. El error no está en quienes responden al incentivo real: está en quien diseñó el incentivo. Antes de juzgar la conducta de alguien como irracional, pregunta qué incentivos está respondiendo. Antes de diseñar el tuyo, verifica que premia lo que quieres conseguir y no otra cosa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Cuestionar lo dado",
-    "content": "Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo dado por sentado no es rebelión — es método.",
+    "title": "Cuestionar lo establecido",
+    "content": "Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo establecido no es rebelión: es método. Esta práctica, asociada al escepticismismo metódico de Descartes y al falsacionismo de Popper, consiste en someter cada supuesto a la pregunta: ¿qué evidencia tengo para creer esto? Muchos supuestos no sobreviven a la pregunta. La incomodidad de no saber es preferible a la falsa seguridad de creer saber. El método no garantiza acertar: reduce la probabilidad de creer sin evidencia.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "El mapa no es el lugar",
-    "content": "Tu idea de la realidad no es la realidad. Es una representación útil pero incompleta. Confundir el mapa con el territorio es un error que se repite en todas las áreas.",
+    "title": "El mapa no es el territorio",
+    "content": "Tu idea de la realidad no es la realidad. Es una representación útil pero incompleta. Confundir el mapa con el territorio es un error que se repite en todas las áreas. Korzybski (1933) formuló este principio en semántica general: el símbolo no es la cosa, la descripción no es lo descrito. Bateson lo extendió al aprendizaje y Watzlawick a la comunicación. Confundir el mapa con el territorio lleva a tratar el modelo como si fuera la realidad y a sorprenderse cuando la realidad no obedece al modelo. Mantener la distinción abierta te permite revisar el modelo cuando la realidad lo exige.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Lo que viene después",
-    "content": "Las consecuencias directas de una acción son predecibles. Las consecuencias de esas consecuencias suelen sorprender, y son las que más importan a largo plazo.",
+    "title": "Pensamiento de segundo orden",
+    "content": "Las consecuencias directas de una acción son predecibles. Las consecuencias de esas consecuencias suelen sorprender, y son las que más importan a largo plazo. Howard Marks popularizó esta distinción: el pensamiento de primer orden pregunta «¿qué pasa si hago X?»; el de segundo orden pregunta «¿y qué pasará después de eso?». El primer nivel es rápido e intuitivo; el segundo requiere esfuerzo y suele estar ausente en las decisiones precipitadas. La mayoría de los errores no están en el primer nivel, donde la consecuencia inmediata era previsible, sino en el segundo, donde la cadena posterior no se anticipó. Antes de decidir, pregunta qué pasará después de lo que pasará.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "La explicación simple",
-    "content": "Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia — porque menos supuestos significan menos puntos donde fallar.",
+    "title": "La navaja de Ockham",
+    "content": "Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia: porque menos supuestos significan menos puntos donde fallar. Este principio, conocido como navaja de Ockham en honor a Guillermo de Ockham, es una regla heurística, no una verdad demostrada. Es útil para comparar hipótesis con el mismo poder explicativo: si ambas explican los datos, la que requiere menos supuestos adicionales tiene menos oportunidades de equivocarse. La simplicidad no es garantía de verdad: es estrategia de gestión de incertidumbre.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Pensar mucho no siempre aclara",
-    "content": "Pensar mucho sobre ti no siempre te conoce mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas. La rumiación no es introspección.",
+    "content": "Pensar mucho sobre ti no siempre te ayuda a conocerte mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas. La rumiación no es introspección. Nolen-Hoeksema (1991) mostró que la rumiación sobre uno mismo agrava el estado emocional y no produce insight, mientras que la introspección dirigida (con una pregunta concreta y un tiempo límite) sí. La diferencia está en el producto: la introspección termina en una conclusión o un plan; la rumiación repite la pregunta sin avanzar. Si llevas tiempo dándole vueltas a algo sin llegar a ninguna conclusión, no estás introspeccionando: estás rumiando.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Otros ven tu patrón",
-    "content": "Tú ves tus intenciones; los demás ven tu comportamiento repetido. Preguntar qué patrón perciben en ti puede revelar lo que la introspección no alcanza.",
+    "content": "Tú ves tus intenciones; los demás ven tu comportamiento repetido. Preguntar qué patrón perciben en ti puede revelar lo que la introspección no alcanza. Carl Rogers enfatizó la discrepancia entre autoconcepto y experiencia como fuente de malestar; la retroalimentación externa es una forma de reducir esa discrepancia. Pedir a alguien de confianza que describa tu patrón habitual, sin justificar ni defenderse al escucharlo, ofrece información que la introspección no puede generar: la visión que otros tienen de ti, no la que tú tienes de ti.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Error de atribución",
-    "content": "Explicas tus errores por la situación, pero los de otros por su carácter. No es hipocresía consciente — es el error fundamental de atribución, y es universal.",
+    "title": "Error fundamental de atribución",
+    "content": "Explicas tus errores por la situación, pero los de otros por su carácter. No es hipocresía consciente: es el error fundamental de atribución, y es universal. Ross (1977) lo documentó: tendemos a atribuir la conducta ajena a disposiciones estables («es así») y la propia a circunstancias («me tocó»). El sesgo erosiona relaciones y equipos: juzga al otro por su conducta visible sin ver su contexto, y te juzga a ti por tu contexto sin ver tu conducta visible. Antes de atribuir un error al carácter de alguien, pregunta qué situación podría haber producido la misma conducta en ti.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Profecía autocumplida",
-    "content": "La profecía autocumplida es real: creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice — puede causar.",
+    "content": "La profecía autocumplida es real: creer que algo va a pasar cambia tu comportamiento de forma que lo hace más probable. La expectativa no solo predice: puede causar. Rosenthal y Jacobson (1968) mostraron que las expectativas de los profesores sobre el rendimiento de los alumnos afectaban al rendimiento real, aunque las expectativas se habían asignado al azar. El mecanismo opera por la conducta que la expectativa genera: si esperas lo bueno, ofreces más oportunidades; si esperas lo malo, las reduces. La profecía no es magia: es conducta adaptada a una creencia. Las creencias sobre ti mismo y sobre los demás operan igual: confirman lo que ya creían.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Creer que puedes",
-    "content": "Autoeficacia: la creencia en tu capacidad para ejecutar acciones necesarias influye directamente en si las intentas, cuánto te esfuerzas y cuánto persistes ante obstáculos. No es optimismo ciego; es calibración de capacidad basada en experiencia.",
+    "content": "Autoeficacia: la creencia en tu capacidad para ejecutar las acciones necesarias influye directamente en si las intentas, cuánto te esfuerzas y cuánto persistes ante obstáculos. No es optimismo ciego; es calibración de capacidad basada en experiencia. Bandura (1977, 1997) mostró que la autoeficacia predice la perseverancia y el rendimiento mejor que la habilidad sola, y que se construye principalmente por experiencia de dominio. Cuanta más evidencia acumulas de haber superado retos similares, más autoeficacia tienes. No es creer que puedes: es saber que has podido.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Aprendizaje autorregulado",
-    "content": "El aprendizaje autorregulado tiene tres fases: planificación (establecer metas y estrategias), ejecución (monitorear el progreso y ajustar), y reflexión (evaluar resultados y adaptar). Quienes regulan su propio aprendizaje no solo estudian más; estudian mejor.",
+    "content": "El aprendizaje autorregulado tiene tres fases: planificación (establecer metas y estrategias), ejecución (supervisar el progreso y ajustar) y reflexión (evaluar resultados y adaptar). Quienes regulan su propio aprendizaje no solo estudian más: estudian mejor.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Construcción de autoeficacia",
-    "content": "La autoeficacia se construye: la experiencia directa de dominio es la fuente más potente, y la vicaria —observar a alguien similar lograr una meta— es la segunda. Ver que otro puede hace que creas que tú también.",
+    "content": "La autoeficacia se construye: la experiencia directa de dominio es la fuente más potente, y la vicaria —observar a alguien similar lograr una meta— es la segunda. Ver que otro puede hacerlo hace que creas que tú también.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "El mecanismo de la autoeficacia",
-    "content": "Las cuatro fuentes de autoeficacia: experiencias de dominio (la más potente), experiencia vicaria (ver a otros lograrlo), persuasión social (feedback creíble) y estados fisiológicos (interpretar activación como capacidad, no amenaza). Comprender el mecanismo permite diseñar intervenciones.",
+    "content": "Las cuatro fuentes de autoeficacia: experiencia de dominio (la más potente), experiencia vicaria (ver a otros lograrlo), persuasión social (retroalimentación creíble) y estados fisiológicos (interpretar la activación como capacidad, no como amenaza). Comprender el mecanismo permite diseñar intervenciones. Bandura (1977, 1997) mostró que cada fuente tiene un peso distinto y que la experiencia de dominio es la que más transferencia produce. Diseñar tu aprendizaje buscando pequeñas experiencias de éxito, observar a pares similares, recibir retroalimentación específica de quien te resulta creíble y reinterpretar la activación fisiológica como energía disponible son las cuatro palancas que sostienen la autoeficacia.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Autoeficacia vicaria y modelado",
-    "content": "Ver a un semejante dominar una habilidad produce un aumento mayor en autoeficacia que ver a un experto. La similitud con el modelo importa más que su nivel de habilidad. Por eso los modelos cercanos son más efectivos que los distantes.",
+    "content": "Ver a un semejante dominar una habilidad produce un aumento mayor en autoeficacia que ver a un experto. La similitud con el modelo importa más que su nivel de habilidad. Por eso los modelos cercanos son más efectivos que los distantes. Bandura (1977) mostró que la eficacia vicaria depende de la similitud percibida: si el modelo es percibido como demasiado distinto, su éxito se atribuye a factores inalcanzables y no aumenta la autoeficacia del observador. Para aprovechar este mecanismo, busca modelos un paso por delante de ti, no diez pasos. Lo que consiguió alguien parecido a ti te parece más alcanzable que lo que consiguió un genio.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
-    "title": "Heurísticos rápido y frugales",
+    "title": "Heurísticos rápidos y frugales",
     "content": "Los heurísticos no son solo fuentes de error. Son herramientas adaptativas que funcionan sorprendentemente bien con poca información. Reconocer una sola buena razón puede superar a analizar veinte variables.",
     "plan": "FREE"
   },
   {
     "empire": "mente",
     "title": "Ruido en las decisiones",
-    "content": "Además del sesgo sistemático, existe variabilidad aleatoria en juicios profesionales: el mismo caso evaluado por expertos diferentes produce veredictos distintos. Este 'ruido' es tan costoso como el sesgo y más fácil de ignorar.",
+    "content": "Además del sesgo sistemático, existe variabilidad aleatoria en los juicios profesionales: el mismo caso evaluado por expertos diferentes produce veredictos distintos. Este «ruido» es tan costoso como el sesgo y más fácil de ignorar. Kahneman, Sibony y Sunstein (2021) distinguieron sesgo (desviación sistemática) de ruido (variabilidad aleatoria) y mostraron que en muchos contextos profesionales (médicos, jueces, evaluadores) el ruido explica una parte importante de la inconsistencia. Reducirlo requiere procedimientos estructurados, rúbricas comunes y agregación de juicios independientes. Donde hay ruido, dos cabezas no pensaban mejor que una porque no pensaban lo mismo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Pensamiento probabilístico",
-    "content": "Pensar en probabilidades en vez de certezas: reemplazar 'va a pasar' por 'hay un X% de probabilidad'. Las frecuencias naturales (3 de cada 10) se procesan mejor que porcentajes abstractos. Entender incertidumbre no es paralizante; es más preciso que la falsa certeza.",
+    "content": "Pensar en probabilidades en vez de certezas: reemplazar «va a pasar» por «hay un X % de probabilidad». Las frecuencias naturales (3 de cada 10) se procesan mejor que los porcentajes abstractos. Gigerenzer (2002) mostró que las frecuencias naturales mejoran el razonamiento probabilístico porque el cerebro las procesa de forma más intuitiva. Entender la incertidumbre no es paralizante: es más preciso que la falsa certeza. Si dices «seguro que pasa», no estás prediciendo, estás declarando. Decir «70 % de probabilidad» obliga a preparar también el 30 % restante, y eso mejora la decisión.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Superpredicción",
-    "content": "Algunas personas predicen eventos futuros sistemáticamente mejor que otras. Los superpredicciones no son videntes; combinan pensamiento probabilístico, actualización de creencias y descomposición de problemas. La buena noticia: estas habilidades se pueden entrenar.",
+    "content": "Algunas personas predicen eventos futuros sistemáticamente mejor que otras. Las superpredicciones no son videntes; combinan pensamiento probabilístico, actualización de creencias y descomposición de problemas. Tetlock y Gardner (2015) mostraron en un estudio de diez años que la precisión predictiva no depende de la experiencia ni del acceso a información privilegiada, sino de ciertos hábitos cognitivos: pensar en probabilidades, actualizar las creencias con la nueva evidencia, descomponer el problema en partes y considerar activamente las razones por las que uno podría estar equivocado. La buena noticia es que estos hábitos se pueden entrenar. La predicción no es un don: es una habilidad.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "Probabilidad subjetiva y sesgo de confianza",
-    "content": "Las personas sistemáticamente sobreestiman la precisión de sus juicios probabilísticos. Estar muy seguro no es lo mismo que estar en lo cierto. La calibración — alinear certeza con precisión — es una habilidad medible y mejorable que distingue a los mejores tomadores de decisiones.",
+    "content": "Las personas sistemáticamente sobreestiman la precisión de sus juicios probabilísticos. Estar muy seguro no es lo mismo que estar en lo cierto. La calibración —alinear la certeza con la precisión— es una habilidad medible y mejorable que distingue a los mejores tomadores de decisiones. Lichtenstein, Fischhoff y Phillips (1982) documentaron el sesgo de sobreconfianza: la certeza subjetiva supera sistemáticamente la precisión objetiva, especialmente en juicios de conocimiento general. La calibración se entrena con retroalimentación frecuente: predice, anota tu confianza, verifica el resultado y ajusta. Con el tiempo, la certeza empieza a parecerse a la precisión.",
     "plan": "PREMIUM"
   }
 ]
