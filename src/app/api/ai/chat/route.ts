@@ -38,25 +38,14 @@ async function handler(request: NextRequest) {
     const isPremium = user.plan === 'PREMIUM';
     const dailyLimit = getDailyLimit(user.plan);
 
-    // Check AI limits
-    const limitCheck = await checkAILimit(user.id, user.plan);
-    if (!limitCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: 'Daily message limit reached. Con Élite, mensajes ilimitados.',
-          remaining: 0,
-          limit: dailyLimit,
-          plan: user.plan,
-        },
-        { status: 403 }
-      );
-    }
-
-    // H-1 FIX: limitConsumed is set AFTER all validations pass, not before.
-    // Previously it was set right after checkAILimit, but returns for invalid
-    // threadId/content/thread would leave the credit consumed without rollback
-    // (return inside try does NOT trigger catch). Now the credit is only
-    // consumed when we're committed to calling Groq.
+    // FINAL-2 FIX: All validations must pass BEFORE consuming the AI credit.
+    // Previously checkAILimit() was called first, atomically incrementing the
+    // counter. But return statements for missing threadId, content too long,
+    // or thread not found did NOT trigger the catch block (return ≠ throw),
+    // so the credit was permanently lost. Now we validate everything first,
+    // then consume the credit only when we're committed to calling Groq.
+    // The advisory lock inside checkAILimit handles concurrency between
+    // requests that both pass validation.
 
     const { threadId, content } = await request.json();
 
@@ -78,8 +67,23 @@ async function handler(request: NextRequest) {
       return NextResponse.json({ error: 'Thread not found or archived' }, { status: 404 });
     }
 
-    // All validations passed — credit is now committed. Any failure after this
-    // point (Groq error, DB save error) will trigger rollback in the catch block.
+    // All validations passed — now consume the AI credit. Any failure after
+    // this point (Groq error, DB save error) will trigger rollback in the
+    // catch block via rollbackAILimit().
+    const limitCheck = await checkAILimit(user.id, user.plan);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily message limit reached. Con Élite, mensajes ilimitados.',
+          remaining: 0,
+          limit: dailyLimit,
+          plan: user.plan,
+        },
+        { status: 403 }
+      );
+    }
+
+    // Credit consumed — any failure from here triggers rollback.
     limitConsumed = true;
 
     // H-2 FIX: Acquire a session-level advisory lock keyed on the threadId

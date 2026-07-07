@@ -79,20 +79,24 @@ export async function POST(request: NextRequest) {
     // nutrition POST) — all share the same (userId, today) key.
     //
     // The date stored is the Madrid date key provided by the client (frontend
-    // sends getTodayDateKey()). We compute the Madrid day window from this key
-    // so the "first log today" check matches the user's perceived day.
-    const todayDateKey = getTodayDateKey();
+    // sends getTodayDateKey()). We compute the Madrid day window from the LOG's
+    // date key so the "first log of this day" check matches the log's perceived
+    // day — not necessarily today. This is consistent with the finance POST
+    // pattern and prevents streak inflation when backdating logs.
+    // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
+    // todayDateKey, mirroring the finance/route.ts pattern.
     const logDate = new Date(date);
-    const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+    const logDateKey = getMadridDateKey(logDate);
+    const { todayStart, todayEnd } = madridDayBoundaries(logDateKey);
 
     const log = await db.$transaction(async (tx) => {
-      // Acquire transaction-scoped advisory lock on (userId, today).
-      // Key is derived from md5(userId || '|' || dateKey) — first 8 bytes as a
+      // Acquire transaction-scoped advisory lock on (userId, logDateKey).
+      // Key is derived from md5(userId || '|' || logDateKey) — first 8 bytes as a
       // bigint. Collisions are acceptable (worst case: two unrelated users
       // serialize unnecessarily).
       await tx.$executeRaw`
         SELECT pg_advisory_xact_lock(
-          ('x' || substring(md5(${user.id} || '|energia|' || ${todayDateKey}), 1, 16))::bit(64)::bigint
+          ('x' || substring(md5(${user.id} || '|energia|' || ${logDateKey}), 1, 16))::bit(64)::bigint
         )`;
 
       const existing = await tx.wellnessLog.findUnique({

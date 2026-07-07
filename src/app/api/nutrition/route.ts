@@ -78,17 +78,20 @@ export async function POST(request: NextRequest) {
     // The advisory lock key MUST match the one used in wellness/route.ts so
     // that cross-type races are serialized correctly. The key includes the
     // literal 'energia' to namespace it.
-    const todayDateKey = getTodayDateKey();
+    // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
+    // todayDateKey, mirroring the finance/route.ts pattern and matching
+    // the wellness/route.ts fix.
     const logDate = new Date(date);
-    const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+    const logDateKey = getMadridDateKey(logDate);
+    const { todayStart, todayEnd } = madridDayBoundaries(logDateKey);
 
     const log = await db.$transaction(async (tx) => {
-      // Acquire transaction-scoped advisory lock on (userId, today).
+      // Acquire transaction-scoped advisory lock on (userId, logDateKey).
       // Key MUST match the one in wellness/route.ts so cross-type POSTs are
       // serialized.
       await tx.$executeRaw`
         SELECT pg_advisory_xact_lock(
-          ('x' || substring(md5(${user.id} || '|energia|' || ${todayDateKey}), 1, 16))::bit(64)::bigint
+          ('x' || substring(md5(${user.id} || '|energia|' || ${logDateKey}), 1, 16))::bit(64)::bigint
         )`;
 
       const existing = await tx.nutritionLog.findUnique({
