@@ -76,6 +76,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Levels must be between 1 and 5' }, { status: 400 });
     }
 
+    // GLOBAL-9 FIX: Validate goals and initialHabits arrays to prevent
+    // excessive payload sizes and DB bloat.
+    const MAX_GOALS = 20;
+    const MAX_HABITS = 20;
+    const MAX_STRING_LENGTH = 100;
+
+    // Validate goals
+    if (goals !== undefined && goals !== null) {
+      if (!Array.isArray(goals)) {
+        return NextResponse.json({ error: 'goals must be an array' }, { status: 400 });
+      }
+      if (goals.length > MAX_GOALS) {
+        return NextResponse.json({ error: `goals must have at most ${MAX_GOALS} items` }, { status: 400 });
+      }
+      for (const g of goals) {
+        if (typeof g !== 'string' || g.length > MAX_STRING_LENGTH) {
+          return NextResponse.json({ error: `Each goal must be a string of at most ${MAX_STRING_LENGTH} characters` }, { status: 400 });
+        }
+      }
+    }
+
+    // Validate initialHabits
+    if (initialHabits !== undefined && initialHabits !== null) {
+      if (!Array.isArray(initialHabits)) {
+        return NextResponse.json({ error: 'initialHabits must be an array' }, { status: 400 });
+      }
+      if (initialHabits.length > MAX_HABITS) {
+        return NextResponse.json({ error: `initialHabits must have at most ${MAX_HABITS} items` }, { status: 400 });
+      }
+      for (const h of initialHabits) {
+        if (typeof h !== 'string' || !h.trim() || h.length > MAX_STRING_LENGTH) {
+          return NextResponse.json({ error: `Each habit must be a non-empty string of at most ${MAX_STRING_LENGTH} characters` }, { status: 400 });
+        }
+      }
+    }
+
     // Update user name if provided and current name is default (email prefix)
     if (name && typeof name === 'string' && name.trim()) {
       const currentName = user.name || '';

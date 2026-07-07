@@ -14,8 +14,13 @@
 //   - Widget rendering failures
 //
 // All tracking is fire-and-forget and never blocks widget operation.
+//
+// GLOBAL-2 FIX: All functions in this module are called exclusively from
+// server-side code (snapshot.ts, API routes, triggers.ts). They now use
+// serverLog (server-logger) instead of reportError (client logger) which
+// was a silent no-op on the server.
 
-import { reportError } from './logger';
+import { serverLog } from './server-logger';
 
 // ─── Widget Error Tracking ──────────────────
 
@@ -29,15 +34,8 @@ export function trackWidgetSnapshotFailure(
   userId?: string,
 ): void {
   const message = error instanceof Error ? error.message : 'Snapshot computation failed';
-  const errorType = error instanceof Error ? error.constructor.name : 'UnknownError';
 
-  reportError(
-    'widget_refresh',
-    'error',
-    `Snapshot failed: ${widgetType} — ${message}`,
-    errorType,
-    { widgetType, route: '/api/widgets/[type]' },
-  );
+  serverLog.error('widget_refresh', `Snapshot failed: ${widgetType} — ${message}`, error, { widgetType, route: '/api/widgets/[type]' });
 }
 
 /**
@@ -48,13 +46,7 @@ export function trackWidgetRefreshRateLimit(
   widgetType: string,
   reason: string,
 ): void {
-  reportError(
-    'widget_refresh',
-    'info', // Not an error — just informational
-    `Refresh rate limited: ${widgetType} — ${reason}`,
-    'RateLimitHit',
-    { widgetType },
-  );
+  serverLog.info('widget_refresh', `Refresh rate limited: ${widgetType} — ${reason}`, { widgetType });
 }
 
 /**
@@ -68,13 +60,7 @@ export function trackWidgetCacheFailure(
 ): void {
   const message = error instanceof Error ? error.message : 'Cache operation failed';
 
-  reportError(
-    'widget_refresh',
-    'warning',
-    `Cache ${operation} failed: ${widgetType} — ${message}`,
-    'CacheError',
-    { widgetType },
-  );
+  serverLog.warn('widget_refresh', `Cache ${operation} failed: ${widgetType} — ${message}`, { widgetType });
 }
 
 /**
@@ -88,13 +74,11 @@ export function trackWidgetApiError(
 ): void {
   const message = error instanceof Error ? error.message : `API error ${statusCode}`;
 
-  reportError(
-    'widget_refresh',
-    statusCode >= 500 ? 'error' : 'warning',
-    `Widget API error: ${widgetType} — ${statusCode} — ${message}`,
-    'WidgetApiError',
-    { widgetType, route: '/api/widgets/[type]' },
-  );
+  if (statusCode >= 500) {
+    serverLog.error('widget_refresh', `Widget API error: ${widgetType} — ${statusCode} — ${message}`, error, { widgetType, route: '/api/widgets/[type]' });
+  } else {
+    serverLog.warn('widget_refresh', `Widget API error: ${widgetType} — ${statusCode} — ${message}`, { widgetType, route: '/api/widgets/[type]' });
+  }
 }
 
 /**
@@ -107,10 +91,5 @@ export function trackWidgetTriggerFailure(
 ): void {
   const message = error instanceof Error ? error.message : 'Trigger failed';
 
-  reportError(
-    'widget_refresh',
-    'warning',
-    `Trigger failed: ${trigger} — ${message}`,
-    'TriggerError',
-  );
+  serverLog.warn('widget_refresh', `Trigger failed: ${trigger} — ${message}`, { trigger });
 }

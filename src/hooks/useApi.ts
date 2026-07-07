@@ -165,11 +165,18 @@ export function useApi() {
     };
 
     const executeWithRetry = async (): Promise<Response> => {
+      // GLOBAL-5 FIX: Only retry GET requests. POST/PUT/PATCH/DELETE are
+      // non-idempotent — retrying them can create duplicate records (e.g.,
+      // duplicate journal entries, meditation sessions, finance logs).
+      // GET requests are safe to retry because they don't mutate state.
+      const httpMethod = (options?.method || 'GET').toUpperCase();
+      const isSafeToRetry = httpMethod === 'GET';
+
       try {
         const res = await attemptFetch();
 
-        // ─── Retry on transient server errors ───
-        if (isRetryableStatus(res.status)) {
+        // ─── Retry on transient server errors (GET only) ───
+        if (isSafeToRetry && isRetryableStatus(res.status)) {
           trackRetry(path, `${res.status}`);
 
           // Wait and retry once
@@ -196,7 +203,7 @@ export function useApi() {
           return new Response(JSON.stringify({ error: 'Request aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
         }
 
-        if (isRetryableError(error)) {
+        if (isSafeToRetry && isRetryableError(error)) {
           trackRetry(path, error instanceof DOMException ? 'timeout' : 'network_error');
 
           // Wait and retry once

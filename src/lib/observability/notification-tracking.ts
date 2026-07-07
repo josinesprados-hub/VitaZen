@@ -14,8 +14,15 @@
 // These failures are usually silent — the user never knows
 // notifications aren't being delivered. This module tracks
 // them so we can identify and fix delivery issues.
+//
+// GLOBAL-2 FIX: Server-side functions (trackFCMSendFailure, trackFCMInvalidTokens,
+// trackNoActiveTokens, trackNotificationGateFailure, trackNotificationDedupFailure)
+// now use serverLog instead of the client-side reportError which was a silent
+// no-op on the server. Client-side functions (trackPush*, trackSW*) still use
+// reportError from the client logger.
 
 import { reportError } from './logger';
+import { serverLog } from './server-logger';
 
 // ─── FCM Token Errors ───────────────────────
 
@@ -84,13 +91,7 @@ export function trackFCMSendFailure(
 ): void {
   const message = error instanceof Error ? error.message : 'FCM send failed';
 
-  reportError(
-    'push_notification',
-    'error',
-    `FCM send failed (${tokenCount} tokens): ${message}`,
-    error instanceof Error ? error.constructor.name : 'FCMError',
-    { route: '/api/notifications' },
-  );
+  serverLog.error('push_notification', `FCM send failed (${tokenCount} tokens): ${message}`, error, { route: '/api/notifications' });
 }
 
 /**
@@ -100,13 +101,7 @@ export function trackFCMSendFailure(
 export function trackFCMInvalidTokens(count: number): void {
   if (count === 0) return;
 
-  reportError(
-    'push_notification',
-    'info',
-    `FCM reported ${count} invalid token(s) — cleaned up`,
-    'InvalidTokens',
-    { route: '/api/notifications' },
-  );
+  serverLog.info('push_notification', `FCM reported ${count} invalid token(s) — cleaned up`, { route: '/api/notifications' });
 }
 
 /**
@@ -114,12 +109,7 @@ export function trackFCMInvalidTokens(count: number): void {
  * May indicate a registration issue.
  */
 export function trackNoActiveTokens(): void {
-  reportError(
-    'push_notification',
-    'info',
-    'No active push tokens for user — cannot deliver notifications',
-    'NoTokens',
-  );
+  serverLog.info('push_notification', 'No active push tokens for user — cannot deliver notifications');
 }
 
 // ─── Service Worker Errors ──────────────────
@@ -160,13 +150,7 @@ export function trackSWBackgroundMessageError(error: unknown): void {
 export function trackNotificationGateFailure(error: unknown): void {
   const message = error instanceof Error ? error.message : 'Gate check failed';
 
-  reportError(
-    'push_notification',
-    'warning',
-    `Notification gate check failed: ${message}`,
-    error instanceof Error ? error.constructor.name : 'GateError',
-    { route: '/api/notifications' },
-  );
+  serverLog.warn('push_notification', `Notification gate check failed: ${message}`, error, { route: '/api/notifications' });
 }
 
 /**
@@ -175,11 +159,5 @@ export function trackNotificationGateFailure(error: unknown): void {
 export function trackNotificationDedupFailure(error: unknown): void {
   const message = error instanceof Error ? error.message : 'Dedup check failed';
 
-  reportError(
-    'push_notification',
-    'warning',
-    `Notification dedup check failed: ${message}`,
-    error instanceof Error ? error.constructor.name : 'DedupError',
-    { route: '/api/notifications' },
-  );
+  serverLog.warn('push_notification', `Notification dedup check failed: ${message}`, error, { route: '/api/notifications' });
 }
