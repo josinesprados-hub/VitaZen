@@ -171,6 +171,19 @@ export async function POST(request: NextRequest) {
     const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
 
     const session = await db.$transaction(async (tx) => {
+      // CERT-1 FIX: Acquire transaction-scoped advisory lock on (userId, today)
+      // before reading or writing. Without this lock, two concurrent POSTs
+      // (e.g., mobile + desktop completing a meditation simultaneously) both
+      // enter the transaction, both create a session, both run findFirst
+      // (which doesn't see the other's uncommitted row under READ COMMITTED),
+      // both see isFirstSessionToday=true, and both increment the mente streak.
+      // This mirrors the pattern in checkin/route.ts:138-141.
+      const lockSeed = user.id + '|' + todayDateKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
       const created = await tx.meditationSession.create({
         data: { userId: user.id, duration, type },
       });
