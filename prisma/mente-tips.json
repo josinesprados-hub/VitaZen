@@ -290,13 +290,13 @@
   {
     "empire": "mente",
     "title": "Cuando estás cargado",
-    "content": "Tu capacidad de ignorar distracciones depende de cuánto tienes ya en la cabeza, no solo de tu voluntad. Una mente ocupada se distrae más fácilmente. Lavie (2010) formuló la teoría de la carga perceptiva: cuando la carga es alta, la capacidad de procesar distracciones se reduce; cuando es baja, las distracciones ocupan el espacio sobrante. La concentración no depende solo de la motivación: depende de cuánto estás procesando ya.",
+    "content": "Tu capacidad de ignorar distracciones depende de cuánto tienes ya en la cabeza, no solo de tu voluntad. Una mente ocupada se distrae más fácilmente. Lavie (1995) formuló la teoría de la carga perceptiva: cuando la carga es alta, la capacidad de procesar distracciones se reduce; cuando es baja, las distracciones ocupan el espacio sobrante. La concentración no depende solo de la motivación: depende de cuánto estás procesando ya.",
     "plan": "PREMIUM"
   },
   {
     "empire": "mente",
     "title": "La ilusión de profundidad",
-    "content": "Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. La familiaridad no es comprensión. Kornell y Bjork (2008) mostraron que la relectura genera una fluidez ilusoria: sentir que el material te resulta familiar se confunde con haberlo comprendido. Para distinguir una de otra, cierra el material y trata de explicarlo con tus palabras. Si no puedes, lo que tenías era familiaridad, no comprensión.",
+    "content": "Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. La familiaridad no es comprensión. Kornell y Bjork (2007) mostraron que la relectura genera una fluidez ilusoria: sentir que el material te resulta familiar se confunde con haberlo comprendido. Para distinguir una de otra, cierra el material y trata de explicarlo con tus palabras. Si no puedes, lo que tenías era familiaridad, no comprensión.",
     "plan": "PREMIUM"
   },
   {
@@ -362,7 +362,7 @@
   {
     "empire": "mente",
     "title": "Sesgo del superviviente",
-    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. Es el sesgo del superviviente: la muestra visible nunca es la completa. Taleb (2004) lo popularizó con el ejemplo de los bomberos: el que sobrevive cuenta su historia; el que no, no. El sesgo opera en inversiones, carreras y hábitos: ves a quien triunfo siguiendo cierto método y asumes que el método funciona, sin ver a los muchos que lo siguieron y no llegaron. Antes de imitar a un ganador, pregunta cuántos perdedores siguieron el mismo camino y por qué no los ves.",
+    "content": "Solo ves los casos de éxito. Los fracasos que no ves te hacen sobreestimar las probabilidades. Es el sesgo del superviviente: la muestra visible nunca es la completa. Taleb (2004) lo popularizó con el ejemplo de los bomberos: el que sobrevive cuenta su historia; el que no, no. El sesgo opera en inversiones, carreras y hábitos: ves a quien triunfó siguiendo cierto método y asumes que el método funciona, sin ver a los muchos que lo siguieron y no llegaron. Antes de imitar a un ganador, pregunta cuántos perdedores siguieron el mismo camino y por qué no los ves.",
     "plan": "PREMIUM"
   },
   {
@@ -428,7 +428,7 @@
   {
     "empire": "mente",
     "title": "Aceptar no es resignarse",
-    "content": "Aceptar una emoción no es rendirse a ella. Es dejar de luchar contra ella para poder responder en vez de reaccionar. Hayes et al. (2006), en la terapia de aceptación y compromiso, mostraron que la aceptación reduce la intensidad emocional más que la supresión, además de mejorar la capacidad de actutar según los propios valores. La diferencia entre aceptar y resignarse está en la acción: la aceptación deja pasar la emoción para actuar con claridad; la resignación deja pasar la emoción y también la acción.",
+    "content": "Aceptar una emoción no es rendirse a ella. Es dejar de luchar contra ella para poder responder en vez de reaccionar. Hayes et al. (2006), en la terapia de aceptación y compromiso, mostraron que la aceptación reduce la intensidad emocional más que la supresión, además de mejorar la capacidad de actuar según los propios valores. La diferencia entre aceptar y resignarse está en la acción: la aceptación deja pasar la emoción para actuar con claridad; la resignación deja pasar la emoción y también la acción.",
     "plan": "PREMIUM"
   },
   {
@@ -452,7 +452,7 @@
   {
     "empire": "mente",
     "title": "Recordar es reconstruir",
-    "content": "Cada vez que recuerdas algo, lo reconstruyes. No es una grabación fiel: es algo que puede cambiar sin que lo notes. Schacter (1999) documentó que la memoria es reconstructiva, no reproductiva, y que cada recuperación puede introducir modificaciones que se integran en el recuerdo. Esto explica los falsos recuerdos y la formación de memorias de eventos que no ocurrieron tal como se relatan. La implicación práctica es que tu memoria no es un archivo: es una reconstrcción sujeta a edición. Anotar lo importante cuando ocurre reduce la deformación posterior.",
+    "content": "Cada vez que recuerdas algo, lo reconstruyes. No es una grabación fiel: es algo que puede cambiar sin que lo notes. Schacter (1999) documentó que la memoria es reconstructiva, no reproductiva, y que cada recuperación puede introducir modificaciones que se integran en el recuerdo. Esto explica los falsos recuerdos y la formación de memorias de eventos que no ocurrieron tal como se relatan. La implicación práctica es que tu memoria no es un archivo: es una reconstrucción sujeta a edición. Anotar lo importante cuando ocurre reduce la deformación posterior.",
     "plan": "PREMIUM"
   },
   {
@@ -464,7 +464,7 @@
   {
     "empire": "mente",
     "title": "La emoción fija",
-    "content": "Lo que aprendes cuando sientes algo se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción ayuda a que se fija. McGaugh (2004) mostró que la activación emocional modula la consolidación de la memoria a través de la amígdala, que marca ciertos recuerdos como prioritarios. La emoción no es enemiga del aprendizaje: es su etiqueta de prioridad. La condición es la intensidad: la emoción moderada consolida; la emoción extrema interfiere, especialmente si se produce durante la codificación.",
+    "content": "Lo que aprendes cuando sientes algo se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción ayuda a que se fije. McGaugh (2004) mostró que la activación emocional modula la consolidación de la memoria a través de la amígdala, que marca ciertos recuerdos como prioritarios. La emoción no es enemiga del aprendizaje: es su etiqueta de prioridad. La condición es la intensidad: la emoción moderada consolida; la emoción extrema interfiere, especialmente si se produce durante la codificación.",
     "plan": "PREMIUM"
   },
   {
@@ -500,7 +500,7 @@
   {
     "empire": "mente",
     "title": "Recuperar es rendimiento",
-    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse: es parte del rendimiento. Erickson et al. (1993) mostraron que los expertos de élite no solo practican más horas: duermen más y hacen pausas deliberadas con más frecuencia. La recuperación no interrumpe el rendimiento: lo sostiene. La condición es la calidad: el descanso pasivo (desplazarse con el móvil) no recupera tanto como el descanso activo (caminar sin estímulos, dormir). El rendimiento sin recuperación se degrada; la recuperación sin rendimiento no produce mejora.",
+    "content": "El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse: es parte del rendimiento. Ericsson, Krampe y Tesch-Römer (1993) mostraron que los expertos de élite no solo practican más horas: duermen más y hacen pausas deliberadas con más frecuencia. La recuperación no interrumpe el rendimiento: lo sostiene. La condición es la calidad: el descanso pasivo (desplazarse con el móvil) no recupera tanto como el descanso activo (caminar sin estímulos, dormir). El rendimiento sin recuperación se degrada; la recuperación sin rendimiento no produce mejora.",
     "plan": "PREMIUM"
   },
   {
@@ -554,7 +554,7 @@
   {
     "empire": "mente",
     "title": "Cuestionar lo establecido",
-    "content": "Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo establecido no es rebelión: es método. Esta práctica, asociada al escepticismismo metódico de Descartes y al falsacionismo de Popper, consiste en someter cada supuesto a la pregunta: ¿qué evidencia tengo para creer esto? Muchos supuestos no sobreviven a la pregunta. La incomodidad de no saber es preferible a la falsa seguridad de creer saber. El método no garantiza acertar: reduce la probabilidad de creer sin evidencia.",
+    "content": "Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo establecido no es rebelión: es método. Esta práctica, asociada al escepticismo metódico de Descartes y al falsacionismo de Popper, consiste en someter cada supuesto a la pregunta: ¿qué evidencia tengo para creer esto? Muchos supuestos no sobreviven a la pregunta. La incomodidad de no saber es preferible a la falsa seguridad de creer saber. El método no garantiza acertar: reduce la probabilidad de creer sin evidencia.",
     "plan": "PREMIUM"
   },
   {
@@ -578,7 +578,7 @@
   {
     "empire": "mente",
     "title": "Pensar mucho no siempre aclara",
-    "content": "Pensar mucho sobre ti no siempre te ayuda a conocerte mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas. La rumiación no es introspección. Nolen-Hoeksema (1991) mostró que la rumiación sobre uno mismo agrava el estado emocional y no produce insight, mientras que la introspección dirigida (con una pregunta concreta y un tiempo límite) sí. La diferencia está en el producto: la introspección termina en una conclusión o un plan; la rumiación repite la pregunta sin avanzar. Si llevas tiempo dándole vueltas a algo sin llegar a ninguna conclusión, no estás introspeccionando: estás rumiando.",
+    "content": "Pensar mucho sobre ti no siempre te ayuda a conocerte mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas. La rumiación no es introspección. Nolen-Hoeksema (1991) mostró que la rumiación sobre uno mismo agrava el estado emocional y no produce comprensión, mientras que la introspección dirigida (con una pregunta concreta y un tiempo límite) sí. La diferencia está en el producto: la introspección termina en una conclusión o un plan; la rumiación repite la pregunta sin avanzar. Si llevas tiempo dándole vueltas a algo sin llegar a ninguna conclusión, no estás introspeccionando: estás rumiando.",
     "plan": "PREMIUM"
   },
   {

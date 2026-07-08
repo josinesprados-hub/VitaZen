@@ -68,7 +68,7 @@
   {
     "empire": "energia",
     "title": "La caída de las tres",
-    "content": "La bajada de energía a media tarde es real y tiene que ver con el ritmo del cuerpo. No es solo la comida — es un ciclo natural. Una pausa breve funciona mejor que otro café.",
+    "content": "La bajada de energía a media tarde es real y tiene dos causas que se suman: el ritmo circadiano (ventana secundaria de somnolencia entre las 14 y las 16 h) y la comida del mediodía (que la amplifica si es copiosa). No es uno u otro: es la combinación. Una pausa breve funciona mejor que otro café, especialmente si el almuerzo fue ligero.",
     "plan": "FREE"
   },
   {
@@ -122,7 +122,7 @@
   {
     "empire": "energia",
     "title": "Aire y cerebro",
-    "content": "Allen et al. (2016): el CO2 por encima de 1000 ppm reduce la función cognitiva en un 15-50 %. El mecanismo es la vasodilatación cerebral y la reducción de oxígeno disponible para la corteza prefrontal. En oficinas y habitaciones cerradas, los niveles de CO2 pueden superar los 2000 ppm en horas. Ventilar no es comodidad: es rendimiento cognitivo. Abrir una ventana diez minutos o tomar aire fuera puede restaurar la capacidad de pensar con claridad.",
+    "content": "Allen et al. (2016): el CO2 por encima de 1000 ppm reduce la función cognitiva en un 15-50 %. El mecanismo no es la falta de oxígeno (la hipercapnia leve aumenta el flujo sanguíneo cerebral), sino los efectos directos del CO2 sobre el pH neuronal y la neurotransmisión, cuyos detalles exactos aún se investigan. En oficinas y habitaciones cerradas, los niveles de CO2 pueden superar los 2000 ppm en horas. Ventilar no es comodidad: es rendimiento cognitivo. Abrir una ventana diez minutos o tomar aire fuera puede restaurar la capacidad de pensar con claridad.",
     "plan": "FREE"
   },
   {
@@ -164,7 +164,7 @@
   {
     "empire": "energia",
     "title": "El peso del almuerzo",
-    "content": "Un almuerzo pesado desvía sangre al sistema digestivo y genera letargo por la tarde. Un almuerzo moderado te permite seguir. La cantidad importa tanto como la calidad. Las comidas pesadas al mediodía son la causa más común de la caída de energía de la tarde: no siempre es el ritmo circadiano, a veces es simplemente lo que comiste y cuánto.",
+    "content": "Un almuerzo pesado desvía sangre al sistema digestivo y amplifica la caída de energía de la tarde, que también tiene un componente circadiano real (ventana de somnolencia entre las 14 y las 16 h). Un almuerzo moderado te permite seguir sin sumar letargo al bajón natural. La cantidad importa tanto como la calidad: las comidas copiosas al mediodía hacen visible la caída que el ritmo circadiano ya producía.",
     "plan": "FREE"
   },
   {
@@ -200,7 +200,7 @@
   {
     "empire": "energia",
     "title": "La jerarquía funciona",
-    "content": "Antes de buscar suplementos o rutinas raras: duerme bien, muévete, come comida real, bebe agua. El sueño resuelve entre el cuarenta y el cincuenta por ciento del rendimiento cognitivo. El ejercicio añade otro veinte a treinta por ciento. La nutrición cubre del quince al veinte por ciento. La suplementación aporta menos de un cinco por ciento sin deficiencia. Cada capa depende de la anterior.",
+    "content": "Antes de buscar suplementos o rutinas raras, conviene ordenar las palancas por impacto: el sueño es la que más condiciona el rendimiento cognitivo; el ejercicio y la nutrición le siguen; la suplementación solo aporta algo cuando hay una deficiencia previa. Sin sueño y sin movimiento, los suplementos no compensan lo que falta. Cada capa depende de la anterior: optimizar la nutrición sin haber resuelto el sueño es trabajar sobre una base inestable.",
     "plan": "FREE"
   },
   {
@@ -301,8 +301,8 @@
   },
   {
     "empire": "energia",
-    "title": "El café posterga",
-    "content": "La cafeína no elimina el cansancio: lo posterga. Bloquea la señal de sueño al ocupar los receptores de adenosina, pero la adenosina sigue acumulándose. Cuando el efecto de la cafeína cesa, la adenosina ocupa los receptores y el cansancio que postergaste vuelve. La cafeína no recupera energía: la traslada. Beber café para enmascarar el cansancio acumula deuda de sueño que el cuerpo cobrará más tarde. El único mecanismo que limpia la adenosina es el sueño real.",
+    "title": "La vida media de la cafeína",
+    "content": "La cafeína no elimina el cansancio: lo posterga, porque la adenosina sigue acumulándose mientras los receptores están bloqueados. Lo que determina cuánto dura el efecto no es solo la dosis, sino la vida media de la cafeína, que oscila entre 2 y 10 horas según el gen CYP1A2 y otros factores (embarazo, anticonceptivos orales, tabaco). La persona con vida media larga que toma café a las cinco de la tarde todavía tiene la mitad de la cafeína activa a medianoche, y puede no notarlo porque el cerebro se adapta a la presencia del bloqueante (tolerancia). La cafeína no recupera energía: la traslada, y la traslada con un retraso que depende de tu genética.",
     "plan": "PREMIUM"
   },
   {
@@ -314,13 +314,13 @@
   {
     "empire": "energia",
     "title": "Despertar agotado con razón",
-    "content": "Microdespertares y apnea del sueño: los microdespertares (más de 3 por hora) fragmentan el sueño sin que lo recuerdes. La apnea obstructiva genera desaturación de oxígeno y microdespertares. Si te levantas agotado tras más de 7 horas, el problema puede ser fragmentación, no duración. El sueño fragmentado no permite completar los ciclos, y el cuerpo no llega al sueño profundo reparador. No es que duermas poco: es que tu sueño no es continuo.",
+    "content": "Microdespertares y apnea del sueño: los microdespertares (más de 10-15 por hora) fragmentan el sueño sin que lo recuerdes. La apnea obstructiva genera desaturación de oxígeno y microdespertares. Si te levantas agotado tras más de 7 horas, el problema puede ser fragmentación, no duración. El sueño fragmentado no permite completar los ciclos, y el cuerpo no llega al sueño profundo reparador. No es que duermas poco: es que tu sueño no es continuo.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
-    "title": "Lo que quemas sin pensar",
-    "content": "La mayor parte de la energía que gastas al día no es ejercicio: es moverte sin pensar. Gesticular, caminar, levantarte: ese movimiento invisible suma mucho. Levine (2002) llamó a esto NEAT (termogénesis por actividad no ejercicio) y mostró que puede variar hasta 800 kcal diarias entre personas con trabajos sedentarios y activos. La diferencia entre alguien que mantiene el peso y alguien que no, a menudo no está en el gimnasio: está en las horas restantes. Moverse con frecuencia durante el día, no solo en una sesión, es lo que sostiene el gasto energético.",
+    "title": "El NEAT se mide",
+    "content": "La mayor parte de la energía que gastas al día no es ejercicio: es moverte sin pensar. La termogénesis por actividad no ejercicio (NEAT) varía hasta 800 kcal diarias entre personas con trabajos sedentarios y activas (Levine 2002), y la forma de medirla sin laboratorio es la acelerometría: podómetros, pulseras y el sensor del móvil estiman los movimientos espontáneos que el cerebro no registra. Lo importante no es el dato exacto, sino la comparación entre días: si tu NEAT baja un 30 % un miércoles sedentario, ya sabes dónde está el margen. Medirlo convierte en visible lo que era invisible y permite intervenir sobre el movimiento real, no sobre la sesión de gimnasio que no compensa ocho horas sentado.",
     "plan": "PREMIUM"
   },
   {
@@ -374,7 +374,7 @@
   {
     "empire": "energia",
     "title": "Caliente para enfriar",
-    "content": "Cascada: la temperatura corporal baja 1-1,5 grados → sueño profundo → GH + glinfático. La ducha caliente activa la vasodilatación periférica que, al secarse el cuerpo, acelera la pérdida de calor central. Sincroniza con GH (pico en sueño profundo temprano), reduce el cortisol y activa el glinfático (Lee 2015). La ducha caliente no te calienta para dormir: te calienta para que el cuerpo se enfríe después, que es justo lo que necesita para entrar en sueño profundo.",
+    "content": "Cascada: la temperatura corporal baja 1-1,5 grados → sueño profundo → GH + glinfático. La ducha caliente activa la vasodilatación periférica que, al secarse el cuerpo, acelera la pérdida de calor central. Sincroniza con el GH (pico en sueño profundo temprano) y reduce el cortisol. La ducha caliente no te calienta para dormir: te calienta para que el cuerpo se enfríe después, que es justo lo que necesita para entrar en sueño profundo.",
     "plan": "PREMIUM"
   },
   {
@@ -385,8 +385,8 @@
   },
   {
     "empire": "energia",
-    "title": "Dos tipos de esfuerzo",
-    "content": "Microbioma y CYP1A2: el esfuerzo moderado favorece la diversidad del microbioma (Clarke et al. 2014), que modula metabolitos energéticos como el butirato. El esfuerzo intenso activa CYP1A2. Los metabolizadores rápidos toleran el café antes del ejercicio; los lentos experimentan ansiedad y peor rendimiento. No todo esfuerzo es igual: el moderado construye microbioma y energía sostenida; el intenso tiene su lugar, pero requiere recuperación. La genética del metabolismo de la cafeína determina si el café te ayuda o te perjudica antes de entrenar.",
+    "title": "Cafeína, genética y esfuerzo",
+    "content": "El efecto del café antes del ejercicio depende del gen CYP1A2, que codifica la enzima hepática que metaboliza la cafeína. Los metabolizadores rápidos (genotipo A/A) toleran la cafeína y mejoran el rendimiento; los lentos (A/C, C/C) experimentan ansiedad y peor rendimiento. El esfuerzo moderado, por su lado, favorece la diversidad del microbioma intestinal (Clarke et al. 2014), que modula metabolitos energéticos como el butirato. La condición para sacar la cafeína antes de entrenar no es la intensidad del esfuerzo: es tu genética, que puedes conocer con una prueba sencilla.",
     "plan": "PREMIUM"
   },
   {
@@ -440,13 +440,13 @@
   {
     "empire": "energia",
     "title": "El eje del estrés crónico",
-    "content": "El estrés crónico activa el eje HPA (hipotálamo-hipófisis-adrenal) de forma sostenida. El cortisol elevado suprime el sueño profundo, reduce la variabilidad cardiaca y eleva la proteína C reactiva. Señales: despertar a las tres o cuatro de la mañana, dificultad para mantener el peso, infecciones frecuentes. Meeusen y De Meirleir (1995) establecieron la relación entre sobreentrenamiento y disfunción del eje HPA. El estrés tiene un mecanismo medible y gestionable.",
+    "content": "El estrés crónico activa el eje HPA (hipotálamo-hipófisis-adrenal) de forma sostenida. El cortisol elevado suprime el sueño profundo, reduce la variabilidad cardiaca y eleva la proteína C reactiva. Señales: despertar a las tres o cuatro de la mañana, dificultad para mantener el peso, infecciones frecuentes. Urhausen y Kindermann (2002) revisaron la relación entre sobreentrenamiento y disfunción del eje HPA. El estrés tiene un mecanismo medible y gestionable.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "La proteína antes de dormir",
-    "content": "Un poco de proteína antes de dormir ayuda a que el cuerpo se repare durante la noche. El cuerpo descansa, pero si tiene material, también reconstruye. La síntesis muscular nocturna es real. Snijders et al. (2015) mostraron que ingerir 30-40 g de proteína antes de dormir aumenta la síntesis proteica muscular durante la noche sin afectar a la calidad del sueño. La condición es la dosis: una cantidad pequeña repara; una cantidad grande puede interferir con la digestión y el descanso.",
+    "content": "Un poco de proteína antes de dormir ayuda a que el cuerpo se repare durante la noche. El cuerpo descansa, pero si tiene material, también reconstruye. La síntesis muscular nocturna es real. Res et al. (2012) mostraron que ingerir 30-40 g de proteína antes de dormir aumenta la síntesis proteica muscular durante la noche sin afectar a la calidad del sueño. La condición es la dosis: una cantidad pequeña repara; una cantidad grande puede interferir con la digestión y el descanso.",
     "plan": "PREMIUM"
   },
   {
@@ -464,7 +464,7 @@
   {
     "empire": "energia",
     "title": "Tres señales, un ritmo",
-    "content": "Eje HPA: las tres señales (luz, comida, movimiento) convergen en el núcleo supraquiasmático y modulan el eje HPA. El cortisol tiene un ritmo circadiano que estas señales sincronizan. La luz es la señal maestra, pero la comida y el movimiento son señales secundarias (zeitgebers) que refuerzan o debilitan el ritmo. Si las tres señales apuntan en la misma dirección, el ritmo es robusto. Si se contradicen, el cuerpo se confunde.",
+    "content": "Las tres señales (luz, comida, movimiento) modulan los relojes circadianos, central y periféricos. La luz es la señal maestra que sincroniza el núcleo supraquiasmático (reloj central); la comida y el movimiento sincronizan sobre todo los relojes periféricos (hígado, músculo). El cortisol tiene un ritmo circadiano que estas señales refuerzan. Si las tres señales apuntan en la misma dirección, el ritmo es robusto. Si se contradicen, el cuerpo se confunde.",
     "plan": "PREMIUM"
   },
   {
@@ -488,7 +488,7 @@
   {
     "empire": "energia",
     "title": "La ley de los rendimientos decrecientes",
-    "content": "La primera hora de ejercicio aporta aproximadamente el setenta por ciento del beneficio. La segunda añade un veinte. La tercera, un siete. Es la ley de los rendimientos decrecientes. Kuipers (1998) documentó que el sobreentrenamiento ocurre cuando la carga supera la capacidad de recuperación durante más de dos semanas. Más allá del punto de inflexión, cada minuto adicional no suma: resta. Entrenar menos pero mejor supera a entrenar más sin descansar.",
+    "content": "La mejora que aporta cada hora adicional de ejercicio decrece respecto a la anterior: la primera hora produce la mayor parte del beneficio, la segunda añade menos y la tercera aún menos. Es la ley de los rendimientos decrecientes. Kuipers (1998) documentó que el sobreentrenamiento ocurre cuando la carga supera la capacidad de recuperación durante más de dos semanas. Más allá del punto de inflexión, cada minuto adicional no suma: resta. Entrenar menos pero mejor supera a entrenar más sin descansar.",
     "plan": "PREMIUM"
   },
   {
@@ -512,13 +512,13 @@
   {
     "empire": "energia",
     "title": "Vitamina C y estrés",
-    "content": "Las glándulas suprarrenales consumen más vitamina C cuando las demandas son altas. No es un calmante: es parte de cómo el cuerpo responde cuando le exiges más. La vitamina C es cofactor de la dopamina beta-hidroxilasa, enzima clave en la síntesis de noradrenalina en la médula suprarrenal. Padayatty et al. (2003) mostraron que las glándulas suprarrenales concentran vitamina C y la liberan junto con el cortisol en respuesta al estrés. El déficit no impide la respuesta al estrés, pero la limita; la suplementación solo produce beneficio medible en casos de déficit, no en personas con dieta suficiente.",
+    "content": "Las glándulas suprarrenales consumen más vitamina C cuando las demandas son altas. No es un calmante: es parte de cómo el cuerpo responde cuando le exiges más. La vitamina C es cofactor de la dopamina beta-hidroxilasa, enzima clave en la síntesis de noradrenalina en la médula suprarrenal. Padayatty et al. (2007) mostraron que las glándulas suprarrenales concentran vitamina C y la liberan junto con el cortisol en respuesta a la ACTH. El déficit no impide la respuesta al estrés, pero la limita; la suplementación solo produce beneficio medible en casos de déficit, no en personas con dieta suficiente.",
     "plan": "PREMIUM"
   },
   {
     "empire": "energia",
     "title": "Ejercicio y sueño: bidireccional",
-    "content": "El ejercicio regular aumenta el tono vagal (HRV), facilitando el sueño profundo (Kuo y Sloan 2005; Buchheit y Gindre 2006); el sueño deficiente lo reduce. La respiración lenta y la exhalación prolongada activan el parasimpático a través del nervio vago. La bidireccionalidad entre ejercicio y sueño opera por varias vies (termorregulación, inflamación, tono autónomo), no por una sola. Entrenar el sistema parasimpático con respiración lenta es una palanca accesible para mejorar la calidad del sueño sin depender solo del ejercicio.",
+    "content": "El ejercicio regular aumenta el tono vagal (HRV), lo que facilita el sueño profundo; el sueño deficiente lo reduce. La bidireccionalidad entre ejercicio y sueño opera por varias vías (termorregulación, inflamación, tono autónomo), no por una sola. La respiración lenta y la exhalación prolongada activan el parasimpático a través del nervio vago. Entrenar el sistema parasimpático con respiración lenta es una palanca accesible para mejorar la calidad del sueño sin depender solo del ejercicio.",
     "plan": "PREMIUM"
   },
   {
@@ -572,7 +572,7 @@
   {
     "empire": "energia",
     "title": "Glinfático: limpieza nocturna",
-    "content": "El sistema glinfático es hasta diez veces más activo durante el sueño que durante la vigilia, lo que limpia los desechos metabólicos del cerebro, incluido el beta-amiloide. Iliff et al. (2012) y Lee et al. (2015) encontraron que la posición lateral facilita el drenaje glinfático más que boca abajo. Limitación: la evidencia principal proviene de modelos animales; la extrapolación a humanos es parcial. La caracterización original del sistema glinfático se debe a Nedergaard y colaboradores (2012-2013), no a autores anteriores.",
+    "content": "El sistema glinfático es hasta diez veces más activo durante el sueño que durante la vigilia, lo que limpia los desechos metabólicos del cerebro, incluido el beta-amiloide. Lee et al. (2015) encontraron que la posición lateral facilita el drenaje glinfático más que boca abajo. El descubrimiento original del sistema glinfático se debe a Iliff et al. (2012). Limitación: la evidencia principal proviene de modelos animales; la extrapolación a humanos es parcial.",
     "plan": "PREMIUM"
   },
   {
@@ -596,7 +596,7 @@
   {
     "empire": "energia",
     "title": "Testosterona, ejercicio y recuperación",
-    "content": "La testosterona responde al ejercicio de resistencia con un pico agudo que facilita la síntesis proteica y la recuperación. Los niveles bajos crónicos se asocian con fatiga, pérdida muscular y baja motivación. Kraemer y Ratamess (2005): el sueño deficiente reduce la testosterona en un 10-15 % tras una semana. La testosterona no es solo fuerza: es el motor de la recuperación masculina.",
+    "content": "La testosterona responde al entrenamiento de fuerza con un pico agudo que facilita la síntesis proteica y la recuperación (Kraemer y Ratamess 2005). Los niveles bajos crónicos se asocian con fatiga, pérdida muscular y baja motivación. El sueño deficiente, además, reduce la testosterona en un 10-15 % tras una semana de restricción a 5 horas diarias (Leproult y Van Cauter 2011). La testosterona no es solo fuerza: es el motor de la recuperación masculina, y depende tanto del estímulo como del descanso.",
     "plan": "PREMIUM"
   },
   {
@@ -632,7 +632,7 @@
   {
     "empire": "energia",
     "title": "Resistencia a la insulina y fatiga crónica",
-    "content": "La resistencia a la insulina es una causa oculta de fatiga: las células no responden a la insulina y el cerebro recibe menos combustible a pesar de la glucosa alta en sangre. Reaven (1988) documentó el síndrome metabólico y su asociación con fatiga postprandial, somnolencia y embotamiento mental. Se detecta con HbA1c y HOMA-IR. Es el paso anterior a la diabetes de tipo 2 y es reversible con ejercicio y dieta.",
+    "content": "La resistencia a la insulina es una causa oculta de fatiga: las células no responden a la insulina y el cerebro recibe menos combustible a pesar de la glucosa alta en sangre. Reaven (1988) documentó el síndrome metabólico (Syndrome X); la asociación de la resistencia a la insulina con fatiga postprandial, somnolencia y embotamiento mental se ha descrito en estudios posteriores. Se detecta con HbA1c y HOMA-IR. Es el paso anterior a la diabetes de tipo 2 y es reversible con ejercicio y dieta.",
     "plan": "PREMIUM"
   },
   {
@@ -650,7 +650,7 @@
   {
     "empire": "energia",
     "title": "Saciedad y densidad energética",
-    "content": "La densidad energética (calorías por gramo) determina la saciedad más que el contenido calórico total. Los alimentos de baja densidad (frutas, verduras, sopas) llenan con menos calorías porque activan los mecanismos de estiramiento gástrico y la liberación de CCK y del péptido YY. Rolls (2009, 2010) documentó que los de alta densidad (aceite, frutos secos, procesados) pasan desapercibidos. No es cuántas calorías: es cuánto volumen por caloría. Comer alimentos de baja densidad energética te permite llenarte sin excederte.",
+    "content": "La densidad energética (calorías por gramo) determina la saciedad más que el contenido calórico total. Los alimentos de baja densidad (frutas, verduras, sopas) llenan con menos calorías porque activan los mecanismos de estiramiento gástrico y la liberación de CCK y del péptido YY. Rolls (2009, 2010) documentó que los de alta densidad como el aceite y los procesados pasan desapercibidos. Los frutos secos son una excepción: pese a su densidad, producen saciedad elevada y aportan menos energía metabolizable de la que predicen los factores de Atwater. No es solo cuántas calorías: es cuánto volumen y cuánta saciedad por caloría.",
     "plan": "PREMIUM"
   },
   {

@@ -319,8 +319,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El doble ciclo",
-    "content": "Aprender de los errores es un ciclo. Cuestionar los supuestos que te llevaron a esos errores es otro. El segundo ciclo es donde está el crecimiento real. Chris Argyris llamó a esto aprendizaje de doble bucle (double-loop learning): el bucle sencillo cambia la acción para corregir el error; el bucle doble cuestiona los supuestos que generaron la acción errónea. El primero corrige el síntoma; el segundo, la causa. Sin segundo bucle, los errores se repiten bajo formas distintas.",
+    "title": "El doble bucle",
+    "content": "Aprender de los errores es un bucle. Cuestionar los supuestos que te llevaron a esos errores es otro. El segundo bucle es donde está el crecimiento real. Chris Argyris llamó a esto aprendizaje de doble bucle (double-loop learning): el bucle sencillo cambia la acción para corregir el error; el bucle doble cuestiona los supuestos que generaron la acción errónea. El primero corrige el síntoma; el segundo, la causa. Sin segundo bucle, los errores se repiten bajo formas distintas.",
     "plan": "PREMIUM"
   },
   {
@@ -368,7 +368,7 @@
   {
     "empire": "crecimiento",
     "title": "El efecto del mentor",
-    "content": "Un buen mentor no te da las respuestas: te hace las preguntas que no te harías solo. El valor está en la perspectiva, no en la solución. Ericsson (2006) enfatizó que el retroalimentación de un experto es una de las palancas más eficaces para mejorar, porque identifica discrepancias entre lo que crees hacer y lo que haces realmente. El mentor no sustituye la práctica: la dirige. Sin práctica deliberada, el mentor no tiene nada que orientar; sin mentor, la práctica puede consolidar errores.",
+    "content": "Un buen mentor no te da las respuestas: te hace las preguntas que no te harías solo. El valor está en la perspectiva, no en la solución. Ericsson (2006) enfatizó que la retroalimentación de un experto es una de las palancas más eficaces para mejorar, porque identifica discrepancias entre lo que crees hacer y lo que haces realmente. El mentor no sustituye la práctica: la dirige. Sin práctica deliberada, el mentor no tiene nada que orientar; sin mentor, la práctica puede consolidar errores.",
     "plan": "PREMIUM"
   },
   {
@@ -428,7 +428,7 @@
   {
     "empire": "crecimiento",
     "title": "Las fases de Dreyfus",
-    "content": "El modelo Dreyfus (Dreyfus y Dreyfus 1986) describe la adquisición de pericia en cinco niveles: novato (sigue reglas), principiante avanzado (reconoce patrones), competente (adapta y planifica), competente experto (intuye y considera la situación completa) y experto (intuición fluida). No se saltan niveles: cada uno tiene su lógica y su utilidad. La progresión implica el paso del procesamiento deliberado basado en reglas al reconocimiento intuitivo basado en experiencia. Entender en qué nivel estás ayuda a elegir el tipo de práctica adecuado para avanzar al siguiente.",
+    "content": "El modelo Dreyfus (Dreyfus y Dreyfus 1986) describe la adquisición de pericia en cinco niveles: novato (sigue reglas), principiante avanzado (reconoce patrones), competente (adapta y planifica), proficiente (intuye y considera la situación completa) y experto (intuición fluida). No se saltan niveles: cada uno tiene su lógica y su utilidad. La progresión implica el paso del procesamiento deliberado basado en reglas al reconocimiento intuitivo basado en experiencia. Entender en qué nivel estás ayuda a elegir el tipo de práctica adecuado para avanzar al siguiente.",
     "plan": "PREMIUM"
   },
   {
@@ -463,13 +463,13 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El costo de cambiar",
+    "title": "El coste de cambiar",
     "content": "Cambiar de dirección tiene un coste: lo invertido en la dirección anterior. Pero quedarse por ese coste es seguir pagando por algo que ya no funciona. El sesgo de coste hundido (Arkes y Blumer 1985) distorsiona la decisión: el coste ya incurrido es irrecuperable y no debe influir en la decisión futura; solo deben influir el coste futuro y el beneficio futuro. La dificultad es psicológica, no matemática: abandonar una inversión hace explícita la pérdida, mientras que continuar la mantiene implícita. La decisión racional ignora el coste hundido; la decisión cómoda lo perpetúa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "El retroalimentación negativo vale más",
+    "title": "La retroalimentación negativa vale más",
     "content": "La retroalimentación que te molesta suele ser la más valiosa. No porque tenga razón siempre, sino porque toca algo real que el elogio ignora. La retroalimentación negativa produce más información utilizable que la positiva, porque identifica brechas específicas entre la conducta actual y la deseada. La reacción emocional negativa no es señal de que la retroalimentación sea incorrecta: es señal de que ha tocado un punto sensible. La habilidad de procesar retroalimentación molesta sin defenderse es una de las más correlacionadas con la mejora sostenida.",
     "plan": "PREMIUM"
   },
@@ -482,7 +482,7 @@
   {
     "empire": "crecimiento",
     "title": "La ventaja del novato",
-    "content": "No saber cómo se hace puede ser una ventaja. El novato ve opciones que el experto descarta automáticamente por experiencia. El fenómeno se llama efecto Einstellung inverso (Luchins 1942): la experiencia con una solución que funciona reduce la probabilidad de encontrar una mejor. El novato, al no tener esa experiencia, no descarta nada. La ventaja del novato no es ignorancia: es ausencia de supuestos. Por eso los grandes avances en muchos campos vienen de gente que llega desde otro dominio y no ha fosilizado las soluciones del dominio nuevo.",
+    "content": "No saber cómo se hace puede ser una ventaja. El novato ve opciones que el experto descarta automáticamente por experiencia. El fenómeno subyacente es el efecto Einstellung (Luchins 1942): la experiencia con una solución que funciona reduce la probabilidad de encontrar una mejor. El novato, al no tener esa experiencia, no descarta nada. La ventaja del novato no es ignorancia: es ausencia de supuestos. Por eso los grandes avances en muchos campos vienen de gente que llega desde otro dominio y no ha fosilizado las soluciones del dominio nuevo.",
     "plan": "PREMIUM"
   },
   {
@@ -506,7 +506,7 @@
   {
     "empire": "crecimiento",
     "title": "El efecto de los demás",
-    "content": "Tu red de contactos no es solo a quién conoces: es qué conversaciones tienes. Una conversación buena puede hacer más que cien genéricas. Granovetter (1973) mostró en «The Strength of Weak Ties» que los vínculos débiles (conocidos lejanos) aportan más información nueva que los vínculos fuertes (amigos cercanos), porque los fuertes comparten información redundante. La red útil para aprender no es la más cercana: es la más diversa. Una conversación con alguien de otro dominio suele aportar más insight que diez con personas del tuyo.",
+    "content": "Tu red de contactos no es solo a quién conoces: es qué conversaciones tienes. Una conversación buena puede hacer más que cien genéricas. Granovetter (1973) mostró en «The Strength of Weak Ties» que los vínculos débiles (conocidos lejanos) aportan más información nueva que los vínculos fuertes (amigos cercanos), porque los fuertes comparten información redundante. La red útil para aprender no es la más cercana: es la más diversa. Una conversación con alguien de otro dominio suele aportar más perspicacia que diez con personas del tuyo.",
     "plan": "PREMIUM"
   },
   {
@@ -554,7 +554,7 @@
   {
     "empire": "crecimiento",
     "title": "El ciclo completo",
-    "content": "Un ciclo completo de aprendizaje incluye: intentar, fallar, recibir retroalimentación, ajustar, volver a intentar. Saltarse pasos acelera, pero no profundiza. El ciclo completo es lento pero sólido. Kolb (1984) formalizó el ciclo de aprendizaje experiencial en cuatro fases: experiencia concreta, observación reflexiva, conceptualización abstracta y experimentación activa. La omisión de cualquier fase produce aprendizaje incompleto: sin reflexión, la experiencia no genera insight; sin abstracción, la reflexión no genera principio transferible; sin experimentación, la abstracción no se valida.",
+    "content": "Un ciclo completo de aprendizaje incluye: intentar, fallar, recibir retroalimentación, ajustar, volver a intentar. Saltarse pasos acelera, pero no profundiza. El ciclo completo es lento pero sólido. Kolb (1984) formalizó el ciclo de aprendizaje experiencial en cuatro fases: experiencia concreta, observación reflexiva, conceptualización abstracta y experimentación activa. La omisión de cualquier fase produce aprendizaje incompleto: sin reflexión, la experiencia no genera comprensión; sin abstracción, la reflexión no genera principio transferible; sin experimentación, la abstracción no se valida.",
     "plan": "PREMIUM"
   },
   {
@@ -565,8 +565,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "La zona del maestro",
-    "content": "El maestro no es quien más sabe: es quien mejor sabe qué no sabe. La conciencia de los propios límites es señal de profundidad. Kruger y Dunning (1999) mostraron que la competencia necesaria para evaluar la propia competencia es la misma que se necesita para tenerla: por eso los principiantes sobreestiman y los expertos subestiman. La conciencia de los propios límites no es modestia: es precisión metacognitiva, y es ella la que permite seguir aprendiendo. Quien cree saberlo todo ha dejado de aprender en el momento en que lo creyó.",
+    "title": "La conciencia del límite",
+    "content": "El maestro no es quien más sabe: es quien mejor sabe qué no sabe. La conciencia de los propios límites es señal de profundidad. La atribución del error a la propia ignorancia, en lugar de a la mala suerte o al azar, distingue a quien sigue aprendiendo de quien ha dejado de hacerlo. Quien cree saberlo todo ha dejado de aprender en el momento en que lo creyó; quien sabe que no sabe mantiene abierto el único canal por el que entra conocimiento nuevo. La pregunta «¿qué parte de esto no entiendo todavía?» es la herramienta más simple y la que menos se usa.",
     "plan": "PREMIUM"
   },
   {
@@ -577,7 +577,7 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Elaborative Interrogation",
+    "title": "Interrogación elaborativa",
     "content": "Preguntarse «por qué» y «cómo» sobre los hechos y conceptos estudiados produce aprendizajes más profundos y duraderos. Mecanismo: la interrogación fuerza la integración con conocimiento previo y genera múltiples rutas de acceso. Pressley et al. (1987) la documentaron. Diferencia con la autoexplicación: la interrogación se centra en «por qué es así», frente a «cómo funciona paso a paso». Aplicación: para cada concepto, generar al menos una pregunta «por qué» y una respuesta. Limitación: requiere conocimiento previo relevante para generar explicaciones significativas.",
     "plan": "PREMIUM"
   },
@@ -589,13 +589,13 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Cognitive Load Theory",
-    "content": "La memoria de trabajo procesa 4-7 elementos nuevos a la vez. Sweller (1988) identificó tres cargas: intrínseca (complejidad del contenido), extrínseca (diseño deficiente) y relevante (construye esquemas mentales). Reducir la extrínseca libera recursos para la relevante. Sweller, Ayres y Kalyuga (2011): los ejemplos resueltos y el efecto goal-free reducen carga extrínseca y mejoran el aprendizaje. Aplicación: un concepto nuevo a la vez. Limitación: en tareas de descubrimiento o creatividad, cierta carga extrínseca puede ser beneficiosa.",
+    "title": "Teoría de la carga cognitiva",
+    "content": "La memoria de trabajo procesa 4-7 elementos nuevos a la vez. Sweller (1988) identificó tres cargas: intrínseca (complejidad del contenido), extrínseca (diseño deficiente) y relevante (construye esquemas mentales). Reducir la extrínseca libera recursos para la relevante. Sweller, Ayres y Kalyuga (2011): los ejemplos resueltos y el efecto sin meta reducen carga extrínseca y mejoran el aprendizaje. Aplicación: un concepto nuevo a la vez. Limitación: en tareas de descubrimiento o creatividad, cierta carga extrínseca puede ser beneficiosa.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Desirable Difficulties",
+    "title": "Dificultades deseables",
     "content": "Las condiciones que hacen la práctica más difícil durante el aprendizaje (espaciado, intercalación, recuperación) producen mejor retención a largo plazo. Mecanismo: las dificultades durante la codificación generan procesos de elaboración y recuperación más profundos. Bjork y Bjork (2011): las condiciones que mejoran el rendimiento rápido suelen fallar en sostener la retención a largo plazo. Limitación: las dificultades deben ser moduladas; la dificultad excesiva produce frustración, no aprendizaje.",
     "plan": "PREMIUM"
   },
@@ -607,55 +607,55 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Dual Coding",
+    "title": "Codificación dual",
     "content": "La información codificada simultáneamente en formato verbal y visual se recuerda mejor que la codificada en un solo formato. Mecanismo: dos trazas de memoria independientes (verbal e imaginal) proporcionan rutas de recuperación redundantes. Paivio (1971, 1986). Aplicación: hacer diagramas, esquemas o dibujos mientras se estudia texto. Limitación: solo funciona si ambos canales procesan el mismo concepto; las imágenes irrelevantes no ayudan.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Self-Explanation",
+    "title": "Autoexplicación",
     "content": "Explicarse los pasos de un problema mejora la comprensión más que leer la solución. Mecanismo: la autoexplicación genera inferencias que llenan lagunas en la representación mental y detecta inconsistencias. Chi et al. (1989, 1994) lo confirmaron: los estudiantes que se autoexplican superan a los que solo leen. Aplicación: tras cada paso, preguntarse «por qué funciona este paso». Limitación: requiere conocimiento base previo para generar explicaciones significativas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Pretesting Effect",
+    "title": "Efecto del pretest",
     "content": "Intentar responder preguntas antes de estudiar el material mejora el aprendizaje posterior, incluso cuando las respuestas iniciales son incorrectas. Mecanismo: el pretest activa conocimiento previo y crea puntos de anclaje que facilitan la codificación de la información correcta. Little y Bjork (2012). Diferencia con la práctica de recuperación: el pretest ocurre antes del estudio, no después. Aplicación: antes de leer un capítulo, intentar responder sus preguntas clave. Limitación: el efecto se reduce si el pretest es demasiado fácil o no relacionado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Perceptual Learning",
+    "title": "Aprendizaje perceptual",
     "content": "Gibson (1969): el aprendizaje perceptual no requiere retroalimentación explícita. La exposición repetida a diferencias finas calibra la sensibilidad del sistema. La atención se ajusta a las dimensiones diagnósticas del estímulo, lo que reduce el procesamiento consciente. Aplicación: exponerse a múltiples ejemplos variados entrena la discriminación. Limitación: es específico al dominio; la transferencia entre dominios es limitada.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Metacognitive Accuracy",
+    "title": "Precisión metacognitiva",
     "content": "La precisión metacognitiva es la correspondencia entre lo que crees saber y lo que realmente sabes; la mayoría la sobreestima. Mecanismo: la fluidez ilusoria (leer y sentir que entiendes) genera falsa competencia. Dunlosky y Rawson (2012): la calibración mejora con práctica de recuperación. Aplicación: tras estudiar, recitar sin mirar antes de juzgar si dominas el tema. Limitación: la calibración requiere práctica; los novatos son sistemáticamente imprecisos.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Transfer-Appropriate Processing",
+    "title": "Procesamiento apropiado para la transferencia",
     "content": "La retención depende de la similitud entre los procesos cognitivos usados durante el aprendizaje y los requeridos durante el uso. Mecanismo: la memoria no es copia pasiva, sino reconstrucción que depende de las claves de recuperación disponibles. Morris, Bransford y Franks (1977): procesamiento apropiado para la transferencia. Aplicación: si el examen requiere aplicar conceptos, la práctica debe incluir aplicación, no solo memorización. Limitación: la especificidad es relativa; cierta transferencia siempre ocurre.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Concrete Examples",
+    "title": "Ejemplos concretos",
     "content": "Los conceptos abstractos se comprenden y retienen mejor cuando se anclan en ejemplos concretos. Mecanismo: los ejemplos activan representaciones específicas que sirven como puente entre lo abstracto y lo aplicable. Rawson y Dunlosky (2011): la combinación de definición y múltiples ejemplos supera a la definición sola. Aplicación: para cada concepto, generar al menos dos ejemplos concretos de dominios distintos. Limitación: los ejemplos superficiales sin conexión al principio generan conocimiento fragmentado.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Retrieval-Induced Forgetting",
-    "content": "La recuperación selectiva de cierta información puede inhibir la recuperación de información relacionada. Mecanismo: la recuperación exitosa fortalece lo recordado, pero debilita lo competidor no recordado (inhibition-based account). Anderson (2003): olvido inducido por recuperación. Aplicación: al estudiar temas relacionados, alternar equilibradamente para evitar que la práctica de uno inhiba al otro. Limitación: el efecto es pequeño pero robusto; se reduce con práctica espaciada de todos los temas.",
+    "title": "Olvido inducido por recuperación",
+    "content": "La recuperación selectiva de cierta información puede inhibir la recuperación de información relacionada. Mecanismo: la recuperación exitosa fortalece lo recordado, pero debilita lo competidor no recordado (explicación basada en inhibición). Anderson (2003): olvido inducido por recuperación. Aplicación: al estudiar temas relacionados, alternar equilibradamente para evitar que la práctica de uno inhiba al otro. Limitación: el efecto es pequeño pero robusto; se reduce con práctica espaciada de todos los temas.",
     "plan": "PREMIUM"
   },
   {
     "empire": "crecimiento",
-    "title": "Collaborative Learning",
+    "title": "Aprendizaje colaborativo",
     "content": "El aprendizaje en grupo produce beneficios cuando se dan dos condiciones: interdependencia positiva (el éxito de uno depende del de otros) y responsabilidad individual (cada miembro debe rendir cuentas). Mecanismo: la explicación entre pares genera procesamiento más profundo; la exposición a perspectivas diversas amplía las representaciones. Slavin (1995), Johnson y Johnson (2009). Limitación: sin responsabilidad individual, el aprovechamiento gratuito (free riding) reduce el beneficio; los grupos homogéneos generan menos perspectivas diversas.",
     "plan": "PREMIUM"
   }

@@ -140,7 +140,7 @@
   {
     "empire": "disciplina",
     "title": "Cadena visible",
-    "content": "Marcar cada día que cumples crea una cadena que no quieres romper. Un día sin hábito es accidente. Dos días, ya es costumbre nueva. La cadena visible te da dos cosas: la motivación de no romperla y el dato de cuándo se rompe. Si solo saltas un día, la cadena sigue. Si saltas dos, empieza una nueva costumbre — la de no hacerlo.",
+    "content": "Marcar cada día que cumples crea una cadena visual que no quieres romper. La cadena tiene dos funciones: la motivación de no interrumpirla y el dato exacto de cuándo se interrumpe. Si rompes un día, la cadena sigue numerada y se reinicia al día siguiente con un contador nuevo; si rompes dos, la caída es visible. Lo que cuenta no es la perfección: es la visibilidad del patrón, que permite distinguir un lapsus puntual de una costumbre nueva en formación.",
     "plan": "FREE"
   },
   {
@@ -439,8 +439,8 @@
   },
   {
     "empire": "disciplina",
-    "title": "Ya que estoy aquí",
-    "content": "«Ya que estoy aquí, hago X» usa la inercia del momento para activar conducta sin esfuerzo adicional. Es el efecto de arrastre: lo que ya está en movimiento tiende a seguir.",
+    "title": "El efecto de arrastre",
+    "content": "Una vez que empiezas una tarea, continuarla cuesta menos que empezarla. Este efecto de arrastre fue descrito por Kurt Lewin como resultado de la tensión psicológica asociada a las tareas iniciadas y no completadas: el sistema mantiene activa la representación de la tarea en curso, lo que facilita la continuación. La aplicación práctica es inversa a la habitual: en lugar de dividir el trabajo en bloques separados, mantener una sola tarea abierta durante más tiempo aprovecha la inercia y reduce el coste de reactivación. El riesgo es la fatiga sostenida; la condición es alternar tarea con pausas cortas, no tarea con otra tarea.",
     "plan": "PREMIUM"
   },
   {
@@ -500,7 +500,7 @@
   {
     "empire": "disciplina",
     "title": "Lo conocido pesa",
-    "content": "A veces no rompes un hábito porque lo conocido, aunque malo, se siente más seguro que lo desconocido. La incomodidad del cambio no es debilidad: es el coste real de moverse. Schwabe y Wolf (2009) mostraron que bajo estrés el cerebro privilegia las rutinas familiares incluso cuando son peores. La resistencia al cambio no es pereza: es una preferencia del sistema por lo predecible. Para vencerla, haz que lo nuevo sea predecible: repítelo en el mismo contexto hasta que deje de ser desconocido.",
+    "content": "A veces no rompes un hábito porque lo conocido, aunque malo, se siente más seguro que lo desconocido. La incomodidad del cambio no es debilidad: es el coste real de moverse. Bajo presión, el cerebro privilegia lo familiar incluso cuando es peor, porque lo familiar es predecible y la incertidumbre consume recursos cognitivos. La resistencia al cambio no es pereza: es una preferencia del sistema por lo predecible. Para vencerla, haz que lo nuevo sea predecible: repítelo en el mismo contexto hasta que deje de ser desconocido y el cerebro lo reclasifique como familiar.",
     "plan": "PREMIUM"
   },
   {
@@ -548,7 +548,7 @@
   {
     "empire": "disciplina",
     "title": "El límite del registro",
-    "content": "Medir funciona hasta que medir se vuelve la conducta en sí. Si registras para sentir que hiciste algo sin hacerlo, pierde su función. El registro es valioso solo cuando es consecuencia de la acción. Latham y Locke (1991) mostraron que la retroalimentación es más eficaz cuando informa sobre la ejecución real, no cuando sustituye la ejecución. Si te encuentras registrando sin hacer, invierte el orden: primero la acción, después la marca.",
+    "content": "Cuando una métrica se convierte en objetivo, deja de ser una buena métrica. Es la ley de Goodhart, formulada por Charles Goodhart (1975) para la política monetaria y aplicada después a cualquier sistema de medición. Si premias el número de pasos, caminarás más; si premias las calorías quemadas, aprenderás a agitar la muñeca en el sofá. El registro deja de ser útil cuando el cerebro aprende a optimizar la métrica sin mejorar la conducta subyacente. La defensa no es dejar de medir: es cambiar de métrica cuando la anterior se satura, y mantener siempre una métrica de resultado (no solo de actividad) que no pueda falsearse registrando.",
     "plan": "PREMIUM"
   },
   {
@@ -577,8 +577,8 @@
   },
   {
     "empire": "disciplina",
-    "title": "La marca como recompensa",
-    "content": "A veces la recompensa que sostiene un hábito es simbólica: una marca, un visto, un símbolo visual. El cerebro responde a la sensación de cierre tanto como al placer. Este cierre simbólico activa el circuito de recompensa de forma similar a una recompensa material, según mostraron Dillon et al. (2008). Por eso marcar una X en el calendario o tachar una tarea sostiene la cadena de hábitos incluso cuando la recompensa real está lejos. El cierre que se ve pesa más que el que se intuye.",
+    "title": "El cierre que se ve",
+    "content": "Tachar una tarea o marcar una X en el calendario no es decoración: activa el circuito de recompensa de forma similar a una recompensa material. Dillon et al. (2008) mostraron mediante resonancia magnética que la percepción de cierre produce activación en el estriado ventral, región implicada en el procesamiento de recompensas. Esta es la razón por la que un cierre simbólico —aunque no aporte nada material— sostiene la cadena de hábitos: el cerebro lo registra como una recompensa real. El cierre que se ve pesa más que el que se intuye porque activa el mismo sustrato neural que una ganancia concreta.",
     "plan": "PREMIUM"
   },
   {
@@ -596,7 +596,7 @@
   {
     "empire": "disciplina",
     "title": "Elegir ayuda",
-    "content": "Los hábitos que sientes elegidos se sostienen más que los impuestos. Incluso la ilusión de elección aumenta la adherencia. Deci y Ryan (2000) demostraron, en la teoría de la autodeterminación, que la autonomía —sentir que eliges— es uno de los tres pilares de la motivación intrínseca. Cuando te obligan, cumples hasta que puedes dejar de cumplir; cuando eliges, cumples porque quieres. La autonomía es el combustible de la persistencia. Diseñar tus hábitos como elecciones —no como obligaciones— prolonga su vida.",
+    "content": "Los hábitos que sientes elegidos se sostienen más que los impuestos. Incluso la ilusión de elección aumenta la adherencia. Cuando te obligan, cumples hasta que puedes dejar de cumplir; cuando eliges, cumples porque quieres. Diseñar tus hábitos como elecciones —no como obligaciones— prolonga su vida. La diferencia no está en la conducta, sino en la narrativa: el mismo gesto descrito como «tengo que» se sostiene peor que descrito como «he decidido». La palabra no cambia la acción, pero cambia la persistencia.",
     "plan": "PREMIUM"
   },
   {
@@ -620,7 +620,7 @@
   {
     "empire": "disciplina",
     "title": "Efecto Zeigarnik",
-    "content": "El cerebro recuerda mejor las tareas incompletas que las completadas. Bluma Zeigarnik (1927) observó que los camareros recordaban pedidos pendientes pero olvidaban los servidos. Tu cerebro no cierra la pestaña de una tarea pendiente — sigue procesándola en segundo plano. Esto explica por qué empezar es lo más difícil: hasta que no empiezas, la tarea no existe para tu cerebro. Una vez que empiezas, el efecto Zeigarnik te empuja a terminar. La incompletud es un motor.",
+    "content": "El cerebro recuerda mejor las tareas incompletas que las completadas. Kurt Lewin observó en un café vienés que los camareros recordaban los pedidos pendientes pero olvidaban los servidos; Bluma Zeigarnik (1927) lo demostró experimentalmente y cuantificó el efecto. Tu cerebro no cierra la pestaña de una tarea pendiente: sigue procesándola en segundo plano. Esto explica por qué empezar es lo más difícil: hasta que no empiezas, la tarea no existe para tu cerebro. Una vez que empiezas, el efecto Zeigarnik te empuja a terminar. La incompletud es un motor.",
     "plan": "PREMIUM"
   },
   {
@@ -631,13 +631,13 @@
   },
   {
     "empire": "disciplina",
-    "title": "Habit Discontinuity",
-    "content": "Los cambios de contexto rompen hábitos — y eso es una oportunidad. Verplanken y Wood (2006) documentaron el efecto de discontinuidad de hábitos: mudanzas, nuevos trabajos, cambios de vida desactivan las señales que sostenían los hábitos anteriores. En esa ventana de inestabilidad, los nuevos comportamientos se insertan más fácilmente. Si quieres cambiar un hábito, un cambio de contexto es tu mejor aliado. Si no tienes uno, créalo: reorganiza tu escritorio, cambia tu ruta, altera tu horario.",
+    "title": "Discontinuidad de hábitos",
+    "content": "Los cambios de contexto rompen hábitos —y eso es una oportunidad. Mudanzas, nuevos trabajos o cambios de vida desactivan las señales que sostenían los hábitos anteriores. En esa ventana de inestabilidad, los nuevos comportamientos se insertan más fácilmente porque las señales antiguas ya no compiten. Si quieres cambiar un hábito, un cambio de contexto es tu mejor aliado. Si no tienes uno, créalo: reorganiza tu escritorio, cambia tu ruta o altera tu horario para forzar una discontinuidad artificial.",
     "plan": "PREMIUM"
   },
   {
     "empire": "disciplina",
-    "title": "Goal Setting Mechanism",
+    "title": "Mecanismo del establecimiento de metas",
     "content": "Los objetivos específicos funcionan porque activan un mecanismo cognitivo preciso: dirigen la atención, regulan el esfuerzo, fomentan la persistencia y promueven el desarrollo de estrategias. Locke y Latham (2002) demostraron que este mecanismo se activa solo cuando el objetivo es claro y medible. Un objetivo vago no activa nada; un objetivo específico enciende cuatro funciones mentales que trabajan juntas hacia la meta. La claridad no es un lujo: es el interruptor.",
     "plan": "PREMIUM"
   },
@@ -649,8 +649,8 @@
   },
   {
     "empire": "disciplina",
-    "title": "Mindfulness y disrupción de hábitos",
-    "content": "La atención plena puede interrumpir un hábito automático insertando una pausa entre la señal y la respuesta. Teper et al. (2013) encontraron que la práctica de mindfulness mejora la capacidad de notar el impulso sin actuar automáticamente. No reemplaza el hábito — crea un espacio donde puedes elegir. Ese espacio no existía antes: la señal disparaba la conducta directamente. Mindfulness inserta un segundo entre el estímulo y la respuesta, y en ese segundo está tu libertad.",
+    "title": "Atención plena y disrupción de hábitos",
+    "content": "La atención plena puede interrumpir un hábito automático insertando una pausa entre la señal y la respuesta. Teper, Inzlicht y Rowse (2013) encontraron que la práctica de atención plena mejora la capacidad de notar el impulso sin actuar automáticamente. No reemplaza el hábito: crea un espacio donde puedes elegir. Ese espacio no existía antes: la señal disparaba la conducta directamente. La atención plena inserta un segundo entre el estímulo y la respuesta, y en ese segundo está tu libertad.",
     "plan": "PREMIUM"
   },
   {
