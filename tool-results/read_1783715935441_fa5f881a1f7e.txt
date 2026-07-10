@@ -11,7 +11,7 @@
     11→import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
     12→import { NumericInput } from '@/components/ui/NumericInput';
     13→import PrivacyMask from '@/components/ui/PrivacyMask';
-    14→import { getTodayDateKey } from '@/lib/deterministic';
+    14→import { getTodayDateKey } from '@/lib/dates';
     15→
     16→interface WellnessLog {
     17→  id: string;
