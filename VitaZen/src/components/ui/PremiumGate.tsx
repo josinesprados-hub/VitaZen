@@ -91,7 +91,7 @@ export default function PremiumGate({
 
 interface PremiumInlineBadgeProps {
   isPremium: boolean;
-  /** FREE label text, e.g. "7 días" or "3 insights" */
+  /** FREE label text, e.g. "7 días" or "3 observaciones" */
   freeLabel: string;
   /** Premium label text — now more contemplative */
   premiumLabel?: string;

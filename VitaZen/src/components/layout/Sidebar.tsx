@@ -146,7 +146,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               }`}
             >
               <Lightbulb size={18} />
-              Insights
+              Observaciones
             </Link>
 
             <Link
@@ -159,7 +159,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               }`}
             >
               <Layers size={18} />
-              Etapas
+              Tu evolución
             </Link>
 
             <Link
