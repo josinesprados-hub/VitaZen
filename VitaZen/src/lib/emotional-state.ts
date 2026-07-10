@@ -224,7 +224,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'enfocado',
       label: 'Enfocado',
-      description: 'Claridad y energía alineadas.',
+      description: 'Energía y claridad alineadas.',
     };
   }
 
@@ -233,7 +233,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'Estrés alto y poca energía.',
+      description: 'Tu nivel de estrés es alto y tu energía, baja.',
     };
   }
 
@@ -242,7 +242,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'El estrés pesa.',
+      description: 'Tu nivel de estrés es elevado.',
     };
   }
 
@@ -255,7 +255,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
       return {
         status: 'en_progreso',
         label: 'En progreso',
-        description: 'Los hábitos se van asentando.',
+        description: 'Tus hábitos van asentándose.',
       };
     }
   }
@@ -274,7 +274,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'en_progreso',
       label: 'En progreso',
-      description: 'Va tomando forma.',
+      description: 'Tu actividad va tomando forma.',
     };
   }
 

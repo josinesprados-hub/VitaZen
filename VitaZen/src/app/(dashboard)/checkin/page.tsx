@@ -271,7 +271,7 @@ export default function CheckinPage() {
       <ContextualHelp
         storageKey="vitazen_help_checkin"
         title="Check-in"
-        text="Registra cómo te sientes hoy: emoción, energía, enfoque y estrés."
+        text="Cómo te sientes hoy: emoción, energía, enfoque y estrés."
       />
 
       {/* Header */}

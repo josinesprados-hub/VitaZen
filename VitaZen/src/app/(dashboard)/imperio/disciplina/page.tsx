@@ -282,7 +282,7 @@ export default function DisciplinaPage() {
         <ContextualHelp
           storageKey="vitazen_help_habits"
           title="Mis Hábitos"
-          text="Crea hábitos y márcalos como completados cada día. Tu racha crece con la consistencia. Puedes editar o eliminar cualquier hábito en cualquier momento."
+          text="Crea hábitos y márcalos cada día. Tu racha crece con la consistencia. Puedes editar o eliminar cualquier hábito cuando quieras."
         />
       )}
 

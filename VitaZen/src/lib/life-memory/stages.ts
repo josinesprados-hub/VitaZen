@@ -232,13 +232,13 @@ function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        return 'Registraste un periodo con más calma que los anteriores.';
+        return 'Este fue uno de tus periodos con más calma.';
       return 'Un periodo tranquilo, con poca presión.';
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        return 'Un periodo orientado al crecimiento personal.';
-      return 'Registraste más actividad que en meses anteriores.';
+        return 'Este fue uno de tus periodos más activos.';
+      return 'Tu actividad fue mayor que en meses anteriores.';
 
     case 'intensity':
       return 'Fue un periodo con mucha actividad y varios cambios.';
@@ -247,7 +247,7 @@ function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
       return 'Tus días fueron muy distintos entre sí durante este periodo.';
 
     case 'exhaustion':
-      return 'Registraste menos energía durante estas semanas.';
+      return 'Tu energía fue más baja durante estas semanas.';
 
     case 'quiet':
       return 'Hubo menos registros, por lo que este periodo ofrece menos información.';
