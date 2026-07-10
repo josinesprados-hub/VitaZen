@@ -142,12 +142,17 @@ async function handler(request: NextRequest) {
     ];
 
     // Call Groq API — PREMIUM gets more tokens and creativity
+    // TIMEOUT FIX: Pass request.signal to the Groq SDK so that when the
+    // client disconnects (e.g. 15s timeout in useApi, user navigates away),
+    // the server aborts the underlying HTTP request to Groq immediately
+    // instead of continuing to wait for a response that nobody will receive.
+    // The groq-sdk (v1.1.2+) accepts { signal } as RequestOptions.
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: groqMessages,
       temperature: isPremium ? 0.8 : 0.5,
       max_tokens: isPremium ? 2048 : 800,
-    });
+    }, { signal: request.signal });
 
     // L-10 FIX: Treat an empty Groq response as an error, not a fallback.
     // Previously, an empty response was replaced with a fallback string,
@@ -194,6 +199,7 @@ async function handler(request: NextRequest) {
     const messageCount = await db.aIMessage.count({ where: { threadId } });
     if (messageCount <= 2 && thread.title === 'Nueva conversación') {
       try {
+        // Also propagate client signal to the title generation call
         const titleCompletion = await groq.chat.completions.create({
           model: 'llama-3.3-70b-versatile',
           messages: [
@@ -208,7 +214,7 @@ async function handler(request: NextRequest) {
           ],
           temperature: 0.3,
           max_tokens: 20,
-        });
+        }, { signal: request.signal });
 
         const generatedTitle = titleCompletion.choices[0]?.message?.content?.trim();
         if (generatedTitle && generatedTitle.length > 0 && generatedTitle.length <= 80) {
