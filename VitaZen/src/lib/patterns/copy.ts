@@ -39,14 +39,14 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
 
   'finanzas-mente': [
     'Semanas con más práctica mental, más tranquilidad.',
-    'Cuando hay sesiones de mente, tranquilidad también está.',
+    'Con más práctica mental, también hay más tranquilidad.',
     'Más mente, más calma en los números.',
     'La práctica mental se nota en las decisiones.',
   ],
 
   'finanzas-estres': [
     'Semanas con más presión, más necesidad en tus gastos.',
-    'Cuando hay presión, necesidad aparece más.',
+    'En las semanas con más presión, tus gastos reflejan más necesidad.',
     'Estrés y necesidad van juntos.',
     'La presión cambia lo que necesitas.',
   ],

@@ -295,8 +295,8 @@ function generateTransitionObservation(from: StageFlavor, to: StageFlavor): stri
     'intensity->stability': 'Tu ritmo se volvió más constante después de varias semanas activas.',
     'dispersion->stability': 'Tus días se volvieron más uniformes que antes.',
     'dispersion->calm': 'La variabilidad entre días disminuyó respecto al periodo anterior.',
-    'quiet->growth': 'Después de un periodo con poca actividad, empezaste a registrar más cosas.',
-    'quiet->stability': 'Pasaste de registrar poco a mantener un ritmo más constante.',
+    'quiet->growth': 'Después de un periodo con poca actividad, tu nivel de actividad aumentó.',
+    'quiet->stability': 'Tu ritmo pasó de ser irregular a más constante.',
     'calm->growth': 'Después de un periodo tranquilo, aumentó tu nivel de actividad.',
     'calm->intensity': 'Un periodo tranquilo seguido de uno con más cambios y actividad.',
     'growth->calm': 'Después de un periodo activo, la actividad disminuyó.',
@@ -308,7 +308,7 @@ function generateTransitionObservation(from: StageFlavor, to: StageFlavor): stri
     'growth->intensity': 'La alta actividad del periodo anterior trajo consigo más intensidad.',
     'intensity->exhaustion': 'Después de un periodo muy activo, tu energía bajó.',
     'exhaustion->growth': 'Tras un periodo con poca energía, la actividad volvió a subir.',
-    'quiet->calm': 'Empezaste a registrar más actividad tras un periodo con pocos datos.',
+    'quiet->calm': 'Tu nivel de actividad fue mayor tras un periodo con poca información.',
   };
 
   const key = `${from}->${to}`;
