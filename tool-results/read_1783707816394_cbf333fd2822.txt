@@ -1,0 +1,614 @@
+    60→  emotionalState: {
+    61→    status: string;
+    62→    statusLabel: string;
+    63→    statusDescription: string;
+    64→    energy: number;
+    65→    focus: number;
+    66→    calm: number;
+    67→    consistency: number;
+    68→    recommendation: string;
+    69→  };
+    70→  evolution: {
+    71→    emotionTrend: number;
+    72→    energyTrend: number;
+    73→    stressTrend: number;
+    74→    activityTrend: number;
+    75→    meditationTrend: number;
+    76→    habitTrend: number;
+    77→  } | null;
+    78→  mainInsight: MainInsight | null;
+    79→  mentorRecommendation: string;
+    80→  plan: string;
+    81→}
+    82→
+    83→// ─────────────────────────────────────────
+    84→// Helpers
+    85→// ─────────────────────────────────────────
+    86→
+    87→function getScoreRingColor(score: number): string {
+    88→  if (score >= 75) return '#22c55e';
+    89→  if (score >= 50) return '#c8a55a';
+    90→  if (score >= 30) return '#e8a849';
+    91→  return '#ef4444';
+    92→}
+    93→
+    94→function getMetricLevel(value: number): string {
+    95→  if (value >= 65) return 'Alto';
+    96→  if (value >= 35) return 'Medio';
+    97→  return 'Bajo';
+    98→}
+    99→
+   100→function getMetricColor(value: number): string {
+   101→  if (value >= 65) return '#c8a55a';
+   102→  if (value >= 35) return '#999';
+   103→  return '#666';
+   104→}
+   105→
+   106→function TrendBadge({ value, invert = false }: { value: number; invert?: boolean }) {
+   107→  // invert=true means positive when value is negative (e.g. stress going down)
+   108→  const positive = invert ? value < -0.2 : value > 0.2;
+   109→  const negative = invert ? value > 0.2 : value < -0.2;
+   110→
+   111→  if (positive) {
+   112→    return (
+   113→      <span className="flex items-center gap-1 text-[11px] text-[#22c55e]">
+   114→        <TrendingUp size={11} /> {invert ? '↓' : '↑'}
+   115→      </span>
+   116→    );
+   117→  }
+   118→  if (negative) {
+   119→    return (
+   120→      <span className="flex items-center gap-1 text-[11px] text-champagne-warm">
+   121→        <TrendingDown size={11} /> {invert ? '↑' : '↓'}
+   122→      </span>
+   123→    );
+   124→  }
+   125→  return (
+   126→    <span className="flex items-center gap-1 text-[11px] text-[#555]">
+   127→      <Minus size={11} /> —
+   128→    </span>
+   129→  );
+   130→}
+   131→
+   132→function getInsightBorderClass(type: string): string {
+   133→  switch (type) {
+   134→    case 'positive': return 'border-[#22c55e]/15 hover:border-[#22c55e]/30';
+   135→    case 'warning': return 'border-champagne-warm/15 hover:border-champagne-warm/30';
+   136→    case 'trend': return 'border-champagne/15 hover:border-champagne/30';
+   137→    default: return 'border-[#1a1a1a] hover:border-[#2a2a2a]';
+   138→  }
+   139→}
+   140→
+   141→function getCategoryHref(category: string): string {
+   142→  const map: Record<string, string> = {
+   143→    'hábitos': '/imperio/disciplina',
+   144→    'meditación': '/imperio/mente',
+   145→    'emociones': '/checkin',
+   146→    'energía': '/imperio/energia',
+   147→    'estrés': '/imperio/mente',
+   148→    'diario': '/imperio/crecimiento',
+   149→    'finanzas': '/imperio/riqueza',
+   150→    'nutrición': '/imperio/energia',
+   151→    'bienestar': '/insights',
+   152→    'consistencia': '/insights',
+   153→    'actividad': '/insights',
+   154→    'imperios': '/insights',
+   155→    'recomendación': '/imperio/mentor',
+   156→  };
+   157→  return map[category.toLowerCase()] || '/insights';
+   158→}
+   159→
+   160→// ─────────────────────────────────────────
+   161→// Main Component
+   162→// ─────────────────────────────────────────
+   163→
+   164→export function WeeklyRecap() {
+   165→  const { user } = useAuth();
+   166→  const { apiFetch } = useApi();
+   167→  const { isActive: screenshotMode, displayUser } = useScreenshotMode();
+   168→  const [data, setData] = useState<RecapData | null>(null);
+   169→  const [loading, setLoading] = useState(true);
+   170→  const [error, setError] = useState(false);
+   171→  const [emailHover, setEmailHover] = useState(false);
+   172→  const isPremium = screenshotMode ? true : (displayUser?.plan === 'PREMIUM');
+   173→
+   174→  const fetchRecap = useCallback(async () => {
+   175→    // ── Screenshot mode: use mock data, skip API calls ──
+   176→    if (screenshotMode) {
+   177→      setData({
+   178→        weekLabel: '5 — 11 may 2026',
+   179→        score: 73,
+   180→        scoreLabel: 'Bueno',
+   181→        progress: {
+   182→          totalActivities: 34,
+   183→          checkins: 5,
+   184→          habitsCompleted: 12,
+   185→          meditationSessions: 5,
+   186→          journalEntries: 4,
+   187→        },
+   188→        topHabits: [
+   189→          { name: 'Meditación matutina', streak: 7 },
+   190→          { name: 'Registrar finanzas', streak: 9 },
+   191→          { name: 'Lectura 20 páginas', streak: 5 },
+   192→        ],
+   193→        emotionalState: {
+   194→          status: 'enfocado',
+   195→          statusLabel: 'Enfocado',
+   196→          statusDescription: 'Claridad y energía alineadas.',
+   197→          energy: 75,
+   198→          focus: 82,
+   199→          calm: 65,
+   200→          consistency: 71,
+   201→          recommendation: 'Claridad. Lo que hagas con ella es tuyo.',
+   202→        },
+   203→        evolution: {
+   204→          emotionTrend: 0.3,
+   205→          energyTrend: 0.2,
+   206→          stressTrend: -0.15,
+   207→          activityTrend: 0.25,
+   208→          meditationTrend: 0.4,
+   209→          habitTrend: 0.2,
+   210→        },
+   211→        mainInsight: {
+   212→          id: 'demo-recap-insight',
+   213→          type: 'positive',
+   214→          category: 'hábitos',
+   215→          icon: '✅',
+   216→          title: 'Racha de 7 días en hábitos',
+   217→          description: '7 días seguidos en Disciplina.',
+   218→        },
+   219→        mentorRecommendation: 'Buen ritmo esta semana. La disciplina se nota.',
+   220→        plan: 'PREMIUM',
+   221→      });
+   222→      setLoading(false);
+   223→      return;
+   224→    }
+   225→
+   226→    setLoading(true);
+   227→    setError(false);
+   228→    try {
+   229→      const res = await apiFetch('/api/weekly-recap');
+   230→      if (res.ok) {
+   231→        const result = await res.json();
+   232→        setData(result);
+   233→      } else {
+   234→        setError(true);
+   235→      }
+   236→    } catch (error) {
+   237→      console.error('Error fetching weekly recap:', error);
+   238→      setError(true);
+   239→    } finally {
+   240→      setLoading(false);
+   241→    }
+   242→  }, [apiFetch, screenshotMode]);
+   243→
+   244→  useEffect(() => {
+   245→    fetchRecap();
+   246→  }, [fetchRecap]);
+   247→
+   248→  // Loading skeleton
+   249→  if (loading) {
+   250→    return <WeeklyRecapSkeleton />;
+   251→  }
+   252→
+   253→  if (!data || error) {
+   254→    // Calm fallback — no retry button, just elegant nothingness
+   255→    return (
+   256→      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden">
+   257→        <div className="px-4 py-4 sm:px-7 sm:py-7">
+   258→          <div className="flex items-center gap-2 sm:gap-3">
+   259→            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-champagne/5 flex items-center justify-center">
+   260→              <CalendarRange size={16} className="text-champagne/30 sm:w-[20px] sm:h-[20px]" />
+   261→            </div>
+   262→            <div>
+   263→              <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu semana</h2>
+   264→              <p className="fallback-warm">Con más actividad aparecerá</p>
+   265→            </div>
+   266→          </div>
+   267→        </div>
+   268→      </div>
+   269→    );
+   270→  }
+   271→
+   272→  // Score ring
+   273→  const scoreRadius = 38;
+   274→  const scoreCircumference = 2 * Math.PI * scoreRadius;
+   275→  const scoreDashoffset = scoreCircumference - (data.score / 100) * scoreCircumference;
+   276→  const scoreColor = getScoreRingColor(data.score);
+   277→
+   278→  // Emotional metrics for small bars
+   279→  const emotionalMetrics = [
+   280→    { label: 'Energía', value: data.emotionalState.energy, icon: Zap },
+   281→    { label: 'Enfoque', value: data.emotionalState.focus, icon: Activity },
+   282→    { label: 'Calma', value: data.emotionalState.calm, icon: Heart },
+   283→    { label: 'Consistencia', value: data.emotionalState.consistency, icon: Flame },
+   284→  ];
+   285→
+   286→  // Progress items
+   287→  const progressItems = [
+   288→    { label: 'Check-ins', value: data.progress.checkins, icon: Zap, unit: 'días', href: '/checkin' },
+   289→    { label: 'Hábitos', value: data.progress.habitsCompleted, icon: CheckCircle, unit: 'completados', href: '/imperio/disciplina' },
+   290→    { label: 'Meditación', value: data.progress.meditationSessions, icon: Wind, unit: 'sesiones', href: '/imperio/mente' },
+   291→    { label: 'Diario', value: data.progress.journalEntries, icon: BookOpen, unit: 'entradas', href: '/imperio/crecimiento' },
+   292→  ];
+   293→
+   294→  // Mobile score ring (smaller)
+   295→  const mobileScoreRadius = 20;
+   296→  const mobileScoreCircumference = 2 * Math.PI * mobileScoreRadius;
+   297→  const mobileScoreDashoffset = mobileScoreCircumference - (data.score / 100) * mobileScoreCircumference;
+   298→
+   299→  return (
+   300→    <div className="recap-fade-in">
+   301→      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl overflow-hidden hover:border-champagne/15 transition-colors duration-300">
+   302→        {/* Header */}
+   303→        <div className="px-4 pt-4 pb-3 sm:px-7 sm:pt-7 sm:pb-5 sm:border-b sm:border-[#1a1a1a]/60">
+   304→          <div className="flex items-center justify-between">
+   305→            <div className="flex items-center gap-2 sm:gap-3">
+   306→              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-champagne/10 flex items-center justify-center">
+   307→                <CalendarRange size={16} className="text-champagne sm:w-[20px] sm:h-[20px]" />
+   308→              </div>
+   309→              <div>
+   310→                <div className="flex items-center gap-2">
+   311→                  <h2 className="text-base sm:text-lg font-semibold text-white">Tu semana</h2>
+   312→                  {isPremium && (
+   313→                    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50">
+   314→                      <Circle size={3} fill="currentColor" className="text-champagne/40" />
+   315→                      Élite
+   316→                    </span>
+   317→                  )}
+   318→                </div>
+   319→                <p className="text-[10px] sm:text-[11px] text-[#666]">{data.weekLabel}</p>
+   320→              </div>
+   321→            </div>
+   322→            <div className="flex items-center gap-2 sm:gap-3">
+   323→              {!isPremium && (
+   324→                <span className="text-[10px] text-[#555] items-center gap-1 hidden sm:flex">
+   325→                  <Circle size={3} fill="currentColor" className="text-champagne/30" />
+   326→                  Hay más aquí con el tiempo
+   327→                </span>
+   328→              )}
+   329→              <Link
+   330→                href="/insights"
+   331→                className="text-[10px] sm:text-[11px] text-champagne hover:underline flex items-center gap-1 transition-colors"
+   332→              >
+   333→                Ver todo <ArrowRight size={11} />
+   334→              </Link>
+   335→            </div>
+   336→          </div>
+   337→
+   338→          {/* Mobile: compact score row — only visible on mobile */}
+   339→          <div className="flex sm:hidden items-center gap-3 mt-3 pt-3 border-t border-[#1a1a1a]/60">
+   340→            <PrivacyMask compact>
+   341→            <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+   342→              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 48 48">
+   343→                <circle cx="24" cy="24" r={mobileScoreRadius} fill="none" stroke="#1a1a1a" strokeWidth="3" />
+   344→                <circle
+   345→                  cx="24" cy="24" r={mobileScoreRadius}
+   346→                  fill="none"
+   347→                  stroke={scoreColor}
+   348→                  strokeWidth="3"
+   349→                  strokeLinecap="round"
+   350→                  strokeDasharray={mobileScoreCircumference}
+   351→                  strokeDashoffset={mobileScoreDashoffset}
+   352→                  className="recap-ring-transition"
+   353→                />
+   354→              </svg>
+   355→              <span className="text-xs font-bold text-white relative z-10">{data.score}</span>
+   356→            </div>
+   357→            <div className="flex-1 min-w-0">
+   358→              <p className="text-xs text-white font-medium">{data.scoreLabel}</p>
+   359→              <p className="text-[10px] text-[#666]">{data.progress.totalActivities} acciones</p>
+   360→            </div>
+   361→            </PrivacyMask>
+   362→            <Link
+   363→              href="/insights"
+   364→              className="text-[10px] text-champagne hover:underline flex items-center gap-1 transition-colors"
+   365→            >
+   366→              Ver resumen <ArrowRight size={10} />
+   367→            </Link>
+   368→          </div>
+   369→        </div>
+   370→
+   371→        {/* Body — hidden on mobile, visible on sm+ */}
+   372→        <div className="hidden sm:block p-3 sm:p-7 space-y-4 sm:space-y-7">
+   373→          {/* Row 1: Score + Emotional State */}
+   374→          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
+   375→            {/* Wellness Score — clickable to insights */}
+   376→            <Link href="/insights" className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 flex items-center gap-3 sm:gap-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press">
+   377→            <PrivacyMask>
+   378→              <div className="relative w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
+   379→                <svg className="absolute inset-0 -rotate-90" viewBox="0 0 96 96">
+   380→                  <circle
+   381→                    cx="48" cy="48" r={scoreRadius}
+   382→                    fill="none"
+   383→                    stroke="#1a1a1a"
+   384→                    strokeWidth="4"
+   385→                  />
+   386→                  <circle
+   387→                    cx="48" cy="48" r={scoreRadius}
+   388→                    fill="none"
+   389→                    stroke={scoreColor}
+   390→                    strokeWidth="4"
+   391→                    strokeLinecap="round"
+   392→                    strokeDasharray={scoreCircumference}
+   393→                    strokeDashoffset={scoreDashoffset}
+   394→                    className="recap-ring-transition"
+   395→                  />
+   396→                </svg>
+   397→                <div className="text-center relative z-10">
+   398→                  <p className="text-xl sm:text-2xl font-bold text-white">{data.score}</p>
+   399→                  <p className="text-[8px] sm:text-[9px] text-[#666] uppercase tracking-wider">/100</p>
+   400→                </div>
+   401→              </div>
+   402→              <div className="flex-1 min-w-0">
+   403→                <p className="text-xs sm:text-sm font-semibold text-white mb-0.5 sm:mb-1 group-hover:text-champagne transition-colors">Tu semana</p>
+   404→                <p className="text-[11px] sm:text-[13px] mb-1.5 sm:mb-3" style={{ color: scoreColor }}>
+   405→                  {data.scoreLabel}
+   406→                </p>
+   407→                <div className="flex items-center gap-1.5 sm:gap-2">
+   408→                  <Activity size={11} className="text-[#666] sm:w-[13px] sm:h-[13px]" />
+   409→                  <span className="text-[10px] sm:text-[11px] text-[#666]">
+   410→                    {data.progress.totalActivities} acciones
+   411→                  </span>
+   412→                </div>
+   413→              </div>
+   414→              <ArrowRight size={14} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0" />
+   415→            </PrivacyMask>
+   416→            </Link>
+   417→
+   418→            {/* Emotional State — PREMIUM details */}
+   419→            <PremiumGate isPremium={isPremium} intensity="light" compact label="Métricas profundas">
+   420→              <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
+   421→                <div className="flex items-center justify-between mb-2 sm:mb-4">
+   422→                  <div className="flex items-center gap-1.5 sm:gap-2">
+   423→                    <Heart size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+   424→                    <p className="text-xs sm:text-sm font-semibold text-white">Estado emocional</p>
+   425→                  </div>
+   426→                  <span className="text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-full bg-champagne/10 text-champagne border border-champagne/20">
+   427→                    {data.emotionalState.statusLabel}
+   428→                  </span>
+   429→                </div>
+   430→                <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-none">
+   431→                  {data.emotionalState.statusDescription}
+   432→                </p>
+   433→                <PrivacyMask compact>
+   434→                <div className="space-y-2 sm:space-y-3">
+   435→                  {emotionalMetrics.map((metric) => {
+   436→                    const Icon = metric.icon;
+   437→                    const color = getMetricColor(metric.value);
+   438→                    return (
+   439→                      <div key={metric.label} className="flex items-center gap-2 sm:gap-3">
+   440→                        <Icon size={10} style={{ color }} className="shrink-0 sm:w-[12px] sm:h-[12px]" />
+   441→                        <span className="text-[9px] sm:text-[11px] text-[#999] w-14 sm:w-20 shrink-0">{metric.label}</span>
+   442→                        <div className="flex-1 h-1 sm:h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+   443→                          <div
+   444→                            className="h-1 sm:h-1.5 rounded-full recap-bar-transition"
+   445→                            style={{
+   446→                              width: `${metric.value}%`,
+   447→                              backgroundColor: color,
+   448→                            }}
+   449→                          />
+   450→                        </div>
+   451→                        <span className="text-[9px] sm:text-[10px] text-[#666] w-6 sm:w-8 text-right">{metric.value}</span>
+   452→                      </div>
+   453→                    );
+   454→                  })}
+   455→                </div>
+   456→                </PrivacyMask>
+   457→              </div>
+   458→            </PremiumGate>
+   459→          </div>
+   460→
+   461→          {/* Row 2: Progress + Top Habits */}
+   462→          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
+   463→            {/* Weekly Progress */}
+   464→            <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
+   465→              <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
+   466→                <Flame size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+   467→                <p className="text-xs sm:text-sm font-semibold text-white">Tu actividad</p>
+   468→              </div>
+   469→              <PrivacyMask compact>
+   470→              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+   471→                {progressItems.map((item) => {
+   472→                  const Icon = item.icon;
+   473→                  return (
+   474→                    <Link
+   475→                      key={item.label}
+   476→                      href={item.href}
+   477→                      className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group"
+   478→                    >
+   479→                      <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+   480→                        <Icon size={10} className="text-champagne sm:w-[12px] sm:h-[12px]" />
+   481→                  <p className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider label-discrete">{item.label}</p>
+   482→                      </div>
+   483→                      <p className="text-lg sm:text-xl font-bold text-white">{item.value}</p>
+   484→                      <p className="text-[8px] sm:text-[9px] text-[#555]">{item.unit}</p>
+   485→                    </Link>
+   486→                  );
+   487→                })}
+   488→              </div>
+   489→              </PrivacyMask>
+   490→            </div>
+   491→
+   492→            {/* Top Habits */}
+   493→            <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
+   494→              <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
+   495→                <CheckCircle size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+   496→                <p className="text-xs sm:text-sm font-semibold text-white">Hábitos más consistentes</p>
+   497→              </div>
+   498→              {data.topHabits.length > 0 ? (
+   499→                <PrivacyMask compact>
+   500→                <div className="space-y-2 sm:space-y-3">
+   501→                  {data.topHabits.map((habit, idx) => (
+   502→                    <Link
+   503→                      key={habit.name}
+   504→                      href="/imperio/disciplina"
+   505→                      className="flex items-center gap-2 sm:gap-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2.5 sm:p-3.5 hover:border-champagne/15 transition-colors cursor-pointer group"
+   506→                    >
+   507→                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+   508→                        <span className="text-[10px] sm:text-[11px] font-bold text-champagne">{idx + 1}</span>
+   509→                      </div>
+   510→                      <div className="flex-1 min-w-0">
+   511→                        <p className="text-[11px] sm:text-[13px] text-white font-medium truncate">{habit.name}</p>
+   512→                        <p className="text-[9px] sm:text-[10px] text-[#666]">
+   513→                          <Flame size={8} className="inline mr-0.5 text-champagne sm:w-[9px] sm:h-[9px]" />
+   514→                          {habit.streak}d racha
+   515→                        </p>
+   516→                      </div>
+   517→                      <div className="w-8 sm:w-10 h-1 sm:h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+   518→                        <div
+   519→                          className="h-1 sm:h-1.5 rounded-full bg-champagne recap-bar-transition"
+   520→                          style={{ width: `${Math.min((habit.streak / 14) * 100, 100)}%` }}
+   521→                        />
+   522→                      </div>
+   523→                    </Link>
+   524→                  ))}
+   525→                </div>
+   526→                </PrivacyMask>
+   527→              ) : (
+   528→                <div className="text-center py-4 sm:py-6">
+   529→                  <CheckCircle size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
+   530→                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin hábitos activos</p>
+   531→                  <p className="text-[9px] sm:text-[10px] text-[#444]"></p>
+   532→                </div>
+   533→              )}
+   534→            </div>
+   535→          </div>
+   536→
+   537→          {/* Row 3: Evolution (PREMIUM gated with blur) + Main Insight */}
+   538→          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
+   539→            {/* Evolution vs Previous Week — PremiumGate */}
+   540→            <PremiumGate isPremium={isPremium} intensity="medium" label="Evolución semanal">
+   541→              <div className="bg-[#000000] border border-champagne/10 rounded-xl p-3 sm:p-6 hover:border-champagne/20 transition-colors">
+   542→                <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
+   543→                  <TrendingUp size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+   544→                  <p className="text-xs sm:text-sm font-semibold text-white">Evolución vs. semana anterior</p>
+   545→                </div>
+   546→                <PrivacyMask compact>
+   547→                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+   548→                  <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
+   549→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Emociones</p>
+   550→                    <div className="flex items-center justify-between">
+   551→                      <span className="text-[11px] sm:text-[13px] text-white font-medium">
+   552→                        {data.evolution?.emotionTrend != null ? `${data.evolution.emotionTrend > 0 ? '+' : ''}${data.evolution.emotionTrend}` : '—'}
+   553→                      </span>
+   554→                      {data.evolution && <TrendBadge value={data.evolution.emotionTrend} />}
+   555→                    </div>
+   556→                  </Link>
+   557→                  <Link href="/imperio/energia" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
+   558→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
+   559→                    <div className="flex items-center justify-between">
+   560→                      <span className="text-[11px] sm:text-[13px] text-white font-medium">
+   561→                        {data.evolution?.energyTrend != null ? `${data.evolution.energyTrend > 0 ? '+' : ''}${data.evolution.energyTrend}` : '—'}
+   562→                      </span>
+   563→                      {data.evolution && <TrendBadge value={data.evolution.energyTrend} />}
+   564→                    </div>
+   565→                  </Link>
+   566→                  <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
+   567→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Estrés</p>
+   568→                    <div className="flex items-center justify-between">
+   569→                      <span className="text-[11px] sm:text-[13px] text-white font-medium">
+   570→                        {data.evolution?.stressTrend != null ? (data.evolution.stressTrend > 0 ? '↓ bajó' : '↑ subió') : '—'}
+   571→                      </span>
+   572→                      {data.evolution && <TrendBadge value={data.evolution.stressTrend} invert />}
+   573→                    </div>
+   574→                  </Link>
+   575→                  <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
+   576→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Actividad</p>
+   577→                    <div className="flex items-center justify-between">
+   578→                      <span className="text-[11px] sm:text-[13px] text-white font-medium">
+   579→                        {data.evolution?.activityTrend != null ? `${data.evolution.activityTrend > 0 ? '+' : ''}${data.evolution.activityTrend}` : '—'}
+   580→                      </span>
+   581→                      {data.evolution && <TrendBadge value={data.evolution.activityTrend} />}
+   582→                    </div>
+   583→                  </Link>
+   584→                </div>
+   585→                </PrivacyMask>
+   586→              </div>
+   587→            </PremiumGate>
+   588→
+   589→            {/* Main Insight — clickable to relevant section */}
+   590→            <Link
+   591→              href={data.mainInsight ? getCategoryHref(data.mainInsight.category) : '/insights'}
+   592→              className="block bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press"
+   593→            >
+   594→              <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
+   595→                <Sparkles size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+   596→                <p className="text-xs sm:text-sm font-semibold text-white group-hover:text-champagne transition-colors">Lo que destaca</p>
+   597→              </div>
+   598→              {data.mainInsight ? (
+   599→                <div
+   600→                  className={`bg-[#0a0a0a] border rounded-xl p-3 sm:p-4 transition-all duration-200 ${getInsightBorderClass(data.mainInsight.type)}`}
+   601→                >
+   602→                  <div className="flex items-start gap-2 sm:gap-3">
+   603→                    <span className="text-base sm:text-xl shrink-0 mt-0.5">{data.mainInsight.icon}</span>
+   604→                    <div className="min-w-0">
+   605→                      <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+   606→                        <h3 className="text-[11px] sm:text-[13px] font-semibold text-white">{data.mainInsight.title}</h3>
+   607→                        <span className="text-[7px] sm:text-[8px] px-1 sm:px-1.5 py-0.5 rounded-full bg-[#1a1a1a] text-[#666] uppercase tracking-wider">
+   608→                          {data.mainInsight.category}
+   609→                        </span>
+   610→                      </div>
+   611→                      <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed line-clamp-2 sm:line-clamp-none">{data.mainInsight.description}</p>
+   612→                    </div>
+   613→                    <ArrowRight size={12} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0 mt-1" />
+   614→                  </div>
+   615→                </div>
+   616→              ) : (
+   617→                <div className="text-center py-4 sm:py-6">
+   618→                  <Sparkles size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
+   619→                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin insights</p>
+   620→                </div>
+   621→              )}
+   622→            </Link>
+   623→          </div>
+   624→
+   625→          {/* Row 4: Mentor Recommendation — FREE gets truncated, PREMIUM full */}
+   626→          <Link href="/imperio/mentor" className="block bg-gradient-to-r from-champagne/5 via-[#0a0a0a] to-[#0a0a0a] border border-champagne/10 rounded-xl p-3 sm:p-6 relative overflow-hidden hover:border-champagne/20 transition-colors cursor-pointer group">
+   627→            {/* Subtle glow */}
+   628→            <div
+   629→              className="absolute inset-0 rounded-xl pointer-events-none"
+   630→              style={{ boxShadow: 'inset 0 1px 0 0 rgba(200, 165, 90, 0.05)' }}
+   631→            />
+   632→            <div className="relative z-10">
+   633→              <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+   634→                <Lightbulb size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
+   635→                <p className="text-xs sm:text-sm font-semibold text-white">Observación</p>
+   636→                <PremiumInlineBadge
+   637→                  isPremium={isPremium}
+   638→                  freeLabel="Resumido"
+   639→                  premiumLabel="Completo"
+   640→                />
+   641→              </div>
+   642→              <p className={`text-[11px] sm:text-[13px] text-champagne/90 font-light italic leading-relaxed max-w-2xl ${
+   643→                isPremium ? '' : 'line-clamp-2'
+   644→              }`}>
+   645→                {data.mentorRecommendation}
+   646→              </p>
+   647→              {!isPremium && data.mentorRecommendation.length > 100 && (
+   648→                <div className="mt-2 flex items-center gap-1.5">
+   649→                  <span className="text-[9px] sm:text-[10px] text-champagne/60 group-hover:text-champagne transition-colors flex items-center gap-1">
+   650→                    <Circle size={3} fill="currentColor" className="text-champagne/30" /> Las conexiones aparecen con el tiempo
+   651→                  </span>
+   652→                </div>
+   653→              )}
+   654→            </div>
+   655→          </Link>
+   656→
+   657→          {/* Email CTA */}
+   658→          <div className="pt-1 pb-0.5 sm:pt-2 sm:pb-1 flex items-center justify-center">
+   659→            <button
+   660→              onMouseEnter={() => setEmailHover(true)}
+   661→              onMouseLeave={() => setEmailHover(false)}
+   662→              className="hidden sm:flex items-center gap-2 text-[11px] text-[#555] hover:text-champagne transition-colors duration-300 group cursor-default"
+   663→            >
+   664→              <Mail size={12} className={`transition-colors duration-300 ${emailHover ? 'text-champagne' : 'text-[#444]'}`} />
+   665→              <span>Resumen semanal por email próximamente</span>
+   666→            </button>
+   667→          </div>
+   668→        </div>
+   669→      </div>
+   670→    </div>
+   671→  );
+   672→}
+   673→
