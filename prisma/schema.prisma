@@ -1,0 +1,552 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════
+// USER & AUTH
+// ═══════════════════════════════════════════
+
+model User {
+  id                String   @id @default(cuid())
+  firebaseUid       String   @unique
+  email             String   @unique
+  name              String?
+  avatarUrl         String?
+  country           String?
+  city              String?
+  age               Int?
+  bio               String?
+  weeklyEmailSummary Boolean @default(true)    // REAL: consumed by weekly-recap-sender cron
+  dailyReminders    Boolean @default(false)   // PLACEBO: stored but never consumed by any backend logic
+  privacyStatsVisible Boolean @default(false) // REAL: controls visual masking of personal metrics (scores, streaks, counts, balances) via <PrivacyMask>
+  plan              String   @default("FREE") // FREE | PREMIUM
+  stripeCustomerId  String?  @unique
+  emailVerified     Boolean  @default(false)
+  welcomeEmailSent  Boolean  @default(false)
+  onboardingCompleted Boolean @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  subscriptions     Subscription[]
+  aiThreads         AIThread[]
+  aiUsage           AIUsage?
+  wellnessLogs      WellnessLog[]
+  meditationSessions MeditationSession[]
+  journalEntries    JournalEntry[]
+  dailyChallenges   UserChallenge[]
+  habitLogs         HabitLog[]
+  nutritionLogs     NutritionLog[]
+  financeLogs       FinanceLog[]
+  empireProgress    EmpireProgress[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  achievements      Achievement[]
+  dailyCheckins     DailyCheckin[]
+  onboardingData    OnboardingData?
+  pushTokens        PushToken[]
+  notificationPreference NotificationPreference?
+  notificationLog   NotificationLog[]
+  widgetSnapshots        WidgetSnapshot[]
+  monthlyClosures        MonthlyClosure[]
+  weeklyEmailLogs        WeeklyEmailLog[]
+  emotionalDashboardState EmotionalDashboardState?
+}
+
+// ═══════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════
+
+model OnboardingData {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  goals           String   // JSON array of personal goals
+  primaryFocus    String   // mente | disciplina | energia | riqueza
+  stressLevel     Int      // 1-5
+  energyLevel     Int      // 1-5
+  focusLevel      Int      // 1-5
+  initialHabits   String   // JSON array of habit names
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  stripeSubscriptionId String   @unique
+  stripePriceId        String
+  status               String   @default("active") // active | canceled | past_due | incomplete | trialing | superseded | unpaid
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// AI SYSTEM
+// ═══════════════════════════════════════════
+
+model AIThread {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("Nueva conversación")
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIMessage[]
+
+  @@index([userId, archived])
+}
+
+model AIMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  role      String   // user | assistant
+  content   String
+  createdAt DateTime @default(now())
+
+  thread AIThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+}
+
+model AIUsage {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  count     Int      @default(0)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// CHALLENGES
+// ═══════════════════════════════════════════
+
+model DailyChallenge {
+  id          String   @id @default(cuid())
+  category    String   // disciplina | mentalidad | habitos | productividad | salud
+  title       String
+  description String
+  difficulty  String   @default("medium") // easy | medium | hard
+  createdAt   DateTime @default(now())
+
+  userChallenges UserChallenge[]
+}
+
+model UserChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  challengeId String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  date        DateTime
+
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge DailyChallenge @relation(fields: [challengeId], references: [id])
+
+  @@unique([userId, date])
+}
+
+// ═══════════════════════════════════════════
+// WELLNESS & TRACKING
+// ═══════════════════════════════════════════
+
+model WellnessLog {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  mood      Int      // 1-5
+  energy    Int      // 1-5
+  sleep     Int      // 1-5
+  stress    Int      // 1-5
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model MeditationSession {
+  id          String   @id @default(cuid())
+  userId      String
+  duration    Int      // minutes
+  type        String   // diaphragmatic | coherence | mindfulness | nadi_shodhana | box
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, completedAt]) // GLOBAL-18: composite for widget/dashboard queries
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  mood      Int?     // 1-5
+  gratitude String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt]) // GLOBAL-18: composite for widget/dashboard queries
+}
+
+// ═══════════════════════════════════════════
+// EMPIRE-SPECIFIC TRACKING
+// ═══════════════════════════════════════════
+
+model HabitLog {
+  id              String    @id @default(cuid())
+  userId          String
+  name            String
+  description     String?
+  frequency       String    @default("daily") // daily | weekly | monthly
+  streak          Int       @default(0)
+  lastCompletedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, lastCompletedAt]) // GLOBAL-18: composite for dashboard/streaks queries
+}
+
+model NutritionLog {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  meals     String?  // JSON string with meal data
+  water     Int      @default(0) // glasses
+  calories  Int?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model FinanceLog {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  type        String   // income | expense
+  category    String
+  amount      Float
+  description String?
+  mood        String?  // tranquility | growth | necessity | enjoyment (legacy: calm|conscious|impulse|necessary)
+  contexto    String?  // personal memory — "¿Qué pasó?" — human context behind the transaction
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+// ═══════════════════════════════════════════
+// EMPIRE SYSTEM
+// ═══════════════════════════════════════════
+
+model EmpireProgress {
+  id       String  @id @default(cuid())
+  userId   String
+  empire   String  // disciplina | mente | energia | riqueza | crecimiento
+  level    Int     @default(1)
+  xp       Int     @default(0)
+  streak   Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, empire])
+}
+
+model EmpireTip {
+  id        String   @id @default(cuid())
+  empire    String   // disciplina | mente | energia | riqueza | crecimiento
+  title     String
+  content   String
+  plan      String   @default("FREE") // FREE | PREMIUM
+  createdAt DateTime @default(now())
+}
+
+// ═══════════════════════════════════════════
+// ACHIEVEMENTS
+// ═══════════════════════════════════════════
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  key         String   // e.g. "meditation_7", "journal_first", "habits_10"
+  unlockedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId])
+}
+
+// ═══════════════════════════════════════════
+// DAILY CHECK-IN
+// ═══════════════════════════════════════════
+
+model DailyCheckin {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  emotion     Int      // 1-5 emotional state
+  energy      Int      // 1-5
+  focus       Int      // 1-5
+  stress      Int      // 1-5
+  intention   String   // daily intention
+  note        String?  // optional note
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date]) // GLOBAL-18: composite for range queries (gte/lt on date)
+}
+
+// ═══════════════════════════════════════════
+// ANALYTICS (privacy-first, lightweight)
+// ═══════════════════════════════════════════
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  event      String   // event name (e.g. "user_registered", "checkin_created")
+  userId     String?  // optional — null for anonymous events
+  properties String?  // JSON string for minimal context
+  createdAt  DateTime @default(now())
+
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ═══════════════════════════════════════════
+// NOTIFICATIONS & PUSH
+// ═══════════════════════════════════════════
+
+model PushToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique // FCM device token
+  platform  String   @default("web") // web | ios | android
+  userAgent String?  // browser/device info for dedup
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, active])
+  @@index([token])
+}
+
+model NotificationPreference {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  pushEnabled           Boolean  @default(false)
+  checkinReminders      Boolean  @default(true)
+  streakReminders       Boolean  @default(true) // DEPRECATED: removed from UI and API. Kept for DB backward compat only. No code reads this.
+  weeklyRecap           Boolean  @default(true)
+  comebackReminders     Boolean  @default(true)
+  reflectionReminders   Boolean  @default(true)
+  quietHoursEnabled     Boolean  @default(true)
+  quietHoursStart       String   @default("22:00") // HH:mm in user timezone
+  quietHoursEnd         String   @default("08:00") // HH:mm in user timezone
+  timezone              String   @default("Europe/Madrid")
+  maxDailyNotifications Int      @default(2) // hard cap per day (matches UI: 1 or 2)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model NotificationLog {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // checkin | weekly_recap | comeback | reflection  (streak removed)
+  title       String
+  body        String
+  sentAt      DateTime @default(now())
+  wasDelivered Boolean @default(false) // FCM response confirmed
+  wasInQuietHours Boolean @default(false) // scheduled during quiet hours (deferred)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, sentAt])
+  @@index([userId, sentAt])
+}
+
+// ═══════════════════════════════════════════
+// WIDGETS — Mobile Widget Snapshots
+// Pre-computed, lightweight payloads for iOS/Android widgets.
+// Snapshots are computed on data change, not on read.
+// This means widget reads are O(1) — no heavy DB queries on every refresh.
+// ═══════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+// MONTHLY CLOSURE — Cierre Mensual
+// The second core Élite feature.
+// Reflection first, then data. Always.
+// The reflection is PRIVATE — never sent to AI, never scored.
+// ═══════════════════════════════════════════
+
+model MonthlyClosure {
+  id              String   @id @default(cuid())
+  userId          String
+  month           String   // YYYY-MM format (e.g. "2025-04")
+  reflection      String?  // Private, intimate — never analyzed by AI
+  reflectedAt     DateTime? // When the user wrote their reflection
+  summaryViewedAt DateTime? // When the user saw the monthly summary
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month])
+  @@index([userId])
+}
+
+model WidgetSnapshot {
+  id          String   @id @default(cuid())
+  userId      String
+  widgetType  String   // reflection | momentum | checkin | daily_focus | calm_quote
+  data        String   // JSON string — pre-shaped, minimal widget payload
+  version     Int      @default(1) // Schema version for future payload evolution
+  computedAt  DateTime @default(now())
+  expiresAt   DateTime // When this snapshot is considered stale
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, widgetType])
+  @@index([userId, widgetType, expiresAt])
+  @@map("widget_snapshots")
+}
+
+// ═══════════════════════════════════════════
+// EMOTIONAL DASHBOARD STATE
+// Single source of truth for emotional content.
+// Shared across all devices. Persistent. Coherent.
+// ═══════════════════════════════════════════
+
+model EmotionalDashboardState {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+
+  // DEPRECATED: Reflection rotation state (JSON).
+  // The reflections system has been removed. This column is kept
+  // in the database to avoid a migration, but no code reads or
+  // writes it. Safe to remove in a future migration.
+  reflectionState String   @default("{}")
+
+  // Tips rotation state per empire (JSON)
+  // { [empire]: { freeOrder[], freePosition, premiumOrder[], premiumPosition, cycleStart, recentFree[], recentPremium[] } }
+  tipsState       String   @default("{}")
+
+  // Silent memory rarity state (JSON)
+  // { lastShown: { [type]: ISO date }, shown: string[] }
+  memoryState     String   @default("{}")
+
+  // Daily quote rotation state (JSON)
+  // { currentIndex, cycleNumber, lastDateKey, collectionLength }
+  quoteState      String   @default("{}")
+
+  // Last dashboard visit — for cross-device visit tracking
+  lastVisitAt     DateTime @default(now())
+
+  // Daily stability — which day this state was computed for
+  dateKey         String   @default("") // YYYY-MM-DD
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ═══════════════════════════════════════════
+// WEEKLY EMAIL IDEMPOTENCY
+// Prevents duplicate weekly recap emails.
+// Claim-first pattern: create log before sending,
+// delete on failure. Unique constraint on
+// (userId, weekKey) is the atomic guard.
+// ═══════════════════════════════════════════
+
+model WeeklyEmailLog {
+  id        String   @id @default(cuid())
+  userId    String
+  weekKey   String   // ISO week: "2026-W22" (timezone-aware, deterministic)
+  sentAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekKey])
+  @@index([weekKey])
+}
+
+// ═══════════════════════════════════════════
+// STRIPE WEBHOOK IDEMPOTENCY
+// Prevents duplicate processing of Stripe events.
+// Stripe retries webhooks on 500 responses — without
+// dedup, a single event could create duplicate
+// Subscription records, send duplicate emails, etc.
+// Auto-cleaned after 7 days via webhook handler.
+// ═══════════════════════════════════════════
+
+model StripeEventLog {
+  id        String   @id @default(cuid())
+  eventId   String   @unique  // Stripe event ID (evt_...)
+  eventType String              // checkout.session.completed, etc.
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
