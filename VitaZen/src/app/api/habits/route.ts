@@ -6,6 +6,7 @@ import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
+import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -118,8 +119,8 @@ export async function PATCH(request: NextRequest) {
       if (lastCompleted) {
         const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
         // Compute day diff using date keys (timezone-aware)
-        const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
-        const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
+        const todayMs = startOfMadridDay(todayDateKey).getTime();
+        const lastMs = startOfMadridDay(lastDateKey).getTime();
         const diffDays = Math.round((todayMs - lastMs) / 86400000);
         // H-7 FIX: Completion guard respects frequency.
         // Before this fix, the guard only checked lastDateKey === todayDateKey (daily logic),
@@ -172,14 +173,7 @@ export async function PATCH(request: NextRequest) {
       // for a single Madrid day. Now: derive the exact UTC instant of Madrid
       // midnight from the Madrid date key (same approach as startOfMadridDay
       // in insights.ts), so the DB query window matches the real Madrid day.
-      const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-      const madridNoonParts = madridNoonUtc
-        .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-        .split(' ')[1].split(':').map(Number);
-      const msSinceMadridMidnight =
-        (madridNoonParts[0] * 3600 + madridNoonParts[1] * 60 + madridNoonParts[2]) * 1000;
-      const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-      const todayEnd = new Date(todayStart.getTime() + 86400000);
+      const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
       const otherCompletedToday = await tx.habitLog.findFirst({
         where: {
           userId: user.id,
@@ -306,14 +300,7 @@ export async function DELETE(request: NextRequest) {
         const habitDateKey = getMadridDateKey(habit.lastCompletedAt);
         if (habitDateKey === todayDateKey) {
           // Use the same Madrid-aware day boundaries as the H-10/H-11 fix.
-          const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-          const madridNoonParts = madridNoonUtc
-            .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-            .split(' ')[1].split(':').map(Number);
-          const msSinceMadridMidnight =
-            (madridNoonParts[0] * 3600 + madridNoonParts[1] * 60 + madridNoonParts[2]) * 1000;
-          const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-          const todayEnd = new Date(todayStart.getTime() + 86400000);
+          const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
           const otherCompletedToday = await tx.habitLog.findFirst({
             where: {
               userId: user.id,

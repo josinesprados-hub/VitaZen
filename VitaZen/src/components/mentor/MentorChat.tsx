@@ -38,7 +38,7 @@ import {
 import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 
 // ─────────────────────────────────────────
 // Types
@@ -74,11 +74,7 @@ function getRelativeDate(dateStr: string): string {
   // Calendar-day difference using Madrid-normalized dates
   const entryKey = getMadridDateKey(date);
   const todayKey = getTodayDateKey();
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDays = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffMins < 1 && diffDays === 0) return 'Ahora';
   if (diffMins < 60 && diffDays === 0) return `Hace ${diffMins} min`;
@@ -89,6 +85,8 @@ function getRelativeDate(dateStr: string): string {
     const weeks = Math.floor(diffDays / 7);
     return weeks === 1 ? 'Hace 1 semana' : `Hace ${weeks} semanas`;
   }
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
   return entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
@@ -99,11 +97,7 @@ function getDateGroup(dateStr: string): string {
 
   if (entryKey === todayKey) return 'Hoy';
 
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDays = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffDays === 1) return 'Ayer';
   if (diffDays < 7) return 'Esta semana';

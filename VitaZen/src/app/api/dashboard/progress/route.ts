@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getMadridDateKey } from '@/lib/deterministic';
+import { startOf7DaysAgoMadrid } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,8 +12,7 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekAgo = startOf7DaysAgoMadrid();
 
     // Meditation: sessions this week (target 7)
     const meditationCount = await db.meditationSession.count({

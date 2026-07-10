@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { getMadridDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_HABITS, SCREENSHOT_CHALLENGE as SCREENSHOT_HABIT_CHALLENGE } from '@/lib/screenshot-data';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
@@ -45,9 +45,7 @@ export default function DisciplinaPage() {
     const lastDate = getMadridDateKey(new Date(habit.lastCompletedAt));
     const today = getMadridDateKey(new Date());
     if (habit.frequency === 'daily') return lastDate === today;
-    const todayMs = new Date(today + 'T00:00:00').getTime();
-    const lastMs = new Date(lastDate + 'T00:00:00').getTime();
-    const diffDays = Math.round((todayMs - lastMs) / 86400000);
+    const diffDays = daysBetweenDateKeys(lastDate, today);
     if (habit.frequency === 'weekly') return diffDays < 7;
     if (habit.frequency === 'monthly') return diffDays < 30;
     return lastDate === today;

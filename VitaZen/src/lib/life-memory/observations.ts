@@ -11,6 +11,7 @@
 
 import { db } from '@/lib/db';
 import type { LifeStage, StageTransition } from './stages';
+import { getMadridMonthRange } from '@/lib/dates';
 
 // ─── Types ───
 
@@ -69,16 +70,14 @@ export async function getHighlightedMemories(userId: string, months: string[]): 
 
   const startStr = months[0];
   const endStr = months[months.length - 1];
-  const [startYear, startMonth] = startStr.split('-').map(Number);
-  const [endYear, endMonth] = endStr.split('-').map(Number);
-  const start = new Date(startYear, startMonth - 1, 1);
-  const end = new Date(endYear, endMonth, 1);
+  const { start } = getMadridMonthRange(startStr);
+  const { end } = getMadridMonthRange(endStr);
 
   // Finance logs with contexto (most human)
   const financeWithCtx = await db.financeLog.findMany({
     where: {
       userId,
-      date: { gte: start, lt: new Date(end.getFullYear(), end.getMonth() + 1, 1) },
+      date: { gte: start, lt: end },
       contexto: { not: null },
     },
     select: { contexto: true, date: true, category: true, mood: true },
@@ -100,7 +99,7 @@ export async function getHighlightedMemories(userId: string, months: string[]): 
   const journals = await db.journalEntry.findMany({
     where: {
       userId,
-      createdAt: { gte: start, lt: new Date(end.getFullYear(), end.getMonth() + 1, 1) },
+      createdAt: { gte: start, lt: end },
     },
     select: { title: true, content: true, createdAt: true },
     orderBy: { createdAt: 'desc' },
@@ -119,7 +118,7 @@ export async function getHighlightedMemories(userId: string, months: string[]): 
   const checkinNotes = await db.dailyCheckin.findMany({
     where: {
       userId,
-      date: { gte: start, lt: new Date(end.getFullYear(), end.getMonth() + 1, 1) },
+      date: { gte: start, lt: end },
       note: { not: null },
     },
     select: { note: true, date: true },

@@ -27,7 +27,7 @@ import {
   passesPhilosophicalFilter,
   computeWeight,
 } from './validation';
-import { getMadridDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getMadridWeekKey } from '@/lib/dates';
 
 // ─── Configuration ───
 
@@ -55,17 +55,6 @@ function resolveIntention(mood: string | null): string | null {
 const SOCIAL_KEYWORDS = /\b(amigos|amiga|amigo|social|cumple|fiesta|cena con|quedada|bar|copa|grupo|compañero|pareja|familia|mamá|papa|regalo)\b/i;
 
 // ─── Week Helpers ───
-
-function getWeekKey(date: Date): string {
-  // Normalize to Madrid date first, then compute ISO week from that date.
-  // This ensures the week boundary matches the user's perceived day,
-  // not UTC midnight — same source of truth as Dashboard, Momentum, etc.
-  const madridDateStr = getMadridDateKey(date); // "YYYY-MM-DD"
-  const d = new Date(madridDateStr + 'T12:00:00Z'); // noon UTC avoids any day-boundary issue
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  return `${d.getFullYear()}-W${1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)}`;
-}
 
 function parseDate(dateStr: string): Date {
   return new Date(dateStr);
@@ -101,7 +90,7 @@ function aggregateFinanceWeekly(data: CrossEmpireData): Map<string, WeeklyFinanc
   const weeks = new Map<string, WeeklyFinance>();
 
   for (const log of data.financeLogs) {
-    const weekKey = getWeekKey(parseDate(log.date));
+    const weekKey = getMadridWeekKey(parseDate(log.date));
     if (!weeks.has(weekKey)) {
       weeks.set(weekKey, {
         weekKey,
@@ -155,7 +144,7 @@ function aggregateWellnessWeekly(data: CrossEmpireData): Map<string, WeeklyWelln
   const weeks = new Map<string, WeeklyWellness>();
 
   for (const log of data.wellnessLogs) {
-    const weekKey = getWeekKey(parseDate(log.date));
+    const weekKey = getMadridWeekKey(parseDate(log.date));
     if (!weeks.has(weekKey)) {
       weeks.set(weekKey, { weekKey, avgSleep: 0, avgEnergy: 0, avgStress: 0, avgMood: 0, _count: 0, _sleep: 0, _energy: 0, _stress: 0, _mood: 0 } as any);
     }
@@ -183,7 +172,7 @@ function aggregateMeditationWeekly(data: CrossEmpireData): Map<string, WeeklyMed
   const weeks = new Map<string, WeeklyMeditation>();
 
   for (const session of data.meditationSessions) {
-    const weekKey = getWeekKey(parseDate(session.completedAt));
+    const weekKey = getMadridWeekKey(parseDate(session.completedAt));
     if (!weeks.has(weekKey)) {
       weeks.set(weekKey, { weekKey, sessionCount: 0, totalMinutes: 0 });
     }

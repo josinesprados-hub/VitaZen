@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { startOf7DaysAgoMadrid, startOf14DaysAgoMadrid, startOf60DaysAgoMadrid, calcStreakFromKeys } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // Momentum Score — consistency-based metric
@@ -42,11 +43,10 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = startOf7DaysAgoMadrid();
+    const fourteenDaysAgo = startOf14DaysAgoMadrid();
     // Streak calculation: only need last 60 days (no real streak exceeds this)
-    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = startOf60DaysAgoMadrid();
 
     // ═══ PERFORMANCE FIX: Merge all 4 sequential rounds into 1 parallel round ═══
     // Previously: 4 rounds × 4-5 queries each = 18 queries sequentially
@@ -215,23 +215,7 @@ export async function GET(request: NextRequest) {
       streakDays.add(getMadridDateKey(new Date(d)));
     }
 
-    const todayStr = getTodayDateKey();
-    let checkDateStr = todayStr;
-    if (!streakDays.has(todayStr)) {
-      const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-      checkDateStr = getMadridDateKey(yesterday);
-    }
-
-    let currentStreak = 0;
-    while (true) {
-      if (streakDays.has(checkDateStr)) {
-        currentStreak++;
-        const prev = new Date(new Date(checkDateStr + 'T00:00:00').getTime() - 24 * 60 * 60 * 1000);
-        checkDateStr = getMadridDateKey(prev);
-      } else {
-        break;
-      }
-    }
+    const currentStreak = calcStreakFromKeys(streakDays);
 
     // ─── Calculate Momentum Score ───
     const activityScore = Math.min(25, Math.round((activeDays / 7) * 25));

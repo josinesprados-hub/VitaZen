@@ -15,7 +15,7 @@ import { NumericInput } from '@/components/ui/NumericInput';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { formatCurrency } from '@/lib/utils';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { getTodayDateKey, getMadridMonthRange, getCurrentMonthKey } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // Types
@@ -211,9 +211,8 @@ function parseEuropeanQuick(raw: string): number {
 // ═══════════════════════════════════════════
 
 function getMonthRange(date: Date) {
-  const start = new Date(date.getFullYear(), date.getMonth(), 1);
-  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
-  return { start, end };
+  const yyyyMM = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  return getMadridMonthRange(yyyyMM);
 }
 
 function filterLogsByRange(logs: FinanceLog[], start: Date, end: Date) {
@@ -658,8 +657,9 @@ export default function RiquezaPage() {
   const monthLabel = viewingMonth
     ? `${MONTH_LABELS_ES[viewingMonth.getMonth()]} ${viewingMonth.getFullYear()}`
     : '';
+  const currentMonthKey = getCurrentMonthKey();
   const isCurrentMonth = viewingMonth
-    ? viewingMonth.getMonth() === new Date().getMonth() && viewingMonth.getFullYear() === new Date().getFullYear()
+    ? `${viewingMonth.getFullYear()}-${String(viewingMonth.getMonth() + 1).padStart(2, '0')}` === currentMonthKey
     : true;
 
   // ═══════════════════════════════════════════

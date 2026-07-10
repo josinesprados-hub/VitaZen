@@ -3,22 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getMadridDateKey } from '@/lib/deterministic';
-
-// R-1/R-2/R-3 helper: compute the UTC instants that bound the Madrid calendar day
-// for the given Madrid date key (YYYY-MM-DD). Used by POST, PUT and DELETE so
-// the "first log of the day" / "last log of the day" checks align with the
-// user's perceived day boundary (same approach as startOfMadridDay in
-// insights.ts, the H-11 fix in habits, and the M-1/M-2/E-1/E-3 fixes).
-function madridDayBoundaries(dateKey: string): { start: Date; end: Date } {
-  const madridNoonUtc = new Date(dateKey + 'T12:00:00Z');
-  const parts = madridNoonUtc
-    .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-    .split(' ')[1].split(':').map(Number);
-  const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
-  const start = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-  const end = new Date(start.getTime() + 86400000);
-  return { start, end };
-}
+import { madridDayBoundaries, startOfMadridDay, madridDaysAgo } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,7 +18,7 @@ export async function GET(request: NextRequest) {
     const logs = await db.financeLog.findMany({
       where: {
         userId: user.id,
-        date: { gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) },
+        date: { gte: startOfMadridDay(madridDaysAgo(days)) },
       },
       orderBy: { date: 'desc' },
     });

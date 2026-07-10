@@ -18,6 +18,7 @@ import { getHighlightedMemories, buildTimeline, observationsFromPatterns } from 
 import type { PatternObservationData } from '@/lib/life-memory/observations';
 import { detectPatterns } from '@/lib/patterns/detector';
 import type { CrossEmpireData } from '@/lib/patterns/types';
+import { startOf90DaysAgoMadrid } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,8 +46,7 @@ export async function GET(request: NextRequest) {
 
     if (isPremium) {
       try {
-        const ninetyDaysAgo = new Date();
-        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        const ninetyDaysAgo = startOf90DaysAgoMadrid();
 
         const [
           financeLogs, wellnessLogs, meditationSessions,

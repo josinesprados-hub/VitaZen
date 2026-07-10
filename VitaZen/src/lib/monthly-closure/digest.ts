@@ -11,7 +11,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { getMadridMonthRange, getPreviousMonthKey, getMadridDayOfMonth } from '@/lib/dates';
 import {
   formatMonthLabel,
   INTENTION_BALANCE_EMPTY,
@@ -28,30 +28,6 @@ import {
   NO_DATA_TITLE,
   NO_DATA_SUBTITLE,
 } from './copy';
-
-// T-3 FIX helper: compute the UTC instant of Madrid midnight on the first day
-// of a given month. `new Date(year, month - 1, 1)` (no Z suffix) is
-// interpreted as server-local midnight — on a UTC server (Vercel), this is
-// UTC midnight, NOT Madrid midnight. For October 2024 on a UTC server:
-//   start = 2024-10-01T00:00:00Z = 02:00 Madrid (CEST)
-//   end   = 2024-11-01T00:00:00Z = 02:00 Madrid (CET)
-// A checkin at Madrid 2024-10-01 00:30 (UTC 2024-09-30 22:30) was EXCLUDED
-// from October. A checkin at Madrid 2024-11-01 00:30 (UTC 2024-10-31 22:30)
-// was INCLUDED in October. This silently misattributed activities near month
-// boundaries to the wrong month.
-//
-// Fix: compute the Madrid midnight of the first day of the month by using
-// the same `madridNoonUtc → msSinceMadridMidnight` technique as
-// startOfMadridDay() in insights.ts and madridDayBoundaries() in
-// finance/wellness/meditation routes.
-function startOfMadridMonth(year: number, month1Based: number): Date {
-  const madridNoonUtc = new Date(Date.UTC(year, month1Based - 1, 1, 12, 0, 0));
-  const madridStr = madridNoonUtc.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-  const timePart = madridStr.split(' ')[1];
-  const [hours, minutes, seconds] = timePart.split(':').map(Number);
-  const msSinceMadridMidnight = (hours * 3600 + minutes * 60 + seconds) * 1000;
-  return new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-}
 
 // ─── Types ───
 
@@ -109,17 +85,6 @@ export interface MonthlyDigest {
 
 // ─── Helper: date range for a month ───
 
-function getMonthRange(yyyyMM: string) {
-  const [year, month] = yyyyMM.split('-').map(Number);
-  // T-3 FIX: use Madrid-aware month boundaries (not server-local midnight).
-  // startOfMadridMonth computes the UTC instant of Madrid midnight on the
-  // first day of the month, so queries correctly include activities near
-  // month boundaries in the user's perceived calendar month.
-  const start = startOfMadridMonth(year, month);
-  const end = startOfMadridMonth(year, month + 1); // first day of next month
-  return { start, end };
-}
-
 function getPreviousMonth(yyyyMM: string): string {
   const [year, month] = yyyyMM.split('-').map(Number);
   if (month === 1) return `${year - 1}-12`;
@@ -132,7 +97,7 @@ async function computeIntentionBalance(
   userId: string,
   yyyyMM: string
 ): Promise<IntentionBalance | null> {
-  const { start, end } = getMonthRange(yyyyMM);
+  const { start, end } = getMadridMonthRange(yyyyMM);
 
   const logs = await db.financeLog.findMany({
     where: {
@@ -170,7 +135,7 @@ async function computeFinancialSummary(
   userId: string,
   yyyyMM: string
 ): Promise<FinancialSummary | null> {
-  const { start, end } = getMonthRange(yyyyMM);
+  const { start, end } = getMadridMonthRange(yyyyMM);
 
   const logs = await db.financeLog.findMany({
     where: {
@@ -220,7 +185,7 @@ async function computeRhythm(
   userId: string,
   yyyyMM: string
 ): Promise<RhythmData | null> {
-  const { start, end } = getMonthRange(yyyyMM);
+  const { start, end } = getMadridMonthRange(yyyyMM);
 
   const [checkins, journals, habits, meditations, wellness, nutrition, finances] =
     await Promise.all([
@@ -286,7 +251,7 @@ async function computeMemories(
   userId: string,
   yyyyMM: string
 ): Promise<MemoryItem[]> {
-  const { start, end } = getMonthRange(yyyyMM);
+  const { start, end } = getMadridMonthRange(yyyyMM);
   const memories: MemoryItem[] = [];
 
   // Finance memories with contexto
@@ -438,21 +403,8 @@ export async function generateMonthlyDigest(
 
 // ─── Check if previous month needs closure ───
 
-export function getPreviousMonthForClosure(): string {
-  // Use Madrid calendar — avoids UTC drift near midnight on Vercel
-  const todayKey = getTodayDateKey(); // YYYY-MM-DD
-  const [yearStr, monthStr] = todayKey.split('-');
-  const year = parseInt(yearStr, 10);
-  const month = parseInt(monthStr, 10);
-  // Previous month: if January, wrap to December of prior year
-  if (month === 1) return `${year - 1}-12`;
-  return `${year}-${String(month - 1).padStart(2, '0')}`;
-}
+export const getPreviousMonthForClosure = getPreviousMonthKey;
 
 export function isClosurePeriod(): boolean {
-  // Use Madrid calendar — avoids UTC drift near midnight on Vercel
-  const todayKey = getTodayDateKey(); // YYYY-MM-DD
-  const dayOfMonth = parseInt(todayKey.split('-')[2], 10);
-  // First 7 days of the month — gentle window for closure
-  return dayOfMonth <= 7;
+  return getMadridDayOfMonth() <= 7;
 }

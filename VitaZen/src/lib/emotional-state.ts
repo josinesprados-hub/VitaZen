@@ -1,4 +1,5 @@
 import { gatherData, type RawData } from './insights';
+import { startOfMadridDaysAgo } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // EMOTIONAL STATE ENGINE
@@ -185,7 +186,7 @@ function computeProgress(data: RawData): { value: number; prevValue: number } {
 function computeActivity(data: RawData): { value: number; prevValue: number } {
   // Activity from last 3 days vs full week baseline
   // Includes all 6 activity types for consistency with computeProgress and computeConsistency
-  const threeDaysAgo = new Date(Date.now() - 3 * 86400000);
+  const threeDaysAgo = startOfMadridDaysAgo(3);
 
   const recentCheckins = data.thisWeekCheckins.filter((c: any) => new Date(c.date) >= threeDaysAgo).length;
   const recentHabits = data.thisWeekHabits.filter((h: any) => h.lastCompletedAt && new Date(h.lastCompletedAt) >= threeDaysAgo).length;

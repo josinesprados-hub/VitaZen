@@ -19,7 +19,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -59,15 +59,12 @@ function formatDate(dateStr: string): string {
 
   if (checkinKey === todayKey) return 'Hoy';
 
-  // Calculate calendar-day difference using Madrid-normalized dates
-  const [cY, cM, cD] = checkinKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const checkinDate = new Date(cY, cM - 1, cD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diff = Math.round((todayDate.getTime() - checkinDate.getTime()) / 86400000);
+  const diff = daysBetweenDateKeys(checkinKey, todayKey);
 
   if (diff === 1) return 'Ayer';
 
+  const [cY, cM, cD] = checkinKey.split('-').map(Number);
+  const checkinDate = new Date(cY, cM - 1, cD);
   return checkinDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 

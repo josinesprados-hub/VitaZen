@@ -4,6 +4,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { withTiming, timeOperation } from '@/lib/observability/api-timing';
 import { serverLog } from '@/lib/observability/server-logger';
+import { startOf7DaysAgoMadrid, startOf30DaysAgoMadrid } from '@/lib/dates';
 
 async function handler(request: NextRequest) {
   try {
@@ -12,8 +13,7 @@ async function handler(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekAgo = startOf7DaysAgoMadrid();
 
     // Meditation sessions this week
     const meditationWeek = await db.meditationSession.count({
@@ -40,7 +40,7 @@ async function handler(request: NextRequest) {
     });
 
     // Financial balance (income - expenses, last 30 days)
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = startOf30DaysAgoMadrid();
     const financeLogs = await db.financeLog.findMany({
       where: {
         userId: user.id,

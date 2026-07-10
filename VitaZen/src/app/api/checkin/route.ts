@@ -6,6 +6,7 @@ import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onCheckinChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey } from '@/lib/deterministic';
+import { startOfTodayMadrid, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
 
 // ─── GET: today's checkin + history ─────────────────────
 
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Today's checkin — use Europe/Madrid timezone to match user's perceived "today"
     if (mode === 'today' || !mode) {
-      const today = new Date(getTodayDateKey() + 'T00:00:00');
+      const today = startOfTodayMadrid();
 
       const todayCheckin = await db.dailyCheckin.findUnique({
         where: { userId_date: { userId: user.id, date: today } },
@@ -45,9 +46,7 @@ export async function GET(request: NextRequest) {
     // Trends — last 14 days averages
     if (mode === 'trends') {
       const days = Math.min(parseInt(searchParams.get('days') || '14'), 30);
-      const todayDate = new Date(getTodayDateKey() + 'T00:00:00');
-      const since = new Date(todayDate);
-      since.setDate(since.getDate() - days);
+      const since = startOfMadridDay(addDaysToDateKey(getTodayDateKey(), -days));
 
       const checkins = await db.dailyCheckin.findMany({
         where: { userId: user.id, date: { gte: since } },
@@ -102,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     // Use Europe/Madrid timezone — Vercel servers run UTC, so
     // new Date() at 00:30 Madrid = 23:30 UTC = wrong day.
-    const today = new Date(getTodayDateKey() + 'T00:00:00');
+    const today = startOfTodayMadrid();
 
     // M-3 FIX: Race condition during check-in creation.
     // The original code did `findUnique(date) → upsert → if (!existingCheckin)

@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { startOfTodayMadrid, startOfNextDayMadrid } from '@/lib/dates';
 
 // ═══════════════════════════════════════════════════════════
 // POST /api/analytics/track
@@ -37,10 +38,8 @@ export async function POST(request: NextRequest) {
 
     // Deduplicate daily_session: only one per user per calendar day
     if (event === 'daily_session' && userId) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const today = startOfTodayMadrid();
+      const tomorrow = startOfNextDayMadrid();
 
       const existing = await db.analyticsEvent.findFirst({
         where: {

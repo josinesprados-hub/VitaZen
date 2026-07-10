@@ -7,6 +7,7 @@
 // ═══════════════════════════════════════════════════════════
 
 import { db } from '@/lib/db';
+import { startOfTodayMadrid, startOfNextDayMadrid } from '@/lib/dates';
 
 // ─── Valid event names (whitelist) ─────────────────────────
 
@@ -58,10 +59,8 @@ export async function trackEvent({ event, userId, properties }: TrackOptions): P
   try {
     // Deduplicate daily_session: only one per user per calendar day
     if (event === 'daily_session' && userId) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const today = startOfTodayMadrid();
+      const tomorrow = startOfNextDayMadrid();
 
       const existing = await db.analyticsEvent.findFirst({
         where: {

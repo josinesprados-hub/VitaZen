@@ -5,21 +5,7 @@ import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onMeditationChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-
-// M-1/M-2 helper: compute the UTC instants that bound the Madrid calendar day
-// for the given Madrid date key (YYYY-MM-DD). Used by POST and DELETE so the
-// "first meditation today" check aligns with the user's perceived day boundary
-// (same approach as startOfMadridDay in insights.ts and the H-11 fix in habits).
-function madridDayBoundaries(todayDateKey: string): { todayStart: Date; todayEnd: Date } {
-  const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-  const parts = madridNoonUtc
-    .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-    .split(' ')[1].split(':').map(Number);
-  const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
-  const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-  const todayEnd = new Date(todayStart.getTime() + 86400000);
-  return { todayStart, todayEnd };
-}
+import { madridDayBoundaries } from '@/lib/dates';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -91,12 +77,12 @@ export async function DELETE(request: NextRequest) {
       if (session.completedAt) {
         const sessionDateKey = getMadridDateKey(session.completedAt);
         if (sessionDateKey === todayDateKey) {
-          const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+          const { start, end } = madridDayBoundaries(todayDateKey);
           const otherSessionToday = await tx.meditationSession.findFirst({
             where: {
               userId: user.id,
               id: { not: sessionId },
-              completedAt: { gte: todayStart, lt: todayEnd },
+              completedAt: { gte: start, lt: end },
             },
             select: { id: true },
           });
@@ -168,7 +154,7 @@ export async function POST(request: NextRequest) {
     // The whole operation (session create + empire progress upsert) runs inside
     // a transaction so partial failures cannot leave inconsistent state (M-4).
     const todayDateKey = getTodayDateKey();
-    const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+    const { start, end } = madridDayBoundaries(todayDateKey);
 
     const session = await db.$transaction(async (tx) => {
       // CERT-1 FIX: Acquire transaction-scoped advisory lock on (userId, today)
@@ -195,7 +181,7 @@ export async function POST(request: NextRequest) {
         where: {
           userId: user.id,
           id: { not: created.id },
-          completedAt: { gte: todayStart, lt: todayEnd },
+          completedAt: { gte: start, lt: end },
         },
         select: { id: true },
       });

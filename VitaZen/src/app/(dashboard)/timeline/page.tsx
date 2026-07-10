@@ -24,7 +24,7 @@ import {
   Target,
   Gem,
 } from 'lucide-react';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -128,15 +128,12 @@ function dayLabel(dateStr: string): { label: string; sublabel?: string } {
 
   if (entryKey === todayKey) return { label: 'Hoy' };
 
-  // Calculate calendar-day difference using Madrid-normalized dates
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDay = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDay = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffDay === 1) return { label: 'Ayer' };
 
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
   const dayName = entryDate.toLocaleDateString('es-ES', { weekday: 'long' });
   const dateStr2 = entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 

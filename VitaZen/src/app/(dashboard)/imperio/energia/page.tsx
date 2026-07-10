@@ -11,7 +11,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import PrivacyMask from '@/components/ui/PrivacyMask';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { getTodayDateKey } from '@/lib/dates';
 
 interface WellnessLog {
   id: string;
