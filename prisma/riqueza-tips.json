@@ -206,7 +206,7 @@
   {
     "empire": "riqueza",
     "title": "Lo que usas realmente",
-    "content": "La mitad de lo que compras se usa menos de tres veces. Lo que no usas activamente es dinero que se fue. Comprar es fácil: usar es la prueba.",
+    "content": "La mitad de lo que compras se usa menos de tres veces. El armario lleno de ropa con etiqueta, el aparato de cocina que solo encendiste una vez, el curso que abandonaste en el segundo módulo: comprar fue fácil, usar es la prueba. Antes de la próxima compra, mira lo que ya tienes y pregúntate cuánto lo has usado en el último mes; el dato te dirá más sobre tu próxima compra que cualquier descripción del producto.",
     "plan": "FREE"
   },
   {
@@ -398,7 +398,7 @@
   {
     "empire": "riqueza",
     "title": "Negociar sin culpa",
-    "content": "Pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación: es respeto por tu propio dinero. Lo peor que puede pasar es que digan no. Los datos apoyan la práctica: en negociación salarial, quienes piden obtienen mejoras significativas con más frecuencia de lo que asumen. La renuencia a negociar no es prudencia, es un sesgo de evitación de la incomodidad social. La estrategia es separar la conversación de la relación: pedir mejores condiciones no es desafiar a la otra parte, es informarse del rango posible. Si la respuesta es no, no has perdido nada; si es sí, has ganado sin coste.",
+    "content": "Pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación: es respeto por tu propio dinero. Los datos apoyan la práctica: en negociación salarial, quienes piden obtienen mejoras significativas con más frecuencia de lo que asumen. La renuencia a negociar no es prudencia, es un sesgo de evitación de la incomodidad social. La estrategia es separar la conversación de la relación: pedir mejores condiciones no es desafiar a la otra parte, es informarse del rango posible. El coste de no preguntar es siempre mayor que el coste de preguntar: en el peor escenario, la respuesta es no y la posición no empeora; en el mejor, se gana sin coste.",
     "plan": "PREMIUM"
   },
   {
@@ -506,7 +506,7 @@
   {
     "empire": "riqueza",
     "title": "Negociar el salario",
-    "content": "Aceptar la primera oferta salarial sin negociar puede costar cientos de miles de euros a lo largo de una carrera profesional. La mayoría de los empleadores esperan que negocies. Babcock y Laschever (2003) documentaron que los candidatos que negocian reciben ofertas iniciales un 7-10 % más altas de media, y esa diferencia se acumula y se capitaliza a lo largo de toda la carrera profesional. La renuencia a negociar no es prudencia, es un coste oculto enorme. La estrategia es preparar el rango objetivo antes de la conversación, basar la petición en datos de mercado y tratar la negociación como un intercambio de información, no como un conflicto. La primera oferta casi nunca es la mejor oferta posible.",
+    "content": "Aceptar la primera oferta salarial sin negociar puede costar cientos de miles de euros a lo largo de una carrera profesional. La mayoría de los empleadores esperan que negocies. Babcock y Laschever (2003) documentaron que los candidatos que negocian reciben ofertas iniciales un 7-10 % más altas de media, y esa diferencia se acumula y se capitaliza a lo largo de toda la carrera profesional. No negociar tiene un coste invisible que se cobra en silencio, año tras año. La estrategia es preparar el rango objetivo antes de la conversación, basar la petición en datos de mercado y tratar la negociación como un intercambio de información, no como un conflicto. La primera oferta casi nunca es la mejor oferta posible.",
     "plan": "PREMIUM"
   },
   {

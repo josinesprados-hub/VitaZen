@@ -458,7 +458,7 @@
   {
     "empire": "energia",
     "title": "El enfriamiento tras el ejercicio",
-    "content": "Enfriarse progresivamente tras el ejercicio reduce la inflamación sin bloquear la adaptación. Un rato de movimiento suave al final funciona mejor que parar de golpe. El mecanismo: el movimiento ligero mantiene el flujo sanguíneo que evacúa metabolitos y reduce la vasoconstrucción brusca que se produce al detenerse. La contrastoterapia (frío/calor) tiene evidencia mixta; la recuperación activa moderada tiene evidencia consistente. La condición es la intensidad: si el enfriamiento compite en intensidad con la sesión principal, deja de ser recuperación y se convierte en carga adicional.",
+    "content": "Enfriarse progresivamente tras el ejercicio reduce la inflamación sin bloquear la adaptación. Un rato de movimiento suave al final funciona mejor que parar de golpe. Parar de forma brusca tras un esfuerzo intenso produce una caída rápida de la frecuencia cardiaca y un cierto acumulo venoso en los miembros inferiores; mantener movimiento ligero durante 5-10 minutos evita ese descenso abrupto y favorece el retorno venoso. La contrastoterapia (frío/calor) tiene evidencia mixta; la recuperación activa moderada tiene evidencia consistente. La condición es la intensidad: si el enfriamiento compite en intensidad con la sesión principal, deja de ser recuperación y se convierte en carga adicional.",
     "plan": "PREMIUM"
   },
   {
@@ -619,8 +619,8 @@
   },
   {
     "empire": "energia",
-    "title": "Pantallas y melatonina: profundización",
-    "content": "Chang et al. (2015): 4 horas de iPad antes de dormir retrasan la melatonina 1,5 horas y reducen la fase REM. Los filtros de luz azul reducen la supresión un 50 %, pero no la eliminan (umbral: 10 lux a 460 nm). Hysing et al. (2015) confirmaron el efecto en adolescentes. La solución completa es eliminar las pantallas 2 horas antes de dormir. La melatonina no negocia con la luz azul.",
+    "title": "Pantallas y melatonina en adolescentes",
+    "content": "El efecto de las pantallas sobre la melatonina no se limita a los adultos. Hysing et al. (2015) documentaron en más de 10 000 adolescentes noruegos que el uso de dispositivos electrónicos antes de dormir se asociaba de forma dosis-dependiente con menor duración del sueño, mayor latencia y más insomnio. Los filtros de luz azul reducen la supresión de melatonina, pero no la eliminan (el umbral de supresión está en torno a 10 lux a 460 nm). La solución completa, especialmente en adolescentes, es eliminar las pantallas en las 2 horas previas al sueño. La melatonina no negocia con la luz azul.",
     "plan": "PREMIUM"
   },
   {
