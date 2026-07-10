@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = user.id;
+    const isPremium = user.plan === 'PREMIUM';
     const ninetyDaysAgo = startOf90DaysAgoMadrid();
 
     const [
@@ -101,13 +102,23 @@ export async function GET(request: NextRequest) {
 
     // Return: observations + weight (for cache duration on client)
     // NEVER expose confidence, consistency, anomaly count
+    // FREE users: only the first observation (for PremiumGate preview)
+    // ÉLITE users: all observations (unchanged behavior)
+    const allObservations = result.observations.map(o => ({
+      id: o.id,
+      text: o.text,
+      empires: o.empires,
+      weight: o.weight,
+    }));
+
+    const observations = isPremium
+      ? allObservations
+      : allObservations.length > 0
+        ? [allObservations[0]]
+        : [];
+
     return NextResponse.json({
-      observations: result.observations.map(o => ({
-        id: o.id,
-        text: o.text,
-        empires: o.empires,
-        weight: o.weight,
-      })),
+      observations,
       hasEnoughData: result.hasEnoughData,
       totalDataPoints: result.totalDataPoints,
     });
