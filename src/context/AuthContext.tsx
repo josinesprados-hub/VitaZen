@@ -295,7 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((result) => {
         console.log('[AUTH-FORENSIC] getRedirectResult() RESOLVED →',
           result
-            ? { type: 'UserCredential', uid: result.user?.uid, email: result.user?.email, providerId: result.credential?.providerId, operationType: result.operationType }
+            ? { type: 'UserCredential', uid: result.user?.uid, email: result.user?.email, providerId: result.providerId, operationType: result.operationType }
             : { type: 'null' }
         );
       })
