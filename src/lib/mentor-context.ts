@@ -5,6 +5,8 @@ import type { RawData } from './insights';
 import { detectPatterns } from './patterns/detector';
 import type { CrossEmpireData } from './patterns/types';
 import { detectLifeStages, getPastMonths, type LifeStage, type StageTransition, type StageFlavor } from './life-memory/stages';
+import { generateMonthlyDigest } from './monthly-closure/digest';
+import type { ConnectionItem } from './monthly-closure/digest';
 import type { SilentMemoryType } from './silent-memories/shared';
 
 // ═══════════════════════════════════════════
@@ -115,6 +117,12 @@ interface UserContext {
     hasReflection: boolean;
     reflectedAt: Date | null;
     summaryViewedAt: Date | null;
+    connections: {
+      id: string;
+      text: string;
+      empires: string[];
+      weight: string;
+    }[];
   }[];
   silentMemories: string[];
 }
@@ -254,22 +262,24 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       : Promise.resolve(null),
 
     // Wellness logs: PREMIUM only — sleep quality + notes (dedup: mood/energy/stress already in DailyCheckin)
-    // No take limit: full 14-day data needed for emotional state; display is sliced to 7 later
+    // Extended to 90 days for PREMIUM: reuses this data for pattern detection (eliminates 6 redundant queries).
+    // No take limit: full range needed for emotional state + pattern engine; display is sliced to 7 later.
     isPremium
       ? db.wellnessLog.findMany({
-          where: { userId, date: { gte: fourteenDaysAgo } },
+          where: { userId, date: { gte: ninetyDaysAgo } },
           orderBy: { date: 'desc' },
-          select: { date: true, sleep: true, mood: true, stress: true, notes: true },
+          select: { date: true, sleep: true, mood: true, energy: true, stress: true, notes: true },
         })
       : Promise.resolve([]),
 
-    // Finance logs: PREMIUM only — spending mood patterns + contexto
+    // Finance logs: PREMIUM only — spending mood patterns + contexto + pattern engine input.
+    // Extended to 90 days for PREMIUM: reuses this data for pattern detection (eliminates 6 redundant queries).
     isPremium
       ? db.financeLog.findMany({
-          where: { userId, date: { gte: thirtyDaysAgo }, type: 'expense' },
+          where: { userId, date: { gte: ninetyDaysAgo } },
           orderBy: { date: 'desc' },
-          take: 15,
-          select: { type: true, category: true, mood: true, contexto: true, date: true },
+          take: 200,
+          select: { type: true, category: true, amount: true, mood: true, contexto: true, date: true },
         })
       : Promise.resolve([]),
 
@@ -424,21 +434,49 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }
   }
 
-  // Monthly closure records: consume existing closure records (PREMIUM only; empty for FREE)
-  // No recalculation, no summaries — just the fact that closures exist.
-  const recentClosures = isPremium
-    ? await db.monthlyClosure.findMany({
-        where: { userId },
-        select: {
-          month: true,
-          reflection: true,
-          reflectedAt: true,
-          summaryViewedAt: true,
-        },
-        orderBy: { month: 'desc' },
-        take: 3,
-      })
-    : [];
+  // Monthly closure records: consume existing closure records + their connections (PREMIUM only; empty for FREE)
+  // The connections come from generateMonthlyDigest which already runs detectPatterns() for that month.
+  // This gives the mentor awareness of what the user saw in their last closure — no recalculation.
+  let recentClosures: {
+    month: string;
+    hasReflection: boolean;
+    reflectedAt: Date | null;
+    summaryViewedAt: Date | null;
+    connections: ConnectionItem[];
+  }[] = [];
+  if (isPremium) {
+    const closureRows = await db.monthlyClosure.findMany({
+      where: { userId },
+      select: {
+        month: true,
+        reflection: true,
+        reflectedAt: true,
+        summaryViewedAt: true,
+      },
+      orderBy: { month: 'desc' },
+      take: 3,
+    });
+
+    // Get connections from the most recent closure's digest (single query via the digest module)
+    let latestConnections: ConnectionItem[] = [];
+    if (closureRows.length > 0) {
+      try {
+        const digest = await generateMonthlyDigest(userId, closureRows[0].month);
+        latestConnections = digest.connections;
+      } catch {
+        // Non-blocking: if digest fails, continue without connections
+      }
+    }
+
+    recentClosures = closureRows.map((c, i) => ({
+      month: c.month,
+      hasReflection: !!c.reflection,
+      reflectedAt: c.reflectedAt,
+      summaryViewedAt: c.summaryViewedAt,
+      // Only the most recent closure gets connections (the one we just computed)
+      connections: i === 0 ? latestConnections : [],
+    }));
+  }
 
   // Life stage detection: consume the official engine result (PREMIUM only; null for FREE)
   // No recalculation, no inference — the engine is the single source of truth for life stages.
@@ -475,78 +513,37 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
 
   // Pattern detection: consume the official engine result (PREMIUM only; null for FREE)
   // No recalculation, no cross-referencing — the engine is the single source of truth.
+  // IMPORTANT: Reuses data already fetched in the main Promise.all (financeLogRows,
+  // wellnessLogRows, recentMeditations, habitStreaks, weeklyCheckins, recentJournals)
+  // instead of making 6 redundant DB queries. This eliminates ~60 lines of duplicated queries.
   let patternObservations: UserContext['patternObservations'] = null;
   if (isPremium) {
     try {
-      const [
-        pFinance,
-        pWellness,
-        pMeditation,
-        pHabits,
-        pCheckins,
-        pJournals,
-      ] = await Promise.all([
-        db.financeLog.findMany({
-          where: { userId, date: { gte: ninetyDaysAgo } },
-          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
-          orderBy: { date: 'desc' },
-          take: 200,
-        }),
-        db.wellnessLog.findMany({
-          where: { userId, date: { gte: ninetyDaysAgo } },
-          select: { date: true, mood: true, energy: true, sleep: true, stress: true },
-          orderBy: { date: 'desc' },
-          take: 90,
-        }),
-        db.meditationSession.findMany({
-          where: { userId, completedAt: { gte: ninetyDaysAgo } },
-          select: { duration: true, type: true, completedAt: true },
-          orderBy: { completedAt: 'desc' },
-          take: 90,
-        }),
-        db.habitLog.findMany({
-          where: { userId },
-          select: { name: true, streak: true, lastCompletedAt: true },
-          orderBy: { lastCompletedAt: 'desc' },
-          take: 50,
-        }),
-        db.dailyCheckin.findMany({
-          where: { userId, date: { gte: ninetyDaysAgo } },
-          select: { date: true, emotion: true, energy: true, focus: true, stress: true },
-          orderBy: { date: 'desc' },
-          take: 90,
-        }),
-        db.journalEntry.findMany({
-          where: { userId, createdAt: { gte: ninetyDaysAgo } },
-          select: { content: true, mood: true, createdAt: true },
-          orderBy: { createdAt: 'desc' },
-          take: 90,
-        }),
-      ]);
-
       const crossEmpireData: CrossEmpireData = {
-        financeLogs: pFinance.map(l => ({
+        financeLogs: financeLogRows.map(l => ({
           date: l.date.toISOString(), type: l.type, category: l.category,
           amount: l.amount, mood: l.mood, contexto: l.contexto,
         })),
-        wellnessLogs: pWellness.map(l => ({
+        wellnessLogs: wellnessLogRows.map(l => ({
           date: l.date.toISOString(), mood: l.mood, energy: l.energy,
           sleep: l.sleep, stress: l.stress,
         })),
-        meditationSessions: pMeditation.map(s => ({
+        meditationSessions: recentMeditations.map(s => ({
           duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
         })),
-        habitLogs: pHabits.map(h => ({
+        habitLogs: habitStreaks.map(h => ({
           name: h.name, streak: h.streak,
           lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
         })),
-        checkins: pCheckins.map(c => ({
+        checkins: weeklyCheckins.map(c => ({
           date: c.date.toISOString(), emotion: c.emotion, energy: c.energy,
           focus: c.focus, stress: c.stress,
         })),
-        journalEntries: pJournals.map(j => ({
-          content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString(),
-        })),
+        journalEntries: recentJournals
+          .filter((j): j is typeof j & { content: string } => 'content' in j)
+          .map(j => ({
+            content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString(),
+          })),
       };
 
       const result = detectPatterns(crossEmpireData);
@@ -660,9 +657,15 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     lifeStage,
     monthlyClosures: recentClosures.map(c => ({
       month: c.month,
-      hasReflection: !!c.reflection,
+      hasReflection: c.hasReflection,
       reflectedAt: c.reflectedAt,
       summaryViewedAt: c.summaryViewedAt,
+      connections: c.connections.map(conn => ({
+        id: conn.id,
+        text: conn.text,
+        empires: conn.empires,
+        weight: conn.weight,
+      })),
     })),
     silentMemories,
   };
@@ -1184,8 +1187,10 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
   }
 
-  // Finance context — spending patterns, not financial advice
-  if (ctx.financeLogs.length >= 3) {
+  // Finance context — spending patterns (expenses only), not financial advice
+  // Note: financeLogRows contains all types (for pattern engine); filter to expenses for display.
+  const expenseLogs = ctx.financeLogs.filter(l => l.type === 'expense');
+  if (expenseLogs.length >= 3) {
     const FINANCE_MOOD_LABELS: Record<string, string> = {
       necessity: 'necesidad',
       enjoyment: 'disfrute',
@@ -1193,7 +1198,7 @@ function formatAdvancedContext(ctx: UserContext): string {
       tranquility: 'tranquilidad',
     };
 
-    const logs = ctx.financeLogs;
+    const logs = expenseLogs;
 
     // Find predominant spending mood
     const moodCounts: Record<string, number> = {};
@@ -1230,8 +1235,9 @@ function formatAdvancedContext(ctx: UserContext): string {
     }
   }
 
-  // Monthly closure signals — whether the user practices monthly reflection
-  // Only signals from existing closure records. No recalculation, no summaries.
+  // Monthly closure signals — reflection habits + connections from the closure digest
+  // Connections come from generateMonthlyDigest (same engine as Observaciones).
+  // Deduplication: skip connections already surfaced in the pattern observations block above.
   if (ctx.monthlyClosures.length > 0) {
     const closures = ctx.monthlyClosures;
     const latest = closures[0]; // already sorted desc by month
@@ -1263,6 +1269,19 @@ function formatAdvancedContext(ctx: UserContext): string {
     } else {
       // A while since last closure
       lines.push(`Hace tiempo que no realiza un cierre mensual.`);
+    }
+
+    // Connections from the closure digest — only if the closure is recent (≤3 months)
+    // and the connection hasn't already been mentioned in pattern observations.
+    if (monthsAgo <= 3 && latest.connections.length > 0) {
+      const patternIds = new Set(
+        (ctx.patternObservations || []).map(p => p.id)
+      );
+      const closureConns = latest.connections.filter(c => !patternIds.has(c.id));
+      if (closureConns.length > 0) {
+        const connTexts = closureConns.map(c => c.text).join('. ');
+        lines.push(`En su cierre mensual, VitaZen también observó: ${connTexts}.`);
+      }
     }
   }
 
