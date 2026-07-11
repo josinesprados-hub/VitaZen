@@ -1,14 +1,23 @@
-import { Resend } from 'resend';
+// Lazy Resend client — avoids calling new Resend() at module evaluation time.
+// The constructor throws in some SDK versions when apiKey is missing/empty.
 
-const apiKey = process.env.RESEND_API_KEY;
-
-if (!apiKey) {
-  console.error('[EMAIL] RESEND_API_KEY no definida. Los emails no se enviarán.');
-} else {
-  console.log('[EMAIL] RESEND_API_KEY found — length:', apiKey.length, 'prefix:', apiKey.slice(0, 4) + '...');
+let _resend: any = undefined;
+function getResend(): any {
+  if (!_resend) {
+    const { Resend } = require('resend');
+    _resend = new Resend(process.env.RESEND_API_KEY as string);
+  }
+  return _resend;
 }
 
-// Pass a placeholder when the key is missing so the constructor doesn't throw
-// during build / static prerendering. Actual send calls will fail gracefully
-// (returning an error response or throwing), which is the desired behaviour.
-export const resend = new Resend(apiKey || 're_build_placeholder');
+const handler: ProxyHandler<Record<string, unknown>> = {
+  get(_target, prop) {
+    const instance = getResend();
+    const value = instance[prop];
+    if (typeof value === 'function') return value.bind(instance);
+    return value;
+  },
+};
+
+// Backward-compatible export: consumers do `resend.emails.send(...)`
+export const resend = new Proxy({}, handler) as any;

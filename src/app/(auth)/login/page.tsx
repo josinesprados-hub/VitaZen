@@ -14,7 +14,7 @@ const GoogleIcon = () => (
 
 export default function LoginPage() {
   console.log('[AUTH-FORENSIC] LoginPage MOUNT — url:', typeof window !== 'undefined' ? window.location.href : 'SSR');
-  $d('LoginPage MOUNT', window?.location?.href);
+  $d('LoginPage MOUNT', typeof window !== 'undefined' ? window.location.href : 'SSR');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -112,11 +112,11 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     console.log('[AUTH-FORENSIC] handleGoogleLogin() START:', {
       timestamp: Date.now(),
-      platform: navigator?.platform,
-      userAgent: navigator?.userAgent,
-      url: window?.location?.href,
+      platform: typeof navigator !== 'undefined' ? navigator.platform : 'SSR',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'SSR',
+      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
     });
-    $d('handleGoogleLogin()', { platform: navigator?.platform, url: window?.location?.href });
+    $d('handleGoogleLogin()', { platform: typeof navigator !== 'undefined' ? navigator.platform : 'SSR', url: typeof window !== 'undefined' ? window.location.href : 'SSR' });
     setError('');
     setProviderHint(null);
     setLoading(true);

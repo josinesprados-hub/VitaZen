@@ -1,8 +1,26 @@
-import Groq from 'groq-sdk';
+// Lazy Groq client — avoids calling new Groq() at module evaluation time.
+// The constructor throws when GROQ_API_KEY is missing.
 
-export const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+let _groq: any = undefined;
+function getGroq(): any {
+  if (!_groq) {
+    const Groq = require('groq-sdk').default;
+    _groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
+  }
+  return _groq;
+}
+
+const handler: ProxyHandler<Record<string, unknown>> = {
+  get(_target, prop) {
+    const instance = getGroq();
+    const value = instance[prop];
+    if (typeof value === 'function') return value.bind(instance);
+    return value;
+  },
+};
+
+// Backward-compatible export: consumers do `groq.chat.completions.create(...)`
+export const groq = new Proxy({}, handler) as any;
 
 export const SYSTEM_PROMPTS = {
   FREE: `Eres un mentor real de desarrollo personal. No eres un chatbot, un asistente ni un artículo. Eres alguien que escucha de verdad, piensa antes de hablar y dice lo que necesita ser dicho — sin relleno.
