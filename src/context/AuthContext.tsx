@@ -7,6 +7,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   fetchSignInMethodsForEmail,
@@ -15,6 +17,43 @@ import {
 import { getAuthInstance } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 import { setAuthToken } from '@/lib/observability';
+
+/**
+ * Returns true when the current environment cannot reliably use
+ * `signInWithPopup` — i.e. mobile browsers, PWAs, and Android TWA.
+ *
+ * Desktop Chrome / Edge / Firefox / Safari  → false (popup works)
+ * Android Chrome / Samsung Internet          → true  (popup fails in CCT)
+ * iOS Safari / Chrome                        → true  (popup blocked by Safari)
+ * Standalone PWA (display: standalone)        → true  (no popup support)
+ * Android TWA (Chrome Custom Tabs)           → true  (cross-context postMessage fails)
+ *
+ * Detection strategy (ordered by reliability):
+ *  1. `window.navigator.standalone` — iOS PWA indicator
+ *  2. `display-mode: standalone` via matchMedia — cross-browser PWA
+ *  3. TWA detection — `document.referrer` contains `android-app://`
+ *  4. UA heuristics — touch + mobile UA as safe fallback
+ */
+function shouldUseRedirect(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  // iOS PWA (Safari-only property)
+  const standalone = (window.navigator as any).standalone;
+  if (standalone === true) return true;
+
+  // Cross-browser PWA (Chrome, Edge, Firefox)
+  if (window.matchMedia?.('(display-mode: standalone)').matches) return true;
+
+  // Android TWA — referrer contains the package URI scheme
+  if (document.referrer.includes('android-app://')) return true;
+
+  // Mobile UA fallback (covers Chrome Android, Safari iOS, Samsung Internet, etc.)
+  const ua = navigator.userAgent || '';
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  if (isMobile) return true;
+
+  return false;
+}
 
 interface SubscriptionData {
   id: string;
@@ -197,6 +236,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }, 8000);
 
+    // Resolve redirect result from signInWithRedirect().
+    // Must be called early — alongside onAuthStateChanged — so that
+    // the OAuth credential is processed and onAuthStateChanged fires with the
+    // authenticated user. If no redirect operation occurred, this resolves
+    // to null silently. Errors are logged for debugging; the user simply
+    // remains unauthenticated on the login page.
+    getRedirectResult(getAuthInstance()).catch((err) => {
+      console.error('[Auth] getRedirectResult error:', err?.code, err?.message);
+    });
+
     const unsubscribe = onAuthStateChanged(getAuthInstance(), (fbUser) => {
       authResolved = true;
       clearTimeout(timeoutId);
@@ -249,8 +298,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(getAuthInstance(), provider);
-    // syncUser handled by onAuthStateChanged
+    if (shouldUseRedirect()) {
+      // Mobile / PWA / TWA — full-page redirect (works in CCT, Safari, standalone)
+      await signInWithRedirect(getAuthInstance(), provider);
+      // Note: on redirect, the page navigates away. When the user returns,
+      // getRedirectResult() in the useEffect below will resolve the credential
+      // and onAuthStateChanged will fire syncUser. The caller's router.replace
+      // will NOT execute — that's expected.
+    } else {
+      // Desktop — popup provides better UX (no full-page navigation)
+      await signInWithPopup(getAuthInstance(), provider);
+      // syncUser handled by onAuthStateChanged
+    }
   };
 
   const signOut = useCallback(async () => {
