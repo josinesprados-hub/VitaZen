@@ -18,19 +18,50 @@ export function AuthDebugPanel() {
   const counterRef = useRef(0);
   const t0Ref = useRef(0);
   const endRef = useRef<HTMLDivElement>(null);
+  const loadedRef = useRef(false);
+
+  // Sync events from window on initial render (survives full-page navigations)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (new URLSearchParams(window.location.search).get('debugAuth') !== '1') return;
+    const restored = (window as any).__authDebugEvents as DebugEvent[] | undefined;
+    if (restored && restored.length > 0 && !loadedRef.current) {
+      setEvents(restored);
+      counterRef.current = restored.length;
+      loadedRef.current = true;
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (new URLSearchParams(window.location.search).get('debugAuth') !== '1') return;
 
+    // Restore persisted events from previous mount (redundant safety net)
+    const persisted = (window as any).__authDebugEvents as DebugEvent[] | undefined;
+    if (persisted && persisted.length > 0 && !loadedRef.current) {
+      setEvents(persisted);
+      counterRef.current = persisted.length;
+      loadedRef.current = true;
+    }
+
     setActive(true);
     t0Ref.current = Date.now();
+
+    // Incremental mount ID persisted on window — survives full navigations
+    // (signInWithRedirect destroys React state but window is the same tab)
+    if (!(window as any).__authDebugMountId) (window as any).__authDebugMountId = 0;
+    (window as any).__authDebugMountId++;
+    const mountId = (window as any).__authDebugMountId;
+    const mTag = `[MOUNT ${mountId}] `;
 
     const log = (event: string, data?: string | number | object | null) => {
       counterRef.current++;
       const ms = Date.now() - t0Ref.current;
       let detail = '';
       let color = '#ccc';
+
+      // Auto-prefix with mount tag (skip if caller already included it)
+      const prefixedEvent = event.startsWith('[MOUNT') ? event : mTag + event;
 
       if (data === null || data === undefined) {
         detail = '';
@@ -62,7 +93,11 @@ export function AuthDebugPanel() {
       else if (lc.includes('guard')) color = '#dfe6e9';
       else if (lc.includes('catch')) color = '#ff6b6b';
 
-      setEvents((prev) => [...prev, { id: counterRef.current, ms, event, detail, color }]);
+      setEvents((prev) => {
+        const next = [...prev, { id: counterRef.current, ms, event: prefixedEvent, detail, color }];
+        (window as any).__authDebugEvents = next;
+        return next;
+      });
     };
 
     (window as any).__authDebugLog = log;
@@ -70,6 +105,13 @@ export function AuthDebugPanel() {
     return () => {
       delete (window as any).__authDebugLog;
     };
+  }, []);
+
+  // Expose mountId to probe display
+  const [mountDisplay, setMountDisplay] = useState('SSR');
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setMountDisplay(String((window as any).__authDebugMountId || '?'));
   }, []);
 
   // Probe: capture raw URL values every render
@@ -114,6 +156,7 @@ export function AuthDebugPanel() {
       <div>toString(): {probe.paramsStr}</div>
       <div>get(debugAuth): {probe.debugAuth}</div>
       <div>active: {String(active)}</div>
+      <div>mount: {mountDisplay}</div>
     </div>
 
     {/* TOGGLE BAR — always visible when active, tap to expand/collapse */}
