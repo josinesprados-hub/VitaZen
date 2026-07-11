@@ -10,8 +10,6 @@ import {
   Moon,
   Sunrise,
   Heart,
-  BarChart3,
-  RotateCcw,
   Brain,
   Loader2,
   Check,
@@ -240,10 +238,10 @@ export function NotificationPreferences() {
       </div>
 
       {/* Reminder types */}
-      {/* AUDIT NOTE: Only 'Reflexión diaria' (reflection) has an actual trigger (cron at 18:00 UTC).
-          The other 3 toggles (Check-in, Resumen semanal, Te echamos de menos) persist state
-          and pass gate checks, but NO code ever calls sendNotification() for those types.
-          They are effectively PLACEBO — users can toggle them, but no push is ever sent. */}
+      {/* NOTE: 'checkin' (cron at 07:00 UTC via checkin.ts) and 'reflection' (cron at 18:00 UTC via reflection.ts)
+          have active triggers that call sendNotification(). 'weekly_recap' and 'comeback' have
+          templates, types, caps, and cooldowns defined, but no cron trigger yet — toggles are
+          hidden from the UI until triggers are implemented. */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Heart size={14} />
@@ -259,28 +257,6 @@ export function NotificationPreferences() {
           saving={savingKey === 'checkinReminders'}
           saved={savedKeys.has('checkinReminders')}
           onChange={(v) => handleToggle('checkinReminders', v)}
-        />
-
-        {/* Weekly recap */}
-        <ToggleRow
-          icon={<BarChart3 size={14} className="text-champagne" />}
-          title="Resumen semanal"
-          description="Un resumen tranquilo de tu progreso cada semana"
-          checked={preferences.weeklyRecap}
-          saving={savingKey === 'weeklyRecap'}
-          saved={savedKeys.has('weeklyRecap')}
-          onChange={(v) => handleToggle('weeklyRecap', v)}
-        />
-
-        {/* Comeback reminders */}
-        <ToggleRow
-          icon={<RotateCcw size={14} className="text-champagne" />}
-          title="Te echamos de menos"
-          description="Un mensaje suave si llevas tiempo sin entrar"
-          checked={preferences.comebackReminders}
-          saving={savingKey === 'comebackReminders'}
-          saved={savedKeys.has('comebackReminders')}
-          onChange={(v) => handleToggle('comebackReminders', v)}
         />
 
         {/* Reflection reminders */}

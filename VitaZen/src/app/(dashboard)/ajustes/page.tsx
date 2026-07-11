@@ -146,8 +146,8 @@ export default function AjustesPage() {
       </div>
 
       {/* Email Notifications Section */}
-      {/* AUDIT NOTE: 'Resumen semanal' is REAL (consumed by weekly-recap cron).
-          'Recordatorios diarios' is PLACEBO — stored in DB but never read by any backend logic. */}
+      {/* NOTE: Both toggles are functional. 'Resumen semanal' → weekly-recap-sender.ts (cron).
+          'Recordatorios diarios' → notifications/reminders/daily.ts:188 (cron pre-filter). */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Mail size={14} />

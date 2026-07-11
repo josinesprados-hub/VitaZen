@@ -49,9 +49,9 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { weeklyEmailSummary, dailyReminders, privacyStatsVisible } = body;
 
-    // AUDIT NOTE (settings):
+    // NOTE (settings):
     //   weeklyEmailSummary  → CONSUMED by weekly-recap-sender.ts (cron)
-    //   dailyReminders      → PLACEBO: stored but NEVER read by any backend logic
+    //   dailyReminders      → CONSUMED by notifications/reminders/daily.ts:188 (cron pre-filter)
     //   privacyStatsVisible → CONSUMED by usePrivacy() hook → <PrivacyMask> component
     //     Controls visual masking of personal metrics (scores, streaks, counts, balances).
     //     When false (= private), sensitive numbers are gently blurred in the UI.
