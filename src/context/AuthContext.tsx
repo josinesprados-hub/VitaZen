@@ -18,73 +18,30 @@ import { getAuthInstance } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 import { setAuthToken } from '@/lib/observability';
 
-// Visual debug panel hook — no-op when ?debugAuth=1 is not present
-const $d = (e: string, v?: any) => { try { (window as any).__authDebugLog?.(e, v); } catch {} };
-
 /**
  * Returns true when the current environment cannot reliably use
- * `signInWithPopup` — i.e. mobile browsers, PWAs, and Android TWA.
+ * `signInWithPopup` due to running as an installed PWA or TWA.
  *
- * Desktop Chrome / Edge / Firefox / Safari  → false (popup works)
- * Android Chrome / Samsung Internet          → true  (popup fails in CCT)
- * iOS Safari / Chrome                        → true  (popup blocked by Safari)
- * Standalone PWA (display: standalone)        → true  (no popup support)
- * Android TWA (Chrome Custom Tabs)           → true  (cross-context postMessage fails)
- *
- * Detection strategy (ordered by reliability):
- *  1. `window.navigator.standalone` — iOS PWA indicator
+ * Detection uses only three reliable, non-UA signals:
+ *  1. `window.navigator.standalone` — iOS PWA indicator (Safari-only)
  *  2. `display-mode: standalone` via matchMedia — cross-browser PWA
- *  3. TWA detection — `document.referrer` contains `android-app://`
- *  4. UA heuristics — touch + mobile UA as safe fallback
+ *  3. `document.referrer` containing `android-app://` — Android TWA
+ *
+ * All other contexts (desktop browsers, normal mobile browsers)
+ * return false and use signInWithPopup.
  */
 function shouldUseRedirect(): boolean {
-  if (typeof window === 'undefined') {
-    console.log('[AUTH-FORENSIC] shouldUseRedirect() → FALSE (SSR)');
-    $d('shouldUseRedirect()', 'FALSE (SSR)');
-    return false;
-  }
-
-  console.log('[AUTH-FORENSIC] shouldUseRedirect() inputs:', {
-    standalone: (window.navigator as any).standalone,
-    displayModeStandalone: window.matchMedia?.('(display-mode: standalone)')?.matches,
-    referrer: document.referrer?.substring(0, 100),
-    uaMobile: /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || ''),
-  });
-  $d('shouldUseRedirect() inputs', { standalone: (window.navigator as any).standalone, displayMode: window.matchMedia?.('(display-mode: standalone)')?.matches, referrer: document.referrer?.substring(0, 60), uaMobile: /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') });
+  if (typeof window === 'undefined') return false;
 
   // iOS PWA (Safari-only property)
-  const standalone = (window.navigator as any).standalone;
-  if (standalone === true) {
-    console.log('[AUTH-FORENSIC] shouldUseRedirect() → TRUE [iOS PWA standalone]');
-    $d('shouldUseRedirect()', 'TRUE [iOS PWA]');
-    return true;
-  }
+  if ((window.navigator as any).standalone === true) return true;
 
   // Cross-browser PWA (Chrome, Edge, Firefox)
-  if (window.matchMedia?.('(display-mode: standalone)').matches) {
-    console.log('[AUTH-FORENSIC] shouldUseRedirect() → TRUE [display-mode: standalone]');
-    $d('shouldUseRedirect()', 'TRUE [display-mode]');
-    return true;
-  }
+  if (window.matchMedia?.('(display-mode: standalone)').matches) return true;
 
   // Android TWA — referrer contains the package URI scheme
-  if (document.referrer.includes('android-app://')) {
-    console.log('[AUTH-FORENSIC] shouldUseRedirect() → TRUE [TWA android-app:// referrer]');
-    $d('shouldUseRedirect()', 'TRUE [TWA]');
-    return true;
-  }
+  if (document.referrer.startsWith('android-app://')) return true;
 
-  // Mobile UA fallback (covers Chrome Android, Safari iOS, Samsung Internet, etc.)
-  const ua = navigator.userAgent || '';
-  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
-  if (isMobile) {
-    console.log('[AUTH-FORENSIC] shouldUseRedirect() → TRUE [Mobile UA]');
-    $d('shouldUseRedirect()', 'TRUE [Mobile UA]');
-    return true;
-  }
-
-  console.log('[AUTH-FORENSIC] shouldUseRedirect() → FALSE [desktop]');
-  $d('shouldUseRedirect()', 'FALSE [desktop]');
   return false;
 }
 
@@ -141,12 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncInFlight = useRef(false);
 
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
-    console.log('[AUTH-FORENSIC] syncUser() ENTRY:', { uid: fbUser.uid, email: fbUser.email, syncInFlight: syncInFlight.current });
-    $d('syncUser()', 'uid=' + fbUser.uid + ' syncInFlight=' + syncInFlight.current);
     // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
     if (syncInFlight.current) {
-      console.log('[AUTH-FORENSIC] syncUser() ABORTED — syncInFlight already true');
-      $d('syncUser() ABORTED', 'syncInFlight=true');
       return;
     }
     syncInFlight.current = true;
@@ -163,8 +116,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (res.ok) {
           const data = await res.json();
-          console.log('[AUTH-FORENSIC] syncUser() SYNC OK:', { id: data.user?.id, email: data.user?.email, name: data.user?.name });
-          $d('syncUser() OK', 'id=' + (data.user?.id) + ' email=' + (data.user?.email));
           setUser(data.user);
           return true;
         } else {
@@ -192,12 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Both attempts failed
       setSyncError(true);
     } finally {
-      // ALWAYS reset — even if an unexpected error occurs.
-      // Without this, a single unhandled rejection would lock
-      // syncInFlight forever, blocking all future syncs.
       syncInFlight.current = false;
-      console.log('[AUTH-FORENSIC] syncUser() EXIT — syncInFlight reset to false');
-      $d('syncUser() EXIT');
     }
   }, []);
 
@@ -270,92 +216,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
     let onAuthCount = 0;
 
-    console.log('[AUTH-FORENSIC] ═══════ AuthProvider useEffect MOUNT ═══════', {
-      timestamp: Date.now(),
-      loading,
-      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
-      user: user ? { id: user.id, email: user.email } : null,
-      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-      pathname: typeof window !== 'undefined' ? window.location.pathname : 'SSR',
-      search: typeof window !== 'undefined' ? window.location.search : 'SSR',
-      hash: typeof window !== 'undefined' ? window.location.hash : 'SSR',
-      referrer: typeof document !== 'undefined' ? document.referrer : 'SSR',
-      navType: typeof performance !== 'undefined' ? (performance as any).navigation?.type : 'N/A',
-    });
-    $d('AuthProvider MOUNT', { loading, url: typeof window !== 'undefined' ? window.location.href : 'SSR', pathname: typeof window !== 'undefined' ? window.location.pathname : 'SSR', search: typeof window !== 'undefined' ? window.location.search : 'SSR', hash: typeof window !== 'undefined' ? window.location.hash : 'SSR', referrer: typeof document !== 'undefined' ? document.referrer?.substring(0, 60) : 'SSR' });
-
     // Defensive timeout: if onAuthStateChanged never fires (e.g. Firebase
     // init hangs in Android TWA/WebView), force loading=false after 8s to
     // prevent ANR / infinite spinner.
     const timeoutId = setTimeout(() => {
       if (!authResolved) {
         console.warn('[Auth] onAuthStateChanged timeout — forcing loading=false');
-        console.warn('[AUTH-FORENSIC] ⚠ 8s TIMEOUT — onAuthStateChanged never fired');
-        $d('TIMEOUT', '8s onAuthStateChanged never fired');
         if (mounted) setLoading(false);
       }
     }, 8000);
 
     // Resolve redirect result from signInWithRedirect().
-    // Must be called early — alongside onAuthStateChanged — so that
-    // the OAuth credential is processed and onAuthStateChanged fires with the
-    // authenticated user. If no redirect operation occurred, this resolves
-    // to null silently. Errors are logged for debugging; the user simply
-    // remains unauthenticated on the login page.
-    console.log('[AUTH-FORENSIC] Calling getRedirectResult() — pre-call:', {
-      timestamp: Date.now(),
-      authCurrentUser: getAuthInstance().currentUser ? { uid: getAuthInstance().currentUser!.uid, email: getAuthInstance().currentUser!.email } : null,
+    // Called early so the OAuth credential is processed and onAuthStateChanged
+    // fires with the authenticated user. Resolves to null when no redirect
+    // operation occurred (e.g. on desktop or fresh page load).
+    getRedirectResult(getAuthInstance()).catch((err) => {
+      console.error('[Auth] getRedirectResult error:', err?.message);
     });
-    $d('getRedirectResult() CALLED', { authCurrentUser: getAuthInstance().currentUser ? getAuthInstance().currentUser!.uid : null });
-
-    getRedirectResult(getAuthInstance())
-      .then((result) => {
-        console.log('[AUTH-FORENSIC] getRedirectResult() RESOLVED →',
-          result
-            ? { type: 'UserCredential', uid: result.user?.uid, email: result.user?.email, providerId: result.providerId, operationType: result.operationType }
-            : { type: 'null' }
-        );
-        $d('getRedirectResult() RESULT', result ? 'UserCredential uid=' + result.user?.uid + ' provider=' + result.providerId : 'NULL');
-      })
-      .catch((err) => {
-        console.error('[AUTH-FORENSIC] getRedirectResult() REJECTED →', { code: err?.code, message: err?.message, stack: err?.stack });
-        $d('getRedirectResult() ERROR', { code: err?.code, message: err?.message });
-      });
 
     const unsubscribe = onAuthStateChanged(getAuthInstance(), (fbUser) => {
       onAuthCount++;
-      console.log(`[AUTH-FORENSIC] onAuthStateChanged #${onAuthCount} →`, {
-        timestamp: Date.now(),
-        user: fbUser ? { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName } : null,
-      });
-      $d('onAuthStateChanged #' + onAuthCount, fbUser ? 'uid=' + fbUser.uid + ' email=' + fbUser.email : 'null');
-
       authResolved = true;
       clearTimeout(timeoutId);
       if (!mounted) return; // Don't update state after unmount
 
-      console.log('[AUTH-FORENSIC] STATE firebaseUser:', firebaseUser ? firebaseUser.uid : null, '→', fbUser ? fbUser.uid : null);
-      $d('STATE firebaseUser', (firebaseUser ? firebaseUser.uid : null) + ' → ' + (fbUser ? fbUser.uid : null));
       setFirebaseUser(fbUser);
       if (fbUser) {
         // Fire-and-forget: sync user data in background.
         // Don't block the loading state — the UI can render immediately
         // once Firebase auth is confirmed. Server sync (DB lookup, emails,
         // analytics) all run independently and update `user` when done.
-        console.log('[AUTH-FORENSIC] → calling syncUser() for', fbUser.uid);
-        $d('→ syncUser()', 'uid=' + fbUser.uid);
         syncUser(fbUser);
       } else {
-        console.log('[AUTH-FORENSIC] STATE user:', user ? user.id : null, '→ null');
-        $d('STATE user', (user ? user.id : null) + ' → null');
         setUser(null);
       }
       // Set loading false immediately — Firebase auth state is confirmed.
       // Components should check both `firebaseUser` and `user`:
       //   - firebaseUser: Firebase auth confirmed (instant)
       //   - user: Server sync completed (background, 1-5s)
-      console.log('[AUTH-FORENSIC] STATE loading:', loading, '→ false');
-      $d('STATE loading', loading + ' → false');
       setLoading(false);
     });
 
@@ -391,22 +289,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     if (shouldUseRedirect()) {
-      // Mobile / PWA / TWA — full-page redirect (works in CCT, Safari, standalone)
-      console.log('[AUTH-FORENSIC] PRE-signInWithRedirect():', {
-        timestamp: Date.now(),
-        authCurrentUser: getAuthInstance().currentUser ? { uid: getAuthInstance().currentUser!.uid, email: getAuthInstance().currentUser!.email } : null,
-        provider: 'google.com',
-      });
-      $d('signInWithRedirect()', { authCurrentUser: getAuthInstance().currentUser ? getAuthInstance().currentUser!.uid : null, provider: 'google.com' });
+      // PWA / TWA / standalone — full-page redirect (popup unsupported)
       await signInWithRedirect(getAuthInstance(), provider);
-      // Note: on redirect, the page navigates away. When the user returns,
-      // getRedirectResult() in the useEffect below will resolve the credential
-      // and onAuthStateChanged will fire syncUser. The caller's router.replace
-      // will NOT execute — that's expected.
+      // Page navigates away; on return, getRedirectResult() processes the
+      // credential and onAuthStateChanged fires syncUser.
     } else {
-      // Desktop — popup provides better UX (no full-page navigation)
-      console.log('[AUTH-FORENSIC] signInWithPopup() called');
-      $d('signInWithPopup()');
+      // Desktop / normal mobile browser — popup provides better UX
       await signInWithPopup(getAuthInstance(), provider);
       // syncUser handled by onAuthStateChanged
     }
