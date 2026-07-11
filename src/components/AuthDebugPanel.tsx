@@ -13,6 +13,7 @@ interface DebugEvent {
 export function AuthDebugPanel() {
   const [events, setEvents] = useState<DebugEvent[]>([]);
   const [active, setActive] = useState(false);
+  const [probe, setProbe] = useState({ href: 'SSR', search: 'SSR', paramsStr: 'SSR', debugAuth: 'SSR' });
   const counterRef = useRef(0);
   const t0Ref = useRef(0);
   const endRef = useRef<HTMLDivElement>(null);
@@ -70,14 +71,52 @@ export function AuthDebugPanel() {
     };
   }, []);
 
+  // Probe: capture raw URL values every render
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const sp = new URLSearchParams(window.location.search);
+    setProbe({
+      href: window.location.href,
+      search: window.location.search,
+      paramsStr: sp.toString(),
+      debugAuth: sp.get('debugAuth') as string,
+    });
+  });
+
   // Auto-scroll to bottom on new events
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'instant' } as any);
   }, [events]);
 
-  if (!active) return null;
-
   return (
+    <>
+    {/* PROBE — always visible */}
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        background: 'rgba(255,0,0,0.92)',
+        color: '#fff',
+        fontSize: 9,
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        padding: '4px 6px',
+        zIndex: 9999999,
+        lineHeight: '13px',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-all',
+      }}
+    >
+      <div>href: {probe.href}</div>
+      <div>search: {probe.search}</div>
+      <div>toString(): {probe.paramsStr}</div>
+      <div>get(debugAuth): {probe.debugAuth}</div>
+      <div>active: {String(active)}</div>
+    </div>
+
+    {/* EVENT LOG — only when active */}
+    {active && (
     <div
       style={{
         position: 'fixed',
@@ -148,5 +187,7 @@ export function AuthDebugPanel() {
         <div ref={endRef} />
       </div>
     </div>
+    )}
+    </>
   );
 }
