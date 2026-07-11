@@ -12,10 +12,16 @@
 // between two empires with sufficient data density.
 
 export type EmpireConnection =
+  // Riqueza ↔ Energía (existing)
   | 'finanzas-energia'
-  | 'finanzas-mente'
   | 'finanzas-estres'
-  | 'finanzas-sueno';
+  | 'finanzas-sueno'
+  // Riqueza ↔ Mente (existing)
+  | 'finanzas-mente'
+  // Energía ↔ Mente (new)
+  | 'energia-mente'
+  // Check-ins ↔ Mente (new)
+  | 'checkin-mente';
 
 // ─── Observation Weight ───
 // Internal. NEVER shown to user.
@@ -133,6 +139,8 @@ export interface CrossEmpireData {
   }[];
 }
 
+export type ConfidenceLevel = 'bajo' | 'medio' | 'alto';
+
 // ─── Detection Result ───
 // What the pattern detector returns
 
@@ -140,6 +148,45 @@ export interface PatternDetectionResult {
   /** Observations that meet the threshold AND pass all validation */
   observations: LifeObservation[];
   /** Whether there's enough data to even attempt detection */
+  hasEnoughData: boolean;
+  /** Total data points across all empires */
+  totalDataPoints: number;
+}
+
+// ─── Empire Connection Signal (raw, text-free) ───
+// The engine's internal output. No user-facing text.
+// Consumed by modules that format their own output.
+
+export interface EmpireConnectionSignal {
+  /** Unique identifier for this connection type */
+  id: string;
+  /** Which empires are connected */
+  connection: EmpireConnection;
+  /** Empire labels for display */
+  empires: string[];
+  /** Statistical confidence (0-1) */
+  confidence: number;
+  /** User-facing confidence level */
+  confidenceLevel: ConfidenceLevel;
+  /** Number of overlapping weeks with data */
+  weeksObserved: number;
+  /** Fraction of clean weeks following the pattern direction */
+  consistencyScore: number;
+  /** Whether this signal is strong enough to show to users */
+  showable: boolean;
+  /** Computed emotional weight — controls persistence */
+  weight: ObservationWeight;
+}
+
+// ─── Engine Result ───
+// What the connections engine returns.
+
+export interface ConnectionsEngineResult {
+  /** All detected connections (raw, no text) */
+  connections: EmpireConnectionSignal[];
+  /** Only connections that meet the quality bar for user display */
+  showableConnections: EmpireConnectionSignal[];
+  /** Whether there's enough data to attempt detection */
   hasEnoughData: boolean;
   /** Total data points across all empires */
   totalDataPoints: number;

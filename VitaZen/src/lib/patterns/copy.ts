@@ -57,6 +57,20 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
     'No dormir bien cambia lo que necesitas.',
     'El descanso afecta tus prioridades.',
   ],
+
+  'energia-mente': [
+    'Las semanas con más energía tienen más práctica mental.',
+    'Con más energía, también hay más práctica mental.',
+    'La energía y la práctica mental van juntas.',
+    'Más práctica mental en las semanas de más energía.',
+  ],
+
+  'checkin-mente': [
+    'Las semanas con más enfoque tienen más práctica mental.',
+    'Con más atención diaria, también hay más práctica mental.',
+    'El enfoque y la práctica mental van juntos.',
+    'Más práctica mental en las semanas con más atención.',
+  ],
 };
 
 // ─── Empire Labels ───

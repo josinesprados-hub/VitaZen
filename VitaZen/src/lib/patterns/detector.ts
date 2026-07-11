@@ -503,6 +503,8 @@ function getEmpireLabels(connection: EmpireConnection): string[] {
     'finanzas-mente': ['Finanzas', 'Mente'],
     'finanzas-estres': ['Finanzas', 'Energía'],
     'finanzas-sueno': ['Finanzas', 'Energía'],
+    'energia-mente': ['Energía', 'Mente'],
+    'checkin-mente': ['Disciplina', 'Mente'],
   };
   return map[connection] || [];
 }
