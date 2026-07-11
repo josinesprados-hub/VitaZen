@@ -12,6 +12,8 @@
 
 import { db } from '@/lib/db';
 import { getTodayDateKey } from '@/lib/deterministic';
+import { detectPatterns } from '@/lib/patterns/detector';
+import type { CrossEmpireData } from '@/lib/patterns/types';
 import {
   formatMonthLabel,
   INTENTION_BALANCE_EMPTY,
@@ -95,6 +97,13 @@ export interface EvolutionData {
   label: string;
 }
 
+export interface ConnectionItem {
+  id: string;
+  text: string;
+  empires: string[];
+  weight: 'ligera' | 'relevante' | 'profunda';
+}
+
 export interface MonthlyDigest {
   month: string;
   monthLabel: string;
@@ -104,6 +113,7 @@ export interface MonthlyDigest {
   rhythm: RhythmData | null;
   memories: MemoryItem[];
   evolution: EvolutionData | null;
+  connections: ConnectionItem[];
   noDataMessage: { title: string; subtitle: string } | null;
 }
 
@@ -398,6 +408,90 @@ async function computeEvolution(
   return { hasPrevious: true, direction, label };
 }
 
+// ─── Connections ───
+// Reuses the single source of truth: detectPatterns() from the patterns module.
+// No parallel engines. No duplicated logic.
+
+async function computeConnections(
+  userId: string,
+  yyyyMM: string
+): Promise<ConnectionItem[]> {
+  const { start, end } = getMonthRange(yyyyMM);
+
+  const [
+    financeLogs,
+    wellnessLogs,
+    meditationSessions,
+    habitLogs,
+    checkins,
+    journalEntries,
+  ] = await Promise.all([
+    db.financeLog.findMany({
+      where: { userId, date: { gte: start, lt: end } },
+      select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+      orderBy: { date: 'desc' },
+    }),
+    db.wellnessLog.findMany({
+      where: { userId, date: { gte: start, lt: end } },
+      select: { date: true, mood: true, energy: true, sleep: true, stress: true },
+      orderBy: { date: 'desc' },
+    }),
+    db.meditationSession.findMany({
+      where: { userId, completedAt: { gte: start, lt: end } },
+      select: { duration: true, type: true, completedAt: true },
+      orderBy: { completedAt: 'desc' },
+    }),
+    db.habitLog.findMany({
+      where: { userId },
+      select: { name: true, streak: true, lastCompletedAt: true },
+    }),
+    db.dailyCheckin.findMany({
+      where: { userId, date: { gte: start, lt: end } },
+      select: { date: true, emotion: true, energy: true, focus: true, stress: true },
+      orderBy: { date: 'desc' },
+    }),
+    db.journalEntry.findMany({
+      where: { userId, createdAt: { gte: start, lt: end } },
+      select: { content: true, mood: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
+
+  const crossEmpireData: CrossEmpireData = {
+    financeLogs: financeLogs.map(l => ({
+      date: l.date.toISOString(), type: l.type, category: l.category,
+      amount: l.amount, mood: l.mood, contexto: l.contexto,
+    })),
+    wellnessLogs: wellnessLogs.map(l => ({
+      date: l.date.toISOString(), mood: l.mood, energy: l.energy,
+      sleep: l.sleep, stress: l.stress,
+    })),
+    meditationSessions: meditationSessions.map(s => ({
+      duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
+    })),
+    habitLogs: habitLogs.map(h => ({
+      name: h.name, streak: h.streak,
+      lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
+    })),
+    checkins: checkins.map(c => ({
+      date: c.date.toISOString(), emotion: c.emotion, energy: c.energy,
+      focus: c.focus, stress: c.stress,
+    })),
+    journalEntries: journalEntries.map(j => ({
+      content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString(),
+    })),
+  };
+
+  const result = detectPatterns(crossEmpireData);
+
+  return result.observations.map(o => ({
+    id: o.id,
+    text: o.text,
+    empires: o.empires,
+    weight: o.weight,
+  }));
+}
+
 // ─── Main Digest ───
 
 export async function generateMonthlyDigest(
@@ -406,20 +500,22 @@ export async function generateMonthlyDigest(
 ): Promise<MonthlyDigest> {
   const monthLabel = formatMonthLabel(yyyyMM);
 
-  const [intentionBalance, financial, rhythm, memories, evolution] =
+  const [intentionBalance, financial, rhythm, memories, evolution, connections] =
     await Promise.all([
       computeIntentionBalance(userId, yyyyMM),
       computeFinancialSummary(userId, yyyyMM),
       computeRhythm(userId, yyyyMM),
       computeMemories(userId, yyyyMM),
       computeEvolution(userId, yyyyMM),
+      computeConnections(userId, yyyyMM),
     ]);
 
   const hasData =
     intentionBalance !== null ||
     financial !== null ||
     rhythm !== null ||
-    memories.length > 0;
+    memories.length > 0 ||
+    connections.length > 0;
 
   return {
     month: yyyyMM,
@@ -430,6 +526,7 @@ export async function generateMonthlyDigest(
     rhythm,
     memories,
     evolution,
+    connections,
     noDataMessage: !hasData
       ? { title: NO_DATA_TITLE, subtitle: NO_DATA_SUBTITLE }
       : null,

@@ -23,6 +23,9 @@ import {
   ELITE_DEEPER,
   ELITE_EVOLUTION,
   ELITE_MEMORIES,
+  PATTERNS_TITLE,
+  PATTERNS_INTRO,
+  PATTERNS_INTRO_FREE,
   formatMonthLabel,
 } from '@/lib/monthly-closure/copy';
 import type {
@@ -31,6 +34,7 @@ import type {
   RhythmData,
   MemoryItem,
   EvolutionData,
+  ConnectionItem,
 } from '@/lib/monthly-closure/digest';
 
 // ─── Types ───
@@ -52,6 +56,7 @@ interface DigestData {
   rhythm: RhythmData | null;
   memories: MemoryItem[];
   evolution: EvolutionData | null;
+  connections: ConnectionItem[];
   noDataMessage: { title: string; subtitle: string } | null;
 }
 
@@ -296,6 +301,31 @@ export default function CierreMensualPage() {
           <PremiumGate isPremium={false} intensity="light" compact label={ELITE_MEMORIES}>
             <div className="h-12" />
           </PremiumGate>
+        </div>
+      )}
+
+      {/* Connections — from the patterns engine, single source of truth */}
+      {digest.connections.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{PATTERNS_TITLE}</h2>
+          <div className="space-y-3">
+            {isPremium && digest.connections.length > 1 && (
+              <p className="text-[#555] text-xs italic mb-2">{PATTERNS_INTRO}</p>
+            )}
+            {!isPremium && digest.connections.length === 1 && (
+              <p className="text-[#555] text-xs italic mb-2">{PATTERNS_INTRO_FREE}</p>
+            )}
+            {digest.connections.map((conn) => (
+              <div key={conn.id} className="border-l border-[#151515] pl-3">
+                <p className="text-[#888] text-sm italic leading-relaxed">{conn.text}</p>
+                {isPremium && conn.empires.length > 0 && (
+                  <p className="text-[9px] text-[#2a2a2a] mt-1">
+                    {conn.empires.join(' · ')}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

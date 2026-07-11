@@ -125,12 +125,21 @@ export async function POST(request: NextRequest) {
 
 // ─── FREE trim ───
 // FREE users see basic summary.
-// Élite users see full depth: evolution, memories, patterns.
+// Élite users see full depth: evolution, memories, connections.
+//
+// FREE connections: only profunda/relevante, max 1, no empire labels.
+// Élite connections: all weights, up to 2, with empire context.
 
 function trimDigestForFree(digest: MonthlyDigest) {
+  // FREE: only show the strongest, most trustworthy connection
+  const eliteConnections = digest.connections.filter(
+    c => c.weight === 'profunda' || c.weight === 'relevante'
+  );
+
   return {
     ...digest,
-    evolution: null,  // Élite only
-    memories: [],     // Élite only
+    evolution: null,                        // Élite only
+    memories: [],                           // Élite only
+    connections: eliteConnections.slice(0, 1), // FREE: max 1, high confidence only
   };
 }
