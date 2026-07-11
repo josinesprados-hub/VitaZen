@@ -13,6 +13,7 @@ interface DebugEvent {
 export function AuthDebugPanel() {
   const [events, setEvents] = useState<DebugEvent[]>([]);
   const [active, setActive] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [probe, setProbe] = useState({ href: 'SSR', search: 'SSR', paramsStr: 'SSR', debugAuth: 'SSR' });
   const counterRef = useRef(0);
   const t0Ref = useRef(0);
@@ -115,12 +116,37 @@ export function AuthDebugPanel() {
       <div>active: {String(active)}</div>
     </div>
 
-    {/* EVENT LOG — only when active */}
+    {/* TOGGLE BAR — always visible when active, tap to expand/collapse */}
     {active && (
     <div
+      onClick={() => setExpanded((v) => !v)}
       style={{
         position: 'fixed',
         bottom: 0,
+        left: 0,
+        right: 0,
+        padding: '8px 10px',
+        background: 'rgba(8, 8, 8, 0.95)',
+        borderTop: '1px solid #333',
+        zIndex: 999999,
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        fontSize: 10,
+        color: '#ff6b6b',
+        cursor: 'pointer',
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      🐞 AUTH DEBUG ({events.length})
+    </div>
+    )}
+
+    {/* FULL EVENT LOG — only when expanded */}
+    {active && expanded && (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 36,
         left: 0,
         right: 0,
         height: '42vh',
