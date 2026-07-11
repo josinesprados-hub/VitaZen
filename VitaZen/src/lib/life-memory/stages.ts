@@ -6,11 +6,17 @@
 // NO scores. NO diagnostics. NO clinical labels.
 // Only gentle observations: calm, growth, intensity, dispersion.
 //
+// Stage narratives can be enriched with connections
+// from the empire connections engine (detectConnections).
+// This module consumes engine results — never calculates
+// correlations on its own.
+//
 // If insufficient data: silence.
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
 import { getMadridMonthRange, formatMonthLabel, getPastMonthKeys } from '@/lib/dates';
+import type { EmpireConnectionSignal } from '@/lib/patterns/types';
 
 // ─── Types ───
 
@@ -184,46 +190,142 @@ function classifyStage(agg: MonthAggregation): StageFlavor {
   return 'dispersion';
 }
 
+// ─── Connection enrichment ───
+// Maps stage flavors to empire connections that provide
+// meaningful context. Only showable connections (high enough
+// confidence) are used. The engine decides quality;
+// this module only selects relevant context.
+
+const STAGE_CONNECTION_MAP: Record<StageFlavor, string[]> = {
+  growth: ['finanzas-mente', 'energia-mente', 'checkin-mente'],
+  stability: ['finanzas-mente', 'energia-mente'],
+  calm: ['finanzas-energia', 'energia-mente'],
+  intensity: ['finanzas-estres'],
+  exhaustion: ['finanzas-energia', 'finanzas-sueno'],
+  dispersion: [],
+  quiet: [],
+};
+
+// Connection → enrichment text (observed, never causal).
+// These are append-only: they follow the base observation.
+const CONNECTION_ENRICHMENT: Record<string, string> = {
+  'finanzas-mente': 'También coincide con una mayor estabilidad en tus decisiones.',
+  'energia-mente': 'También coincide con una mejora de tu energía.',
+  'checkin-mente': 'También coincide con un mayor enfoque en tu día a día.',
+  'finanzas-energia': 'También coincide con cambios en tu nivel de energía.',
+  'finanzas-estres': 'También coincide con un cambio en tu nivel de presión.',
+  'finanzas-sueno': 'También coincide con un cambio en tu descanso.',
+};
+
+function findRelevantConnection(
+  flavor: StageFlavor,
+  connections: EmpireConnectionSignal[],
+): EmpireConnectionSignal | null {
+  const candidates = STAGE_CONNECTION_MAP[flavor] || [];
+  for (const connectionId of candidates) {
+    const match = connections.find(c => c.connection === connectionId && c.showable);
+    if (match) return match;
+  }
+  return null;
+}
+
 // ─── Generate a calm human observation for a stage ───
 
-function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
+function stageObservation(
+  flavor: StageFlavor,
+  agg: MonthAggregation,
+  connections: EmpireConnectionSignal[],
+  isPremium: boolean,
+): string {
   const { intentionBalance } = agg;
   const { growth, tranquility, total } = intentionBalance;
+
+  let base: string;
 
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        return 'Este fue uno de tus periodos con más calma.';
-      return 'Un periodo tranquilo, con poca presión.';
+        base = 'Este fue uno de tus periodos con más calma.';
+      else
+        base = 'Un periodo tranquilo, con poca presión.';
+      break;
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        return 'Este fue uno de tus periodos más activos.';
-      return 'Tu actividad fue mayor que en meses anteriores.';
+        base = 'Este fue uno de tus periodos más activos.';
+      else
+        base = 'Tu actividad fue mayor que en meses anteriores.';
+      break;
 
     case 'intensity':
-      return 'Fue un periodo con mucha actividad y varios cambios.';
+      base = 'Fue un periodo con mucha actividad y varios cambios.';
+      break;
 
     case 'dispersion':
-      return 'Tus días fueron muy distintos entre sí durante este periodo.';
+      base = 'Tus días fueron muy distintos entre sí durante este periodo.';
+      break;
 
     case 'exhaustion':
-      return 'Tu energía fue más baja durante estas semanas.';
+      base = 'Tu energía fue más baja durante estas semanas.';
+      break;
 
     case 'quiet':
-      return 'Hubo menos registros, por lo que este periodo ofrece menos información.';
+      base = 'Hubo menos registros, por lo que este periodo ofrece menos información.';
+      break;
 
     case 'stability':
-      return 'Mantuviste un ritmo constante durante estas semanas.';
+      base = 'Mantuviste un ritmo constante durante estas semanas.';
+      break;
 
     default:
       return '';
   }
+
+  // FREE: no connection enrichment (brief narrative)
+  if (!isPremium) return base;
+
+  // ÉLITE: enrich with a relevant connection from the engine
+  const relevant = findRelevantConnection(flavor, connections);
+  if (relevant) {
+    const enrichment = CONNECTION_ENRICHMENT[relevant.connection];
+    if (enrichment) return `${base} ${enrichment}`;
+  }
+
+  return base;
 }
+
+// ─── Enrich transition observations with connections ───
+
+const TRANSITION_ENRICHMENT: Record<string, string> = {
+  'exhaustion->calm': 'Tus finanzas también reflejan ese cambio.',
+  'exhaustion->stability': 'Esa estabilidad se nota también en otras áreas.',
+  'intensity->calm': 'Tu práctica mental también se reflejó en ese cambio.',
+  'intensity->stability': 'Ese ritmo más constante se observa en varias áreas.',
+  'quiet->growth': 'Esa actividad aumentó de forma coordinada en varias áreas.',
+  'quiet->stability': 'Encontraste un ritmo constante en varios aspectos de tu vida.',
+  'growth->stability': 'Esa estabilidad abarca varios aspectos de tu vida.',
+  'exhaustion->growth': 'Esa recuperación se observa en varias áreas a la vez.',
+};
+
+// Connections that validate a transition (same empire domains)
+const TRANSITION_CONNECTION_VALIDATION: Record<string, string[]> = {
+  'exhaustion->calm': ['finanzas-energia', 'energia-mente'],
+  'exhaustion->stability': ['finanzas-energia', 'energia-mente'],
+  'intensity->calm': ['finanzas-mente', 'energia-mente'],
+  'intensity->stability': ['finanzas-mente', 'checkin-mente'],
+  'quiet->growth': ['energia-mente', 'checkin-mente', 'finanzas-mente'],
+  'quiet->stability': ['finanzas-mente', 'energia-mente'],
+  'growth->stability': ['energia-mente', 'checkin-mente'],
+  'exhaustion->growth': ['energia-mente'],
+};
 
 // ─── Detect stage transitions ───
 
-function detectTransitions(stages: LifeStage[]): StageTransition[] {
+function detectTransitions(
+  stages: LifeStage[],
+  connections: EmpireConnectionSignal[],
+  isPremium: boolean,
+): StageTransition[] {
   const transitions: StageTransition[] = [];
 
   for (let i = 1; i < stages.length; i++) {
@@ -232,7 +334,7 @@ function detectTransitions(stages: LifeStage[]): StageTransition[] {
 
     if (prev.flavor === curr.flavor) continue;
 
-    const observation = generateTransitionObservation(prev.flavor, curr.flavor);
+    const observation = generateTransitionObservation(prev.flavor, curr.flavor, connections, isPremium);
     if (observation) {
       transitions.push({
         from: prev.flavor,
@@ -247,7 +349,12 @@ function detectTransitions(stages: LifeStage[]): StageTransition[] {
   return transitions;
 }
 
-function generateTransitionObservation(from: StageFlavor, to: StageFlavor): string {
+function generateTransitionObservation(
+  from: StageFlavor,
+  to: StageFlavor,
+  connections: EmpireConnectionSignal[],
+  isPremium: boolean,
+): string {
   // Just changes. Not improvements or setbacks.
   const transitions: Record<string, string> = {
     'exhaustion->calm': 'Tu nivel de tranquilidad aumentó respecto al periodo anterior.',
@@ -273,15 +380,41 @@ function generateTransitionObservation(from: StageFlavor, to: StageFlavor): stri
   };
 
   const key = `${from}->${to}`;
-  return transitions[key] || '';
+  const base = transitions[key] || '';
+  if (!base) return '';
+
+  // FREE: no connection enrichment
+  if (!isPremium) return base;
+
+  // ÉLITE: enrich if a relevant connection validates the transition
+  const validConnections = TRANSITION_CONNECTION_VALIDATION[key] || [];
+  const hasValidation = validConnections.some(
+    connId => connections.some(c => c.connection === connId && c.showable),
+  );
+  if (hasValidation) {
+    const enrichment = TRANSITION_ENRICHMENT[key];
+    if (enrichment) return `${base} ${enrichment}`;
+  }
+
+  return base;
 }
 
 // ─── Main: Detect all life stages ───
 
-export async function detectLifeStages(userId: string, months: string[]): Promise<{
+export async function detectLifeStages(
+  userId: string,
+  months: string[],
+  options?: {
+    connections?: EmpireConnectionSignal[];
+    isPremium?: boolean;
+  },
+): Promise<{
   stages: LifeStage[];
   transitions: StageTransition[];
 }> {
+  const connections = options?.connections || [];
+  const isPremium = options?.isPremium ?? false;
+
   // Aggregate each month in parallel
   const aggregations = await Promise.all(
     months.map(m => aggregateMonth(userId, m))
@@ -298,13 +431,13 @@ export async function detectLifeStages(userId: string, months: string[]): Promis
       month: agg.month,
       monthLabel: formatMonthLabel(agg.month),
       flavor,
-      observation: stageObservation(flavor, agg),
+      observation: stageObservation(flavor, agg, connections, isPremium),
       dataPoints: agg.totalActivity,
     });
   }
 
   // Detect transitions between stages
-  const transitions = detectTransitions(stages);
+  const transitions = detectTransitions(stages, connections, isPremium);
 
   return { stages, transitions };
 }
