@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://firebase.google.com/docs/auth/web/redirect-best-practices",
+    "name": "Best practices for using signInWithRedirect on browsers that block",
+    "snippet": "This document describes the best practices for using redirect sign-ins on browsers that block third-party cookies. You must follow one of the options listed ...",
+    "host_name": "firebase.google.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/firebase/firebase-js-sdk/issues/5529",
+    "name": "Firebase PWA won't authenticate offline users in mobile browsers",
+    "snippet": "The reason is that for those browsers, the Auth SDK proactively initializes the code that is necessary to perform signInWithPopup and ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.ionicframework.com/t/firebase-firebase-auth-signinwithpopup/91476",
+    "name": "[Firebase] firebase.auth().signInWithPopup - ionic-v3 - Ionic Forum",
+    "snippet": "Don't sign in with popup on a mobile device. Sign in with redirect. That's what the Firebase docs recommend for mobile. Ionic React Firebase authentication with redirect returns to browser ... Firebase Google Login For Mobile Browser - Ionic Forum More results from forum.ionicframework.com",
+    "host_name": "forum.ionicframework.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/Firebase/comments/1doskev/signinwithredirect_is_not_signing_in_but",
+    "name": "signInWithRedirect is not signing in but signInWithPopup does - Reddit",
+    "snippet": "I've reviewed the documentation, and while signInWithPopup works seamlessly, signInWithRedirect continues to fail. I can't seem to figure out ...\nI've applied your suggestions, and it does initiate the redirect to https://localhost:5137/__/auth/handler?apiKey=abc123, however I just land on the below.\nI've applied your suggestions, and it does initiate the redirect to https://localhost:5137/__/auth/handler?apiKey=abc123, however I just land on the below. Any tips on signInWithRedirect Google Auth for React Native? : r/Firebase Firebase Google Login redirect issue when opening in a new window More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/46261453/firebase-auth-not-work-with-pwa-installed-on-android-desktop",
+    "name": "firebase auth not work with PWA installed on Android desktop",
+    "snippet": "Try using signInWithRedirect, signInWithPopup has issues in a lot of PWA environments/frameworks. ().signInWithPopup(provider).then(function( ...\nTry using signInWithRedirect, signInWithPopup has issues in a lot of PWA environments/frameworks. ... Firebase Phone auth opening browser · 5. React PWA is handling auth redirect for custom domain instead of ... is it necessary to use signInWIthPopup to authenticate with google ... More results from stackoverflow.com\nTry using signInWithRedirect, signInWithPopup has issues in a lot of PWA environments/frameworks. bojeil. – bojeil. 2017-09-18 05:37:09 +00:00. React PWA is handling auth redirect for custom domain instead of Firebase Firebase auth with signInWithPopup not working on mobile device More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://groups.google.com/g/firebase-talk/c/643d_lwUAMI",
+    "name": "Dealing with Popups and Redirects - Google Groups",
+    "snippet": "signInWithRedirect works, but not after signInWithPopup. The recommended Firebase 2 workflow doesn't work in Facebook embedded browser.",
+    "host_name": "groups.google.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@harrykinigopoulos/how-to-implement-google-sign-in-with-firebase-3f1d54fdb225",
+    "name": "How to implement Google sign-in with Firebase - Medium",
+    "snippet": "Google strongly recommends the signInWithRedirect flow, as it properly connects with your app and also the Firebase Hosting plan.\nAs the above described flow works seamlessly on your apps, Google strongly recommends the signInWithRedirect flow, as it properly connects with ...",
+    "host_name": "medium.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=cZAnibwI9u8",
+    "name": "Google Authentication With React JS & Firebase - YouTube",
+    "snippet": "In this video I demonstrate how to use Google authentication with Firebase using React JS. We will focus on two separate ways to ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://firebase.google.com/docs/auth/web/google-signin",
+    "name": "Authenticate Using Google with JavaScript - Firebase",
+    "snippet": "The easiest way to authenticate your users with Firebase using their Google Accounts is to handle the sign-in flow with the Firebase JavaScript SDK.\nYou can prompt your users to sign in with their Google Accounts either by opening a pop-up window or by redirecting to the sign-in page. The redirect method is ...",
+    "host_name": "firebase.google.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://modularfirebase.web.app/common-use-cases/authentication",
+    "name": "Authentication - Firebase Modular JavaScript SDK Documentation",
+    "snippet": "This EAP site is no longer maintained. See the official Firebase Documentation site for the latest documentation and information about the Firebase JS SDK.",
+    "host_name": "modularfirebase.web.app",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/46261453/firebase-auth-not-work-with-pwa-installed-on-android-desktop",
+    "name": "firebase auth not work with PWA installed on Android desktop",
+    "snippet": "The issue has something to do with the loading of the additional tab for the google signin. According to the onscreen dialog Android asks me ... Firebase signInWithPopup gives auth/popup-blocked when used via ... signInWithPopup doesn't work on android(Ionic 2 + Firebase 3) More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://groups.google.com/g/firebase-talk/c/643d_lwUAMI",
+    "name": "Dealing with Popups and Redirects - Google Groups",
+    "snippet": "One issue could be the window popping mechanism. Is the popup window opening at all? Is signInWithRedirect working for you?\nOne issue could be the window popping mechanism. Is the popup window opening at all? Is signInWithRedirect working for you?. Daniel Steigerwald's profile ...",
+    "host_name": "groups.google.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.ionicframework.com/t/firebase-firebase-auth-signinwithpopup/91476",
+    "name": "[Firebase] firebase.auth().signInWithPopup",
+    "snippet": "I'm using ionic v 3 There is a error using the firebase.auth().signInWithPopup on mobile devices. The popup appears for a quick second and ... firebase google authentication opens up browser instead of in-app ... Google Firebase signInWithPopup doesn't show on iOS using Ionic ... More results from forum.ionicframework.com",
+    "host_name": "forum.ionicframework.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/firebase/firebase-js-sdk/issues/63",
+    "name": "[Bug] signInWithPopup creates new tab instead of popup in Chrome 59",
+    "snippet": "When using firebase.auth.signInWithPopup(provider) a new tab is created with the auth instead of creating a popup as it did in Chrome 58 and earlier.",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://firebase.google.com/docs/auth/web/redirect-best-practices",
+    "name": "Best practices for using signInWithRedirect on browsers",
+    "snippet": "This document describes the best practices for using redirect sign-ins on browsers that block third-party cookies.",
+    "host_name": "firebase.google.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]
