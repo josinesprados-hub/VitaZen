@@ -69,30 +69,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncInFlight = useRef(false);
 
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
+    // [SYNC-TRACE] 1. Entry in syncUser()
+    console.warn('[SYNC-TRACE] syncUser() ENTER | uid:', fbUser.uid);
     // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
-    if (syncInFlight.current) return;
+    if (syncInFlight.current) {
+      console.warn('[SYNC-TRACE] syncUser() BLOCKED — syncInFlight=true, returning without sync');
+      return;
+    }
     syncInFlight.current = true;
 
     const attemptSync = async (attempt: number): Promise<boolean> => {
+      // [SYNC-TRACE] 2. Entry in attemptSync()
+      console.warn(`[SYNC-TRACE] attemptSync(${attempt}) ENTER`);
       try {
         setSyncError(false);
+        // [SYNC-TRACE] 3. Start of getIdToken()
+        console.warn('[SYNC-TRACE] attemptSync() getIdToken() START');
         const idToken = await fbUser.getIdToken();
-        const res = await fetch('/api/auth/sync', {
+        // [SYNC-TRACE] 4. Result of getIdToken()
+        console.warn('[SYNC-TRACE] attemptSync() getIdToken() OK | length:', idToken?.length, '| prefix:', idToken?.substring(0, 8));
+        // [SYNC-TRACE] 5/6/7. Start of fetch + URL + method
+        const fetchUrl = '/api/auth/sync';
+        console.warn(`[SYNC-TRACE] attemptSync() fetch START | url: ${fetchUrl} | method: POST`);
+        const fetchStart = Date.now();
+        const res = await fetch(fetchUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken }),
         });
+        const fetchMs = Date.now() - fetchStart;
+        // [SYNC-TRACE] 8/9/10/11. Fetch returned response + time + status + ok
+        console.warn(`[SYNC-TRACE] attemptSync() fetch RESPONSE | status: ${res.status} | ok: ${res.ok} | elapsed: ${fetchMs}ms`);
 
         if (res.ok) {
           const data = await res.json();
+          // [SYNC-TRACE] 12. JSON received complete
+          console.warn('[SYNC-TRACE] attemptSync() JSON received | keys:', Object.keys(data), '| hasUser:', !!data.user);
+          // [SYNC-TRACE] 13. Just before setUser(data.user)
+          console.warn('[SYNC-TRACE] attemptSync() BEFORE setUser(data.user) | userId:', data.user?.id);
           setUser(data.user);
+          // [SYNC-TRACE] 14. Just after setUser(data.user)
+          console.warn('[SYNC-TRACE] attemptSync() AFTER setUser(data.user) | userId:', data.user?.id);
           return true;
         } else {
+          // [SYNC-TRACE] 15. return false — non-2xx response
+          console.warn(`[SYNC-TRACE] attemptSync(${attempt}) RETURN FALSE | cause: HTTP ${res.status}`);
           console.error(`[Auth] sync failed (attempt ${attempt}):`, res.status);
           trackAuthSyncFailure(attempt, res.status);
           return false;
         }
       } catch (error) {
+        // [SYNC-TRACE] 16. Exception caught by attemptSync()
+        console.warn(`[SYNC-TRACE] attemptSync(${attempt}) EXCEPTION CAUGHT |`, error);
         console.error(`[Auth] sync error (attempt ${attempt}):`, error);
         trackAuthSyncFailure(attempt, undefined, error);
         return false;
@@ -109,6 +137,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const retryOk = await attemptSync(2);
       if (retryOk) return;
 
+      // [SYNC-TRACE] 17. setSyncError(true) executed
+      console.warn('[SYNC-TRACE] syncUser() BOTH ATTEMPTS FAILED — executing setSyncError(true)');
       // Both attempts failed
       setSyncError(true);
     } finally {

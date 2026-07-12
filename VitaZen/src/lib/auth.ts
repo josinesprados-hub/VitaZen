@@ -2,10 +2,18 @@ import { adminAuth } from './firebase-admin';
 import { db } from './db';
 
 export async function verifyFirebaseToken(idToken: string) {
+  // [SYNC-TRACE] 1. Entry in verifyFirebaseToken()
+  console.warn('[SYNC-TRACE] verifyFirebaseToken() ENTER | tokenLength:', idToken?.length, '| prefix:', idToken?.substring(0, 8));
   try {
+    // [SYNC-TRACE] 2. Start of adminAuth.verifyIdToken()
+    console.warn('[SYNC-TRACE] verifyFirebaseToken() adminAuth.verifyIdToken() START');
     const decodedToken = await adminAuth.verifyIdToken(idToken);
+    // [SYNC-TRACE] 3/4/5. Correct result + UID + email
+    console.warn('[SYNC-TRACE] verifyFirebaseToken() adminAuth.verifyIdToken() OK | uid:', decodedToken.uid, '| email:', decodedToken.email, '| verified:', decodedToken.email_verified);
     return decodedToken;
   } catch (error) {
+    // [SYNC-TRACE] 6. Complete exception
+    console.warn('[SYNC-TRACE] verifyFirebaseToken() EXCEPTION |', error);
     console.error('Error verifying Firebase token:', error);
     return null;
   }
