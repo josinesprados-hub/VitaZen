@@ -12,8 +12,8 @@
 
 // ─── Page ───
 
-export const PAGE_TITLE = 'Etapas';
-export const PAGE_SUBTITLE = 'Cómo ha ido cambiando tu vida';
+export const PAGE_TITLE = 'Tu evolución';
+export const PAGE_SUBTITLE = 'Descubre cómo ha evolucionado tu vida.';
 
 // ─── Section titles ───
 
