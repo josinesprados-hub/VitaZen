@@ -107,7 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.warn('[SYNC-TRACE] attemptSync() JSON received | keys:', Object.keys(data), '| hasUser:', !!data.user);
           // [SYNC-TRACE] 13. Just before setUser(data.user)
           console.warn('[SYNC-TRACE] attemptSync() BEFORE setUser(data.user) | userId:', data.user?.id);
+          console.warn('[REACT-TRACE] BEFORE setUser', data.user);
           setUser(data.user);
+          console.warn('[REACT-TRACE] AFTER setUser');
           // [SYNC-TRACE] 14. Just after setUser(data.user)
           console.warn('[SYNC-TRACE] attemptSync() AFTER setUser(data.user) | userId:', data.user?.id);
           return true;
@@ -289,6 +291,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setFirebaseUser(null);
     setSyncError(false);
   }, []);
+
+  // ── REACT-TRACE: state change observers ──
+  useEffect(() => {
+    console.warn('[REACT-TRACE] USER STATE CHANGED', { user });
+  }, [user]);
+
+  useEffect(() => {
+    console.warn('[REACT-TRACE] FIREBASE USER CHANGED', { firebaseUser });
+  }, [firebaseUser]);
+
+  useEffect(() => {
+    console.warn('[REACT-TRACE] LOADING CHANGED', { loading });
+  }, [loading]);
 
   // Memoize the provider value to prevent cascade re-renders.
   // Without this, every auth state change creates a new object reference,

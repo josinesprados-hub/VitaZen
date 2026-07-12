@@ -4,79 +4,52 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
-const BT = '[BOOT-TRACE]';
-
-let _renderSeq = 0;
-let _effectSeq = 0;
-
 export default function Home() {
   const router = useRouter();
   const { user, firebaseUser, loading } = useAuth();
 
-  // ── RENDER trace ──
-  _renderSeq++;
-  const rSeq = _renderSeq;
-  console.warn(
-    `${BT} RENDER #${rSeq}`,
-    JSON.stringify({
-      loading,
-      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
-      user: user ? { id: user.id, email: user.email, onboardingCompleted: user.onboardingCompleted } : null,
-    })
-  );
+  console.warn('[REACT-TRACE] PAGE RENDER', {
+    loading,
+    'firebaseUser != null': firebaseUser != null,
+    'user != null': user != null,
+    'user?.onboardingCompleted': user?.onboardingCompleted,
+  });
 
   useEffect(() => {
-    _effectSeq++;
-    const eSeq = _effectSeq;
-    const snap = JSON.stringify({
+    console.warn('[REACT-TRACE] PAGE EFFECT ENTER', {
       loading,
-      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
-      user: user ? { id: user.id, email: user.email, onboardingCompleted: user.onboardingCompleted } : null,
+      'firebaseUser != null': firebaseUser != null,
+      'user != null': user != null,
+      'user?.onboardingCompleted': user?.onboardingCompleted,
     });
 
-    console.warn(`${BT} EFFECT #${eSeq} ENTRY`, snap);
+    if (loading) return;
 
-    // ── GUARD: loading ──
-    if (loading) {
-      console.warn(`${BT} EFFECT #${eSeq} → BLOCKED by loading=true — returning early (no navigation)`);
-      return;
-    }
-    console.warn(`${BT} EFFECT #${eSeq} → loading=false — proceeding to decision tree`);
-
-    // ── GUARD: no auth at all → login ──
+    // No auth at all → login
     if (!user && !firebaseUser) {
-      console.warn(`${BT} EFFECT #${eSeq} → DECISION: !user(${!!user}) && !firebaseUser(${!!firebaseUser}) = TRUE → router.replace('/login')`);
-      console.warn(`${BT} EFFECT #${eSeq} → BEFORE router.replace('/login')`);
-      const result = router.replace('/login');
-      console.warn(`${BT} EFFECT #${eSeq} → AFTER router.replace('/login') — returned:`, typeof result, result);
+      console.warn('[REACT-TRACE] LOGIN BRANCH');
+      router.replace('/login');
       return;
     }
-    console.warn(`${BT} EFFECT #${eSeq} → DECISION: !user && !firebaseUser = FALSE — skipped login redirect`);
 
-    // ── GUARD: Firebase auth confirmed, server sync pending ──
+    // Firebase auth confirmed, but server sync pending.
+    // Do NOT redirect yet — we need `user.onboardingCompleted` to decide
+    // the correct destination. Redirecting to /onboarding before knowing
+    // causes the onboarding flash for returning users.
     if (firebaseUser && !user) {
-      console.warn(`${BT} EFFECT #${eSeq} → DECISION: firebaseUser(${!!firebaseUser}) && !user(${!user}) = TRUE → BLOCKED (wait for syncUser)`);
-      console.warn(`${BT} EFFECT #${eSeq} → returning — NO navigation. User will remain on splash V.`);
-      return;
+      console.warn('[REACT-TRACE] WAIT BRANCH');
+      return; // wait for syncUser to complete
     }
-    console.warn(`${BT} EFFECT #${eSeq} → DECISION: firebaseUser && !user = FALSE — skipped splash block`);
 
-    // ── ROUTE: server sync complete ──
+    // Server sync complete — route based on onboarding status
     if (user?.onboardingCompleted) {
-      console.warn(`${BT} EFFECT #${eSeq} → DECISION: user?.onboardingCompleted=${!!user?.onboardingCompleted} → router.replace('/dashboard')`);
-      console.warn(`${BT} EFFECT #${eSeq} → BEFORE router.replace('/dashboard')`);
+      console.warn('[REACT-TRACE] DASHBOARD BRANCH');
       router.replace('/dashboard');
-      console.warn(`${BT} EFFECT #${eSeq} → AFTER router.replace('/dashboard')`);
     } else {
-      console.warn(`${BT} EFFECT #${eSeq} → DECISION: user?.onboardingCompleted=${!!user?.onboardingCompleted} → router.replace('/onboarding')`);
-      console.warn(`${BT} EFFECT #${eSeq} → BEFORE router.replace('/onboarding')`);
+      console.warn('[REACT-TRACE] ONBOARDING BRANCH');
       router.replace('/onboarding');
-      console.warn(`${BT} EFFECT #${eSeq} → AFTER router.replace('/onboarding')`);
     }
   }, [user, firebaseUser, loading, router]);
-
-  // ── POST-EFFECT render check ──
-  console.warn(`${BT} RENDER #${rSeq} → about to return JSX (splash V visible)`);
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center">
