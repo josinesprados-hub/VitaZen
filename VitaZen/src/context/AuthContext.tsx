@@ -107,9 +107,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.warn('[SYNC-TRACE] attemptSync() JSON received | keys:', Object.keys(data), '| hasUser:', !!data.user);
           // [SYNC-TRACE] 13. Just before setUser(data.user)
           console.warn('[SYNC-TRACE] attemptSync() BEFORE setUser(data.user) | userId:', data.user?.id);
-          console.warn('[REACT-TRACE] BEFORE setUser', data.user);
+          console.warn('[REACT-TRACE] BEFORE setUser | typeof:', typeof data.user, '| keys:', Object.keys(data.user ?? {}), '| value:', JSON.stringify(data.user));
           setUser(data.user);
           console.warn('[REACT-TRACE] AFTER setUser');
+          console.warn('[REACT-TRACE] AFTER setUser | typeof user param:', typeof data.user, '| id:', data.user?.id);
           // [SYNC-TRACE] 14. Just after setUser(data.user)
           console.warn('[SYNC-TRACE] attemptSync() AFTER setUser(data.user) | userId:', data.user?.id);
           return true;
@@ -294,7 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── REACT-TRACE: state change observers ──
   useEffect(() => {
-    console.warn('[REACT-TRACE] USER STATE CHANGED', { user });
+    console.warn('[REACT-TRACE] USER STATE CHANGED | user:', user, '| user===null:', user === null, '| id:', user?.id, '| onboardingCompleted:', user?.onboardingCompleted);
   }, [user]);
 
   useEffect(() => {

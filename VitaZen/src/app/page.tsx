@@ -8,20 +8,10 @@ export default function Home() {
   const router = useRouter();
   const { user, firebaseUser, loading } = useAuth();
 
-  console.warn('[REACT-TRACE] PAGE RENDER', {
-    loading,
-    'firebaseUser != null': firebaseUser != null,
-    'user != null': user != null,
-    'user?.onboardingCompleted': user?.onboardingCompleted,
-  });
+  console.warn('[REACT-TRACE] PAGE RENDER', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
 
   useEffect(() => {
-    console.warn('[REACT-TRACE] PAGE EFFECT ENTER', {
-      loading,
-      'firebaseUser != null': firebaseUser != null,
-      'user != null': user != null,
-      'user?.onboardingCompleted': user?.onboardingCompleted,
-    });
+    console.warn('[REACT-TRACE] PAGE EFFECT ENTER', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
 
     if (loading) return;
 
