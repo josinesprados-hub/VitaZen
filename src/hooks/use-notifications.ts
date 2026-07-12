@@ -223,6 +223,28 @@ export function useNotifications(): UseNotificationsReturn {
       setPermissionState(state);
       permissionStateRef.current = state;
       await trackPermissionChange(state);
+
+      // Set the user's real timezone so quiet hours (22:00–08:00)
+      // align with their local time, not the server default.
+      if (firebaseUser) {
+        try {
+          const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          if (userTimezone) {
+            const idToken = await firebaseUser.getIdToken();
+            await fetch('/api/notifications/preferences', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${idToken}`,
+              },
+              body: JSON.stringify({ timezone: userTimezone }),
+            });
+          }
+        } catch {
+          // Non-critical: quiet hours will use the server default timezone
+        }
+      }
+
       await loadPreferences();
       return true;
     } else {

@@ -2,45 +2,30 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useNotifications } from '@/hooks/use-notifications';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import {
   Bell,
   BellOff,
   Moon,
-  Sunrise,
-  Heart,
-  Brain,
   Loader2,
   Check,
-  Shield,
-  ChevronDown,
 } from 'lucide-react';
 
-/** Common timezone list for the selector */
-const TIMEZONES = [
-  'Europe/Madrid',
-  'Europe/London',
-  'Europe/Paris',
-  'Europe/Berlin',
-  'Europe/Rome',
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'America/Mexico_City',
-  'America/Bogota',
-  'America/Lima',
-  'America/Buenos_Aires',
-  'America/Santiago',
-  'America/Sao_Paulo',
-  'Asia/Tokyo',
-  'Asia/Shanghai',
-  'Asia/Kolkata',
-  'Australia/Sydney',
-  'Pacific/Auckland',
-];
-
+/**
+ * Push notification preferences for the Ajustes page.
+ *
+ * Two visible states:
+ *   1. Not enabled  → activation card with "Activar notificaciones"
+ *   2. Active        → confirmation + "Desactivar notificaciones"
+ *
+ * Plus two non-interactive states:
+ *   - Loading        → spinner
+ *   - Not supported  → explanatory message
+ *   - Denied         → instructions to unblock
+ *
+ * All state reflects the real browser permission and server state.
+ * No placebo buttons, no simulated states.
+ */
 export function NotificationPreferences() {
   const {
     preferences,
@@ -49,38 +34,10 @@ export function NotificationPreferences() {
     loading,
     enablePush,
     disablePush,
-    updatePreferences,
   } = useNotifications();
 
-  const [savingKey, setSavingKey] = useState<string | null>(null);
-  const [savedKeys, setSavedKeys] = useState<Set<string>>(new Set());
   const [enablingPush, setEnablingPush] = useState(false);
-  const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  useEffect(() => {
-    return () => {
-      timersRef.current.forEach(t => clearTimeout(t));
-    };
-  }, []);
-
-  const showSaved = (key: string) => {
-    setSavedKeys(prev => new Set(prev).add(key));
-    timersRef.current.push(setTimeout(() => {
-      setSavedKeys(prev => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-    }, 2000));
-  };
-
-  const handleToggle = async (key: string, value: boolean) => {
-    setSavingKey(key);
-    const ok = await updatePreferences({ [key]: value });
-    if (ok) showSaved(key);
-    setSavingKey(null);
-  };
+  const [disablingPush, setDisablingPush] = useState(false);
 
   const handleEnablePush = async () => {
     setEnablingPush(true);
@@ -89,15 +46,9 @@ export function NotificationPreferences() {
   };
 
   const handleDisablePush = async () => {
+    setDisablingPush(true);
     await disablePush();
-  };
-
-  const handleTimezoneChange = async (tz: string) => {
-    setShowTimezoneSelect(false);
-    setSavingKey('timezone');
-    const ok = await updatePreferences({ timezone: tz });
-    if (ok) showSaved('timezone');
-    setSavingKey(null);
+    setDisablingPush(false);
   };
 
   // ─── Loading ───
@@ -196,216 +147,37 @@ export function NotificationPreferences() {
     );
   }
 
-  // ─── Full preferences panel ───
+  // ─── Notifications active ───
   return (
-    <div className="space-y-4">
-      {/* Push master toggle */}
-      <div className="card-primary p-6 sm:p-8">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-5">
-          <Bell size={14} />
-          NOTIFICACIONES PUSH
-        </h3>
-
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="icon-sm mt-0.5">
-              <Bell size={14} className="text-champagne" />
-            </div>
-            <div>
-              <p className="text-sm text-white font-medium">Notificaciones activas</p>
-              <p className="text-xs text-[#999] mt-0.5">
-                {preferences.maxDailyNotifications} recordatorios máx. al día
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {savingKey === 'pushEnabled' && (
-              <Loader2 size={14} className="animate-spin text-champagne" />
-            )}
-            <Switch
-              checked={preferences.pushEnabled}
-              onCheckedChange={(v) => {
-                if (v) {
-                  enablePush();
-                } else {
-                  handleDisablePush();
-                }
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Reminder types */}
-      <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
-          <Heart size={14} />
-          Tipos de recordatorios
-        </h3>
-
-        {/* Check-in reminders */}
-        <ToggleRow
-          icon={<Sunrise size={14} className="text-champagne" />}
-          title="Check-in diario"
-          description="Un recordatorio suave para tu check-in matutino"
-          checked={preferences.checkinReminders}
-          saving={savingKey === 'checkinReminders'}
-          saved={savedKeys.has('checkinReminders')}
-          onChange={(v) => handleToggle('checkinReminders', v)}
-        />
-
-        {/* Reflection reminders */}
-        <ToggleRow
-          icon={<Brain size={14} className="text-champagne" />}
-          title="Reflexión diaria"
-          description="Un momento para ti antes de acabar el día"
-          checked={preferences.reflectionReminders}
-          saving={savingKey === 'reflectionReminders'}
-          saved={savedKeys.has('reflectionReminders')}
-          onChange={(v) => handleToggle('reflectionReminders', v)}
-        />
-      </div>
-
-      {/* Quiet hours & frequency */}
-      <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
-          <Moon size={14} />
-          Horas de silencio
-        </h3>
-
-        {/* Quiet hours toggle */}
-        <ToggleRow
-          icon={<Moon size={14} className="text-champagne" />}
-          title="Activar horas de silencio"
-          description={`Sin notificaciones de ${preferences.quietHoursStart} a ${preferences.quietHoursEnd}`}
-          checked={preferences.quietHoursEnabled}
-          saving={savingKey === 'quietHoursEnabled'}
-          saved={savedKeys.has('quietHoursEnabled')}
-          onChange={(v) => handleToggle('quietHoursEnabled', v)}
-        />
-
-        {/* Quiet hours time range */}
-        {preferences.quietHoursEnabled && (
-          <div className="ml-7 space-y-3">
-            <div className="flex items-center gap-3">
-              <label className="text-xs text-[#999] w-16">Desde</label>
-              <input
-                type="time"
-                value={preferences.quietHoursStart}
-                onChange={(e) => handleToggle('quietHoursStart', e.target.value)}
-                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-champagne focus:outline-none"
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <label className="text-xs text-[#999] w-16">Hasta</label>
-              <input
-                type="time"
-                value={preferences.quietHoursEnd}
-                onChange={(e) => handleToggle('quietHoursEnd', e.target.value)}
-                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-champagne focus:outline-none"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Timezone */}
-        <div className="ml-0">
-          <div className="flex items-center gap-3">
-            <label className="text-xs text-[#999]">Zona horaria</label>
-            <button
-              onClick={() => setShowTimezoneSelect(!showTimezoneSelect)}
-              className="flex items-center gap-1.5 text-xs text-white hover:text-champagne transition-colors"
-            >
-              {preferences.timezone.replace('_', ' ')}
-              <ChevronDown size={12} />
-            </button>
-            {savingKey === 'timezone' && (
-              <Loader2 size={12} className="animate-spin text-champagne" />
-            )}
-          </div>
-
-          {showTimezoneSelect && (
-            <div className="mt-2 bg-[#111] border border-[#333] rounded-lg max-h-40 overflow-y-auto">
-              {TIMEZONES.map((tz) => (
-                <button
-                  key={tz}
-                  onClick={() => handleTimezoneChange(tz)}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-[#1a1a1a] transition-colors ${
-                    preferences.timezone === tz ? 'text-champagne' : 'text-[#999]'
-                  }`}
-                >
-                  {tz.replace(/_/g, ' ')}
-                </button>
-              ))}
-            </div>
+    <div className="card-primary p-6 sm:p-8">
+      <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
+        <Bell size={14} />
+        NOTIFICACIONES PUSH
+      </h3>
+      <div className="space-y-4">
+        <p className="text-sm text-white font-medium">
+          Notificaciones activadas
+        </p>
+        <p className="text-xs text-[#999]">
+          Recibirás recordatorios para mantener tus hábitos y seguir avanzando.
+        </p>
+        <Button
+          onClick={handleDisablePush}
+          disabled={disablingPush}
+          className="border border-[#444] text-[#888] hover:text-white hover:border-[#666] font-medium text-sm bg-transparent"
+        >
+          {disablingPush ? (
+            <>
+              <Loader2 size={14} className="animate-spin mr-2" />
+              Desactivando...
+            </>
+          ) : (
+            <>
+              <BellOff size={14} className="mr-2" />
+              Desactivar notificaciones
+            </>
           )}
-        </div>
-
-        {/* Daily frequency cap */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="icon-sm mt-0.5">
-              <Shield size={14} className="text-champagne" />
-            </div>
-            <div>
-              <p className="text-sm text-white font-medium">Límite diario</p>
-              <p className="text-xs text-[#999] mt-0.5">
-                Máximo de notificaciones por día
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {[1, 2].map((n) => (
-              <button
-                key={n}
-                onClick={() => handleToggle('maxDailyNotifications', n)}
-                className={`w-7 h-7 rounded-full text-xs font-medium transition-all ${
-                  preferences.maxDailyNotifications >= n
-                    ? 'bg-champagne text-black'
-                    : 'bg-[#1a1a1a] text-[#666] hover:bg-[#222]'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Toggle row sub-component ───
-function ToggleRow({
-  icon,
-  title,
-  description,
-  checked,
-  saving,
-  saved,
-  onChange,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  checked: boolean;
-  saving: boolean;
-  saved: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-start gap-3 flex-1">
-        <div className="icon-sm mt-0.5">{icon}</div>
-        <div>
-          <p className="text-sm text-white font-medium">{title}</p>
-          <p className="text-xs text-[#999] mt-0.5">{description}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {saving && <Loader2 size={14} className="animate-spin text-champagne" />}
-        {saved && <Check size={14} className="text-champagne" />}
-        <Switch checked={checked} onCheckedChange={onChange} />
+        </Button>
       </div>
     </div>
   );
