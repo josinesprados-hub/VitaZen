@@ -14,7 +14,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/ajustes': 'Ajustes',
   '/elite': 'Élite',
   '/cierre-mensual': 'Cierre mensual',
-  '/memoria-de-vida': 'Etapas',
+  '/memoria-de-vida': 'Tu evolución',
   '/imperio/mente': 'Mente',
   '/imperio/energia': 'Energía',
   '/imperio/disciplina': 'Disciplina',
