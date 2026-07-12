@@ -88,7 +88,7 @@ export async function requestPushToken(): Promise<string | null> {
     // Request permission — this shows the browser prompt
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      console.log('[PushClient] Permission not granted:', permission);
+      console.error('[PushClient] Permission not granted:', permission);
       trackPushPermissionDenied();
       return null;
     }
@@ -106,25 +106,34 @@ export async function requestPushToken(): Promise<string | null> {
       serviceWorkerRegistration: await getOrCreateSWRegistration(),
     });
 
-    if (token) {
-      const registered = await registerTokenWithServer(token);
-      if (!registered) {
-        // Token obtained from FCM but server registration failed.
-        // Clear the local token so the UI correctly shows push as not active
-        // (the server doesn't know about this device).
-        // The user can retry — getToken() will return the same cached token
-        // and registerTokenWithServer will attempt registration again.
-        console.error('[PushClient] FCM token obtained but server registration failed');
-        currentToken = null;
-        return null;
-      }
-      currentToken = token;
+    if (!token) {
+      // getToken returned null/undefined — FCM could not obtain a token.
+      // This can happen on iOS Safari when the SW registration is not ready
+      // or the FCM backend rejects the registration.
+      console.error('[PushClient] getToken() returned null — FCM registration failed');
+      return null;
     }
+
+    const registered = await registerTokenWithServer(token);
+    if (!registered) {
+      // Token obtained from FCM but server registration failed.
+      // Clear the local token so the UI correctly shows push as not active
+      // (the server doesn't know about this device).
+      // The user can retry — getToken() will return the same cached token
+      // and registerTokenWithServer will attempt registration again.
+      console.error('[PushClient] FCM token obtained but server registration failed');
+      currentToken = null;
+      return null;
+    }
+    currentToken = token;
 
     return token;
   } catch (error) {
     console.error('[PushClient] Error requesting push token:', error);
     trackPushTokenRegistrationFailure(error);
+    // IMPORTANT: Even though we return null (signaling token failure),
+    // the caller (enablePush) MUST still check getPermissionState() because
+    // the user may have already granted permission before this error.
     return null;
   }
 }
@@ -132,11 +141,39 @@ export async function requestPushToken(): Promise<string | null> {
 /**
  * Deactivate the current push token.
  * Called when the user disables push notifications.
+ *
+ * Always attempts to unregister via the server (which deactivates ALL tokens
+ * for the user, not just the local one). This ensures that even if the
+ * module-level currentToken was lost (HMR, error path), tokens are still
+ * cleaned up on the server side.
  */
 export async function deactivatePushToken(): Promise<void> {
   try {
+    // Unregister the specific token we know about
     if (currentToken) {
       await unregisterTokenWithServer(currentToken);
+    }
+
+    // Also tell the server to deactivate ALL tokens for this user.
+    // This is the authoritative cleanup — covers tokens registered
+    // from other tabs, sessions, or after module re-initialization.
+    try {
+      const { getAuth } = await import('firebase/auth');
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+        await fetch('/api/notifications/deactivate-all', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+      }
+    } catch {
+      // Best-effort: the PATCH pushEnabled=false in the hook already
+      // triggers server-side token deactivation as a safety net.
     }
 
     if (messagingInstance) {

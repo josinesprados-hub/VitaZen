@@ -218,11 +218,13 @@ export function useNotifications(): UseNotificationsReturn {
   const enablePush = useCallback(async (): Promise<boolean> => {
     const token = await requestPushToken();
 
-    if (token) {
-      const state = 'granted' as const;
-      setPermissionState(state);
-      permissionStateRef.current = state;
+    // After requestPushToken, always sync the real browser permission state.
+    // Even if token registration failed, the user may have granted permission.
+    const actualPermission = getPermissionState();
+    setPermissionState(actualPermission);
+    permissionStateRef.current = actualPermission;
 
+    if (token) {
       // Optimistic state update: the register-token endpoint guarantees
       // pushEnabled=true after successful registration. Update immediately
       // so the UI transitions without waiting for the loadPreferences round-trip.
@@ -245,7 +247,7 @@ export function useNotifications(): UseNotificationsReturn {
         };
       });
 
-      await trackPermissionChange(state);
+      await trackPermissionChange(actualPermission);
 
       // Set the user's real timezone so quiet hours (22:00–08:00)
       // align with their local time, not the server default.
@@ -272,13 +274,39 @@ export function useNotifications(): UseNotificationsReturn {
       await loadPreferences();
       return true;
     } else {
-      const newState = getPermissionState();
-      setPermissionState(newState);
-      permissionStateRef.current = newState;
-      await trackPermissionChange(newState);
+      // Token registration failed (or not supported). If the user DID grant
+      // permission but we couldn't get/register a token, we must still tell
+      // the server so that pushEnabled reflects reality. Otherwise the UI
+      // shows "Activar" forever while the OS permission is already granted.
+      await trackPermissionChange(actualPermission);
+
+      // If permission was granted but token failed, try a server-side
+      // preferences sync so the UI has the latest server state.
+      if (actualPermission === 'granted') {
+        // Tell the server that push is enabled from the user's perspective.
+        // The register-token endpoint already set pushEnabled=true if it
+        // reached the upsert, but if it failed before that, we ensure it here.
+        if (firebaseUser) {
+          try {
+            const idToken = await firebaseUser.getIdToken();
+            await fetch('/api/notifications/preferences', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${idToken}`,
+              },
+              body: JSON.stringify({ pushEnabled: true }),
+            });
+          } catch {
+            // Best-effort
+          }
+        }
+        await loadPreferences();
+      }
+
       return false;
     }
-  }, [loadPreferences]);
+  }, [loadPreferences, firebaseUser]);
 
   // ─── Disable push ───
   const disablePush = useCallback(async () => {
@@ -288,7 +316,14 @@ export function useNotifications(): UseNotificationsReturn {
     setPermissionState(state);
     permissionStateRef.current = state;
 
-    // Update preferences on server
+    // Optimistic update: immediately reflect the disabled state in the UI
+    // so the user sees the transition without waiting for the server round-trip.
+    setPreferences(prev => {
+      if (!prev) return prev;
+      return { ...prev, pushEnabled: false };
+    });
+
+    // Update preferences on server (also deactivates all tokens server-side)
     if (firebaseUser) {
       try {
         const idToken = await firebaseUser.getIdToken();
@@ -300,6 +335,7 @@ export function useNotifications(): UseNotificationsReturn {
           },
           body: JSON.stringify({ pushEnabled: false }),
         });
+        // Sync final state from server
         await loadPreferences();
       } catch (error) {
         console.error('[useNotifications] Error disabling push:', error);
