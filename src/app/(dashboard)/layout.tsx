@@ -99,25 +99,34 @@ export default function DashboardLayout({
   // All navigation redirects in a single useEffect.
   // Calling router.replace() during render causes race conditions and loops.
   useEffect(() => {
-    if (loading) return;
+    console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted, syncError });
+    if (loading) {
+      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → EARLY RETURN (loading=true)');
+      return;
+    }
 
     // No auth at all → login
     if (!user && !firebaseUser) {
+      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → REDIRECT /login');
       router.replace('/login');
       return;
     }
 
     // Sync failed while we have Firebase auth → onboarding gate handles it
     if (firebaseUser && !user && syncError) {
+      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → REDIRECT /onboarding (syncError)');
       router.replace('/onboarding');
       return;
     }
 
     // User confirmed but onboarding not completed → onboarding gate
     if (user && !user.onboardingCompleted) {
+      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → REDIRECT /onboarding (!onboardingCompleted)');
       router.replace('/onboarding');
       return;
     }
+
+    console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → NO REDIRECT (all clear)');
   }, [user, firebaseUser, loading, syncError, router]);
 
   // ─── Offline banner + retry handler ───
@@ -129,6 +138,7 @@ export default function DashboardLayout({
   }, [firebaseUser, refreshUser]);
 
   // ─── 1. Auth resolving (no firebaseUser yet) ───
+  console.warn('[POST-LOGIN-TRACE] LAYOUT guard-1 check', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted, result: loading && !firebaseUser ? 'SHOW SPLASH' : 'PASS' });
   if (loading && !firebaseUser) {
     return (
       <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
@@ -143,6 +153,7 @@ export default function DashboardLayout({
   }
 
   // ─── 2. Sync pending (firebaseUser confirmed, waiting for server) ───
+  console.warn('[POST-LOGIN-TRACE] LAYOUT guard-2 check', { loading, firebaseUser: !!firebaseUser, user: !!user, syncTimedOut, onboardingCompleted: user?.onboardingCompleted, result: firebaseUser && !user ? (syncTimedOut ? 'SHOW OFFLINE/RETRY' : 'SHOW LOADING') : 'PASS' });
   if (firebaseUser && !user) {
     // Show network-aware fallback instead of infinite spinner
     if (syncTimedOut) {
@@ -189,6 +200,7 @@ export default function DashboardLayout({
 
   // ─── 3. No auth or onboarding not completed ───
   // Redirect handled by useEffect above. Show loading while redirecting.
+  console.warn('[POST-LOGIN-TRACE] LAYOUT guard-3 check', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted, result: !user || !user.onboardingCompleted ? 'SHOW PREPARANDO' : 'PASS' });
   if (!user || !user.onboardingCompleted) {
     return (
       <div className="min-h-dvh bg-[#000000] flex items-center justify-center">
@@ -203,6 +215,7 @@ export default function DashboardLayout({
   }
 
   // ─── 4. All checks passed — render dashboard ───
+  console.warn('[POST-LOGIN-TRACE] LAYOUT → RENDER CHILDREN (dashboard)', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
   return (
     <div className="min-h-dvh bg-[#000000]">
       {/* Route transition progress bar */}

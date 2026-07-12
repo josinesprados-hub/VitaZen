@@ -98,8 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncInFlight = useRef(false);
 
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
+    console.warn('[POST-LOGIN-TRACE] syncUser() CALLED', { uid: fbUser.uid, email: fbUser.email, syncInFlight: syncInFlight.current });
     // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
     if (syncInFlight.current) {
+      console.warn('[POST-LOGIN-TRACE] syncUser() ABORTED — syncInFlight already true');
       return;
     }
     syncInFlight.current = true;
@@ -108,14 +110,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         setSyncError(false);
         const idToken = await fbUser.getIdToken();
+        console.warn('[POST-LOGIN-TRACE] /api/auth/sync REQUEST start', { attempt });
         const res = await fetch('/api/auth/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken }),
         });
 
+        console.warn('[POST-LOGIN-TRACE] /api/auth/sync RESPONSE', { attempt, status: res.status, ok: res.ok });
+
         if (res.ok) {
           const data = await res.json();
+          console.warn('[POST-LOGIN-TRACE] /api/auth/sync JSON', { userId: data.user?.id, email: data.user?.email, onboardingCompleted: data.user?.onboardingCompleted });
           setUser(data.user);
           return true;
         } else {
@@ -124,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return false;
         }
       } catch (error) {
+        console.warn('[POST-LOGIN-TRACE] /api/auth/sync ERROR', { attempt, message: error instanceof Error ? error.message : String(error) });
         console.error(`[Auth] sync error (attempt ${attempt}):`, error);
         trackAuthSyncFailure(attempt, undefined, error);
         return false;
@@ -141,6 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (retryOk) return;
 
       // Both attempts failed
+      console.warn('[POST-LOGIN-TRACE] syncUser() BOTH ATTEMPTS FAILED');
       setSyncError(true);
     } finally {
       syncInFlight.current = false;
@@ -236,6 +244,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(getAuthInstance(), (fbUser) => {
       onAuthCount++;
+      console.warn('[POST-LOGIN-TRACE] onAuthStateChanged #' + onAuthCount, {
+        uid: fbUser?.uid ?? null,
+        email: fbUser?.email ?? null,
+        isNull: fbUser === null,
+      });
       authResolved = true;
       clearTimeout(timeoutId);
       if (!mounted) return; // Don't update state after unmount
@@ -246,6 +259,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Don't block the loading state — the UI can render immediately
         // once Firebase auth is confirmed. Server sync (DB lookup, emails,
         // analytics) all run independently and update `user` when done.
+        console.warn('[POST-LOGIN-TRACE] calling syncUser() for', fbUser.uid);
         syncUser(fbUser);
       } else {
         setUser(null);
@@ -254,6 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Components should check both `firebaseUser` and `user`:
       //   - firebaseUser: Firebase auth confirmed (instant)
       //   - user: Server sync completed (background, 1-5s)
+      console.warn('[POST-LOGIN-TRACE] setLoading(false)');
       setLoading(false);
     });
 
