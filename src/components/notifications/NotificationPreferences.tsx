@@ -10,8 +10,6 @@ import {
   Moon,
   Sunrise,
   Heart,
-  BarChart3,
-  RotateCcw,
   Brain,
   Loader2,
   Check,
@@ -120,7 +118,7 @@ export function NotificationPreferences() {
       <div className="card-primary p-6 sm:p-8">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
           <BellOff size={14} />
-          Notificaciones push
+          NOTIFICACIONES PUSH
         </h3>
         <p className="text-sm text-[#999]">
           Tu navegador no soporta notificaciones push. Prueba con Chrome, Firefox o Edge en su versión más reciente.
@@ -135,7 +133,7 @@ export function NotificationPreferences() {
       <div className="card-primary p-6 sm:p-8">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
           <BellOff size={14} />
-          Notificaciones push
+          NOTIFICACIONES PUSH
         </h3>
         <div className="space-y-3">
           <p className="text-sm text-[#999]">
@@ -157,24 +155,23 @@ export function NotificationPreferences() {
       <div className="card-primary p-6 sm:p-8">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-4">
           <Bell size={14} />
-          Notificaciones push
+          NOTIFICACIONES PUSH
         </h3>
         <div className="space-y-4">
           <p className="text-sm text-[#999]">
-            Recibe recordatorios suaves y útiles. Nada de spam, sin culpa, sin presión.
+            No pierdas el ritmo de tu evolución.
+          </p>
+          <p className="text-sm text-[#999]">
+            Recibe recordatorios cuando puedan ayudarte a mantener tus hábitos y seguir avanzando en tu evolución personal.
           </p>
           <div className="text-xs text-[#666] space-y-1.5">
             <p className="flex items-center gap-2">
               <Check size={12} className="text-champagne" />
-              Máximo 2 notificaciones al día
+              Recordatorios diarios
             </p>
             <p className="flex items-center gap-2">
               <Moon size={12} className="text-champagne" />
-              Horas de silencio automáticas (22:00 - 08:00)
-            </p>
-            <p className="flex items-center gap-2">
-              <Shield size={12} className="text-champagne" />
-              Puedes desactivarlas cuando quieras
+              Horario de silencio automático (22:00–08:00)
             </p>
           </div>
           <Button
@@ -206,7 +203,7 @@ export function NotificationPreferences() {
       <div className="card-primary p-6 sm:p-8">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2 mb-5">
           <Bell size={14} />
-          Notificaciones push
+          NOTIFICACIONES PUSH
         </h3>
 
         <div className="flex items-center justify-between gap-4">
@@ -240,10 +237,6 @@ export function NotificationPreferences() {
       </div>
 
       {/* Reminder types */}
-      {/* AUDIT NOTE: Only 'Reflexión diaria' (reflection) has an actual trigger (cron at 18:00 UTC).
-          The other 3 toggles (Check-in, Resumen semanal, Te echamos de menos) persist state
-          and pass gate checks, but NO code ever calls sendNotification() for those types.
-          They are effectively PLACEBO — users can toggle them, but no push is ever sent. */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Heart size={14} />
@@ -259,28 +252,6 @@ export function NotificationPreferences() {
           saving={savingKey === 'checkinReminders'}
           saved={savedKeys.has('checkinReminders')}
           onChange={(v) => handleToggle('checkinReminders', v)}
-        />
-
-        {/* Weekly recap */}
-        <ToggleRow
-          icon={<BarChart3 size={14} className="text-champagne" />}
-          title="Resumen semanal"
-          description="Un resumen tranquilo de tu progreso cada semana"
-          checked={preferences.weeklyRecap}
-          saving={savingKey === 'weeklyRecap'}
-          saved={savedKeys.has('weeklyRecap')}
-          onChange={(v) => handleToggle('weeklyRecap', v)}
-        />
-
-        {/* Comeback reminders */}
-        <ToggleRow
-          icon={<RotateCcw size={14} className="text-champagne" />}
-          title="Te echamos de menos"
-          description="Un mensaje suave si llevas tiempo sin entrar"
-          checked={preferences.comebackReminders}
-          saving={savingKey === 'comebackReminders'}
-          saved={savedKeys.has('comebackReminders')}
-          onChange={(v) => handleToggle('comebackReminders', v)}
         />
 
         {/* Reflection reminders */}
