@@ -129,6 +129,23 @@ export default function DashboardLayout({
     console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → NO REDIRECT (all clear)');
   }, [user, firebaseUser, loading, syncError, router]);
 
+  // ─── TEMPORARY: mount debug visual panel when debugAuth=1 in URL ───
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!new URLSearchParams(window.location.search).has('debugAuth')) return;
+    let root: any = null;
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    import('react-dom/client').then(({ createRoot }) => {
+      root = createRoot(el);
+      root.render(<__DebugAuthPanel />);
+    });
+    return () => {
+      if (root) root.unmount();
+      el.remove();
+    };
+  }, []);
+
   // ─── Offline banner + retry handler ───
   const handleRetry = useCallback(() => {
     setSyncTimedOut(false);
@@ -216,6 +233,10 @@ export default function DashboardLayout({
 
   // ─── 4. All checks passed — render dashboard ───
   console.warn('[POST-LOGIN-TRACE] LAYOUT → RENDER CHILDREN (dashboard)', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
+  if (typeof window !== 'undefined') {
+    const d = (window as any).__authDebug;
+    if (d && d.step < 7) Object.assign(d, { step: 7, stepLabel: 'dashboard render' });
+  }
   return (
     <div className="min-h-dvh bg-[#000000]">
       {/* Route transition progress bar */}
@@ -235,6 +256,72 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+    </div>
+  );
+}
+
+// ─── TEMPORARY DEBUG PANEL COMPONENT (remove after diagnosis) ───
+const STEP_LABELS = ['—','AuthContext mounted','onAuthStateChanged','firebaseUser recibido','syncUser iniciado','/api/auth/sync OK','user actualizado','dashboard render','children render'];
+
+function __DebugAuthPanel() {
+  const [debug, setLocal] = useState<any>(null);
+  const [minimized, setMinimized] = useState(false);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const d = (window as any).__authDebug;
+      if (d) setLocal({ ...d });
+    }, 200);
+    return () => clearInterval(id);
+  }, []);
+
+  // Auto step 8 when dashboard children are live
+  useEffect(() => {
+    if (debug && debug.step === 7 && debug.hasUser && debug.onboardingCompleted) {
+      const d = (window as any).__authDebug;
+      if (d) { Object.assign(d, { step: 8, stepLabel: 'children render' }); setLocal({ ...d, step: 8, stepLabel: 'children render' }); }
+    }
+  }, [debug]);
+
+  if (!debug) return null;
+
+  const c = (v: boolean | undefined, invert = false) => {
+    if (v === undefined) return '#555';
+    return invert ? (v ? '#ef4444' : '#22c55e') : (v ? '#22c55e' : '#666');
+  };
+  const sc: Record<string, string> = { NOT_STARTED: '#666', RUNNING: '#eab308', SUCCESS: '#22c55e', ERROR: '#ef4444' };
+
+  return (
+    <div style={{ position: 'fixed', bottom: 16, right: 16, width: 220, zIndex: 9999, fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: 11, userSelect: 'none' }}>
+      {minimized ? (
+        <button onClick={() => setMinimized(false)} style={{ width: 36, height: 36, borderRadius: '50%', background: '#111', border: '1px solid #333', color: '#D4AF37', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+          DBG
+        </button>
+      ) : (
+        <div style={{ background: 'rgba(8,8,8,0.96)', border: '1px solid #2a2a2a', borderRadius: 8, padding: 10, color: '#aaa', boxShadow: '0 4px 20px rgba(0,0,0,0.7)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ color: '#D4AF37', fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>AUTH TRACE</span>
+            <button onClick={() => setMinimized(true)} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>&times;</button>
+          </div>
+          <div style={{ marginBottom: 8, padding: '5px 7px', background: '#0a0a0a', borderRadius: 4, border: '1px solid #1a1a1a' }}>
+            <div style={{ color: '#777', fontSize: 9, marginBottom: 2 }}>PASO {debug.step}/8</div>
+            <div style={{ color: debug.step >= 7 ? '#22c55e' : debug.step >= 1 ? '#eab308' : '#666', fontWeight: 600, fontSize: 10, lineHeight: 1.3 }}>{STEP_LABELS[debug.step] || '—'}</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '3px 8px', fontSize: 10, marginBottom: 8 }}>
+            <span style={{ color: '#555' }}>loading</span><span style={{ color: c(debug.loading, true) }}>{String(debug.loading)}</span>
+            <span style={{ color: '#555' }}>firebaseUser</span><span style={{ color: c(debug.hasFirebaseUser) }}>{String(debug.hasFirebaseUser)}</span>
+            <span style={{ color: '#555' }}>user</span><span style={{ color: c(debug.hasUser) }}>{String(debug.hasUser)}</span>
+            <span style={{ color: '#555' }}>onboarding</span><span style={{ color: c(debug.onboardingCompleted) }}>{debug.onboardingCompleted === undefined ? '—' : String(debug.onboardingCompleted)}</span>
+            <span style={{ color: '#555' }}>syncUser</span><span style={{ color: sc[debug.syncStatus] || '#666', fontWeight: 600 }}>{debug.syncStatus}</span>
+          </div>
+          {debug.errorCode && (
+            <div style={{ padding: '5px 7px', background: '#1a0505', borderRadius: 4, border: '1px solid #3a1515', fontSize: 10 }}>
+              <div style={{ color: '#ef4444', fontWeight: 600, marginBottom: 2 }}>{debug.errorCode}</div>
+              {debug.errorMessage && <div style={{ color: '#888', lineHeight: 1.3, wordBreak: 'break-all' }}>{debug.errorMessage}</div>}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

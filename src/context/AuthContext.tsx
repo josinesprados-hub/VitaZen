@@ -18,6 +18,32 @@ import { getAuthInstance } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 import { setAuthToken } from '@/lib/observability';
 
+// ─── TEMPORARY DEBUG PANEL STATE (remove after diagnosis) ───
+interface __AuthDebugState {
+  step: number;
+  stepLabel: string;
+  loading: boolean;
+  hasFirebaseUser: boolean;
+  hasUser: boolean;
+  onboardingCompleted: boolean | undefined;
+  syncStatus: 'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'ERROR';
+  errorCode: string | null;
+  errorMessage: string | null;
+}
+function __setDebug(update: Partial<__AuthDebugState>) {
+  if (typeof window === 'undefined') return;
+  if (!(window as any).__authDebug) {
+    (window as any).__authDebug = {
+      step: 0, stepLabel: '', loading: true,
+      hasFirebaseUser: false, hasUser: false,
+      onboardingCompleted: undefined,
+      syncStatus: 'NOT_STARTED' as const,
+      errorCode: null, errorMessage: null,
+    };
+  }
+  Object.assign((window as any).__authDebug, update);
+}
+
 /**
  * Returns true when the current environment cannot reliably use
  * `signInWithPopup` due to running as an installed PWA or TWA.
@@ -97,8 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState(false);
   const syncInFlight = useRef(false);
 
+  // TEMPORARY: sync auth state to debug panel
+  useEffect(() => {
+    __setDebug({ loading, hasFirebaseUser: !!firebaseUser, hasUser: !!user, onboardingCompleted: user?.onboardingCompleted });
+  }, [loading, firebaseUser, user]);
+
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
     console.warn('[POST-LOGIN-TRACE] syncUser() CALLED', { uid: fbUser.uid, email: fbUser.email, syncInFlight: syncInFlight.current });
+    __setDebug({ step: 4, stepLabel: 'syncUser iniciado', syncStatus: 'RUNNING' });
     // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
     if (syncInFlight.current) {
       console.warn('[POST-LOGIN-TRACE] syncUser() ABORTED — syncInFlight already true');
@@ -122,15 +154,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (res.ok) {
           const data = await res.json();
           console.warn('[POST-LOGIN-TRACE] /api/auth/sync JSON', { userId: data.user?.id, email: data.user?.email, onboardingCompleted: data.user?.onboardingCompleted });
+          __setDebug({ step: 5, stepLabel: '/api/auth/sync OK', syncStatus: 'SUCCESS' });
           setUser(data.user);
+          __setDebug({ step: 6, stepLabel: 'user actualizado', hasUser: true, onboardingCompleted: data.user?.onboardingCompleted });
           return true;
         } else {
           console.error(`[Auth] sync failed (attempt ${attempt}):`, res.status);
+          __setDebug({ syncStatus: 'ERROR', errorCode: 'HTTP_' + res.status, errorMessage: '/api/auth/sync returned ' + res.status });
           trackAuthSyncFailure(attempt, res.status);
           return false;
         }
       } catch (error) {
         console.warn('[POST-LOGIN-TRACE] /api/auth/sync ERROR', { attempt, message: error instanceof Error ? error.message : String(error) });
+        __setDebug({ syncStatus: 'ERROR', errorCode: 'FETCH_ERROR', errorMessage: error instanceof Error ? error.message : String(error) });
         console.error(`[Auth] sync error (attempt ${attempt}):`, error);
         trackAuthSyncFailure(attempt, undefined, error);
         return false;
@@ -149,6 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Both attempts failed
       console.warn('[POST-LOGIN-TRACE] syncUser() BOTH ATTEMPTS FAILED');
+      __setDebug({ syncStatus: 'ERROR', errorCode: 'SYNC_FAILED_2X', errorMessage: 'Both sync attempts failed' });
       setSyncError(true);
     } finally {
       syncInFlight.current = false;
@@ -223,6 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let authResolved = false;
     let mounted = true;
     let onAuthCount = 0;
+    __setDebug({ step: 1, stepLabel: 'AuthContext mounted' });
 
     // Defensive timeout: if onAuthStateChanged never fires (e.g. Firebase
     // init hangs in Android TWA/WebView), force loading=false after 8s to
@@ -249,12 +287,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: fbUser?.email ?? null,
         isNull: fbUser === null,
       });
+      __setDebug({ step: 2, stepLabel: 'onAuthStateChanged', hasFirebaseUser: !!fbUser });
       authResolved = true;
       clearTimeout(timeoutId);
       if (!mounted) return; // Don't update state after unmount
 
       setFirebaseUser(fbUser);
       if (fbUser) {
+        __setDebug({ step: 3, stepLabel: 'firebaseUser recibido', hasFirebaseUser: true });
         // Fire-and-forget: sync user data in background.
         // Don't block the loading state — the UI can render immediately
         // once Firebase auth is confirmed. Server sync (DB lookup, emails,
