@@ -302,6 +302,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
+      <SyncTracePanel />
     </AuthContext.Provider>
   );
 }
@@ -366,6 +367,163 @@ export interface ProviderCheckResult {
  * Returns { exists: false, ... } if the email is not registered at all,
  * allowing the register flow to proceed normally.
  */
+// ═══════════════════════════════════════════════════════════════════
+// SYNC-TRACE VISUAL PANEL (temporary — only renders when ?debugSync=1)
+// Single source of truth: intercepts console.warn for [SYNC-TRACE] messages.
+// No window.__* globals. No parallel state. No duplicate instrumentation.
+// ═══════════════════════════════════════════════════════════════════
+
+interface SyncTraceEntry {
+  id: number;
+  time: string;
+  msg: string;
+  isError: boolean;
+}
+
+const _origWarn = console.warn;
+const _stEvents: SyncTraceEntry[] = [];
+const _stSubs = new Set<() => void>();
+let _stId = 0;
+let _stPatched = false;
+
+function _stPatch() {
+  if (_stPatched) return;
+  _stPatched = true;
+  console.warn = (...args: unknown[]) => {
+    const first = typeof args[0] === 'string' ? args[0] : '';
+    if (first.includes('[SYNC-TRACE]')) {
+      _stId++;
+      const now = new Date();
+      const ms = String(now.getMilliseconds()).padStart(3, '0');
+      const time = now.toLocaleTimeString('es-ES', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '.' + ms;
+      const msg = args.map(a => typeof a === 'string' ? a : a instanceof Error ? a.message + (a.stack ? '\n' + a.stack : '') : JSON.stringify(a ?? '')).join(' ');
+      _stEvents.push({ id: _stId, time, msg, isError: /EXCEPTION|FAILED|BLOCKED|RETURN FALSE|RETURN \d{3}/i.test(msg) });
+      _stSubs.forEach(fn => fn());
+    }
+    _origWarn.apply(console, args);
+  };
+}
+
+function SyncTracePanel() {
+  const [, rerender] = useState(0);
+  const [minimized, setMinimized] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    _stPatch();
+    const sub = () => rerender(n => n + 1);
+    _stSubs.add(sub);
+    return () => { _stSubs.delete(sub); };
+  }, []);
+
+  useEffect(() => {
+    if (scrollRef.current && !minimized) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [rerender, minimized]);
+
+  if (typeof window === 'undefined') return null;
+  if (!new URLSearchParams(window.location.search).has('debugSync')) return null;
+
+  const events = _stEvents;
+  const errCount = events.filter(e => e.isError).length;
+
+  const handleCopy = () => {
+    const text = events.map(e => `#${e.id} [${e.time}] ${e.msg}`).join('\n');
+    navigator.clipboard.writeText(text || '(no events)').catch(() => {});
+  };
+
+  const handleClear = () => {
+    _stEvents.length = 0;
+    _stId = 0;
+    _stSubs.forEach(fn => fn());
+  };
+
+  if (minimized) {
+    return (
+      <div
+        onClick={() => setMinimized(false)}
+        style={{
+          position: 'fixed', bottom: 12, right: 12, zIndex: 9999,
+          background: errCount > 0 ? '#7f1d1d' : '#1a1a1a',
+          border: '1px solid ' + (errCount > 0 ? '#ef4444' : '#333'),
+          borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
+          color: errCount > 0 ? '#fca5a5' : '#888', fontSize: 11, fontFamily: 'monospace',
+          userSelect: 'none', lineHeight: 1,
+        }}
+      >
+        SYNC-TRACE ({events.length}){errCount > 0 ? ` ${errCount} ERR` : ''}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 12, right: 12, zIndex: 9999,
+      width: 'min(92vw, 380px)', maxHeight: '55vh',
+      background: '#0a0a0a', border: '1px solid #262626', borderRadius: 10,
+      fontFamily: 'monospace', fontSize: 10, color: '#ccc',
+      display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.6)',
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '6px 8px', borderBottom: '1px solid #1a1a1a', flexShrink: 0,
+        background: '#111',
+      }}>
+        <span style={{ color: '#eab308', fontWeight: 600, fontSize: 10, letterSpacing: 0.5 }}>
+          SYNC-TRACE ({events.length})
+        </span>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button onClick={handleCopy} style={{
+            background: 'none', border: '1px solid #333', borderRadius: 4, color: '#888',
+            fontSize: 10, padding: '2px 6px', cursor: 'pointer', lineHeight: 1,
+          }}>
+            Copy
+          </button>
+          <button onClick={handleClear} style={{
+            background: 'none', border: '1px solid #333', borderRadius: 4, color: '#888',
+            fontSize: 10, padding: '2px 6px', cursor: 'pointer', lineHeight: 1,
+          }}>
+            Clear
+          </button>
+          <button onClick={() => setMinimized(true)} style={{
+            background: 'none', border: '1px solid #333', borderRadius: 4, color: '#888',
+            fontSize: 10, padding: '2px 6px', cursor: 'pointer', lineHeight: 1,
+          }}>
+            &#x2014;
+          </button>
+        </div>
+      </div>
+
+      {/* Event list */}
+      <div ref={scrollRef} style={{
+        flex: 1, overflowY: 'auto', padding: '4px 0',
+        scrollbarWidth: 'thin', scrollbarColor: '#333 transparent',
+      }}>
+        {events.length === 0 && (
+          <div style={{ padding: '12px 8px', color: '#555', textAlign: 'center', fontSize: 10 }}>
+            Esperando eventos [SYNC-TRACE]...
+          </div>
+        )}
+        {events.map(e => (
+          <div key={e.id} style={{
+            padding: '3px 8px', borderBottom: '1px solid #111',
+            borderLeft: e.isError ? '2px solid #ef4444' : '2px solid #333',
+            background: e.isError ? 'rgba(239,68,68,0.06)' : 'transparent',
+            lineHeight: 1.4, wordBreak: 'break-all', whiteSpace: 'pre-wrap',
+          }}>
+            <span style={{ color: '#555' }}>#{e.id}</span>{' '}
+            <span style={{ color: '#444' }}>[{e.time}]</span>{' '}
+            <span style={{ color: e.isError ? '#f87171' : '#d4d4d4' }}>{e.msg.replace('[SYNC-TRACE] ', '')}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export async function checkEmailProvider(email: string): Promise<ProviderCheckResult> {
   try {
     const methods = await fetchSignInMethodsForEmail(getAuthInstance(), email);
