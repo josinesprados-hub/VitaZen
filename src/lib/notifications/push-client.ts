@@ -107,8 +107,18 @@ export async function requestPushToken(): Promise<string | null> {
     });
 
     if (token) {
+      const registered = await registerTokenWithServer(token);
+      if (!registered) {
+        // Token obtained from FCM but server registration failed.
+        // Clear the local token so the UI correctly shows push as not active
+        // (the server doesn't know about this device).
+        // The user can retry — getToken() will return the same cached token
+        // and registerTokenWithServer will attempt registration again.
+        console.error('[PushClient] FCM token obtained but server registration failed');
+        currentToken = null;
+        return null;
+      }
       currentToken = token;
-      await registerTokenWithServer(token);
     }
 
     return token;
@@ -192,8 +202,9 @@ async function getOrCreateSWRegistration(): Promise<ServiceWorkerRegistration> {
 
 /**
  * Register the FCM token with our backend.
+ * Returns true if the server accepted the token, false otherwise.
  */
-async function registerTokenWithServer(token: string): Promise<void> {
+async function registerTokenWithServer(token: string): Promise<boolean> {
   try {
     // Get the current user's ID token from Firebase Auth
     const { getAuth } = await import('firebase/auth');
@@ -202,7 +213,7 @@ async function registerTokenWithServer(token: string): Promise<void> {
 
     if (!currentUser) {
       console.warn('[PushClient] No authenticated user — cannot register token');
-      return;
+      return false;
     }
 
     const idToken = await currentUser.getIdToken();
@@ -221,10 +232,14 @@ async function registerTokenWithServer(token: string): Promise<void> {
     });
 
     if (!res.ok) {
-      console.error('[PushClient] Failed to register token:', res.status);
+      console.error('[PushClient] Failed to register token with server:', res.status);
+      return false;
     }
+
+    return true;
   } catch (error) {
     console.error('[PushClient] Error registering token:', error);
+    return false;
   }
 }
 
