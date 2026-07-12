@@ -1,0 +1,502 @@
+   549→   549→   549→        body: JSON.stringify({ threadId: sentThreadId, content }),
+   550→   550→   550→      });
+   551→   551→   551→
+   552→   552→   552→      if (res.status === 403) {
+   553→   553→   553→        const data = await res.json();
+   554→   554→   554→        setShowLimitModal(true);
+   555→   555→   555→        setRemaining(0);
+   556→   556→   556→        setDailyLimit(data.limit || 15);
+   557→   557→   557→        // Remove the optimistic user message since it was blocked
+   558→   558→   558→        setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+   559→   559→   559→        // L-4 FIX: Restore the input text so the user doesn't lose their message.
+   560→   560→   560→        // Previously the input was cleared (line 547) and never restored on 403.
+   561→   561→   561→        setInput(content);
+   562→   562→   562→        return;
+   563→   563→   563→      }
+   564→   564→   564→
+   565→   565→   565→      if (res.ok) {
+   566→   566→   566→        const data = await res.json();
+   567→   567→   567→        const assistantMessage: Message = {
+   568→   568→   568→          id: 'resp-' + Date.now(),
+   569→   569→   569→          role: 'assistant',
+   570→   570→   570→          content: data.message,
+   571→   571→   571→          createdAt: new Date().toISOString(),
+   572→   572→   572→        };
+   573→   573→   573→        // Only add response if still on the same thread
+   574→   574→   574→        if (activeThreadRef.current === sentThreadId) {
+   575→   575→   575→          setMessages(prev => [...prev, assistantMessage]);
+   576→   576→   576→          setRemaining(data.remaining);
+   577→   577→   577→          setDailyLimit(data.limit || 15);
+   578→   578→   578→          setIsContextual(!!data.contextual);
+   579→   579→   579→        }
+   580→   580→   580→
+   581→   581→   581→        // Refresh threads to get updated title and updatedAt
+   582→   582→   582→        const threadsRes = await apiFetch('/api/ai/threads');
+   583→   583→   583→        if (threadsRes.ok) {
+   584→   584→   584→          const threadsData = await threadsRes.json();
+   585→   585→   585→          setThreads(threadsData.threads);
+   586→   586→   586→          setHistoryLimited(!!threadsData.historyLimited);
+   587→   587→   587→        }
+   588→   588→   588→      } else if (res.status !== 403) {
+   589→   589→   589→        // Non-403 error: remove optimistic message and show error
+   590→   590→   590→        if (activeThreadRef.current === sentThreadId) {
+   591→   591→   591→          setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+   592→   592→   592→          setInput(content);
+   593→   593→   593→          setActionError('Error al enviar. Inténtalo de nuevo.');
+   594→   594→   594→        }
+   595→   595→   595→      }
+   596→   596→   596→    } catch (e) {
+   597→   597→   597→      console.error(e);
+   598→   598→   598→      // Remove optimistic user message on network error if still on same thread
+   599→   599→   599→      if (activeThreadRef.current === sentThreadId) {
+   600→   600→   600→        setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+   601→   601→   601→        setInput(content); // Restore input so user can retry
+   602→   602→   602→        setActionError('Sin conexión. Tu mensaje se ha restaurado.');
+   603→   603→   603→      }
+   604→   604→   604→    }
+   605→   605→   605→    finally {
+   606→   606→   606→      setSending(false);
+   607→   607→   607→      sendingRef.current = false;
+   608→   608→   608→    }
+   609→   609→   609→  };
+   610→   610→   610→
+   611→   611→   611→  // ─────────────────────────────────────────
+   612→   612→   612→  // Computed (memoized to avoid re-filtering on every render)
+   613→   613→   613→  // ─────────────────────────────────────────
+   614→   614→   614→
+   615→   615→   615→  const activeThreads = useMemo(() => threads.filter(t => !t.archived), [threads]);
+   616→   616→   616→  const archivedThreads = useMemo(() => threads.filter(t => t.archived), [threads]);
+   617→   617→   617→  const visibleThreads = useMemo(() => tab === 'active' ? activeThreads : archivedThreads, [tab, activeThreads, archivedThreads]);
+   618→   618→   618→
+   619→   619→   619→  // Group visible threads by date
+   620→   620→   620→  const groupedThreads = useMemo(() => visibleThreads.reduce<Record<string, Thread[]>>((acc, thread) => {
+   621→   621→   621→    const group = getDateGroup(thread.updatedAt);
+   622→   622→   622→    if (!acc[group]) acc[group] = [];
+   623→   623→   623→    acc[group].push(thread);
+   624→   624→   624→    return acc;
+   625→   625→   625→  }, {}), [visibleThreads]);
+   626→   626→   626→
+   627→   627→   627→  const activeThreadData = useMemo(() => threads.find(t => t.id === activeThread) ?? null, [threads, activeThread]);
+   628→   628→   628→
+   629→   629→   629→  const IconComponent = useMemo(() => headerIcon === 'brain' ? Brain : Sparkles, [headerIcon]);
+   630→   630→   630→
+   631→   631→   631→  // ─────────────────────────────────────────
+   632→   632→   632→  // Context menu handler
+   633→   633→   633→  // ─────────────────────────────────────────
+   634→   634→   634→
+   635→   635→   635→  const handleContextMenu = (e: React.MouseEvent, threadId: string) => {
+   636→   636→   636→    e.stopPropagation();
+   637→   637→   637→    e.preventDefault();
+   638→   638→   638→    const rect = (e.currentTarget as HTMLElement).closest('.sidebar-area')?.getBoundingClientRect();
+   639→   639→   639→    const x = rect ? e.clientX - rect.left : e.clientX;
+   640→   640→   640→    const y = rect ? e.clientY - rect.top : e.clientY;
+   641→   641→   641→    setContextMenu({ threadId, x, y });
+   642→   642→   642→  };
+   643→   643→   643→
+   644→   644→   644→  // ─────────────────────────────────────────
+   645→   645→   645→  // Shared: Sidebar content (used in desktop sidebar & mobile drawer)
+   646→   646→   646→  // ─────────────────────────────────────────
+   647→   647→   647→
+   648→   648→   648→  const sidebarContent = (
+   649→   649→   649→    <>
+   650→   650→   650→      {/* Back + New button */}
+   651→   651→   651→      <div className="p-3 border-b border-[#1a1a1a] space-y-2">
+   652→   652→   652→        <Link
+   653→   653→   653→          href={backHref}
+   654→   654→   654→          className="text-[#666] text-xs hover:text-champagne flex items-center gap-1 transition-colors"
+   655→   655→   655→        >
+   656→   656→   656→          <ChevronLeft size={12} /> Volver
+   657→   657→   657→        </Link>
+   658→   658→   658→        <button
+   659→   659→   659→          onClick={createThread}
+   660→   660→   660→          className="w-full flex items-center justify-center gap-2 bg-champagne text-black font-semibold py-2.5 rounded-lg hover:bg-champagne-hover transition-colors text-sm"
+   661→   661→   661→        >
+   662→   662→   662→          <Plus size={16} /> Nueva conversación
+   663→   663→   663→        </button>
+   664→   664→   664→      </div>
+   665→   665→   665→
+   666→   666→   666→      {/* Tab selector: Todas / Archivadas */}
+   667→   667→   667→      <div className="flex border-b border-[#1a1a1a]">
+   668→   668→   668→        <button
+   669→   669→   669→          onClick={() => setTab('active')}
+   670→   670→   670→          className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
+   671→   671→   671→            tab === 'active'
+   672→   672→   672→              ? 'text-champagne'
+   673→   673→   673→              : 'text-[#666] hover:text-[#999]'
+   674→   674→   674→          }`}
+   675→   675→   675→        >
+   676→   676→   676→          Todas
+   677→   677→   677→          {activeThreads.length > 0 && (
+   678→   678→   678→            <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+   679→   679→   679→              tab === 'active' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
+   680→   680→   680→            }`}>
+   681→   681→   681→              {activeThreads.length}
+   682→   682→   682→            </span>
+   683→   683→   683→          )}
+   684→   684→   684→          {tab === 'active' && (
+   685→   685→   685→            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
+   686→   686→   686→          )}
+   687→   687→   687→        </button>
+   688→   688→   688→        <button
+   689→   689→   689→          onClick={() => setTab('archived')}
+   690→   690→   690→          className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
+   691→   691→   691→            tab === 'archived'
+   692→   692→   692→              ? 'text-champagne'
+   693→   693→   693→              : 'text-[#666] hover:text-[#999]'
+   694→   694→   694→          }`}
+   695→   695→   695→        >
+   696→   696→   696→          Archivadas
+   697→   697→   697→          {archivedThreads.length > 0 && (
+   698→   698→   698→            <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+   699→   699→   699→              tab === 'archived' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
+   700→   700→   700→            }`}>
+   701→   701→   701→              {archivedThreads.length}
+   702→   702→   702→            </span>
+   703→   703→   703→          )}
+   704→   704→   704→          {tab === 'archived' && (
+   705→   705→   705→            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
+   706→   706→   706→          )}
+   707→   707→   707→        </button>
+   708→   708→   708→      </div>
+   709→   709→   709→
+   710→   710→   710→      {/* Thread list grouped by date */}
+   711→   711→   711→      <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-hide">
+   712→   712→   712→        {DATE_GROUP_ORDER.map((group, groupIdx) => {
+   713→   713→   713→          const groupThreads = groupedThreads[group];
+   714→   714→   714→          if (!groupThreads || groupThreads.length === 0) return null;
+   715→   715→   715→          // FREE users: blur groups beyond "Esta semana" (index 3+)
+   716→   716→   716→          const isOldGroup = !isPremium && groupIdx >= 3;
+   717→   717→   717→          return (
+   718→   718→   718→            <div key={group} className="animate-in" style={{ animationDelay: '50ms' }}>
+   719→   719→   719→              <div className="flex items-center justify-between px-3 py-1.5">
+   720→   720→   720→                <p className="text-[10px] text-[#555] uppercase tracking-widest font-semibold">
+   721→   721→   721→                  {group}
+   722→   722→   722→                </p>
+   723→   723→   723→                {groupIdx === 0 && !isPremium && visibleThreads.length > 5 && (
+   724→   724→   724→                  <PremiumInlineBadge isPremium={isPremium} freeLabel="7 días" premiumLabel="Ilimitado" />
+   725→   725→   725→                )}
+   726→   726→   726→              </div>
+   727→   727→   727→              {isOldGroup ? (
+   728→   728→   728→                <PremiumGate isPremium={isPremium} intensity="medium" compact label="Historial completo">
+   729→   729→   729→                  <div className="space-y-0.5">
+   730→   730→   730→                    {groupThreads.map((thread) => (
+   731→   731→   731→                      <div
+   732→   732→   732→                        key={thread.id}
+   733→   733→   733→                        className="group flex items-center rounded-lg px-3 py-2.5 text-[#ccc]"
+   734→   734→   734→                      >
+   735→   735→   735→                        <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#555]" />
+   736→   736→   736→                        <div className="flex-1 min-w-0">
+   737→   737→   737→                          <p className="text-sm truncate leading-tight">{thread.title}</p>
+   738→   738→   738→                          <p className="text-[10px] text-[#555] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
+   739→   739→   739→                        </div>
+   740→   740→   740→                      </div>
+   741→   741→   741→                    ))}
+   742→   742→   742→                  </div>
+   743→   743→   743→                </PremiumGate>
+   744→   744→   744→              ) : (
+   745→   745→   745→                <div className="space-y-0.5">
+   746→   746→   746→                  {groupThreads.map((thread) => (
+   747→   747→   747→                    <div
+   748→   748→   748→                      key={thread.id}
+   749→   749→   749→                      className={`group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ${
+   750→   750→   750→                        activeThread === thread.id
+   751→   751→   751→                          ? 'bg-champagne/10 text-champagne'
+   752→   752→   752→                          : tab === 'archived'
+   753→   753→   753→                          ? 'text-[#888] hover:bg-[#1a1a1a]/40'
+   754→   754→   754→                          : 'text-[#ccc] hover:bg-[#1a1a1a]/60'
+   755→   755→   755→                      }`}
+   756→   756→   756→                      onClick={() => {
+   757→   757→   757→                        if (editingThreadId !== thread.id) {
+   758→   758→   758→                          setActiveThread(thread.id);
+   759→   759→   759→                        }
+   760→   760→   760→                      }}
+   761→   761→   761→                    >
+   762→   762→   762→                      {thread.archived ? (
+   763→   763→   763→                        <Archive size={14} className="shrink-0 mr-2.5 text-[#555]" />
+   764→   764→   764→                      ) : (
+   765→   765→   765→                        <MessageCircle
+   766→   766→   766→                          size={14}
+   767→   767→   767→                          className={`shrink-0 mr-2.5 ${
+   768→   768→   768→                            activeThread === thread.id ? 'text-champagne' : 'text-[#555]'
+   769→   769→   769→                          }`}
+   770→   770→   770→                        />
+   771→   771→   771→                      )}
+   772→   772→   772→                      <div className="flex-1 min-w-0">
+   773→   773→   773→                        {editingThreadId === thread.id ? (
+   774→   774→   774→                          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+   775→   775→   775→                            <input
+   776→   776→   776→                              ref={editInputRef}
+   777→   777→   777→                              type="text"
+   778→   778→   778→                              value={editTitle}
+   779→   779→   779→                              onChange={(e) => setEditTitle(e.target.value)}
+   780→   780→   780→                              onKeyDown={(e) => {
+   781→   781→   781→                                if (e.key === 'Enter') renameThread(thread.id, editTitle);
+   782→   782→   782→                                if (e.key === 'Escape') setEditingThreadId(null);
+   783→   783→   783→                              }}
+   784→   784→   784→                              className="flex-1 bg-[#000] border border-champagne rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
+   785→   785→   785→                              maxLength={100}
+   786→   786→   786→                            />
+   787→   787→   787→                            <button
+   788→   788→   788→                              onClick={() => renameThread(thread.id, editTitle)}
+   789→   789→   789→                              className="text-champagne hover:text-champagne-hover p-0.5"
+   790→   790→   790→                            >
+   791→   791→   791→                              <Check size={12} />
+   792→   792→   792→                            </button>
+   793→   793→   793→                            <button
+   794→   794→   794→                              onClick={() => setEditingThreadId(null)}
+   795→   795→   795→                              className="text-[#666] hover:text-white p-0.5"
+   796→   796→   796→                            >
+   797→   797→   797→                              <X size={12} />
+   798→   798→   798→                            </button>
+   799→   799→   799→                          </div>
+   800→   800→   800→                        ) : (
+   801→   801→   801→                          <>
+   802→   802→   802→                            <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
+   803→   803→   803→                              {thread.title}
+   804→   804→   804→                            </p>
+   805→   805→   805→                            <p className="text-[10px] text-[#555] mt-0.5">
+   806→   806→   806→                              {getRelativeDate(thread.updatedAt)}
+   807→   807→   807→                            </p>
+   808→   808→   808→                          </>
+   809→   809→   809→                        )}
+   810→   810→   810→                      </div>
+   811→   811→   811→                      {/* Context menu trigger (⋯) */}
+   812→   812→   812→                      {editingThreadId !== thread.id && (
+   813→   813→   813→                        <button
+   814→   814→   814→                          onClick={(e) => handleContextMenu(e, thread.id)}
+   815→   815→   815→                          className="text-[#444] hover:text-champagne p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
+   816→   816→   816→                          title="Más opciones"
+   817→   817→   817→                        >
+   818→   818→   818→                          <MoreVertical size={14} />
+   819→   819→   819→                        </button>
+   820→   820→   820→                      )}
+   821→   821→   821→                    </div>
+   822→   822→   822→                  ))}
+   823→   823→   823→                </div>
+   824→   824→   824→              )}
+   825→   825→   825→            </div>
+   826→   826→   826→          );
+   827→   827→   827→        })}
+   828→   828→   828→
+   829→   829→   829→        {/* Premium history gate at bottom of sidebar */}
+   830→   830→   830→        {!isPremium && tab === 'active' && activeThreads.length > 3 && (
+   831→   831→   831→          <PremiumHistoryGate isPremium={isPremium} label="historial completo de conversaciones" />
+   832→   832→   832→        )}
+   833→   833→   833→
+   834→   834→   834→        {/* Empty state: active tab */}
+   835→   835→   835→        {tab === 'active' && activeThreads.length === 0 && (
+   836→   836→   836→          <div className="text-center py-12 animate-in">
+   837→   837→   837→            <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
+   838→   838→   838→              <Inbox size={24} className="text-[#444]" />
+   839→   839→   839→            </div>
+   840→   840→   840→            <p className="text-[#555] text-sm font-medium mb-1">Sin conversaciones</p>
+   841→   841→   841→            <p className="text-[#444] text-xs">Crea una nueva para empezar</p>
+   842→   842→   842→          </div>
+   843→   843→   843→        )}
+   844→   844→   844→
+   845→   845→   845→        {/* Empty state: archived tab */}
+   846→   846→   846→        {tab === 'archived' && archivedThreads.length === 0 && (
+   847→   847→   847→          <div className="text-center py-12 animate-in">
+   848→   848→   848→            <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
+   849→   849→   849→              <MessageSquareOff size={24} className="text-[#444]" />
+   850→   850→   850→            </div>
+   851→   851→   851→            <p className="text-[#555] text-sm font-medium mb-1">Sin archivadas</p>
+   852→   852→   852→            <p className="text-[#444] text-xs">Las conversaciones archivadas aparecerán aquí</p>
+   853→   853→   853→          </div>
+   854→   854→   854→        )}
+   855→   855→   855→      </div>
+   856→   856→   856→
+   857→   857→   857→      {/* Message counter for FREE users — elegant bottom bar */}
+   858→   858→   858→      {!isPremium && remaining !== null && (
+   859→   859→   859→        <div className="p-3 border-t border-[#1a1a1a]">
+   860→   860→   860→          <div className="flex items-center justify-between text-xs mb-1.5">
+   861→   861→   861→            <span className="text-[#666] flex items-center gap-1.5">
+   862→   862→   862→              <Zap size={10} />
+   863→   863→   863→              Mensajes hoy
+   864→   864→   864→            </span>
+   865→   865→   865→            <span className={`font-semibold ${
+   866→   866→   866→              remaining === 0 ? 'text-red-400' :
+   867→   867→   867→              remaining <= 3 ? 'text-champagne-warm' :
+   868→   868→   868→              'text-champagne'
+   869→   869→   869→            }`}>
+   870→   870→   870→              {remaining}/{dailyLimit}
+   871→   871→   871→            </span>
+   872→   872→   872→          </div>
+   873→   873→   873→          <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+   874→   874→   874→            <div
+   875→   875→   875→              className="h-full rounded-full transition-all duration-700 ease-out"
+   876→   876→   876→              style={{
+   877→   877→   877→                width: `${Math.max((remaining / dailyLimit) * 100, 0)}%`,
+   878→   878→   878→                backgroundColor: getProgressColor(remaining, dailyLimit),
+   879→   879→   879→              }}
+   880→   880→   880→            />
+   881→   881→   881→          </div>
+   882→   882→   882→          {remaining <= 3 && remaining > 0 && (
+   883→   883→   883→            <p className="text-[10px] text-champagne-warm mt-1.5 flex items-center gap-1">
+   884→   884→   884→              <Circle size={3} fill="currentColor" className="text-champagne/40" />
+   885→   885→   885→              Más conexiones con Élite
+   886→   886→   886→            </p>
+   887→   887→   887→          )}
+   888→   888→   888→          {remaining === 0 && (
+   889→   889→   889→            <button
+   890→   890→   890→              onClick={() => setShowLimitModal(true)}
+   891→   891→   891→              className="w-full mt-2 text-[10px] text-champagne bg-champagne/10 border border-champagne/20 rounded-lg py-1.5 hover:bg-champagne/15 transition-colors flex items-center justify-center gap-1"
+   892→   892→   892→            >
+   893→   893→   893→              <Circle size={3} fill="currentColor" className="text-champagne/40" />
+   894→   894→   894→              Conversaciones sin límite
+   895→   895→   895→            </button>
+   896→   896→   896→          )}
+   897→   897→   897→        </div>
+   898→   898→   898→      )}
+   899→   899→   899→
+   900→   900→   900→      {/* Premium contextual memory indicator in sidebar */}
+   901→   901→   901→      {isPremium && (
+   902→   902→   902→        <div className="p-3 border-t border-[#1a1a1a]">
+   903→   903→   903→          <div className="flex items-center gap-2 text-[10px] text-champagne/70">
+   904→   904→   904→            <BrainCircuit size={12} className="shrink-0" />
+   905→   905→   905→            <span>Memoria contextual profunda</span>
+   906→   906→   906→          </div>
+   907→   907→   907→        </div>
+   908→   908→   908→      )}
+   909→   909→   909→    </>
+   910→   910→   910→  );
+   911→   911→   911→
+   912→   912→   912→  // ─────────────────────────────────────────
+   913→   913→   913→  // Render
+   914→   914→   914→  // ─────────────────────────────────────────
+   915→   915→   915→
+   916→   916→   916→  if (loading) {
+   917→   917→   917→    return <MentorSkeleton />;
+   918→   918→   918→  }
+   919→   919→   919→
+   920→   920→   920→  if (loadError) {
+   921→   921→   921→    return (
+   922→   922→   922→      <div className="max-w-6xl mx-auto min-h-[60dvh] flex items-center justify-center">
+   923→   923→   923→        <PremiumErrorState
+   924→   924→   924→          variant="loading"
+   925→   925→   925→          title="El mentor no está disponible"
+   926→   926→   926→          subtitle="No se pudo conectar con el asistente. Tu historial está a salvo."
+   927→   927→   927→          onRetry={() => {
+   928→   928→   928→            setLoadError(false);
+   929→   929→   929→            setLoading(true);
+   930→   930→   930→            fetchThreads();
+   931→   931→   931→          }}
+   932→   932→   932→          secondaryAction={{
+   933→   933→   933→            label: 'Volver al dashboard',
+   934→   934→   934→            href: backHref,
+   935→   935→   935→          }}
+   936→   936→   936→          size="lg"
+   937→   937→   937→        />
+   938→   938→   938→      </div>
+   939→   939→   939→    );
+   940→   940→   940→  }
+   941→   941→   941→
+   942→   942→   942→  return (
+   943→   943→   943→    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
+   944→   944→   944→      {/* Offline indicator — subtle top banner */}
+   945→   945→   945→      {isOffline && (
+   946→   946→   946→        <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
+   947→   947→   947→          Sin conexión — los mensajes se enviarán cuando vuelva la red
+   948→   948→   948→        </div>
+   949→   949→   949→      )}
+   950→   950→   950→
+   951→   951→   951→      {/* ═══════════════════════════════════════════
+   952→   952→   952→          MOBILE LAYOUT: Single panel, full viewport
+   953→   953→   953→          ═══════════════════════════════════════════ */}
+   954→   954→   954→
+   955→   955→   955→      {/* Mobile header — ultra compact */}
+   956→   956→   956→      <div className="flex sm:hidden items-center justify-between px-3 py-2 border-b border-[#1a1a1a] shrink-0 bg-[#0a0a0a]">
+   957→   957→   957→        <div className="flex items-center gap-2 min-w-0">
+   958→   958→   958→          <Link href={backHref} className="p-1.5 -ml-1 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors shrink-0">
+   959→   959→   959→            <ChevronLeft size={20} />
+   960→   960→   960→          </Link>
+   961→   961→   961→          <IconComponent size={16} className="text-champagne shrink-0" />
+   962→   962→   962→          <p className="text-sm font-semibold text-white truncate">
+   963→   963→   963→            {activeThreadData?.title || 'Mentor IA'}
+   964→   964→   964→          </p>
+   965→   965→   965→        </div>
+   966→   966→   966→        <div className="flex items-center gap-2 shrink-0">
+   967→   967→   967→          {/* Message counter pill — mobile compact */}
+   968→   968→   968→          {!isPremium && remaining !== null && (
+   969→   969→   969→            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+   970→   970→   970→              remaining <= 3 ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#1a1a1a] text-champagne border border-[#2a2a2a]'
+   971→   971→   971→            }`}>
+   972→   972→   972→              {remaining}
+   973→   973→   973→            </span>
+   974→   974→   974→          )}
+   975→   975→   975→          {isPremium && (
+   976→   976→   976→            <InfinityIcon size={14} className="text-champagne" />
+   977→   977→   977→          )}
+   978→   978→   978→          {/* Drawer toggle */}
+   979→   979→   979→          <button
+   980→   980→   980→            onClick={() => setDrawerOpen(true)}
+   981→   981→   981→            className="p-1.5 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+   982→   982→   982→          >
+   983→   983→   983→            <Menu size={20} />
+   984→   984→   984→          </button>
+   985→   985→   985→        </div>
+   986→   986→   986→      </div>
+   987→   987→   987→
+   988→   988→   988→      {/* ═══════════════════════════════════════════
+   989→   989→   989→          DESKTOP LAYOUT: Header + sidebar + chat
+   990→   990→   990→          ═══════════════════════════════════════════ */}
+   991→   991→   991→
+   992→   992→   992→      {/* Desktop header */}
+   993→   993→   993→      <div className="hidden sm:flex items-center justify-between mb-5 shrink-0">
+   994→   994→   994→        <div className="flex items-center gap-4">
+   995→   995→   995→          <div className="w-14 h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+   996→   996→   996→            <IconComponent size={28} className="text-champagne" />
+   997→   997→   997→          </div>
+   998→   998→   998→          <div>
+   999→   999→   999→            <div className="flex items-center gap-2">
+  1000→  1000→  1000→              <h1 className="text-2xl font-bold text-white">Mentor IA</h1>
+  1001→  1001→  1001→              {isPremium && (
+  1002→  1002→  1002→                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50 px-2 py-0.5">
+  1003→  1003→  1003→                  <Circle size={3} fill="currentColor" className="text-champagne/40" />
+  1004→  1004→  1004→                  Élite
+  1005→  1005→  1005→                </span>
+  1006→  1006→  1006→              )}
+  1007→  1007→  1007→            </div>
+  1008→  1008→  1008→            <p className="text-[#999] text-sm">
+  1009→  1009→  1009→              {isPremium
+  1010→  1010→  1010→                ? 'Tu mentor con memoria profunda'
+  1011→  1011→  1011→                : 'Tu guía de desarrollo personal'}
+  1012→  1012→  1012→            </p>
+  1013→  1013→  1013→          </div>
+  1014→  1014→  1014→        </div>
+  1015→  1015→  1015→        <div className="flex items-center gap-2">
+  1016→  1016→  1016→          {!isPremium && remaining !== null && (
+  1017→  1017→  1017→            <div className="message-counter-pill flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a]">
+  1018→  1018→  1018→              <Zap size={12} className={remaining <= 3 ? 'text-red-400' : 'text-champagne'} />
+  1019→  1019→  1019→              <span className={remaining <= 3 ? 'text-red-400' : 'text-champagne'}>
+  1020→  1020→  1020→                {remaining}/{dailyLimit}
+  1021→  1021→  1021→              </span>
+  1022→  1022→  1022→            </div>
+  1023→  1023→  1023→          )}
+  1024→  1024→  1024→          {isPremium && (
+  1025→  1025→  1025→            <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-champagne/5 border border-champagne/15">
+  1026→  1026→  1026→              <InfinityIcon size={12} className="text-champagne" />
+  1027→  1027→  1027→              <span className="text-champagne">Sin límite</span>
+  1028→  1028→  1028→            </div>
+  1029→  1029→  1029→          )}
+  1030→  1030→  1030→          <button
+  1031→  1031→  1031→            onClick={() => setSidebarOpen(!sidebarOpen)}
+  1032→  1032→  1032→            className="p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+  1033→  1033→  1033→            title={sidebarOpen ? 'Ocultar sidebar' : 'Mostrar sidebar'}
+  1034→  1034→  1034→          >
+  1035→  1035→  1035→            {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+  1036→  1036→  1036→          </button>
+  1037→  1037→  1037→        </div>
+  1038→  1038→  1038→      </div>
+  1039→  1039→  1039→
+  1040→  1040→  1040→      {/* Contextual Help — desktop only */}
+  1041→  1041→  1041→      <div className="hidden sm:block">
+  1042→  1042→  1042→        <ContextualHelp
+  1043→  1043→  1043→          storageKey="vitazen_help_mentor"
+  1044→  1044→  1044→          title="Mentor IA"
+  1045→  1045→  1045→          text="Escribe tu pregunta y el mentor te responderá. Crea nuevas conversaciones, renómbralas o archívalas desde el menú lateral."
+  1046→  1046→  1046→        />
+  1047→  1047→  1047→      </div>
+  1048→  1048→  1048→
+
+[showing lines 549-1048 of 1457; use offset=1049 with limit to continue reading]

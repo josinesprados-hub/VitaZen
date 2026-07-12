@@ -1,0 +1,252 @@
+     1→/home/z/my-project/src/lib/analytics-server.ts:54:    console.warn(`[Analytics] Unknown event: ${event}`);
+     2→/home/z/my-project/src/lib/analytics-server.ts:87:    console.error('[Analytics] Failed to track event:', event, error);
+     3→/home/z/my-project/src/lib/observability/hydration.ts:23:// React logs hydration warnings as console.error.
+     4→/home/z/my-project/src/lib/observability/hydration.ts:27:let originalConsoleError: typeof console.error | null = null;
+     5→/home/z/my-project/src/lib/observability/hydration.ts:85:  originalConsoleError = console.error;
+     6→/home/z/my-project/src/lib/observability/hydration.ts:87:  console.error = function (...args: unknown[]) {
+     7→/home/z/my-project/src/lib/observability/hydration.ts:104:    // Call original console.error
+     8→/home/z/my-project/src/lib/observability/hydration.ts:118:      console.error = originalConsoleError;
+     9→/home/z/my-project/src/lib/observability/server-logger.ts:96:      console.error(json);
+    10→/home/z/my-project/src/lib/observability/server-logger.ts:99:      console.warn(json);
+    11→/home/z/my-project/src/lib/observability/server-logger.ts:102:      console.info(json);
+    12→/home/z/my-project/src/lib/patterns/detector.ts:477:      console.log(`[Patrones] Filtered: "${text}" — ${filterResult.reason}`);
+    13→/home/z/my-project/src/lib/auth.ts:9:    console.error('Error verifying Firebase token:', error);
+    14→/home/z/my-project/src/lib/auth.ts:51:      console.log('[Auth] getAuthUser: found user by email (not firebaseUid). user.id:', user.id);
+    15→/home/z/my-project/src/lib/auth.ts:57:        console.warn('[Auth] getAuthUser: updating firebaseUid from', user.firebaseUid, 'to', decodedToken.uid);
+    16→/home/z/my-project/src/lib/notifications/scheduler.ts:78:    console.warn('[Scheduler] Invalid timezone for todayStart, using UTC:', timezone);
+    17→/home/z/my-project/src/lib/notifications/scheduler.ts:238:    console.warn('[Scheduler] Invalid timezone, skipping quiet hours:', timezone);
+    18→/home/z/my-project/src/lib/notifications/reminders/daily.ts:87:    console.warn('[DailyReminder] Invalid timezone, skipping:', timezone);
+    19→/home/z/my-project/src/lib/notifications/reminders/daily.ts:270:      console.error('[DailyReminder] Error for user:', candidate.userId, error);
+    20→/home/z/my-project/src/lib/notifications/reminders/reflection.ts:85:    console.warn('[ReflectionReminder] Invalid timezone, skipping:', timezone);
+    21→/home/z/my-project/src/lib/notifications/reminders/reflection.ts:331:      console.error('[ReflectionReminder] Error for user:', candidate.userId, error);
+    22→/home/z/my-project/src/lib/notifications/reminders/checkin.ts:77:    console.warn('[CheckinReminder] Invalid timezone, skipping:', timezone);
+    23→/home/z/my-project/src/lib/notifications/reminders/checkin.ts:256:      console.error('[CheckinReminder] Error for user:', candidate.userId, error);
+    24→/home/z/my-project/src/lib/notifications/service.ts:112:    console.error('[Notifications] FCM send error:', error);
+    25→/home/z/my-project/src/lib/notifications/service.ts:124:      console.error('[Notifications] Token cleanup error:', err);
+    26→/home/z/my-project/src/lib/notifications/push-client.ts:80:      console.warn('[PushClient] Push not supported in this browser');
+    27→/home/z/my-project/src/lib/notifications/push-client.ts:91:      console.log('[PushClient] Permission not granted:', permission);
+    28→/home/z/my-project/src/lib/notifications/push-client.ts:99:      console.error('[PushClient] NEXT_PUBLIC_FIREBASE_VAPID_KEY not set');
+    29→/home/z/my-project/src/lib/notifications/push-client.ts:116:    console.error('[PushClient] Error requesting push token:', error);
+    30→/home/z/my-project/src/lib/notifications/push-client.ts:142:    console.error('[PushClient] Error deactivating push token:', error);
+    31→/home/z/my-project/src/lib/notifications/push-client.ts:204:      console.warn('[PushClient] No authenticated user — cannot register token');
+    32→/home/z/my-project/src/lib/notifications/push-client.ts:224:      console.error('[PushClient] Failed to register token:', res.status);
+    33→/home/z/my-project/src/lib/notifications/push-client.ts:227:    console.error('[PushClient] Error registering token:', error);
+    34→/home/z/my-project/src/lib/notifications/push-client.ts:253:    console.error('[PushClient] Error unregistering token:', error);
+    35→/home/z/my-project/src/lib/notifications/push-client.ts:279:    console.error('[PushClient] Error tracking permission:', error);
+    36→/home/z/my-project/src/lib/avatar.ts:262:    console.warn(
+    37→/home/z/my-project/src/lib/widgets/snapshot.ts:245:    console.error(`[Widgets] Failed to recompute ${widgetType} for user ${userId}:`, error);
+    38→/home/z/my-project/src/lib/challenge-auto-complete.ts:108:      console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason})`);
+    39→/home/z/my-project/src/lib/challenge-auto-complete.ts:112:    console.error('[Challenge] Auto-complete error (non-blocking):', error);
+    40→/home/z/my-project/src/lib/db.ts:64:      console.warn(JSON.stringify({
+    41→/home/z/my-project/src/lib/emails/sender.ts:22:  console.log('[WELCOME] starting — to:', to, 'name:', name);
+    42→/home/z/my-project/src/lib/emails/sender.ts:25:    console.log('[WELCOME] template generated, calling Resend...');
+    43→/home/z/my-project/src/lib/emails/sender.ts:40:    console.log('[WELCOME] Resend raw response — data:', JSON.stringify(result?.data), 'error:', JSON.stringify(result?.error));
+    44→/home/z/my-project/src/lib/emails/sender.ts:43:      console.log('[WELCOME] sent ✓ — ID:', result.data.id);
+    45→/home/z/my-project/src/lib/emails/sender.ts:49:    console.error('[WELCOME] Resend returned error:', errorMsg);
+    46→/home/z/my-project/src/lib/emails/sender.ts:54:      console.error('[WELCOME] failed (Resend error):', error.message);
+    47→/home/z/my-project/src/lib/emails/sender.ts:57:    console.error('[WELCOME] failed (unexpected):', error instanceof Error ? error.message : String(error));
+    48→/home/z/my-project/src/lib/emails/sender.ts:65:  console.log('[EMAIL] Enviando verify a:', to);
+    49→/home/z/my-project/src/lib/emails/sender.ts:83:      console.log('[EMAIL] Verify enviado. ID:', result.data.id);
+    50→/home/z/my-project/src/lib/emails/sender.ts:89:    console.error('[EMAIL] Error Resend verify:', errorMsg);
+    51→/home/z/my-project/src/lib/emails/sender.ts:96:    console.error('[EMAIL] Excepción verify:', error instanceof Error ? error.message : error);
+    52→/home/z/my-project/src/lib/emails/sender.ts:104:  console.log('[EMAIL] Enviando reset-password a:', to);
+    53→/home/z/my-project/src/lib/emails/sender.ts:122:      console.log('[EMAIL] Reset password enviado. ID:', result.data.id);
+    54→/home/z/my-project/src/lib/emails/sender.ts:124:      console.error('[EMAIL] Error Resend reset-password:', JSON.stringify(result.error));
+    55→/home/z/my-project/src/lib/emails/sender.ts:127:    console.error('[EMAIL] Excepción reset-password:', error instanceof Error ? error.message : error);
+    56→/home/z/my-project/src/lib/emails/sender.ts:134:  console.log('[EMAIL] Enviando subscription-confirmed a:', to, 'plan:', planName);
+    57→/home/z/my-project/src/lib/emails/sender.ts:151:      console.log('[EMAIL] Subscription confirmed enviado. ID:', result.data.id);
+    58→/home/z/my-project/src/lib/emails/sender.ts:153:      console.error('[EMAIL] Error Resend subscription:', JSON.stringify(result.error));
+    59→/home/z/my-project/src/lib/emails/sender.ts:156:    console.error('[EMAIL] Excepción subscription:', error instanceof Error ? error.message : error);
+    60→/home/z/my-project/src/lib/analytics.ts:35:    console.warn(`[Analytics] Unknown client event: ${event}`);
+    61→/home/z/my-project/src/lib/weekly-recap-sender.ts:194:    console.error(`[WEEKLY-RECAP] Error generating data for user ${userId}:`, error);
+    62→/home/z/my-project/src/lib/weekly-recap-sender.ts:240:    console.log(`[WEEKLY-RECAP] Released claim for ${userId}/${weekKey}: ${reason}`);
+    63→/home/z/my-project/src/lib/weekly-recap-sender.ts:243:    console.error(`[WEEKLY-RECAP] Failed to release claim for ${userId}/${weekKey}:`, err);
+    64→/home/z/my-project/src/lib/weekly-recap-sender.ts:259:      console.log(`[WEEKLY-RECAP] Idempotent skip: ${user.email} already has log for ${weekKey}`);
+    65→/home/z/my-project/src/lib/weekly-recap-sender.ts:263:    console.error(`[WEEKLY-RECAP] Unexpected DB error claiming slot for ${user.email}:`, error);
+    66→/home/z/my-project/src/lib/weekly-recap-sender.ts:299:      console.log(`[WEEKLY-RECAP] Sent to ${user.email}. ID: ${result.data.id}. Week: ${weekKey}`);
+    67→/home/z/my-project/src/lib/weekly-recap-sender.ts:304:      console.error(`[WEEKLY-RECAP] Resend error for ${user.email}:`, JSON.stringify(result.error));
+    68→/home/z/my-project/src/lib/weekly-recap-sender.ts:315:    console.error(`[WEEKLY-RECAP] Exception sending to ${user.email}:`, msg);
+    69→/home/z/my-project/src/lib/weekly-recap-sender.ts:338:  console.log(`[WEEKLY-RECAP] Starting weekly recap send for week ${weekKey}...`);
+    70→/home/z/my-project/src/lib/weekly-recap-sender.ts:341:  console.log(`[WEEKLY-RECAP] Found ${users.length} eligible users for week ${weekKey}.`);
+    71→/home/z/my-project/src/lib/weekly-recap-sender.ts:364:      console.error(`[WEEKLY-RECAP] Unexpected error for user ${user.id}:`, error);
+    72→/home/z/my-project/src/lib/weekly-recap-sender.ts:375:  console.log(
+    73→/home/z/my-project/src/components/dashboard/MomentumCard.tsx:57:      console.error('Momentum fetch error:', e);
+    74→/home/z/my-project/src/components/dashboard/WeeklyRecap.tsx:237:      console.error('Error fetching weekly recap:', error);
+    75→/home/z/my-project/src/components/checkin/CheckInModal.tsx:206:      console.error('[CHECKIN] Error saving:', err);
+    76→/home/z/my-project/src/app/widget/reflection/route.ts:115:    console.error('[ReflectionWidget] Render error:', error);
+    77→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:106:      console.error('Error:', error);
+    78→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:144:      console.error('Error adding habit:', error);
+    79→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:164:      console.error('Error completing habit:', error);
+    80→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:188:        console.error('Habits PUT failed:', res.status, errData);
+    81→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:190:    } catch (error) { console.error('Error updating habit:', error); }
+    82→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:206:        console.error('Habits DELETE failed:', res.status, errData);
+    83→/home/z/my-project/src/app/(dashboard)/imperio/disciplina/page.tsx:208:    } catch (error) { console.error('Error deleting habit:', error); }
+    84→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:98:      console.error(e);
+    85→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:124:    } catch (error) { console.error('Error submitting wellness:', error); }
+    86→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:145:    } catch (error) { console.error('Error submitting nutrition:', error); }
+    87→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:168:        console.error('Wellness PUT failed:', res.status, errData);
+    88→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:170:    } catch (error) { console.error('Error updating wellness log:', error); }
+    89→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:193:        console.error('Nutrition PUT failed:', res.status, errData);
+    90→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:195:    } catch (error) { console.error('Error updating nutrition log:', error); }
+    91→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:216:        console.error('DELETE failed:', res.status, errData);
+    92→/home/z/my-project/src/app/(dashboard)/imperio/energia/page.tsx:218:    } catch (error) { console.error('Error deleting log:', error); }
+    93→/home/z/my-project/src/app/(dashboard)/imperio/mente/page.tsx:245:      console.error('Error:', error);
+    94→/home/z/my-project/src/app/(dashboard)/imperio/mente/page.tsx:292:      console.error('Error saving meditation:', error);
+    95→/home/z/my-project/src/app/(dashboard)/imperio/mente/page.tsx:323:        console.error('Meditation PUT failed:', res.status, errData);
+    96→/home/z/my-project/src/app/(dashboard)/imperio/mente/page.tsx:326:      console.error('Error updating session:', error);
+    97→/home/z/my-project/src/app/(dashboard)/imperio/mente/page.tsx:343:        console.error('Meditation DELETE failed:', res.status, errData);
+    98→/home/z/my-project/src/app/(dashboard)/imperio/mente/page.tsx:346:      console.error('Error deleting session:', error);
+    99→/home/z/my-project/src/app/(dashboard)/imperio/riqueza/page.tsx:536:      console.error(e);
+   100→/home/z/my-project/src/app/(dashboard)/imperio/riqueza/page.tsx:795:    } catch (error) { console.error('Error deleting finance log:', error); }
+   101→/home/z/my-project/src/app/(dashboard)/imperio/crecimiento/page.tsx:134:      console.error(e);
+   102→/home/z/my-project/src/app/(dashboard)/imperio/crecimiento/page.tsx:163:      console.error('Error submitting entry:', error);
+   103→/home/z/my-project/src/app/(dashboard)/imperio/crecimiento/page.tsx:191:        console.error('Journal PUT failed:', res.status, errData);
+   104→/home/z/my-project/src/app/(dashboard)/imperio/crecimiento/page.tsx:194:      console.error('Error updating entry:', error);
+   105→/home/z/my-project/src/app/(dashboard)/imperio/crecimiento/page.tsx:213:        console.error('Journal DELETE failed:', res.status, errData);
+   106→/home/z/my-project/src/app/(dashboard)/imperio/crecimiento/page.tsx:216:      console.error('Error deleting entry:', error);
+   107→/home/z/my-project/src/app/(dashboard)/timeline/page.tsx:188:      console.error('[TIMELINE] Error:', err);
+   108→/home/z/my-project/src/app/(dashboard)/dashboard/page.tsx:159:        console.error('Error fetching dashboard data:', error);
+   109→/home/z/my-project/src/app/(dashboard)/checkin/page.tsx:154:      console.error('[CHECKIN PAGE] Error:', err);
+   110→/home/z/my-project/src/app/(dashboard)/checkin/page.tsx:219:      console.error('Error deleting checkin:', error);
+   111→/home/z/my-project/src/app/(dashboard)/pricing/page.tsx:54:      console.error('Checkout error:', error);
+   112→/home/z/my-project/src/app/(dashboard)/pricing/page.tsx:74:      console.error('Portal error:', error);
+   113→/home/z/my-project/src/app/(dashboard)/memoria-de-vida/page.tsx:106:      console.error('[Etapas] Fetch error:', error);
+   114→/home/z/my-project/src/app/(dashboard)/layout.tsx:102:    console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted, syncError });
+   115→/home/z/my-project/src/app/(dashboard)/layout.tsx:104:      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → EARLY RETURN (loading=true)');
+   116→/home/z/my-project/src/app/(dashboard)/layout.tsx:110:      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → REDIRECT /login');
+   117→/home/z/my-project/src/app/(dashboard)/layout.tsx:117:      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → REDIRECT /onboarding (syncError)');
+   118→/home/z/my-project/src/app/(dashboard)/layout.tsx:124:      console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → REDIRECT /onboarding (!onboardingCompleted)');
+   119→/home/z/my-project/src/app/(dashboard)/layout.tsx:129:    console.warn('[POST-LOGIN-TRACE] LAYOUT redirect-effect → NO REDIRECT (all clear)');
+   120→/home/z/my-project/src/app/(dashboard)/layout.tsx:141:  console.warn('[POST-LOGIN-TRACE] LAYOUT guard-1 check', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted, result: loading && !firebaseUser ? 'SHOW SPLASH' : 'PASS' });
+   121→/home/z/my-project/src/app/(dashboard)/layout.tsx:156:  console.warn('[POST-LOGIN-TRACE] LAYOUT guard-2 check', { loading, firebaseUser: !!firebaseUser, user: !!user, syncTimedOut, onboardingCompleted: user?.onboardingCompleted, result: firebaseUser && !user ? (syncTimedOut ? 'SHOW OFFLINE/RETRY' : 'SHOW LOADING') : 'PASS' });
+   122→/home/z/my-project/src/app/(dashboard)/layout.tsx:203:  console.warn('[POST-LOGIN-TRACE] LAYOUT guard-3 check', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted, result: !user || !user.onboardingCompleted ? 'SHOW PREPARANDO' : 'PASS' });
+   123→/home/z/my-project/src/app/(dashboard)/layout.tsx:218:  console.warn('[POST-LOGIN-TRACE] LAYOUT → RENDER CHILDREN (dashboard)', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
+   124→/home/z/my-project/src/app/(dashboard)/cierre-mensual/page.tsx:110:      console.error('[Cierre Mensual] Fetch error:', error);
+   125→/home/z/my-project/src/app/(dashboard)/cierre-mensual/page.tsx:137:      console.error('[Cierre Mensual] Save error:', error);
+   126→/home/z/my-project/src/app/(dashboard)/insights/page.tsx:196:      console.error(e);
+   127→/home/z/my-project/src/components/patterns/LifePatternsSection.tsx:268:      console.error('[Patrones] Error fetching:', error);
+   128→/home/z/my-project/src/app/(auth)/onboarding/page.tsx:64:  console.log('[AUTH-FORENSIC] OnboardingPage MOUNT');
+   129→/home/z/my-project/src/app/(auth)/onboarding/page.tsx:81:    console.log('[AUTH-FORENSIC] Onboarding auth-guard useEffect:', {
+   130→/home/z/my-project/src/app/(auth)/onboarding/page.tsx:91:        console.log('[AUTH-FORENSIC] Onboarding → router.replace("/login") — no user, no firebaseUser');
+   131→/home/z/my-project/src/app/(auth)/onboarding/page.tsx:94:        console.log('[AUTH-FORENSIC] Onboarding → router.replace("/dashboard") — onboarding completed');
+   132→/home/z/my-project/src/app/(auth)/onboarding/page.tsx:139:        console.log('[ONBOARDING] User not found in DB, forcing sync retry');
+   133→/home/z/my-project/src/app/(auth)/login/page.tsx:13:  console.log('[AUTH-FORENSIC] LoginPage MOUNT — url:', typeof window !== 'undefined' ? window.location.href : 'SSR');
+   134→/home/z/my-project/src/app/(auth)/login/page.tsx:29:    console.log('[AUTH-FORENSIC] Login auth-guard useEffect:', {
+   135→/home/z/my-project/src/app/(auth)/login/page.tsx:36:      console.log('[AUTH-FORENSIC] Login → router.replace("/onboarding") via auth-guard');
+   136→/home/z/my-project/src/app/(auth)/login/page.tsx:107:    console.log('[AUTH-FORENSIC] handleGoogleLogin() START:', {
+   137→/home/z/my-project/src/app/(auth)/login/page.tsx:118:      console.log('[AUTH-FORENSIC] handleGoogleLogin() → calling signInWithGoogle()');
+   138→/home/z/my-project/src/app/(auth)/login/page.tsx:120:      console.log('[AUTH-FORENSIC] handleGoogleLogin() → signInWithGoogle() resolved, calling router.replace("/onboarding")');
+   139→/home/z/my-project/src/app/(auth)/login/page.tsx:123:      console.log('[AUTH-FORENSIC] handleGoogleLogin() CATCH:', { code: err?.code, message: err?.message });
+   140→/home/z/my-project/src/app/(auth)/verify-email/verify-email-client.tsx:60:        console.error('[VERIFY PAGE] Error:', error);
+   141→/home/z/my-project/src/app/(auth)/verify-email/verify-email-client.tsx:116:          console.error('[VERIFY] Client-side sendEmailVerification failed:', fbError);
+   142→/home/z/my-project/src/app/api/monthly-closure/route.ts:57:    console.error('[Monthly Closure] GET error:', error);
+   143→/home/z/my-project/src/app/api/monthly-closure/route.ts:121:    console.error('[Monthly Closure] POST error:', error);
+   144→/home/z/my-project/src/app/api/meditation/route.ts:45:    console.error('Meditation PUT error:', error);
+   145→/home/z/my-project/src/app/api/meditation/route.ts:121:    console.error('Meditation DELETE error:', error);
+   146→/home/z/my-project/src/app/api/meditation/route.ts:141:    console.error('Meditation GET error:', error);
+   147→/home/z/my-project/src/app/api/meditation/route.ts:224:    console.error('Meditation POST error:', error);
+   148→/home/z/my-project/src/app/api/patterns/route.ts:115:    console.error('[Patrones] Error detecting patterns:', error);
+   149→/home/z/my-project/src/app/api/profile/route.ts:37:    console.error('[Profile] GET error:', error);
+   150→/home/z/my-project/src/app/api/profile/route.ts:110:    console.error('[Profile] PUT error:', error);
+   151→/home/z/my-project/src/app/api/onboarding/route.ts:40:    console.error('Onboarding GET error:', error);
+   152→/home/z/my-project/src/app/api/onboarding/route.ts:207:    console.error('Onboarding POST error:', error);
+   153→/home/z/my-project/src/app/api/empire/tips/route.ts:64:      console.error('[Tips] Deterministic rotation failed — using raw fallback:', rotationError);
+   154→/home/z/my-project/src/app/api/empire/tips/route.ts:83:    console.error('Empire tips GET error:', error);
+   155→/home/z/my-project/src/app/api/notifications/register-token/route.ts:126:    console.error('[Notifications] Register token error:', error);
+   156→/home/z/my-project/src/app/api/notifications/register-token/route.ts:170:    console.error('[Notifications] Delete token error:', error);
+   157→/home/z/my-project/src/app/api/notifications/permission/route.ts:44:    console.error('[Notifications] Permission tracking error:', error);
+   158→/home/z/my-project/src/app/api/notifications/preferences/route.ts:57:    console.error('[Notifications] GET preferences error:', error);
+   159→/home/z/my-project/src/app/api/notifications/preferences/route.ts:152:    console.error('[Notifications] PATCH preferences error:', error);
+   160→/home/z/my-project/src/app/api/journal/route.ts:27:    console.error('Journal GET error:', error);
+   161→/home/z/my-project/src/app/api/journal/route.ts:90:    console.error('Journal POST error:', error);
+   162→/home/z/my-project/src/app/api/journal/route.ts:120:    console.error('Journal PUT error:', error);
+   163→/home/z/my-project/src/app/api/journal/route.ts:171:    console.error('Journal DELETE error:', error);
+   164→/home/z/my-project/src/app/api/widgets/[type]/route.ts:79:    console.error('[Widgets] GET error:', error);
+   165→/home/z/my-project/src/app/api/widgets/refresh/route.ts:58:    console.error('[Widgets] Refresh error:', error);
+   166→/home/z/my-project/src/app/api/widgets/config/route.ts:49:    console.error('[Widgets] Config error:', error);
+   167→/home/z/my-project/src/app/api/settings/route.ts:29:    console.error('[Settings] GET error:', error);
+   168→/home/z/my-project/src/app/api/settings/route.ts:82:    console.error('[Settings] PUT error:', error);
+   169→/home/z/my-project/src/app/api/dashboard/progress/route.ts:91:    console.error('Dashboard progress error:', error);
+   170→/home/z/my-project/src/app/api/dashboard/momentum/route.ts:277:    console.error('Momentum error:', error);
+   171→/home/z/my-project/src/app/api/dashboard/streaks/route.ts:164:    console.error('Dashboard streaks error:', error);
+   172→/home/z/my-project/src/app/api/checkin/route.ts:83:    console.error('Checkin GET error:', error);
+   173→/home/z/my-project/src/app/api/checkin/route.ts:181:    console.error('Checkin POST error:', error);
+   174→/home/z/my-project/src/app/api/checkin/route.ts:208:    console.error('Checkin PUT error:', error);
+   175→/home/z/my-project/src/app/api/checkin/route.ts:251:    console.error('Checkin DELETE error:', error);
+   176→/home/z/my-project/src/app/api/habits/route.ts:24:    console.error('Habits GET error:', error);
+   177→/home/z/my-project/src/app/api/habits/route.ts:57:    console.error('Habits POST error:', error);
+   178→/home/z/my-project/src/app/api/habits/route.ts:221:    console.error('Habits PATCH error:', error);
+   179→/home/z/my-project/src/app/api/habits/route.ts:261:    console.error('Habits PUT error:', error);
+   180→/home/z/my-project/src/app/api/habits/route.ts:343:    console.error('Habits DELETE error:', error);
+   181→/home/z/my-project/src/app/api/auth/verify-email/route.ts:67:    console.log('[VERIFY] Email verified for user:', updatedUser.email);
+   182→/home/z/my-project/src/app/api/auth/verify-email/route.ts:79:    console.error('[VERIFY] Error verifying email:', error);
+   183→/home/z/my-project/src/app/api/auth/send-verification/route.ts:53:      console.error('[VERIFY] Could not check Firebase user status:', fbError);
+   184→/home/z/my-project/src/app/api/auth/send-verification/route.ts:102:      console.log('[VERIFY] Verification email sent via Firebase+Resend to:', user.email);
+   185→/home/z/my-project/src/app/api/auth/send-verification/route.ts:105:      console.error('[VERIFY] Firebase generateEmailVerificationLink failed:', firebaseLinkError?.message || firebaseLinkError);
+   186→/home/z/my-project/src/app/api/auth/send-verification/route.ts:111:      console.log('[VERIFY] Falling back to client-side Firebase sendEmailVerification');
+   187→/home/z/my-project/src/app/api/auth/send-verification/route.ts:119:    console.error('[VERIFY] Error sending verification email:', error);
+   188→/home/z/my-project/src/app/api/auth/reset-password/route.ts:15:    console.log('[RESET DEBUG] db.passwordResetToken exists:', !!db.passwordResetToken);
+   189→/home/z/my-project/src/app/api/auth/reset-password/route.ts:17:      console.error('[RESET DEBUG] db.passwordResetToken is undefined — Prisma Client desactualizado');
+   190→/home/z/my-project/src/app/api/auth/reset-password/route.ts:27:    console.log('[RESET PASSWORD] Solicitud de reset para:', email);
+   191→/home/z/my-project/src/app/api/auth/reset-password/route.ts:36:      console.log('[RESET PASSWORD] No se encontró usuario para:', email);
+   192→/home/z/my-project/src/app/api/auth/reset-password/route.ts:59:    console.log('[RESET PASSWORD] Token creado para user:', user.id, 'expira:', expiresAt.toISOString());
+   193→/home/z/my-project/src/app/api/auth/reset-password/route.ts:67:    console.log('[RESET PASSWORD] Email enviado a:', user.email);
+   194→/home/z/my-project/src/app/api/auth/reset-password/route.ts:71:    console.error('[RESET PASSWORD] Error en POST:', error);
+   195→/home/z/my-project/src/app/api/auth/reset-password/route.ts:80:    console.log('[RESET DEBUG] db.passwordResetToken exists:', !!db.passwordResetToken);
+   196→/home/z/my-project/src/app/api/auth/reset-password/route.ts:82:      console.error('[RESET DEBUG] db.passwordResetToken is undefined — Prisma Client desactualizado');
+   197→/home/z/my-project/src/app/api/auth/reset-password/route.ts:96:    console.log('[RESET PASSWORD] Intentando reset con token:', token.substring(0, 8) + '...');
+   198→/home/z/my-project/src/app/api/auth/reset-password/route.ts:105:      console.log('[RESET PASSWORD] Token no encontrado');
+   199→/home/z/my-project/src/app/api/auth/reset-password/route.ts:111:      console.log('[RESET PASSWORD] Token ya utilizado');
+   200→/home/z/my-project/src/app/api/auth/reset-password/route.ts:117:      console.log('[RESET PASSWORD] Token expirado');
+   201→/home/z/my-project/src/app/api/auth/reset-password/route.ts:131:      console.log('[RESET PASSWORD] Contraseña actualizada en Firebase para uid:', resetToken.user.firebaseUid);
+   202→/home/z/my-project/src/app/api/auth/reset-password/route.ts:133:      console.error('[RESET PASSWORD] Error actualizando contraseña en Firebase:', firebaseError);
+   203→/home/z/my-project/src/app/api/auth/reset-password/route.ts:143:    console.log('[RESET PASSWORD] Token invalidado. Reset completado para:', resetToken.user.email);
+   204→/home/z/my-project/src/app/api/auth/reset-password/route.ts:147:    console.error('[RESET PASSWORD] Error en PUT:', error);
+   205→/home/z/my-project/src/app/api/auth/session/route.ts:128:    console.error('Session error:', error);
+   206→/home/z/my-project/src/app/api/stripe/portal/route.ts:10:      console.warn('[Portal] Missing or invalid Authorization header');
+   207→/home/z/my-project/src/app/api/stripe/portal/route.ts:17:      console.warn('[Portal] User not found for provided token');
+   208→/home/z/my-project/src/app/api/stripe/portal/route.ts:22:      console.warn('[Portal] No stripeCustomerId for user:', user.id, '— plan:', user.plan);
+   209→/home/z/my-project/src/app/api/stripe/portal/route.ts:31:    console.log('[Portal] Creating billing portal session — customer:', user.stripeCustomerId, 'returnUrl:', returnUrl);
+   210→/home/z/my-project/src/app/api/stripe/portal/route.ts:38:    console.log('[Portal] Session created successfully — url:', session.url);
+   211→/home/z/my-project/src/app/api/stripe/portal/route.ts:41:    console.error('[Portal] Stripe portal error:', error);
+   212→/home/z/my-project/src/app/api/stripe/checkout/route.ts:34:      console.warn('[Checkout] User is PREMIUM but has no active subscription — allowing checkout:', user.id);
+   213→/home/z/my-project/src/app/api/stripe/checkout/route.ts:75:        console.log('[Checkout] Found active subscription but FREE plan — promoted:', user.id);
+   214→/home/z/my-project/src/app/api/stripe/checkout/route.ts:117:    console.error('Stripe checkout error:', error);
+   215→/home/z/my-project/src/app/api/challenges/route.ts:62:    console.error('Challenges GET error:', error);
+   216→/home/z/my-project/src/app/api/ai/threads/route.ts:63:    console.error('Get threads error:', error);
+   217→/home/z/my-project/src/app/api/ai/threads/route.ts:104:    console.error('Create thread error:', error);
+   218→/home/z/my-project/src/app/api/ai/threads/route.ts:147:    console.error('Update thread error:', error);
+   219→/home/z/my-project/src/app/api/ai/threads/route.ts:180:    console.error('Delete thread error:', error);
+   220→/home/z/my-project/src/app/api/ai/threads/[threadId]/messages/route.ts:72:    console.error('Get messages error:', error);
+   221→/home/z/my-project/src/app/api/wellness/route.ts:43:    console.error('Wellness GET error:', error);
+   222→/home/z/my-project/src/app/api/wellness/route.ts:155:    console.error('Wellness POST error:', error);
+   223→/home/z/my-project/src/app/api/wellness/route.ts:183:    console.error('Wellness PUT error:', error);
+   224→/home/z/my-project/src/app/api/wellness/route.ts:266:    console.error('Wellness DELETE error:', error);
+   225→/home/z/my-project/src/app/api/nutrition/route.ts:40:    console.error('Nutrition GET error:', error);
+   226→/home/z/my-project/src/app/api/nutrition/route.ts:150:    console.error('Nutrition POST error:', error);
+   227→/home/z/my-project/src/app/api/nutrition/route.ts:178:    console.error('Nutrition PUT error:', error);
+   228→/home/z/my-project/src/app/api/nutrition/route.ts:261:    console.error('Nutrition DELETE error:', error);
+   229→/home/z/my-project/src/app/api/weekly-recap/route.ts:193:    console.error('Weekly recap error:', error);
+   230→/home/z/my-project/src/app/api/life-memory/route.ts:125:    console.error('[Life Memory] GET error:', error);
+   231→/home/z/my-project/src/app/api/finance/route.ts:43:    console.error('Finance GET error:', error);
+   232→/home/z/my-project/src/app/api/finance/route.ts:166:    console.error('Finance PUT error:', error);
+   233→/home/z/my-project/src/app/api/finance/route.ts:244:    console.error('Finance DELETE error:', error);
+   234→/home/z/my-project/src/app/api/finance/route.ts:327:    console.error('Finance POST error:', error);
+   235→/home/z/my-project/src/app/api/analytics/track/route.ts:69:    console.error('[Analytics] Track error:', error);
+   236→/home/z/my-project/src/app/api/analytics/insights/route.ts:121:    console.error('[Analytics] Insights error:', error);
+   237→/home/z/my-project/src/components/ui/EmailVerificationBanner.tsx:71:          console.error('[BANNER] Client-side sendEmailVerification failed:', fbError);
+   238→/home/z/my-project/src/components/mentor/MentorChat.tsx:239:      console.error(e); 
+   239→/home/z/my-project/src/components/mentor/MentorChat.tsx:281:    } catch (e) { console.error(e); }
+   240→/home/z/my-project/src/components/mentor/MentorChat.tsx:443:    } catch (e) { console.error(e); setActionError('No se pudo crear la conversación'); }
+   241→/home/z/my-project/src/components/mentor/MentorChat.tsx:467:    } catch (e) { console.error(e); setActionError('No se pudo eliminar'); }
+   242→/home/z/my-project/src/components/mentor/MentorChat.tsx:493:    } catch (e) { console.error(e); setActionError('No se pudo archivar'); }
+   243→/home/z/my-project/src/components/mentor/MentorChat.tsx:505:    } catch (e) { console.error(e); setActionError('No se pudo restaurar'); }
+   244→/home/z/my-project/src/components/mentor/MentorChat.tsx:521:    } catch (e) { console.error(e); setActionError('No se pudo renombrar'); }
+   245→/home/z/my-project/src/components/mentor/MentorChat.tsx:597:      console.error(e);
+   246→/home/z/my-project/src/hooks/use-notifications.ts:73:      console.error('[useNotifications] Error loading preferences:', error);
+   247→/home/z/my-project/src/hooks/use-notifications.ts:99:        console.error('[useNotifications] Init error:', error);
+   248→/home/z/my-project/src/hooks/use-notifications.ts:166:        console.error('[useNotifications] Error disabling push:', error);
+   249→/home/z/my-project/src/hooks/use-notifications.ts:193:        console.error('[useNotifications] Error updating preferences:', error);
+   250→/home/z/my-project/src/hooks/useEmpireTips.ts:132:        console.warn(`[Tips] API returned ${res.status} for empire=${empire}`);
+   251→
+   252→[Showing results with pagination = limit: 250]

@@ -1,0 +1,420 @@
+     1→   801→  // ═══════════════════════════════════════════
+     2→   802→
+     3→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+     4→   804→  // from Date-dependent content. This skeleton mirrors the exact page
+     5→   805→  // structure so there is no layout shift when content loads.
+     6→   806→  if (!mounted || loading) {
+     7→   807→    return <FinanzasSkeleton />;
+     8→   808→  }
+     9→   809→
+    10→   810→  if (fetchError) {
+    11→   811→    return (
+    12→   812→      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[50vh] flex items-center justify-center">
+    13→   813→        <PremiumErrorState
+    14→   814→          variant="loading"
+    15→   815→          title="No se pudo cargar"
+    16→   816→          onRetry={fetchData}
+    17→   817→          size="md"
+    18→   818→        />
+    19→   819→      </div>
+    20→   820→    );
+    21→   821→  }
+    22→   822→
+    23→   823→  // ═══════════════════════════════════════════
+    24→   824→  // Render
+    25→   825→  // ═══════════════════════════════════════════
+    26→   826→
+    27→   827→  const isEmpty = logs.length === 0;
+    28→   828→
+    29→   829→  return (
+    30→   830→    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-24">
+    31→   831→      <SaveToast show={toast.show} message={toast.message} />
+    32→   832→
+    33→   833→      {/* ── Edit Overlay ── */}
+    34→   834→      {editingLog && (
+    35→   835→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
+    36→   836→          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+    37→   837→            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+    38→   838→              <Pencil size={20} className="text-champagne" />
+    39→   839→            </div>
+    40→   840→            <h3 className="text-lg font-bold text-white text-center mb-6">Editar registro</h3>
+    41→   841→            <div className="space-y-3">
+    42→   842→              <div className="flex gap-2">
+    43→   843→                <button onClick={() => setEditForm({ ...editForm, type: 'income' })}
+    44→   844→                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+    45→   845→                  Ingreso
+    46→   846→                </button>
+    47→   847→                <button onClick={() => setEditForm({ ...editForm, type: 'expense' })}
+    48→   848→                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
+    49→   849→                  Gasto
+    50→   850→                </button>
+    51→   851→              </div>
+    52→   852→              <input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+    53→   853→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
+    54→   854→              <div>
+    55→   855→                <input type="text" placeholder="Categoría" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+    56→   856→                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+    57→   857→                <CategoryChips categories={userCategories} value={editForm.category} onChange={(v) => setEditForm({ ...editForm, category: v })} />
+    58→   858→              </div>
+    59→   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+    60→   860→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+    61→   861→              <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+    62→   862→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+    63→   863→              <input type="text" placeholder="¿Qué pasó? (opcional)" value={editForm.contexto} onChange={(e) => setEditForm({ ...editForm, contexto: e.target.value })}
+    64→   864→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#444] italic" />
+    65→   865→              <IntentionSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
+    66→   866→              {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+    67→   867→            </div>
+    68→   868→            <div className="flex items-center justify-center gap-3 mt-7">
+    69→   869→              <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+    70→   870→              <button onClick={saveEdit} disabled={editSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+    71→   871→            </div>
+    72→   872→          </div>
+    73→   873→        </div>
+    74→   874→      )}
+    75→   875→
+    76→   876→      {/* ── Delete Confirmation ── */}
+    77→   877→      {pendingDeleteId && (
+    78→   878→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
+    79→   879→          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+    80→   880→            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+    81→   881→              <Trash2 size={22} className="text-red-400" />
+    82→   882→            </div>
+    83→   883→            <h3 className="text-lg font-bold text-white mb-2">Eliminar registro</h3>
+    84→   884→            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+    85→   885→            <div className="flex items-center justify-center gap-3">
+    86→   886→              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+    87→   887→              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
+    88→   888→            </div>
+    89→   889→          </div>
+    90→   890→        </div>
+    91→   891→      )}
+    92→   892→
+    93→   893→      {/* ── Header ── */}
+    94→   894→      <div className="flex items-center justify-between">
+    95→   895→        <div className="flex items-center gap-4 sm:gap-5">
+    96→   896→          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-champagne/10 flex items-center justify-center">
+    97→   897→            <Gem size={30} className="text-champagne sm:w-[34px] sm:h-[34px]" />
+    98→   898→          </div>
+    99→   899→          <div>
+   100→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+   101→   901→            <p className="text-[#777] text-sm sm:text-base mt-0.5">Cómo fluye tu dinero</p>
+   102→   902→          </div>
+   103→   903→        </div>
+   104→   904→      </div>
+   105→   905→
+   106→   906→      {/* Contextual Help — progressive disclosure */}
+   107→   907→      <ContextualHelp
+   108→   908→        storageKey="vitazen_help_riqueza"
+   109→   909→        title="Finanzas"
+   110→   910→        text="Registra gastos e ingresos con intención. Usa la captura rápida o el formulario completo, y observa cómo fluye tu dinero."
+   111→   911→      />
+   112→   912→
+   113→   913→      {/* ═══════════════════════════════════════════
+   114→   914→          SINGLE STABLE LAYOUT
+   115→   915→          The same structure is ALWAYS present.
+   116→   916→          Sections gracefully handle empty data
+   117→   917→          without appearing, disappearing, or
+   118→   918→          changing the visual hierarchy.
+   119→   919→          
+   120→   920→          "No importa cuándo entro.
+   121→   921→           Siempre vuelvo al mismo espacio."
+   122→   922→          ═══════════════════════════════════════════ */}
+   123→   923→
+   124→   924→      {/* ── Month Navigation — always present ── */}
+   125→   925→      <div className="flex items-center justify-between">
+   126→   926→        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
+   127→   927→          <ChevronLeft size={18} />
+   128→   928→        </button>
+   129→   929→        <div className="flex items-center gap-2">
+   130→   930→          <CalendarDays size={15} className="text-champagne/60" />
+   131→   931→          <h2 className="text-sm sm:text-base font-medium text-white capitalize tracking-wide">{monthLabel}</h2>
+   132→   932→          {!isCurrentMonth && (
+   133→   933→            <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-champagne/60 hover:text-champagne ml-1 underline underline-offset-2">Hoy</button>
+   134→   934→          )}
+   135→   935→        </div>
+   136→   936→        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
+   137→   937→          <ChevronRight size={18} />
+   138→   938→        </button>
+   139→   939→      </div>
+   140→   940→
+   141→   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+   142→   942→      {isEmpty ? (
+   143→   943→        <PremiumEmptyState
+   144→   944→          icon={Wallet}
+   145→   945→          title="Sin movimientos este mes"
+   146→   946→          subtitle="Cuando quieras."
+   147→   947→          cta="Registrar"
+   148→   948→          onCta={() => { setQuickMode(true); setShowAdd(true); }}
+   149→   949→          size="lg"
+   150→   950→          variant="gold"
+   151→   951→        />
+   152→   952→      ) : (
+   153→   953→        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-8 lg:p-10">
+   154→   954→          <p className="text-sm sm:text-base text-[#666] mb-6 sm:mb-8 tracking-wide">Este mes tu dinero ha fluido así</p>
+   155→   955→          {hasIntentions ? (
+   156→   956→            <IntentionBalance flows={intentionFlows} totalExpense={cmExpense} />
+   157→   957→          ) : currentMonthLogs.length > 0 ? (
+   158→   958→            <p className="text-xs sm:text-sm text-[#444] leading-relaxed">Asigna intenciones a tus movimientos para ver hacia dónde fluye tu energía.</p>
+   159→   959→          ) : (
+   160→   960→            <p className="text-xs sm:text-sm text-[#444]">Sin movimientos este mes.</p>
+   161→   961→          )}
+   162→   962→        </div>
+   163→   963→      )}
+   164→   964→
+   165→   965→      {/* ── 2. Saldo neto — reserved space, invisible when empty ── */}
+   166→   966→      {!isEmpty && currentMonthLogs.length > 0 && (
+   167→   967→        <div className="py-1">
+   168→   968→          <PrivacyMask compact>
+   169→   969→            <div className="flex items-baseline gap-3">
+   170→   970→              <span className={`text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums tracking-tight ${cmBalance >= 0 ? 'text-white' : 'text-champagne-warm'}`}>
+   171→   971→                {cmBalance >= 0 ? '+' : ''}{formatCurrency(cmBalance)}
+   172→   972→              </span>
+   173→   973→            </div>
+   174→   974→            <div className="flex items-center gap-3 mt-2">
+   175→   975→              {cmIncome > 0 && <span className="text-xs sm:text-sm text-[#777]">+{formatCurrency(cmIncome)} ingresos</span>}
+   176→   976→              {cmIncome > 0 && cmExpense > 0 && <span className="text-[#222] text-xs">·</span>}
+   177→   977→              {cmExpense > 0 && <span className="text-xs sm:text-sm text-[#777]">{formatCurrency(cmExpense)} gastos</span>}
+   178→   978→            </div>
+   179→   979→          </PrivacyMask>
+   180→   980→        </div>
+   181→   981→      )}
+   182→   982→
+   183→   983→      {/* ── 3. Insight — reserved space, only visible when meaningful ── */}
+   184→   984→      {!isEmpty && dominantIntention && currentMonthLogs.length >= 5 && (
+   185→   985→        <div className="bg-champagne/5 border border-champagne/15 rounded-2xl p-5 sm:p-6 lg:p-7">
+   186→   986→          <p className="text-champagne/80 text-sm sm:text-base italic leading-relaxed">
+   187→   987→            La mayor parte de tu energía fue hacia {dominantIntention.label.toLowerCase()}.
+   188→   988→          </p>
+   189→   989→        </div>
+   190→   990→      )}
+   191→   991→
+   192→   992→      {/* ── 4. Historial — always present when has data ── */}
+   193→   993→      {!isEmpty && (
+   194→   994→      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-5 sm:p-6 lg:p-8">
+   195→   995→        <div className="flex items-center justify-between mb-5 sm:mb-6">
+   196→   996→          <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">Movimientos</h2>
+   197→   997→          <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-champagne hover:text-champagne-hover touch-press transition-colors">
+   198→   998→            <Plus size={16} /> <span className="hidden sm:inline">Añadir</span>
+   199→   999→          </button>
+   200→  1000→        </div>
+   201→  1001→
+   202→  1002→        {/* Quick Capture / Full Form */}
+   203→  1003→        {showAdd && (
+   204→  1004→          <div ref={addFormRef} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-5">
+   205→  1005→            <div className="flex items-center justify-between mb-3">
+   206→  1006→              <span className="text-xs text-[#555] uppercase tracking-wider">Nuevo movimiento</span>
+   207→  1007→              <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
+   208→  1008→                <X size={16} />
+   209→  1009→              </button>
+   210→  1010→            </div>
+   211→  1011→            {quickMode ? (
+   212→  1012→              <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
+   213→  1013→            ) : (
+   214→  1014→              <div className="space-y-3">
+   215→  1015→                <div className="flex gap-2">
+   216→  1016→                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+   217→  1017→                  <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
+   218→  1018→                </div>
+   219→  1019→                <div>
+   220→  1020→                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   221→  1021→                  <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
+   222→  1022→                </div>
+   223→  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   224→  1024→                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   225→  1025→                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
+   226→  1026→                <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+   227→  1027→                {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+   228→  1028→                <div className="flex gap-2 pt-1">
+   229→  1029→                  <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+   230→  1030→                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-champagne transition-colors">Captura rápida</button>
+   231→  1031→                </div>
+   232→  1032→              </div>
+   233→  1033→            )}
+   234→  1034→            {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
+   235→  1035→          </div>
+   236→  1036→        )}
+   237→  1037→
+   238→  1038→        {/* Period Filter */}
+   239→  1039→        {logs.length > 0 && (
+   240→  1040→          <div className="flex gap-2 mb-4 overflow-x-auto">
+   241→  1041→            {([
+   242→  1042→              { key: 'month' as Period, label: 'Este mes' },
+   243→  1043→              { key: 'prev' as Period, label: 'Mes anterior' },
+   244→  1044→              { key: 'all' as Period, label: 'Todo' },
+   245→  1045→            ]).map(p => (
+   246→  1046→              <button
+   247→  1047→                key={p.key}
+   248→  1048→                onClick={() => setPeriod(p.key)}
+   249→  1049→                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border whitespace-nowrap ${
+   250→  1050→                  period === p.key
+   251→  1051→                    ? 'bg-champagne/15 border-champagne/30 text-champagne'
+   252→  1052→                    : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:text-[#999] hover:border-[#333]'
+   253→  1053→                }`}
+   254→  1054→              >
+   255→  1055→                {p.label}
+   256→  1056→              </button>
+   257→  1057→            ))}
+   258→  1058→          </div>
+   259→  1059→        )}
+   260→  1060→
+   261→  1061→        {/* Grouped History */}
+   262→  1062→        {Object.keys(groupedHistory).length > 0 ? (
+   263→  1063→          <div className="space-y-5 max-h-[600px] overflow-y-auto">
+   264→  1064→            {Object.entries(groupedHistory).map(([dateLabel, dateLogs]) => {
+   265→  1065→              const dayIncome = dateLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
+   266→  1066→              const dayExpense = dateLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
+   267→  1067→              return (
+   268→  1068→                <div key={dateLabel}>
+   269→  1069→                  <div className="flex items-center justify-between mb-2.5">
+   270→  1070→                    <span className="text-[11px] font-medium text-[#555] uppercase tracking-wider">{dateLabel}</span>
+   271→  1071→                    <span className="text-[11px] text-[#333]">
+   272→  1072→                      {dayIncome > 0 && <span className="text-champagne/40">+{formatCurrency(dayIncome)}</span>}
+   273→  1073→                      {dayIncome > 0 && dayExpense > 0 && <span className="text-[#1a1a1a] mx-1.5">·</span>}
+   274→  1074→                      {dayExpense > 0 && <span className="text-red-400/40">{formatCurrency(dayExpense)}</span>}
+   275→  1075→                    </span>
+   276→  1076→                  </div>
+   277→  1077→                  <div className="space-y-2">
+   278→  1078→                    {dateLogs.map((log) => {
+   279→  1079→                      const moodInfo = getIntentionLabel(log.mood);
+   280→  1080→                      return (
+   281→  1081→                        <div key={log.id} className="flex items-center gap-3 bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+   282→  1082→                          <div className={`w-1 h-8 rounded-full flex-shrink-0 ${log.type === 'income' ? 'bg-champagne/40' : 'bg-red-400/30'}`} />
+   283→  1083→                          <div className="flex-1 min-w-0">
+   284→  1084→                            <div className="flex items-center gap-2">
+   285→  1085→                              <span className="text-sm text-white font-medium">{log.category}</span>
+   286→  1086→                              {moodInfo && (
+   287→  1087→                                <span className="text-[10px] text-[#444] tracking-wide">{moodInfo.label.toLowerCase()}</span>
+   288→  1088→                              )}
+   289→  1089→                            </div>
+   290→  1090→                            {log.description && (
+   291→  1091→                              <p className="text-xs text-[#555] truncate mt-0.5">{log.description}</p>
+   292→  1092→                            )}
+   293→  1093→                            {log.contexto && (
+   294→  1094→                              <p className="text-[11px] text-[#3a3a3a] truncate mt-0.5 italic font-light">{log.contexto}</p>
+   295→  1095→                            )}
+   296→  1096→                          </div>
+   297→  1097→                          <div className="flex items-center gap-2 flex-shrink-0">
+   298→  1098→                            <PrivacyMask compact>
+   299→  1099→                              <p className={`text-sm font-semibold tabular-nums ${log.type === 'income' ? 'text-champagne' : 'text-red-400'}`}>
+   300→  1100→                                {log.type === 'income' ? '+' : '-'}{formatCurrency(log.amount)}
+   301→  1101→                              </p>
+   302→  1102→                            </PrivacyMask>
+   303→  1103→                            <div className="flex items-center gap-1 flex-shrink-0">
+   304→  1104→                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+   305→  1105→                              <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+   306→  1106→                            </div>
+   307→  1107→                          </div>
+   308→  1108→                        </div>
+   309→  1109→                      );
+   310→  1110→                    })}
+   311→  1111→                  </div>
+   312→  1112→                </div>
+   313→  1113→              );
+   314→  1114→            })}
+   315→  1115→          </div>
+   316→  1116→        ) : (
+   317→  1117→          <PremiumEmptyState
+   318→  1118→            icon={Wallet}
+   319→  1119→            title="Sin movimientos en este período"
+   320→  1120→            subtitle="Cambia el filtro o registra algo nuevo."
+   321→  1121→            cta="Añadir movimiento"
+   322→  1122→            onCta={() => { setQuickMode(true); setShowAdd(true); }}
+   323→  1123→            size="sm"
+   324→  1124→            variant="gold"
+   325→  1125→          />
+   326→  1126→        )}
+   327→  1127→      </div>
+   328→  1128→      )}
+   329→  1129→
+   330→  1130→      {/* ── Empty state form overlay ── */}
+   331→  1131→      {isEmpty && showAdd && (
+   332→  1132→        <div ref={addFormRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+   333→  1133→          <div className="flex items-center justify-between mb-4">
+   334→  1134→            <h3 className="text-base font-semibold text-white">Nuevo movimiento</h3>
+   335→  1135→            <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
+   336→  1136→              <X size={18} />
+   337→  1137→            </button>
+   338→  1138→          </div>
+   339→  1139→          {quickMode ? (
+   340→  1140→            <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
+   341→  1141→          ) : (
+   342→  1142→            <div className="space-y-3">
+   343→  1143→              <div className="flex gap-2">
+   344→  1144→                <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+   345→  1145→                <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
+   346→  1146→              </div>
+   347→  1147→              <div>
+   348→  1148→                <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   349→  1149→                <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
+   350→  1150→              </div>
+   351→  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   352→  1152→              <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   353→  1153→              <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
+   354→  1154→              <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+   355→  1155→              {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+   356→  1156→              <div className="flex gap-2 pt-1">
+   357→  1157→                <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+   358→  1158→                <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
+   359→  1159→              </div>
+   360→  1160→            </div>
+   361→  1161→          )}
+   362→  1162→          {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
+   363→  1163→        </div>
+   364→  1164→      )}
+   365→  1165→
+   366→  1166→      {/* ── FAB ── */}
+   367→  1167→      {!editingLog && !pendingDeleteId && (
+   368→  1168→        <button
+   369→  1169→          onClick={() => { setQuickMode(true); setShowAdd(true); }}
+   370→  1170→          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-champagne text-black rounded-2xl shadow-lg shadow-champagne/25 flex items-center justify-center hover:bg-champagne-hover active:scale-95 transition-all touch-press"
+   371→  1171→          title="Añadir movimiento"
+   372→  1172→        >
+   373→  1173→          <Plus size={24} />
+   374→  1174→        </button>
+   375→  1175→      )}
+   376→  1176→
+   377→  1177→      {/* ── FAB Overlay ── */}
+   378→  1178→      {showAdd && !editingLog && !pendingDeleteId && (
+   379→  1179→        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop" onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }}>
+   380→  1180→          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md section-enter-1" onClick={(e) => e.stopPropagation()}>
+   381→  1181→            <div className="flex items-center justify-between mb-4">
+   382→  1182→              <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
+   383→  1183→              <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
+   384→  1184→                <X size={18} />
+   385→  1185→              </button>
+   386→  1186→            </div>
+   387→  1187→            {quickMode ? (
+   388→  1188→              <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
+   389→  1189→            ) : (
+   390→  1190→              <div className="space-y-3">
+   391→  1191→                <div className="flex gap-2">
+   392→  1192→                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
+   393→  1193→                  <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
+   394→  1194→                </div>
+   395→  1195→                <div>
+   396→  1196→                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   397→  1197→                  <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
+   398→  1198→                </div>
+   399→  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   400→  1200→                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+   401→  1201→                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
+   402→  1202→                <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
+   403→  1203→                {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+   404→  1204→                <div className="flex gap-2 pt-1">
+   405→  1205→                  <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
+   406→  1206→                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
+   407→  1207→                </div>
+   408→  1208→              </div>
+   409→  1209→            )}
+   410→  1210→            {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
+   411→  1211→          </div>
+   412→  1212→        </div>
+   413→  1213→      )}
+   414→  1214→
+   415→  1215→      {/* Tips */}
+   416→  1216→      <EmpireTipsSection empire="riqueza" subtitle="Notas sobre tu dinero" />
+   417→  1217→    </div>
+   418→  1218→  );
+   419→  1219→}
+   420→  1220→
