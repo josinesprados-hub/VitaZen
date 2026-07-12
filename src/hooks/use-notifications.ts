@@ -222,6 +222,29 @@ export function useNotifications(): UseNotificationsReturn {
       const state = 'granted' as const;
       setPermissionState(state);
       permissionStateRef.current = state;
+
+      // Optimistic state update: the register-token endpoint guarantees
+      // pushEnabled=true after successful registration. Update immediately
+      // so the UI transitions without waiting for the loadPreferences round-trip.
+      setPreferences(prev => {
+        if (prev) return { ...prev, pushEnabled: true };
+        // Preferences not loaded yet (init may have failed) — provide
+        // defaults so the render condition passes and the UI transitions.
+        return {
+          pushEnabled: true,
+          checkinReminders: true,
+          weeklyRecap: true,
+          comebackReminders: true,
+          reflectionReminders: true,
+          quietHoursEnabled: true,
+          quietHoursStart: '22:00',
+          quietHoursEnd: '08:00',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          maxDailyNotifications: 2,
+          permissionState: 'granted' as const,
+        };
+      });
+
       await trackPermissionChange(state);
 
       // Set the user's real timezone so quiet hours (22:00–08:00)
@@ -245,6 +268,7 @@ export function useNotifications(): UseNotificationsReturn {
         }
       }
 
+      // Sync full state from server (confirms optimistic update)
       await loadPreferences();
       return true;
     } else {
