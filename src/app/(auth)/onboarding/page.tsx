@@ -4,9 +4,6 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
-
-// Visual debug panel hook — no-op when ?debugAuth=1 is not present
-const $d = (e: string, v?: any) => { try { (window as any).__authDebugLog?.(e, v); } catch {} };
 import {
   Shield,
   Brain,
@@ -65,7 +62,6 @@ const TOTAL_STEPS = 3;
 
 export default function OnboardingPage() {
   console.log('[AUTH-FORENSIC] OnboardingPage MOUNT');
-  $d('OnboardingPage MOUNT');
   const { user, loading, refreshUser, firebaseUser, syncError } = useAuth();
   const { apiFetch } = useApi();
   const router = useRouter();
@@ -89,16 +85,13 @@ export default function OnboardingPage() {
       syncError,
       completingRef: completingRef.current,
     });
-    $d('Onboarding auth-guard', { loading, hasUser: !!user, hasFirebaseUser: !!firebaseUser, syncError, onboardingCompleted: user?.onboardingCompleted });
     if (completingRef.current) return;
     if (!loading) {
       if (!user && !firebaseUser) {
         console.log('[AUTH-FORENSIC] Onboarding → router.replace("/login") — no user, no firebaseUser');
-        $d('router.replace("/login")', 'no user, no firebaseUser');
         router.replace('/login');
       } else if (user?.onboardingCompleted && !saving) {
         console.log('[AUTH-FORENSIC] Onboarding → router.replace("/dashboard") — onboarding completed');
-        $d('router.replace("/dashboard")', 'onboarding completed');
         router.replace('/dashboard');
       }
     }
