@@ -69,61 +69,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncInFlight = useRef(false);
 
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
-    // [SYNC-TRACE] 1. Entry in syncUser()
-    console.warn('[SYNC-TRACE] syncUser() ENTER | uid:', fbUser.uid);
     // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
     if (syncInFlight.current) {
-      console.warn('[SYNC-TRACE] syncUser() BLOCKED — syncInFlight=true, returning without sync');
       return;
     }
     syncInFlight.current = true;
 
     const attemptSync = async (attempt: number): Promise<boolean> => {
-      // [SYNC-TRACE] 2. Entry in attemptSync()
-      console.warn(`[SYNC-TRACE] attemptSync(${attempt}) ENTER`);
       try {
         setSyncError(false);
-        // [SYNC-TRACE] 3. Start of getIdToken()
-        console.warn('[SYNC-TRACE] attemptSync() getIdToken() START');
         const idToken = await fbUser.getIdToken();
-        // [SYNC-TRACE] 4. Result of getIdToken()
-        console.warn('[SYNC-TRACE] attemptSync() getIdToken() OK | length:', idToken?.length, '| prefix:', idToken?.substring(0, 8));
-        // [SYNC-TRACE] 5/6/7. Start of fetch + URL + method
-        const fetchUrl = '/api/auth/sync';
-        console.warn(`[SYNC-TRACE] attemptSync() fetch START | url: ${fetchUrl} | method: POST`);
-        const fetchStart = Date.now();
-        const res = await fetch(fetchUrl, {
+        const res = await fetch('/api/auth/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken }),
         });
-        const fetchMs = Date.now() - fetchStart;
-        // [SYNC-TRACE] 8/9/10/11. Fetch returned response + time + status + ok
-        console.warn(`[SYNC-TRACE] attemptSync() fetch RESPONSE | status: ${res.status} | ok: ${res.ok} | elapsed: ${fetchMs}ms`);
 
         if (res.ok) {
           const data = await res.json();
-          // [SYNC-TRACE] 12. JSON received complete
-          console.warn('[SYNC-TRACE] attemptSync() JSON received | keys:', Object.keys(data), '| hasUser:', !!data.user);
-          // [SYNC-TRACE] 13. Just before setUser(data.user)
-          console.warn('[SYNC-TRACE] attemptSync() BEFORE setUser(data.user) | userId:', data.user?.id);
-          console.warn('[REACT-TRACE] BEFORE setUser | typeof:', typeof data.user, '| keys:', Object.keys(data.user ?? {}), '| value:', JSON.stringify(data.user));
           setUser(data.user);
-          console.warn('[REACT-TRACE] AFTER setUser');
-          console.warn('[REACT-TRACE] AFTER setUser | typeof user param:', typeof data.user, '| id:', data.user?.id);
-          // [SYNC-TRACE] 14. Just after setUser(data.user)
-          console.warn('[SYNC-TRACE] attemptSync() AFTER setUser(data.user) | userId:', data.user?.id);
           return true;
         } else {
-          // [SYNC-TRACE] 15. return false — non-2xx response
-          console.warn(`[SYNC-TRACE] attemptSync(${attempt}) RETURN FALSE | cause: HTTP ${res.status}`);
           console.error(`[Auth] sync failed (attempt ${attempt}):`, res.status);
           trackAuthSyncFailure(attempt, res.status);
           return false;
         }
       } catch (error) {
-        // [SYNC-TRACE] 16. Exception caught by attemptSync()
-        console.warn(`[SYNC-TRACE] attemptSync(${attempt}) EXCEPTION CAUGHT |`, error);
         console.error(`[Auth] sync error (attempt ${attempt}):`, error);
         trackAuthSyncFailure(attempt, undefined, error);
         return false;
@@ -140,8 +111,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const retryOk = await attemptSync(2);
       if (retryOk) return;
 
-      // [SYNC-TRACE] 17. setSyncError(true) executed
-      console.warn('[SYNC-TRACE] syncUser() BOTH ATTEMPTS FAILED — executing setSyncError(true)');
       // Both attempts failed
       setSyncError(true);
     } finally {
@@ -293,19 +262,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncError(false);
   }, []);
 
-  // ── REACT-TRACE: state change observers ──
-  useEffect(() => {
-    console.warn('[REACT-TRACE] USER STATE CHANGED | user:', user, '| user===null:', user === null, '| id:', user?.id, '| onboardingCompleted:', user?.onboardingCompleted);
-  }, [user]);
-
-  useEffect(() => {
-    console.warn('[REACT-TRACE] FIREBASE USER CHANGED', { firebaseUser });
-  }, [firebaseUser]);
-
-  useEffect(() => {
-    console.warn('[REACT-TRACE] LOADING CHANGED', { loading });
-  }, [loading]);
-
   // Memoize the provider value to prevent cascade re-renders.
   // Without this, every auth state change creates a new object reference,
   // causing ALL consumers (Sidebar, TopBar, every page) to re-render
@@ -318,7 +274,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
-      <SyncTracePanel />
     </AuthContext.Provider>
   );
 }
@@ -383,163 +338,6 @@ export interface ProviderCheckResult {
  * Returns { exists: false, ... } if the email is not registered at all,
  * allowing the register flow to proceed normally.
  */
-// ═══════════════════════════════════════════════════════════════════
-// SYNC-TRACE VISUAL PANEL (temporary — only renders when ?debugSync=1)
-// Single source of truth: intercepts console.warn for [SYNC-TRACE] messages.
-// No window.__* globals. No parallel state. No duplicate instrumentation.
-// ═══════════════════════════════════════════════════════════════════
-
-interface SyncTraceEntry {
-  id: number;
-  time: string;
-  msg: string;
-  isError: boolean;
-}
-
-const _origWarn = console.warn;
-const _stEvents: SyncTraceEntry[] = [];
-const _stSubs = new Set<() => void>();
-let _stId = 0;
-let _stPatched = false;
-
-function _stPatch() {
-  if (_stPatched) return;
-  _stPatched = true;
-  console.warn = (...args: unknown[]) => {
-    const first = typeof args[0] === 'string' ? args[0] : '';
-    if (first.includes('[SYNC-TRACE]')) {
-      _stId++;
-      const now = new Date();
-      const ms = String(now.getMilliseconds()).padStart(3, '0');
-      const time = now.toLocaleTimeString('es-ES', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '.' + ms;
-      const msg = args.map(a => typeof a === 'string' ? a : a instanceof Error ? a.message + (a.stack ? '\n' + a.stack : '') : JSON.stringify(a ?? '')).join(' ');
-      _stEvents.push({ id: _stId, time, msg, isError: /EXCEPTION|FAILED|BLOCKED|RETURN FALSE|RETURN \d{3}/i.test(msg) });
-      _stSubs.forEach(fn => fn());
-    }
-    _origWarn.apply(console, args);
-  };
-}
-
-function SyncTracePanel() {
-  const [, rerender] = useState(0);
-  const [minimized, setMinimized] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    _stPatch();
-    const sub = () => rerender(n => n + 1);
-    _stSubs.add(sub);
-    return () => { _stSubs.delete(sub); };
-  }, []);
-
-  useEffect(() => {
-    if (scrollRef.current && !minimized) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [rerender, minimized]);
-
-  if (typeof window === 'undefined') return null;
-  if (!new URLSearchParams(window.location.search).has('debugSync')) return null;
-
-  const events = _stEvents;
-  const errCount = events.filter(e => e.isError).length;
-
-  const handleCopy = () => {
-    const text = events.map(e => `#${e.id} [${e.time}] ${e.msg}`).join('\n');
-    navigator.clipboard.writeText(text || '(no events)').catch(() => {});
-  };
-
-  const handleClear = () => {
-    _stEvents.length = 0;
-    _stId = 0;
-    _stSubs.forEach(fn => fn());
-  };
-
-  if (minimized) {
-    return (
-      <div
-        onClick={() => setMinimized(false)}
-        style={{
-          position: 'fixed', bottom: 12, right: 12, zIndex: 9999,
-          background: errCount > 0 ? '#7f1d1d' : '#1a1a1a',
-          border: '1px solid ' + (errCount > 0 ? '#ef4444' : '#333'),
-          borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
-          color: errCount > 0 ? '#fca5a5' : '#888', fontSize: 11, fontFamily: 'monospace',
-          userSelect: 'none', lineHeight: 1,
-        }}
-      >
-        SYNC-TRACE ({events.length}){errCount > 0 ? ` ${errCount} ERR` : ''}
-      </div>
-    );
-  }
-
-  return (
-    <div style={{
-      position: 'fixed', bottom: 12, right: 12, zIndex: 9999,
-      width: 'min(92vw, 380px)', maxHeight: '55vh',
-      background: '#0a0a0a', border: '1px solid #262626', borderRadius: 10,
-      fontFamily: 'monospace', fontSize: 10, color: '#ccc',
-      display: 'flex', flexDirection: 'column', overflow: 'hidden',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.6)',
-    }}>
-      {/* Header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '6px 8px', borderBottom: '1px solid #1a1a1a', flexShrink: 0,
-        background: '#111',
-      }}>
-        <span style={{ color: '#eab308', fontWeight: 600, fontSize: 10, letterSpacing: 0.5 }}>
-          SYNC-TRACE ({events.length})
-        </span>
-        <div style={{ display: 'flex', gap: 4 }}>
-          <button onClick={handleCopy} style={{
-            background: 'none', border: '1px solid #333', borderRadius: 4, color: '#888',
-            fontSize: 10, padding: '2px 6px', cursor: 'pointer', lineHeight: 1,
-          }}>
-            Copy
-          </button>
-          <button onClick={handleClear} style={{
-            background: 'none', border: '1px solid #333', borderRadius: 4, color: '#888',
-            fontSize: 10, padding: '2px 6px', cursor: 'pointer', lineHeight: 1,
-          }}>
-            Clear
-          </button>
-          <button onClick={() => setMinimized(true)} style={{
-            background: 'none', border: '1px solid #333', borderRadius: 4, color: '#888',
-            fontSize: 10, padding: '2px 6px', cursor: 'pointer', lineHeight: 1,
-          }}>
-            &#x2014;
-          </button>
-        </div>
-      </div>
-
-      {/* Event list */}
-      <div ref={scrollRef} style={{
-        flex: 1, overflowY: 'auto', padding: '4px 0',
-        scrollbarWidth: 'thin', scrollbarColor: '#333 transparent',
-      }}>
-        {events.length === 0 && (
-          <div style={{ padding: '12px 8px', color: '#555', textAlign: 'center', fontSize: 10 }}>
-            Esperando eventos [SYNC-TRACE]...
-          </div>
-        )}
-        {events.map(e => (
-          <div key={e.id} style={{
-            padding: '3px 8px', borderBottom: '1px solid #111',
-            borderLeft: e.isError ? '2px solid #ef4444' : '2px solid #333',
-            background: e.isError ? 'rgba(239,68,68,0.06)' : 'transparent',
-            lineHeight: 1.4, wordBreak: 'break-all', whiteSpace: 'pre-wrap',
-          }}>
-            <span style={{ color: '#555' }}>#{e.id}</span>{' '}
-            <span style={{ color: '#444' }}>[{e.time}]</span>{' '}
-            <span style={{ color: e.isError ? '#f87171' : '#d4d4d4' }}>{e.msg.replace('[SYNC-TRACE] ', '')}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export async function checkEmailProvider(email: string): Promise<ProviderCheckResult> {
   try {
     const methods = await fetchSignInMethodsForEmail(getAuthInstance(), email);

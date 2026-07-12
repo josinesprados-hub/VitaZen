@@ -8,16 +8,11 @@ export default function Home() {
   const router = useRouter();
   const { user, firebaseUser, loading, syncError } = useAuth();
 
-  console.warn('[REACT-TRACE] PAGE RENDER', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
-
   useEffect(() => {
-    console.warn('[REACT-TRACE] PAGE EFFECT ENTER', { loading, firebaseUser: !!firebaseUser, user: !!user, onboardingCompleted: user?.onboardingCompleted });
-
     if (loading) return;
 
     // No auth at all → login
     if (!user && !firebaseUser) {
-      console.warn('[REACT-TRACE] LOGIN BRANCH');
       router.replace('/login');
       return;
     }
@@ -28,20 +23,16 @@ export default function Home() {
     // causes the onboarding flash for returning users.
     if (firebaseUser && !user) {
       if (syncError) {
-        console.warn('[REACT-TRACE] WAIT BRANCH → SYNC ERROR → /login');
         router.replace('/login');
         return;
       }
-      console.warn('[REACT-TRACE] WAIT BRANCH');
       return; // wait for syncUser to complete
     }
 
     // Server sync complete — route based on onboarding status
     if (user?.onboardingCompleted) {
-      console.warn('[REACT-TRACE] DASHBOARD BRANCH');
       router.replace('/dashboard');
     } else {
-      console.warn('[REACT-TRACE] ONBOARDING BRANCH');
       router.replace('/onboarding');
     }
   }, [user, firebaseUser, loading, syncError, router]);

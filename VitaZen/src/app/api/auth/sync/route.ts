@@ -12,37 +12,19 @@ import { serverLog } from '@/lib/observability/server-logger';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 async function handler(request: NextRequest) {
-  // [SYNC-TRACE] 1. Entry to endpoint
-  console.warn('[SYNC-TRACE] /api/auth/sync ENTER');
   try {
     const { idToken } = await request.json();
-    // [SYNC-TRACE] 2. Body received
-    console.warn('[SYNC-TRACE] /api/auth/sync body parsed | hasIdToken:', !!idToken, '| tokenLength:', idToken?.length);
 
     if (!idToken) {
-      // [SYNC-TRACE] 13. Before return HTTP 400
-      console.warn('[SYNC-TRACE] /api/auth/sync RETURN 400 — no idToken');
       return NextResponse.json({ error: 'ID token required' }, { status: 400 });
     }
 
-    // [SYNC-TRACE] 3. Start of verifyFirebaseToken()
-    console.warn('[SYNC-TRACE] /api/auth/sync verifyFirebaseToken() START');
     const decodedToken = await verifyFirebaseToken(idToken);
-    // [SYNC-TRACE] 4/5/6. Result of verifyFirebaseToken() + UID + email
-    if (decodedToken) {
-      console.warn('[SYNC-TRACE] /api/auth/sync verifyFirebaseToken() OK | uid:', decodedToken.uid, '| email:', decodedToken.email, '| verified:', decodedToken.email_verified);
-    } else {
-      console.warn('[SYNC-TRACE] /api/auth/sync verifyFirebaseToken() RETURNED NULL');
-    }
 
     if (!decodedToken) {
-      // [SYNC-TRACE] 14. Before return HTTP 401
-      console.warn('[SYNC-TRACE] /api/auth/sync RETURN 401 — decodedToken is null');
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // [SYNC-TRACE] 7. Start of search by firebaseUid
-    console.warn('[SYNC-TRACE] /api/auth/sync db.user.findUnique(firebaseUid) START | uid:', decodedToken.uid);
     // Search by firebaseUid first
     let existingUser = await db.user.findUnique({
       where: { firebaseUid: decodedToken.uid },
@@ -54,16 +36,12 @@ async function handler(request: NextRequest) {
         },
       },
     });
-    // [SYNC-TRACE] 8. Result search firebaseUid
-    console.warn('[SYNC-TRACE] /api/auth/sync db.user.findUnique(firebaseUid) RESULT | found:', !!existingUser, '| userId:', existingUser?.id);
 
     // If not found by firebaseUid, search by email to avoid P2002
     // BUG-A1 FIX: Only allow email fallback if the email is verified.
     // Without this check, an attacker can create a Firebase account with the
     // victim's email and overwrite their firebaseUid, taking over the account.
     if (!existingUser && decodedToken.email && decodedToken.email_verified) {
-      // [SYNC-TRACE] 9. Start search by email
-      console.warn('[SYNC-TRACE] /api/auth/sync db.user.findUnique(email) START | email:', decodedToken.email);
       existingUser = await db.user.findUnique({
         where: { email: decodedToken.email },
         include: {
@@ -74,12 +52,8 @@ async function handler(request: NextRequest) {
           },
         },
       });
-      // [SYNC-TRACE] 10. Result search email
-      console.warn('[SYNC-TRACE] /api/auth/sync db.user.findUnique(email) RESULT | found:', !!existingUser, '| userId:', existingUser?.id);
     }
 
-    // [SYNC-TRACE] 11. Existing user or new
-    console.warn('[SYNC-TRACE] /api/auth/sync path decision | existingUser:', !!existingUser);
     // If user exists, return it directly
     if (existingUser) {
       // Sync emailVerified from Firebase if needed
@@ -159,8 +133,6 @@ async function handler(request: NextRequest) {
         }
       }
 
-      // [SYNC-TRACE] 12. Before return HTTP 200 (existing user)
-      console.warn('[SYNC-TRACE] /api/auth/sync RETURN 200 (existing) | userId:', existingUser.id, '| onboardingCompleted:', existingUser.onboardingCompleted);
       return NextResponse.json({
         user: {
           id: existingUser.id,
@@ -237,8 +209,6 @@ async function handler(request: NextRequest) {
     // ─── Return user data IMMEDIATELY ───
     // No awaiting emails, analytics, or other background operations.
     // The user gets their data back as fast as the DB write completes.
-    // [SYNC-TRACE] 12. Before return HTTP 200 (new user)
-    console.warn('[SYNC-TRACE] /api/auth/sync RETURN 200 (new) | userId:', user.id, '| onboardingCompleted:', user.onboardingCompleted);
     return NextResponse.json({
       user: {
         id: user.id,
@@ -262,10 +232,6 @@ async function handler(request: NextRequest) {
       },
     });
   } catch (error) {
-    // [SYNC-TRACE] 16. Main catch — full exception
-    console.warn('[SYNC-TRACE] /api/auth/sync CATCH EXCEPTION |', error);
-    // [SYNC-TRACE] 15. Before return HTTP 500
-    console.warn('[SYNC-TRACE] /api/auth/sync RETURN 500 — caught exception');
     serverLog.apiError('api/auth/sync', 'POST', 500, error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
