@@ -343,15 +343,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    if (shouldUseRedirect()) {
-      // PWA / TWA / standalone — full-page redirect (popup unsupported)
+    const isIOSPWA = typeof window !== 'undefined'
+      && (window.navigator as any).standalone === true;
+
+    if (isIOSPWA) {
+      // iOS PWA: intentar popup primero (soportado en iOS 17.4+).
+      // Si el popup es bloqueado por el entorno, hacer fallback a redirect.
+      try {
+        await signInWithPopup(getAuthInstance(), provider);
+      } catch (err: any) {
+        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {
+          await signInWithRedirect(getAuthInstance(), provider);
+        } else {
+          throw err;
+        }
+      }
+    } else if (shouldUseRedirect()) {
+      // Android TWA / Chrome standalone — full-page redirect
       await signInWithRedirect(getAuthInstance(), provider);
-      // Page navigates away; on return, getRedirectResult() processes the
-      // credential and onAuthStateChanged fires syncUser.
     } else {
-      // Desktop / normal mobile browser — popup provides better UX
+      // Desktop / Safari normal / otros navegadores — popup
       await signInWithPopup(getAuthInstance(), provider);
-      // syncUser handled by onAuthStateChanged
     }
   };
 
