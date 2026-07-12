@@ -14,7 +14,6 @@ import {
   Brain,
   Heart,
   Loader2,
-  Sparkles,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════
@@ -208,43 +207,6 @@ export default function ElitePage() {
         </div>
       </div>
 
-      {/* ─── What depth feels like — real examples ─── */}
-      <div className="mb-14 sm:mb-20">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <Sparkles size={12} className="text-champagne/25" />
-          <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
-            Ejemplos
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            {
-              text: 'Tus semanas con menos descanso coinciden con más gasto impulsivo.',
-              empires: 'Energía · Finanzas',
-            },
-            {
-              text: 'Cuando tus hábitos mentales se estabilizan, tu energía financiera cambia.',
-              empires: 'Mente · Finanzas',
-            },
-            {
-              text: 'Los periodos de más disciplina también son los de mejor descanso.',
-              empires: 'Disciplina · Energía',
-            },
-          ].map((example, i) => (
-            <div
-              key={i}
-              className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5"
-            >
-              <p className="text-champagne/60 text-sm italic leading-relaxed mb-3">
-                &ldquo;{example.text}&rdquo;
-              </p>
-              <p className="text-[10px] text-[#2a2a2a] tracking-wide">{example.empires}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ─── Free vs Élite — human, not SaaS ─── */}
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -262,27 +224,31 @@ export default function ElitePage() {
                 <Eye size={16} className="text-[#555]" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Free</h3>
-                <p className="text-[#444] text-[10px]">0€/mes</p>
+                <h3 className="text-white font-semibold text-lg">Free</h3>
+                <p className="text-[#444] text-xs">0€/mes</p>
               </div>
             </div>
 
             <p className="text-[#777] text-sm leading-relaxed mb-5">
-              Todo lo esencial ya está aquí.
-              Hábitos, estados, notas, el mentor, los 5 imperios.
-              Lo necesario para empezar a entenderse.
+              Todo lo esencial para desarrollar los 5 imperios.
+              Registro completo, mentor, logros y seguimiento.
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
               <p className="text-[#333] text-[10px] uppercase tracking-wider font-medium mb-3">Lo que ya tienes</p>
               <ul className="space-y-2">
                 {[
-                  'Registro manual de hábitos y estados',
-                  'Mentor IA con ritmo diario',
-                  'Acceso a los 5 imperios',
-                  'Notas básicas de cada imperio',
-                  'Check-in y seguimiento emocional',
-                  'Memoria de tu vida',
+                  'Check-in diario y seguimiento emocional',
+                  'Hábitos con retos diarios y rachas',
+                  'Meditación y ejercicios de respiración',
+                  'Registro de bienestar y nutrición',
+                  'Finanzas: ingresos, gastos y categorías',
+                  'Diario personal con estado de ánimo',
+                  '5 imperios con niveles y progreso',
+                  'Mentor IA (15 mensajes al día)',
+                  'Resumen semanal básico',
+                  'Observaciones (vista resumida)',
+                  'Logros y desbloqueos',
                 ].map((item) => (
                   <li key={item} className="text-[#666] text-xs flex items-start gap-2">
                     <span className="text-[#333] mt-0.5">·</span>
@@ -305,14 +271,14 @@ export default function ElitePage() {
                 <Circle size={5} fill="currentColor" className="text-champagne/50" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Élite</h3>
-                <p className="text-champagne/40 text-[10px]">5€/mes</p>
+                <h3 className="text-white font-semibold text-lg">Élite</h3>
+                <p className="text-champagne/40 text-xs">5€/mes</p>
               </div>
             </div>
 
             <p className="text-[#999] text-sm leading-relaxed mb-5">
-              Élite conecta más cosas con el tiempo.
-              Más contexto, más memoria, más conexiones entre lo que vives.
+              Más memoria, más conexiones, más profundidad
+              en cada capa de VitaZen.
             </p>
 
             <div className="border-t border-champagne/8 pt-4">
@@ -321,14 +287,17 @@ export default function ElitePage() {
               </p>
               <ul className="space-y-2">
                 {[
-                  'Conexiones entre tus imperios',
-                  'Patrones de vida: lo que se repite',
-                  'Mentor sin límite diario, con más contexto',
-                  'Memoria que acumula y conecta',
-                  'Historial completo de conversaciones',
-                  'Notas con más detalle de cada imperio',
-                  'Observaciones semanales con más detalle',
-                  'Cierres mensuales con evolución',
+                  'Mentor IA sin límite diario de mensajes',
+                  'Mentor con memoria profunda y contexto ampliado',
+                  'Historial completo de conversaciones del mentor',
+                  'Conexiones entre imperios (patrones cruzados)',
+                  'Patrones de vida y momentos destacados',
+                  'Transiciones y evolución en tu vida',
+                  'Observaciones semanales con comparativa y detalle',
+                  'Cierres mensuales con evolución y recuerdos',
+                  'Resumen semanal con métricas avanzadas',
+                  'Timeline con historial completo',
+                  'Consejos premium de cada imperio',
                 ].map((item) => (
                   <li key={item} className="text-[#aaa] text-xs flex items-start gap-2">
                     <span className="text-champagne/40 mt-0.5">·</span>
