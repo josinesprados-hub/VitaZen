@@ -61,10 +61,10 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Auto-create notification preferences if they don't exist
+      // Ensure notification preferences exist and pushEnabled is true
       await db.notificationPreference.upsert({
         where: { userId: user.id },
-        update: {},
+        update: { pushEnabled: true },
         create: { userId: user.id, pushEnabled: true },
       });
 
@@ -108,10 +108,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Auto-create notification preferences if they don't exist
+    // Ensure notification preferences exist and pushEnabled is true
     await db.notificationPreference.upsert({
       where: { userId: user.id },
-      update: {},
+      update: { pushEnabled: true },
       create: {
         userId: user.id,
         pushEnabled: true,
