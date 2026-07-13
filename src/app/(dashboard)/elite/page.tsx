@@ -230,8 +230,7 @@ export default function ElitePage() {
             </div>
 
             <p className="text-[#777] text-sm leading-relaxed mb-5">
-              Todo lo esencial para desarrollar los 5 imperios.
-              Registro completo, mentor, logros y seguimiento.
+              Todo lo necesario para empezar tu evolución personal. Conoce tus hábitos, tu mente y el camino que recorres.
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
@@ -276,8 +275,7 @@ export default function ElitePage() {
             </div>
 
             <p className="text-[#999] text-sm leading-relaxed mb-5">
-              Más memoria, más conexiones, más profundidad
-              en cada capa de VitaZen.
+              Descubre cómo evoluciona tu vida. Con más memoria, más contexto y conexiones que solo aparecen con el tiempo.
             </p>
 
             <div className="border-t border-champagne/8 pt-4">
