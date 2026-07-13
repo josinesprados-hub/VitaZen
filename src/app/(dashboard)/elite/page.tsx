@@ -224,8 +224,8 @@ export default function ElitePage() {
                 <Eye size={16} className="text-[#555]" />
               </div>
               <div>
-                <h3 className="text-white font-semibold text-lg">Free</h3>
-                <p className="text-[#444] text-xs">0€/mes</p>
+                <h3 className="text-white font-semibold text-xl">Free</h3>
+                <p className="text-[#444] text-sm">0 €/mes</p>
               </div>
             </div>
 
@@ -246,8 +246,7 @@ export default function ElitePage() {
                   'Diario personal con estado de ánimo',
                   '5 imperios con niveles y progreso',
                   'Mentor IA (15 mensajes al día)',
-                  'Resumen semanal básico',
-                  'Observaciones (vista resumida)',
+                  'Observaciones semanales (vista resumida)',
                   'Logros y desbloqueos',
                 ].map((item) => (
                   <li key={item} className="text-[#666] text-xs flex items-start gap-2">
@@ -271,8 +270,8 @@ export default function ElitePage() {
                 <Circle size={5} fill="currentColor" className="text-champagne/50" />
               </div>
               <div>
-                <h3 className="text-white font-semibold text-lg">Élite</h3>
-                <p className="text-champagne/40 text-xs">5€/mes</p>
+                <h3 className="text-white font-semibold text-xl">Élite</h3>
+                <p className="text-champagne/50 text-sm">5 €/mes</p>
               </div>
             </div>
 
@@ -290,12 +289,10 @@ export default function ElitePage() {
                   'Mentor IA sin límite diario de mensajes',
                   'Mentor con memoria profunda y contexto ampliado',
                   'Historial completo de conversaciones del mentor',
-                  'Conexiones entre imperios (patrones cruzados)',
-                  'Patrones de vida y momentos destacados',
-                  'Transiciones y evolución en tu vida',
-                  'Observaciones semanales con comparativa y detalle',
+                  'Patrones cruzados entre imperios',
+                  'Momentos destacados y transiciones de vida',
+                  'Observaciones con comparativa semanal',
                   'Cierres mensuales con evolución y recuerdos',
-                  'Resumen semanal con métricas avanzadas',
                   'Timeline con historial completo',
                   'Consejos premium de cada imperio',
                 ].map((item) => (
@@ -307,18 +304,6 @@ export default function ElitePage() {
               </ul>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ─── Quiet philosophy ─── */}
-      <div className="text-center mb-10 sm:mb-14">
-        <div className="max-w-md mx-auto">
-          <p className="text-[#555] text-sm leading-relaxed">
-            Todo lo esencial ya está en Free. Élite conecta más cosas con el tiempo.
-          </p>
-          <p className="text-[#333] text-xs mt-3">
-            Sin compromiso. Cancela cuando quieras.
-          </p>
         </div>
       </div>
 
@@ -356,7 +341,7 @@ export default function ElitePage() {
                 </>
               )}
             </button>
-            <p className="text-[#333] text-[10px] mt-3">5€/mes · Cancela cuando quieras</p>
+            <p className="text-[#333] text-[10px] mt-3">Cancela cuando quieras</p>
           </div>
         </div>
       )}
