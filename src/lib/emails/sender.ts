@@ -120,11 +120,22 @@ export async function sendResetPasswordEmail(to: string, name: string, resetLink
 
     if (result?.data?.id) {
       console.log('[EMAIL] Reset password enviado. ID:', result.data.id);
-    } else if (result?.error) {
-      console.error('[EMAIL] Error Resend reset-password:', JSON.stringify(result.error));
+      return; // success
     }
+
+    // P-1 FIX: Resend returned an error — throw so the caller knows it failed.
+    // Previously, errors were silently caught, causing the API route to always
+    // return success even when the email was never sent.
+    const errorMsg = result?.error?.message || JSON.stringify(result?.error) || 'Resend error desconocido';
+    console.error('[EMAIL] Error Resend reset-password:', errorMsg);
+    throw new Error(`Error enviando email de recuperación: ${errorMsg}`);
   } catch (error) {
+    // Re-throw our own errors; wrap unexpected errors
+    if (error instanceof Error && error.message.startsWith('Error enviando email')) {
+      throw error;
+    }
     console.error('[EMAIL] Excepción reset-password:', error instanceof Error ? error.message : error);
+    throw new Error('No se pudo enviar el email de recuperación. Inténtalo más tarde.');
   }
 }
 

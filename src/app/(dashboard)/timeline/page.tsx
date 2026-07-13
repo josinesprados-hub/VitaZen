@@ -12,6 +12,7 @@ import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import {
+  Sunrise,
   Wind,
   BookOpen,
   Heart,

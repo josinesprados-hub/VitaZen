@@ -63,8 +63,17 @@ export async function POST(request: NextRequest) {
     // to increment the crecimiento streak — matching the pattern used by
     // meditation (M-1), habits (H-10), and energy (E-3).
     const todayDateKey = getTodayDateKey();
-    const todayStart = new Date(todayDateKey + 'T00:00:00');
-    const todayEnd = new Date(todayDateKey + 'T23:59:59');
+    // J-NEW1 FIX: Use the same madridDayBoundaries calculation as meditation,
+    // wellness, nutrition and habits. The previous code used UTC boundaries
+    // (new Date(key + 'T00:00:00')), which during CEST (UTC+2) misclassified
+    // entries between Madrid 00:00–02:00 as belonging to the previous day.
+    const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
+    const parts = madridNoonUtc
+      .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
+      .split(' ')[1].split(':').map(Number);
+    const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
+    const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
+    const todayEnd = new Date(todayStart.getTime() + 86400000);
 
     const entry = await db.$transaction(async (tx) => {
       // C-1 FIX: advisory lock serializes concurrent journal POSTs and DELETEs

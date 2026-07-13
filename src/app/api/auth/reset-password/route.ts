@@ -62,7 +62,16 @@ export async function POST(request: NextRequest) {
     const resetLink = `${APP_URL}/reset-password?token=${token}`;
 
     // Send email via Resend
-    await sendResetPasswordEmail(user.email, user.name || 'Amigo', resetLink);
+    // P-1 FIX: sendResetPasswordEmail now throws on failure instead of
+    // silently swallowing errors. We catch it here and return a generic
+    // error message that does NOT reveal whether the user exists.
+    try {
+      await sendResetPasswordEmail(user.email, user.name || 'Amigo', resetLink);
+    } catch (emailError) {
+      console.error('[RESET PASSWORD] Error enviando email:', emailError instanceof Error ? emailError.message : emailError);
+      // Return generic error — do not reveal user existence
+      return NextResponse.json({ error: 'No se pudo enviar el email. Inténtalo de nuevo.' }, { status: 500 });
+    }
 
     console.log('[RESET PASSWORD] Email enviado a:', user.email);
 
