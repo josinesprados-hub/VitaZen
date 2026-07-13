@@ -61,6 +61,30 @@ interface Message {
 }
 
 // ─────────────────────────────────────────
+// Suggestion pool — reuses real strings from the project
+// (3 existing mentor starters + 8 onboarding goals)
+// ─────────────────────────────────────────
+
+const MENTOR_SUGGESTIONS = [
+  '¿Cómo mejorar mi disciplina?',
+  'Crear nuevos hábitos',
+  'Necesito motivación',
+  'Reducir el estrés',
+  'Dormir mejor',
+  'Ser más constante',
+  'Mejorar mi enfoque',
+  'Cuidar mi cuerpo',
+  'Organizar mis finanzas',
+  'Meditar regularmente',
+  'Escribir un diario',
+];
+
+function pickSuggestions(count: number): string[] {
+  const shuffled = [...MENTOR_SUGGESTIONS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+// ─────────────────────────────────────────
 // Relative date helper
 // ─────────────────────────────────────────
 
@@ -154,6 +178,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [dailyLimit, setDailyLimit] = useState<number>(15);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [suggestions] = useState(() => pickSuggestions(3));
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [historyLimited, setHistoryLimited] = useState(false);
@@ -1109,11 +1134,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                           : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
                       </p>
                       <div className="flex flex-wrap justify-center gap-2 mt-4">
-                        {[
-                          '¿Cómo mejorar mi disciplina?',
-                          'Crear nuevos hábitos',
-                          'Necesito motivación',
-                        ].map((suggestion) => (
+                        {suggestions.map((suggestion) => (
                           <button
                             key={suggestion}
                             onClick={() => {
