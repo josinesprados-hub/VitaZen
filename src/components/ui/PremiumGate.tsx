@@ -43,7 +43,7 @@ export default function PremiumGate({
   const displayLabel = label || '';
 
   return (
-    <div className="relative group/depth-gate">
+    <div className="relative overflow-hidden group/depth-gate">
       {/* Content visible but gently dimmed — not blurred, not hidden */}
       <div className="opacity-40 select-none pointer-events-none" aria-hidden="true">
         {children}
