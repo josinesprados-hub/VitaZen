@@ -1,0 +1,252 @@
+/home/z/my-project/worklog.md:4:Task: Sprint 2 — Consumir el motor de conexiones desde Observaciones
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783952515729_5126d612a312.txt:180:   180→// ─── Insights: Weekly Summary ────────────────
+/home/z/my-project/tool-results/read_1783952515729_5126d612a312.txt:197:   197→// ─── Insights: Auto-detected insights ────────
+/home/z/my-project/tool-results/read_1783952515729_5126d612a312.txt:247:   247→// ─── Insights: Weekly Comparison ─────────────
+/home/z/my-project/tool-results/read_1783882939429_07fe6c17218f.txt:139:   139→   139→/** Insights page skeleton */
+/home/z/my-project/tool-results/read_1783882939429_07fe6c17218f.txt:140:   140→   140→export function InsightsSkeleton() {
+/home/z/my-project/tool-results/read_1783882939429_07fe6c17218f.txt:188:   188→   188→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783883256974_68575eb18059.txt:236:   236→   236→/home/z/my-project/src/app/api/analytics/insights/route.ts:121:    console.error('[Analytics] Insights error:', error);
+/home/z/my-project/scripts/vitazen_audit_report.py:482:story.append(h1('7. Observaciones, Tu Evolucion y Memoria'))
+/home/z/my-project/scripts/vitazen_audit_report.py:484:story.append(h2('7.1 Observaciones (/insights)'))
+/home/z/my-project/scripts/vitazen_audit_report.py:588:    ('Observaciones - comparativa semanal', 'No disponible', 'Completo', 'Gated PremiumGate + API'),
+/home/z/my-project/scripts/vitazen_audit_report.py:641:    ('ALTA', 'Inconsistencia de textos Insights/insights',
+/home/z/my-project/scripts/vitazen_audit_report.py:643:     'El sidebar dice "Observaciones" pero textos internos usan "Insights Semanales", "No se pudieron cargar los insights", "Sin insights". Mezcla de espanol e ingles.'),
+/home/z/my-project/scripts/vitazen_audit_report.py:653:    ('MEDIA', 'Enlaces auto-referenciados en Insights',
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:19:   108→   167→   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:24:   113→   172→   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:28:   117→   176→   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:55:   144→   203→   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:56:   145→   204→   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:59:   148→   207→   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:88:   177→   236→   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:101:   190→   249→   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:208:   297→   356→   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783925019361_f1925b2362b6.txt:1239:  1239→  // Connections come from generateMonthlyDigest (same engine as Observaciones).
+/home/z/my-project/tool-results/grep_1783882891271_8d04bf0c23f9.txt:236:/home/z/my-project/src/app/api/analytics/insights/route.ts:121:    console.error('[Analytics] Insights error:', error);
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882917391_85bde9121e52.txt:139:   139→/** Insights page skeleton */
+/home/z/my-project/tool-results/read_1783882917391_85bde9121e52.txt:140:   140→export function InsightsSkeleton() {
+/home/z/my-project/tool-results/read_1783882917391_85bde9121e52.txt:188:   188→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783943574232_85bde9121e52.txt:139:   139→/** Insights page skeleton */
+/home/z/my-project/tool-results/read_1783943574232_85bde9121e52.txt:140:   140→export function InsightsSkeleton() {
+/home/z/my-project/tool-results/read_1783943574232_85bde9121e52.txt:188:   188→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783883252215_8ef1ced7a2a2.txt:236:   236→/home/z/my-project/src/app/api/analytics/insights/route.ts:121:    console.error('[Analytics] Insights error:', error);
+/home/z/my-project/tool-results/read_1783882978867_85bde9121e52.txt:139:   139→/** Insights page skeleton */
+/home/z/my-project/tool-results/read_1783882978867_85bde9121e52.txt:140:   140→export function InsightsSkeleton() {
+/home/z/my-project/tool-results/read_1783882978867_85bde9121e52.txt:188:   188→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:9:     9→     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:79:    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:167:   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:172:   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:176:   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:203:   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:204:   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:207:   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:236:   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:249:   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:356:   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:9:     9→     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:79:    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:167:   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:172:   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:176:   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:203:   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:204:   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:207:   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:236:   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:249:   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:356:   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:20:    79→    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:108:   167→   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:113:   172→   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:117:   176→   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:144:   203→   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:145:   204→   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:148:   207→   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:177:   236→   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:190:   249→   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:297:   356→   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882940150_85bde9121e52.txt:139:   139→/** Insights page skeleton */
+/home/z/my-project/tool-results/read_1783882940150_85bde9121e52.txt:140:   140→export function InsightsSkeleton() {
+/home/z/my-project/tool-results/read_1783882940150_85bde9121e52.txt:188:   188→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882934154_8ef1ced7a2a2.txt:236:   236→/home/z/my-project/src/app/api/analytics/insights/route.ts:121:    console.error('[Analytics] Insights error:', error);
+/home/z/my-project/tool-results/read_1783882877278_f1925b2362b6.txt:1239:  1239→  // Connections come from generateMonthlyDigest (same engine as Observaciones).
+/home/z/my-project/tool-results/read_1783949641337_5126d612a312.txt:180:   180→// ─── Insights: Weekly Summary ────────────────
+/home/z/my-project/tool-results/read_1783949641337_5126d612a312.txt:197:   197→// ─── Insights: Auto-detected insights ────────
+/home/z/my-project/tool-results/read_1783949641337_5126d612a312.txt:247:   247→// ─── Insights: Weekly Comparison ─────────────
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:9:     9→     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:79:    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:167:   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:172:   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:176:   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:203:   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:204:   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:207:   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:236:   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:249:   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:356:   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783943589468_f9903ca96030.txt:1993:  1993→  /* Insights page: tighter grid gaps */
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:9:     9→     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:79:    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:167:   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:172:   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:176:   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:203:   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:204:   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:207:   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:236:   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:249:   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783938517446_13e8c630694a.txt:356:   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783882890091_85bde9121e52.txt:139:   139→/** Insights page skeleton */
+/home/z/my-project/tool-results/read_1783882890091_85bde9121e52.txt:140:   140→export function InsightsSkeleton() {
+/home/z/my-project/tool-results/read_1783882890091_85bde9121e52.txt:188:   188→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:9:     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:79:    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:167:   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:172:   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:176:   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:203:   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:204:   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:207:   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:236:   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:249:   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783943576480_a7a7e61404f1.txt:356:   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:9:     9→     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:79:    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:167:   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:172:   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:176:   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:203:   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:204:   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:207:   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:236:   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:249:   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783943597235_13e8c630694a.txt:356:   356→   356→      {/* Insights Cards */}
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:9:     9→     9→import { InsightsSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:79:    79→    79→interface InsightsData {
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:167:   167→   167→export default function InsightsPage() {
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:172:   172→   172→  const [data, setData] = useState<InsightsData | null>(null);
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:176:   176→   176→  const fetchInsights = useCallback(async () => {
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:203:   203→   203→    fetchInsights();
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:204:   204→   204→  }, [fetchInsights]);
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:207:   207→   207→    return <InsightsSkeleton />;
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:236:   236→   236→          title="Insights Semanales"
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:249:   249→   249→              <h1 className="title-page">Observaciones</h1>
+/home/z/my-project/tool-results/read_1783944216829_13e8c630694a.txt:356:   356→   356→      {/* Insights Cards */}
+/home/z/my-project/src/lib/insights.ts:48:export interface InsightsResult {
+/home/z/my-project/src/lib/insights.ts:415:function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison | null, plan: string): Insight[] {
+/home/z/my-project/src/lib/insights.ts:678:  const maxInsights = isPremium ? 5 : 3;
+/home/z/my-project/src/lib/insights.ts:684:  return insights.slice(0, maxInsights);
+/home/z/my-project/src/lib/insights.ts:691:export async function generateWeeklyInsights(userId: string, plan: string, existingData?: RawData): Promise<InsightsResult> {
+/home/z/my-project/src/lib/insights.ts:698:  const insights = generateInsights(summary, comparison, plan);
+
+[Showing results with pagination = limit: 250]

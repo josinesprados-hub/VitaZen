@@ -1,0 +1,252 @@
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783943643869_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783944730219_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783883044185_a70998cd01c6.txt:3:     3→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783883044185_a70998cd01c6.txt:7:     7→   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783883044185_a70998cd01c6.txt:100:   100→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783883044185_a70998cd01c6.txt:109:   109→   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783883044185_a70998cd01c6.txt:141:   141→   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783952515729_5126d612a312.txt:143:   143→      label: 'Energía',
+/home/z/my-project/tool-results/read_1783952515729_5126d612a312.txt:329:   329→      { title: 'Energía y ritmo circadiano', content: 'Tu energía tiene picos naturales. Las mañanas son para crear, las tardes para integrar.' },
+/home/z/my-project/tool-results/read_1783952515729_5126d612a312.txt:521:   521→    { key: 'habits_steady_14', title: 'Constancia Tranquila', description: '14 días seguidos en un hábito', category: 'habits', icon: 'Flame', target: 14, current: 9, percent: 64, unlocked: false, unlockedAt: null, hidden: false },
+/home/z/my-project/scripts/vitazen_audit_report.py:614:    ('CRITICA', 'Inconsistencia Riqueza/Finanzas en toda la app',
+/home/z/my-project/scripts/vitazen_audit_report.py:616:     'El sidebar y TopBar muestran "Riqueza" pero la pagina dice "Finanzas". El onboarding, insights, logros, pricing, privacy y terms usan "Finanzas". Un usuario ve un nombre en navegacion y otro al llegar a la pagina.'),
+/home/z/my-project/scripts/vitazen_audit_report.py:828:    'ha activado algo que no funciona, (2) la inconsistencia Riqueza/Finanzas que confunde al '
+/home/z/my-project/tool-results/read_1783943599409_92b47267dbc9.txt:251:   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943599409_92b47267dbc9.txt:319:   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783943599409_92b47267dbc9.txt:327:   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783943599409_92b47267dbc9.txt:343:   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943599409_92b47267dbc9.txt:366:   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783935475832_64134ff05f5f.txt:280:   280→   280→    { label: 'Energía', value: data.emotionalState.energy, icon: Zap },
+/home/z/my-project/tool-results/read_1783935475832_64134ff05f5f.txt:558:   558→   558→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783882939429_07fe6c17218f.txt:627:   627→   627→/** Finanzas (riqueza) page skeleton — mirrors the EXACT layout of the non-empty Finanzas page.
+/home/z/my-project/tool-results/read_1783882939429_07fe6c17218f.txt:630:   630→   630→export function FinanzasSkeleton() {
+/home/z/my-project/tool-results/read_1783882939429_07fe6c17218f.txt:633:   633→   633→      {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
+/home/z/my-project/tool-results/read_1783937348452_9e4aa5bf6f8e.txt:251:   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937348452_9e4aa5bf6f8e.txt:319:   319→   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783937348452_9e4aa5bf6f8e.txt:327:   327→   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783937348452_9e4aa5bf6f8e.txt:343:   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937348452_9e4aa5bf6f8e.txt:366:   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783925019361_f1925b2362b6.txt:684:   684→  energia: 'Energía',
+/home/z/my-project/tool-results/read_1783925019361_f1925b2362b6.txt:685:   685→  riqueza: 'Finanzas',
+/home/z/my-project/tool-results/read_1783925019361_f1925b2362b6.txt:905:   905→      energia: 'Energía',
+/home/z/my-project/tool-results/read_1783925019361_f1925b2362b6.txt:906:   906→      riqueza: 'Finanzas',
+/home/z/my-project/tool-results/read_1783943610953_9e4aa5bf6f8e.txt:251:   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943610953_9e4aa5bf6f8e.txt:319:   319→   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783943610953_9e4aa5bf6f8e.txt:327:   327→   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783943610953_9e4aa5bf6f8e.txt:343:   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943610953_9e4aa5bf6f8e.txt:366:   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783882898049_92b47267dbc9.txt:251:   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783882898049_92b47267dbc9.txt:319:   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783882898049_92b47267dbc9.txt:327:   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783882898049_92b47267dbc9.txt:343:   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783882898049_92b47267dbc9.txt:366:   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783937395905_b8f0351e2d8f.txt:59:   158→   212→   251→   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937395905_b8f0351e2d8f.txt:127:   226→   280→   319→   319→   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783937395905_b8f0351e2d8f.txt:135:   234→   288→   327→   327→   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783937395905_b8f0351e2d8f.txt:151:   250→   304→   343→   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937395905_b8f0351e2d8f.txt:174:   273→   327→   366→   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:184:   273→   332→   332→   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:280:   369→   428→   428→   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783883065699_11866d8d9940.txt:378:   467→   526→   526→   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783924945685_37a460b7abc6.txt:251:   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783924945685_37a460b7abc6.txt:319:   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783924945685_37a460b7abc6.txt:327:   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783924945685_37a460b7abc6.txt:343:   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783924945685_37a460b7abc6.txt:366:   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783882879877_37a460b7abc6.txt:251:   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783882879877_37a460b7abc6.txt:319:   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783882879877_37a460b7abc6.txt:327:   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783882879877_37a460b7abc6.txt:343:   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783882879877_37a460b7abc6.txt:366:   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783937380078_83b04fb5d404.txt:158:   212→   251→   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937380078_83b04fb5d404.txt:226:   280→   319→   319→   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783937380078_83b04fb5d404.txt:234:   288→   327→   327→   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783937380078_83b04fb5d404.txt:250:   304→   343→   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937380078_83b04fb5d404.txt:273:   327→   366→   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783943563671_37a460b7abc6.txt:251:   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943563671_37a460b7abc6.txt:319:   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783943563671_37a460b7abc6.txt:327:   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783943563671_37a460b7abc6.txt:343:   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943563671_37a460b7abc6.txt:366:   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783938517901_64134ff05f5f.txt:280:   280→   280→    { label: 'Energía', value: data.emotionalState.energy, icon: Zap },
+/home/z/my-project/tool-results/read_1783938517901_64134ff05f5f.txt:558:   558→   558→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783882894526_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783882917391_85bde9121e52.txt:627:   627→/** Finanzas (riqueza) page skeleton — mirrors the EXACT layout of the non-empty Finanzas page.
+/home/z/my-project/tool-results/read_1783882917391_85bde9121e52.txt:630:   630→export function FinanzasSkeleton() {
+/home/z/my-project/tool-results/read_1783882917391_85bde9121e52.txt:633:   633→      {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783944209000_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783882910625_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783943574232_85bde9121e52.txt:627:   627→/** Finanzas (riqueza) page skeleton — mirrors the EXACT layout of the non-empty Finanzas page.
+/home/z/my-project/tool-results/read_1783943574232_85bde9121e52.txt:630:   630→export function FinanzasSkeleton() {
+/home/z/my-project/tool-results/read_1783943574232_85bde9121e52.txt:633:   633→      {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:900:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:909:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783924943947_d43d87496c52.txt:941:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783882943694_55284f36869b.txt:3:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783882943694_55284f36869b.txt:7:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783882943694_55284f36869b.txt:100:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783882943694_55284f36869b.txt:109:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783882943694_55284f36869b.txt:141:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783882978867_85bde9121e52.txt:627:   627→/** Finanzas (riqueza) page skeleton — mirrors the EXACT layout of the non-empty Finanzas page.
+/home/z/my-project/tool-results/read_1783882978867_85bde9121e52.txt:630:   630→export function FinanzasSkeleton() {
+/home/z/my-project/tool-results/read_1783882978867_85bde9121e52.txt:633:   633→      {/* Header — matches Gem icon + "Finanzas" + "Cómo fluye tu dinero" */}
+/home/z/my-project/tool-results/read_1783924982683_e5c15d93fdfd.txt:280:   280→    { label: 'Energía', value: data.emotionalState.energy, icon: Zap },
+/home/z/my-project/tool-results/read_1783924982683_e5c15d93fdfd.txt:558:   558→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783933805775_7fffdb28f7a6.txt:403:   803→   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783933805775_7fffdb28f7a6.txt:407:   807→   807→   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783933805775_7fffdb28f7a6.txt:500:   900→   900→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:332:   332→   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:428:   428→   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783882912712_13e8c630694a.txt:526:   526→   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:900:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:909:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783941920569_d43d87496c52.txt:941:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:900:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:909:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783937271139_d43d87496c52.txt:941:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783950068105_92b47267dbc9.txt:251:   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783950068105_92b47267dbc9.txt:319:   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783950068105_92b47267dbc9.txt:327:   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783950068105_92b47267dbc9.txt:343:   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783950068105_92b47267dbc9.txt:366:   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783938502608_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783943630189_8dafa099183b.txt:192:   251→   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943630189_8dafa099183b.txt:260:   319→   319→   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783943630189_8dafa099183b.txt:268:   327→   327→   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783943630189_8dafa099183b.txt:284:   343→   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783943630189_8dafa099183b.txt:307:   366→   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:273:   332→   332→   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:369:   428→   428→   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783882968294_68c9bc676488.txt:467:   526→   526→   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783925031492_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783938501803_e5c15d93fdfd.txt:280:   280→    { label: 'Energía', value: data.emotionalState.energy, icon: Zap },
+/home/z/my-project/tool-results/read_1783938501803_e5c15d93fdfd.txt:558:   558→                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:900:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:909:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783943572891_d43d87496c52.txt:941:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783937367921_468b9287898a.txt:26:    65→    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783937367921_468b9287898a.txt:270:   309→   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783943577200_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783935454223_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783883060579_53b22fcd2f54.txt:71:   100→   100→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783883060579_53b22fcd2f54.txt:80:   109→   109→   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783883060579_53b22fcd2f54.txt:112:   141→   141→   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783882877278_f1925b2362b6.txt:684:   684→  energia: 'Energía',
+/home/z/my-project/tool-results/read_1783882877278_f1925b2362b6.txt:685:   685→  riqueza: 'Finanzas',
+/home/z/my-project/tool-results/read_1783882877278_f1925b2362b6.txt:905:   905→      energia: 'Energía',
+/home/z/my-project/tool-results/read_1783882877278_f1925b2362b6.txt:906:   906→      riqueza: 'Finanzas',
+/home/z/my-project/tool-results/read_1783943630670_468b9287898a.txt:26:    65→    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783943630670_468b9287898a.txt:270:   309→   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:332:   332→   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:428:   428→   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783935475370_13e8c630694a.txt:526:   526→   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:13:    13→    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:65:    65→    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:309:   309→   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:803:   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:807:   807→   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:900:   900→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:909:   909→   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783933718664_499f9e657f9f.txt:941:   941→   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783933719898_92b47267dbc9.txt:251:   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783933719898_92b47267dbc9.txt:319:   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783933719898_92b47267dbc9.txt:327:   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783933719898_92b47267dbc9.txt:343:   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783933719898_92b47267dbc9.txt:366:   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783949641337_5126d612a312.txt:143:   143→      label: 'Energía',
+/home/z/my-project/tool-results/read_1783949641337_5126d612a312.txt:329:   329→      { title: 'Energía y ritmo circadiano', content: 'Tu energía tiene picos naturales. Las mañanas son para crear, las tardes para integrar.' },
+/home/z/my-project/tool-results/read_1783949641337_5126d612a312.txt:521:   521→    { key: 'habits_steady_14', title: 'Constancia Tranquila', description: '14 días seguidos en un hábito', category: 'habits', icon: 'Flame', target: 14, current: 9, percent: 64, unlocked: false, unlockedAt: null, hidden: false },
+/home/z/my-project/tool-results/read_1783937367416_4595f7eecd66.txt:212:   251→   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937367416_4595f7eecd66.txt:280:   319→   319→   319→   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783937367416_4595f7eecd66.txt:288:   327→   327→   327→   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783937367416_4595f7eecd66.txt:304:   343→   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937367416_4595f7eecd66.txt:327:   366→   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:332:   332→   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:428:   428→   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783944738121_13e8c630694a.txt:526:   526→   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:900:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:909:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783950035353_d43d87496c52.txt:941:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783937270675_37a460b7abc6.txt:251:   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937270675_37a460b7abc6.txt:319:   319→          <h1 className="title-page">Energía</h1>
+/home/z/my-project/tool-results/read_1783937270675_37a460b7abc6.txt:327:   327→        title="Energía"
+/home/z/my-project/tool-results/read_1783937270675_37a460b7abc6.txt:343:   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+/home/z/my-project/tool-results/read_1783937270675_37a460b7abc6.txt:366:   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:13:    13→    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:65:    65→    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:309:   309→   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:803:   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:807:   807→   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:900:   900→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:909:   909→   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783882898515_499f9e657f9f.txt:941:   941→   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783937380876_8e43baeea2e0.txt:216:   270→   309→   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:900:   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:909:   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783882881820_d43d87496c52.txt:941:   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:13:    13→    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:65:    65→    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:309:   309→   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:803:   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:807:   807→   807→    return <FinanzasSkeleton />;
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:900:   900→   900→            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:909:   909→   909→        title="Finanzas"
+/home/z/my-project/tool-results/read_1783950067645_499f9e657f9f.txt:941:   941→   941→      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:332:   332→              <p className="text-xs text-[#666] mb-2 group-hover:text-[#999] transition-colors">Energía</p>
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:428:   428→                  <span className="text-[#666]">Energía</span>
+/home/z/my-project/tool-results/read_1783950047515_a7a7e61404f1.txt:526:   526→                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+/home/z/my-project/tool-results/read_1783933702460_d43d87496c52.txt:13:    13→import { FinanzasSkeleton } from '@/components/ui/PremiumSkeleton';
+/home/z/my-project/tool-results/read_1783933702460_d43d87496c52.txt:65:    65→// Intenciones — the soul of Finanzas
+/home/z/my-project/tool-results/read_1783933702460_d43d87496c52.txt:309:   309→// Balance de Intenciones — the home of Finanzas
+/home/z/my-project/tool-results/read_1783933702460_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783933702460_d43d87496c52.txt:807:   807→    return <FinanzasSkeleton />;
+
+[Showing results with pagination = limit: 250]
