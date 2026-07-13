@@ -165,9 +165,27 @@ export default function CheckinPage() {
   const handleModalClose = useCallback(() => {
     setShowModal(false);
     setEditingCheckin(null);
-    // Only refetch if data might have changed (new/edited checkin)
-    // The save handler already updates state optimistically
-  }, []);
+    // Refresh history and trends after any mutation (create/edit/delete)
+    // so data is never stale
+    (async () => {
+      try {
+        const [historyRes, trendsRes] = await Promise.all([
+          apiFetch('/api/checkin?mode=history&days=30'),
+          apiFetch('/api/checkin?mode=trends&days=14'),
+        ]);
+        if (historyRes.ok) {
+          const data = await historyRes.json();
+          setCheckins(data.checkins || []);
+        }
+        if (trendsRes.ok) {
+          const data = await trendsRes.json();
+          setTrends(data.trends || null);
+        }
+      } catch (err) {
+        console.error('[CHECKIN PAGE] Error refreshing data:', err);
+      }
+    })();
+  }, [apiFetch]);
 
   const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }): Promise<{ xpAwarded: number }> => {
     if (editingCheckin) {

@@ -100,6 +100,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // C1 FIX: Validate metric ranges (1–5) to prevent data corruption.
+    // Client enforces this via sliders, but server must be the authority.
+    const metrics = { emotion, energy, focus, stress };
+    for (const [name, val] of Object.entries(metrics)) {
+      if (typeof val !== 'number' || !Number.isInteger(val) || val < 1 || val > 5) {
+        return NextResponse.json({ error: `${name} must be an integer between 1 and 5` }, { status: 400 });
+      }
+    }
+
+    // C2 FIX: Validate intention length server-side.
+    if (typeof intention !== 'string' || intention.length > 200 || intention.trim().length === 0) {
+      return NextResponse.json({ error: 'Intention must be 1–200 characters' }, { status: 400 });
+    }
+
     // Use Europe/Madrid timezone — Vercel servers run UTC, so
     // new Date() at 00:30 Madrid = 23:30 UTC = wrong day.
     const today = new Date(getTodayDateKey() + 'T00:00:00');
@@ -194,6 +208,23 @@ export async function PUT(request: NextRequest) {
 
     const { checkinId, emotion, energy, focus, stress, intention, note } = await request.json();
 
+    if (!checkinId) {
+      return NextResponse.json({ error: 'Missing checkinId' }, { status: 400 });
+    }
+
+    // C7 FIX: Validate metric ranges (1–5) on PUT — same as POST.
+    const metrics = { emotion, energy, focus, stress };
+    for (const [name, val] of Object.entries(metrics)) {
+      if (typeof val !== 'number' || !Number.isInteger(val) || val < 1 || val > 5) {
+        return NextResponse.json({ error: `${name} must be an integer between 1 and 5` }, { status: 400 });
+      }
+    }
+
+    // Validate intention on PUT as well.
+    if (typeof intention !== 'string' || intention.length > 200 || intention.trim().length === 0) {
+      return NextResponse.json({ error: 'Intention must be 1–200 characters' }, { status: 400 });
+    }
+
     const existing = await db.dailyCheckin.findUnique({ where: { id: checkinId } });
     if (!existing) return NextResponse.json({ error: 'Checkin not found' }, { status: 404 });
     if (existing.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -202,6 +233,13 @@ export async function PUT(request: NextRequest) {
       where: { id: checkinId },
       data: { emotion, energy, focus, stress, intention, note },
     });
+
+    // C3 FIX: Trigger widget snapshot refresh after edit (was missing — only
+    // POST and DELETE called this). Widgets would show stale data after edits.
+    onCheckinChange(user.id, user.plan);
+
+    // C4 FIX: Track edit event in analytics (was missing — only POST tracked).
+    trackEvent({ event: 'checkin_edited', userId: user.id, properties: { emotion, energy, focus, stress } });
 
     return NextResponse.json({ checkin: updated });
   } catch (error) {

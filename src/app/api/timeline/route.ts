@@ -49,14 +49,40 @@ export async function GET(request: NextRequest) {
 
   const items: TimelineItem[] = [];
 
-  const fetchMeditation = !category || category === 'meditation';
-  const fetchJournal = !category || category === 'journal';
-  const fetchWellness = !category || category === 'wellness';
-  const fetchHabits = !category || category === 'habits';
-  const fetchNutrition = !category || category === 'nutrition';
-  const fetchFinance = !category || category === 'finance';
+  // category can be comma-separated (e.g. 'meditation,journal') for multi-type imperios
+  const categories = category ? category.split(',').map(c => c.trim()) : [];
+  const fetchMeditation = categories.length === 0 || categories.includes('meditation');
+  const fetchJournal = categories.length === 0 || categories.includes('journal');
+  const fetchWellness = categories.length === 0 || categories.includes('wellness');
+  const fetchHabits = categories.length === 0 || categories.includes('habits');
+  const fetchNutrition = categories.length === 0 || categories.includes('nutrition');
+  const fetchFinance = categories.length === 0 || categories.includes('finance');
+
+  const fetchCheckin = categories.length === 0 || categories.includes('checkin');
 
   const queries: Promise<void>[] = [];
+
+  if (fetchCheckin) {
+    queries.push(
+      db.dailyCheckin.findMany({
+        where: { userId: user.id },
+        orderBy: { date: 'desc' },
+        take: limit,
+      }).then((checkins) => {
+        for (const c of checkins) {
+          items.push({
+            id: c.id,
+            type: 'checkin',
+            imperio: 'mente',
+            title: `Check-in · ${c.intention}`,
+            description: `Emoción ${c.emotion}/5 · Energía ${c.energy}/5 · Enfoque ${c.focus}/5`,
+            date: c.date,
+            meta: { emotion: c.emotion, energy: c.energy, focus: c.focus, stress: c.stress },
+          });
+        }
+      })
+    );
+  }
 
   if (fetchMeditation) {
     queries.push(

@@ -88,6 +88,7 @@ const IMPERIO_CONFIG: Record<string, {
 
 // Activity type → imperio fallback (in case API doesn't send imperio)
 const TYPE_IMPERIO: Record<string, string> = {
+  checkin: 'mente',
   meditation: 'mente',
   journal: 'mente',
   wellness: 'energia',
@@ -97,6 +98,7 @@ const TYPE_IMPERIO: Record<string, string> = {
 };
 
 const TYPE_ICON: Record<string, any> = {
+  checkin: Sunrise,
   meditation: Wind,
   journal: BookOpen,
   wellness: Heart,
@@ -198,14 +200,16 @@ export default function TimelinePage() {
 
   const handleFilter = (key: string) => {
     setActiveFilter(key);
-    // Map imperio filters to their activity types for the API
-    const imperioToTypes: Record<string, string> = {
-      mente: 'meditation',
-      energia: 'wellness',
+    // Map imperio filters to ALL their activity types.
+    // An imperio can span multiple types (e.g. mente = meditation + journal).
+    // The API accepts comma-separated categories.
+    const imperioToTypes: Record<string, string | undefined> = {
+      mente: 'meditation,journal,checkin',
+      energia: 'wellness,nutrition',
       disciplina: 'habits',
       riqueza: 'finance',
     };
-    fetchTimeline(imperioToTypes[key] || undefined);
+    fetchTimeline(imperioToTypes[key]);
   };
 
   // Filter items client-side for imperios that span multiple activity types
