@@ -950,7 +950,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }
 
   return (
-    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
+    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0 sm:gap-4">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
         <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
@@ -1058,211 +1058,212 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* ═══════════════════════════════════════════
           MAIN CONTENT AREA
-          Mobile: only chat (full width)
+          Mobile: chat fills full width
           Desktop: sidebar + chat (flex-row)
           ═══════════════════════════════════════════ */}
-      <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-hidden sm:gap-4">
 
-        {/* ────────── Desktop Sidebar ────────── */}
-        <div
-          className={`hidden sm:flex shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
-            sidebarOpen ? 'w-72' : 'w-0 border-0'
-          }`}
-        >
-          {sidebarContent}
-        </div>
+      {/* ────────── Desktop Sidebar ────────── */}
+      <div
+        className={`hidden sm:flex shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
+          sidebarOpen ? 'w-72' : 'w-0 border-0'
+        }`}
+      >
+        {sidebarContent}
+      </div>
 
-        {/* ────────── Chat Area — full width on both mobile and desktop ────────── */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
-          {activeThread ? (
-            <>
-              {/* Desktop: Chat header bar inside chat card */}
-              <div className="hidden sm:flex px-5 py-3 border-b border-[#1a1a1a] items-center justify-between shrink-0">
-                <div className="flex items-center gap-2 min-w-0">
-                  <MessageCircle size={14} className="text-champagne shrink-0" />
-                  <p className="text-sm text-white truncate">
-                    {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Conversación'}
-                  </p>
-                  {activeThreadData?.archived && (
-                    <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
-                      Archivada
+      {/* ────────── Chat Area — full width on mobile, card on desktop ────────── */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
+        {activeThread ? (
+          <>
+            {/* Desktop: Chat header bar inside chat card */}
+            <div className="hidden sm:flex px-5 py-3 border-b border-[#1a1a1a] items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <MessageCircle size={14} className="text-champagne shrink-0" />
+                <p className="text-sm text-white truncate">
+                  {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Conversación'}
+                </p>
+                {activeThreadData?.archived && (
+                  <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
+                    Archivada
+                  </span>
+                )}
+              </div>
+              {/* Contextual indicator — desktop only */}
+              {isContextual && (
+                <div className="relative shrink-0">
+                  <button
+                    onMouseEnter={() => setShowContextTooltip(true)}
+                    onMouseLeave={() => setShowContextTooltip(false)}
+                    className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
+                      isPremium
+                        ? 'text-champagne/80 hover:text-champagne border-champagne/20 hover:border-champagne/40'
+                        : 'text-champagne/60 hover:text-champagne border-champagne/15 hover:border-champagne/30'
+                    }`}
+                  >
+                    <BrainCircuit size={12} className="shrink-0" />
+                    <span>
+                      {isPremium ? 'Memoria contextual' : 'Contexto activo'}
                     </span>
+                  </button>
+                  {showContextTooltip && (
+                    <div className="absolute right-0 top-full mt-2 w-60 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 shadow-xl context-menu z-10">
+                      <p className="text-[11px] text-[#999] leading-relaxed">
+                        {isPremium
+                          ? 'El mentor usa tu actividad, emociones y conversaciones previas para ofrecerte respuestas profundas y personalizadas.'
+                          : 'El mentor usa tu actividad reciente para personalizar respuestas.'}
+                      </p>
+                    </div>
                   )}
                 </div>
-                {/* Contextual indicator — desktop only */}
-                {isContextual && (
-                  <div className="relative shrink-0">
-                    <button
-                      onMouseEnter={() => setShowContextTooltip(true)}
-                      onMouseLeave={() => setShowContextTooltip(false)}
-                      className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
-                        isPremium
-                          ? 'text-champagne/80 hover:text-champagne border-champagne/20 hover:border-champagne/40'
-                          : 'text-champagne/60 hover:text-champagne border-champagne/15 hover:border-champagne/30'
-                      }`}
-                    >
-                      <BrainCircuit size={12} className="shrink-0" />
-                      <span>
-                        {isPremium ? 'Memoria contextual' : 'Contexto activo'}
-                      </span>
-                    </button>
-                    {showContextTooltip && (
-                      <div className="absolute right-0 top-full mt-2 w-60 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 shadow-xl context-menu z-10">
-                        <p className="text-[11px] text-[#999] leading-relaxed">
-                          {isPremium
-                            ? 'El mentor usa tu actividad, emociones y conversaciones previas para ofrecerte respuestas profundas y personalizadas.'
-                            : 'El mentor usa tu actividad reciente para personalizar respuestas.'}
-                        </p>
-                      </div>
+              )}
+            </div>
+
+            {/* Messages — single scroll container */}
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overscroll-contain scroll-smooth">
+              {messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full p-3 sm:p-5">
+                  <div className="text-center animate-in">
+                    <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                      <IconComponent size={32} className="text-champagne" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
+                    <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
+                      {isPremium
+                        ? 'Tu mentor con memoria profunda. Pregúntame lo que necesites.'
+                        : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2 mt-4">
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => {
+                            setInput(suggestion);
+                            setTimeout(() => chatInputRef.current?.focus(), 50);
+                          }}
+                          className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-champagne/30 hover:text-champagne transition-colors"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                    {!isPremium && (
+                      <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
+                        <Circle size={3} fill="currentColor" className="text-champagne/30" />
+                        El mentor recuerda más cuando profundizas
+                      </p>
                     )}
                   </div>
-                )}
-              </div>
-
-              {/* Messages — single scroll container with overscroll containment */}
-              <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
-                {messages.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center animate-in">
-                      <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
-                        <IconComponent size={32} className="text-champagne" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
-                      <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
-                        {isPremium
-                          ? 'Tu mentor con memoria profunda. Pregúntame lo que necesites.'
-                          : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-2 mt-4">
-                        {suggestions.map((suggestion) => (
-                          <button
-                            key={suggestion}
-                            onClick={() => {
-                              setInput(suggestion);
-                              setTimeout(() => chatInputRef.current?.focus(), 50);
-                            }}
-                            className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-champagne/30 hover:text-champagne transition-colors"
-                          >
-                            {suggestion}
-                          </button>
-                        ))}
-                      </div>
-                      {!isPremium && (
-                        <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
-                          <Circle size={3} fill="currentColor" className="text-champagne/30" />
-                          El mentor recuerda más cuando profundizas
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {messages.map((msg, idx) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in`}
-                    style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
-                  >
-                    <div
-                      className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
-                        msg.role === 'user'
-                          ? 'bg-champagne/10 border border-champagne/20 rounded-br-md'
-                          : isPremium
-                          ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
-                          : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
-                      }`}
-                    >
-                      <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
-                    </div>
-                  </div>
-                ))}
-                {sending && (
-                  <div className="flex justify-start animate-in">
-                    <div className={`border rounded-2xl rounded-bl-md p-4 ${
-                      isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
-                    }`}>
-                      <div className="flex gap-1.5">
-                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {messages.length > 0 && <div ref={messagesEndRef} />}
-              </div>
-
-              {/* Input area — safe-area for iPhone home indicator */}
-              <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-                {/* Low message warning */}
-                {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
-                  <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
-                    <Zap size={10} className="shrink-0" />
-                    <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
-                    <button
-                      onClick={() => setShowLimitModal(true)}
-                      className="ml-auto text-champagne hover:text-champagne-hover flex items-center gap-1"
-                    >
-                      <Circle size={3} fill="currentColor" className="text-champagne/40" />
-                      Conocer Élite
-                    </button>
-                  </div>
-                )}
-                <form
-                  onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                  className="flex gap-2"
-                >
-                  <input
-                    ref={chatInputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    enterKeyHint="send"
-                    autoComplete="off"
-                    placeholder={
-                      activeThreadData?.archived
-                        ? 'Conversación archivada'
-                        : !isPremium && remaining === 0
-                        ? 'Límite diario alcanzado'
-                        : 'Escribe tu mensaje...'
-                    }
-                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base placeholder-[#555] transition-colors ${
-                      activeThreadData?.archived
-                        ? 'border-[#333] cursor-not-allowed opacity-40'
-                        : !isPremium && remaining === 0
-                        ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
-                        : 'border-[#1a1a1a] focus:border-champagne focus:outline-none'
-                    }`}
-                    disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
-                  />
-                  <button
-                    type="submit"
-                    disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
-                    className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
-                  >
-                    <Send size={18} />
-                  </button>
-                </form>
-              </div>
-            </>
-          ) : (
-            /* No active thread — empty state */
-            <div className="flex items-center justify-center flex-1 min-h-0">
-              <div className="text-center animate-in px-4">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
-                  <IconComponent size={28} className="text-champagne sm:size-8" />
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
-                <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
-                <button
-                  onClick={createThread}
-                  className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
-                >
-                  <Plus size={16} /> Nueva conversación
-                </button>
-              </div>
+              ) : (
+                <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in`}
+                      style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
+                    >
+                      <div
+                        className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
+                          msg.role === 'user'
+                            ? 'bg-champagne/10 border border-champagne/20 rounded-br-md'
+                            : isPremium
+                            ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
+                            : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
+                        }`}
+                      >
+                        <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {sending && (
+                    <div className="flex justify-start animate-in">
+                      <div className={`border rounded-2xl rounded-bl-md p-4 ${
+                        isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
+                      }`}>
+                        <div className="flex gap-1.5">
+                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Composer — safe-area for iPhone home indicator */}
+            <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+              {/* Low message warning */}
+              {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
+                <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
+                  <Zap size={10} className="shrink-0" />
+                  <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
+                  <button
+                    onClick={() => setShowLimitModal(true)}
+                    className="ml-auto text-champagne hover:text-champagne-hover flex items-center gap-1"
+                  >
+                    <Circle size={3} fill="currentColor" className="text-champagne/40" />
+                    Conocer Élite
+                  </button>
+                </div>
+              )}
+              <form
+                onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+                className="flex gap-2"
+              >
+                <input
+                  ref={chatInputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  enterKeyHint="send"
+                  autoComplete="off"
+                  placeholder={
+                    activeThreadData?.archived
+                      ? 'Conversación archivada'
+                      : !isPremium && remaining === 0
+                      ? 'Límite diario alcanzado'
+                      : 'Escribe tu mensaje...'
+                  }
+                  className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base placeholder-[#555] transition-colors ${
+                    activeThreadData?.archived
+                      ? 'border-[#333] cursor-not-allowed opacity-40'
+                      : !isPremium && remaining === 0
+                      ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
+                      : 'border-[#1a1a1a] focus:border-champagne focus:outline-none'
+                  }`}
+                  disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
+                  className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
+                >
+                  <Send size={18} />
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          /* No active thread — empty state */
+          <div className="flex items-center justify-center flex-1 min-h-0">
+            <div className="text-center animate-in px-4">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                <IconComponent size={28} className="text-champagne sm:size-8" />
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
+              <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
+              <button
+                onClick={createThread}
+                className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
+              >
+                <Plus size={16} /> Nueva conversación
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ═══════════════════════════════════════════
