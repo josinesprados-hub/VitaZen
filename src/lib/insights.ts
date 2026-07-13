@@ -238,7 +238,7 @@ const EMPIRE_NAMES: Record<string, string> = {
   disciplina: 'Disciplina',
   mente: 'Mente',
   energia: 'Energía',
-  riqueza: 'Finanzas',
+  riqueza: 'Riqueza',
   crecimiento: 'Crecimiento',
 };
 
@@ -487,7 +487,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'estrés',
       icon: '🌿',
-      title: 'Poca presión',
+      title: 'Estrés bajo',
       description: `Promedio ${summary.checkins.avgStress}/5.`,
     });
   }
@@ -608,7 +608,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'nutrición',
       icon: '💧',
-      title: 'Buena hidratación',
+      title: 'Hidratación constante',
       description: `Promedio de ${summary.nutrition.avgWater} vasos diarios.`,
     });
   }

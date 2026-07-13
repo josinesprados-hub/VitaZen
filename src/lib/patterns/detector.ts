@@ -510,10 +510,10 @@ export function detectPatterns(data: CrossEmpireData): PatternDetectionResult {
 
 function getEmpireLabels(connection: EmpireConnection): string[] {
   const map: Record<EmpireConnection, string[]> = {
-    'finanzas-energia': ['Finanzas', 'Energía'],
-    'finanzas-mente': ['Finanzas', 'Mente'],
-    'finanzas-estres': ['Finanzas', 'Energía'],
-    'finanzas-sueno': ['Finanzas', 'Energía'],
+    'finanzas-energia': ['Riqueza', 'Energía'],
+    'finanzas-mente': ['Riqueza', 'Mente'],
+    'finanzas-estres': ['Riqueza', 'Energía'],
+    'finanzas-sueno': ['Riqueza', 'Energía'],
   };
   return map[connection] || [];
 }

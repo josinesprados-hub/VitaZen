@@ -116,12 +116,16 @@ export default function PricingPage() {
           <div className="space-y-3 mb-8">
             <p className="text-[#444] text-[10px] uppercase tracking-wider font-medium">Lo esencial</p>
             {[
-              'Registro manual de hábitos y estados',
-              'Mentor IA con ritmo diario',
-              'Acceso a los 5 imperios',
-              'Notas básicas de cada imperio',
-              'Check-in y seguimiento emocional',
-              'Memoria de tu vida',
+              'Check-in diario y seguimiento de ánimo',
+              'Hábitos con retos diarios y rachas',
+              'Meditación y ejercicios de respiración',
+              'Registro de bienestar y nutrición',
+              'Riqueza: ingresos, gastos y categorías',
+              'Diario personal',
+              '5 imperios con niveles y progreso',
+              'Mentor IA (15 mensajes al día)',
+              'Observaciones semanales (vista resumida)',
+              'Logros y desbloqueos',
             ].map((feature) => (
               <div key={feature} className="flex items-start gap-3">
                 <Check size={14} className="text-[#333] shrink-0 mt-0.5" />
@@ -158,14 +162,15 @@ export default function PricingPage() {
           <div className="space-y-3 mb-6">
             <p className="text-champagne/30 text-[10px] uppercase tracking-wider font-medium">Todo lo anterior, y más conexiones</p>
             {[
-              'Conexiones entre tus imperios',
-              'Patrones de vida: lo que se repite',
-              'Mentor IA sin límite diario',
-              'Memoria que acumula contexto',
-              'Historial completo de conversaciones',
-              'Notas con más detalle de cada imperio',
-              'Recomendaciones del mentor completas',
-              'Observaciones semanales con más detalle',
+              'Mentor IA sin límite diario de mensajes',
+              'Mentor con memoria profunda y contexto ampliado',
+              'Historial completo de conversaciones del mentor',
+              'Patrones cruzados entre imperios',
+              'Momentos destacados y transiciones de vida',
+              'Observaciones con comparativa semanal',
+              'Cierres mensuales con evolución y recuerdos',
+              'Timeline con historial completo',
+              'Consejos premium de cada imperio',
             ].map((feature) => (
               <div key={feature} className="flex items-start gap-3">
                 <Check size={14} className="text-champagne/50 shrink-0 mt-0.5" />
@@ -204,11 +209,11 @@ export default function PricingPage() {
           {[
             {
               text: 'Tus semanas con menos descanso coinciden con más gasto impulsivo.',
-              empires: 'Energía · Finanzas',
+              empires: 'Energía · Riqueza',
             },
             {
               text: 'Cuando tus hábitos mentales se estabilizan, tu energía financiera cambia.',
-              empires: 'Mente · Finanzas',
+              empires: 'Mente · Riqueza',
             },
             {
               text: 'Los periodos de más disciplina también son los de mejor descanso.',

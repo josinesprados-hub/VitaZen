@@ -682,7 +682,7 @@ const EMPIRE_NAMES: Record<string, string> = {
   disciplina: 'Disciplina',
   mente: 'Mente',
   energia: 'Energía',
-  riqueza: 'Finanzas',
+  riqueza: 'Riqueza',
   crecimiento: 'Crecimiento',
 };
 
@@ -903,7 +903,7 @@ function formatAdvancedContext(ctx: UserContext): string {
       mente: 'Mente',
       disciplina: 'Disciplina',
       energia: 'Energía',
-      riqueza: 'Finanzas',
+      riqueza: 'Riqueza',
     };
 
     if (ob.goals.length > 0) {

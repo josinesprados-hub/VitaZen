@@ -103,7 +103,7 @@ const CATEGORIES = [
   { key: 'wellness', label: 'Bienestar', icon: Heart },
   { key: 'habits', label: 'Hábitos', icon: CheckCircle },
   { key: 'nutrition', label: 'Nutrición', icon: Utensils },
-  { key: 'finance', label: 'Finanzas', icon: Wallet },
+  { key: 'finance', label: 'Riqueza', icon: Wallet },
   { key: 'checkin', label: 'Check-in', icon: Sun },
   { key: 'general', label: 'General', icon: Crown },
 ] as const;
@@ -114,7 +114,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   wellness: 'Bienestar',
   habits: 'Hábitos',
   nutrition: 'Nutrición',
-  finance: 'Finanzas',
+  finance: 'Riqueza',
   checkin: 'Check-in',
   general: 'General',
 };

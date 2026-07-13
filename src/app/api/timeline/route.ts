@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
             type: 'checkin',
             imperio: 'mente',
             title: `Check-in · ${c.intention}`,
-            description: `Emoción ${c.emotion}/5 · Energía ${c.energy}/5 · Enfoque ${c.focus}/5`,
+            description: `Ánimo ${c.emotion}/5 · Energía ${c.energy}/5 · Enfoque ${c.focus}/5`,
             date: c.date,
             meta: { emotion: c.emotion, energy: c.energy, focus: c.focus, stress: c.stress },
           });

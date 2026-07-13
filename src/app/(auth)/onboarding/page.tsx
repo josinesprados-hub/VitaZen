@@ -40,7 +40,7 @@ const FOCUS_OPTIONS = [
   { key: 'mente', label: 'Mente', description: 'Claridad, calma y bienestar emocional', icon: Brain, emoji: '🧠' },
   { key: 'disciplina', label: 'Disciplina', description: 'Hábitos sólidos y consistencia diaria', icon: Shield, emoji: '⚔️' },
   { key: 'energia', label: 'Energía', description: 'Vitalidad física y descanso reparador', icon: Zap, emoji: '⚡' },
-  { key: 'riqueza', label: 'Finanzas', description: 'Consciencia y claridad económica', icon: Gem, emoji: '💎' },
+  { key: 'riqueza', label: 'Riqueza', description: 'Consciencia y claridad económica', icon: Gem, emoji: '💎' },
 ];
 
 const GOAL_OPTIONS = [

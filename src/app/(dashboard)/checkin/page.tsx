@@ -47,7 +47,7 @@ interface TrendsData {
 // ─── Helpers ─────────────────────────────────────────────
 
 const METRIC_CONFIG = [
-  { key: 'emotion', label: 'Emoción', icon: Heart, color: '#c8a55a' },
+  { key: 'emotion', label: 'Ánimo', icon: Heart, color: '#c8a55a' },
   { key: 'energy', label: 'Energía', icon: Zap, color: '#c8a55a' },
   { key: 'focus', label: 'Enfoque', icon: Target, color: '#c8a55a' },
   { key: 'stress', label: 'Estrés', icon: AlertTriangle, color: '#c8a55a' },
@@ -289,7 +289,7 @@ export default function CheckinPage() {
       <ContextualHelp
         storageKey="vitazen_help_checkin"
         title="Check-in"
-        text="Cómo te sientes hoy. Emoción, energía, enfoque, estrés."
+        text="Ánimo, energía, enfoque, estrés."
       />
 
       {/* Header */}
@@ -319,7 +319,7 @@ export default function CheckinPage() {
           <PrivacyMask compact>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { label: 'Emoción', val: todayCheckin.emotion },
+                { label: 'Ánimo', val: todayCheckin.emotion },
                 { label: 'Energía', val: todayCheckin.energy },
                 { label: 'Enfoque', val: todayCheckin.focus },
                 { label: 'Estrés', val: todayCheckin.stress },
@@ -410,7 +410,7 @@ export default function CheckinPage() {
                     <PrivacyMask compact>
                       <div className="flex gap-3 mt-0.5">
                         {[
-                          { label: 'Emoción', val: c.emotion },
+                          { label: 'Ánimo', val: c.emotion },
                           { label: 'Energía', val: c.energy },
                           { label: 'Enfoque', val: c.focus },
                           { label: 'Estrés', val: c.stress },

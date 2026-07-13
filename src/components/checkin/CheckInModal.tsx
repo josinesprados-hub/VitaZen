@@ -19,23 +19,23 @@ const EMOTION_LABELS: Record<number, { label: string; emoji: string }> = {
 const ENERGY_LABELS: Record<number, { label: string }> = {
   1: { label: 'Agotado' },
   2: { label: 'Bajo' },
-  3: { label: 'Normal' },
+  3: { label: 'Estable' },
   4: { label: 'Activo' },
   5: { label: 'Pleno' },
 };
 
 const FOCUS_LABELS: Record<number, { label: string }> = {
   1: { label: 'Disperso' },
-  2: { label: 'Distracto' },
-  3: { label: 'Normal' },
+  2: { label: 'Distraído' },
+  3: { label: 'Adecuado' },
   4: { label: 'Concentrado' },
-  5: { label: 'Láser' },
+  5: { label: 'Profundo' },
 };
 
 const STRESS_LABELS: Record<number, { label: string }> = {
   1: { label: 'En calma' },
   2: { label: 'Relajado' },
-  3: { label: 'Normal' },
+  3: { label: 'Equilibrado' },
   4: { label: 'Tenso' },
   5: { label: 'Sobrepasado' },
 };
@@ -246,7 +246,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               <p id="checkin-modal-desc" className="text-xs text-[#666]">Sin juicio</p>
             </div>
 
-            <ValueSlider label="Estado emocional" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} sliderId="emotion" />
+            <ValueSlider label="Ánimo" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} sliderId="emotion" />
             <ValueSlider label="Energía" value={energy} onChange={setEnergy} labels={ENERGY_LABELS} sliderId="energy" />
             <ValueSlider label="Enfoque" value={focus} onChange={setFocus} labels={FOCUS_LABELS} sliderId="focus" />
             <ValueSlider label="Estrés" value={stress} onChange={setStress} labels={STRESS_LABELS} sliderId="stress" />

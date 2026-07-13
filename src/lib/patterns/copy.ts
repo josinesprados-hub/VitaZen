@@ -62,7 +62,7 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
 // ─── Empire Labels ───
 
 export const EMPIRE_LABELS: Record<string, string> = {
-  finanzas: 'Finanzas',
+  finanzas: 'Riqueza',
   energia: 'Energía',
   mente: 'Mente',
   estres: 'Estrés',

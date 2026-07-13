@@ -421,7 +421,7 @@ export default function InsightsPage() {
             {summary.checkins.count > 0 && (
               <div className="mt-3 space-y-1">
                 <div className="flex justify-between text-[10px]">
-                  <span className="text-[#666]">Emoción</span>
+                  <span className="text-[#666]">Ánimo</span>
                   <span className="text-champagne-soft">{summary.checkins.avgEmotion}/5</span>
                 </div>
                 <div className="flex justify-between text-[10px]">
@@ -523,7 +523,7 @@ export default function InsightsPage() {
             <Link href="/imperio/riqueza" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-champagne/20 transition-colors cursor-pointer group">
               <div className="flex items-center gap-2 mb-3">
                 <Gem size={16} className="text-champagne" />
-                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
+                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Riqueza</span>
               </div>
               <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-champagne-soft' : 'text-red-400'}`}>
                 {summary.finance.balance >= 0 ? '+' : ''}{formatCurrency(Math.abs(summary.finance.balance))}

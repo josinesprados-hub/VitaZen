@@ -376,7 +376,7 @@ function generateSummary(
   }
 
   if (status === 'sobrecargado') {
-    return 'El cuerpo pide pausa.';
+    return 'Semana de mucha carga.';
   }
 
   if (status === 'enfocado') {

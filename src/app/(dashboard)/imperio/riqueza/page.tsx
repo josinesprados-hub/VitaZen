@@ -897,7 +897,7 @@ export default function RiquezaPage() {
             <Gem size={30} className="text-champagne sm:w-[34px] sm:h-[34px]" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Riqueza</h1>
             <p className="text-[#777] text-sm sm:text-base mt-0.5">Cómo fluye tu dinero</p>
           </div>
         </div>
@@ -906,7 +906,7 @@ export default function RiquezaPage() {
       {/* Contextual Help — progressive disclosure */}
       <ContextualHelp
         storageKey="vitazen_help_riqueza"
-        title="Finanzas"
+        title="Riqueza"
         text="Registra gastos e ingresos con intención. Usa la captura rápida o el formulario completo, y observa cómo fluye tu dinero."
       />
 

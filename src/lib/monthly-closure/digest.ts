@@ -316,7 +316,7 @@ async function computeMemories(
       memories.push({
         text: f.contexto,
         date: f.date.toISOString(),
-        empire: 'Finanzas',
+        empire: 'Riqueza',
       });
     }
   }
