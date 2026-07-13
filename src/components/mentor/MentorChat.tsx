@@ -1225,7 +1225,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         ? 'Límite diario alcanzado'
                         : 'Escribe tu mensaje...'
                     }
-                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base sm:text-sm placeholder-[#555] transition-colors ${
+                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base placeholder-[#555] transition-colors ${
                       activeThreadData?.archived
                         ? 'border-[#333] cursor-not-allowed opacity-40'
                         : !isPremium && remaining === 0
