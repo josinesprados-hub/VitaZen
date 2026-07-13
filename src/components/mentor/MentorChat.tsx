@@ -1120,9 +1120,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               </div>
 
               {/* Messages — single scroll container with overscroll containment */}
-              <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
+              <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
                 {messages.length === 0 && (
-                  <div className="flex items-center justify-center h-full">
+                  <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center animate-in">
                       <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
                         <IconComponent size={32} className="text-champagne" />
