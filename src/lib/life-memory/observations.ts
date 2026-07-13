@@ -91,7 +91,7 @@ export async function getHighlightedMemories(userId: string, months: string[]): 
       memories.push({
         text: f.contexto,
         date: f.date.toISOString(),
-        empire: 'Riqueza',
+        empire: 'Finanzas',
       });
     }
   }

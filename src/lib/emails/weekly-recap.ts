@@ -126,7 +126,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     ? `
     <tr>
       <td class="content-cell" style="padding:24px 0 0;background-color:#080808;" bgcolor="#080808">
-        ${sectionLabel('INSIGHT')}
+        ${sectionLabel('OBSERVACIÓN')}
         <p class="white-text" style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:${FONT_STACK_CSS};">${data.mainInsight!.title}</p>
         <p class="secondary-text" style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:${FONT_STACK_CSS};">${data.mainInsight!.description}</p>
       </td>
@@ -290,7 +290,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     : '';
 
   const insightText = hasInsight
-    ? `\nInsight: ${data.mainInsight!.title}\n${data.mainInsight!.description}`
+    ? `\nObservación: ${data.mainInsight!.title}\n${data.mainInsight!.description}`
     : '';
 
   const text = `Tu semana, ${data.name}.

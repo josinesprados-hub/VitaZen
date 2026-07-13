@@ -352,7 +352,7 @@ const EMPIRE_LABELS: Record<string, string> = {
   disciplina: 'Disciplina',
   mente: 'Mente',
   energia: 'Energía',
-  riqueza: 'Riqueza',
+  riqueza: 'Finanzas',
   crecimiento: 'Crecimiento',
 };
 
@@ -387,7 +387,7 @@ export async function shapeDailyFocusPayload(
     disciplina: { title: 'Disciplina', content: 'Días que se repiten.' },
     mente: { title: 'Calma', content: 'La calma se nota cuando llega.' },
     energia: { title: 'Energía', content: 'El cuerpo sabe antes que la cabeza.' },
-    riqueza: { title: 'Riqueza', content: 'El dinero refleja decisiones.' },
+    riqueza: { title: 'Finanzas', content: 'El dinero refleja decisiones.' },
     crecimiento: { title: 'Crecimiento', content: 'Algunas cosas cambian sin hacer ruido.' },
   };
 

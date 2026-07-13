@@ -212,7 +212,7 @@ export default function InsightsPage() {
       <div className="max-w-4xl mx-auto min-h-[50dvh] flex items-center justify-center">
         <PremiumErrorState
           variant="loading"
-          title="No se pudieron cargar los insights"
+          title="No se pudieron cargar las observaciones"
           subtitle="Tu actividad está guardada. Intenta recargar para ver tus datos."
           onRetry={() => window.location.reload()}
           secondaryAction={{
@@ -233,7 +233,7 @@ export default function InsightsPage() {
       {!screenshotMode && (
         <ContextualHelp
           storageKey="vitazen_help_insights"
-          title="Insights Semanales"
+          title="Observaciones Semanales"
           text="Cada semana se observan tus datos y se generan notas automáticas. Tendencias y patrones, cuando aparecen."
         />
       )}
@@ -523,7 +523,7 @@ export default function InsightsPage() {
             <Link href="/imperio/riqueza" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-champagne/20 transition-colors cursor-pointer group">
               <div className="flex items-center gap-2 mb-3">
                 <Gem size={16} className="text-champagne" />
-                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Riqueza</span>
+                <span className="text-xs text-[#666] uppercase tracking-wider font-medium">Finanzas</span>
               </div>
               <p className={`text-2xl font-bold ${summary.finance.balance >= 0 ? 'text-champagne-soft' : 'text-red-400'}`}>
                 {summary.finance.balance >= 0 ? '+' : ''}{formatCurrency(Math.abs(summary.finance.balance))}

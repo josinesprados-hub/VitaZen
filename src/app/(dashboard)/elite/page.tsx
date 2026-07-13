@@ -241,7 +241,7 @@ export default function ElitePage() {
                   'Hábitos con retos diarios y rachas',
                   'Meditación y ejercicios de respiración',
                   'Registro de bienestar y nutrición',
-                  'Riqueza: ingresos, gastos y categorías',
+                  'Finanzas: ingresos, gastos y categorías',
                   'Diario personal con estado de ánimo',
                   '5 imperios con niveles y progreso',
                   'Mentor IA (15 mensajes al día)',

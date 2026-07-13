@@ -37,7 +37,7 @@ export default function InsightsPageError({
     <div className="max-w-5xl mx-auto min-h-[60dvh] flex items-center justify-center">
       <PremiumErrorState
         variant={isNetworkError ? 'network' : 'loading'}
-        title="No se pudieron cargar los insights"
+        title="No se pudieron cargar las observaciones"
         subtitle="Tu actividad está registrada. Intenta recargar para ver tus datos."
         onRetry={reset}
         secondaryAction={{

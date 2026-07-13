@@ -616,7 +616,7 @@ export function WeeklyRecap() {
               ) : (
                 <div className="text-center py-4 sm:py-6">
                   <Sparkles size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
-                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin insights</p>
+                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin observaciones</p>
                 </div>
               )}
             </Link>

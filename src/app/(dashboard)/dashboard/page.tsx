@@ -44,7 +44,7 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string }> 
   disciplina: { name: 'Disciplina', icon: Shield, color: '#c8a55a' },
   mente: { name: 'Mente', icon: Brain, color: '#c8a55a' },
   energia: { name: 'Energía', icon: Zap, color: '#c8a55a' },
-  riqueza: { name: 'Riqueza', icon: Gem, color: '#c8a55a' },
+  riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a' },
   crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a' },
 };
 

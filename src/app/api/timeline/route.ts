@@ -19,7 +19,7 @@ const IMPERIO_LABEL: Record<string, string> = {
   mente: 'Mente',
   energia: 'Energía',
   disciplina: 'Disciplina',
-  riqueza: 'Riqueza',
+  riqueza: 'Finanzas',
 };
 
 export async function GET(request: NextRequest) {

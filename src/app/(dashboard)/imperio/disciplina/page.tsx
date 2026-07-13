@@ -282,7 +282,7 @@ export default function DisciplinaPage() {
         <ContextualHelp
           storageKey="vitazen_help_habits"
           title="Mis Hábitos"
-          text="Aquí se construye lo que se repite. No la motivación: la repetición. Cada día marcado es una pequeña prueba de que algo importa."
+          text="Crea hábitos y márcalos como completados cada día. Tu racha crece con la consistencia. Puedes editar o eliminar cualquier hábito."
         />
       )}
 

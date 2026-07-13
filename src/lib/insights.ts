@@ -238,7 +238,7 @@ const EMPIRE_NAMES: Record<string, string> = {
   disciplina: 'Disciplina',
   mente: 'Mente',
   energia: 'Energía',
-  riqueza: 'Riqueza',
+  riqueza: 'Finanzas',
   crecimiento: 'Crecimiento',
 };
 

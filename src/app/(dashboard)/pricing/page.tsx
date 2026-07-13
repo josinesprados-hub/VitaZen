@@ -120,7 +120,7 @@ export default function PricingPage() {
               'Hábitos con retos diarios y rachas',
               'Meditación y ejercicios de respiración',
               'Registro de bienestar y nutrición',
-              'Riqueza: ingresos, gastos y categorías',
+              'Finanzas: ingresos, gastos y categorías',
               'Diario personal',
               '5 imperios con niveles y progreso',
               'Mentor IA (15 mensajes al día)',
@@ -209,11 +209,11 @@ export default function PricingPage() {
           {[
             {
               text: 'Tus semanas con menos descanso coinciden con más gasto impulsivo.',
-              empires: 'Energía · Riqueza',
+              empires: 'Energía · Finanzas',
             },
             {
               text: 'Cuando tus hábitos mentales se estabilizan, tu energía financiera cambia.',
-              empires: 'Mente · Riqueza',
+              empires: 'Mente · Finanzas',
             },
             {
               text: 'Los periodos de más disciplina también son los de mejor descanso.',

@@ -39,7 +39,7 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
     tip: 'El descanso no es parar: es dejar que el cuerpo recupere lo que el día gasta.',
   },
   riqueza: {
-    name: 'Riqueza',
+    name: 'Finanzas',
     icon: Gem,
     href: '/imperio/riqueza',
     tip: 'Lo que haces con tu dinero refleja lo que priorizas sin darte cuenta.',
