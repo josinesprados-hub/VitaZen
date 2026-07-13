@@ -950,7 +950,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }
 
   return (
-    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0 sm:gap-4">
+    <div className="mentor-full-viewport flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0 sm:gap-4">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
         <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
