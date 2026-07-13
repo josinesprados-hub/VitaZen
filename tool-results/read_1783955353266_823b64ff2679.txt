@@ -1,0 +1,663 @@
+     1→[
+     2→  {
+     3→    "empire": "riqueza",
+     4→    "title": "Págate primero",
+     5→    "content": "Antes de cualquier gasto, destina algo a ahorro. No es solo una regla financiera — es una forma de priorizarte. Lo que guardas primero es lo que realmente guarda.",
+     6→    "plan": "FREE"
+     7→  },
+     8→  {
+     9→    "empire": "riqueza",
+    10→    "title": "Suscripciones fantasma",
+    11→    "content": "Lo que no usas activamente es dinero que se fue sin que lo notaras. Revisa regularmente lo que se renueva solo: es lo que más se olvida y lo que más sangra tu cuenta.",
+    12→    "plan": "FREE"
+    13→  },
+    14→  {
+    15→    "empire": "riqueza",
+    16→    "title": "Veinticuatro horas",
+    17→    "content": "Esperar un día antes de comprar algo no planificado suele resolver la mitad de las compras impulsivas. El impulso tiene fecha de caducidad — y suele ser corta.",
+    18→    "plan": "FREE"
+    19→  },
+    20→  {
+    21→    "empire": "riqueza",
+    22→    "title": "Automatizar el ahorro",
+    23→    "content": "Lo que no depende de la voluntad del momento tiene más probabilidad de cumplirse.",
+    24→    "plan": "FREE"
+    25→  },
+    26→  {
+    27→    "empire": "riqueza",
+    28→    "title": "Efectivo duele más",
+    29→    "content": "Pagar con billetes te hace sentir lo que gastas. Usar efectivo como presupuesto físico — cuando se acaba el efectivo, se acaba el gasto — es una herramienta de control que la tarjeta no te da.",
+    30→    "plan": "FREE"
+    31→  },
+    32→  {
+    33→    "empire": "riqueza",
+    34→    "title": "Descuento no es ahorro",
+    35→    "content": "Gastar menos de lo esperado sigue siendo gastar. Ahorrar es no gastar. El descuento es gasto disfrazado de oportunidad.",
+    36→    "plan": "FREE"
+    37→  },
+    38→  {
+    39→    "empire": "riqueza",
+    40→    "title": "Lo caro parece mejor",
+    41→    "content": "El cerebro asocia precio con calidad. A veces se paga más por la percepción que por el producto. La relación entre precio y calidad real es más débil de lo que solemos creer.",
+    42→    "plan": "FREE"
+    43→  },
+    44→  {
+    45→    "empire": "riqueza",
+    46→    "title": "Compras con emoción",
+    47→    "content": "El estado de ánimo al comprar afecta más el gasto que el precio mismo. Tristeza y aburrimiento gastan distinto que calma. Las emociones negativas suelen gastar más.",
+    48→    "plan": "FREE"
+    49→  },
+    50→  {
+    51→    "empire": "riqueza",
+    52→    "title": "Gratis es irresistible",
+    53→    "content": "La palabra «gratis» activa una parte del cerebro que ignora el coste oculto. Si es gratis, tú eres el producto. El cerebro no procesa bien lo que no tiene precio.",
+    54→    "plan": "FREE"
+    55→  },
+    56→  {
+    57→    "empire": "riqueza",
+    58→    "title": "Poner fricción",
+    59→    "content": "Dificultar una compra — eliminar tarjeta guardada, cerrar la app — reduce el gasto sin reducir la satisfacción. La fricción es tu amiga.",
+    60→    "plan": "FREE"
+    61→  },
+    62→  {
+    63→    "empire": "riqueza",
+    64→    "title": "El pago mínimo",
+    65→    "content": "Pagar solo el mínimo de la tarjeta es un préstamo con el interés más alto que probablemente tienes. El mínimo es una trampa, no una solución.",
+    66→    "plan": "FREE"
+    67→  },
+    68→  {
+    69→    "empire": "riqueza",
+    70→    "title": "Precio por uso",
+    71→    "content": "El coste real de algo es lo que pagaste dividido entre las veces que lo usas. Un abrigo de 300 euros usado 100 veces costó 3 euros por uso. Un dispositivo de 100 euros usado 2 veces costó 50 euros por uso. La pregunta es: ¿vale la pena?",
+    72→    "plan": "FREE"
+    73→  },
+    74→  {
+    75→    "empire": "riqueza",
+    76→    "title": "Cerca vence a lejos",
+    77→    "content": "El presente siempre pesa más que el futuro en las decisiones financieras. Lo que está cerca se siente real; lo lejano parece negociable. Es el sesgo del presente — y funciona en contra del ahorro.",
+    78→    "plan": "FREE"
+    79→  },
+    80→  {
+    81→    "empire": "riqueza",
+    82→    "title": "Precio por unidad",
+    83→    "content": "El paquete más grande no siempre es más barato por unidad. Comparar el precio por unidad real —gramos, mililitros, unidades— revela cuándo el tamaño grande es una trampa de marketing, no una oferta.",
+    84→    "plan": "FREE"
+    85→  },
+    86→  {
+    87→    "empire": "riqueza",
+    88→    "title": "El colchón",
+    89→    "content": "Tener un fondo de emergencia no es planificación financiera — es poder tomar decisiones sin pánico. La tranquilidad financiera tiene un valor real que no aparece en ningún extracto.",
+    90→    "plan": "FREE"
+    91→  },
+    92→  {
+    93→    "empire": "riqueza",
+    94→    "title": "El come silencioso",
+    95→    "content": "La inflación reduce lo que puedes comprar sin que lo notes. Lo que costaba cien hace unos años ahora cuesta más, y tu salario no siempre acompaña. El dinero que parece seguro en la cuenta pierde poder silenciosamente: si no lo vigilas, no lo ves.",
+    96→    "plan": "FREE"
+    97→  },
+    98→  {
+    99→    "empire": "riqueza",
+   100→    "title": "Presupuestar es elegir",
+   101→    "content": "Un presupuesto no es una cárcel. Es decidir antes dónde quieres que vaya tu dinero en lugar de descubrirlo después. La gente que presupuesta suele sentir más control, no menos libertad.",
+   102→    "plan": "FREE"
+   103→  },
+   104→  {
+   105→    "empire": "riqueza",
+   106→    "title": "Las cantidades pequeñas",
+   107→    "content": "Veinte euros diarios son seiscientos al mes. Lo que parece insignificante diario se vuelve significativo anual.",
+   108→    "plan": "FREE"
+   109→  },
+   110→  {
+   111→    "empire": "riqueza",
+   112→    "title": "Ver el saldo",
+   113→    "content": "Las personas que revisan su cuenta regularmente gastan menos. No por ansiedad — por consciencia.",
+   114→    "plan": "FREE"
+   115→  },
+   116→  {
+   117→    "empire": "riqueza",
+   118→    "title": "Ya tengo algo parecido",
+   119→    "content": "Antes de comprar, preguntar si ya tienes algo que cumple la misma función evita la mitad de las compras innecesarias.",
+   120→    "plan": "FREE"
+   121→  },
+   122→  {
+   123→    "empire": "riqueza",
+   124→    "title": "Experiencias rinden más",
+   125→    "content": "Las cosas se adaptan. Las experiencias se recuerdan. El dinero invertido en vivencias devuelve más con el tiempo.",
+   126→    "plan": "FREE"
+   127→  },
+   128→  {
+   129→    "empire": "riqueza",
+   130→    "title": "El método del sobre",
+   131→    "content": "Separar el dinero en sobres por categoría — lo que hay, hay. Cuando se acaba, no se rellena. Simple y efectivo.",
+   132→    "plan": "FREE"
+   133→  },
+   134→  {
+   135→    "empire": "riqueza",
+   136→    "title": "Preguntar siempre",
+   137→    "content": "Pedir un descuento o una condición mejor funciona más veces de lo que parece. Lo peor que puede pasar es que digan no.",
+   138→    "plan": "FREE"
+   139→  },
+   140→  {
+   141→    "empire": "riqueza",
+   142→    "title": "Lo que ya invertiste",
+   143→    "content": "Seguir gastando en algo solo porque ya invertiste es tirar dinero bueno tras malo. El curso que nunca terminas, el dispositivo que no funciona, el proyecto que no avanza: lo que ya pusiste no se recupera insistando.",
+   144→    "plan": "FREE"
+   145→  },
+   146→  {
+   147→    "empire": "riqueza",
+   148→    "title": "Lo que otros compran",
+   149→    "content": "Ver a alguien más comprar algo hace que parezca más valioso. La mayoría no siempre tiene razón — pero influye.",
+   150→    "plan": "FREE"
+   151→  },
+   152→  {
+   153→    "empire": "riqueza",
+   154→    "title": "La opción trampa",
+   155→    "content": "Cuando aparece una tercera opción que nadie elige, las otras dos parecen mejores de lo que son. No siempre lo son.",
+   156→    "plan": "FREE"
+   157→  },
+   158→  {
+   159→    "empire": "riqueza",
+   160→    "title": "La conveniencia cobra",
+   161→    "content": "Lo cómodo tiene un sobreprecio. Reparto a domicilio, servicio exprés, compra en un clic: la conveniencia es un gasto invisible que se normaliza rápido.",
+   162→    "plan": "FREE"
+   163→  },
+   164→  {
+   165→    "empire": "riqueza",
+   166→    "title": "El fondo indexado",
+   167→    "content": "Un fondo que replica el mercado no necesita adivinar qué empresa ganará. A largo plazo, la mayoría de gestores no le ganan al índice.",
+   168→    "plan": "FREE"
+   169→  },
+   170→  {
+   171→    "empire": "riqueza",
+   172→    "title": "Invertir no es apostar",
+   173→    "content": "Invertir es poner dinero a trabajar durante años. Apostar es esperar un resultado rápido. Se parecen solo en la superficie.",
+   174→    "plan": "FREE"
+   175→  },
+   176→  {
+   177→    "empire": "riqueza",
+   178→    "title": "El tiempo dentro frente al momento",
+   179→    "content": "Estar invertido mucho tiempo importa más que entrar en el momento perfecto. El momento perfecto de entrada es una ilusión.",
+   180→    "plan": "FREE"
+   181→  },
+   182→  {
+   183→    "empire": "riqueza",
+   184→    "title": "Más opciones, peor elección",
+   185→    "content": "Tener demasiadas opciones financieras puede paralizar. Por cada 10 fondos adicionales en un plan de pensiones, la participación cae un 2 % (Iyengar, 2004). A veces, limitar las alternativas aclara la decisión y te ayuda a elegir mejor.",
+   186→    "plan": "FREE"
+   187→  },
+   188→  {
+   189→    "empire": "riqueza",
+   190→    "title": "La marca cobra extra",
+   191→    "content": "El mismo producto con un logo distinto puede costar el doble. El sobreprecio de marca es un impuesto por identidad, no por calidad.",
+   192→    "plan": "FREE"
+   193→  },
+   194→  {
+   195→    "empire": "riqueza",
+   196→    "title": "Plan fijo, gasto fijo",
+   197→    "content": "Elegir un plan ilimitado por la paz mental suele costar más que pagar por uso. La mayoría usa menos de lo que paga en planes ilimitados.",
+   198→    "plan": "FREE"
+   199→  },
+   200→  {
+   201→    "empire": "riqueza",
+   202→    "title": "Comparar con calma",
+   203→    "content": "Tomarse dos minutos para buscar el mismo producto en otro sitio suele encontrarlo más barato. La prisa es enemiga del precio.",
+   204→    "plan": "FREE"
+   205→  },
+   206→  {
+   207→    "empire": "riqueza",
+   208→    "title": "Lo que usas realmente",
+   209→    "content": "La mitad de lo que compras se usa menos de tres veces. El armario lleno de ropa con etiqueta, el aparato de cocina que solo encendiste una vez, el curso que abandonaste en el segundo módulo: comprar fue fácil, usar es la prueba. Antes de la próxima compra, mira lo que ya tienes y pregúntate cuánto lo has usado en el último mes; el dato te dirá más sobre tu próxima compra que cualquier descripción del producto.",
+   210→    "plan": "FREE"
+   211→  },
+   212→  {
+   213→    "empire": "riqueza",
+   214→    "title": "Las reseñas de cinco",
+   215→    "content": "Las reseñas perfectas suelen ser pocas o compradas. Busca las de tres y cuatro estrellas: suelen ser más honestas.",
+   216→    "plan": "FREE"
+   217→  },
+   218→  {
+   219→    "empire": "riqueza",
+   220→    "title": "Lo usado vale",
+   221→    "content": "Comprar algo que ya tuvo dueño no es falta de recursos — es inteligencia con el dinero. El valor no depende de que sea nuevo.",
+   222→    "plan": "FREE"
+   223→  },
+   224→  {
+   225→    "empire": "riqueza",
+   226→    "title": "Gasta lo que importa",
+   227→    "content": "Antes de presupuestar, identifica tus tres valores principales. Lo que realmente valoras merece presupuesto generoso; lo demás solo ocupa espacio. La alineación no es el método — es el primer paso antes de cualquier método.",
+   228→    "plan": "FREE"
+   229→  },
+   230→  {
+   231→    "empire": "riqueza",
+   232→    "title": "Cómo repartes importa más",
+   233→    "content": "Cómo repartes tu dinero entre categorías —acciones, bonos, efectivo— importa más que qué activo individual eliges. Más del 90 % de la variabilidad de tus retornos depende de esta distribución, no de tu selección. La decisión más importante en inversión no es qué comprar, sino cómo repartir.",
+   234→    "plan": "FREE"
+   235→  },
+   236→  {
+   237→    "empire": "riqueza",
+   238→    "title": "El coste en horas",
+   239→    "content": "Convierte cada gasto en las horas de trabajo que necesitas para pagarlo. Un objeto de 500 euros no cuesta 500 euros: cuesta 25 horas de tu vida. La pregunta cambia de «¿puedo permitirme esto?» a «¿vale esta cantidad de mi tiempo?».",
+   240→    "plan": "FREE"
+   241→  },
+   242→  {
+   243→    "empire": "riqueza",
+   244→    "title": "El punto de suficiencia",
+   245→    "content": "El bienestar emocional aumenta con los ingresos hasta un punto, y luego se estabiliza. El dinero adicional no produce bienestar adicional más allá de cierto umbral. Kahneman y Deaton (2010) estimaron ese punto en torno a los 75 000 dólares anuales en EE. UU.; estudios posteriores (Killingsworth 2021) matizan que la satisfacción sigue creciendo, pero más despacio. Saber dónde está ese punto cambia la pregunta: no es cuánto más puedes ganar, sino cuánto es suficiente para ti.",
+   246→    "plan": "FREE"
+   247→  },
+   248→  {
+   249→    "empire": "riqueza",
+   250→    "title": "Riqueza es lo que no se ve",
+   251→    "content": "Lo visible no es riqueza: es consumo. El coche lujoso que ves en la calle consumió dinero que alguien podría haber invertido. La riqueza real es el dinero que no gastaste: es la opción de no tener que trabajar, la libertad que nadie ve.",
+   252→    "plan": "FREE"
+   253→  },
+   254→  {
+   255→    "empire": "riqueza",
+   256→    "title": "Deja espacio para el error",
+   257→    "content": "Nunca inviertas esperando el mejor escenario. Deja espacio para el error, para lo inesperado, para equivocarte. Si una inversión solo funciona si todo sale bien, no es una inversión — es una apuesta. El margen de seguridad es la distancia entre tu decisión y el desastre.",
+   258→    "plan": "FREE"
+   259→  },
+   260→  {
+   261→    "empire": "riqueza",
+   262→    "title": "Riesgo que puedes quitar y riesgo que no",
+   263→    "content": "La diversificación elimina el riesgo de que una empresa individual fracase, pero no el riesgo de que todo el mercado caiga. Entender esta distinción cambia cómo piensas sobre invertir: no es eliminar todo riesgo, es eliminar el innecesario y aceptar el inevitable.",
+   264→    "plan": "FREE"
+   265→  },
+   266→  {
+   267→    "empire": "riqueza",
+   268→    "title": "El socio emocional",
+   269→    "content": "Imagina que tienes un socio que cada día te ofrece comprar o vender a un precio. Algunos días está eufórico y los precios son absurdos; otros está deprimido y regala. Tú no tienes que aceptar sus ofertas. El mercado tiene emociones — tú no tienes que compartirlas.",
+   270→    "plan": "FREE"
+   271→  },
+   272→  {
+   273→    "empire": "riqueza",
+   274→    "title": "Cuando gano, es mi habilidad",
+   275→    "content": "Cuando una inversión sale bien, atribuimos el resultado a nuestra habilidad. Cuando sale mal, culpamos al mercado. Este sesgo nos impide aprender de los errores y nos hace sobreconfiados justo cuando deberíamos ser más cautelosos.",
+   276→    "plan": "FREE"
+   277→  },
+   278→  {
+   279→    "empire": "riqueza",
+   280→    "title": "No mires solo la ganancia",
+   281→    "content": "Un retorno del 15 % arriesgando mucho no es mejor que 8 % con poco riesgo. Comparar solo ganancias sin mirar cuánto arriesgaste es como comparar coches sin ver el consumo de combustible. La ganancia real es la que obtienes ajustada por lo que pudiste haber perdido.",
+   282→    "plan": "FREE"
+   283→  },
+   284→  {
+   285→    "empire": "riqueza",
+   286→    "title": "Planifica para toda la vida",
+   287→    "content": "La planificación financiera no se hace por mes ni por año: se hace para toda la vida. Ahorrar en la etapa de ingresos altos para mantener el nivel de vida cuando estos bajen no es prudente: es una cuestión matemática. Tu yo futuro depende de las decisiones de tu yo actual.",
+   288→    "plan": "FREE"
+   289→  },
+   290→  {
+   291→    "empire": "riqueza",
+   292→    "title": "Libertad financiera",
+   293→    "content": "La libertad financiera no es ser rico: es que tu dinero trabaje lo suficiente para cubrir tus gastos básicos. Cuando los ingresos de tus inversiones igualan tus necesidades, ya no trabajas por necesidad: trabajas por elección. Ese punto llega antes de lo que imaginas.",
+   294→    "plan": "FREE"
+   295→  },
+   296→  {
+   297→    "empire": "riqueza",
+   298→    "title": "La regla del 72",
+   299→    "content": "Para saber en cuántos años se duplica tu dinero, divide 72 entre el tipo de interés. Al 6 %, se duplica en 12 años. Al 9 %, en 8 años. Es una herramienta mental sencilla que te permite evaluar cualquier inversión o deuda en segundos.",
+   300→    "plan": "FREE"
+   301→  },
+   302→  {
+   303→    "empire": "riqueza",
+   304→    "title": "Aversión a la pérdida",
+   305→    "content": "Perder duele aproximadamente el doble de lo que alegra ganar lo mismo. Kahneman y Tversky (1979) lo llamaron teoría prospectiva: evaluamos los resultados respecto a un punto de referencia, no en términos absolutos. La asimetría es de aproximadamente 2 a 1. Esto explica por qué vendes lo que sube y mantienes lo que baja (efecto disposición): cerrar una pérdida duele más que la pérdida misma cuando se realiza. Conocer la asimetría te permite revisar decisiones que tu cerebro quiere conservar por miedo a perder.",
+   306→    "plan": "PREMIUM"
+   307→  },
+   308→  {
+   309→    "empire": "riqueza",
+   310→    "title": "Contabilidad mental",
+   311→    "content": "El cerebro trata de manera distinta el dinero del salario, el del bono y el del ahorro. Thaler (1999) lo llamó contabilidad mental: un euro es un euro, pero la cuenta de la que procede cambia lo que decides con él. El mecanismo puede ser útil (separar presupuesto de ahorro del de gasto) o perjudicial (tratar el dinero ganado en una inversión con menos cuidado que el invertido original). La contabilidad mental no es un error: es una herramienta. Saber que opera te permite usarla a tu favor o corregirla cuando te perjudica.",
+   312→    "plan": "PREMIUM"
+   313→  },
+   314→  {
+   315→    "empire": "riqueza",
+   316→    "title": "Mentalidad de escasez",
+   317→    "content": "La escasez no solo limita recursos: reduce la capacidad de ver opciones. Mullainathan y Shafir (2013) lo mostraron: la mente se enfoca en lo urgente y excluye lo importante, incluso cuando la solución está ahí. El mecanismo es cognitivo, no emocional: la escasez consume ancho de banda mental, lo que reduce la calidad de las decisiones. Esto explica por quienes tienen menos recursos toman decisiones que parecen irracionales desde fuera: no es falta de información, es falta de margen mental.",
+   318→    "plan": "PREMIUM"
+   319→  },
+   320→  {
+   321→    "empire": "riqueza",
+   322→    "title": "Anclaje y sesgo",
+   323→    "content": "El anclaje funciona incluso cuando sabes que existe. Tversky y Kahneman (1974) lo demostraron: saber que un número de referencia era alto no evita que influya en lo que consideras justo. El ancla es persistente, incluso para quienes la conocen. El mecanismo es automático y opera en milisegundos, antes de que la razón pueda corregirlo. La defensa no es ignorar el ancla (no se puede), sino generar contra-anclas explícitas: antes de negociar, define tu rango objetivo por escrito y oblígate a justificar cualquier desviación.",
+   324→    "plan": "PREMIUM"
+   325→  },
+   326→  {
+   327→    "empire": "riqueza",
+   328→    "title": "El dolor según el método de pago",
+   329→    "content": "El pago en efectivo duele más que el débito, y el débito duele más que el crédito. Cuanto menos se siente, más se gasta. Elegir cómo pagar cambia cuánto. Prelec y Simester (2001) mostraron que los participantes estaban dispuestos a pagar hasta el doble por las mismas entradas en una subasta silenciosa cuando pagaban con tarjeta que cuando pagaban en efectivo. El dolor del pago es un freno natural que el crédito elimina. Si quieres reducir el gasto impulsivo, usa efectivo para las decisiones pequeñas y reserva la tarjeta para las grandes, donde la fricción de la decisión compensa la ausencia de dolor.",
+   330→    "plan": "PREMIUM"
+   331→  },
+   332→  {
+   333→    "empire": "riqueza",
+   334→    "title": "Efecto de dotación",
+   335→    "content": "Valoramos más lo que ya tenemos, aunque nunca lo usemos. Es el efecto de dotación: poseer algo le añade un valor irracional. Knetsch (1989) lo demostró entregando una taza a la mitad de los participantes y observando que el precio mínimo al que estaban dispuestos a venderla era más del doble del máximo al que los que no la tenían estaban dispuestos a comprarla. Vender o regalar lo innecesario requiere superar esa ilusión. La pregunta no es «¿cuánto vale esto para mí?», sino «¿cuánto pagaría hoy por esto si no lo tuviera?». Si la respuesta es cero, sobra.",
+   336→    "plan": "PREMIUM"
+   337→  },
+   338→  {
+   339→    "empire": "riqueza",
+   340→    "title": "Exponencial, no lineal",
+   341→    "content": "El interés compuesto crece como una curva que se acelera: los primeros años parecen poco, los últimos parecen magia. Pero es solo matemáticas. La atribución a Einstein de la frase «el interés compuesto es la octava maravilla del mundo» no está documentada de forma fiable y probablemente sea apócrifa; el principio, en cualquier caso, es correcto. Lo importante no es la cita, sino la consecuencia: el factor determinante del interés compuesto no es la rentabilidad, sino el tiempo. Empezar diez años antes produce más diferencia que aumentar la rentabilidad en dos puntos.",
+   342→    "plan": "PREMIUM"
+   343→  },
+   344→  {
+   345→    "empire": "riqueza",
+   346→    "title": "La tarjeta como impuesto",
+   347→    "content": "El crédito no solo cobra intereses: cambia cuánto gastas. Los estudios muestran que se gasta más con crédito que con efectivo, incluso pagando lo mismo. El impuesto es doble. Prelec y Simester (2001) documentaron el efecto y mostraron que la separación temporal entre compra y pago reduce la sensación de coste, lo que relaja el control del gasto. La tarjeta de crédito no es buena ni mala: es una herramienta que altera la percepción del coste. Si la usas, hazlo con un sistema que recupere la fricción (presupuesto cerrado, pago mensual completo) o el impuesto silencioso se acumulará.",
+   348→    "plan": "PREMIUM"
+   349→  },
+   350→  {
+   351→    "empire": "riqueza",
+   352→    "title": "Lo que aprendiste del dinero",
+   353→    "content": "Las creencias sobre el dinero se forman en la infancia y operan en piloto automático. «El dinero es peligroso», «no hay suficiente», «merezco esto»: guían sin que lo sepas. Klontz y Britt (2012) identificaron esquemas de dinero (evitación, adoración, estatus, vigilancia) que predicen conductas financieras y se transmiten entre generaciones. Identificarlas es el primer paso. No se trata de reemplazarlas por creencias positivas mágicas: se trata de reconocer las que distorsionan tus decisiones para que dejen de operar en piloto automático.",
+   354→    "plan": "PREMIUM"
+   355→  },
+   356→  {
+   357→    "empire": "riqueza",
+   358→    "title": "Presupuesto base cero",
+   359→    "content": "En lugar de ajustar el gasto al ingreso, justificar cada euro desde cero obliga a preguntar: ¿esto sigue siendo necesario? Lo heredado sin revisar suele ser lo más caro. El presupuesto base cero, importado de la gestión empresarial, trata cada partida como nueva cada periodo, sin asumir que lo del año pasado sigue siendo válido. Aplicado a la economía doméstica, revela suscripciones que ya no usas, categorías que han perdido sentido y gastos que se justificaban por un contexto que ya no existe. La condición es revisarlo periódicamente, no una sola vez.",
+   360→    "plan": "PREMIUM"
+   361→  },
+   362→  {
+   363→    "empire": "riqueza",
+   364→    "title": "Dos formas de pagar deudas",
+   365→    "content": "Pagar la deuda más pequeña primero da victorias rápidas. Pagar la más cara primero cuesta más psicológicamente, pero menos en total. La diferencia está entre lo que sientes y lo que pagas. La primera estrategia (método bola de nieve) se apoya en la motivación y la adherencia; la segunda (método avalancha) es matemáticamente óptima. Ambos métodos funcionan si se sostienen: elige el que mantengas en el tiempo. Si la deuda más cara es también la más pequeña, no hay conflicto; si no, decide si priorizas motivación o coste total.",
+   366→    "plan": "PREMIUM"
+   367→  },
+   368→  {
+   369→    "empire": "riqueza",
+   370→    "title": "Lo nuevo se acostumbra",
+   371→    "content": "Las cosas nuevas dejan de emocionar en semanas. El cerebro se adapta y vuelve al nivel base de satisfacción. Se llama adaptación hedónica. Brickman, Coates y Janoff-Bulman (1978) mostraron que los ganadores de premios importantes no eran significativamente más felices que el grupo de control un año después. Comprar para ser feliz es una carrera que no termina: cada nueva adquisición pierde su efecto y exige la siguiente. La salida no es comprar menos por austeridad, sino canalizar el gasto hacia lo que no se adapta tan rápido: experiencias, relaciones y tiempo.",
+   372→    "plan": "PREMIUM"
+   373→  },
+   374→  {
+   375→    "empire": "riqueza",
+   376→    "title": "La opción por defecto como negocio",
+   377→    "content": "Las empresas diseñan opciones por defecto para que gastes sin decidir. Las suscripciones autorrenovables, los planes ilimitados, las pruebas gratuitas que se convierten en cobro funcionan porque cancelar requiere acción y la inercia favorece lo establecido. Reconocer cuándo te diseñan es el primer paso para diseñar por ti mismo. La defensa práctica es reversar el sentido de la inercia: pon las cancelaciones en el calendario al suscribirte, desmarca las casillas preseleccionadas y exige justificación explícita para mantener cualquier suscripción que no uses semanalmente.",
+   378→    "plan": "PREMIUM"
+   379→  },
+   380→  {
+   381→    "empire": "riqueza",
+   382→    "title": "La ilusión del crédito",
+   383→    "content": "El límite de la tarjeta no es dinero tuyo: es dinero prestado que parece tuyo. Cuanto más alto es el límite, más gastas, porque tu cerebro confunde disponibilidad con posesión. El crédito no solo cobra intereses: distorsiona tu percepción de cuánto puedes gastar. La defensa es tratar el límite de crédito como límite de gasto no como capacidad de gasto: si no podrías pagarlo en efectivo este mes, no lo compres a crédito esperando poder pagarlo el próximo.",
+   384→    "plan": "PREMIUM"
+   385→  },
+   386→  {
+   387→    "empire": "riqueza",
+   388→    "title": "El encuadre del gasto",
+   389→    "content": "Presentar un gasto mensual como «solo dos euros al día» lo hace parecer pequeño. La misma cantidad presentada como coste anual revela su tamaño real. El encuadre cambia la percepción. Thaler y Sunstein (2008) llamaron a esto encuadre (framing): la misma cifra presentada en distintas escalas produce decisiones distintas. La defensa es traducir siempre el coste a la escala anual antes de decidir: dos euros al día son 730 euros al año, una cifra que cambia el juicio sobre si merece la pena.",
+   390→    "plan": "PREMIUM"
+   391→  },
+   392→  {
+   393→    "empire": "riqueza",
+   394→    "title": "El coste que no ves",
+   395→    "content": "El coste de oportunidad no aparece en ningún extracto de cuenta. Pero es el coste real de cada decisión: todo lo que ese dinero dejó de hacer. Si inviertes 1000 euros en un dispositivo, el coste de oportunidad no son los 1000 euros, sino los rendimientos que esos 1000 euros habrían generado invertidos durante los años que el dispositivo se devalúa. El coste de oportunidad es invisible en la contabilidad, pero real en el patrimonio. Antes de un gasto importante, pregunta qué habría hecho ese dinero en su alternativa más razonable; la respuesta suele cambiar la decisión.",
+   396→    "plan": "PREMIUM"
+   397→  },
+   398→  {
+   399→    "empire": "riqueza",
+   400→    "title": "Negociar sin culpa",
+   401→    "content": "Pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación: es respeto por tu propio dinero. Los datos apoyan la práctica: en negociación salarial, quienes piden obtienen mejoras significativas con más frecuencia de lo que asumen. La renuencia a negociar no es prudencia, es un sesgo de evitación de la incomodidad social. La estrategia es separar la conversación de la relación: pedir mejores condiciones no es desafiar a la otra parte, es informarse del rango posible. El coste de no preguntar es siempre mayor que el coste de preguntar: en el peor escenario, la respuesta es no y la posición no empeora; en el mejor, se gana sin coste.",
+   402→    "plan": "PREMIUM"
+   403→  },
+   404→  {
+   405→    "empire": "riqueza",
+   406→    "title": "El colchón como libertad",
+   407→    "content": "Tener liquidez disponible reduce las decisiones financieras impulsivas. El mecanismo es cognitivo: la escasez consume ancho de banda mental y estrecha el horizonte temporal de evaluación (Mullainathan y Shafir 2013), lo que lleva a reaccionar en lugar de procesar alternativas. Con un fondo de emergencia, cada imprevisto se enmarca en un horizonte más amplio en lugar de forzar una decisión reactiva. El colchón no es solo defensa: es la condición para decidir con perspectiva. Sin liquidez, cada urgencia fuerza una decisión a corto plazo; con liquidez, cada urgencia se enmarca en un horizonte más amplio.",
+   408→    "plan": "PREMIUM"
+   409→  },
+   410→  {
+   411→    "empire": "riqueza",
+   412→    "title": "El impuesto invisible",
+   413→    "content": "La inflación es un coste que se cobra a quien no invierte. El dinero que parece seguro en la cuenta pierde poder de compra en silencio. No invertir tiene un precio real que se acumula año tras año. Si la inflación es del 3 % anual, el poder de compra de 10 000 euros se reduce a 7 400 en diez años aunque la cuenta siga marcando 10 000. La ilusión de seguridad del dinero en cuenta es costosa: la estabilidad nominal oculta la pérdida real. El dinero parado no se queda igual: se devalúa. La inversión no es arriesgada por oposición a la caja de ahorros; la caja de ahorros también tiene su riesgo, solo que es invisible.",
+   414→    "plan": "PREMIUM"
+   415→  },
+   416→  {
+   417→    "empire": "riqueza",
+   418→    "title": "Diversificar protege",
+   419→    "content": "Diversificar no reduce lo que ganas: reduce la probabilidad de perder mucho de golpe. Es un seguro, no una limitación. No poner todos los huevos en la misma cesta no es miedo: es sentido común con datos. Markowitz (1952) mostró que combinar activos con baja correlación reduce el riesgo de la cartera sin reducir necesariamente el retorno esperado. La diversificación no es gratuita (limita el potencial al alza tanto como a la baja), pero su beneficio neto es positivo: la reducción del riesgo extremo compensa con creces la renuncia al mejor escenario.",
+   420→    "plan": "PREMIUM"
+   421→  },
+   422→  {
+   423→    "empire": "riqueza",
+   424→    "title": "Lo reciente engaña",
+   425→    "content": "Comprar lo que más subió recientemente es seguir al rebaño. Lo que subió rápido suele corregir con la misma velocidad. El rendimiento pasado no predice el futuro: predice el comportamiento del rebaño. La advertencia reglamentaria «los rendimientos pasados no garantizan resultados futuros» no es una fórmula legal: es una regularidad estadística. Los inversores particulares tienden a comprar alto y vender bajo precisamente porque siguen el rendimiento reciente. La defensa es invertir de forma sistemática (aportaciones periódicas automáticas) en lugar de reactivas a lo que acaba de subir.",
+   426→    "plan": "PREMIUM"
+   427→  },
+   428→  {
+   429→    "empire": "riqueza",
+   430→    "title": "La deuda que compra tiempo",
+   431→    "content": "Una deuda para educación o para un negocio puede generar más valor del que cuesta. El criterio no es si hay deuda: es si compra algo que crece. La deuda para un máster con un retorno de inversión claro no es equivalente a la deuda de un televisor. La diferencia está en lo que financia: si compra un activo (formación, negocio, vivienda) que generará ingresos o ahorro futuro, es deuda productiva; si compra un consumo que pierde valor, es deuda onerosa. No toda deuda es igual: el tipo de interés y el activo financiado importan más que el hecho de endeudarse.",
+   432→    "plan": "PREMIUM"
+   433→  },
+   434→  {
+   435→    "empire": "riqueza",
+   436→    "title": "El coste hundido en suscripciones",
+   437→    "content": "Seguir pagando algo que no usas porque «ya pagué este mes» es el sesgo de coste hundido. El dinero ya se fue. La pregunta es si sigues yendo. El coste hundido es irrecuperable por definición: la decisión racional debe ignorarlo y comparar solo el coste futuro con el beneficio futuro. Si una suscripción no aporta valor equivalente a su coste mensual, cancelarla es la decisión correcta aunque hayas pagado este mes. El dinero ya pagado no se recupera manteniendo la suscripción: se pierde igual, y además sigues pagando el mes siguiente.",
+   438→    "plan": "PREMIUM"
+   439→  },
+   440→  {
+   441→    "empire": "riqueza",
+   442→    "title": "La ilusión de control",
+   443→    "content": "Creer que puedes predecir el mercado da una falsa sensación de competencia. Elegir el momento perfecto de entrada, analizar patrones o seguir instintos no mejora resultados: los empeora. Incluso los profesionales no superan al mercado de forma consistente. French (2008) estimó que el coste agregado de la búsqueda activa de alpha en el mercado estadounidense era del 0,67 % anual, una transferencia neta de los inversores activos a los pasivos. La humildad ante la incertidumbre es una ventaja, no una renuncia: te lleva a estrategias de bajo coste, diversificación amplia y horizonte largo que estadísticamente superan al intento de anticipar el momento del mercado.",
+   444→    "plan": "PREMIUM"
+   445→  },
+   446→  {
+   447→    "empire": "riqueza",
+   448→    "title": "Confirmación financiera",
+   449→    "content": "Buscar información que confirme lo que ya crees sobre una inversión es natural y peligroso. El sesgo de confirmación te hace ignorar señales contrarias. Nickerson (1998) lo documentó como un sesgo general que opera en la búsqueda de información, la interpretación y la memoria. En inversión, te lleva a sobrevalorar las noticias favorables a tu posición y a descartar las desfavorables como ruido. La defensa es buscar activamente la tesis contraria a la tuya y obligarte a articularla: si no puedes defender la posición contraria con la misma fuerza que la tuya, no la entiendes lo suficiente como para sostener la tuya.",
+   450→    "plan": "PREMIUM"
+   451→  },
+   452→  {
+   453→    "empire": "riqueza",
+   454→    "title": "Treinta días",
+   455→    "content": "Para compras grandes, esperar un mes separa lo que necesitas de lo que querías en un momento. Si después de treinta días sigues pensando en ello, probablemente valga la pena. La regla de los treinta días no es austeridad: es filtrado. El impulso de compra tiene una vida media de horas a días; lo que sobrevive un mes no es impulso, es intención. La regla también opera en sentido inverso: si olvidas la compra en una semana, has ahorrado el dinero que hubieras gastado por un deseo que ya no existe.",
+   456→    "plan": "PREMIUM"
+   457→  },
+   458→  {
+   459→    "empire": "riqueza",
+   460→    "title": "El coste del cambio",
+   461→    "content": "Cambiar de banco, seguro o proveedor requiere tiempo y esfuerzo. Pero quedarse por inercia suele costar más que el esfuerzo de cambiar. El statu quo tiene precio y se cobra en silencio. Samuelson y Zeckhauser (1988) llamaron a esto sesgo de estatus quo: la opción por defecto se mantiene con más frecuencia de la que justifica su calidad. El coste del cambio no es solo el esfuerzo, es la renuncia a lo conocido. La estrategia es revisar periódicamente (cada uno o dos años) las suscripciones recurrentes, seguros y proveedores, y obligarse a comparar con alternativas. Si la diferencia es pequeña, no cambies; si es grande, el esfuerzo inicial se amortiza pronto.",
+   462→    "plan": "PREMIUM"
+   463→  },
+   464→  {
+   465→    "empire": "riqueza",
+   466→    "title": "El sueño y el dinero",
+   467→    "content": "Dormir mal deteriora las decisiones financieras tanto como el alcohol. Menos horas de sueño equivalen a más riesgo y más errores. La conexión entre sueño y decisión financiera está bien documentada. Walker (2017) mostró que la privación de sueño deteriora la función de la corteza prefrontal, responsable del control de impulsos y la evaluación de riesgos, con un efecto comparable a la intoxicación alcohólica. Las decisiones financieras tomadas con sueño insuficiente son más impulsivas, más sensibles al corto plazo y menos capaces de evaluar escenarios. La defensa no es decidir menos, es decidir mejor: si una decisión financiera importante está pendiente y llevas varios días durmiendo mal, posterga la decisión hasta descansar.",
+   468→    "plan": "PREMIUM"
+   469→  },
+   470→  {
+   471→    "empire": "riqueza",
+   472→    "title": "Los tres minutos",
+   473→    "content": "El impulso de compra tiene una ventana crítica de unos minutos. Si la pasas —respirando, caminando, bebiendo agua— la urgencia suele desaparecer. La activación del circuito de recompensa decae en pocos minutos, momento en el que la corteza prefrontal recupera capacidad de evaluación. La regla de los tres minutos es una heurística práctica: no es una ley neurológica exacta, pero captura el hecho de que el pico de urgencia tiene una vida media corta. Si la urgencia no sobrevive a los tres minutos, no era una necesidad: era un pico de activación.",
+   474→    "plan": "PREMIUM"
+   475→  },
+   476→  {
+   477→    "empire": "riqueza",
+   478→    "title": "Tu precio interno",
+   479→    "content": "Cada persona tiene un precio de referencia interno para las cosas. Se forma con tu primera compra y es difícil de actualizar. Si tu primer móvil costó 200, uno de 500 parece caro aunque sea justo. Tu ancla interna filtra toda evaluación de precio. Tversky y Kahneman (1974) documentaron el anclaje como heurística general: el primer número al que se expone el cerebro sesga el juicio posterior, incluso si es irrelevante. El precio que te parece «normal» no es objetivo: es tu ancla histórica. Si vas a comprar algo caro, exponte primero al rango completo de precios del mercado, no solo a una marca, para que tu ancla se forme con datos y no con un único recuerdo.",
+   480→    "plan": "PREMIUM"
+   481→  },
+   482→  {
+   483→    "empire": "riqueza",
+   484→    "title": "Esperar fortalece",
+   485→    "content": "La capacidad de esperar por algo mejor se correlaciona con mejores resultados financieros a largo plazo. No es paciencia innata: es práctica. La gratificación diferida se entrena. Mischel y Ebbesen (1970) mostraron en el experimento del malvavisco que la capacidad de esperar una recompensa mayor en lugar de aceptar una menor inmediata predice resultados a largo plazo. La habilidad no es fija: se entrena con práctica consistente, empezando por pequeñas decisiones (esperar veinticuatro horas antes de una compra) y avanzando hacia decisiones más grandes. La gratificación diferida no es renuncia al placer: es intercambiar un placer menor ahora por uno mayor después.",
+   486→    "plan": "PREMIUM"
+   487→  },
+   488→  {
+   489→    "empire": "riqueza",
+   490→    "title": "Dinero de la casa",
+   491→    "content": "El dinero ganado en una inversión se gasta con menos cuidado que el invertido original. El cerebro lo clasifica como «ganancia», no como capital. Thaler y Johnson (1990) llamaron a esto el efecto de dinero de la casa (house money effect): los beneficios se asumen con más riesgo que el capital inicial porque se perciben como «ganados», no como propios. El efecto erosionará tu patrimonio si no lo controlas: la solución es tratar los beneficios como capital en cuanto se realizan, no como dinero de juguete. La distinción entre capital y ganancia es contable, no psicológica; tu cerebro debe aprender a tratar ambos igual.",
+   492→    "plan": "PREMIUM"
+   493→  },
+   494→  {
+   495→    "empire": "riqueza",
+   496→    "title": "Escasez artificial",
+   497→    "content": "Reducir la escasez artificial —suscripciones innecesarias, deudas acumuladas, cosas sin usar— crea margen mental sin necesitar más ingresos. La escasez real (no tener recursos) y la escasez artificial (tenerlos comprometidos en gastos innecesarios) producen el mismo efecto cognitivo: reducen la capacidad de decidir. Mullainathan y Shafir (2013) mostraron que el margen mental es un recurso escaso: cualquier cosa que lo libere mejora la calidad de las decisiones, incluso sin cambiar los ingresos. Cancelar suscripciones no usadas y deudas de pequeño saldo no es solo ahorro: es liberar margen mental para decisiones más importantes.",
+   498→    "plan": "PREMIUM"
+   499→  },
+   500→  {
+   501→    "empire": "riqueza",
+   502→    "title": "Presupuesto por valores",
+   503→    "content": "Alinear el gasto con lo que realmente valoras —no con lo que la cultura dice que deberías valorar— genera más satisfacción por cada euro gastado. Dunn, Gilbert y Wilson (2011) mostraron que el gasto alineado con los valores personales produce más bienestar subjetivo que el gasto en bienes materiales, especialmente cuando el gasto se dirige a experiencias, tiempo y otros. La condición es la honestidad: la mayoría dice valorar la salud, las relaciones y el aprendizaje, pero su gasto dice otra cosa. Antes de presupuestar, escribe tus tres valores principales y compara tu gasto real con ellos. Si la alineación es baja, no cambies los valores: cambia el gasto.",
+   504→    "plan": "PREMIUM"
+   505→  },
+   506→  {
+   507→    "empire": "riqueza",
+   508→    "title": "Negociar el salario",
+   509→    "content": "Aceptar la primera oferta salarial sin negociar puede costar cientos de miles de euros a lo largo de una carrera profesional. La mayoría de los empleadores esperan que negocies. Babcock y Laschever (2003) documentaron que los candidatos que negocian reciben ofertas iniciales un 7-10 % más altas de media, y esa diferencia se acumula y se capitaliza a lo largo de toda la carrera profesional. No negociar tiene un coste invisible que se cobra en silencio, año tras año. La estrategia es preparar el rango objetivo antes de la conversación, basar la petición en datos de mercado y tratar la negociación como un intercambio de información, no como un conflicto. La primera oferta casi nunca es la mejor oferta posible.",
+   510→    "plan": "PREMIUM"
+   511→  },
+   512→  {
+   513→    "empire": "riqueza",
+   514→    "title": "Deuda emocional",
+   515→    "content": "Algunas compras compensan algo que no es financiero: soledad, frustración, cansancio. Identificar la emoción detrás del gasto es más útil que cualquier presupuesto. El gasto emocional no es irracional: es una estrategia de regulación emocional, aunque cara e ineficiente. Si detectas un patrón de compras tras días difíciles, la intervención no es prohibir el gasto, es sustituir la estrategia de regulación: caminar, llamar a alguien, dormir. El presupuesto no resuelve el gasto emocional porque no aborda la causa; la regulación emocional sí.",
+   516→    "plan": "PREMIUM"
+   517→  },
+   518→  {
+   519→    "empire": "riqueza",
+   520→    "title": "Ambiente que gasta",
+   521→    "content": "La música lenta en las tiendas hace que camines más despacio y gastes más. La luz cálida, los olores, la distribución: todo está diseñado para que compres. Underhill (2009) documentó en décadas de observación en tiendas que factores ambientales aparentemente neutros (música, iluminación, orden de los pasillos, colocación de los productos) alteran de forma medible el tiempo de permanencia y el importe gastado. El diseño ambiental no es decoración: es ingeniería conductual. La defensa es entrar con lista, fijar un tiempo máximo y no recorrer los pasillos sin objetivo. Donde hay estímulo diseñado para prolongar tu estancia, la única protección es acortarla deliberadamente.",
+   522→    "plan": "PREMIUM"
+   523→  },
+   524→  {
+   525→    "empire": "riqueza",
+   526→    "title": "La deuda multiplica",
+   527→    "content": "La deuda amplifica tanto las ganancias como las pérdidas. No crea valor: lo multiplica, en ambas direcciones. Una posición apalancada al 50 % que sube un 10 % produce un 20 % de rentabilidad sobre el capital propio; la misma posición que baja un 10 % produce una pérdida del 20 %. El apalancamiento no es una apuesta direccional: es un multiplicador de la dirección que tomes. La condición es la solvencia: la deuda solo es viable si puedes soportar el escenario desfavorable sin que te liquide. Si el apalancamiento te obliga a vender en el peor momento, no multiplica: destruye.",
+   528→    "plan": "PREMIUM"
+   529→  },
+   530→  {
+   531→    "empire": "riqueza",
+   532→    "title": "Dinero disponible",
+   533→    "content": "Tener dinero accesible tiene un valor que no aparece en ningún extracto: es la opción de aprovechar oportunidades. No es solo para emergencias: es poder decir sí cuando aparece una inversión, una formación o una negociación que no esperabas. En finanzas, esta opción tiene un nombre (valor opcional) y un precio (el coste de oportunidad de no invertir ese dinero). La liquidez no es ineficiente: es la prima de un seguro que te permite actuar cuando otros no pueden. Mantener parte del patrimonio en liquidez no es timidez: es conservar la opción de aprovechar los momentos en los que el precio de los activos cae y los que no tienen liquidez se quedan fuera.",
+   534→    "plan": "PREMIUM"
+   535→  },
+   536→  {
+   537→    "empire": "riqueza",
+   538→    "title": "Imitación social",
+   539→    "content": "El gasto por imitación sigue una curva: se acelera cuando los cercanos gastan y se frena cuando uno queda fuera del grupo. La referencia no es el precio: es la tribu. Christakis y Fowler (2008) mostraron que las conductas —incluido el gasto— se propagan por redes sociales hasta tres grados de separación. El gasto de tus conocidos afecta a tu percepción de lo normal y, por tanto, a tu gasto. La defensa no es aislarse: es ser consciente de qué grupo de referencia está modulando tu percepción de lo razonable y, si conviene, cambiar de grupo de referencia o filtrar la exposición.",
+   540→    "plan": "PREMIUM"
+   541→  },
+   542→  {
+   543→    "empire": "riqueza",
+   544→    "title": "La edad y el riesgo",
+   545→    "content": "La tolerancia al riesgo debería disminuir con el tiempo, no porque seas menos capaz, sino porque tienes menos tiempo para recuperar. La razón es aritmética: una caída del 50 % a los 30 años se recupera en décadas de aportaciones; a los 60, no hay décadas. La glide path de los fondos objetivo (target-date) formaliza este principio reduciendo automáticamente la exposición a renta variable conforme se acerca la fecha de jubilación. La regla práctica de «100 menos tu edad = porcentaje en renta variable» es una aproximación burda; la lógica subyacente es correcta. Ajustar el riesgo a la edad no es conservadurismo: es calibrar la exposición a la capacidad real de recuperación.",
+   546→    "plan": "PREMIUM"
+   547→  },
+   548→  {
+   549→    "empire": "riqueza",
+   550→    "title": "La fatiga de decisión",
+   551→    "content": "La calidad de las decisiones financieras tiende a disminuir a lo largo del día. Esto no se debe a que se agote una reserva de voluntad, sino a la acumulación de factores: la motivación se desplaza, la atención se dispersa y el cerebro comienza a buscar atajos. Danziger, Levav y Avnaim-Pesso (2011) mostraron que los jueces tomaban decisiones diferentes según el momento del día, un patrón que refleja cómo varía la calidad decisional con el cansancio y la carga previa. La defensa en finanzas personales es la misma: automatizar las decisiones repetitivas (domiciliación de ahorro, pagos, inversiones periódicas) para preservar la atención para las que no se pueden automatizar. Las decisiones importantes no deben tomarse al final del día ni tras una sesión larga.",
+   552→    "plan": "PREMIUM"
+   553→  },
+   554→  {
+   555→    "empire": "riqueza",
+   556→    "title": "La inflación percibida",
+   557→    "content": "Las personas suelen sentir que la inflación es más alta de lo que es. Se recuerdan mejor los precios que subieron y se olvidan de los que bajaron o se mantuvieron. Brachinger (2008) documentó este sesgo de percepción inflacionaria: la memoria de precios es asimétrica, pondera más las subidas que las bajadas, y la inflación percibida supera sistemáticamente a la oficial. El sesgo no es conspiración de los datos oficiales: es una característica de la memoria. Antes de ajustar decisiones por una percepción inflacionaria, contrasta con el dato oficial del IPC. La inflación percibida no es la inflación real; decidir por la percibida te lleva a sobrecompensar.",
+   558→    "plan": "PREMIUM"
+   559→  },
+   560→  {
+   561→    "empire": "riqueza",
+   562→    "title": "No mirar no ayuda",
+   563→    "content": "Evitar mirar el saldo cuando las cosas van mal es natural. Pero la información que se ignora no desaparece: se agrava. La evitación de la información (information avoidance) está documentada como un sesgo que agrava los problemas financieros: retrasar la revisión del saldo aumenta el daño porque las decisiones correctivas se toman más tarde. La defensa no es mirar todos los días (eso genera ansiedad sin mejorar las decisiones), sino revisar con frecuencia fija (mensual) y obligatoria, sin excepciones. Si las cosas van mal, mirar antes es lo que permite corregir antes; no mirar es lo que permite que el problema crezca.",
+   564→    "plan": "PREMIUM"
+   565→  },
+   566→  {
+   567→    "empire": "riqueza",
+   568→    "title": "Herramienta, no identidad",
+   569→    "content": "El dinero es una herramienta, no una identidad. Ser «alguien que ahorra» funciona. Identificarte con «mi valor es mi saldo» no. La relación con el dinero mejora cuando deja de ser quién eres y pasa a ser lo que usas. Klontz y Britt (2012) mostraron que los esquemas de identidad financiera (evitación, adoración, estatus, vigilancia) predicen conductas financieras y bienestar subjetivo. La identidad basada en el saldo es frágil porque el saldo es volátil; la identidad basada en hábitos es robusta porque los hábitos son estables. Tu valor no es tu saldo; tu valor son tus decisiones repetidas.",
+   570→    "plan": "PREMIUM"
+   571→  },
+   572→  {
+   573→    "empire": "riqueza",
+   574→    "title": "Las consecuencias invisibles",
+   575→    "content": "Cada decisión financiera tiene un efecto directo visible y otro indirecto oculto. Comprar barato puede costar más si se rompe pronto; ahorrar demasiado puede costar experiencias que no se repiten; vender en una caída puede evitar una pérdida mayor pero también cerrar la posibilidad de recuperación. La trampa no está en el primer efecto, que suele ser evidente: está en el segundo, que no se ve y que muchas veces pesa más a largo plazo. Antes de decidir, enumera explícitamente las consecuencias indirectas que el primer razonamiento omite; casi siempre hay alguna que cambia la decisión.",
+   576→    "plan": "PREMIUM"
+   577→  },
+   578→  {
+   579→    "empire": "riqueza",
+   580→    "title": "Lo que no miden los balances",
+   581→    "content": "El bienestar financiero no aparece en el saldo. Es la ausencia de preocupación constante, la capacidad de absorber un golpe y la alineación entre gasto y valores. La investigación en bienestar financiero (Netemeyer et al. 2018) lo define como la percepción subjetiva de tener recursos suficientes para la propia situación, independiente del ingreso absoluto. El bienestar financiero correlaciona más con el control percibido y la alineación con los valores que con el nivel de ingresos por encima de un umbral. Lo que no miden los balances importa más que lo que miden: el saldo es un número, el bienestar es la experiencia de vivir sin preocupación financiera constante.",
+   582→    "plan": "PREMIUM"
+   583→  },
+   584→  {
+   585→    "empire": "riqueza",
+   586→    "title": "Empujones y arquitectura de elección",
+   587→    "content": "Diseñar el contexto de decisión cambia la conducta sin prohibir opciones. La autoinscripción en planes de ahorro (cancelación voluntaria) frente a la inscripción manual (inscripción voluntaria) cambia la participación del 40 % al 90 %. No necesitas más fuerza de voluntad: necesitas mejor diseño de tus decisiones financieras. Thaler y Sunstein (2008) lo llamaron arquitectura de elección y lo ilustraron con el caso de los planes de pensiones en EE. UU. El principio es que la opción por defecto gana no porque sea mejor, sino porque es la más fácil. Diseñar tus propias opciones por defecto (domiciliación de ahorro, eliminación de tarjetas guardadas, presupuesto automático) produce más cambio que la fuerza de voluntad.",
+   588→    "plan": "PREMIUM"
+   589→  },
+   590→  {
+   591→    "empire": "riqueza",
+   592→    "title": "La sobreoperación y el coste de la acción",
+   593→    "content": "Los inversores que operan con más frecuencia obtienen peores resultados. Barber y Odean (2000) lo documentaron: los hogares que más operaban ganaban un 7 % menos que el mercado. La ilusión de que la acción genera resultados es cara: en inversión, menos es más. El mecanismo es doble: las operaciones tienen costes de transacción que erosionan el retorno, y los inversores particulares tienden a comprar tras subidas y a vender tras caídas, el patrón opuesto al óptimo. La sobreoperación no es señal de implicación: es señal de ruido. La estrategia pasiva (comprar y mantener fondos indexados de bajo coste) supera estadísticamente a la operativa activa de la mayoría de los inversores particulares.",
+   594→    "plan": "PREMIUM"
+   595→  },
+   596→  {
+   597→    "empire": "riqueza",
+   598→    "title": "El paseo aleatorio y los mercados eficientes",
+   599→    "content": "Los precios incorporan toda la información disponible tan rápido que superar al mercado de forma consistente es prácticamente imposible. Los errores son impredecibles. La mejor estrategia no es ganarle al mercado, sino participar. Malkiel (1973, actualizado en 2023) lo argumentó en A Random Walk Down Wall Street. La hipótesis de los mercados eficientes (Fama 1970) matiza que la eficiencia no es perfecta, pero sí suficiente para que el coste de buscar ineficiencias supere el beneficio de explotarlas después de costes. La consecuencia práctica es que, para la mayoría de inversores, un fondo indexado de bajo coste supera al intento de selección de valores.",
+   600→    "plan": "PREMIUM"
+   601→  },
+   602→  {
+   603→    "empire": "riqueza",
+   604→    "title": "Los cuatro pilares de la inversión",
+   605→    "content": "La teoría, la historia, la psicología y el negocio de la inversión son los cuatro pilares. Ignorar cualquiera de ellos es construir sobre arena. Los inversores que solo miran números sin entender psicología, o que confían en la teoría sin conocer la historia, construyen carteras frágiles. Bernstein (2002) lo articuló en The Four Pillars of Investing. La teoría enseña la relación entre riesgo y retorno; la historia enseña cómo se han comportado los mercados en crisis reales; la psicología enseña los sesgos que te hacen tomar malas decisiones; el negocio enseña cómo se incentivan los intermediarios. Un inversor completo domina los cuatro: ninguno basta por separado.",
+   606→    "plan": "PREMIUM"
+   607→  },
+   608→  {
+   609→    "empire": "riqueza",
+   610→    "title": "Teoría de carteras y correlación",
+   611→    "content": "La magia de la diversificación está en tener cosas que no se mueven juntas. Dos activos con baja correlación reducen el riesgo más que dos con alta correlación y alta ganancia. La frontera eficiente marca la combinación óptima de riesgo y retorno. Markowitz (1952, Nobel 1990) formalizó la teoría moderna de carteras: la varianza de una cartera no es el promedio de las varianzas de sus componentes, sino que depende de las covarianzas entre ellos. La consecuencia práctica es que añadir un activo con retorno bajo pero baja correlación puede mejorar la relación riesgo-retorno de la cartera. La diversificación no es solo tener muchos activos: es tener activos que respondan de forma distinta a los mismos eventos.",
+   612→    "plan": "PREMIUM"
+   613→  },
+   614→  {
+   615→    "empire": "riqueza",
+   616→    "title": "Regulación emocional y decisión financiera",
+   617→    "content": "La reevaluación cognitiva (repensar el estímulo) funciona mejor que la supresión (ignorar la emoción) para decidir financieramente. Reevaluar («esto es marketing, no necesidad») supera intentar no pensar en ello. Gross (2015) mostró que la reevaluación reduce la intensidad emocional sin el coste cognitivo de la supresión, que agota recursos y rebota en cuanto se relaja la atención. La emoción no es el problema: cómo la gestionas sí lo es. La reevaluación aplicada a las decisiones financieras consiste en reformular el estímulo («¿es esto una necesidad o un deseo activado por marketing?») antes de decidir, no en intentar bloquear la emoción.",
+   618→    "plan": "PREMIUM"
+   619→  },
+   620→  {
+   621→    "empire": "riqueza",
+   622→    "title": "La mentalidad de crecimiento financiero",
+   623→    "content": "Creer que tu situación financiera puede mejorar con estrategia y aprendizaje se opone a la mentalidad de escasez. No es optimismo ingenuo: la capacidad de planificar compensa la escasez de recursos. Dweck (2006) llamó mentalidad de crecimiento a la creencia de que las capacidades son mejorables con esfuerzo y estrategia, frente a la mentalidad fija que las considera innatas. Aplicada a las finanzas, la mentalidad de crecimiento financiero sostiene que las decisiones y los hábitos importan más que el punto de partida. Quienes la sostienen buscan más opciones y toman mejores decisiones; quienes sostienen la mentalidad fija asumen que su situación es inmutable y deciden en consecuencia. La diferencia no es el ingreso: es la disposición a aprender y cambiar de estrategia.",
+   624→    "plan": "PREMIUM"
+   625→  },
+   626→  {
+   627→    "empire": "riqueza",
+   628→    "title": "La columna de costes ignorada",
+   629→    "content": "En las tablas de rendimientos, la mayoría ignora la columna de costes y se concentra en los rendimientos pasados. Pero los costes son el único predictor fiable de rendimientos futuros relativos. El fondo más barato gana más veces de las que parece. Morningstar (2017) publicó un estudio que mostraba que los costes eran el mejor predictor de los rendimientos futuros a largo plazo, mejor que el rating por estrellas, mejor que el rendimiento pasado. La razón es aritmética: los costes son ciertos y se restan cada año; los rendimientos futuros son inciertos. La columna de costes es la menos leída porque es la menos atractiva; es también la más útil.",
+   630→    "plan": "PREMIUM"
+   631→  },
+   632→  {
+   633→    "empire": "riqueza",
+   634→    "title": "La neurociencia del gasto",
+   635→    "content": "Tu cerebro activa la recompensa al anticipar una compra y el dolor al pagar. Los responsables de marketing maximizan la anticipación y minimizan la sensación de pago. Entender que tu cerebro está siendo manipulado es el primer paso para contrarrestarlo. Zweig (2007) lo documentó en Your Money and Your Brain basándose en estudios de neurociencia financiera. El circuito de recompensa se activa antes de la compra (anticipación), no después; el dolor del pago se reduce cuando el pago se separa temporalmente de la compra (crédito, suscripción). La defensa es restablecer la conexión entre compra y pago: pagar en efectivo, eliminar tarjetas guardadas, revisar el cargo en el momento de la decisión. Donde el marketing reduce la fricción, tú debes recuperar la fricción.",
+   636→    "plan": "PREMIUM"
+   637→  },
+   638→  {
+   639→    "empire": "riqueza",
+   640→    "title": "Invertir en el segundo nivel",
+   641→    "content": "Primer orden: «Las acciones bajan, debería comprar». Segundo orden: «Todos van a comprar, los precios subirán demasiado y corregirán: debería esperar». Pensar un paso más allá de lo obvio separa al inversor promedio del excepcional. Howard Marks popularizó esta distinción en The Most Important Thing (2011): lo obvio no da ventaja, porque todo el mundo lo ve. La ventaja está en el segundo nivel, donde se anticipa lo que los demás harán con la información obvia. El pensamiento de segundo orden no es intuición: es análisis explícito de la cadena de consecuencias. Antes de una decisión, articula el primer nivel (lo evidente) y el segundo (lo que pasará después); si los dos coinciden, la decisión es trivial; si difieren, la diferencia es donde está la ventaja.",
+   642→    "plan": "PREMIUM"
+   643→  },
+   644→  {
+   645→    "empire": "riqueza",
+   646→    "title": "La reversión a la media en inversiones",
+   647→    "content": "Los rendimientos extremos —muy altos o muy bajos— tienden a volver al promedio con el tiempo. Un fondo que ganó 40 % un año probablemente no lo repita. Esta tendencia estadística no predice cuándo, pero sí sugiere que las extrapolaciones lineales son peligrosas en finanzas. Lo excepcional no es la regla: es la excepción. La reversión a la media es una regularidad estadística documentada en múltiples clases de activos; no es una ley física y no opera en todos los plazos. La trampa es extrapolar el rendimiento reciente como si fuera permanente: los activos que más subieron en un periodo tienden a corregir, y los que más bajaron tienden a recuperarse. La consecuencia práctica es no comprar el fondo del año ni evitar el fondo peor del año por su historial reciente; la base de la decisión debe ser el coste, la diversificación y el horizonte, no el rendimiento aislado de un periodo corto.",
+   648→    "plan": "PREMIUM"
+   649→  },
+   650→  {
+   651→    "empire": "riqueza",
+   652→    "title": "El efecto manada en los mercados",
+   653→    "content": "El comportamiento de manada crea burbujas y crisis. Cuando todos compran, los precios se desconectan del valor. Cuando todos venden, el pánico destruye valor real. Permanecer racional cuando el resto pierde la cabeza es una ventaja genuina. Bikhchandani, Hirshleifer y Welch (1992) formalizaron la cascada informativa: cuando las personas deciden en base a lo que ven hacer a otros, en lugar de a su información privada, se produce un efecto de manada que puede ser desadaptativo incluso cuando cada individuo decide racionalmente. La defensa no es ignorar al grupo (no se puede): es separar la información del comportamiento del grupo de la imitación del comportamiento del grupo. Si todos compran, eso es información; si tú compras solo porque todos compran, eso es imitación. La diferencia es si puedes articular la razón independiente de tu decisión.",
+   654→    "plan": "PREMIUM"
+   655→  },
+   656→  {
+   657→    "empire": "riqueza",
+   658→    "title": "Sesgo de supervivencia en fondos",
+   659→    "content": "Solo los fondos que sobreviven reportan rendimientos. Los que cerraron desaparecen de las estadísticas. Esto infla el rendimiento promedio que ves. El rendimiento histórico se ve mejor de lo que realmente fue porque los perdedores ya no están. Brown, Goetzmann, Ibbotson y Ross (1992) documentaron el sesgo de supervivencia en fondos de inversión y mostraron que el rendimiento medio de los fondos supervivientes supera al rendimiento medio de todos los fondos (supervivientes y liquidados) en una magnitud significativa. La consecuencia es que el historial que ves al elegir un fondo está sesgado al alza: los fondos malos no están en la muestra. Antes de comparar rendimientos, pregunta cuántos fondos del mismo tipo cerraron durante el periodo; la diferencia entre el rendimiento que ves y el rendimiento real lo condiciona todo.",
+   660→    "plan": "PREMIUM"
+   661→  }
+   662→]
+   663→

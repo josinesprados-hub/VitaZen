@@ -548,7 +548,7 @@
   {
     "empire": "riqueza",
     "title": "La fatiga de decisión",
-    "content": "Cada decisión financiera del día agota la capacidad de la siguiente. Reservar la fuerza de voluntad para las decisiones importantes —delegar las rutinarias— no es pereza: es estrategia. Danziger, Levav y Avnaim-Pesso (2011) mostraron que la calidad de las decisiones de los jueces disminuía a lo largo de una sesión y se recuperaba tras un descanso, lo que sugiere que la fatiga de decisión es real y medible. En finanzas personales, la defensa es automatizar las decisiones repetitivas (domiciliación de ahorro, pagos, inversiones periódicas) para preservar la capacidad de decisión para las que no se pueden automatizar. Las decisiones importantes no deben tomarse al final del día ni tras una sesión larga de decisiones menores.",
+    "content": "La calidad de las decisiones financieras tiende a disminuir a lo largo del día. Esto no se debe a que se agote una reserva de voluntad, sino a la acumulación de factores: la motivación se desplaza, la atención se dispersa y el cerebro comienza a buscar atajos. Danziger, Levav y Avnaim-Pesso (2011) mostraron que los jueces tomaban decisiones diferentes según el momento del día, un patrón que refleja cómo varía la calidad decisional con el cansancio y la carga previa. La defensa en finanzas personales es la misma: automatizar las decisiones repetitivas (domiciliación de ahorro, pagos, inversiones periódicas) para preservar la atención para las que no se pueden automatizar. Las decisiones importantes no deben tomarse al final del día ni tras una sesión larga.",
     "plan": "PREMIUM"
   },
   {
@@ -637,7 +637,7 @@
   },
   {
     "empire": "riqueza",
-    "title": "El pensamiento de segundo orden",
+    "title": "Invertir en el segundo nivel",
     "content": "Primer orden: «Las acciones bajan, debería comprar». Segundo orden: «Todos van a comprar, los precios subirán demasiado y corregirán: debería esperar». Pensar un paso más allá de lo obvio separa al inversor promedio del excepcional. Howard Marks popularizó esta distinción en The Most Important Thing (2011): lo obvio no da ventaja, porque todo el mundo lo ve. La ventaja está en el segundo nivel, donde se anticipa lo que los demás harán con la información obvia. El pensamiento de segundo orden no es intuición: es análisis explícito de la cadena de consecuencias. Antes de una decisión, articula el primer nivel (lo evidente) y el segundo (lo que pasará después); si los dos coinciden, la decisión es trivial; si difieren, la diferencia es donde está la ventaja.",
     "plan": "PREMIUM"
   },

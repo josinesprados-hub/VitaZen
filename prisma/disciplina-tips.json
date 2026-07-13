@@ -38,7 +38,7 @@
   {
     "empire": "disciplina",
     "title": "Pensar como alguien",
-    "content": "Pensar «soy alguien que corre» funciona distinto a «tengo que correr». La identidad dirige la conducta más que la obligación.",
+    "content": "Cuando algo forma parte de tu identidad, no requiere decisión. Decir «soy alguien que corre» elimina la fricción que genera «tengo que correr». La identidad convierte la acción en algo automático: no eliges cada día, simplemente lo haces porque es lo que haces.",
     "plan": "FREE"
   },
   {
@@ -152,7 +152,7 @@
   {
     "empire": "disciplina",
     "title": "La opción por defecto gana",
-    "content": "La opción que requiere cero esfuerzo es la que más gente elige.",
+    "content": "Si tienes que elegir cada día, algunos días elegirás mal. Convierte la buena opción en la predeterminada: que sea más fácil hacer lo correcto que lo incorrecto. Lo que no requiere decisión se repite sin esfuerzo.",
     "plan": "FREE"
   },
   {
@@ -302,7 +302,7 @@
   {
     "empire": "disciplina",
     "title": "Voluntad: músculo o señal",
-    "content": "La fuerza de voluntad como músculo que se agota es una idea de Baumeister. Pero la investigación posterior muestra que a veces lo que se agota es la motivación, no la capacidad. Si crees que se renueva, rindes más.",
+    "content": "La idea de que la fuerza de voluntad funciona como un músculo que se agota fue propuesta por Baumeister, pero las réplicas posteriores no la han respaldado de forma consistente. Lo que cambia tras esfuerzo sostenido no es la capacidad, sino la motivación y la atención. Además, creer que la voluntad se renueva mejora el rendimiento (Job, Dweck y Walton, 2010): la creencia sobre tu propia capacidad influye en cuánto persistes.",
     "plan": "PREMIUM"
   },
   {
@@ -571,7 +571,7 @@
   },
   {
     "empire": "disciplina",
-    "title": "El coste del cambio",
+    "title": "El coste de alternar",
     "content": "Alternar entre tareas cuesta más tiempo y energía de lo que parece. Cada cambio mental tiene un coste invisible. Rubinstein, Meyer y Evans (2001) midieron que el cambio de tarea añade un coste temporal medio del 20 % a la nueva tarea. El cerebro necesita reactivar el contexto, las reglas y los objetivos de cada tarea cada vez que cambia. Para minimizarlo, agrupa tareas similares en bloques temporales y protege los bloques de trabajo profundo de interrupciones. La concentración no es un don: es la ausencia de cambios de tarea.",
     "plan": "PREMIUM"
   },
@@ -644,7 +644,7 @@
   {
     "empire": "disciplina",
     "title": "Inhibición de respuesta",
-    "content": "Cuando resistes una tentación, la corteza prefrontal derecha se activa para inhibir la respuesta automática. Hedgcock et al. (2012) mostraron que esta inhibición tiene un coste energético real: cada vez que te contienes, gastas recursos neurales limitados. Al final del día tu voluntad es más débil: no eres más perezoso, tus recursos están agotados. Diseñar el entorno para no tener que inhibir es más inteligente que depender de la inhibición.",
+    "content": "Cuando resistes una tentación, la corteza prefrontal se activa para inhibir la respuesta automática. Hedgcock et al. (2012) mostraron que el control inhibitorio activa regiones cerebrales específicas. Lo que cambia tras muchas decisiones no es que se vacíe una reserva, sino que la motivación se desplaza y la atención se dispersa más fácilmente. Por eso es más inteligente diseñar el entorno para minimizar las situaciones que requieren inhibición, en lugar de depender de la fuerza de voluntad a lo largo del día.",
     "plan": "PREMIUM"
   },
   {
