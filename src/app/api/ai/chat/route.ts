@@ -210,7 +210,7 @@ async function handler(request: NextRequest) {
           max_tokens: 20,
         });
 
-        const generatedTitle = titleCompletion.choices[0]?.message?.content?.trim();
+        const generatedTitle = titleCompletion.choices[0]?.message?.content?.trim().replace(/[*#_`~]/g, '');
         if (generatedTitle && generatedTitle.length > 0 && generatedTitle.length <= 80) {
           await db.aIThread.update({
             where: { id: threadId },
@@ -219,9 +219,10 @@ async function handler(request: NextRequest) {
         }
       } catch {
         // Fallback to simple title if AI generation fails
+        const fallbackTitle = content.slice(0, 50).replace(/[*#_`~]/g, '') + (content.length > 50 ? '...' : '');
         await db.aIThread.update({
           where: { id: threadId },
-          data: { title: content.slice(0, 50) + (content.length > 50 ? '...' : '') },
+          data: { title: fallbackTitle },
         });
       }
     }

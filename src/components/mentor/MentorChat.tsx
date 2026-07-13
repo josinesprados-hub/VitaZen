@@ -700,7 +700,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           // FREE users: blur groups beyond "Esta semana" (index 3+)
           const isOldGroup = !isPremium && groupIdx >= 3;
           return (
-            <div key={group} className="animate-in" style={{ animationDelay: '50ms' }}>
+            <div key={group}>
               <div className="flex items-center justify-between px-3 py-1.5">
                 <p className="text-[10px] text-[#555] uppercase tracking-widest font-semibold">
                   {group}
@@ -719,7 +719,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       >
                         <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#555]" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm truncate leading-tight">{thread.title}</p>
+                          <p className="text-sm truncate leading-tight">{thread.title.replace(/[*#_`~]/g, '')}</p>
                           <p className="text-[10px] text-[#555] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
                         </div>
                       </div>
@@ -785,7 +785,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         ) : (
                           <>
                             <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
-                              {thread.title}
+                              {thread.title.replace(/[*#_`~]/g, '')}
                             </p>
                             <p className="text-[10px] text-[#555] mt-0.5">
                               {getRelativeDate(thread.updatedAt)}
@@ -945,7 +945,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </Link>
           <IconComponent size={16} className="text-champagne shrink-0" />
           <p className="text-sm font-semibold text-white truncate">
-            {activeThreadData?.title || 'Mentor IA'}
+            {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Mentor IA'}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -1056,7 +1056,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 <div className="flex items-center gap-2 min-w-0">
                   <MessageCircle size={14} className="text-champagne shrink-0" />
                   <p className="text-sm text-white truncate">
-                    {activeThreadData?.title || 'Conversación'}
+                    {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Conversación'}
                   </p>
                   {activeThreadData?.archived && (
                     <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
