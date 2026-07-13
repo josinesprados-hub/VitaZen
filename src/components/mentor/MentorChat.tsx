@@ -207,6 +207,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const diagRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const sendingRef = useRef(false);
@@ -425,6 +426,107 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       }
     };
   }, [activeThread, fetchMessages, fetchThreads]);
+
+  // ─────────────────────────────────────────
+  // LAYOUT DIAGNOSTIC — temporary, remove after audit
+  // ─────────────────────────────────────────
+  useEffect(() => {
+    if (messages.length !== 0 || sending) return;
+    const measure = () => {
+      const targets = [
+        'page-wrapper', 'mentor-root', 'mobile-header',
+        'main-content', 'chat-area', 'messages-container',
+        'empty-state-wrapper', 'messages-end', 'composer',
+      ];
+      const results: Record<string, {
+        clientHeight: number; scrollHeight: number; offsetHeight: number;
+        rectH: number; diff: number; overflowY: string;
+        paddingTop: number; paddingBottom: number; marginTop: number; marginBottom: number;
+        borderTop: number; borderBottom: number; flex: string;
+      }> = {};
+      for (const id of targets) {
+        const el = document.querySelector(`[data-debug="${id}"]`);
+        if (!el) continue;
+        const cs = getComputedStyle(el);
+        const rect = el.getBoundingClientRect();
+        const r = {
+          clientHeight: el.clientHeight,
+          scrollHeight: el.scrollHeight,
+          offsetHeight: el.offsetHeight,
+          rectH: Math.round(rect.height * 100) / 100,
+          diff: el.scrollHeight - el.clientHeight,
+          overflowY: cs.overflowY,
+          paddingTop: parseFloat(cs.paddingTop),
+          paddingBottom: parseFloat(cs.paddingBottom),
+          marginTop: parseFloat(cs.marginTop),
+          marginBottom: parseFloat(cs.marginBottom),
+          borderTop: parseFloat(cs.borderTopWidth),
+          borderBottom: parseFloat(cs.borderBottomWidth),
+          flex: cs.flex,
+        };
+        results[id] = r;
+      }
+      // Also measure document-level
+      const html = document.documentElement;
+      const body = document.body;
+      console.group('%c[MENTOR-SCROLL-DIAG]', 'color:#f59e0b;font-weight:bold;font-size:14px');
+      console.log('messages.length:', messages.length, '| sending:', sending);
+      console.log('viewport H:', window.innerHeight, '| dvh approx:', html.clientHeight);
+      console.table(results);
+      // Flag overflow elements
+      console.group('%cElements with scrollHeight > clientHeight', 'color:#ef4444;font-weight:bold');
+      let found = false;
+      for (const [name, r] of Object.entries(results)) {
+        if (r.diff > 0) {
+          found = true;
+          console.log(`%c${name}: scrollHeight(${r.scrollHeight}) - clientHeight(${r.clientHeight}) = ${r.diff}px`, 'color:#ef4444;font-weight:bold');
+          console.log(`  overflow-y: ${r.overflowY} | padding: ${r.paddingTop}/${r.paddingBottom} | margin: ${r.marginTop}/${r.marginBottom} | border: ${r.borderTop}/${r.borderBottom} | flex: ${r.flex}`);
+        }
+      }
+      // Document level
+      if (html.scrollHeight > html.clientHeight) {
+        found = true;
+        console.log(`%c<html>: scrollHeight(${html.scrollHeight}) - clientHeight(${html.clientHeight}) = ${html.scrollHeight - html.clientHeight}px`, 'color:#ef4444;font-weight:bold');
+      }
+      if (body.scrollHeight > body.clientHeight) {
+        found = true;
+        console.log(`%c<body>: scrollHeight(${body.scrollHeight}) - clientHeight(${body.clientHeight}) = ${body.scrollHeight - body.clientHeight}px`, 'color:#ef4444;font-weight:bold');
+      }
+      if (!found) console.log('%cNONE — no element has scrollHeight > clientHeight', 'color:#22c55e');
+      console.groupEnd();
+      // Children of messages-container
+      const mc = document.querySelector('[data-debug="messages-container"]');
+      if (mc) {
+        console.group('%cmessages-container children detail', 'color:#8b5cf6;font-weight:bold');
+        const kids = mc.children;
+        for (let i = 0; i < kids.length; i++) {
+          const k = kids[i] as HTMLElement;
+          const kcs = getComputedStyle(k);
+          const krect = k.getBoundingClientRect();
+          console.log(`  child[${i}] tag=${k.tagName} data-debug=${k.getAttribute('data-debug') || '—'} position=${kcs.position} display=${kcs.display} h=${Math.round(krect.height*100)/100} marginTop=${kcs.marginTop} marginBottom=${kcs.marginBottom} paddingTop=${kcs.paddingTop} paddingBottom=${kcs.paddingBottom}`);
+        }
+        // scrollbar-gutter
+        console.log('  scrollbar-gutter:', getComputedStyle(mc).scrollbarGutter);
+        console.log('  env(safe-area-inset-bottom):', getComputedStyle(mc).paddingBottom);
+        console.groupEnd();
+      }
+      // Composer safe-area
+      const comp = document.querySelector('[data-debug="composer"]');
+      if (comp) {
+        const ccs = getComputedStyle(comp);
+        console.group('%ccomposer detail', 'color:#06b6d4;font-weight:bold');
+        console.log('  paddingTop:', ccs.paddingTop, '| paddingBottom:', ccs.paddingBottom, '| paddingBottom (computed):', ccs.paddingBottom);
+        console.log('  height:', comp.clientHeight, '| offsetHeight:', comp.offsetHeight);
+        console.log('  style.paddingBottom attr:', (comp as HTMLElement).style.paddingBottom);
+        console.groupEnd();
+      }
+      console.groupEnd();
+    };
+    // Measure after paint + 200ms for layout settle
+    const t1 = requestAnimationFrame(() => setTimeout(measure, 200));
+    const t2 = requestAnimationFrame(() => setTimeout(measure, 1000));
+    return () => { cancelAnimationFrame(t1); cancelAnimationFrame(t2); };
+  }, [messages.length, sending, activeThread]);
 
   // ─────────────────────────────────────────
   // Thread actions
@@ -950,7 +1052,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }
 
   return (
-    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
+    <div ref={diagRef} data-debug="mentor-root" className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
         <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
@@ -963,7 +1065,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           ═══════════════════════════════════════════ */}
 
       {/* Mobile header — ultra compact */}
-      <div className="flex sm:hidden items-center justify-between px-3 py-2 border-b border-[#1a1a1a] shrink-0 bg-[#0a0a0a]">
+      <div data-debug="mobile-header" className="flex sm:hidden items-center justify-between px-3 py-2 border-b border-[#1a1a1a] shrink-0 bg-[#0a0a0a]">
         <div className="flex items-center gap-2 min-w-0">
           <Link href={backHref} className="p-1.5 -ml-1 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors shrink-0">
             <ChevronLeft size={20} />
@@ -1061,7 +1163,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           Mobile: only chat (full width)
           Desktop: sidebar + chat (flex-row)
           ═══════════════════════════════════════════ */}
-      <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-hidden sm:gap-4">
+      <div data-debug="main-content" className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-hidden sm:gap-4">
 
         {/* ────────── Desktop Sidebar ────────── */}
         <div
@@ -1073,7 +1175,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         </div>
 
         {/* ────────── Chat Area — full width on both mobile and desktop ────────── */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
+        <div data-debug="chat-area" className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
           {activeThread ? (
             <>
               {/* Desktop: Chat header bar inside chat card */}
@@ -1120,9 +1222,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               </div>
 
               {/* Messages — single scroll container with overscroll containment */}
-              <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
+              <div data-debug="messages-container" ref={scrollContainerRef} className="relative flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
                 {messages.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div data-debug="empty-state-wrapper" className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center animate-in">
                       <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
                         <IconComponent size={32} className="text-champagne" />
@@ -1188,11 +1290,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
+                <div data-debug="messages-end" ref={messagesEndRef} />
               </div>
 
               {/* Input area — safe-area for iPhone home indicator */}
-              <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+              <div data-debug="composer" className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
                 {/* Low message warning */}
                 {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
                   <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
