@@ -15,6 +15,8 @@ export type AnalyticsEventType =
   | 'onboarding_completed'
   | 'daily_session'
   | 'checkin_created'
+  | 'checkin_edited'
+  | 'checkin_deleted'
   | 'habit_completed'
   | 'mentor_used'
   | 'premium_upgrade_clicked'
@@ -27,6 +29,8 @@ const VALID_EVENTS = new Set<string>([
   'onboarding_completed',
   'daily_session',
   'checkin_created',
+  'checkin_edited',
+  'checkin_deleted',
   'habit_completed',
   'mentor_used',
   'premium_upgrade_clicked',

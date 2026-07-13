@@ -348,6 +348,15 @@ export default function DisciplinaPage() {
               onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]"
             />
+            <select
+              value={newHabit.frequency}
+              onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors appearance-none"
+            >
+              <option value="daily">Diario</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
             <div className="flex gap-2">
               <button onClick={addHabit} className="bg-champagne text-black font-semibold px-5 py-2 rounded-xl text-sm hover:bg-champagne-hover transition-colors touch-press">Guardar</button>
               <button onClick={() => setShowAddHabit(false)} className="text-[#999] px-4 py-2 text-sm hover:text-white touch-press">Cancelar</button>

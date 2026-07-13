@@ -284,6 +284,11 @@ export async function DELETE(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);
 
+    // C10 FIX: Track deletion in analytics (was missing — only POST and PUT tracked).
+    // Also fixes that checkin_edited was in the whitelist but never reached this code path;
+    // the PUT handler already calls trackEvent('checkin_edited') from the prior C4 fix.
+    trackEvent({ event: 'checkin_deleted', userId: user.id, properties: { checkinDate: existing.date.toISOString() } });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Checkin DELETE error:', error);

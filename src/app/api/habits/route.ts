@@ -35,6 +35,12 @@ export async function POST(request: NextRequest) {
 
     const { name, description, frequency } = await request.json();
 
+    // Validate frequency — only supported values
+    const VALID_FREQUENCIES = ['daily', 'weekly', 'monthly'];
+    if (frequency && !VALID_FREQUENCIES.includes(frequency)) {
+      return NextResponse.json({ error: 'Invalid frequency' }, { status: 400 });
+    }
+
     const habit = await db.habitLog.create({
       data: { userId: user.id, name, description, frequency },
     });

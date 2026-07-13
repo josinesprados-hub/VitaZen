@@ -37,6 +37,34 @@ import type {
   ConnectionItem,
 } from '@/lib/monthly-closure/digest';
 
+const SKIP_KEY_PREFIX = 'vz_monthly_closure_skipped_';
+
+/** Returns the current month key (YYYY-MM) in Europe/Madrid timezone. */
+function getCurrentMonthKey(): string {
+  const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
+  return madridStr.split(' ')[0].slice(0, 7); // YYYY-MM
+}
+
+/** Check if the user skipped reflection for the current month (localStorage fallback). */
+function isSkippedThisMonth(): boolean {
+  try {
+    const key = SKIP_KEY_PREFIX + getCurrentMonthKey();
+    return localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Persist skip for the current month in localStorage (fallback). */
+function markSkippedThisMonth(): void {
+  try {
+    const key = SKIP_KEY_PREFIX + getCurrentMonthKey();
+    localStorage.setItem(key, '1');
+  } catch {
+    // localStorage unavailable — graceful
+  }
+}
+
 // ─── Types ───
 
 type Phase = 'loading' | 'reflection' | 'summary';
@@ -96,10 +124,11 @@ export default function CierreMensualPage() {
 
         // Determine phase:
         // If already reflected → go to summary
+        // If skipped this month (localStorage fallback) → go to summary
         // If not → go to reflection
-        if (data.closure?.reflectedAt) {
+        if (data.closure?.reflectedAt || isSkippedThisMonth()) {
           setPhase('summary');
-          if (data.closure.reflection) {
+          if (data.closure?.reflection) {
             setReflectionText(data.closure.reflection);
           }
         } else {
@@ -108,7 +137,12 @@ export default function CierreMensualPage() {
       }
     } catch (error) {
       console.error('[Cierre Mensual] Fetch error:', error);
-      setPhase('reflection');
+      // CM1 FIX: If the user previously skipped, respect that even on error
+      if (isSkippedThisMonth()) {
+        setPhase('summary');
+      } else {
+        setPhase('reflection');
+      }
     }
   }, [apiFetch]);
 
@@ -132,9 +166,21 @@ export default function CierreMensualPage() {
 
       if (res.ok) {
         setPhase('summary');
+      } else {
+        // CM1 FIX: Even if API fails, persist the skip decision locally
+        // so the user doesn't see the reflection again on refresh
+        if (skip) {
+          markSkippedThisMonth();
+          setPhase('summary');
+        }
       }
     } catch (error) {
       console.error('[Cierre Mensual] Save error:', error);
+      // CM1 FIX: Persist skip locally on network error too
+      if (skip) {
+        markSkippedThisMonth();
+        setPhase('summary');
+      }
     } finally {
       setSaving(false);
     }

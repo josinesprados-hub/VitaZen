@@ -116,6 +116,26 @@ export default function DashboardPage() {
     }
   }, [user?.plan, searchParams, router]);
 
+  // I3 FIX: Refresh empire data when the user navigates back to the dashboard
+  // from an imperio sub-page. The imperio pages award XP server-side but don't
+  // notify the dashboard, so the grid showed stale values. We listen for the
+  // page becoming visible again (tab focus or SPA navigation within same tab)
+  // and silently re-fetch empire progress.
+  const empireFetchedRef = useRef(false);
+
+  const refreshEmpires = useCallback(async () => {
+    if (screenshotMode || empireFetchedRef.current === false) return;
+    try {
+      const empRes = await apiFetch('/api/empire');
+      if (empRes.ok) {
+        const empData = await empRes.json();
+        setEmpires(empData.empires);
+      }
+    } catch {
+      // Non-blocking — empire grid will update on next full load
+    }
+  }, [apiFetch, screenshotMode]);
+
   useEffect(() => {
     if (!user || !onboardingConfirmed) return;
 
@@ -158,7 +178,10 @@ export default function DashboardPage() {
         if (error instanceof DOMException && error.name === 'AbortError') return;
         console.error('Error fetching dashboard data:', error);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          empireFetchedRef.current = true;
+        }
       }
     };
 
@@ -168,6 +191,18 @@ export default function DashboardPage() {
       controller.abort();
     };
   }, [user, onboardingConfirmed, apiFetch, screenshotMode]);
+
+  // Re-fetch empire data when the page becomes visible again
+  // (user returns from an imperio sub-page in the same tab)
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refreshEmpires();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [refreshEmpires]);
 
   const handleCheckinSave = useCallback(async (data: any): Promise<{ xpAwarded: number }> => {
     // DASH-7: Throw on API error so the modal shows the error state instead of

@@ -145,10 +145,13 @@ export default function AjustesPage() {
         <p className="subtitle-silent mt-1">Tu espacio personal</p>
       </div>
 
-      {/* Email Notifications Section */}
-      {/* weeklyEmailSummary → consumed by weekly-recap cron (email via Resend)
-          dailyReminders → consumed by daily-reminder cron (push via FCM)
-            processDailyBatch() reads User.dailyReminders as pre-filter */}
+      {/* A1 FIX: Reorganized notification sections.
+          - Email section: only weeklyEmailSummary (actually sends email via Resend)
+          - Daily reminders: moved to Push section (sends push via FCM, not email)
+          This eliminates user confusion about what controls emails vs push. */}
+
+      {/* Email Notifications Section — only actual email settings */}
+      {/* weeklyEmailSummary → consumed by weekly-recap cron (email via Resend) */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Mail size={14} />
@@ -181,8 +184,18 @@ export default function AjustesPage() {
             />
           </div>
         </div>
+      </div>
 
-        {/* Daily Reminders (email) */}
+      {/* Push Notifications Section — includes daily reminders toggle */}
+      {/* dailyReminders → consumed by daily-reminder cron (push via FCM)
+          processDailyBatch() reads User.dailyReminders as pre-filter */}
+      <div className="card-primary p-6 sm:p-8 space-y-5">
+        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
+          <Bell size={14} />
+          Notificaciones Push
+        </h3>
+
+        {/* Daily Reminders (push notification) */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="icon-sm mt-0.5">
@@ -191,7 +204,7 @@ export default function AjustesPage() {
             <div>
               <p className="text-sm text-white font-medium">Recordatorios diarios</p>
               <p className="text-xs text-[#999] mt-0.5">
-                Un aviso para tu check-in y hábitos
+                Un aviso para tu check-in y hábitos (notificación push)
               </p>
             </div>
           </div>
@@ -210,7 +223,7 @@ export default function AjustesPage() {
         </div>
       </div>
 
-      {/* Push Notifications Section */}
+      {/* Push Notification Preferences — activation/deactivation card */}
       <NotificationPreferences />
 
       {/* Privacy Section */}
