@@ -1,0 +1,395 @@
+    55→    94→    94→    94→    94→      ]);
+    56→    95→    95→    95→    95→      if (wRes.ok) { const d = await wRes.json(); setWellnessLogs(d.logs); }
+    57→    96→    96→    96→    96→      if (nRes.ok) { const d = await nRes.json(); setNutrition(d.logs); }
+    58→    97→    97→    97→    97→    } catch (e) {
+    59→    98→    98→    98→    98→      console.error(e);
+    60→    99→    99→    99→    99→      setFetchError(true);
+    61→   100→   100→   100→   100→    } finally { setLoading(false); }
+    62→   101→   101→   101→   101→  }, [apiFetch]);
+    63→   102→   102→   102→   102→
+    64→   103→   103→   103→   103→  useEffect(() => {
+    65→   104→   104→   104→   104→    fetchData();
+    66→   105→   105→   105→   105→  }, [fetchData]);
+    67→   106→   106→   106→   106→
+    68→   107→   107→   107→   107→  const submitWellness = async () => {
+    69→   108→   108→   108→   108→    if (submittingWellness) return;
+    70→   109→   109→   109→   109→    setSubmittingWellness(true);
+    71→   110→   110→   110→   110→    try {
+    72→   111→   111→   111→   111→      const res = await apiFetch('/api/wellness', {
+    73→   112→   112→   112→   112→        method: 'POST',
+    74→   113→   113→   113→   113→        body: JSON.stringify({ date: getTodayDateKey(), ...wellnessForm }),
+    75→   114→   114→   114→   114→      });
+    76→   115→   115→   115→   115→      if (res.ok) {
+    77→   116→   116→   116→   116→        const data = await res.json();
+    78→   117→   117→   117→   117→        setWellnessLogs(prev => {
+    79→   118→   118→   118→   118→          const filtered = prev.filter(l => l.id !== data.log.id);
+    80→   119→   119→   119→   119→          return [data.log, ...filtered];
+    81→   120→   120→   120→   120→        });
+    82→   121→   121→   121→   121→        setWellnessForm({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
+    83→   122→   122→   122→   122→        setShowWellness(false);
+    84→   123→   123→   123→   123→      }
+    85→   124→   124→   124→   124→    } catch (error) { console.error('Error submitting wellness:', error); }
+    86→   125→   125→   125→   125→    finally { setSubmittingWellness(false); }
+    87→   126→   126→   126→   126→  };
+    88→   127→   127→   127→   127→
+    89→   128→   128→   128→   128→  const submitNutrition = async () => {
+    90→   129→   129→   129→   129→    if (submittingNutrition) return;
+    91→   130→   130→   130→   130→    setSubmittingNutrition(true);
+    92→   131→   131→   131→   131→    try {
+    93→   132→   132→   132→   132→      const res = await apiFetch('/api/nutrition', {
+    94→   133→   133→   133→   133→        method: 'POST',
+    95→   134→   134→   134→   134→        body: JSON.stringify({ date: getTodayDateKey(), ...nutritionForm }),
+    96→   135→   135→   135→   135→      });
+    97→   136→   136→   136→   136→      if (res.ok) {
+    98→   137→   137→   137→   137→        const data = await res.json();
+    99→   138→   138→   138→   138→        setNutrition(prev => {
+   100→   139→   139→   139→   139→          const filtered = prev.filter(l => l.id !== data.log.id);
+   101→   140→   140→   140→   140→          return [data.log, ...filtered];
+   102→   141→   141→   141→   141→        });
+   103→   142→   142→   142→   142→        setNutritionForm({ meals: '', water: 0, calories: 0, notes: '' });
+   104→   143→   143→   143→   143→        setShowNutrition(false);
+   105→   144→   144→   144→   144→      }
+   106→   145→   145→   145→   145→    } catch (error) { console.error('Error submitting nutrition:', error); }
+   107→   146→   146→   146→   146→    finally { setSubmittingNutrition(false); }
+   108→   147→   147→   147→   147→  };
+   109→   148→   148→   148→   148→
+   110→   149→   149→   149→   149→  const startEditWellness = (log: WellnessLog) => {
+   111→   150→   150→   150→   150→    setEditingWellness(log);
+   112→   151→   151→   151→   151→    setEditWellnessForm({ mood: log.mood, energy: log.energy, sleep: log.sleep, stress: log.stress, notes: log.notes || '' });
+   113→   152→   152→   152→   152→  };
+   114→   153→   153→   153→   153→
+   115→   154→   154→   154→   154→  const saveEditWellness = async () => {
+   116→   155→   155→   155→   155→    if (!editingWellness) return;
+   117→   156→   156→   156→   156→    setEditWellnessSaving(true);
+   118→   157→   157→   157→   157→    try {
+   119→   158→   158→   158→   158→      const res = await apiFetch('/api/wellness', {
+   120→   159→   159→   159→   159→        method: 'PUT',
+   121→   160→   160→   160→   160→        body: JSON.stringify({ logId: editingWellness.id, ...editWellnessForm }),
+   122→   161→   161→   161→   161→      });
+   123→   162→   162→   162→   162→      if (res.ok) {
+   124→   163→   163→   163→   163→        const data = await res.json();
+   125→   164→   164→   164→   164→        setWellnessLogs(prev => prev.map(l => l.id === editingWellness.id ? data.log : l));
+   126→   165→   165→   165→   165→        setEditingWellness(null);
+   127→   166→   166→   166→   166→      } else {
+   128→   167→   167→   167→   167→        const errData = await res.json().catch(() => ({}));
+   129→   168→   168→   168→   168→        console.error('Wellness PUT failed:', res.status, errData);
+   130→   169→   169→   169→   169→      }
+   131→   170→   170→   170→   170→    } catch (error) { console.error('Error updating wellness log:', error); }
+   132→   171→   171→   171→   171→    finally { setEditWellnessSaving(false); }
+   133→   172→   172→   172→   172→  };
+   134→   173→   173→   173→   173→
+   135→   174→   174→   174→   174→  const startEditNutrition = (log: NutritionLog) => {
+   136→   175→   175→   175→   175→    setEditingNutrition(log);
+   137→   176→   176→   176→   176→    setEditNutritionForm({ meals: log.meals || '', water: log.water, calories: log.calories || 0, notes: log.notes || '' });
+   138→   177→   177→   177→   177→  };
+   139→   178→   178→   178→   178→
+   140→   179→   179→   179→   179→  const saveEditNutrition = async () => {
+   141→   180→   180→   180→   180→    if (!editingNutrition) return;
+   142→   181→   181→   181→   181→    setEditNutritionSaving(true);
+   143→   182→   182→   182→   182→    try {
+   144→   183→   183→   183→   183→      const res = await apiFetch('/api/nutrition', {
+   145→   184→   184→   184→   184→        method: 'PUT',
+   146→   185→   185→   185→   185→        body: JSON.stringify({ logId: editingNutrition.id, ...editNutritionForm }),
+   147→   186→   186→   186→   186→      });
+   148→   187→   187→   187→   187→      if (res.ok) {
+   149→   188→   188→   188→   188→        const data = await res.json();
+   150→   189→   189→   189→   189→        setNutrition(prev => prev.map(l => l.id === editingNutrition.id ? data.log : l));
+   151→   190→   190→   190→   190→        setEditingNutrition(null);
+   152→   191→   191→   191→   191→      } else {
+   153→   192→   192→   192→   192→        const errData = await res.json().catch(() => ({}));
+   154→   193→   193→   193→   193→        console.error('Nutrition PUT failed:', res.status, errData);
+   155→   194→   194→   194→   194→      }
+   156→   195→   195→   195→   195→    } catch (error) { console.error('Error updating nutrition log:', error); }
+   157→   196→   196→   196→   196→    finally { setEditNutritionSaving(false); }
+   158→   197→   197→   197→   197→  };
+   159→   198→   198→   198→   198→
+   160→   199→   199→   199→   199→  const confirmDelete = async () => {
+   161→   200→   200→   200→   200→    if (!pendingDeleteId) return;
+   162→   201→   201→   201→   201→    try {
+   163→   202→   202→   202→   202→      const endpoint = pendingDeleteId.type === 'wellness' ? '/api/wellness' : '/api/nutrition';
+   164→   203→   203→   203→   203→      const bodyKey = 'logId';
+   165→   204→   204→   204→   204→      const res = await apiFetch(endpoint, {
+   166→   205→   205→   205→   205→        method: 'DELETE',
+   167→   206→   206→   206→   206→        body: JSON.stringify({ [bodyKey]: pendingDeleteId.id }),
+   168→   207→   207→   207→   207→      });
+   169→   208→   208→   208→   208→      if (res.ok) {
+   170→   209→   209→   209→   209→        if (pendingDeleteId.type === 'wellness') {
+   171→   210→   210→   210→   210→          setWellnessLogs(prev => prev.filter(l => l.id !== pendingDeleteId.id));
+   172→   211→   211→   211→   211→        } else {
+   173→   212→   212→   212→   212→          setNutrition(prev => prev.filter(l => l.id !== pendingDeleteId.id));
+   174→   213→   213→   213→   213→        }
+   175→   214→   214→   214→   214→      } else {
+   176→   215→   215→   215→   215→        const errData = await res.json().catch(() => ({}));
+   177→   216→   216→   216→   216→        console.error('DELETE failed:', res.status, errData);
+   178→   217→   217→   217→   217→      }
+   179→   218→   218→   218→   218→    } catch (error) { console.error('Error deleting log:', error); }
+   180→   219→   219→   219→   219→    finally { setPendingDeleteId(null); }
+   181→   220→   220→   220→   220→  };
+   182→   221→   221→   221→   221→
+   183→   222→   222→   222→   222→  if (loading) {
+   184→   223→   223→   223→   223→    return <EmpireSkeleton message="Cargando tu energía..." />;
+   185→   224→   224→   224→   224→  }
+   186→   225→   225→   225→   225→
+   187→   226→   226→   226→   226→  if (fetchError) {
+   188→   227→   227→   227→   227→    return (
+   189→   228→   228→   228→   228→      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+   190→   229→   229→   229→   229→        <PremiumErrorState
+   191→   230→   230→   230→   230→          variant="loading"
+   192→   231→   231→   231→   231→          title="No se pudo cargar el imperio"
+   193→   232→   232→   232→   232→          onRetry={fetchData}
+   194→   233→   233→   233→   233→          size="md"
+   195→   234→   234→   234→   234→        />
+   196→   235→   235→   235→   235→      </div>
+   197→   236→   236→   236→   236→    );
+   198→   237→   237→   237→   237→  }
+   199→   238→   238→   238→   238→
+   200→   239→   239→   239→   239→  return (
+   201→   240→   240→   240→   240→    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+   202→   241→   241→   241→   241→      {/* Edit Wellness Overlay */}
+   203→   242→   242→   242→   242→      {editingWellness && (
+   204→   243→   243→   243→   243→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingWellness(null)}>
+   205→   244→   244→   244→   244→          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+   206→   245→   245→   245→   245→            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+   207→   246→   246→   246→   246→              <Pencil size={20} className="text-champagne" />
+   208→   247→   247→   247→   247→            </div>
+   209→   248→   248→   248→   248→            <h3 className="text-lg font-bold text-white text-center mb-6">Editar bienestar</h3>
+   210→   249→   249→   249→   249→            <div className="space-y-4">
+   211→   250→   250→   250→   250→              <RatingInput label="Estado de ánimo" value={editWellnessForm.mood} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, mood: v })} />
+   212→   251→   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+   213→   252→   252→   252→   252→              <RatingInput label="Sueño" value={editWellnessForm.sleep} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, sleep: v })} />
+   214→   253→   253→   253→   253→              <RatingInput label="Estrés" value={editWellnessForm.stress} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, stress: v })} />
+   215→   254→   254→   254→   254→              <textarea placeholder="Notas (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
+   216→   255→   255→   255→   255→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
+   217→   256→   256→   256→   256→            </div>
+   218→   257→   257→   257→   257→            <div className="flex items-center justify-center gap-3 mt-7">
+   219→   258→   258→   258→   258→              <button onClick={() => setEditingWellness(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+   220→   259→   259→   259→   259→              <button onClick={saveEditWellness} disabled={editWellnessSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editWellnessSaving ? 'Guardando...' : 'Guardar'}</button>
+   221→   260→   260→   260→   260→            </div>
+   222→   261→   261→   261→   261→          </div>
+   223→   262→   262→   262→   262→        </div>
+   224→   263→   263→   263→   263→      )}
+   225→   264→   264→   264→   264→
+   226→   265→   265→   265→   265→      {/* Edit Nutrition Overlay */}
+   227→   266→   266→   266→   266→      {editingNutrition && (
+   228→   267→   267→   267→   267→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingNutrition(null)}>
+   229→   268→   268→   268→   268→          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+   230→   269→   269→   269→   269→            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+   231→   270→   270→   270→   270→              <Pencil size={20} className="text-champagne" />
+   232→   271→   271→   271→   271→            </div>
+   233→   272→   272→   272→   272→            <h3 className="text-lg font-bold text-white text-center mb-6">Editar nutrición</h3>
+   234→   273→   273→   273→   273→            <div className="space-y-3">
+   235→   274→   274→   274→   274→              <textarea placeholder="Comidas del día" value={editNutritionForm.meals} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, meals: e.target.value })}
+   236→   275→   275→   275→   275→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
+   237→   276→   276→   276→   276→              <div className="grid grid-cols-2 gap-3">
+   238→   277→   277→   277→   277→                <div>
+   239→   278→   278→   278→   278→                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
+   240→   279→   279→   279→   279→                  <NumericInput value={editNutritionForm.water} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
+   241→   280→   280→   280→   280→                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
+   242→   281→   281→   281→   281→                </div>
+   243→   282→   282→   282→   282→                <div>
+   244→   283→   283→   283→   283→                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
+   245→   284→   284→   284→   284→                  <NumericInput value={editNutritionForm.calories} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
+   246→   285→   285→   285→   285→                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
+   247→   286→   286→   286→   286→                </div>
+   248→   287→   287→   287→   287→              </div>
+   249→   288→   288→   288→   288→            </div>
+   250→   289→   289→   289→   289→            <div className="flex items-center justify-center gap-3 mt-7">
+   251→   290→   290→   290→   290→              <button onClick={() => setEditingNutrition(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+   252→   291→   291→   291→   291→              <button onClick={saveEditNutrition} disabled={editNutritionSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editNutritionSaving ? 'Guardando...' : 'Guardar'}</button>
+   253→   292→   292→   292→   292→            </div>
+   254→   293→   293→   293→   293→          </div>
+   255→   294→   294→   294→   294→        </div>
+   256→   295→   295→   295→   295→      )}
+   257→   296→   296→   296→   296→
+   258→   297→   297→   297→   297→      {/* Delete Confirmation Overlay */}
+   259→   298→   298→   298→   298→      {pendingDeleteId && (
+   260→   299→   299→   299→   299→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
+   261→   300→   300→   300→   300→          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+   262→   301→   301→   301→   301→            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+   263→   302→   302→   302→   302→              <Trash2 size={22} className="text-red-400" />
+   264→   303→   303→   303→   303→            </div>
+   265→   304→   304→   304→   304→            <h3 className="text-lg font-bold text-white mb-2">Eliminar registro</h3>
+   266→   305→   305→   305→   305→            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+   267→   306→   306→   306→   306→            <div className="flex items-center justify-center gap-3">
+   268→   307→   307→   307→   307→              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+   269→   308→   308→   308→   308→              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
+   270→   309→   309→   309→   309→            </div>
+   271→   310→   310→   310→   310→          </div>
+   272→   311→   311→   311→   311→        </div>
+   273→   312→   312→   312→   312→      )}
+   274→   313→   313→   313→   313→
+   275→   314→   314→   314→   314→      <div className="flex items-center gap-4">
+   276→   315→   315→   315→   315→        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+   277→   316→   316→   316→   316→          <Zap size={28} className="text-champagne" />
+   278→   317→   317→   317→   317→        </div>
+   279→   318→   318→   318→   318→        <div>
+   280→   319→   319→   319→   319→          <h1 className="title-page">Energía</h1>
+   281→   320→   320→   320→   320→          <p className="subtitle-silent mt-1">Cuerpo y vitalidad</p>
+   282→   321→   321→   321→   321→        </div>
+   283→   322→   322→   322→   322→      </div>
+   284→   323→   323→   323→   323→
+   285→   324→   324→   324→   324→      {/* Contextual Help — progressive disclosure */}
+   286→   325→   325→   325→   325→      <ContextualHelp
+   287→   326→   326→   326→   326→        storageKey="vitazen_help_energia"
+   288→   327→   327→   327→   327→        title="Energía"
+   289→   328→   328→   328→   328→        text="Registra tu bienestar físico y nutrición diaria. Ánimo, energía, sueño y estrés, junto con tus comidas y agua."
+   290→   329→   329→   329→   329→      />
+   291→   330→   330→   330→   330→
+   292→   331→   331→   331→   331→      {/* Wellness Log */}
+   293→   332→   332→   332→   332→      <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+   294→   333→   333→   333→   333→        <div className="flex items-center justify-between mb-4">
+   295→   334→   334→   334→   334→          <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
+   296→   335→   335→   335→   335→          <button onClick={() => setShowWellness(!showWellness)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
+   297→   336→   336→   336→   336→            + Registrar hoy
+   298→   337→   337→   337→   337→          </button>
+   299→   338→   338→   338→   338→        </div>
+   300→   339→   339→   339→   339→
+   301→   340→   340→   340→   340→        {showWellness && (
+   302→   341→   341→   341→   341→          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
+   303→   342→   342→   342→   342→            <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
+   304→   343→   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+   305→   344→   344→   344→   344→            <RatingInput label="Sueño" value={wellnessForm.sleep} onChange={(v) => setWellnessForm({ ...wellnessForm, sleep: v })} />
+   306→   345→   345→   345→   345→            <RatingInput label="Estrés" value={wellnessForm.stress} onChange={(v) => setWellnessForm({ ...wellnessForm, stress: v })} />
+   307→   346→   346→   346→   346→            <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
+   308→   347→   347→   347→   347→              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
+   309→   348→   348→   348→   348→            <div className="flex gap-2">
+   310→   349→   349→   349→   349→              <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
+   311→   350→   350→   350→   350→              <button onClick={() => setShowWellness(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
+   312→   351→   351→   351→   351→            </div>
+   313→   352→   352→   352→   352→          </div>
+   314→   353→   353→   353→   353→        )}
+   315→   354→   354→   354→   354→        {wellnessLogs.length > 0 ? (
+   316→   355→   355→   355→   355→          <div className="space-y-2 max-h-96 overflow-y-auto">
+   317→   356→   356→   356→   356→            {wellnessLogs.slice(0, 7).map((log) => (
+   318→   357→   357→   357→   357→              <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+   319→   358→   358→   358→   358→                <div className="flex items-center justify-between">
+   320→   359→   359→   359→   359→                  <div className="flex items-center gap-3 sm:gap-4">
+   321→   360→   360→   360→   360→                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+   322→   361→   361→   361→   361→                      <Heart size={16} className="text-champagne" />
+   323→   362→   362→   362→   362→                    </div>
+   324→   363→   363→   363→   363→                    <div>
+   325→   364→   364→   364→   364→                      <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
+   326→   365→   365→   365→   365→                        <span className="text-champagne">Ánimo: <PrivacyMask compact>{log.mood}</PrivacyMask></span>
+   327→   366→   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+   328→   367→   367→   367→   367→                        <span className="text-champagne">Sueño: <PrivacyMask compact>{log.sleep}</PrivacyMask></span>
+   329→   368→   368→   368→   368→                      </div>
+   330→   369→   369→   369→   369→                      <div className="flex items-center gap-3">
+   331→   370→   370→   370→   370→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+   332→   371→   371→   371→   371→                        <span className="text-[#333] text-xs">·</span>
+   333→   372→   372→   372→   372→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+   334→   373→   373→   373→   373→                      </div>
+   335→   374→   374→   374→   374→                    </div>
+   336→   375→   375→   375→   375→                  </div>
+   337→   376→   376→   376→   376→                  <div className="flex items-center gap-1 flex-shrink-0">
+   338→   377→   377→   377→   377→                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+   339→   378→   378→   378→   378→                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+   340→   379→   379→   379→   379→                  </div>
+   341→   380→   380→   380→   380→                </div>
+   342→   381→   381→   381→   381→                {log.notes && (
+   343→   382→   382→   382→   382→                  <p className="mt-2 ml-[52px] sm:ml-[60px] text-xs text-[#888] italic leading-relaxed">{log.notes}</p>
+   344→   383→   383→   383→   383→                )}
+   345→   384→   384→   384→   384→              </div>
+   346→   385→   385→   385→   385→            ))}
+   347→   386→   386→   386→   386→          </div>
+   348→   387→   387→   387→   387→        ) : (
+   349→   388→   388→   388→   388→          <PremiumEmptyState
+   350→   389→   389→   389→   389→            icon={Heart}
+   351→   390→   390→   390→   390→            title="Aún sin registros"
+   352→   391→   391→   391→   391→            subtitle="Cuando quieras."
+   353→   392→   392→   392→   392→            cta="Registrar"
+   354→   393→   393→   393→   393→            onCta={() => setShowWellness(true)}
+   355→   394→   394→   394→   394→            size="sm"
+   356→   395→   395→   395→   395→            variant="gold"
+   357→   396→   396→   396→   396→          />
+   358→   397→   397→   397→   397→        )}
+   359→   398→   398→   398→   398→      </div>
+   360→   399→   399→   399→   399→
+   361→   400→   400→   400→   400→      {/* Nutrition */}
+   362→   401→   401→   401→   401→      <div className="section-enter-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+   363→   402→   402→   402→   402→        <div className="flex items-center justify-between mb-4">
+   364→   403→   403→   403→   403→          <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
+   365→   404→   404→   404→   404→          <button onClick={() => setShowNutrition(!showNutrition)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
+   366→   405→   405→   405→   405→            + Registrar hoy
+   367→   406→   406→   406→   406→          </button>
+   368→   407→   407→   407→   407→        </div>
+   369→   408→   408→   408→   408→
+   370→   409→   409→   409→   409→        {showNutrition && (
+   371→   410→   410→   410→   410→          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
+   372→   411→   411→   411→   411→            <textarea placeholder="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
+   373→   412→   412→   412→   412→              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
+   374→   413→   413→   413→   413→            <div className="grid grid-cols-2 gap-3">
+   375→   414→   414→   414→   414→              <div>
+   376→   415→   415→   415→   415→                <label className="text-sm text-[#999] mb-1 block">Vasos de agua</label>
+   377→   416→   416→   416→   416→                <NumericInput value={nutritionForm.water} onChange={(v) => setNutritionForm({ ...nutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
+   378→   417→   417→   417→   417→                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
+   379→   418→   418→   418→   418→              </div>
+   380→   419→   419→   419→   419→              <div>
+   381→   420→   420→   420→   420→                <label className="text-sm text-[#999] mb-1 block">Calorías</label>
+   382→   421→   421→   421→   421→                <NumericInput value={nutritionForm.calories} onChange={(v) => setNutritionForm({ ...nutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
+   383→   422→   422→   422→   422→                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
+   384→   423→   423→   423→   423→              </div>
+   385→   424→   424→   424→   424→            </div>
+   386→   425→   425→   425→   425→            <div className="flex gap-2">
+   387→   426→   426→   426→   426→              <button onClick={submitNutrition} disabled={submittingNutrition} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingNutrition ? 'Guardando...' : 'Guardar'}</button>
+   388→   427→   427→   427→   427→              <button onClick={() => setShowNutrition(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
+   389→   428→   428→   428→   428→            </div>
+   390→   429→   429→   429→   429→          </div>
+   391→   430→   430→   430→   430→        )}
+   392→   431→   431→   431→   431→        {nutrition.length > 0 ? (
+   393→   432→   432→   432→   432→          <div className="space-y-2 max-h-96 overflow-y-auto">
+   394→   433→   433→   433→   433→            {nutrition.slice(0, 7).map((log) => (
+   395→   434→   434→   434→   434→              <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+   396→   435→   435→   435→   435→                <div className="flex items-center justify-between">
+   397→   436→   436→   436→   436→                  <div className="flex items-center gap-4">
+   398→   437→   437→   437→   437→                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+   399→   438→   438→   438→   438→                      <Apple size={16} className="text-champagne" />
+   400→   439→   439→   439→   439→                    </div>
+   401→   440→   440→   440→   440→                    <div>
+   402→   441→   441→   441→   441→                      <div className="flex gap-2 text-xs mb-1">
+   403→   442→   442→   442→   442→                        <span className="flex items-center gap-1 text-champagne"><Droplets size={12} /> <PrivacyMask compact>{log.water}</PrivacyMask></span>
+   404→   443→   443→   443→   443→                        <span className="text-champagne"><PrivacyMask compact>{log.calories || 0}</PrivacyMask> kcal</span>
+   405→   444→   444→   444→   444→                      </div>
+   406→   445→   445→   445→   445→                      <div className="flex items-center gap-3">
+   407→   446→   446→   446→   446→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+   408→   447→   447→   447→   447→                        <span className="text-[#333] text-xs">·</span>
+   409→   448→   448→   448→   448→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+   410→   449→   449→   449→   449→                      </div>
+   411→   450→   450→   450→   450→                    </div>
+   412→   451→   451→   451→   451→                  </div>
+   413→   452→   452→   452→   452→                  <div className="flex items-center gap-1 flex-shrink-0">
+   414→   453→   453→   453→   453→                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+   415→   454→   454→   454→   454→                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+   416→   455→   455→   455→   455→                  </div>
+   417→   456→   456→   456→   456→                </div>
+   418→   457→   457→   457→   457→                {(log.meals || log.notes) && (
+   419→   458→   458→   458→   458→                  <div className="mt-2 ml-[56px] space-y-0.5">
+   420→   459→   459→   459→   459→                    {log.meals && (
+   421→   460→   460→   460→   460→                      <p className="text-xs text-[#888] leading-relaxed">{log.meals}</p>
+   422→   461→   461→   461→   461→                    )}
+   423→   462→   462→   462→   462→                    {log.notes && (
+   424→   463→   463→   463→   463→                      <p className="text-xs text-[#666] italic leading-relaxed">{log.notes}</p>
+   425→   464→   464→   464→   464→                    )}
+   426→   465→   465→   465→   465→                  </div>
+   427→   466→   466→   466→   466→                )}
+   428→   467→   467→   467→   467→              </div>
+   429→   468→   468→   468→   468→            ))}
+   430→   469→   469→   469→   469→          </div>
+   431→   470→   470→   470→   470→        ) : (
+   432→   471→   471→   471→   471→          <PremiumEmptyState
+   433→   472→   472→   472→   472→            icon={Apple}
+   434→   473→   473→   473→   473→            title="Aún sin registros"
+   435→   474→   474→   474→   474→            subtitle="Cuando quieras."
+   436→   475→   475→   475→   475→            cta="Registrar"
+   437→   476→   476→   476→   476→            onCta={() => setShowNutrition(true)}
+   438→   477→   477→   477→   477→            size="sm"
+   439→   478→   478→   478→   478→            variant="gold"
+   440→   479→   479→   479→   479→          />
+   441→   480→   480→   480→   480→        )}
+   442→   481→   481→   481→   481→      </div>
+   443→   482→   482→   482→   482→
+   444→   483→   483→   483→   483→      {/* Tips */}
+   445→   484→   484→   484→   484→      <EmpireTipsSection empire="energia" subtitle="Notas sobre tu energía" />
+   446→   485→   485→   485→   485→    </div>
+   447→   486→   486→   486→   486→  );
+   448→   487→   487→   487→   487→}
+   449→   488→   488→   488→   488→

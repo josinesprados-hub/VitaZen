@@ -1,0 +1,296 @@
+   100→   154→   193→   193→   193→   193→        console.error('Nutrition PUT failed:', res.status, errData);
+   101→   155→   194→   194→   194→   194→      }
+   102→   156→   195→   195→   195→   195→    } catch (error) { console.error('Error updating nutrition log:', error); }
+   103→   157→   196→   196→   196→   196→    finally { setEditNutritionSaving(false); }
+   104→   158→   197→   197→   197→   197→  };
+   105→   159→   198→   198→   198→   198→
+   106→   160→   199→   199→   199→   199→  const confirmDelete = async () => {
+   107→   161→   200→   200→   200→   200→    if (!pendingDeleteId) return;
+   108→   162→   201→   201→   201→   201→    try {
+   109→   163→   202→   202→   202→   202→      const endpoint = pendingDeleteId.type === 'wellness' ? '/api/wellness' : '/api/nutrition';
+   110→   164→   203→   203→   203→   203→      const bodyKey = 'logId';
+   111→   165→   204→   204→   204→   204→      const res = await apiFetch(endpoint, {
+   112→   166→   205→   205→   205→   205→        method: 'DELETE',
+   113→   167→   206→   206→   206→   206→        body: JSON.stringify({ [bodyKey]: pendingDeleteId.id }),
+   114→   168→   207→   207→   207→   207→      });
+   115→   169→   208→   208→   208→   208→      if (res.ok) {
+   116→   170→   209→   209→   209→   209→        if (pendingDeleteId.type === 'wellness') {
+   117→   171→   210→   210→   210→   210→          setWellnessLogs(prev => prev.filter(l => l.id !== pendingDeleteId.id));
+   118→   172→   211→   211→   211→   211→        } else {
+   119→   173→   212→   212→   212→   212→          setNutrition(prev => prev.filter(l => l.id !== pendingDeleteId.id));
+   120→   174→   213→   213→   213→   213→        }
+   121→   175→   214→   214→   214→   214→      } else {
+   122→   176→   215→   215→   215→   215→        const errData = await res.json().catch(() => ({}));
+   123→   177→   216→   216→   216→   216→        console.error('DELETE failed:', res.status, errData);
+   124→   178→   217→   217→   217→   217→      }
+   125→   179→   218→   218→   218→   218→    } catch (error) { console.error('Error deleting log:', error); }
+   126→   180→   219→   219→   219→   219→    finally { setPendingDeleteId(null); }
+   127→   181→   220→   220→   220→   220→  };
+   128→   182→   221→   221→   221→   221→
+   129→   183→   222→   222→   222→   222→  if (loading) {
+   130→   184→   223→   223→   223→   223→    return <EmpireSkeleton message="Cargando tu energía..." />;
+   131→   185→   224→   224→   224→   224→  }
+   132→   186→   225→   225→   225→   225→
+   133→   187→   226→   226→   226→   226→  if (fetchError) {
+   134→   188→   227→   227→   227→   227→    return (
+   135→   189→   228→   228→   228→   228→      <div className="max-w-4xl mx-auto min-h-[50vh] flex items-center justify-center">
+   136→   190→   229→   229→   229→   229→        <PremiumErrorState
+   137→   191→   230→   230→   230→   230→          variant="loading"
+   138→   192→   231→   231→   231→   231→          title="No se pudo cargar el imperio"
+   139→   193→   232→   232→   232→   232→          onRetry={fetchData}
+   140→   194→   233→   233→   233→   233→          size="md"
+   141→   195→   234→   234→   234→   234→        />
+   142→   196→   235→   235→   235→   235→      </div>
+   143→   197→   236→   236→   236→   236→    );
+   144→   198→   237→   237→   237→   237→  }
+   145→   199→   238→   238→   238→   238→
+   146→   200→   239→   239→   239→   239→  return (
+   147→   201→   240→   240→   240→   240→    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+   148→   202→   241→   241→   241→   241→      {/* Edit Wellness Overlay */}
+   149→   203→   242→   242→   242→   242→      {editingWellness && (
+   150→   204→   243→   243→   243→   243→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingWellness(null)}>
+   151→   205→   244→   244→   244→   244→          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+   152→   206→   245→   245→   245→   245→            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+   153→   207→   246→   246→   246→   246→              <Pencil size={20} className="text-champagne" />
+   154→   208→   247→   247→   247→   247→            </div>
+   155→   209→   248→   248→   248→   248→            <h3 className="text-lg font-bold text-white text-center mb-6">Editar bienestar</h3>
+   156→   210→   249→   249→   249→   249→            <div className="space-y-4">
+   157→   211→   250→   250→   250→   250→              <RatingInput label="Estado de ánimo" value={editWellnessForm.mood} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, mood: v })} />
+   158→   212→   251→   251→   251→   251→              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+   159→   213→   252→   252→   252→   252→              <RatingInput label="Sueño" value={editWellnessForm.sleep} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, sleep: v })} />
+   160→   214→   253→   253→   253→   253→              <RatingInput label="Estrés" value={editWellnessForm.stress} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, stress: v })} />
+   161→   215→   254→   254→   254→   254→              <textarea placeholder="Notas (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
+   162→   216→   255→   255→   255→   255→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
+   163→   217→   256→   256→   256→   256→            </div>
+   164→   218→   257→   257→   257→   257→            <div className="flex items-center justify-center gap-3 mt-7">
+   165→   219→   258→   258→   258→   258→              <button onClick={() => setEditingWellness(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+   166→   220→   259→   259→   259→   259→              <button onClick={saveEditWellness} disabled={editWellnessSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editWellnessSaving ? 'Guardando...' : 'Guardar'}</button>
+   167→   221→   260→   260→   260→   260→            </div>
+   168→   222→   261→   261→   261→   261→          </div>
+   169→   223→   262→   262→   262→   262→        </div>
+   170→   224→   263→   263→   263→   263→      )}
+   171→   225→   264→   264→   264→   264→
+   172→   226→   265→   265→   265→   265→      {/* Edit Nutrition Overlay */}
+   173→   227→   266→   266→   266→   266→      {editingNutrition && (
+   174→   228→   267→   267→   267→   267→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingNutrition(null)}>
+   175→   229→   268→   268→   268→   268→          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+   176→   230→   269→   269→   269→   269→            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+   177→   231→   270→   270→   270→   270→              <Pencil size={20} className="text-champagne" />
+   178→   232→   271→   271→   271→   271→            </div>
+   179→   233→   272→   272→   272→   272→            <h3 className="text-lg font-bold text-white text-center mb-6">Editar nutrición</h3>
+   180→   234→   273→   273→   273→   273→            <div className="space-y-3">
+   181→   235→   274→   274→   274→   274→              <textarea placeholder="Comidas del día" value={editNutritionForm.meals} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, meals: e.target.value })}
+   182→   236→   275→   275→   275→   275→                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
+   183→   237→   276→   276→   276→   276→              <div className="grid grid-cols-2 gap-3">
+   184→   238→   277→   277→   277→   277→                <div>
+   185→   239→   278→   278→   278→   278→                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
+   186→   240→   279→   279→   279→   279→                  <NumericInput value={editNutritionForm.water} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
+   187→   241→   280→   280→   280→   280→                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
+   188→   242→   281→   281→   281→   281→                </div>
+   189→   243→   282→   282→   282→   282→                <div>
+   190→   244→   283→   283→   283→   283→                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
+   191→   245→   284→   284→   284→   284→                  <NumericInput value={editNutritionForm.calories} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
+   192→   246→   285→   285→   285→   285→                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
+   193→   247→   286→   286→   286→   286→                </div>
+   194→   248→   287→   287→   287→   287→              </div>
+   195→   249→   288→   288→   288→   288→            </div>
+   196→   250→   289→   289→   289→   289→            <div className="flex items-center justify-center gap-3 mt-7">
+   197→   251→   290→   290→   290→   290→              <button onClick={() => setEditingNutrition(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+   198→   252→   291→   291→   291→   291→              <button onClick={saveEditNutrition} disabled={editNutritionSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editNutritionSaving ? 'Guardando...' : 'Guardar'}</button>
+   199→   253→   292→   292→   292→   292→            </div>
+   200→   254→   293→   293→   293→   293→          </div>
+   201→   255→   294→   294→   294→   294→        </div>
+   202→   256→   295→   295→   295→   295→      )}
+   203→   257→   296→   296→   296→   296→
+   204→   258→   297→   297→   297→   297→      {/* Delete Confirmation Overlay */}
+   205→   259→   298→   298→   298→   298→      {pendingDeleteId && (
+   206→   260→   299→   299→   299→   299→        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
+   207→   261→   300→   300→   300→   300→          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+   208→   262→   301→   301→   301→   301→            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+   209→   263→   302→   302→   302→   302→              <Trash2 size={22} className="text-red-400" />
+   210→   264→   303→   303→   303→   303→            </div>
+   211→   265→   304→   304→   304→   304→            <h3 className="text-lg font-bold text-white mb-2">Eliminar registro</h3>
+   212→   266→   305→   305→   305→   305→            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+   213→   267→   306→   306→   306→   306→            <div className="flex items-center justify-center gap-3">
+   214→   268→   307→   307→   307→   307→              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+   215→   269→   308→   308→   308→   308→              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
+   216→   270→   309→   309→   309→   309→            </div>
+   217→   271→   310→   310→   310→   310→          </div>
+   218→   272→   311→   311→   311→   311→        </div>
+   219→   273→   312→   312→   312→   312→      )}
+   220→   274→   313→   313→   313→   313→
+   221→   275→   314→   314→   314→   314→      <div className="flex items-center gap-4">
+   222→   276→   315→   315→   315→   315→        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+   223→   277→   316→   316→   316→   316→          <Zap size={28} className="text-champagne" />
+   224→   278→   317→   317→   317→   317→        </div>
+   225→   279→   318→   318→   318→   318→        <div>
+   226→   280→   319→   319→   319→   319→          <h1 className="title-page">Energía</h1>
+   227→   281→   320→   320→   320→   320→          <p className="subtitle-silent mt-1">Cuerpo y vitalidad</p>
+   228→   282→   321→   321→   321→   321→        </div>
+   229→   283→   322→   322→   322→   322→      </div>
+   230→   284→   323→   323→   323→   323→
+   231→   285→   324→   324→   324→   324→      {/* Contextual Help — progressive disclosure */}
+   232→   286→   325→   325→   325→   325→      <ContextualHelp
+   233→   287→   326→   326→   326→   326→        storageKey="vitazen_help_energia"
+   234→   288→   327→   327→   327→   327→        title="Energía"
+   235→   289→   328→   328→   328→   328→        text="Registra tu bienestar físico y nutrición diaria. Ánimo, energía, sueño y estrés, junto con tus comidas y agua."
+   236→   290→   329→   329→   329→   329→      />
+   237→   291→   330→   330→   330→   330→
+   238→   292→   331→   331→   331→   331→      {/* Wellness Log */}
+   239→   293→   332→   332→   332→   332→      <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+   240→   294→   333→   333→   333→   333→        <div className="flex items-center justify-between mb-4">
+   241→   295→   334→   334→   334→   334→          <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
+   242→   296→   335→   335→   335→   335→          <button onClick={() => setShowWellness(!showWellness)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
+   243→   297→   336→   336→   336→   336→            + Registrar hoy
+   244→   298→   337→   337→   337→   337→          </button>
+   245→   299→   338→   338→   338→   338→        </div>
+   246→   300→   339→   339→   339→   339→
+   247→   301→   340→   340→   340→   340→        {showWellness && (
+   248→   302→   341→   341→   341→   341→          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
+   249→   303→   342→   342→   342→   342→            <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
+   250→   304→   343→   343→   343→   343→            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+   251→   305→   344→   344→   344→   344→            <RatingInput label="Sueño" value={wellnessForm.sleep} onChange={(v) => setWellnessForm({ ...wellnessForm, sleep: v })} />
+   252→   306→   345→   345→   345→   345→            <RatingInput label="Estrés" value={wellnessForm.stress} onChange={(v) => setWellnessForm({ ...wellnessForm, stress: v })} />
+   253→   307→   346→   346→   346→   346→            <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
+   254→   308→   347→   347→   347→   347→              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
+   255→   309→   348→   348→   348→   348→            <div className="flex gap-2">
+   256→   310→   349→   349→   349→   349→              <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
+   257→   311→   350→   350→   350→   350→              <button onClick={() => setShowWellness(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
+   258→   312→   351→   351→   351→   351→            </div>
+   259→   313→   352→   352→   352→   352→          </div>
+   260→   314→   353→   353→   353→   353→        )}
+   261→   315→   354→   354→   354→   354→        {wellnessLogs.length > 0 ? (
+   262→   316→   355→   355→   355→   355→          <div className="space-y-2 max-h-96 overflow-y-auto">
+   263→   317→   356→   356→   356→   356→            {wellnessLogs.slice(0, 7).map((log) => (
+   264→   318→   357→   357→   357→   357→              <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+   265→   319→   358→   358→   358→   358→                <div className="flex items-center justify-between">
+   266→   320→   359→   359→   359→   359→                  <div className="flex items-center gap-3 sm:gap-4">
+   267→   321→   360→   360→   360→   360→                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+   268→   322→   361→   361→   361→   361→                      <Heart size={16} className="text-champagne" />
+   269→   323→   362→   362→   362→   362→                    </div>
+   270→   324→   363→   363→   363→   363→                    <div>
+   271→   325→   364→   364→   364→   364→                      <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
+   272→   326→   365→   365→   365→   365→                        <span className="text-champagne">Ánimo: <PrivacyMask compact>{log.mood}</PrivacyMask></span>
+   273→   327→   366→   366→   366→   366→                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+   274→   328→   367→   367→   367→   367→                        <span className="text-champagne">Sueño: <PrivacyMask compact>{log.sleep}</PrivacyMask></span>
+   275→   329→   368→   368→   368→   368→                      </div>
+   276→   330→   369→   369→   369→   369→                      <div className="flex items-center gap-3">
+   277→   331→   370→   370→   370→   370→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+   278→   332→   371→   371→   371→   371→                        <span className="text-[#333] text-xs">·</span>
+   279→   333→   372→   372→   372→   372→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+   280→   334→   373→   373→   373→   373→                      </div>
+   281→   335→   374→   374→   374→   374→                    </div>
+   282→   336→   375→   375→   375→   375→                  </div>
+   283→   337→   376→   376→   376→   376→                  <div className="flex items-center gap-1 flex-shrink-0">
+   284→   338→   377→   377→   377→   377→                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+   285→   339→   378→   378→   378→   378→                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+   286→   340→   379→   379→   379→   379→                  </div>
+   287→   341→   380→   380→   380→   380→                </div>
+   288→   342→   381→   381→   381→   381→                {log.notes && (
+   289→   343→   382→   382→   382→   382→                  <p className="mt-2 ml-[52px] sm:ml-[60px] text-xs text-[#888] italic leading-relaxed">{log.notes}</p>
+   290→   344→   383→   383→   383→   383→                )}
+   291→   345→   384→   384→   384→   384→              </div>
+   292→   346→   385→   385→   385→   385→            ))}
+   293→   347→   386→   386→   386→   386→          </div>
+   294→   348→   387→   387→   387→   387→        ) : (
+   295→   349→   388→   388→   388→   388→          <PremiumEmptyState
+   296→   350→   389→   389→   389→   389→            icon={Heart}
+   297→   351→   390→   390→   390→   390→            title="Aún sin registros"
+   298→   352→   391→   391→   391→   391→            subtitle="Cuando quieras."
+   299→   353→   392→   392→   392→   392→            cta="Registrar"
+   300→   354→   393→   393→   393→   393→            onCta={() => setShowWellness(true)}
+   301→   355→   394→   394→   394→   394→            size="sm"
+   302→   356→   395→   395→   395→   395→            variant="gold"
+   303→   357→   396→   396→   396→   396→          />
+   304→   358→   397→   397→   397→   397→        )}
+   305→   359→   398→   398→   398→   398→      </div>
+   306→   360→   399→   399→   399→   399→
+   307→   361→   400→   400→   400→   400→      {/* Nutrition */}
+   308→   362→   401→   401→   401→   401→      <div className="section-enter-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
+   309→   363→   402→   402→   402→   402→        <div className="flex items-center justify-between mb-4">
+   310→   364→   403→   403→   403→   403→          <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
+   311→   365→   404→   404→   404→   404→          <button onClick={() => setShowNutrition(!showNutrition)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
+   312→   366→   405→   405→   405→   405→            + Registrar hoy
+   313→   367→   406→   406→   406→   406→          </button>
+   314→   368→   407→   407→   407→   407→        </div>
+   315→   369→   408→   408→   408→   408→
+   316→   370→   409→   409→   409→   409→        {showNutrition && (
+   317→   371→   410→   410→   410→   410→          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
+   318→   372→   411→   411→   411→   411→            <textarea placeholder="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
+   319→   373→   412→   412→   412→   412→              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
+   320→   374→   413→   413→   413→   413→            <div className="grid grid-cols-2 gap-3">
+   321→   375→   414→   414→   414→   414→              <div>
+   322→   376→   415→   415→   415→   415→                <label className="text-sm text-[#999] mb-1 block">Vasos de agua</label>
+   323→   377→   416→   416→   416→   416→                <NumericInput value={nutritionForm.water} onChange={(v) => setNutritionForm({ ...nutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
+   324→   378→   417→   417→   417→   417→                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
+   325→   379→   418→   418→   418→   418→              </div>
+   326→   380→   419→   419→   419→   419→              <div>
+   327→   381→   420→   420→   420→   420→                <label className="text-sm text-[#999] mb-1 block">Calorías</label>
+   328→   382→   421→   421→   421→   421→                <NumericInput value={nutritionForm.calories} onChange={(v) => setNutritionForm({ ...nutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
+   329→   383→   422→   422→   422→   422→                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
+   330→   384→   423→   423→   423→   423→              </div>
+   331→   385→   424→   424→   424→   424→            </div>
+   332→   386→   425→   425→   425→   425→            <div className="flex gap-2">
+   333→   387→   426→   426→   426→   426→              <button onClick={submitNutrition} disabled={submittingNutrition} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingNutrition ? 'Guardando...' : 'Guardar'}</button>
+   334→   388→   427→   427→   427→   427→              <button onClick={() => setShowNutrition(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
+   335→   389→   428→   428→   428→   428→            </div>
+   336→   390→   429→   429→   429→   429→          </div>
+   337→   391→   430→   430→   430→   430→        )}
+   338→   392→   431→   431→   431→   431→        {nutrition.length > 0 ? (
+   339→   393→   432→   432→   432→   432→          <div className="space-y-2 max-h-96 overflow-y-auto">
+   340→   394→   433→   433→   433→   433→            {nutrition.slice(0, 7).map((log) => (
+   341→   395→   434→   434→   434→   434→              <div key={log.id} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-3 sm:p-4 group hover:border-[#222] transition-colors">
+   342→   396→   435→   435→   435→   435→                <div className="flex items-center justify-between">
+   343→   397→   436→   436→   436→   436→                  <div className="flex items-center gap-4">
+   344→   398→   437→   437→   437→   437→                    <div className="w-10 h-10 rounded-lg bg-champagne/10 flex items-center justify-center shrink-0">
+   345→   399→   438→   438→   438→   438→                      <Apple size={16} className="text-champagne" />
+   346→   400→   439→   439→   439→   439→                    </div>
+   347→   401→   440→   440→   440→   440→                    <div>
+   348→   402→   441→   441→   441→   441→                      <div className="flex gap-2 text-xs mb-1">
+   349→   403→   442→   442→   442→   442→                        <span className="flex items-center gap-1 text-champagne"><Droplets size={12} /> <PrivacyMask compact>{log.water}</PrivacyMask></span>
+   350→   404→   443→   443→   443→   443→                        <span className="text-champagne"><PrivacyMask compact>{log.calories || 0}</PrivacyMask> kcal</span>
+   351→   405→   444→   444→   444→   444→                      </div>
+   352→   406→   445→   445→   445→   445→                      <div className="flex items-center gap-3">
+   353→   407→   446→   446→   446→   446→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+   354→   408→   447→   447→   447→   447→                        <span className="text-[#333] text-xs">·</span>
+   355→   409→   448→   448→   448→   448→                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+   356→   410→   449→   449→   449→   449→                      </div>
+   357→   411→   450→   450→   450→   450→                    </div>
+   358→   412→   451→   451→   451→   451→                  </div>
+   359→   413→   452→   452→   452→   452→                  <div className="flex items-center gap-1 flex-shrink-0">
+   360→   414→   453→   453→   453→   453→                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+   361→   415→   454→   454→   454→   454→                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+   362→   416→   455→   455→   455→   455→                  </div>
+   363→   417→   456→   456→   456→   456→                </div>
+   364→   418→   457→   457→   457→   457→                {(log.meals || log.notes) && (
+   365→   419→   458→   458→   458→   458→                  <div className="mt-2 ml-[56px] space-y-0.5">
+   366→   420→   459→   459→   459→   459→                    {log.meals && (
+   367→   421→   460→   460→   460→   460→                      <p className="text-xs text-[#888] leading-relaxed">{log.meals}</p>
+   368→   422→   461→   461→   461→   461→                    )}
+   369→   423→   462→   462→   462→   462→                    {log.notes && (
+   370→   424→   463→   463→   463→   463→                      <p className="text-xs text-[#666] italic leading-relaxed">{log.notes}</p>
+   371→   425→   464→   464→   464→   464→                    )}
+   372→   426→   465→   465→   465→   465→                  </div>
+   373→   427→   466→   466→   466→   466→                )}
+   374→   428→   467→   467→   467→   467→              </div>
+   375→   429→   468→   468→   468→   468→            ))}
+   376→   430→   469→   469→   469→   469→          </div>
+   377→   431→   470→   470→   470→   470→        ) : (
+   378→   432→   471→   471→   471→   471→          <PremiumEmptyState
+   379→   433→   472→   472→   472→   472→            icon={Apple}
+   380→   434→   473→   473→   473→   473→            title="Aún sin registros"
+   381→   435→   474→   474→   474→   474→            subtitle="Cuando quieras."
+   382→   436→   475→   475→   475→   475→            cta="Registrar"
+   383→   437→   476→   476→   476→   476→            onCta={() => setShowNutrition(true)}
+   384→   438→   477→   477→   477→   477→            size="sm"
+   385→   439→   478→   478→   478→   478→            variant="gold"
+   386→   440→   479→   479→   479→   479→          />
+   387→   441→   480→   480→   480→   480→        )}
+   388→   442→   481→   481→   481→   481→      </div>
+   389→   443→   482→   482→   482→   482→
+   390→   444→   483→   483→   483→   483→      {/* Tips */}
+   391→   445→   484→   484→   484→   484→      <EmpireTipsSection empire="energia" subtitle="Notas sobre tu energía" />
+   392→   446→   485→   485→   485→   485→    </div>
+   393→   447→   486→   486→   486→   486→  );
+   394→   448→   487→   487→   487→   487→}
+   395→   449→   488→   488→   488→   488→

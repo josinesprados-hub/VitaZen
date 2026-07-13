@@ -1,0 +1,548 @@
+    55→    94→    94→  [/\b(cine|pelicula|concierto|fiesta|juego|viaje|hotel|hostal|airbnb|excursion|museo|teatro|partido|entradas|ocio|libro|revista|hobby|deporte|karaoke|bowling|festival)\b/i, 'Ocio'],
+    56→    95→    95→  [/\b(farmacia|medico|dentista|terapia|gimnasio|gym|optica|fisioterapeuta|psicologo|hospital|clinica|vacuna|seguro medico|sanitario|analisis|urgencia)\b/i, 'Salud'],
+    57→    96→    96→  [/\b(amazon|zara|ropa|zapatos|tienda|ikea|regalo|moda|accesorio|electronico|movil|ordenador|laptop|pc component|media markt|electrodomestico)\b/i, 'Compras'],
+    58→    97→    97→  [/\b(alquiler|hipoteca|luz|agua|internet|telefono|comunidad|ibi|basura|mantenimiento|reparacion|reform|pintura|fontanero|electricista|seguro hogar)\b/i, 'Vivienda'],
+    59→    98→    98→  [/\b(curso|master|universidad|academia|formacion|seminario|taller|certificacion|udemy|coursera|domestika|estudio|clase|tutoria)\b/i, 'Educación'],
+    60→    99→    99→  [/\b(spotify|netflix|hbo|disney|prime|youtube|icloud|dropbox|suscripcion|premium|membresia|abono)\b/i, 'Suscripción'],
+    61→   100→   100→  [/\b(nomina|salario|sueldo|pago|freelance|bonus|comision|dividendo|renta|ingreso|transferencia|reembolso|devolucion)\b/i, 'Trabajo'],
+    62→   101→   101→];
+    63→   102→   102→
+    64→   103→   103→const INCOME_KEYWORDS = /\b(nomina|salario|sueldo|pago|freelance|bonus|comision|dividendo|renta|ingreso|transferencia|reembolso|devolucion)\b/i;
+    65→   104→   104→
+    66→   105→   105→interface ParsedCapture {
+    67→   106→   106→  description: string;
+    68→   107→   107→  amount: number;
+    69→   108→   108→  category: string;
+    70→   109→   109→  type: 'expense' | 'income';
+    71→   110→   110→}
+    72→   111→   111→
+    73→   112→   112→function parseQuickCapture(input: string, historyMap: Record<string, string>): ParsedCapture | null {
+    74→   113→   113→  if (!input.trim()) return null;
+    75→   114→   114→
+    76→   115→   115→  const tokens = input.trim().split(/\s+/);
+    77→   116→   116→  let amount = 0;
+    78→   117→   117→  let descriptionTokens: string[] = [];
+    79→   118→   118→  let amountFound = false;
+    80→   119→   119→
+    81→   120→   120→  for (let i = tokens.length - 1; i >= 0; i--) {
+    82→   121→   121→    if (/^[\d.,]+$/.test(tokens[i])) {
+    83→   122→   122→      const parsed = parseEuropeanQuick(tokens[i]);
+    84→   123→   123→      if (parsed > 0) {
+    85→   124→   124→        amount = parsed;
+    86→   125→   125→        descriptionTokens = tokens.slice(0, i);
+    87→   126→   126→        amountFound = true;
+    88→   127→   127→        break;
+    89→   128→   128→      }
+    90→   129→   129→    }
+    91→   130→   130→  }
+    92→   131→   131→
+    93→   132→   132→  if (!amountFound && /^[\d.,]+$/.test(tokens[0])) {
+    94→   133→   133→    const parsed = parseEuropeanQuick(tokens[0]);
+    95→   134→   134→    if (parsed > 0) {
+    96→   135→   135→      amount = parsed;
+    97→   136→   136→      descriptionTokens = tokens.slice(1);
+    98→   137→   137→      amountFound = true;
+    99→   138→   138→    }
+   100→   139→   139→  }
+   101→   140→   140→
+   102→   141→   141→  if (!amountFound) {
+   103→   142→   142→    const match = input.match(/([\d.,]+)\s*€?\s*$/);
+   104→   143→   143→    if (match) {
+   105→   144→   144→      const parsed = parseEuropeanQuick(match[1]);
+   106→   145→   145→      if (parsed > 0) {
+   107→   146→   146→        amount = parsed;
+   108→   147→   147→        descriptionTokens = [input.replace(match[0], '').trim()];
+   109→   148→   148→        amountFound = true;
+   110→   149→   149→      }
+   111→   150→   150→    }
+   112→   151→   151→  }
+   113→   152→   152→
+   114→   153→   153→  if (!amountFound || amount <= 0) return null;
+   115→   154→   154→
+   116→   155→   155→  const description = descriptionTokens.join(' ').trim();
+   117→   156→   156→  const textToMatch = description || input;
+   118→   157→   157→
+   119→   158→   158→  let category = '';
+   120→   159→   159→  const descLower = textToMatch.toLowerCase();
+   121→   160→   160→  if (historyMap[descLower]) {
+   122→   161→   161→    category = historyMap[descLower];
+   123→   162→   162→  }
+   124→   163→   163→
+   125→   164→   164→  if (!category) {
+   126→   165→   165→    for (const [regex, cat] of KEYWORD_CATEGORIES) {
+   127→   166→   166→      if (regex.test(textToMatch)) {
+   128→   167→   167→        category = cat;
+   129→   168→   168→        break;
+   130→   169→   169→      }
+   131→   170→   170→    }
+   132→   171→   171→  }
+   133→   172→   172→
+   134→   173→   173→  if (!category) category = 'Otros';
+   135→   174→   174→
+   136→   175→   175→  const type: 'expense' | 'income' = INCOME_KEYWORDS.test(textToMatch) ? 'income' : 'expense';
+   137→   176→   176→
+   138→   177→   177→  return {
+   139→   178→   178→    description: description || category,
+   140→   179→   179→    amount,
+   141→   180→   180→    category,
+   142→   181→   181→    type,
+   143→   182→   182→  };
+   144→   183→   183→}
+   145→   184→   184→
+   146→   185→   185→function parseEuropeanQuick(raw: string): number {
+   147→   186→   186→  const trimmed = raw.trim();
+   148→   187→   187→  if (!trimmed) return 0;
+   149→   188→   188→  const hasComma = trimmed.includes(',');
+   150→   189→   189→  const hasDot = trimmed.includes('.');
+   151→   190→   190→  let normalized: string;
+   152→   191→   191→
+   153→   192→   192→  if (hasComma && hasDot) {
+   154→   193→   193→    normalized = trimmed.replace(/\./g, '').replace(',', '.');
+   155→   194→   194→  } else if (hasComma) {
+   156→   195→   195→    normalized = trimmed.replace(',', '.');
+   157→   196→   196→  } else if (hasDot) {
+   158→   197→   197→    normalized = /^\d{1,3}(\.\d{3})+$/.test(trimmed)
+   159→   198→   198→      ? trimmed.replace(/\./g, '')
+   160→   199→   199→      : trimmed;
+   161→   200→   200→  } else {
+   162→   201→   201→    normalized = trimmed;
+   163→   202→   202→  }
+   164→   203→   203→
+   165→   204→   204→  normalized = normalized.replace(/\.$/, '');
+   166→   205→   205→  const parsed = parseFloat(normalized);
+   167→   206→   206→  return isNaN(parsed) ? 0 : parsed;
+   168→   207→   207→}
+   169→   208→   208→
+   170→   209→   209→// ═══════════════════════════════════════════
+   171→   210→   210→// Helpers
+   172→   211→   211→// ═══════════════════════════════════════════
+   173→   212→   212→
+   174→   213→   213→function getMonthRange(date: Date) {
+   175→   214→   214→  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+   176→   215→   215→  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+   177→   216→   216→  return { start, end };
+   178→   217→   217→}
+   179→   218→   218→
+   180→   219→   219→function filterLogsByRange(logs: FinanceLog[], start: Date, end: Date) {
+   181→   220→   220→  return logs.filter(l => {
+   182→   221→   221→    const d = new Date(l.date);
+   183→   222→   222→    return d >= start && d <= end;
+   184→   223→   223→  });
+   185→   224→   224→}
+   186→   225→   225→
+   187→   226→   226→const MONTH_NAMES_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+   188→   227→   227→const MONTH_LABELS_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+   189→   228→   228→const DAY_NAMES_ES = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+   190→   229→   229→
+   191→   230→   230→function formatDateLabel(dateStr: string): string {
+   192→   231→   231→  const d = new Date(dateStr);
+   193→   232→   232→  const day = DAY_NAMES_ES[d.getDay()];
+   194→   233→   233→  const date = d.getDate();
+   195→   234→   234→  const month = MONTH_NAMES_ES[d.getMonth()];
+   196→   235→   235→  return `${day}, ${date} ${month}`;
+   197→   236→   236→}
+   198→   237→   237→
+   199→   238→   238→function groupLogsByDate(logs: FinanceLog[]) {
+   200→   239→   239→  const groups: Record<string, FinanceLog[]> = {};
+   201→   240→   240→  for (const log of logs) {
+   202→   241→   241→    const key = formatDateLabel(log.date);
+   203→   242→   242→    if (!groups[key]) groups[key] = [];
+   204→   243→   243→    groups[key].push(log);
+   205→   244→   244→  }
+   206→   245→   245→  return groups;
+   207→   246→   246→}
+   208→   247→   247→
+   209→   248→   248→function getIntentionLabel(mood: string | null) {
+   210→   249→   249→  if (!mood) return null;
+   211→   250→   250→  const resolved = LEGACY_MOOD_MAP[mood] || mood;
+   212→   251→   251→  return INTENTIONS.find(i => i.value === resolved) || null;
+   213→   252→   252→}
+   214→   253→   253→
+   215→   254→   254→function resolveIntention(mood: string | null): string | null {
+   216→   255→   255→  if (!mood) return null;
+   217→   256→   256→  return LEGACY_MOOD_MAP[mood] || mood;
+   218→   257→   257→}
+   219→   258→   258→
+   220→   259→   259→// ═══════════════════════════════════════════
+   221→   260→   260→// Subcomponents
+   222→   261→   261→// ═══════════════════════════════════════════
+   223→   262→   262→
+   224→   263→   263→function IntentionSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+   225→   264→   264→  return (
+   226→   265→   265→    <div>
+   227→   266→   266→      <label className="text-[10px] text-[#555] mb-1.5 block tracking-wide uppercase">Este movimiento aporta</label>
+   228→   267→   267→      <div className="flex gap-1.5 flex-wrap">
+   229→   268→   268→        {INTENTIONS.map(i => (
+   230→   269→   269→          <button
+   231→   270→   270→            key={i.value}
+   232→   271→   271→            type="button"
+   233→   272→   272→            onClick={() => onChange(value === i.value ? '' : i.value)}
+   234→   273→   273→            className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
+   235→   274→   274→              value === i.value
+   236→   275→   275→                ? 'bg-champagne/10 border-champagne/25 text-champagne/90'
+   237→   276→   276→                : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
+   238→   277→   277→            }`}
+   239→   278→   278→          >
+   240→   279→   279→            {i.label}
+   241→   280→   280→          </button>
+   242→   281→   281→        ))}
+   243→   282→   282→      </div>
+   244→   283→   283→    </div>
+   245→   284→   284→  );
+   246→   285→   285→}
+   247→   286→   286→
+   248→   287→   287→function CategoryChips({ categories, value, onChange }: { categories: string[]; value: string; onChange: (v: string) => void }) {
+   249→   288→   288→  return (
+   250→   289→   289→    <div className="flex gap-1.5 flex-wrap">
+   251→   290→   290→      {categories.map(cat => (
+   252→   291→   291→        <button
+   253→   292→   292→          key={cat}
+   254→   293→   293→          type="button"
+   255→   294→   294→          onClick={() => onChange(value === cat ? '' : cat)}
+   256→   295→   295→          className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
+   257→   296→   296→            value === cat
+   258→   297→   297→              ? 'bg-champagne/10 border-champagne/25 text-champagne/90'
+   259→   298→   298→              : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
+   260→   299→   299→          }`}
+   261→   300→   300→        >
+   262→   301→   301→          {cat}
+   263→   302→   302→        </button>
+   264→   303→   303→      ))}
+   265→   304→   304→    </div>
+   266→   305→   305→  );
+   267→   306→   306→}
+   268→   307→   307→
+   269→   308→   308→// ═══════════════════════════════════════════
+   270→   309→   309→// Balance de Intenciones — the home of Finanzas
+   271→   310→   310→// ═══════════════════════════════════════════
+   272→   311→   311→
+   273→   312→   312→interface IntentionFlow {
+   274→   313→   313→  intention: string;
+   275→   314→   314→  label: string;
+   276→   315→   315→  amount: number;
+   277→   316→   316→  count: number;
+   278→   317→   317→}
+   279→   318→   318→
+   280→   319→   319→function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; totalExpense: number }) {
+   281→   320→   320→  const maxAmount = Math.max(...flows.map(f => f.amount), 1);
+   282→   321→   321→  const hasData = flows.some(f => f.amount > 0);
+   283→   322→   322→
+   284→   323→   323→  if (!hasData) return null;
+   285→   324→   324→
+   286→   325→   325→  return (
+   287→   326→   326→    <PrivacyMask compact>
+   288→   327→   327→      <div className="space-y-5 sm:space-y-6">
+   289→   328→   328→        {flows.map((flow) => {
+   290→   329→   329→          if (flow.amount <= 0) return null;
+   291→   330→   330→          const barWidth = maxAmount > 0 ? (flow.amount / maxAmount) * 100 : 0;
+   292→   331→   331→          return (
+   293→   332→   332→            <div key={flow.intention} className="space-y-2">
+   294→   333→   333→              <div className="flex items-baseline justify-between">
+   295→   334→   334→                <span className="text-sm sm:text-base text-[#aaa] tracking-wide">{flow.label}</span>
+   296→   335→   335→                <span className="text-xs sm:text-sm text-[#666] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
+   297→   336→   336→              </div>
+   298→   337→   337→              <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
+   299→   338→   338→                <div
+   300→   339→   339→                  className="h-full rounded-full bg-champagne/25 transition-all duration-700"
+   301→   340→   340→                  style={{ width: `${Math.max(barWidth, 0)}%` }}
+   302→   341→   341→                />
+   303→   342→   342→              </div>
+   304→   343→   343→            </div>
+   305→   344→   344→          );
+   306→   345→   345→        })}
+   307→   346→   346→      </div>
+   308→   347→   347→    </PrivacyMask>
+   309→   348→   348→  );
+   310→   349→   349→}
+   311→   350→   350→
+   312→   351→   351→// Save confirmation toast
+   313→   352→   352→function SaveToast({ show, message }: { show: boolean; message: string }) {
+   314→   353→   353→  return (
+   315→   354→   354→    <div
+   316→   355→   355→      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+   317→   356→   356→        show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+   318→   357→   357→      }`}
+   319→   358→   358→    >
+   320→   359→   359→      <div className="bg-champagne text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg shadow-champagne/20">
+   321→   360→   360→        <Check size={14} />
+   322→   361→   361→        {message}
+   323→   362→   362→      </div>
+   324→   363→   363→    </div>
+   325→   364→   364→  );
+   326→   365→   365→}
+   327→   366→   366→
+   328→   367→   367→// ═══════════════════════════════════════════
+   329→   368→   368→// Quick Capture Component
+   330→   369→   369→// ═══════════════════════════════════════════
+   331→   370→   370→
+   332→   371→   371→function QuickCapture({
+   333→   372→   372→  onCapture,
+   334→   373→   373→  onFullForm,
+   335→   374→   374→  submitting,
+   336→   375→   375→  historyMap,
+   337→   376→   376→}: {
+   338→   377→   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+   339→   378→   378→  onFullForm: () => void;
+   340→   379→   379→  submitting: boolean;
+   341→   380→   380→  historyMap: Record<string, string>;
+   342→   381→   381→}) {
+   343→   382→   382→  const [input, setInput] = useState('');
+   344→   383→   383→  const [contexto, setContexto] = useState('');
+   345→   384→   384→  const parsed = useMemo(() => parseQuickCapture(input, historyMap), [input, historyMap]);
+   346→   385→   385→
+   347→   386→   386→  const handleSubmit = () => {
+   348→   387→   387→    if (!parsed || parsed.amount <= 0 || submitting) return;
+   349→   388→   388→    onCapture({
+   350→   389→   389→      type: parsed.type,
+   351→   390→   390→      category: parsed.category,
+   352→   391→   391→      amount: parsed.amount,
+   353→   392→   392→      description: parsed.description,
+   354→   393→   393→      contexto: contexto.trim(),
+   355→   394→   394→    });
+   356→   395→   395→    setInput('');
+   357→   396→   396→    setContexto('');
+   358→   397→   397→  };
+   359→   398→   398→
+   360→   399→   399→  const handleKeyDown = (e: React.KeyboardEvent) => {
+   361→   400→   400→    if (e.key === 'Enter' && parsed && parsed.amount > 0) {
+   362→   401→   401→      e.preventDefault();
+   363→   402→   402→      handleSubmit();
+   364→   403→   403→    }
+   365→   404→   404→  };
+   366→   405→   405→
+   367→   406→   406→  return (
+   368→   407→   407→    <div>
+   369→   408→   408→      <div className="relative">
+   370→   409→   409→        <input
+   371→   410→   410→          type="text"
+   372→   411→   411→          value={input}
+   373→   412→   412→          onChange={(e) => setInput(e.target.value)}
+   374→   413→   413→          onKeyDown={handleKeyDown}
+   375→   414→   414→          placeholder="Café 3,50 · Taxi 14 · Nómina 1250"
+   376→   415→   415→          className="w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3.5 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/40 transition-colors"
+   377→   416→   416→          autoFocus
+   378→   417→   417→          inputMode="text"
+   379→   418→   418→          autoComplete="off"
+   380→   419→   419→        />
+   381→   420→   420→      </div>
+   382→   421→   421→
+   383→   422→   422→      {parsed && parsed.amount > 0 ? (
+   384→   423→   423→        <div className="mt-2 flex items-center justify-between px-0.5">
+   385→   424→   424→          <div className="flex items-center gap-1.5">
+   386→   425→   425→            <span className={`text-[11px] font-medium ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
+   387→   426→   426→              {parsed.type === 'income' ? 'Ingreso' : 'Gasto'}
+   388→   427→   427→            </span>
+   389→   428→   428→            <span className="text-[#222] text-[11px]">·</span>
+   390→   429→   429→            <span className="text-[11px] text-[#666]">{parsed.category}</span>
+   391→   430→   430→            <span className="text-[#222] text-[11px]">·</span>
+   392→   431→   431→            <span className={`text-[11px] font-medium tabular-nums ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
+   393→   432→   432→              {parsed.type === 'income' ? '+' : '-'}{formatCurrency(parsed.amount)}
+   394→   433→   433→            </span>
+   395→   434→   434→          </div>
+   396→   435→   435→          <button
+   397→   436→   436→            onClick={handleSubmit}
+   398→   437→   437→            disabled={submitting}
+   399→   438→   438→            className="bg-champagne text-black px-3 py-1 rounded-lg text-xs font-semibold hover:bg-champagne-hover active:scale-95 transition-all disabled:opacity-50"
+   400→   439→   439→          >
+   401→   440→   440→            {submitting ? '...' : 'OK'}
+   402→   441→   441→          </button>
+   403→   442→   442→        </div>
+   404→   443→   443→      ) : (
+   405→   444→   444→        <p className="mt-2 text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
+   406→   445→   445→      )}
+   407→   446→   446→
+   408→   447→   447→      <div className="mt-3">
+   409→   448→   448→        <input
+   410→   449→   449→          type="text"
+   411→   450→   450→          value={contexto}
+   412→   451→   451→          onChange={(e) => setContexto(e.target.value)}
+   413→   452→   452→          placeholder="¿Qué pasó? (opcional)"
+   414→   453→   453→          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-[12px] text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
+   415→   454→   454→          autoComplete="off"
+   416→   455→   455→        />
+   417→   456→   456→      </div>
+   418→   457→   457→
+   419→   458→   458→      <button
+   420→   459→   459→        onClick={onFullForm}
+   421→   460→   460→        className="mt-2 text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
+   422→   461→   461→      >
+   423→   462→   462→        Formulario completo
+   424→   463→   463→      </button>
+   425→   464→   464→    </div>
+   426→   465→   465→  );
+   427→   466→   466→}
+   428→   467→   467→
+   429→   468→   468→// ═══════════════════════════════════════════
+   430→   469→   469→// Main Page
+   431→   470→   470→// ═══════════════════════════════════════════
+   432→   471→   471→
+   433→   472→   472→export default function RiquezaPage() {
+   434→   473→   473→  const { apiFetch } = useApi();
+   435→   474→   474→  const { user } = useAuth();
+   436→   475→   475→  const [logs, setLogs] = useState<FinanceLog[]>([]);
+   437→   476→   476→  const [showAdd, setShowAdd] = useState(false);
+   438→   477→   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+   439→   478→   478→  const [loading, setLoading] = useState(true);
+   440→   479→   479→  const [mounted, setMounted] = useState(false);
+   441→   480→   480→  const [editingLog, setEditingLog] = useState<FinanceLog | null>(null);
+   442→   481→   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+   443→   482→   482→  const [editSaving, setEditSaving] = useState(false);
+   444→   483→   483→  const [submitting, setSubmitting] = useState(false);
+   445→   484→   484→  const [submitError, setSubmitError] = useState<string | null>(null);
+   446→   485→   485→  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+   447→   486→   486→  const [fetchError, setFetchError] = useState(false);
+   448→   487→   487→  const [period, setPeriod] = useState<Period>('month');
+   449→   488→   488→  const [viewingMonth, setViewingMonth] = useState<Date | null>(null);
+   450→   489→   489→  const [toast, setToast] = useState({ show: false, message: '' });
+   451→   490→   490→  const [quickMode, setQuickMode] = useState(true);
+   452→   491→   491→  const addFormRef = useRef<HTMLDivElement>(null);
+   453→   492→   492→  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+   454→   493→   493→
+   455→   494→   494→  // Cleanup toast timer on unmount
+   456→   495→   495→  useEffect(() => {
+   457→   496→   496→    return () => {
+   458→   497→   497→      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+   459→   498→   498→    };
+   460→   499→   499→  }, []);
+   461→   500→   500→
+   462→   501→   501→  // Hydration guard — only render date-dependent content after mount
+   463→   502→   502→  useEffect(() => {
+   464→   503→   503→    setMounted(true);
+   465→   504→   504→    setViewingMonth(new Date());
+   466→   505→   505→  }, []);
+   467→   506→   506→
+   468→   507→   507→  const showToast = useCallback((message: string) => {
+   469→   508→   508→    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+   470→   509→   509→    setToast({ show: true, message });
+   471→   510→   510→    toastTimerRef.current = setTimeout(() => {
+   472→   511→   511→      setToast({ show: false, message: '' });
+   473→   512→   512→      toastTimerRef.current = null;
+   474→   513→   513→    }, 2000);
+   475→   514→   514→  }, []);
+   476→   515→   515→
+   477→   516→   516→  useEffect(() => {
+   478→   517→   517→    if (pendingDeleteId || editingLog) {
+   479→   518→   518→      document.body.classList.add('scroll-locked');
+   480→   519→   519→      return () => { document.body.classList.remove('scroll-locked'); };
+   481→   520→   520→    }
+   482→   521→   521→  }, [pendingDeleteId, editingLog]);
+   483→   522→   522→
+   484→   523→   523→  useEffect(() => {
+   485→   524→   524→    if (showAdd && addFormRef.current) {
+   486→   525→   525→      addFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+   487→   526→   526→    }
+   488→   527→   527→  }, [showAdd]);
+   489→   528→   528→
+   490→   529→   529→  const fetchData = useCallback(async () => {
+   491→   530→   530→    setLoading(true);
+   492→   531→   531→    setFetchError(false);
+   493→   532→   532→    try {
+   494→   533→   533→      const res = await apiFetch('/api/finance?days=365');
+   495→   534→   534→      if (res.ok) { const d = await res.json(); setLogs(d.logs); }
+   496→   535→   535→    } catch (e) {
+   497→   536→   536→      console.error(e);
+   498→   537→   537→      setFetchError(true);
+   499→   538→   538→    } finally { setLoading(false); }
+   500→   539→   539→  }, [apiFetch]);
+   501→   540→   540→
+   502→   541→   541→  useEffect(() => { fetchData(); }, [fetchData]);
+   503→   542→   542→
+   504→   543→   543→  // ═══════════════════════════════════════════
+   505→   544→   544→  // Smart category suggestions
+   506→   545→   545→  // ═══════════════════════════════════════════
+   507→   546→   546→
+   508→   547→   547→  const userCategories = useMemo(() => {
+   509→   548→   548→    const freq: Record<string, number> = {};
+   510→   549→   549→    for (const l of logs) {
+   511→   550→   550→      freq[l.category] = (freq[l.category] || 0) + 1;
+   512→   551→   551→    }
+   513→   552→   552→    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).map(([cat]) => cat);
+   514→   553→   553→    const merged = [...sorted];
+   515→   554→   554→    for (const dc of DEFAULT_CATEGORIES) {
+   516→   555→   555→      if (!merged.includes(dc)) merged.push(dc);
+   517→   556→   556→    }
+   518→   557→   557→    return merged.slice(0, 12);
+   519→   558→   558→  }, [logs]);
+   520→   559→   559→
+   521→   560→   560→  const descriptionCategoryMap = useMemo(() => {
+   522→   561→   561→    const map: Record<string, string> = {};
+   523→   562→   562→    for (const l of logs) {
+   524→   563→   563→      const desc = (l.description || '').toLowerCase().trim();
+   525→   564→   564→      if (desc) map[desc] = l.category;
+   526→   565→   565→      map[l.category.toLowerCase()] = l.category;
+   527→   566→   566→    }
+   528→   567→   567→    return map;
+   529→   568→   568→  }, [logs]);
+   530→   569→   569→
+   531→   570→   570→  // ═══════════════════════════════════════════
+   532→   571→   571→  // Computed — month ranges (safe with null viewingMonth)
+   533→   572→   572→  // ═══════════════════════════════════════════
+   534→   573→   573→
+   535→   574→   574→  const [currentMonthRange, prevMonthRange] = useMemo(() => {
+   536→   575→   575→    if (!viewingMonth) return [getMonthRange(new Date()), getMonthRange(new Date())];
+   537→   576→   576→    return [getMonthRange(viewingMonth), getMonthRange(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))];
+   538→   577→   577→  }, [viewingMonth]);
+   539→   578→   578→
+   540→   579→   579→  const currentMonthLogs = useMemo(
+   541→   580→   580→    () => filterLogsByRange(logs, currentMonthRange.start, currentMonthRange.end),
+   542→   581→   581→    [logs, currentMonthRange]
+   543→   582→   582→  );
+   544→   583→   583→
+   545→   584→   584→  const prevMonthLogs = useMemo(
+   546→   585→   585→    () => filterLogsByRange(logs, prevMonthRange.start, prevMonthRange.end),
+   547→   586→   586→    [logs, prevMonthRange]
+   548→   587→   587→  );
+   549→   588→   588→
+   550→   589→   589→  const periodLogs = useMemo(() => {
+   551→   590→   590→    switch (period) {
+   552→   591→   591→      case 'month': return currentMonthLogs;
+   553→   592→   592→      case 'prev': return prevMonthLogs;
+   554→   593→   593→      case 'all': return logs;
+   555→   594→   594→    }
+   556→   595→   595→  }, [period, currentMonthLogs, prevMonthLogs, logs]);
+   557→   596→   596→
+   558→   597→   597→  // ═══════════════════════════════════════════
+   559→   598→   598→  // Computed — financial overview
+   560→   599→   599→  // ═══════════════════════════════════════════
+   561→   600→   600→
+   562→   601→   601→  const cmIncome = currentMonthLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
+   563→   602→   602→  const cmExpense = currentMonthLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
+   564→   603→   603→  const cmBalance = cmIncome - cmExpense;
+   565→   604→   604→
+   566→   605→   605→  // ═══════════════════════════════════════════
+   567→   606→   606→  // Computed — Intention Balance (the home)
+   568→   607→   607→  // ═══════════════════════════════════════════
+   569→   608→   608→
+   570→   609→   609→  const intentionFlows = useMemo(() => {
+   571→   610→   610→    const totals: Record<string, number> = {};
+   572→   611→   611→    const counts: Record<string, number> = {};
+   573→   612→   612→    let unassigned = 0;
+   574→   613→   613→
+   575→   614→   614→    for (const l of currentMonthLogs) {
+   576→   615→   615→      const resolved = resolveIntention(l.mood);
+   577→   616→   616→      if (resolved && totals[resolved] !== undefined) {
+   578→   617→   617→        totals[resolved] += l.amount;
+   579→   618→   618→        counts[resolved] = (counts[resolved] || 0) + 1;
+   580→   619→   619→      } else if (resolved) {
+   581→   620→   620→        totals[resolved] = l.amount;
+   582→   621→   621→        counts[resolved] = 1;
+   583→   622→   622→      } else {
+   584→   623→   623→        unassigned += l.amount;
+   585→   624→   624→      }
+   586→   625→   625→    }
+   587→   626→   626→
+   588→   627→   627→    const flows: IntentionFlow[] = INTENTIONS.map(i => ({
+   589→   628→   628→      intention: i.value,
+   590→   629→   629→      label: i.label,
+   591→   630→   630→      amount: totals[i.value] || 0,
+   592→   631→   631→      count: counts[i.value] || 0,
+   593→   632→   632→    }));
+   594→   633→   633→
+   595→   634→   634→    if (unassigned > 0) {
+   596→   635→   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+   597→   636→   636→    }
+   598→   637→   637→
+   599→   638→   638→    return flows;
+   600→   639→   639→  }, [currentMonthLogs]);
+   601→
+   602→[showing lines 40-639 of 1220; use offset=640 with limit to continue reading]
