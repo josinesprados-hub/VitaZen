@@ -217,17 +217,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setRemaining(data.remaining);
           setDailyLimit(data.limit || 15);
         }
-        // Only set active thread on initial load (when none is set)
-        if (allThreads.length > 0 && !activeThreadRef.current) {
-          let savedThreadId: string | null = null;
-          try { savedThreadId = localStorage.getItem(storageKey); } catch {}
-
-          // Only restore if saved thread is active (not archived)
-          const savedExists = savedThreadId && allThreads.some((t: Thread) => t.id === savedThreadId && !t.archived);
-          const activeThreads = allThreads.filter((t: Thread) => !t.archived);
-          setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
-        } else if (allThreads.length === 0 && !activeThreadRef.current) {
-          // No threads at all — clear stale localStorage
+        // Clear stale localStorage if no threads exist
+        if (allThreads.length === 0) {
           try { localStorage.removeItem(storageKey); } catch {}
         }
       } else if (!isRetry) {
@@ -250,13 +241,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               setRemaining(data.remaining);
               setDailyLimit(data.limit || 15);
             }
-            if (data.threads.length > 0 && !activeThreadRef.current) {
-              let savedThreadId: string | null = null;
-              try { savedThreadId = localStorage.getItem(storageKey); } catch {}
-              const savedExists = savedThreadId && data.threads.some((t: Thread) => t.id === savedThreadId && !t.archived);
-              const activeThreads = data.threads.filter((t: Thread) => !t.archived);
-              setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
-            }
+
             setLoadError(false);
             setLoading(false);
             return;
