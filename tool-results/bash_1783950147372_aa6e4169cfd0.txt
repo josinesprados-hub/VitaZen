@@ -1,0 +1,447 @@
+================================================================================
+1. TIPS THAT PROMISE SPECIFIC OUTCOMES / RESULTS
+================================================================================
+  [FREE] disciplina-tips.json - 'Intenciones de implementación'
+    Content: Decidir «si pasa X, entonces hago Y» duplica la probabilidad de actuar. Peter Gollwitzer lo demostró: las intenciones de implementación funcionan mejo...
+    Matched pattern: duplica la probabilidad
+
+  [PREMIUM] disciplina-tips.json - 'Señales que compiten'
+    Content: No puedes tener dos hábitos que compitan por la misma señal. Uno ganará. Diseña señales distintas para hábitos distintos. Wood y Neal (2007) documenta...
+    Matched pattern: siempre
+
+  [PREMIUM] disciplina-tips.json - 'El límite del registro'
+    Content: Cuando una métrica se convierte en objetivo, deja de ser una buena métrica. Es la ley de Goodhart, formulada por Charles Goodhart (1975) para la polít...
+    Matched pattern: siempre
+
+  [FREE] mente-tips.json - 'Ventilar no cura'
+    Content: Expresar rabia repetidamente puede hacerla crecer en vez de aliviarla. Descargarse no siempre equivale a sentirse mejor — a veces es repasar la herida...
+    Matched pattern: siempre
+
+  [FREE] mente-tips.json - 'La respiración como ancla'
+    Content: La respiración es un punto de atención accesible siempre para volver al momento actual. No necesita ser profunda; solo notada....
+    Matched pattern: siempre
+
+  [FREE] mente-tips.json - 'El contexto importa'
+    Content: Lo que aprendes en un contexto se recuerda mejor en contextos similares. Estudiar siempre en el mismo sitio puede limitar la recuperación....
+    Matched pattern: siempre
+
+  [FREE] mente-tips.json - 'La pregunta cambia todo'
+    Content: La forma en que formulaste el problema limita las soluciones que puedes ver. Reformular la pregunta a veces resuelve lo que la respuesta no podía....
+    Matched pattern: resuelve
+
+  [PREMIUM] mente-tips.json - 'Accesibilidad cognitiva'
+    Content: Las experiencias recientes hacen que ciertos conceptos estén más disponibles mentalmente. Lo que encontraste antes influye en cómo piensas ahora, no p...
+    Matched pattern: siempre
+
+  [PREMIUM] mente-tips.json - 'Dejas de ver lo constante'
+    Content: Tu cerebro deja de registrar lo que siempre está ahí. Por eso no ves el desorden después de un rato. Lo constante desaparece de la atención. Este fenó...
+    Matched pattern: siempre
+
+  [PREMIUM] mente-tips.json - 'Emociones mezcladas'
+    Content: Sentir alegría y tristeza simultáneamente no es conflicto: es la experiencia emocional completa de los eventos complejos. La ambivalencia es normal. L...
+    Matched pattern: resolver
+
+  [PREMIUM] mente-tips.json - 'Vulnerabilidad compartida'
+    Content: Expresar vulnerabilidad de forma específica reduce la intensidad emocional. Ventilar vagamente no siempre lo hace; nombrar con precisión sí. Pennebake...
+    Matched pattern: siempre
+
+  [PREMIUM] mente-tips.json - 'Lo sensorial interrumpe'
+    Content: La rumiación se alimenta de pensamiento abstracto. Volver a lo sensorial —texturas, sonidos, temperatura— la interrumpe de forma directa. Nolen-Hoekse...
+    Matched pattern: resuelve
+
+  [PREMIUM] mente-tips.json - 'Lo que cuesta se fija'
+    Content: Aprender se consolida mejor cuando cuesta un poco. Lo demasiado fácil no genera huella; la comodidad y el aprendizaje no siempre van juntos. Bjork y B...
+    Matched pattern: siempre
+
+  [PREMIUM] mente-tips.json - 'El sueño que conecta'
+    Content: Mientras duermes, el cerebro conecta ideas que parecían no tener relación. Por eso a veces despiertas con una idea que no tenías la noche anterior. St...
+    Matched pattern: resolver
+
+  [PREMIUM] mente-tips.json - 'Perspectiva temporal'
+    Content: Preguntar si esto importará en cinco años no siempre calma, pero sí revela la escala real del problema. Lo que parece inmenso hoy a menudo no lo es. E...
+    Matched pattern: siempre
+
+  [PREMIUM] mente-tips.json - 'Cuestionar lo establecido'
+    Content: Separar lo que sabes con certeza de lo que asumes por convención revela opciones que otros no ven. Cuestionar lo establecido no es rebelión: es método...
+    Matched pattern: garant[ií]
+
+  [PREMIUM] mente-tips.json - 'La navaja de Ockham'
+    Content: Si dos explicaciones funcionan igual de bien, la más simple suele ser más probable. No por elegancia: porque menos supuestos significan menos puntos d...
+    Matched pattern: garant[ií]
+
+  [PREMIUM] mente-tips.json - 'Pensar mucho no siempre aclara'
+    Content: Pensar mucho sobre ti no siempre te ayuda a conocerte mejor. A veces genera narrativas que parecen verdad pero son solo historias que te cuentas. La r...
+    Matched pattern: siempre
+
+  [FREE] energia-tips.json - 'La ventana del café'
+    Content: La cafeína funciona mejor un rato después de despertar. Si llega antes, el cuerpo aún está limpiando la adenosina de la noche y el café la posterga, n...
+    Matched pattern: resuelve
+
+  [FREE] energia-tips.json - 'Lo que hidrata'
+    Content: La mayoría de la gente confunde sed con hambre o cansancio. Beber agua antes de buscar algo más suele resolverlo....
+    Matched pattern: resolver
+
+  [FREE] energia-tips.json - 'Sobrecarga progresiva'
+    Content: Sobrecarga progresiva: el cuerpo se adapta al estímulo repetido. Para mejorar, el estímulo debe incrementarse en carga, volumen, densidad o complejida...
+    Matched pattern: siempre
+
+  [PREMIUM] energia-tips.json - 'Hierro y fatiga'
+    Content: La falta de hierro es una de las causas más comunes de fatiga no diagnosticada. No siempre es falta de sueño: a veces la sangre no transporta bien el ...
+    Matched pattern: siempre
+
+  [PREMIUM] energia-tips.json - 'No siempre es hambre'
+    Content: La fatiga durante el ejercicio prolongado no siempre es falta de energía. A veces son minerales que se pierden con el sudor —sodio, potasio, magnesio—...
+    Matched pattern: siempre
+
+  [FREE] riqueza-tips.json - 'Veinticuatro horas'
+    Content: Esperar un día antes de comprar algo no planificado suele resolver la mitad de las compras impulsivas. El impulso tiene fecha de caducidad — y suele s...
+    Matched pattern: resolver
+
+  [FREE] riqueza-tips.json - 'Cerca vence a lejos'
+    Content: El presente siempre pesa más que el futuro en las decisiones financieras. Lo que está cerca se siente real; lo lejano parece negociable. Es el sesgo d...
+    Matched pattern: siempre
+
+  [FREE] riqueza-tips.json - 'Precio por unidad'
+    Content: El paquete más grande no siempre es más barato por unidad. Comparar el precio por unidad real —gramos, mililitros, unidades— revela cuándo el tamaño g...
+    Matched pattern: siempre
+
+  [FREE] riqueza-tips.json - 'El come silencioso'
+    Content: La inflación reduce lo que puedes comprar sin que lo notes. Lo que costaba cien hace unos años ahora cuesta más, y tu salario no siempre acompaña. El ...
+    Matched pattern: siempre
+
+  [FREE] riqueza-tips.json - 'Lo que otros compran'
+    Content: Ver a alguien más comprar algo hace que parezca más valioso. La mayoría no siempre tiene razón — pero influye....
+    Matched pattern: siempre
+
+  [FREE] riqueza-tips.json - 'La opción trampa'
+    Content: Cuando aparece una tercera opción que nadie elige, las otras dos parecen mejores de lo que son. No siempre lo son....
+    Matched pattern: siempre
+
+  [PREMIUM] riqueza-tips.json - 'El encuadre del gasto'
+    Content: Presentar un gasto mensual como «solo dos euros al día» lo hace parecer pequeño. La misma cantidad presentada como coste anual revela su tamaño real. ...
+    Matched pattern: siempre
+
+  [PREMIUM] riqueza-tips.json - 'Negociar sin culpa'
+    Content: Pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación: es respeto por tu propio dinero. Los datos apoyan la ...
+    Matched pattern: siempre
+
+  [PREMIUM] riqueza-tips.json - 'Lo reciente engaña'
+    Content: Comprar lo que más subió recientemente es seguir al rebaño. Lo que subió rápido suele corregir con la misma velocidad. El rendimiento pasado no predic...
+    Matched pattern: garant[ií]
+
+  [PREMIUM] riqueza-tips.json - 'Deuda emocional'
+    Content: Algunas compras compensan algo que no es financiero: soledad, frustración, cansancio. Identificar la emoción detrás del gasto es más útil que cualquie...
+    Matched pattern: resuelve
+
+  [PREMIUM] riqueza-tips.json - 'La deuda multiplica'
+    Content: La deuda amplifica tanto las ganancias como las pérdidas. No crea valor: lo multiplica, en ambas direcciones. Una posición apalancada al 50 % que sube...
+    Matched pattern: multiplica
+
+  [PREMIUM] riqueza-tips.json - 'Las consecuencias invisibles'
+    Content: Cada decisión financiera tiene un efecto directo visible y otro indirecto oculto. Comprar barato puede costar más si se rompe pronto; ahorrar demasiad...
+    Matched pattern: siempre
+
+  [FREE] crecimiento-tips.json - 'Variar la práctica'
+    Content: Practicar lo mismo siempre no es practicar igual. Variar dentro de la repetición mejora la transferencia y la retención. Se llama práctica intercalada...
+    Matched pattern: siempre
+
+  [FREE] crecimiento-tips.json - 'Pequeños ajustes'
+    Content: Un pequeño cambio en cómo haces algo puede tener un efecto grande en el resultado. La mejora no siempre requiere empezar de cero....
+    Matched pattern: siempre
+
+  [FREE] crecimiento-tips.json - 'Mismo tiempo, mismo lugar'
+    Content: Practicar siempre en el mismo contexto ayuda a que el cerebro active el modo aprendizaje automáticamente. El entorno es parte del ritual....
+    Matched pattern: siempre
+
+  [FREE] crecimiento-tips.json - 'Lo que te distrae'
+    Content: Lo que te distrae mientras aprendes puede ser una señal de que el cerebro está saturado. La distracción a veces es el cuerpo pidiendo una pausa. No si...
+    Matched pattern: siempre
+
+  [FREE] crecimiento-tips.json - 'Lo que ya hiciste'
+    Content: Reconocer lo que ya lograste no es conformismo. Es tener una base real desde la que seguir creciendo, en vez de sentir que siempre estás al inicio....
+    Matched pattern: siempre
+
+  [FREE] crecimiento-tips.json - 'La dificultad que enseña'
+    Content: Lo que se siente difícil al practicar suele ser lo que más se recuerda después. Las dificultades deseables hacen que el aprendizaje cueste más durante...
+    Matched pattern: siempre
+
+  [PREMIUM] crecimiento-tips.json - 'El contexto de la prueba'
+    Content: Recuerdas mejor en el contexto donde aprendiste. Si siempre estudias en el mismo sitio, cambiar de sitio al usar lo aprendido puede costar más. Godden...
+    Matched pattern: siempre
+
+  [PREMIUM] crecimiento-tips.json - 'Pensamiento inverso'
+    Content: En lugar de pensar cómo tener éxito, piensa cómo garantizar el fracaso. Las respuestas invertidas suelen ser más claras y más prácticas. Y antes de em...
+    Matched pattern: garant[ií]
+
+  [PREMIUM] crecimiento-tips.json - 'La retroalimentación negativa vale más'
+    Content: La retroalimentación que te molesta suele ser la más valiosa. No porque tenga razón siempre, sino porque toca algo real que el elogio ignora. La retro...
+    Matched pattern: siempre
+
+  [PREMIUM] crecimiento-tips.json - 'Procesamiento apropiado para la transferencia'
+    Content: La retención depende de la similitud entre los procesos cognitivos usados durante el aprendizaje y los requeridos durante el uso. Mecanismo: la memori...
+    Matched pattern: siempre
+
+================================================================================
+2. AI-SOUNDING LANGUAGE PATTERNS
+================================================================================
+  [FREE] disciplina-tips.json - 'Meseta del potencial latente'
+    Matched: 'potencia' in: Los resultados de un hábito no son visibles al principio. James Clear (2018) llama a esto la meseta del potencial latent...
+
+  [PREMIUM] disciplina-tips.json - 'Fricción escondida'
+    Matched: 'desbloquea' in: A veces no haces algo, no por pereza, sino porque hay un paso oculto que molesta. Encontrar y eliminar ese paso lo cambi...
+
+  [PREMIUM] disciplina-tips.json - 'El límite del registro'
+    Matched: 'optimiza' in: Cuando una métrica se convierte en objetivo, deja de ser una buena métrica. Es la ley de Goodhart, formulada por Charles...
+
+  [PREMIUM] disciplina-tips.json - 'Memoria procedimental'
+    Matched: 'simplemente' in: La memoria procedimental almacena cómo hacer las cosas sin que tengas que pensar. Squire (2004) clasificó la memoria en ...
+
+  [FREE] mente-tips.json - 'El primer número ancla'
+    Matched: 'eleva' in: La primera cifra que escuchas influye en tu estimación posterior, incluso si es irrelevante para lo que estás decidiendo...
+
+  [PREMIUM] mente-tips.json - 'El olvido es útil'
+    Matched: 'eleva' in: Olvidar no es un fallo del sistema: es el cerebro priorizando lo que usas y debilitando lo que no. El olvido selectivo e...
+
+  [PREMIUM] mente-tips.json - 'Lo mejor es enemigo de lo bueno'
+    Matched: 'maximiza' in: Quien busca la mejor opción en todo invierte más tiempo y energía decidiendo, y termina menos satisfecho que quien se co...
+
+  [FREE] energia-tips.json - 'Estímulo frío matutino'
+    Matched: 'eleva' in: Una ducha fría de treinta segundos al final te despierta. Beber agua fría por la mañana activa una respuesta de alerta s...
+
+  [FREE] energia-tips.json - 'La jerarquía funciona'
+    Matched: 'optimiza' in: Antes de buscar suplementos o rutinas raras, conviene ordenar las palancas por impacto: el sueño es la que más condicion...
+
+  [FREE] energia-tips.json - 'EPOC: exceso de oxígeno tras el ejercicio'
+    Matched: 'eleva' in: Tras el ejercicio intenso, el cuerpo consume más oxígeno durante horas (EPOC): el metabolismo se mantiene elevado para r...
+
+  [FREE] energia-tips.json - 'Cortisol al despertar (CAR)'
+    Matched: 'potencia' in: La respuesta de cortisol al despertar (CAR) es un pico de cortisol 30-45 minutos tras despertar. Pruessner et al. (1997)...
+
+  [PREMIUM] energia-tips.json - 'Las señales del sobreentrenamiento'
+    Matched: 'eleva' in: Hay señales objetivas de que necesitas descansar: variabilidad cardiaca reducida (HRV baja), cortisol matutino elevado, ...
+
+  [PREMIUM] energia-tips.json - 'Glucosa y decisiones'
+    Matched: 'optimiza' in: La corteza prefrontal consume aproximadamente un veinte por ciento de la glucosa total del cerebro. Cuando la glucemia b...
+
+  [PREMIUM] energia-tips.json - 'La semana suave'
+    Matched: 'eleva' in: Corteza prefrontal y fatiga: Owens et al. (1994) demostraron que la fatiga mental reduce la activación de la corteza pre...
+
+  [PREMIUM] energia-tips.json - 'El eje del estrés crónico'
+    Matched: 'eleva' in: El estrés crónico activa el eje HPA (hipotálamo-hipófisis-adrenal) de forma sostenida. El cortisol elevado suprime el su...
+
+  [PREMIUM] energia-tips.json - 'Ritmo circadiano y comida'
+    Matched: 'maximiza' in: El reloj circadiano regula el sueño, la digestión y el metabolismo. La sensibilidad a la insulina, las enzimas digestiva...
+
+  [PREMIUM] energia-tips.json - 'Supercompensación'
+    Matched: 'eleva' in: Zatsiorsky (1995): tras un estímulo, el cuerpo supera su nivel previo (supercompensación) en 12-36 horas. A tiempo: prog...
+
+  [PREMIUM] energia-tips.json - 'Óxido nítrico y flujo sanguíneo'
+    Matched: 'potencia' in: El óxido nítrico (NO), producido por el endotelio vascular, regula el flujo sanguíneo. El ejercicio aumenta la producció...
+
+  [PREMIUM] energia-tips.json - 'Saciedad y densidad energética'
+    Matched: 'eleva' in: La densidad energética (calorías por gramo) determina la saciedad más que el contenido calórico total. Los alimentos de ...
+
+  [PREMIUM] riqueza-tips.json - 'Diversificar protege'
+    Matched: 'potencia' in: Diversificar no reduce lo que ganas: reduce la probabilidad de perder mucho de golpe. Es un seguro, no una limitación. N...
+
+  [PREMIUM] riqueza-tips.json - 'Tu precio interno'
+    Matched: 'eleva' in: Cada persona tiene un precio de referencia interno para las cosas. Se forma con tu primera compra y es difícil de actual...
+
+  [PREMIUM] riqueza-tips.json - 'La neurociencia del gasto'
+    Matched: 'maximiza' in: Tu cerebro activa la recompensa al anticipar una compra y el dolor al pagar. Los responsables de marketing maximizan la ...
+
+  [PREMIUM] crecimiento-tips.json - 'Modelos mentales'
+    Matched: 'eleva' in: Un buen modelo mental simplifica lo complejo sin perder lo esencial. Construir modelos es una de las habilidades más úti...
+
+  [PREMIUM] crecimiento-tips.json - 'La ventaja del novato'
+    Matched: 'simplemente' in: No saber cómo se hace puede ser una ventaja. El novato ve opciones que el experto descarta automáticamente por experienc...
+
+  [PREMIUM] crecimiento-tips.json - 'Curvas de aprendizaje no lineales'
+    Matched: 'potencia' in: La mejora sigue patrones en forma de escalera donde las mesetas son periodos de consolidación, no estancamiento. Las mes...
+
+  [PREMIUM] crecimiento-tips.json - 'Interrogación elaborativa'
+    Matched: 'eleva' in: Preguntarse «por qué» y «cómo» sobre los hechos y conceptos estudiados produce aprendizajes más profundos y duraderos. M...
+
+  [PREMIUM] crecimiento-tips.json - 'Teoría de la carga cognitiva'
+    Matched: 'eleva' in: La memoria de trabajo procesa 4-7 elementos nuevos a la vez. Sweller (1988) identificó tres cargas: intrínseca (compleji...
+
+  [PREMIUM] crecimiento-tips.json - 'Codificación dual'
+    Matched: 'eleva' in: La información codificada simultáneamente en formato verbal y visual se recuerda mejor que la codificada en un solo form...
+
+================================================================================
+3. POTENTIALLY UNSCIENTIFIC / PSEUDO-SCIENCE CLAIMS
+================================================================================
+  [FREE] mente-tips.json - 'La concentración se agota'
+    Matched: 'aura'
+    Content: La atención se agota tras unos veinte minutos. Las pausas breves la restauran; ignorarlo no lo elimina....
+
+  [PREMIUM] mente-tips.json - 'Accesibilidad cognitiva'
+    Matched: 'frecuencia'
+    Content: Las experiencias recientes hacen que ciertos conceptos estén más disponibles mentalmente. Lo que encontraste antes influye en cómo piensas ahora, no porque te manipule, sino porque está más accesible....
+
+  [PREMIUM] mente-tips.json - 'Quedarse es fácil'
+    Matched: 'frecuencia'
+    Content: Preferimos que las cosas sigan como están, incluso cuando cambiar tiene ventajas. La inercia no es decisión: es dejar pasar. Samuelson y Zeckhauser (1988) llamaron a esto sesgo de estatus quo: cuando ...
+
+  [PREMIUM] mente-tips.json - 'Recuperar es rendimiento'
+    Matched: 'frecuencia'
+    Content: El rendimiento sostenido depende de la calidad de la recuperación, no solo del esfuerzo. Descansar no es rendirse: es parte del rendimiento. Ericsson, Krampe y Tesch-Römer (1993) mostraron que los exp...
+
+  [PREMIUM] mente-tips.json - 'Pensamiento probabilístico'
+    Matched: 'frecuencia'
+    Content: Pensar en probabilidades en vez de certezas: reemplazar «va a pasar» por «hay un X % de probabilidad». Las frecuencias naturales (3 de cada 10) se procesan mejor que los porcentajes abstractos. Gigere...
+
+  [FREE] energia-tips.json - 'Movimiento, no ejercicio'
+    Matched: 'frecuencia'
+    Content: No necesitas hacer ejercicio formal para obtener beneficios energéticos. Moverte todos los días — caminar, subir escaleras, estirar — es la base. Lo importante es la frecuencia, no la intensidad. No n...
+
+  [FREE] energia-tips.json - 'Aire y cerebro'
+    Matched: 'aura'
+    Content: Allen et al. (2016): el CO2 por encima de 1000 ppm reduce la función cognitiva en un 15-50 %. El mecanismo no es la falta de oxígeno (la hipercapnia leve aumenta el flujo sanguíneo cerebral), sino los...
+
+  [FREE] energia-tips.json - 'El ritmo del cuerpo'
+    Matched: 'frecuencia'
+    Content: Ciclo ultradiano (Basic Rest-Activity Cycle, Kleitman 1963): el cerebro alterna fases de alta frecuencia (concentración sostenida) y baja frecuencia (recuperación) cada 90-120 minutos. Forzar más allá...
+
+  [FREE] energia-tips.json - 'El ritmo del cuerpo'
+    Matched: 'aura'
+    Content: Ciclo ultradiano (Basic Rest-Activity Cycle, Kleitman 1963): el cerebro alterna fases de alta frecuencia (concentración sostenida) y baja frecuencia (recuperación) cada 90-120 minutos. Forzar más allá...
+
+  [FREE] energia-tips.json - 'EPOC: exceso de oxígeno tras el ejercicio'
+    Matched: 'aura'
+    Content: Tras el ejercicio intenso, el cuerpo consume más oxígeno durante horas (EPOC): el metabolismo se mantiene elevado para restaurar ATP, limpiar lactato y reparar tejido. Gaesser y Brooks (1984) document...
+
+  [FREE] energia-tips.json - 'Reloj hepático y metabolismo'
+    Matched: 'desintoxic'
+    Content: El hígado tiene reloj circadiano propio que regula la glucogenólisis, la gluconeogénesis y la desintoxicación. Comer altera la fase del reloj hepático; no comer lo desincroniza del reloj central. Stok...
+
+  [PREMIUM] energia-tips.json - 'El ritmo que sostiene'
+    Matched: 'frecuencia'
+    Content: La frecuencia cardiaca en reposo como biomarcador de eficiencia cardiovascular: Shetler et al. (2013) demostraron que la frecuencia cardiaca en reposo es un predictor independiente de mortalidad cardi...
+
+  [PREMIUM] energia-tips.json - 'Las primeras horas'
+    Matched: 'limpieza glinfática. dormirlas mal acelera el desgaste celular'
+    Content: Las primeras horas concentran sueño profundo (fase 3 NREM), pico de hormona del crecimiento y limpieza glinfática. Dormirlas mal acelera el desgaste celular, y la deuda no se compensa: Van Dongen et a...
+
+  [PREMIUM] energia-tips.json - 'La semana suave'
+    Matched: 'aura'
+    Content: Corteza prefrontal y fatiga: Owens et al. (1994) demostraron que la fatiga mental reduce la activación de la corteza prefrontal dorsolateral. La semana de descarga restaura los recursos de la PFC. Sin...
+
+  [PREMIUM] energia-tips.json - 'El enfriamiento tras el ejercicio'
+    Matched: 'frecuencia'
+    Content: Enfriarse progresivamente tras el ejercicio reduce la inflamación sin bloquear la adaptación. Un rato de movimiento suave al final funciona mejor que parar de golpe. Parar de forma brusca tras un esfu...
+
+  [PREMIUM] energia-tips.json - 'HRV: tu marcador de recuperación'
+    Matched: 'frecuencia'
+    Content: La variabilidad de la frecuencia cardiaca refleja el equilibrio simpático-parasimpático. Plews et al. (2013) demostraron que la HRV solo es válida comparada con tu línea base de 7 días (rMSSD es la mé...
+
+  [PREMIUM] energia-tips.json - 'Glinfático: limpieza nocturna'
+    Matched: 'drenaje'
+    Content: El sistema glinfático es hasta diez veces más activo durante el sueño que durante la vigilia, lo que limpia los desechos metabólicos del cerebro, incluido el beta-amiloide. Lee et al. (2015) encontrar...
+
+  [PREMIUM] riqueza-tips.json - 'Negociar sin culpa'
+    Matched: 'frecuencia'
+    Content: Pedir mejores condiciones funciona en la mayoría de las transacciones. No es falta de educación: es respeto por tu propio dinero. Los datos apoyan la práctica: en negociación salarial, quienes piden o...
+
+  [PREMIUM] riqueza-tips.json - 'El coste del cambio'
+    Matched: 'frecuencia'
+    Content: Cambiar de banco, seguro o proveedor requiere tiempo y esfuerzo. Pero quedarse por inercia suele costar más que el esfuerzo de cambiar. El statu quo tiene precio y se cobra en silencio. Samuelson y Ze...
+
+  [PREMIUM] riqueza-tips.json - 'No mirar no ayuda'
+    Matched: 'frecuencia'
+    Content: Evitar mirar el saldo cuando las cosas van mal es natural. Pero la información que se ignora no desaparece: se agrava. La evitación de la información (information avoidance) está documentada como un s...
+
+  [PREMIUM] riqueza-tips.json - 'La sobreoperación y el coste de la acción'
+    Matched: 'frecuencia'
+    Content: Los inversores que operan con más frecuencia obtienen peores resultados. Barber y Odean (2000) lo documentaron: los hogares que más operaban ganaban un 7 % menos que el mercado. La ilusión de que la a...
+
+  [FREE] crecimiento-tips.json - 'Un poco cada día'
+    Matched: 'frecuencia'
+    Content: Veinte minutos diarios superan a tres horas los domingos. Quince minutos seis días superan a noventa minutos uno — la frecuencia le dice al cerebro que esto importa. Repasa hoy, en tres días y en una ...
+
+  [PREMIUM] crecimiento-tips.json - 'La reversión experta'
+    Matched: 'frecuencia'
+    Content: Un experto vuelve a lo básico con más frecuencia que un intermedio. La maestría no es complejidad: es dominio de lo fundamental. En muchos dominios (música, deporte, ajedrez), los expertos revisitan l...
+
+================================================================================
+4. SAFETY CONCERNS - POTENTIALLY HARMFUL ADVICE
+================================================================================
+  [FREE] disciplina-tips.json - 'Menos pasos'
+    Matched: 'forz'
+    Content: Cuantos menos pasos haya entre tú y la acción, más probable es que la hagas. Reducir la fricción funciona mejor que aumentar la motivación. Si algo requiere pasos intermedios, eliminarlos reduce la fr...
+
+  [PREMIUM] disciplina-tips.json - 'Fricción asimétrica'
+    Matched: 'extrem'
+    Content: Añadir un poco de fricción a lo que te perjudica y quitar un poco a lo que te beneficia tiene un efecto desproporcionado. No necesitas cambios extremos: la asimetría pequeña es suficiente. La fricción...
+
+  [PREMIUM] disciplina-tips.json - 'Discontinuidad de hábitos'
+    Matched: 'forz'
+    Content: Los cambios de contexto rompen hábitos —y eso es una oportunidad. Mudanzas, nuevos trabajos o cambios de vida desactivan las señales que sostenían los hábitos anteriores. En esa ventana de inestabilid...
+
+  [PREMIUM] mente-tips.json - 'La emoción fija'
+    Matched: 'extrem'
+    Content: Lo que aprendes cuando sientes algo se recuerda mejor. Ni demasiado plano ni demasiado intenso: la emoción ayuda a que se fije. McGaugh (2004) mostró que la activación emocional modula la consolidació...
+
+  [PREMIUM] mente-tips.json - 'Dejar y volver'
+    Matched: 'forz'
+    Content: Dejar un problema y volver después no es evitación. El cerebro sigue procesando en segundo plano, y a veces la solución aparece cuando dejas de forzarla. Sio y Ormerod (2009) revisaron la evidencia so...
+
+  [FREE] energia-tips.json - 'Estímulo frío matutino'
+    Matched: 'extrem'
+    Content: Una ducha fría de treinta segundos al final te despierta. Beber agua fría por la mañana activa una respuesta de alerta similar. Ambas son formas de estimulación simpática simple — no es extremo, es da...
+
+  [FREE] energia-tips.json - 'El ritmo del cuerpo'
+    Matched: 'forz'
+    Content: Ciclo ultradiano (Basic Rest-Activity Cycle, Kleitman 1963): el cerebro alterna fases de alta frecuencia (concentración sostenida) y baja frecuencia (recuperación) cada 90-120 minutos. Forzar más allá...
+
+  [FREE] energia-tips.json - 'Tu reloj genético'
+    Matched: 'forz'
+    Content: Tu genética influye en si rindes mejor por la mañana o por la noche. Los cronotipos no son preferencias — son configuraciones del reloj interno determinadas genéticamente. Roenneberg y Walker document...
+
+  [FREE] energia-tips.json - 'Reloj hepático y metabolismo'
+    Matched: 'desintoxic'
+    Content: El hígado tiene reloj circadiano propio que regula la glucogenólisis, la gluconeogénesis y la desintoxicación. Comer altera la fase del reloj hepático; no comer lo desincroniza del reloj central. Stok...
+
+  [FREE] energia-tips.json - 'Reloj hepático y metabolismo'
+    Matched: 'no comer'
+    Content: El hígado tiene reloj circadiano propio que regula la glucogenólisis, la gluconeogénesis y la desintoxicación. Comer altera la fase del reloj hepático; no comer lo desincroniza del reloj central. Stok...
+
+  [PREMIUM] energia-tips.json - 'Vitamina D y fatiga'
+    Matched: 'suplemento,'
+    Content: La vitamina D se forma en la piel con la exposición al sol y afecta a huesos, músculos, defensas y estado de ánimo. Su deficiencia está asociada con fatiga y menor rendimiento muscular. Los niveles ba...
+
+  [PREMIUM] energia-tips.json - 'Magnesio silencioso'
+    Matched: 'suplemento '
+    Content: El magnesio participa en cientos de reacciones en el cuerpo, incluida la relajación muscular y la calidad del descanso. Es cofactor de la ATPasa (la enzima que utiliza el ATP) y de más de 300 reaccion...
+
+  [PREMIUM] energia-tips.json - 'Lo que acompaña importa'
+    Matched: 'eliminar carbohidr'
+    Content: Índice glucémico de la comida completa: la proteína, la fibra y la grasa reducen la velocidad de absorción y estabilizan la glucemia. La cetosis no es superior para la energía en personas sanas (Hall ...
+
+  [PREMIUM] energia-tips.json - 'Lo que acompaña importa'
+    Matched: 'no comer'
+    Content: Índice glucémico de la comida completa: la proteína, la fibra y la grasa reducen la velocidad de absorción y estabilizan la glucemia. La cetosis no es superior para la energía en personas sanas (Hall ...
+
+  [PREMIUM] energia-tips.json - 'GH nocturna'
+    Matched: 'suplemento '
+    Content: La hormona del crecimiento (GH) se secreta en el sueño profundo (fase 3 NREM) de la primera mitad de la noche; pico a los 30-70 minutos. Van Cauter et al. (2000) y Steiger (2003) documentaron que supr...
+
+  [PREMIUM] riqueza-tips.json - 'El colchón como libertad'
+    Matched: 'forz'
+    Content: Tener liquidez disponible reduce las decisiones financieras impulsivas. El mecanismo es cognitivo: la escasez consume ancho de banda mental y estrecha el horizonte temporal de evaluación (Mullainathan...
+
+  [PREMIUM] riqueza-tips.json - 'Diversificar protege'
+    Matched: 'extrem'
+    Content: Diversificar no reduce lo que ganas: reduce la probabilidad de perder mucho de golpe. Es un seguro, no una limitación. No poner todos los huevos en la misma cesta no es miedo: es sentido común con dat...
+
+  [PREMIUM] riqueza-tips.json - 'La reversión a la media en inversiones'
+    Matched: 'extrem'
+    Content: Los rendimientos extremos —muy altos o muy bajos— tienden a volver al promedio con el tiempo. Un fondo que ganó 40 % un año probablemente no lo repita. Esta tendencia estadística no predice cuándo, pe...
+
+  [PREMIUM] crecimiento-tips.json - 'La reversión a la media'
+    Matched: 'extrem'
+    Content: Los cambios extremos suelen revertir. Los graduales se mantienen. Si mejoraste mucho de golpe, parte de eso volverá, y eso es normal. Es la reversión a la media, y ocurre en casi todo. Galton (1886) l...
+
+  [PREMIUM] crecimiento-tips.json - 'Pensamiento inverso'
+    Matched: 'forz'
+    Content: En lugar de pensar cómo tener éxito, piensa cómo garantizar el fracaso. Las respuestas invertidas suelen ser más claras y más prácticas. Y antes de empezar algo, imagina que ya fracasaste y pregúntate...
