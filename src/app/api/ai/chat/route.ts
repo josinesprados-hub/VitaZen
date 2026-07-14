@@ -10,6 +10,7 @@ import { withTiming } from '@/lib/observability/api-timing';
 import { serverLog } from '@/lib/observability/server-logger';
 import { getUnderstandingContext, extractAndPersist } from '@/lib/understanding/engine';
 import { optimizeContext } from '@/lib/decision/engine';
+import { reason } from '@/lib/reasoning/engine';
 
 async function handler(request: NextRequest) {
   // T-2 FIX: Track whether the AI limit was consumed so we can roll it back
@@ -160,6 +161,27 @@ async function handler(request: NextRequest) {
     } catch (deError) {
       // Non-blocking: if decision engine fails, use the unfiltered prompt
       serverLog.error('api/ai/chat', 'Decision engine error (non-blocking)', deError);
+    }
+
+    // RE-1: Reasoning Engine — decide HOW the mentor should use the available context.
+    // Takes the optimized prompt + user message + history, returns reasoning instruction.
+    // Zero DB queries. Zero API calls. Pure string analysis. <1ms.
+    // Non-blocking: on any error, the prompt is used without reasoning instruction.
+    // The Decision Engine decides WHAT context to use.
+    // The Reasoning Engine decides HOW to use it.
+    try {
+      const reasoning = reason({
+        userMessage: content,
+        history: history.map(msg => ({ role: msg.role, content: msg.content })),
+        plan: user.plan,
+        systemPrompt,
+      });
+      if (reasoning.instructionSnippet) {
+        systemPrompt = systemPrompt + '\n\n' + reasoning.instructionSnippet;
+      }
+    } catch (reError) {
+      // Non-blocking: if reasoning engine fails, use the prompt as-is
+      serverLog.error('api/ai/chat', 'Reasoning engine error (non-blocking)', reError);
     }
 
     const groqMessages = [
