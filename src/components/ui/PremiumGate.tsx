@@ -44,8 +44,8 @@ export default function PremiumGate({
 
   return (
     <div className="relative overflow-hidden group/depth-gate">
-      {/* Content visible but gently dimmed — not blurred, not hidden */}
-      <div className="opacity-40 select-none pointer-events-none" aria-hidden="true">
+      {/* Content hidden — occupies layout space but invisible */}
+      <div className="opacity-0 select-none pointer-events-none" aria-hidden="true">
         {children}
       </div>
 

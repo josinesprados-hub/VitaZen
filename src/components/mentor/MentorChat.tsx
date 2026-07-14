@@ -1194,7 +1194,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             </div>
 
             {/* Composer — safe-area for iPhone home indicator */}
-            <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+            <div className="p-3 sm:p-4 shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
               {/* Low message warning */}
               {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
                 <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
