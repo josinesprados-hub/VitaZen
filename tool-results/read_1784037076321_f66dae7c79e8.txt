@@ -1,0 +1,586 @@
+   850→  return lines.join('\n');
+   851→}
+   852→
+   853→/**
+   854→ * Format context for PREMIUM users — full context with continuity and evolution signals.
+   855→ *
+   856→ * Context ordering follows cognitive priority for LLM consumption:
+   857→ *
+   858→ *   LAYER 1 — IDENTITY: Who this person is
+   859→ *     Name + Onboarding origin (goals, focus, initial state)
+   860→ *
+   861→ *   LAYER 2 — HIGH-LEVEL SIGNALS: Computed insights that frame everything else
+   862→ *     Emotional State Engine → Life Stage → Pattern Detection → Silent Memories
+   863→ *     These are ordered by recency scope (ESE=this week → Life Stage=this month →
+   864→ *     Patterns=90 days → Silent Memories=lifetime milestones)
+   865→ *
+   866→ *   LAYER 3 — LIVED EXPERIENCE: What the person is going through lately
+   867→ *     Check-ins → Wellness → Journal + fragment → Finance → Monthly Closure
+   868→ *     Ordered by emotional proximity (most visceral first)
+   869→ *
+   870→ *   LAYER 4 — BEHAVIORAL PATTERNS: What the person does habitually
+   871→ *     Habits → Meditations → Activity + Consistency → Empire Progress
+   872→ *     These are more stable/situational, less defining for a response
+   873→ *
+   874→ *   LAYER 5 — CONVERSATIONAL MEMORY: What was discussed before
+   875→ *     Threads
+   876→ *     Last because: continuity matters, but shouldn't override current state
+   877→ */
+   878→function formatAdvancedContext(ctx: UserContext): string {
+   879→  const lines: string[] = [];
+   880→
+   881→  // ═══════════════════════════════════════════
+   882→  // LAYER 1 — IDENTITY
+   883→  // ═══════════════════════════════════════════
+   884→
+   885→  // User name
+   886→  if (ctx.userName) {
+   887→    lines.push(`Se llama ${ctx.userName}.`);
+   888→  }
+   889→
+   890→  // Onboarding origin context — why they came, what they want
+   891→  // Placed right after the name: the model needs to know WHO this person is
+   892→  // and WHAT they want before interpreting any other signal.
+   893→  const ob = ctx.onboardingData;
+   894→  if (ob) {
+   895→    const LEVEL_LABELS: Record<number, string> = {
+   896→      1: 'muy bajo',
+   897→      2: 'bajo',
+   898→      3: 'neutral',
+   899→      4: 'bueno',
+   900→      5: 'alto',
+   901→    };
+   902→    const FOCUS_NAMES: Record<string, string> = {
+   903→      mente: 'Mente',
+   904→      disciplina: 'Disciplina',
+   905→      energia: 'Energía',
+   906→      riqueza: 'Finanzas',
+   907→    };
+   908→
+   909→    if (ob.goals.length > 0) {
+   910→      const goalsStr = ob.goals.length <= 3
+   911→        ? ob.goals.join(' y ')
+   912→        : ob.goals.slice(0, 3).join(', ') + ' y más';
+   913→      lines.push(`Comenzó VitaZen con el objetivo de ${goalsStr}.`);
+   914→    }
+   915→    if (ob.primaryFocus) {
+   916→      const focusName = FOCUS_NAMES[ob.primaryFocus] || ob.primaryFocus;
+   917→      lines.push(`Su foco principal es ${focusName}.`);
+   918→    }
+   919→    if (ob.energyLevel != null) {
+   920→      lines.push(`Al comenzar describía su energía como ${LEVEL_LABELS[ob.energyLevel] || ob.energyLevel}/5.`);
+   921→    }
+   922→    if (ob.stressLevel != null) {
+   923→      lines.push(`Su nivel de estrés inicial era ${LEVEL_LABELS[ob.stressLevel] || ob.stressLevel}/5.`);
+   924→    }
+   925→    if (ob.focusLevel != null) {
+   926→      lines.push(`Su capacidad de enfoque inicial era ${LEVEL_LABELS[ob.focusLevel] || ob.focusLevel}/5.`);
+   927→    }
+   928→    if (ob.initialHabits.length > 0) {
+   929→      const habitsStr = ob.initialHabits.length <= 3
+   930→        ? ob.initialHabits.join(', ')
+   931→        : ob.initialHabits.slice(0, 3).join(', ') + ' y otros';
+   932→      lines.push(`Los hábitos que quería construir: ${habitsStr}.`);
+   933→    }
+   934→  }
+   935→
+   936→  // ═══════════════════════════════════════════
+   937→  // LAYER 2 — HIGH-LEVEL SIGNALS
+   938→  // ═══════════════════════════════════════════
+   939→
+   940→  // Emotional state — the single source of truth from the engine
+   941→  // This replaces any ad-hoc status inference with the official computed state.
+   942→  // First high-level signal: frames how to interpret everything that follows.
+   943→  const es = ctx.emotionalState;
+   944→  if (es) {
+   945→    if (es.statusLabel) {
+   946→      lines.push(`Actualmente se encuentra en un estado ${es.statusLabel}.`);
+   947→    }
+   948→    if (es.statusDescription) {
+   949→      lines.push(es.statusDescription);
+   950→    }
+   951→    if (es.summary) {
+   952→      lines.push(es.summary);
+   953→    }
+   954→    if (es.recommendation) {
+   955→      lines.push(es.recommendation);
+   956→    }
+   957→  }
+   958→
+   959→  // Life stage — the official stage detection from the Life Stage Engine
+   960→  // Complements the ESE (which captures the current emotional state) with
+   961→  // the broader life stage context. Deduplicated: if the ESE already
+   962→  // describes the same quality, we only add the temporal perspective.
+   963→  const ls = ctx.lifeStage;
+   964→  if (ls) {
+   965→    // Dedup: if ESE statusLabel already matches the stage flavor, don't restate it
+   966→    const ESE_STAGE_OVERLAP: Record<string, string[]> = {
+   967→      calm: ['Calma', 'Tranquilidad', 'Serenidad'],
+   968→      growth: ['Crecimiento', 'Progreso', 'Mejora'],
+   969→      intensity: ['Intensidad', 'Estrés', 'Presión'],
+   970→      exhaustion: ['Agotamiento', 'Burnout', 'Desgaste'],
+   971→      stability: ['Estabilidad', 'Equilibrio', 'Consistencia'],
+   972→      dispersion: ['Dispersión', 'Inestabilidad', 'Inconsistencia'],
+   973→      quiet: ['Silencio', 'Inactividad', 'Reposo'],
+   974→    };
+   975→    const overlapLabels = ESE_STAGE_OVERLAP[ls.flavor] || [];
+   976→    const esAlreadyCoversStage = es?.statusLabel
+   977→      ? overlapLabels.some(l => es.statusLabel.includes(l))
+   978→      : false;
+   979→
+   980→    if (!esAlreadyCoversStage) {
+   981→      lines.push(`Actualmente atraviesa una etapa de ${ls.label.toLowerCase()}.`);
+   982→    }
+   983→
+   984→    // Always add the engine's observation — it provides nuance beyond the label
+   985→    if (ls.observation && ls.observation.trim().length > 0) {
+   986→      lines.push(ls.observation);
+   987→    }
+   988→
+   989→    // Transition: only if recent — adds temporal evolution the ESE doesn't cover
+   990→    if (ls.transition) {
+   991→      lines.push(ls.transition);
+   992→    }
+   993→  }
+   994→
+   995→  // Pattern observations — official cross-domain connections from the Pattern Detection Engine
+   996→  // Only surface what the engine has detected. No recalculation, no new correlations.
+   997→  // Maximum 2 patterns (enforced by the engine). Deduplicate against ESE and other blocks.
+   998→  // Placed after Life Stage: patterns connect domains across time, building on the
+   999→  // emotional and stage context already established above.
+  1000→  if (ctx.patternObservations && ctx.patternObservations.length > 0) {
+  1001→    const esText = es
+  1002→      ? `${es.summary ?? ''} ${es.recommendation ?? ''} ${es.statusDescription ?? ''}`.toLowerCase()
+  1003→      : '';
+  1004→
+  1005→    for (const obs of ctx.patternObservations) {
+  1006→      // Dedup: skip if ESE already explicitly connects the same two domains
+  1007→      const domainKeywordPairs: Record<string, [string[], string[]]> = {
+  1008→        'finanzas-energia': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['energía', 'descanso', 'sueño', 'cansancio']],
+  1009→        'finanzas-mente': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['mente', 'meditación', 'práctica', 'mental']],
+  1010→        'finanzas-estres': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['estrés', 'presión', 'tensión', 'agobio']],
+  1011→        'finanzas-sueno': [['gasto', 'finanzas', 'dinero', 'necesidad', 'disfrute'], ['descanso', 'sueño', 'dormir', 'noche']],
+  1012→      };
+  1013→      if (esText) {
+  1014→        const pair = domainKeywordPairs[obs.connection];
+  1015→        if (pair) {
+  1016→          const hasA = pair[0].some(k => esText.includes(k));
+  1017→          const hasB = pair[1].some(k => esText.includes(k));
+  1018→          if (hasA && hasB) continue; // ESE already connects both domains — skip
+  1019→        }
+  1020→      }
+  1021→
+  1022→      // Format as natural cross-domain observation using the engine's official text
+  1023→      const empireLabels = obs.empires.join(' y ');
+  1024→      lines.push(`VitaZen ha detectado una conexión entre ${empireLabels}: ${obs.text}`);
+  1025→    }
+  1026→  }
+  1027→
+  1028→  // Silent Memories — official observations from VitaZen's observation engine
+  1029→  // Consume only what the engine has already generated and shown (shown[] in memoryState).
+  1030→  // No recalculation. No side effects. PREMIUM only.
+  1031→  // Placed last in high-level signals: these are lifetime/persistent observations
+  1032→  // that provide deep temporal context, complementing the shorter-range signals above.
+  1033→  if (ctx.silentMemories.length > 0) {
+  1034→    // Step 1: Map observation texts to their metadata (type + rarity)
+  1035→    const candidates: { observation: string; type: SilentMemoryType; rarity: 'rare' | 'very_rare' }[] = [];
+  1036→    // Iterate in reverse (most recent first) and keep only the latest per type
+  1037→    const seenTypes = new Set<SilentMemoryType>();
+  1038→    for (let i = ctx.silentMemories.length - 1; i >= 0; i--) {
+  1039→      const obs = ctx.silentMemories[i];
+  1040→      const meta = OBSERVATION_META[obs];
+  1041→      if (meta && !seenTypes.has(meta.type)) {
+  1042→        candidates.push({ observation: obs, type: meta.type, rarity: meta.rarity });
+  1043→        seenTypes.add(meta.type);
+  1044→      }
+  1045→    }
+  1046→
+  1047→    // Step 2: Deduplication — skip observations already covered by other context blocks
+  1048→    const deduped = candidates.filter(c => {
+  1049→      // Shift observations: already covered by ESE (energy/stress trends) + check-in trends
+  1050→      // If ESE is active, shift adds nothing new.
+  1051→      if (c.type === 'shift' && es) return false;
+  1052→
+  1053→      // Presence observations: the milestone (30/365 days) is unique — not covered
+  1054→      // by consistency trend which only says "improving/declining".
+  1055→      // Recurrence observations: temporal echo is unique — not covered by ESE or patterns.
+  1056→      // Return observations: absence/return signal is unique.
+  1057→      // Temporal observations: time-since-start milestone is unique.
+  1058→      return true;
+  1059→    });
+  1060→
+  1061→    // Step 3: Prioritization — score by persistence × rarity, take top 2
+  1062→    const scored = deduped.map(c => ({
+  1063→      ...c,
+  1064→      score: TYPE_PRIORITY[c.type] * RARITY_MULTIPLIER[c.rarity],
+  1065→    }));
+  1066→    scored.sort((a, b) => b.score - a.score);
+  1067→
+  1068→    const selected = scored.slice(0, 2);
+  1069→
+  1070→    // Step 4: Format as natural observations — the texts are already poetic and brief
+  1071→    for (const mem of selected) {
+  1072→      lines.push(mem.observation);
+  1073→    }
+  1074→  }
+  1075→
+  1076→  // ═══════════════════════════════════════════
+  1077→  // LAYER 3 — LIVED EXPERIENCE
+  1078→  // ═══════════════════════════════════════════
+  1079→
+  1080→  // Recent emotional check-ins with trends
+  1081→  // First lived-experience signal: the most direct self-report from the user.
+  1082→  if (ctx.recentCheckins.length > 0) {
+  1083→    const latest = ctx.recentCheckins[0];
+  1084→    const days = daysAgo(latest.date);
+  1085→    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+  1086→
+  1087→    lines.push(`Último check-in ${when}: emoción ${EMOTION_LABELS[latest.emotion] || latest.emotion}/5, energía ${latest.energy}/5, enfoque ${latest.focus}/5, estrés ${latest.stress}/5.`);
+  1088→    if (latest.intention) {
+  1089→      lines.push(`Su intención del día: "${latest.intention}"`);
+  1090→    }
+  1091→
+  1092→    // Trend: compare latest vs previous
+  1093→    // Skip raw trend when Emotional State Engine is active — its summary
+  1094→    // already provides the authoritative synthesized trend.
+  1095→    if (!es && ctx.recentCheckins.length >= 2) {
+  1096→      const prev = ctx.recentCheckins[1];
+  1097→      const trends: string[] = [];
+  1098→      if (latest.stress - prev.stress > 0) trends.push('el estrés ha subido');
+  1099→      if (latest.energy - prev.energy > 0) trends.push('la energía ha mejorado');
+  1100→      if (latest.emotion - prev.emotion < 0) trends.push('el estado emocional ha bajado');
+  1101→      if (latest.emotion - prev.emotion > 0) trends.push('el estado emocional ha mejorado');
+  1102→      if (latest.focus - prev.focus > 0) trends.push('el enfoque ha mejorado');
+  1103→      if (trends.length > 0) {
+  1104→        lines.push(`Tendencia reciente: ${trends.join(', ')}.`);
+  1105→      }
+  1106→    }
+  1107→  }
+  1108→
+  1109→  // Wellness log — sleep quality + notes (mood/energy/stress intentionally skipped: already in DailyCheckin)
+  1110→  if (ctx.wellnessLogs.length > 0) {
+  1111→    const SLEEP_LABELS: Record<number, string> = {
+  1112→      1: 'muy mala',
+  1113→      2: 'mala',
+  1114→      3: 'normal',
+  1115→      4: 'buena',
+  1116→      5: 'excelente',
+  1117→    };
+  1118→
+  1119→    const logs = ctx.wellnessLogs;
+  1120→
+  1121→    // Sleep trend: compare recent half vs older half
+  1122→    if (logs.length >= 3) {
+  1123→      const mid = Math.floor(logs.length / 2);
+  1124→      const recentSleep = logs.slice(0, mid).reduce((s, l) => s + l.sleep, 0) / mid;
+  1125→      const olderSleep = logs.slice(mid).reduce((s, l) => s + l.sleep, 0) / (logs.length - mid);
+  1126→      const diff = recentSleep - olderSleep;
+  1127→      if (diff > 0.5) {
+  1128→        lines.push(`En los últimos días ha descansado mejor.`);
+  1129→      } else if (diff < -0.5) {
+  1130→        lines.push(`Su descanso ha sido irregular últimamente.`);
+  1131→      }
+  1132→    }
+  1133→
+  1134→    // Latest sleep quality
+  1135→    const latest = logs[0];
+  1136→    const latestLabel = SLEEP_LABELS[latest.sleep] || `${latest.sleep}/5`;
+  1137→    const days = daysAgo(latest.date);
+  1138→    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+  1139→    lines.push(`Calidad del descanso ${when}: ${latestLabel}.`);
+  1140→
+  1141→    // One brief note reference if it adds unique context
+  1142→    const noteLog = logs.find(l => l.notes && l.notes.trim().length > 0);
+  1143→    if (noteLog && noteLog.notes) {
+  1144→      const snippet = noteLog.notes.length > 60 ? noteLog.notes.slice(0, 57) + '...' : noteLog.notes;
+  1145→      lines.push(`Ha anotado sobre su bienestar: "${snippet}".`);
+  1146→    }
+  1147→  }
+  1148→
+  1149→  // Recent journal entries — what the user has been reflecting on
+  1150→  if (ctx.recentJournals.length > 0) {
+  1151→    const journalParts = ctx.recentJournals.map(j => {
+  1152→      const days = daysAgo(j.createdAt);
+  1153→      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+  1154→      const title = j.title || 'sin título';
+  1155→      const moodStr = j.mood ? ` (ánimo ${j.mood}/5)` : '';
+  1156→      return `"${title}"${moodStr} ${when}`;
+  1157→    });
+  1158→    lines.push(`Reflexiones recientes en su diario: ${journalParts.join(', ')}.`);
+  1159→
+  1160→    // Intelligent content fragment from the most recent journal (PREMIUM only)
+  1161→    // Only adds a fragment when the content provides information beyond the title.
+  1162→    // No AI, no summarization, no reinterpretation — exact user text.
+  1163→    const lastJournal = ctx.recentJournals[0];
+  1164→    if (lastJournal.content) {
+  1165→      const fragment = extractJournalFragment(lastJournal.title, lastJournal.content);
+  1166→      if (fragment) {
+  1167→        // Deduplication: check if the fragment's core content is already covered
+  1168→        // by existing context blocks. Compare significant words (≥4 chars) against
+  1169→        // what the mentor already knows.
+  1170→        const existingContext = lines.join(' ').toLowerCase();
+  1171→
+  1172→        // Extract significant words from the fragment (≥4 chars, lowercase)
+  1173→        const fragmentWords = fragment
+  1174→          .toLowerCase()
+  1175→          .replace(/[^\wáéíóúñü]/g, ' ')
+  1176→          .split(/\s+/)
+  1177→          .filter(w => w.length >= 4);
+  1178→
+  1179→        // Count how many significant fragment words are NOT in existing context
+  1180→        const newWords = fragmentWords.filter(w => !existingContext.includes(w));
+  1181→
+  1182→        // If less than 30% of significant words are new, the fragment is redundant
+  1183→        if (fragmentWords.length > 0 && newWords.length / fragmentWords.length >= 0.3) {
+  1184→          lines.push(`En su última reflexión escribió: «${fragment}»`);
+  1185→        }
+  1186→      }
+  1187→    }
+  1188→  }
+  1189→
+  1190→  // Finance context — spending patterns (expenses only), not financial advice
+  1191→  // Note: financeLogRows contains all types (for pattern engine); filter to expenses for display.
+  1192→  const expenseLogs = ctx.financeLogs.filter(l => l.type === 'expense');
+  1193→  if (expenseLogs.length >= 3) {
+  1194→    const FINANCE_MOOD_LABELS: Record<string, string> = {
+  1195→      necessity: 'necesidad',
+  1196→      enjoyment: 'disfrute',
+  1197→      growth: 'crecimiento',
+  1198→      tranquility: 'tranquilidad',
+  1199→    };
+  1200→
+  1201→    const logs = expenseLogs;
+  1202→
+  1203→    // Find predominant spending mood
+  1204→    const moodCounts: Record<string, number> = {};
+  1205→    for (const l of logs) {
+  1206→      if (l.mood) {
+  1207→        moodCounts[l.mood] = (moodCounts[l.mood] || 0) + 1;
+  1208→      }
+  1209→    }
+  1210→    const moods = Object.entries(moodCounts);
+  1211→    if (moods.length > 0) {
+  1212→      const [topMood, topCount] = moods.reduce((a, b) => a[1] >= b[1] ? a : b);
+  1213→      const ratio = topCount / logs.length;
+  1214→      const moodLabel = FINANCE_MOOD_LABELS[topMood] || topMood;
+  1215→      if (ratio >= 0.5) {
+  1216→        if (topMood === 'necessity') {
+  1217→          lines.push(`Últimamente la mayoría de sus gastos han estado relacionados con necesidades.`);
+  1218→        } else if (topMood === 'growth') {
+  1219→          lines.push(`Ha registrado varias decisiones enfocadas al crecimiento.`);
+  1220→        } else if (topMood === 'enjoyment') {
+  1221→          lines.push(`Sus gastos recientes reflejan una etapa orientada al disfrute.`);
+  1222→        } else if (topMood === 'tranquility') {
+  1223→          lines.push(`Se aprecia una etapa de mayor prudencia en sus decisiones.`);
+  1224→        } else {
+  1225→          lines.push(`Sus gastos recientes tienen como intención predominante ${moodLabel}.`);
+  1226→        }
+  1227→      }
+  1228→    }
+  1229→
+  1230→    // One brief contexto reference — human context behind a transaction
+  1231→    const ctxLog = logs.find(l => l.contexto && l.contexto.trim().length > 0);
+  1232→    if (ctxLog && ctxLog.contexto) {
+  1233→      const snippet = ctxLog.contexto.length > 60 ? ctxLog.contexto.slice(0, 57) + '...' : ctxLog.contexto;
+  1234→      lines.push(`Ha explicado que un gasto estaba relacionado con: "${snippet}".`);
+  1235→    }
+  1236→  }
+  1237→
+  1238→  // Monthly closure signals — reflection habits + connections from the closure digest
+  1239→  // Connections come from generateMonthlyDigest (same engine as Observaciones).
+  1240→  // Deduplication: skip connections already surfaced in the pattern observations block above.
+  1241→  if (ctx.monthlyClosures.length > 0) {
+  1242→    const closures = ctx.monthlyClosures;
+  1243→    const latest = closures[0]; // already sorted desc by month
+  1244→
+  1245→    // How many months ago was the latest closure?
+  1246→    const [cYear, cMonth] = latest.month.split('-').map(Number);
+  1247→    const nowStr = getTodayDateKey();
+  1248→    const [nowYear, nowMonth] = nowStr.split('-').map(Number);
+  1249→    const monthsAgo = (nowYear - cYear) * 12 + (nowMonth - cMonth);
+  1250→
+  1251→    const reflectionsCount = closures.filter(cl => cl.hasReflection).length;
+  1252→
+  1253→    if (monthsAgo <= 1) {
+  1254→      // Recent closure — user is engaged
+  1255→      if (reflectionsCount >= 2) {
+  1256→        lines.push(`Viene realizando cierres personales con regularidad.`);
+  1257→      } else if (latest.hasReflection) {
+  1258→        lines.push(`Su última reflexión mensual fue reciente.`);
+  1259→      } else {
+  1260→        lines.push(`Revisó su cierre mensual recientemente.`);
+  1261→      }
+  1262→    } else if (monthsAgo <= 3) {
+  1263→      // Not too long ago
+  1264→      if (reflectionsCount >= 2) {
+  1265→        lines.push(`Suele reflexionar sobre su evolución cada mes.`);
+  1266→      } else {
+  1267→        lines.push(`Hace poco revisó cómo le fue en un mes.`);
+  1268→      }
+  1269→    } else {
+  1270→      // A while since last closure
+  1271→      lines.push(`Hace tiempo que no realiza un cierre mensual.`);
+  1272→    }
+  1273→
+  1274→    // Connections from the closure digest — only if the closure is recent (≤3 months)
+  1275→    // and the connection hasn't already been mentioned in pattern observations.
+  1276→    if (monthsAgo <= 3 && latest.connections.length > 0) {
+  1277→      const patternIds = new Set(
+  1278→        (ctx.patternObservations || []).map(p => p.id)
+  1279→      );
+  1280→      const closureConns = latest.connections.filter(c => !patternIds.has(c.id));
+  1281→      if (closureConns.length > 0) {
+  1282→        const connTexts = closureConns.map(c => c.text).join('. ');
+  1283→        lines.push(`En su cierre mensual, VitaZen también observó: ${connTexts}.`);
+  1284→      }
+  1285→    }
+  1286→  }
+  1287→
+  1288→  // ═══════════════════════════════════════════
+  1289→  // LAYER 4 — BEHAVIORAL PATTERNS
+  1290→  // ═══════════════════════════════════════════
+  1291→
+  1292→  // Habit streaks with detail
+  1293→  if (ctx.habitStreaks.length > 0) {
+  1294→    const habitParts = ctx.habitStreaks.slice(0, 5).map(h => {
+  1295→      const daysSince = h.lastCompletedAt ? daysAgo(h.lastCompletedAt) : null;
+  1296→      const status = daysSince === 0 ? 'hecho hoy' : daysSince === 1 ? 'hecho ayer' : daysSince !== null ? `último hace ${daysSince} días` : '';
+  1297→      return `${h.name}: racha ${h.streak} días${status ? ` (${status})` : ''}`;
+  1298→    });
+  1299→    lines.push(`Hábitos activos: ${habitParts.join('. ')}.`);
+  1300→  }
+  1301→
+  1302→  // Recent meditations
+  1303→  if (ctx.recentMeditations.length > 0) {
+  1304→    const last = ctx.recentMeditations[0];
+  1305→    const days = daysAgo(last.completedAt);
+  1306→    const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+  1307→    lines.push(`Última meditación: ${last.duration} min de ${last.type.replace('_', ' ')} ${when}. ${ctx.recentMeditations.length} sesiones recientes.`);
+  1308→  }
+  1309→
+  1310→  // Weekly activity summary + consistency signal
+  1311→  const wa = ctx.weeklyActivity;
+  1312→  const totalActivity = wa.meditations + wa.habits + wa.journals + wa.checkins + wa.wellness + wa.nutrition;
+  1313→  if (totalActivity > 0) {
+  1314→    const parts: string[] = [];
+  1315→    if (wa.meditations > 0) parts.push(`${wa.meditations} meditación${wa.meditations > 1 ? 'es' : ''}`);
+  1316→    if (wa.habits > 0) parts.push(`${wa.habits} hábito${wa.habits > 1 ? 's' : ''}`);
+  1317→    if (wa.journals > 0) parts.push(`${wa.journals} entrada${wa.journals > 1 ? 's' : ''} de diario`);
+  1318→    if (wa.checkins > 0) parts.push(`${wa.checkins} check-in${wa.checkins > 1 ? 's' : ''}`);
+  1319→    if (wa.wellness > 0) parts.push(`${wa.wellness} registro${wa.wellness > 1 ? 's' : ''} de bienestar`);
+  1320→    if (wa.nutrition > 0) parts.push(`${wa.nutrition} registro${wa.nutrition > 1 ? 's' : ''} de nutrición`);
+  1321→    lines.push(`Esta semana: ${parts.join(', ')}.`);
+  1322→  }
+  1323→
+  1324→  // Consistency evolution signal — compact, natural
+  1325→  // Skip when ESE is active — its summary already provides the authoritative signal.
+  1326→  const c = ctx.consistency;
+  1327→  if (!es && c.trend === 'improving') {
+  1328→    lines.push(`Viene siendo más constante últimamente.`);
+  1329→  } else if (!es && c.trend === 'declining') {
+  1330→    lines.push(`Últimamente menos activo/a que la semana pasada.`);
+  1331→  } else if (c.trend === 'starting' && totalActivity <= 2) {
+  1332→    lines.push(`Está empezando a usar la app.`);
+  1333→  }
+  1334→
+  1335→  // Empire progress summary
+  1336→  const activeEmpires = ctx.empireProgress.filter(e => e.xp > 0 || e.streak > 0);
+  1337→  if (activeEmpires.length > 0) {
+  1338→    // Find the empire with most XP to signal focus area
+  1339→    const topEmpire = activeEmpires.reduce((a, b) => a.xp > b.xp ? a : b);
+  1340→    const topEmpireName = EMPIRE_NAMES[topEmpire.empire] || topEmpire.empire;
+  1341→
+  1342→    const empireParts = activeEmpires.map(e => {
+  1343→      const name = EMPIRE_NAMES[e.empire] || e.empire;
+  1344→      return `${name}: nivel ${e.level}, ${e.xp} XP${e.streak > 0 ? `, racha ${e.streak} días` : ''}`;
+  1345→    });
+  1346→    lines.push(`Progreso de imperios: ${empireParts.join('. ')}. Enfocado/a especialmente en ${topEmpireName}.`);
+  1347→  }
+  1348→
+  1349→  // ═══════════════════════════════════════════
+  1350→  // LAYER 5 — CONVERSATIONAL MEMORY
+  1351→  // ═══════════════════════════════════════════
+  1352→
+  1353→  // Recent conversation topics
+  1354→  // Last layer: continuity between sessions matters, but the model should
+  1355→  // prioritize current state over past conversations when they conflict.
+  1356→  const namedConversations = ctx.recentConversations.filter(c => c.title !== 'Nueva conversación');
+  1357→  if (namedConversations.length > 0) {
+  1358→    const topics = namedConversations.map(c => {
+  1359→      const days = daysAgo(c.updatedAt);
+  1360→      const when = days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
+  1361→      return `"${c.title}" (${when})`;
+  1362→    });
+  1363→    lines.push(`Temas recientes de conversación: ${topics.join(', ')}.`);
+  1364→  }
+  1365→
+  1366→  return lines.join('\n');
+  1367→}
+  1368→
+  1369→/**
+  1370→ * Format context based on user plan.
+  1371→ */
+  1372→export function formatContextForPrompt(ctx: UserContext): string {
+  1373→  if (ctx.plan === 'PREMIUM') {
+  1374→    return formatAdvancedContext(ctx);
+  1375→  }
+  1376→  return formatBasicContext(ctx);
+  1377→}
+  1378→
+  1379→/**
+  1380→ * Build the full system prompt with injected context.
+  1381→ * FREE users get basic contextual awareness.
+  1382→ * PREMIUM users get full contextual awareness with deeper instructions.
+  1383→ */
+  1384→export function buildContextualSystemPrompt(
+  1385→  basePrompt: string,
+  1386→  context: UserContext
+  1387→): string {
+  1388→  const contextBlock = formatContextForPrompt(context);
+  1389→
+  1390→  if (!contextBlock.trim()) {
+  1391→    return basePrompt;
+  1392→  }
+  1393→
+  1394→  const isPremium = context.plan === 'PREMIUM';
+  1395→
+  1396→  const contextRules = isPremium
+  1397→    ? `CÓMO USAR ESTE CONTEXTO:
+  1398→- Integrar de forma invisible. Nunca digas "según tus datos". Simplemente sabes.
+  1399→- Si el contexto no es relevante para la pregunta, responde directamente sin forzar.
+  1400→- Sé sutil. La personalización se nota en lo natural que suena, no en cuántos datos mencionas.
+  1401→- USA el contexto para responder más preciso sin hacer preguntas extra. Si ya sabes su situación, propón directamente.
+  1402→- Máximo UNA referencia contextual por respuesta. El resto debe ser respuesta útil y directa.
+  1403→- Conecta temas de conversaciones anteriores cuando encaje: "El otro día mencionaste dificultades con el enfoque..."
+  1404→- Construye continuidad entre sesiones. El usuario debe sentir que le recuerdas.
+  1405→- Varía las referencias. No repitas la misma observación en cada respuesta.
+  1406→- Si el usuario viene mejorando, reconócelo en una frase breve y avanza. No te detengas a celebrar.
+  1407→- USA el contexto para ser más accionable, no para alargar. Si sabes que su estrés subió, no lo menciones si no añades algo útil sobre ello.
+  1408→
+  1409→CONTROL DE EVIDENCIA:
+  1410→- Distingue siempre entre datos observados, patrones detectados oficialmente y suposiciones.
+  1411→- Si hay un patrón oficial de VitaZen, puedes apoyarte en él con naturalidad.
+  1412→- Si no hay patrón oficial, no lo sustituyas por intuición. No inventes conexiones.
+  1413→- Nunca afirmes causalidad. Si el motor detecta correlación, no digas que una cosa provoca otra.
+  1414→- Con pocos datos: no asumas, no completes huecos, no interpretes silencios.
+  1415→- Cuando la evidencia sea insuficiente, indica con naturalidad que aún es pronto para saberlo.
+  1416→- Si la evidencia es fuerte, habla con seguridad. Si no, habla con prudencia.
+  1417→- Puedes usar "parece", "podría", "da la impresión", "con lo que se ve hasta ahora" cuando no haya certeza.
+  1418→- No suenes inseguro. Suenas honesto. Un mentor excelente dice cuando no sabe.`
+  1419→    : `CÓMO USAR ESTE CONTEXTO:
+  1420→- Integrar de forma invisible. Nunca digas "según tus datos". Simplemente sabes.
+  1421→- Si el contexto no es relevante para la pregunta, responde directamente sin forzar.
+  1422→- Sé sutil. La personalización se nota en lo natural que suena, no en cuántos datos mencionas.
+  1423→- USA el contexto para responder más preciso sin hacer preguntas extra. Si ya sabes su situación, propón directamente.
+  1424→- Máximo UNA referencia contextual por respuesta. El resto debe ser respuesta útil y directa.
+  1425→- Esta persona tiene mensajes limitados. El contexto te ayuda a dar respuestas más útiles sin gastar mensajes en preguntas que puedes inferir.`;
+  1426→
+  1427→  return `${basePrompt}
+  1428→
+  1429→── Lo que sabes de esta persona ──
+  1430→${contextBlock}
+  1431→── Fin ──
+  1432→
+  1433→${contextRules}`;
+  1434→}
+  1435→
