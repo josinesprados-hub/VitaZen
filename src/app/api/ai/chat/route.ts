@@ -9,6 +9,7 @@ import { trackEvent } from '@/lib/analytics-server';
 import { withTiming } from '@/lib/observability/api-timing';
 import { serverLog } from '@/lib/observability/server-logger';
 import { getUnderstandingContext, extractAndPersist } from '@/lib/understanding/engine';
+import { optimizeContext } from '@/lib/decision/engine';
 
 async function handler(request: NextRequest) {
   // T-2 FIX: Track whether the AI limit was consumed so we can roll it back
@@ -147,6 +148,18 @@ async function handler(request: NextRequest) {
     } catch (euuError) {
       // Non-blocking: if understanding fails, continue without adaptation
       serverLog.error('api/ai/chat', 'Understanding engine error (non-blocking)', euuError);
+    }
+
+    // DE-1: Decision Engine — decide which context the mentor should use.
+    // Takes the fully assembled system prompt + user message, returns optimized version.
+    // Zero DB queries. Zero API calls. Pure string analysis. <1ms.
+    // Non-blocking: on any error, the original systemPrompt is used as-is.
+    try {
+      const decision = optimizeContext(systemPrompt, content, user.plan);
+      systemPrompt = decision.systemPrompt;
+    } catch (deError) {
+      // Non-blocking: if decision engine fails, use the unfiltered prompt
+      serverLog.error('api/ai/chat', 'Decision engine error (non-blocking)', deError);
     }
 
     const groqMessages = [
