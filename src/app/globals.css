@@ -265,7 +265,7 @@ button, [role="button"] {
    Desktop: relative flex child inside a h-dvh flex-col wrapper. */
 .mentor-full-viewport {
   position: absolute;
-  inset: 0;
+  inset: env(safe-area-inset-top) 0 0 0;
   z-index: 30;
   background: #000;
 }
