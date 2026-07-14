@@ -259,9 +259,10 @@ button, [role="button"] {
   animation: drawerSlideIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
-/* Mentor chat — mobile: absolute fills the viewport independently of the
-   dashboard layout chain. Desktop: relative flex child that fills the
-   page wrapper (which is a flex-col with h-dvh). */
+/* Mentor chat — mobile: the page wrapper (page.tsx) is already
+   absolute inset-0 filling the viewport, bypassing the dashboard
+   TopBar and main padding. This element fills that wrapper.
+   Desktop: relative flex child inside a h-dvh flex-col wrapper. */
 .mentor-full-viewport {
   position: absolute;
   inset: 0;
