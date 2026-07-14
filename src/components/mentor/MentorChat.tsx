@@ -12,7 +12,6 @@ import {
   Plus,
   Trash2,
   MessageCircle,
-  Lock,
   Pencil,
   Check,
   X,
@@ -30,9 +29,6 @@ import {
   Circle,
   Zap,
   Infinity as InfinityIcon,
-  ShieldCheck,
-  BookOpen,
-  Lightbulb,
   Menu,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -181,7 +177,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [suggestions] = useState(() => pickSuggestions(3));
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [historyLimited, setHistoryLimited] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState('');
 
@@ -205,7 +200,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [isContextual, setIsContextual] = useState(false);
   const [showContextTooltip, setShowContextTooltip] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
@@ -236,7 +230,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         const data = await res.json();
         const allThreads: Thread[] = data.threads;
         setThreads(allThreads);
-        setHistoryLimited(!!data.historyLimited);
         // Initialize remaining/limit from server if available
         if (data.remaining !== undefined && data.remaining !== null) {
           setRemaining(data.remaining);
@@ -261,7 +254,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           if (res.ok) {
             const data = await res.json();
             setThreads(data.threads);
-            setHistoryLimited(!!data.historyLimited);
             if (data.remaining !== undefined && data.remaining !== null) {
               setRemaining(data.remaining);
               setDailyLimit(data.limit || 15);
@@ -286,7 +278,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (res.ok && fetchIdRef.current === thisFetchId) {
         const data = await res.json();
         setMessages(data.messages);
-        setHistoryLimited(!!data.historyLimited);
       }
     } catch (e) { console.error(e); }
   }, [apiFetch]);
@@ -593,7 +584,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         if (threadsRes.ok) {
           const threadsData = await threadsRes.json();
           setThreads(threadsData.threads);
-          setHistoryLimited(!!threadsData.historyLimited);
         }
       } else if (res.status !== 403) {
         // Non-403 error: remove optimistic message and show error
@@ -1188,7 +1178,6 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       </div>
                     </div>
                   )}
-                  <div ref={messagesEndRef} />
                 </div>
               )}
             </div>
@@ -1277,7 +1266,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             onClick={() => setDrawerOpen(false)}
           />
           {/* Drawer panel — slides from left */}
-          <div className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area">
+          <div className="fixed bottom-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area" style={{ top: 'env(safe-area-inset-top)' }}>
             {/* Drawer header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a] shrink-0">
               <h2 className="text-sm font-semibold text-white">Conversaciones</h2>
