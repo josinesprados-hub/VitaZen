@@ -8,6 +8,7 @@ import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-co
 import { trackEvent } from '@/lib/analytics-server';
 import { withTiming } from '@/lib/observability/api-timing';
 import { serverLog } from '@/lib/observability/server-logger';
+import { getUnderstandingContext, extractAndPersist } from '@/lib/understanding/engine';
 
 async function handler(request: NextRequest) {
   // T-2 FIX: Track whether the AI limit was consumed so we can roll it back
@@ -132,6 +133,22 @@ async function handler(request: NextRequest) {
       serverLog.error('api/ai/chat', 'Context build error (non-blocking)', ctxError);
     }
 
+    // EUU-1: Emotional Understanding — learn HOW to help this user better.
+    // READ path: fetch confirmed insights → inject adaptation instructions.
+    // Runs in a separate try/catch so it never blocks the existing context flow.
+    // PREMIUM gets up to 4 adaptation instructions; FREE gets up to 1.
+    try {
+      const understandingCtx = await getUnderstandingContext(user.id, user.plan);
+      if (understandingCtx.adaptationSnippet) {
+        // Inject as a separate invisible block after context — the mentor
+        // internalizes the guidance without ever revealing the learning process.
+        systemPrompt = systemPrompt + '\n\n' + understandingCtx.adaptationSnippet;
+      }
+    } catch (euuError) {
+      // Non-blocking: if understanding fails, continue without adaptation
+      serverLog.error('api/ai/chat', 'Understanding engine error (non-blocking)', euuError);
+    }
+
     const groqMessages = [
       { role: 'system' as const, content: systemPrompt },
       ...history.map((msg) => ({
@@ -189,6 +206,19 @@ async function handler(request: NextRequest) {
 
     // Track mentor usage (privacy-first, no message content stored)
     trackEvent({ event: 'mentor_used', userId: user.id, properties: { plan: user.plan, threadId } });
+
+    // EUU-2: Emotional Understanding — WRITE path (fire-and-forget).
+    // Extract behavioral signals from the user's message and persist as hypotheses.
+    // Runs AFTER messages are saved. Non-blocking. Silently swallowed on failure.
+    // This is the learning phase — it does NOT affect the current response.
+    extractAndPersist({
+      userId: user.id,
+      threadId,
+      userMessage: content,
+      assistantMessage: assistantContent,
+    }).catch(() => {
+      // Fire-and-forget: extraction failure must never affect the user
+    });
 
     // Auto-generate title using AI if this is the first exchange
     const messageCount = await db.aIMessage.count({ where: { threadId } });

@@ -54,6 +54,7 @@ model User {
   monthlyClosures        MonthlyClosure[]
   weeklyEmailLogs        WeeklyEmailLog[]
   emotionalDashboardState EmotionalDashboardState?
+  emotionalInsights       EmotionalInsight[]
 }
 
 // ═══════════════════════════════════════════
@@ -531,6 +532,50 @@ model WeeklyEmailLog {
 
   @@unique([userId, weekKey])
   @@index([weekKey])
+}
+
+// ═══════════════════════════════════════════
+// EMOTIONAL UNDERSTANDING ENGINE
+// Learns HOW to help each user better.
+// Hypotheses evolve into confirmed knowledge
+// through repeated observation across conversations.
+// Complements (never replaces) Emotional State Engine,
+// Pattern Detection, Silent Memories, and Life Stages.
+// ═══════════════════════════════════════════
+
+model EmotionalInsight {
+  id        String   @id @default(cuid())
+  userId    String
+
+  // What was learned — a behavioral insight about the user
+  // e.g. "Responde mejor a pasos pequeños concretos"
+  insight   String   // max ~120 chars
+
+  // Category of understanding
+  category  String   // motivator | blocker | preference | learning_style | autonomy |
+                     // decision_style | failure_reaction | success_reaction | support_need |
+                     // change_tolerance | habit_style | self_demand | abandonment_pattern | recovery
+
+  // Confidence lifecycle: hypothesis (0.0–0.69) → confirmed (0.7+)
+  confidence Float   @default(0.3)  // starts as hypothesis
+
+  // Evidence tracking
+  evidenceCount Int     @default(1) // how many times observed
+  lastEvidenceAt DateTime @default(now())
+  firstSeenAt   DateTime @default(now())
+
+  // Source of the most recent evidence
+  sourceType  String   @default("message") // message | journal | checkin_note
+  sourceRef   String?                         // threadId or journalId for traceability
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, category])
+  @@index([userId, confidence])
+  @@index([userId, updatedAt])
 }
 
 // ═══════════════════════════════════════════
