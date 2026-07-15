@@ -35,6 +35,7 @@ import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import MentorMarkdown from '@/components/mentor/MentorMarkdown';
+import CopyMessageButton from '@/components/mentor/CopyMessageButton';
 import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ─────────────────────────────────────────
@@ -1153,21 +1154,24 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in`}
                       style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
                     >
-                      <div
-                        className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
-                          msg.role === 'user'
-                            ? 'bg-champagne/10 border border-champagne/20 rounded-br-md'
-                            : isPremium
-                            ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
-                            : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
-                        }`}
-                      >
-                        {msg.role === 'assistant' ? (
-                          <MentorMarkdown content={msg.content} />
-                        ) : (
+                      {msg.role === 'assistant' ? (
+                        <div className="max-w-[88%] sm:max-w-[80%]">
+                          <div className={`rounded-2xl p-3 sm:p-4 ${
+                            isPremium
+                              ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
+                              : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
+                          }`}>
+                            <MentorMarkdown content={msg.content} />
+                          </div>
+                          <div className="flex justify-end pr-1 pt-0.5">
+                            <CopyMessageButton content={msg.content} />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 bg-champagne/10 border border-champagne/20 rounded-br-md">
                           <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {sending && (
