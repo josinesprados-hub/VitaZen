@@ -1,0 +1,252 @@
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:12:    12→// handling flow. Designed for Prisma, Stripe, and generic errors.
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:32:    32→  // Prisma-specific: P2002 (unique constraint), P2025 (not found), P2003 (FK), etc.
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:34:    34→    const prismaLike = error as { code?: string; meta?: unknown; clientVersion?: string };
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:35:    35→    if (typeof prismaLike.code === 'string' && /^P\d{4}$/.test(prismaLike.code)) {
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:36:    36→      details.prismaCode = prismaLike.code;
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:38:    38→        details.prismaMeta = JSON.stringify(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:40:    40→        details.prismaMeta = String(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783760130364_e646d71e4ba4.txt:42:    42→      details.prismaClientVersion = prismaLike.clientVersion;
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:12:    12→    12→// handling flow. Designed for Prisma, Stripe, and generic errors.
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:32:    32→    32→  // Prisma-specific: P2002 (unique constraint), P2025 (not found), P2003 (FK), etc.
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:34:    34→    34→    const prismaLike = error as { code?: string; meta?: unknown; clientVersion?: string };
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:35:    35→    35→    if (typeof prismaLike.code === 'string' && /^P\d{4}$/.test(prismaLike.code)) {
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:36:    36→    36→      details.prismaCode = prismaLike.code;
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:38:    38→    38→        details.prismaMeta = JSON.stringify(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:40:    40→    40→        details.prismaMeta = String(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783715633726_0654683ade41.txt:42:    42→    42→      details.prismaClientVersion = prismaLike.clientVersion;
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:12:    12→// handling flow. Designed for Prisma, Stripe, and generic errors.
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:32:    32→  // Prisma-specific: P2002 (unique constraint), P2025 (not found), P2003 (FK), etc.
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:34:    34→    const prismaLike = error as { code?: string; meta?: unknown; clientVersion?: string };
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:35:    35→    if (typeof prismaLike.code === 'string' && /^P\d{4}$/.test(prismaLike.code)) {
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:36:    36→      details.prismaCode = prismaLike.code;
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:38:    38→        details.prismaMeta = JSON.stringify(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:40:    40→        details.prismaMeta = String(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783871592644_e646d71e4ba4.txt:42:    42→      details.prismaClientVersion = prismaLike.clientVersion;
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:67: VitaZen/prisma.config.ts                           |    14 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:68: VitaZen/prisma/crecimiento-tips.json               |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:69: VitaZen/prisma/disciplina-tips.json                |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:70: VitaZen/prisma/energia-tips.json                   |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:71: VitaZen/prisma/mente-tips.json                     |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:72: VitaZen/prisma/riqueza-tips.json                   |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:73: VitaZen/prisma/schema.prisma                       |   552 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:74: VitaZen/prisma/seed.ts                             |   164 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:394: prisma.config.ts                                   |    14 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:395: prisma/crecimiento-tips.json                       |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:396: prisma/disciplina-tips.json                        |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:397: prisma/energia-tips.json                           |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:398: prisma/mente-tips.json                             |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:399: prisma/riqueza-tips.json                           |   662 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:400: prisma/schema.prisma                               |   552 +
+/home/z/my-project/tool-results/bash_1783802572851_6f0ef6d0963a.txt:401: prisma/seed.ts                                     |   164 +
+/home/z/my-project/bun.lock:13:        "@prisma/adapter-pg": "^7.8.0",
+/home/z/my-project/bun.lock:14:        "@prisma/client": "^7.8.0",
+/home/z/my-project/bun.lock:91:        "prisma": "^7.8.0",
+/home/z/my-project/bun.lock:593:    "@prisma/adapter-pg": ["@prisma/adapter-pg@7.8.0", "", { "dependencies": { "@prisma/driver-adapter-utils": "7.8.0", "@types/pg": "^8.16.0", "pg": "^8.16.3", "postgres-array": "3.0.4" } }, "sha512-ygb3UkerK3v8MDpXVgCISdRNDozpxh6+JVJgiIGbSr5KBgz10LLf5ejUskPGoXlsIjxsOu6nuy1JVQr2EKGSlg=="],
+/home/z/my-project/bun.lock:595:    "@prisma/client": ["@prisma/client@7.8.0", "", { "dependencies": { "@prisma/client-runtime-utils": "7.8.0" }, "peerDependencies": { "prisma": "*", "typescript": ">=5.4.0" }, "optionalPeers": ["prisma", "typescript"] }, "sha512-HFp3Dawv/3sU3JtlPha90IB+48lS7zHiH4LKZPjmcE8YH5P9DOXGPvo8dqOtO7MqLDd1p2hOWMcFlRT1DMblHw=="],
+/home/z/my-project/bun.lock:597:    "@prisma/client-runtime-utils": ["@prisma/client-runtime-utils@7.8.0", "", {}, "sha512-5NQZztQ0oY/ADFkmd9gPuweH5A1/CCY8YQPorLLO0Mu6a87mY5gsnDkzmFmIHs9NFaLnZojzgddFVN4RpKYrdw=="],
+/home/z/my-project/bun.lock:599:    "@prisma/config": ["@prisma/config@7.8.0", "", { "dependencies": { "c12": "3.3.4", "deepmerge-ts": "7.1.5", "effect": "3.20.0", "empathic": "2.0.0" } }, "sha512-HFESzd9rx2ZQxlK+TL7tu1HPvCqrHiL6LCxYykI2c34mvaUuIVVl3lYuicJD/MNnzgPnyeBEMlK4WTomJCV5jw=="],
+/home/z/my-project/bun.lock:601:    "@prisma/debug": ["@prisma/debug@7.8.0", "", {}, "sha512-p+QZReysDUqXC+mk17q9a+Y/qzh4c2KYliDK30buYUyfrGeTGSyfmc0AIrJRhZJrLHhRiJa9Au/J72h3C+szvA=="],
+/home/z/my-project/bun.lock:603:    "@prisma/dev": ["@prisma/dev@0.24.3", "", { "dependencies": { "@electric-sql/pglite": "0.4.1", "@electric-sql/pglite-socket": "0.1.1", "@electric-sql/pglite-tools": "0.3.1", "@hono/node-server": "1.19.11", "@prisma/get-platform": "7.2.0", "@prisma/query-plan-executor": "7.2.0", "@prisma/streams-local": "0.1.2", "foreground-child": "3.3.1", "get-port-please": "3.2.0", "hono": "^4.12.8", "http-status-codes": "2.3.0", "pathe": "2.0.3", "proper-lockfile": "4.1.2", "remeda": "2.33.4", "std-env": "3.10.0", "valibot": "1.2.0", "zeptomatch": "2.1.0" } }, "sha512-ffHlQuKXZiaDt9Go0OnCTdJZrHxK0k7omJKNV86/VjpsXu5EIHZLK0T7JSWgvNlJwh56kW9JFu9v0qJciFzepg=="],
+/home/z/my-project/bun.lock:605:    "@prisma/driver-adapter-utils": ["@prisma/driver-adapter-utils@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0" } }, "sha512-/Q13o0ZT0rjc1Xk0Q9KhZYwuq2EW/vSbWUBKfgEKkaCuB/Sg6bqnjmTZqC5cD4d6y1vfFAEwBRzfzoSMIVJ55A=="],
+/home/z/my-project/bun.lock:607:    "@prisma/engines": ["@prisma/engines@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0", "@prisma/engines-version": "7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a", "@prisma/fetch-engine": "7.8.0", "@prisma/get-platform": "7.8.0" } }, "sha512-jx3rCnNNrt5uzbkKlegtQ2GZHxSlihMCzutgT/BP6UIDF1r9tDI39hV/0T/cHZgzJ3ELbuQPXlVZy+Y1n0pcgw=="],
+/home/z/my-project/bun.lock:609:    "@prisma/engines-version": ["@prisma/engines-version@7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a", "", {}, "sha512-fJPQxCkLgA5EayWaW8eArgCvjJ+N+Kz3VyeNKMEeYiQC4alNkxRKFVAGxv/ZUzuJISKqdw+zGeDbS6mn6RCPOA=="],
+/home/z/my-project/bun.lock:611:    "@prisma/fetch-engine": ["@prisma/fetch-engine@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0", "@prisma/engines-version": "7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a", "@prisma/get-platform": "7.8.0" } }, "sha512-gwB0Euiz/DDRyxFRpLXYlK3RfaZUj1c5dAYMuhZYfApg7arknJlcb9bIsOHDppJmbqYaVA+yBIiFMDBfprsNPQ=="],
+/home/z/my-project/bun.lock:613:    "@prisma/get-platform": ["@prisma/get-platform@7.2.0", "", { "dependencies": { "@prisma/debug": "7.2.0" } }, "sha512-k1V0l0Td1732EHpAfi2eySTezyllok9dXb6UQanajkJQzPUGi3vO2z7jdkz67SypFTdmbnyGYxvEvYZdZsMAVA=="],
+/home/z/my-project/bun.lock:615:    "@prisma/query-plan-executor": ["@prisma/query-plan-executor@7.2.0", "", {}, "sha512-EOZmNzcV8uJ0mae3DhTsiHgoNCuu1J9mULQpGCh62zN3PxPTd+qI9tJvk5jOst8WHKQNwJWR3b39t0XvfBB0WQ=="],
+/home/z/my-project/bun.lock:617:    "@prisma/streams-local": ["@prisma/streams-local@0.1.2", "", { "dependencies": { "ajv": "^8.12.0", "better-result": "^2.7.0", "env-paths": "^3.0.0", "proper-lockfile": "^4.1.2" } }, "sha512-l49yTxKKF2odFxaAXTmwmkBKL3+bVQ1tFOooGifu4xkdb9NMNLxHj27XAhTylWZod8I+ISGM5erU1xcl/oBCtg=="],
+/home/z/my-project/bun.lock:619:    "@prisma/studio-core": ["@prisma/studio-core@0.27.3", "", { "dependencies": { "@radix-ui/react-toggle": "1.1.10", "chart.js": "4.5.1" }, "peerDependencies": { "@types/react": "^18.0.0 || ^19.0.0", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-AADjNFPdsrglxHQVTmHFqv6DuKQZ5WY4p5/gVFY017twvNrSwpLJ9lqUbYYxEu2W7nbvVxTZA8deJ8LseNALsw=="],
+/home/z/my-project/bun.lock:1937:    "prisma": ["prisma@7.8.0", "", { "dependencies": { "@prisma/config": "7.8.0", "@prisma/dev": "0.24.3", "@prisma/engines": "7.8.0", "@prisma/studio-core": "0.27.3", "mysql2": "3.15.3", "postgres": "3.4.7" }, "peerDependencies": { "better-sqlite3": ">=9.0.0", "typescript": ">=5.4.0" }, "optionalPeers": ["better-sqlite3", "typescript"], "bin": { "prisma": "build/index.js" } }, "sha512-yfN4yrw7HV9kEJhoy1+jgah0jafEIQsf7uWouSsM8MvJtlubsk+kM7AIBWZ8+GJl74Yj3c+nbYqBkMOxtsZ3Lw=="],
+/home/z/my-project/bun.lock:2315:    "@prisma/engines/@prisma/get-platform": ["@prisma/get-platform@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0" } }, "sha512-WlxgRGnolL8VH2EmkH1R/DkKNr/mVdS3G2h42IZFFZ3eUrH9OT6t73kIOSlkkrv50wG123Iq8d96ufv5LlZktw=="],
+/home/z/my-project/bun.lock:2317:    "@prisma/fetch-engine/@prisma/get-platform": ["@prisma/get-platform@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0" } }, "sha512-WlxgRGnolL8VH2EmkH1R/DkKNr/mVdS3G2h42IZFFZ3eUrH9OT6t73kIOSlkkrv50wG123Iq8d96ufv5LlZktw=="],
+/home/z/my-project/bun.lock:2319:    "@prisma/get-platform/@prisma/debug": ["@prisma/debug@7.2.0", "", {}, "sha512-YSGTiSlBAVJPzX4ONZmMotL+ozJwQjRmZweQNIq/ER0tQJKJynNkRB3kyvt37eOfsbMCXk3gnLF6J9OJ4QWftw=="],
+/home/z/my-project/bun.lock:2321:    "@prisma/streams-local/ajv": ["ajv@8.20.0", "", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA=="],
+/home/z/my-project/bun.lock:2459:    "@prisma/streams-local/ajv/json-schema-traverse": ["json-schema-traverse@1.0.0", "", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:77: VitaZen/prisma.config.ts                           |    14 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:78: VitaZen/prisma/crecimiento-tips.json               |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:79: VitaZen/prisma/disciplina-tips.json                |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:80: VitaZen/prisma/energia-tips.json                   |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:81: VitaZen/prisma/mente-tips.json                     |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:82: VitaZen/prisma/riqueza-tips.json                   |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:83: VitaZen/prisma/schema.prisma                       |   552 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:84: VitaZen/prisma/seed.ts                             |   164 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:404: prisma.config.ts                                   |    14 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:405: prisma/crecimiento-tips.json                       |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:406: prisma/disciplina-tips.json                        |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:407: prisma/energia-tips.json                           |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:408: prisma/mente-tips.json                             |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:409: prisma/riqueza-tips.json                           |   662 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:410: prisma/schema.prisma                               |   552 +
+/home/z/my-project/tool-results/bash_1783862193530_97d68116592d.txt:411: prisma/seed.ts                                     |   164 +
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:12:    12→// handling flow. Designed for Prisma, Stripe, and generic errors.
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:32:    32→  // Prisma-specific: P2002 (unique constraint), P2025 (not found), P2003 (FK), etc.
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:34:    34→    const prismaLike = error as { code?: string; meta?: unknown; clientVersion?: string };
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:35:    35→    if (typeof prismaLike.code === 'string' && /^P\d{4}$/.test(prismaLike.code)) {
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:36:    36→      details.prismaCode = prismaLike.code;
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:38:    38→        details.prismaMeta = JSON.stringify(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:40:    40→        details.prismaMeta = String(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783722897848_e646d71e4ba4.txt:42:    42→      details.prismaClientVersion = prismaLike.clientVersion;
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:12:    12→// handling flow. Designed for Prisma, Stripe, and generic errors.
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:32:    32→  // Prisma-specific: P2002 (unique constraint), P2025 (not found), P2003 (FK), etc.
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:34:    34→    const prismaLike = error as { code?: string; meta?: unknown; clientVersion?: string };
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:35:    35→    if (typeof prismaLike.code === 'string' && /^P\d{4}$/.test(prismaLike.code)) {
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:36:    36→      details.prismaCode = prismaLike.code;
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:38:    38→        details.prismaMeta = JSON.stringify(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:40:    40→        details.prismaMeta = String(prismaLike.meta);
+/home/z/my-project/tool-results/read_1783715584449_e646d71e4ba4.txt:42:    42→      details.prismaClientVersion = prismaLike.clientVersion;
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:54:A  prisma.config.ts
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:55:A  prisma/crecimiento-tips.json
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:56:A  prisma/disciplina-tips.json
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:57:A  prisma/energia-tips.json
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:58:A  prisma/mente-tips.json
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:59:A  prisma/riqueza-tips.json
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:60:A  prisma/schema.prisma
+/home/z/my-project/tool-results/bash_1783679552294_8a53fa4cb9d3.txt:61:A  prisma/seed.ts
+/home/z/my-project/package.json:7:    "build": "prisma generate && next build",
+/home/z/my-project/package.json:10:    "db:push": "prisma db push",
+/home/z/my-project/package.json:11:    "db:generate": "prisma generate",
+/home/z/my-project/package.json:12:    "db:migrate": "prisma migrate dev",
+/home/z/my-project/package.json:13:    "db:reset": "prisma migrate reset",
+/home/z/my-project/package.json:14:    "db:seed": "bunx tsx prisma/seed.ts",
+/home/z/my-project/package.json:15:    "postinstall": "prisma generate"
+/home/z/my-project/package.json:23:    "@prisma/adapter-pg": "^7.8.0",
+/home/z/my-project/package.json:24:    "@prisma/client": "^7.8.0",
+/home/z/my-project/package.json:101:    "prisma": "^7.8.0",
+/home/z/my-project/scripts/audit-report.py:289:    ["Base de datos", "PostgreSQL via Prisma ORM"],
+/home/z/my-project/scripts/audit-report.py:350:    ("Framework", "Next.js 16 + Prisma ORM + PostgreSQL"),
+/home/z/my-project/scripts/audit-report.py:356:story.append(h2("3.1 Modelos Prisma involucrados"))
+/home/z/my-project/scripts/audit-report.py:358:prisma_models = [
+/home/z/my-project/scripts/audit-report.py:366:story.append(body(", ".join(prisma_models)))
+/home/z/my-project/scripts/audit-report.py:391:    "Prisma consumidos por cada módulo."
+/home/z/my-project/scripts/audit-report.py:477:                  │  DailyCheckin   │  ← Modelo Prisma (escritura)
+/home/z/my-project/scripts/audit-report.py:531:    ("¿Usa datos reales?", "SÍ — gatherData() ejecuta 14 consultas Prisma en paralelo "
+/home/z/my-project/scripts/audit-report.py:1020:        "file": "prisma/schema.prisma — modelo NotificationPreference, campo streakReminders"
+/home/z/my-project/scripts/audit-report.py:1116:        "file": "src/lib/patterns/detector.ts — consultas Prisma con take limits"
+/home/z/my-project/scripts/audit-report.py:1235:    "Se identificó un campo documentado explícitamente como placebo en el esquema Prisma:"
+/home/z/my-project/scripts/audit-report.py:1243:        "file": "prisma/schema.prisma — modelo User, línea ~24, campo dailyReminders"
+/home/z/my-project/scripts/audit-report.py:1272:        "file": "prisma/schema.prisma — modelo NotificationPreference"
+/home/z/my-project/VitaZen/worklog.md:66:- Creé 5 baterías JSON independientes en prisma/ con 110 tips cada una (50 FREE + 60 PREMIUM)
+/home/z/my-project/VitaZen/worklog.md:109:- Encontrado BUG #4: seed.ts — PrismaClient sin PrismaPg adapter
+/home/z/my-project/VitaZen/worklog.md:110:  - El seed usaba new PrismaClient() sin adapter, la app usa PrismaPg
+/home/z/my-project/VitaZen/worklog.md:111:  - Fix: mismo PrismaPg adapter + verificación de conteo post-seed
+/home/z/my-project/VitaZen/prisma.config.ts:1:import { defineConfig } from "prisma/config";
+/home/z/my-project/VitaZen/prisma.config.ts:5:  schema: "prisma/schema.prisma",
+/home/z/my-project/scripts/vitazen_audit.py:238:    'datos PostgreSQL (Prisma ORM) almacena el estado del plan como un string: "FREE" (por defecto) o "PREMIUM". Este campo '
+/home/z/my-project/scripts/vitazen_audit.py:257:        ['Base de datos', 'User.plan: "FREE" | "PREMIUM"', 'prisma/schema.prisma (linea 26)'],
+/home/z/my-project/scripts/vitazen_audit.py:300:    'de transacciones Prisma. Esta arquitectura demuestra un nivel de madurez tecnica inusual para una aplicacion en fase previa '
+/home/z/my-project/scripts/vitazen_audit.py:336:    'con upsert Prisma usando la restriccion @@unique([userId, date]), proteccion contra carrera con pg_advisory_xact_lock, y '
+/home/z/my-project/scripts/vitazen_audit.py:422:    'Prisma de notas. La pagina de precios lista "Notas basicas de cada imperio" (Free) y "Notas con mas detalle de cada imperio" '
+/home/z/my-project/VitaZen/prisma/seed.ts:1:import { PrismaClient } from '@prisma/client';
+/home/z/my-project/VitaZen/prisma/seed.ts:2:import { PrismaPg } from '@prisma/adapter-pg';
+/home/z/my-project/VitaZen/prisma/seed.ts:9:// Use the same PrismaPg adapter as the app for consistency
+/home/z/my-project/VitaZen/prisma/seed.ts:10:const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+/home/z/my-project/VitaZen/prisma/seed.ts:11:const prisma = new PrismaClient({ adapter });
+/home/z/my-project/VitaZen/prisma/seed.ts:88:    await prisma.dailyChallenge.upsert({
+/home/z/my-project/VitaZen/prisma/seed.ts:111:  //   prisma/disciplina-tips.json
+/home/z/my-project/VitaZen/prisma/seed.ts:112:  //   prisma/mente-tips.json
+/home/z/my-project/VitaZen/prisma/seed.ts:113:  //   prisma/energia-tips.json
+/home/z/my-project/VitaZen/prisma/seed.ts:114:  //   prisma/riqueza-tips.json
+/home/z/my-project/VitaZen/prisma/seed.ts:115:  //   prisma/crecimiento-tips.json
+/home/z/my-project/VitaZen/prisma/seed.ts:129:  await prisma.empireTip.deleteMany({});
+/home/z/my-project/VitaZen/prisma/seed.ts:132:    await prisma.empireTip.upsert({
+/home/z/my-project/VitaZen/prisma/seed.ts:142:  const totalTips = await prisma.empireTip.count();
+/home/z/my-project/VitaZen/prisma/seed.ts:143:  const freeTipsCount = await prisma.empireTip.count({ where: { plan: 'FREE' } });
+/home/z/my-project/VitaZen/prisma/seed.ts:144:  const premiumTipsCount = await prisma.empireTip.count({ where: { plan: 'PREMIUM' } });
+/home/z/my-project/VitaZen/prisma/seed.ts:148:    const empireTotal = await prisma.empireTip.count({ where: { empire } });
+/home/z/my-project/VitaZen/prisma/seed.ts:149:    const empireFree = await prisma.empireTip.count({ where: { empire, plan: 'FREE' } });
+/home/z/my-project/VitaZen/prisma/seed.ts:150:    const empirePremium = await prisma.empireTip.count({ where: { empire, plan: 'PREMIUM' } });
+/home/z/my-project/VitaZen/prisma/seed.ts:163:    await prisma.$disconnect();
+/home/z/my-project/scripts/generate-audit-report.js:143:    "Rama: main | Stack: Next.js 15 + Prisma + PostgreSQL",
+/home/z/my-project/scripts/generate-audit-report.js:212:bodyContent.push(body("Esta auditor\u00eda forense analiza la totalidad del c\u00f3digo fuente de VitaZen (29 modelos Prisma, 47 rutas API, 5 cron jobs, 45 logros, 7 detectores de patrones) para responder a una pregunta: \u00bfqu\u00e9 se\u00f1ales objetivas puede obtener VitaZen con la informaci\u00f3n que ya almacena, sin modificar la base de datos, sin a\u00f1adir IA y sin inventar nada?"));
+/home/z/my-project/scripts/generate-audit-report.js:218:bodyContent.push(body("A continuaci\u00f3n se detallan todas las se\u00f1ales objetivas que VitaZen puede calcular con los datos actuales, agrupadas por imperio. Cada se\u00f1al incluye su fuente de datos (modelo Prisma), d\u00f3nde se calcula actualmente (archivo y funci\u00f3n), y si est\u00e1 activamente utilizada o infrautilizada."));
+/home/z/my-project/scripts/generate-audit-report.js:334:bodyContent.push(bodyBold("MomentumCard (src/components/dashboard/MomentumCard.tsx): ", "Este componente existe, importa useApi y llama a GET /api/dashboard/momentum, que ejecuta 26 consultas Prisma en paralelo para calcular un score de momentum (0-100) con 7 sub-puntuaciones. Sin embargo, el componente no est\u00e1 importado ni renderizado en ninguna p\u00e1gina del dashboard. Es c\u00f3digo muerto completo que, de activarse, consumir\u00eda 25+ queries por cada carga del dashboard."));
+/home/z/my-project/scripts/generate-audit-report.js:358:bodyContent.push(body("Las siguientes conexiones podr\u00edan implementarse inmediatamente sin modificar Prisma, sin modificar la base de datos, sin IA y sin NLP. Todas usan datos que ya se almacenan y se consultan en otros contextos."));
+/home/z/my-project/scripts/generate-audit-report.js:375:bodyContent.push(h2("Conexiones que requieren cambios de query (sin modificar Prisma)"));
+/home/z/my-project/scripts/generate-audit-report.js:429:bodyContent.push(h2("Prioridad 3: Requiere query nueva (sin modificar Prisma)"));
+/home/z/my-project/scripts/generate-audit-report.js:470:bodyContent.push(body("Resumen: 5 de 10 combinaciones tienen al menos un detector activo. 2 tienen detectores existentes pero no consumidos. 3 son posibles sin modificar Prisma (usando proxies). 2 est\u00e1n bloqueadas sin cambios estructurales en los datos de Disciplina o NLP para Crecimiento."));
+/home/z/my-project/scripts/generate-audit-report.js:479:    ["Prisma", "schema.prisma", "1"],
+/home/z/my-project/scripts/generate-audit-report.js:501:bodyContent.push(body("Total: 130+ archivos auditados. Ninguna se\u00f1al listada en este informe es hipot\u00e9tica: cada una puede rastrearse hasta un modelo Prisma, una consulta, un campo, una funci\u00f3n y una l\u00ednea de c\u00f3digo espec\u00edfica."));
+/home/z/my-project/scripts/vitazen-audit-report.py:128:# 2. SCHEMA PRISMA
+/home/z/my-project/VitaZen/prisma/schema.prisma:2:  provider = "prisma-client-js"
+/home/z/my-project/VitaZen/package-lock.json:17:        "@prisma/adapter-pg": "^7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:18:        "@prisma/client": "^7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:95:        "prisma": "^7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:3741:    "node_modules/@prisma/adapter-pg": {
+/home/z/my-project/VitaZen/package-lock.json:3743:      "resolved": "https://registry.npmjs.org/@prisma/adapter-pg/-/adapter-pg-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3747:        "@prisma/driver-adapter-utils": "7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:3753:    "node_modules/@prisma/client": {
+/home/z/my-project/VitaZen/package-lock.json:3755:      "resolved": "https://registry.npmjs.org/@prisma/client/-/client-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3759:        "@prisma/client-runtime-utils": "7.8.0"
+/home/z/my-project/VitaZen/package-lock.json:3765:        "prisma": "*",
+/home/z/my-project/VitaZen/package-lock.json:3769:        "prisma": {
+/home/z/my-project/VitaZen/package-lock.json:3777:    "node_modules/@prisma/client-runtime-utils": {
+/home/z/my-project/VitaZen/package-lock.json:3779:      "resolved": "https://registry.npmjs.org/@prisma/client-runtime-utils/-/client-runtime-utils-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3783:    "node_modules/@prisma/config": {
+/home/z/my-project/VitaZen/package-lock.json:3785:      "resolved": "https://registry.npmjs.org/@prisma/config/-/config-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3796:    "node_modules/@prisma/debug": {
+/home/z/my-project/VitaZen/package-lock.json:3798:      "resolved": "https://registry.npmjs.org/@prisma/debug/-/debug-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3802:    "node_modules/@prisma/dev": {
+/home/z/my-project/VitaZen/package-lock.json:3804:      "resolved": "https://registry.npmjs.org/@prisma/dev/-/dev-0.24.3.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3813:        "@prisma/get-platform": "7.2.0",
+/home/z/my-project/VitaZen/package-lock.json:3814:        "@prisma/query-plan-executor": "7.2.0",
+/home/z/my-project/VitaZen/package-lock.json:3815:        "@prisma/streams-local": "0.1.2",
+/home/z/my-project/VitaZen/package-lock.json:3828:    "node_modules/@prisma/driver-adapter-utils": {
+/home/z/my-project/VitaZen/package-lock.json:3830:      "resolved": "https://registry.npmjs.org/@prisma/driver-adapter-utils/-/driver-adapter-utils-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3834:        "@prisma/debug": "7.8.0"
+/home/z/my-project/VitaZen/package-lock.json:3837:    "node_modules/@prisma/engines": {
+/home/z/my-project/VitaZen/package-lock.json:3839:      "resolved": "https://registry.npmjs.org/@prisma/engines/-/engines-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3845:        "@prisma/debug": "7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:3846:        "@prisma/engines-version": "7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a",
+/home/z/my-project/VitaZen/package-lock.json:3847:        "@prisma/fetch-engine": "7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:3848:        "@prisma/get-platform": "7.8.0"
+/home/z/my-project/VitaZen/package-lock.json:3851:    "node_modules/@prisma/engines-version": {
+/home/z/my-project/VitaZen/package-lock.json:3853:      "resolved": "https://registry.npmjs.org/@prisma/engines-version/-/engines-version-7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3858:    "node_modules/@prisma/engines/node_modules/@prisma/get-platform": {
+/home/z/my-project/VitaZen/package-lock.json:3860:      "resolved": "https://registry.npmjs.org/@prisma/get-platform/-/get-platform-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3865:        "@prisma/debug": "7.8.0"
+/home/z/my-project/VitaZen/package-lock.json:3868:    "node_modules/@prisma/fetch-engine": {
+/home/z/my-project/VitaZen/package-lock.json:3870:      "resolved": "https://registry.npmjs.org/@prisma/fetch-engine/-/fetch-engine-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3875:        "@prisma/debug": "7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:3876:        "@prisma/engines-version": "7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a",
+/home/z/my-project/VitaZen/package-lock.json:3877:        "@prisma/get-platform": "7.8.0"
+/home/z/my-project/VitaZen/package-lock.json:3880:    "node_modules/@prisma/fetch-engine/node_modules/@prisma/get-platform": {
+/home/z/my-project/VitaZen/package-lock.json:3882:      "resolved": "https://registry.npmjs.org/@prisma/get-platform/-/get-platform-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3887:        "@prisma/debug": "7.8.0"
+/home/z/my-project/VitaZen/package-lock.json:3890:    "node_modules/@prisma/get-platform": {
+/home/z/my-project/VitaZen/package-lock.json:3892:      "resolved": "https://registry.npmjs.org/@prisma/get-platform/-/get-platform-7.2.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3897:        "@prisma/debug": "7.2.0"
+/home/z/my-project/VitaZen/package-lock.json:3900:    "node_modules/@prisma/get-platform/node_modules/@prisma/debug": {
+/home/z/my-project/VitaZen/package-lock.json:3902:      "resolved": "https://registry.npmjs.org/@prisma/debug/-/debug-7.2.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3907:    "node_modules/@prisma/query-plan-executor": {
+/home/z/my-project/VitaZen/package-lock.json:3909:      "resolved": "https://registry.npmjs.org/@prisma/query-plan-executor/-/query-plan-executor-7.2.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3914:    "node_modules/@prisma/streams-local": {
+/home/z/my-project/VitaZen/package-lock.json:3916:      "resolved": "https://registry.npmjs.org/@prisma/streams-local/-/streams-local-0.1.2.tgz",
+/home/z/my-project/VitaZen/package-lock.json:3931:    "node_modules/@prisma/streams-local/node_modules/ajv": {
+/home/z/my-project/VitaZen/package-lock.json:3948:    "node_modules/@prisma/streams-local/node_modules/json-schema-traverse": {
+/home/z/my-project/VitaZen/package-lock.json:3955:    "node_modules/@prisma/studio-core": {
+/home/z/my-project/VitaZen/package-lock.json:3957:      "resolved": "https://registry.npmjs.org/@prisma/studio-core/-/studio-core-0.27.3.tgz",
+/home/z/my-project/VitaZen/package-lock.json:14463:    "node_modules/prisma": {
+/home/z/my-project/VitaZen/package-lock.json:14465:      "resolved": "https://registry.npmjs.org/prisma/-/prisma-7.8.0.tgz",
+/home/z/my-project/VitaZen/package-lock.json:14471:        "@prisma/config": "7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:14472:        "@prisma/dev": "0.24.3",
+/home/z/my-project/VitaZen/package-lock.json:14473:        "@prisma/engines": "7.8.0",
+/home/z/my-project/VitaZen/package-lock.json:14474:        "@prisma/studio-core": "0.27.3",
+/home/z/my-project/VitaZen/package-lock.json:14479:        "prisma": "build/index.js"
+/home/z/my-project/src/lib/auth.ts:82:  // The PrismaPg driver adapter in Prisma 7 handles both differently
+/home/z/my-project/VitaZen/bun.lock:13:        "@prisma/adapter-pg": "^7.8.0",
+/home/z/my-project/VitaZen/bun.lock:14:        "@prisma/client": "^7.8.0",
+/home/z/my-project/VitaZen/bun.lock:63:        "prisma": "^7.8.0",
+/home/z/my-project/VitaZen/bun.lock:593:    "@prisma/adapter-pg": ["@prisma/adapter-pg@7.8.0", "", { "dependencies": { "@prisma/driver-adapter-utils": "7.8.0", "@types/pg": "^8.16.0", "pg": "^8.16.3", "postgres-array": "3.0.4" } }, "sha512-ygb3UkerK3v8MDpXVgCISdRNDozpxh6+JVJgiIGbSr5KBgz10LLf5ejUskPGoXlsIjxsOu6nuy1JVQr2EKGSlg=="],
+/home/z/my-project/VitaZen/bun.lock:595:    "@prisma/client": ["@prisma/client@7.8.0", "", { "dependencies": { "@prisma/client-runtime-utils": "7.8.0" }, "peerDependencies": { "prisma": "*", "typescript": ">=5.4.0" }, "optionalPeers": ["prisma", "typescript"] }, "sha512-HFp3Dawv/3sU3JtlPha90IB+48lS7zHiH4LKZPjmcE8YH5P9DOXGPvo8dqOtO7MqLDd1p2hOWMcFlRT1DMblHw=="],
+/home/z/my-project/VitaZen/bun.lock:597:    "@prisma/client-runtime-utils": ["@prisma/client-runtime-utils@7.8.0", "", {}, "sha512-5NQZztQ0oY/ADFkmd9gPuweH5A1/CCY8YQPorLLO0Mu6a87mY5gsnDkzmFmIHs9NFaLnZojzgddFVN4RpKYrdw=="],
+/home/z/my-project/VitaZen/bun.lock:599:    "@prisma/config": ["@prisma/config@7.8.0", "", { "dependencies": { "c12": "3.3.4", "deepmerge-ts": "7.1.5", "effect": "3.20.0", "empathic": "2.0.0" } }, "sha512-HFESzd9rx2ZQxlK+TL7tu1HPvCqrHiL6LCxYykI2c34mvaUuIVVl3lYuicJD/MNnzgPnyeBEMlK4WTomJCV5jw=="],
+/home/z/my-project/VitaZen/bun.lock:601:    "@prisma/debug": ["@prisma/debug@7.8.0", "", {}, "sha512-p+QZReysDUqXC+mk17q9a+Y/qzh4c2KYliDK30buYUyfrGeTGSyfmc0AIrJRhZJrLHhRiJa9Au/J72h3C+szvA=="],
+/home/z/my-project/VitaZen/bun.lock:603:    "@prisma/dev": ["@prisma/dev@0.24.3", "", { "dependencies": { "@electric-sql/pglite": "0.4.1", "@electric-sql/pglite-socket": "0.1.1", "@electric-sql/pglite-tools": "0.3.1", "@hono/node-server": "1.19.11", "@prisma/get-platform": "7.2.0", "@prisma/query-plan-executor": "7.2.0", "@prisma/streams-local": "0.1.2", "foreground-child": "3.3.1", "get-port-please": "3.2.0", "hono": "^4.12.8", "http-status-codes": "2.3.0", "pathe": "2.0.3", "proper-lockfile": "4.1.2", "remeda": "2.33.4", "std-env": "3.10.0", "valibot": "1.2.0", "zeptomatch": "2.1.0" } }, "sha512-ffHlQuKXZiaDt9Go0OnCTdJZrHxK0k7omJKNV86/VjpsXu5EIHZLK0T7JSWgvNlJwh56kW9JFu9v0qJciFzepg=="],
+/home/z/my-project/VitaZen/bun.lock:605:    "@prisma/driver-adapter-utils": ["@prisma/driver-adapter-utils@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0" } }, "sha512-/Q13o0ZT0rjc1Xk0Q9KhZYwuq2EW/vSbWUBKfgEKkaCuB/Sg6bqnjmTZqC5cD4d6y1vfFAEwBRzfzoSMIVJ55A=="],
+/home/z/my-project/VitaZen/bun.lock:607:    "@prisma/engines": ["@prisma/engines@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0", "@prisma/engines-version": "7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a", "@prisma/fetch-engine": "7.8.0", "@prisma/get-platform": "7.8.0" } }, "sha512-jx3rCnNNrt5uzbkKlegtQ2GZHxSlihMCzutgT/BP6UIDF1r9tDI39hV/0T/cHZgzJ3ELbuQPXlVZy+Y1n0pcgw=="],
+/home/z/my-project/VitaZen/bun.lock:609:    "@prisma/engines-version": ["@prisma/engines-version@7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a", "", {}, "sha512-fJPQxCkLgA5EayWaW8eArgCvjJ+N+Kz3VyeNKMEeYiQC4alNkxRKFVAGxv/ZUzuJISKqdw+zGeDbS6mn6RCPOA=="],
+/home/z/my-project/VitaZen/bun.lock:611:    "@prisma/fetch-engine": ["@prisma/fetch-engine@7.8.0", "", { "dependencies": { "@prisma/debug": "7.8.0", "@prisma/engines-version": "7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a", "@prisma/get-platform": "7.8.0" } }, "sha512-gwB0Euiz/DDRyxFRpLXYlK3RfaZUj1c5dAYMuhZYfApg7arknJlcb9bIsOHDppJmbqYaVA+yBIiFMDBfprsNPQ=="],
+/home/z/my-project/VitaZen/bun.lock:613:    "@prisma/get-platform": ["@prisma/get-platform@7.2.0", "", { "dependencies": { "@prisma/debug": "7.2.0" } }, "sha512-k1V0l0Td1732EHpAfi2eySTezyllok9dXb6UQanajkJQzPUGi3vO2z7jdkz67SypFTdmbnyGYxvEvYZdZsMAVA=="],
+/home/z/my-project/VitaZen/bun.lock:615:    "@prisma/query-plan-executor": ["@prisma/query-plan-executor@7.2.0", "", {}, "sha512-EOZmNzcV8uJ0mae3DhTsiHgoNCuu1J9mULQpGCh62zN3PxPTd+qI9tJvk5jOst8WHKQNwJWR3b39t0XvfBB0WQ=="],
+/home/z/my-project/VitaZen/bun.lock:617:    "@prisma/streams-local": ["@prisma/streams-local@0.1.2", "", { "dependencies": { "ajv": "^8.12.0", "better-result": "^2.7.0", "env-paths": "^3.0.0", "proper-lockfile": "^4.1.2" } }, "sha512-l49yTxKKF2odFxaAXTmwmkBKL3+bVQ1tFOooGifu4xkdb9NMNLxHj27XAhTylWZod8I+ISGM5erU1xcl/oBCtg=="],
+
+[Showing results with pagination = limit: 250]

@@ -34,6 +34,7 @@ import {
 import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
+import MentorMarkdown from '@/components/mentor/MentorMarkdown';
 import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
 
 // ─────────────────────────────────────────
@@ -1161,7 +1162,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                             : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
                         }`}
                       >
-                        <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
+                        {msg.role === 'assistant' ? (
+                          <MentorMarkdown content={msg.content} />
+                        ) : (
+                          <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
+                        )}
                       </div>
                     </div>
                   ))}

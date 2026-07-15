@@ -1,0 +1,252 @@
+/home/z/my-project/tool-results/read_1783721097220_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783721097220_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783681525760_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783681525760_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783777675266_c1a4f06dd3a8.txt:491:   491→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783777675266_c1a4f06dd3a8.txt:530:   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783768720520_0fb0abd25734.txt:491:   491→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783768720520_0fb0abd25734.txt:530:   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783704217044_ebc8cea84a83.txt:31:   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783672826748_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783672826748_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:29:    29→    29→  amount: number;
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:107:   107→   107→  amount: number;
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:315:   315→   315→  amount: number;
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:377:   377→   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:391:   391→   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:477:   477→   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:481:   481→   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:630:   630→   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:635:   635→   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:683:   683→   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:693:   693→   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:704:   704→   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:715:   715→   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:741:   741→   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:764:   764→   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:803:   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:859:   859→   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:1023:  1023→  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:1151:  1151→  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783683163731_6e0de2a2acb6.txt:1199:  1199→  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783715923418_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783715923418_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783707674256_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783707674256_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:315:   315→  amount: number;
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:377:   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:391:   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:477:   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:481:   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:630:   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:635:   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783711689448_011f3a90053e.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:315:   315→  amount: number;
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:377:   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:391:   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:477:   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:481:   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:630:   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:635:   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783672785587_d43d87496c52.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783721928360_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783721928360_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:315:   315→  amount: number;
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:377:   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:391:   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:477:   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:481:   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:630:   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:635:   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783710878159_011f3a90053e.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783702268788_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783702268788_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:314:   314→  amount: number;
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:376:   376→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:390:   390→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:476:   476→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:480:   480→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:629:   629→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:634:   634→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783722865065_c13677518aab.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:314:   314→  amount: number;
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:376:   376→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:390:   390→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:476:   476→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:480:   480→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:629:   629→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:634:   634→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783760072638_c13677518aab.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:315:   315→  amount: number;
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:377:   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:391:   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:477:   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:481:   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:630:   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:635:   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783683136606_011f3a90053e.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783709862765_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783709862765_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783715936613_c1a4f06dd3a8.txt:491:   491→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783715936613_c1a4f06dd3a8.txt:530:   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783760288748_2e1490a304af.txt:373:   491→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783760288748_2e1490a304af.txt:412:   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783715563914_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783715563914_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783760037100_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783760037100_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783715942972_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783715942972_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783768711398_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783768711398_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783715627938_40cff6827900.txt:442:   442→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783715627938_40cff6827900.txt:481:   481→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:29:    29→    29→  amount: number;
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:107:   107→   107→  amount: number;
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:315:   315→   315→  amount: number;
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:377:   377→   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:391:   391→   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:477:   477→   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:481:   481→   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:630:   630→   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:635:   635→   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:683:   683→   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:693:   693→   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:704:   704→   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:715:   715→   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:741:   741→   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:764:   764→   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:803:   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:859:   859→   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:1023:  1023→  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:1151:  1151→  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783672813672_499f9e657f9f.txt:1199:  1199→  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783715609934_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783715609934_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783702287487_c1a4f06dd3a8.txt:491:   491→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783702287487_c1a4f06dd3a8.txt:530:   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783723137239_c419f2b644ad.txt:491:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783723137239_c419f2b644ad.txt:530:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:29:    29→    29→  amount: number;
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:107:   107→   107→  amount: number;
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:315:   315→   315→  amount: number;
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:377:   377→   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:391:   391→   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:477:   477→   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:481:   481→   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:630:   630→   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:635:   635→   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:683:   683→   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:693:   693→   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:704:   704→   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:715:   715→   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:741:   741→   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:764:   764→   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:803:   803→   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:859:   859→   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:1023:  1023→  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:1151:  1151→  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783673633518_499f9e657f9f.txt:1199:  1199→  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:315:   315→  amount: number;
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:377:   377→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:391:   391→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:477:   477→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:481:   481→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:630:   630→      amount: totals[i.value] || 0,
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:635:   635→      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:683:   683→          amount: form.amount,
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:693:   693→        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:704:   704→  const submitQuickCapture = async (data: { type: string; category: string; amount: number; description: string; contexto: string }) => {
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:715:   715→          amount: data.amount,
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:741:   741→      amount: log.amount,
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:764:   764→          amount: editForm.amount,
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:803:   803→  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:859:   859→              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:1023:  1023→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:1151:  1151→              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783673601460_d43d87496c52.txt:1199:  1199→                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
+/home/z/my-project/tool-results/read_1783760062391_339b56fa0519.txt:442:   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+/home/z/my-project/tool-results/read_1783760062391_339b56fa0519.txt:481:   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:29:    29→  amount: number;
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:107:   107→  amount: number;
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:314:   314→  amount: number;
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:376:   376→  onCapture: (data: { type: string; category: string; amount: number; description: string; contexto: string }) => void;
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:390:   390→      amount: parsed.amount,
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:476:   476→  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+/home/z/my-project/tool-results/read_1783715935127_c13677518aab.txt:480:   480→  const [editForm, setEditForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+
+[Showing results with pagination = limit: 250]
