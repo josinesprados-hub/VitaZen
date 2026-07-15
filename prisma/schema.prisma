@@ -136,15 +136,18 @@ model AIThread {
 }
 
 model AIMessage {
-  id        String   @id @default(cuid())
-  threadId  String
-  role      String   // user | assistant
-  content   String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  threadId    String
+  role        String    // user | assistant
+  content     String
+  isFavorited Boolean   @default(false)
+  favoritedAt DateTime?
+  createdAt   DateTime  @default(now())
 
   thread AIThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
   @@index([threadId, createdAt])
+  @@index([isFavorited, favoritedAt])
 }
 
 model AIUsage {
