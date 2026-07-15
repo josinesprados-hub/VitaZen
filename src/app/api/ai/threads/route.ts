@@ -37,8 +37,12 @@ export async function GET(request: NextRequest) {
     }
     // If no param, return all threads (both active and archived)
 
-    // FREE users see limited recent threads, PREMIUM sees all
-    const threadLimit = isPremium ? undefined : HISTORY_LIMIT_FREE;
+    // PERF-5.2: Both FREE and PREMIUM paths now have safety caps.
+    // PREMIUM: MAX_THREADS_PREMIUM (100) — same ceiling as POST creation limit.
+    // FREE: HISTORY_LIMIT_FREE (10) — unchanged.
+    // Also added select on included messages to avoid transferring full content
+    // (only role + createdAt needed for thread list preview).
+    const threadLimit = isPremium ? MAX_THREADS_PREMIUM : HISTORY_LIMIT_FREE;
 
     const threads = await db.aIThread.findMany({
       where,
@@ -48,6 +52,7 @@ export async function GET(request: NextRequest) {
         messages: {
           orderBy: { createdAt: 'desc' },
           take: 1,
+          select: { role: true, createdAt: true },
         },
       },
     });

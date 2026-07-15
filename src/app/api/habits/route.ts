@@ -6,6 +6,7 @@ import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
+import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,9 +15,12 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    // PERF-5.2: Safety cap — a user rarely manages >100 active habits.
+    // take: 100 prevents unbounded growth while covering all realistic usage.
     const habits = await db.habitLog.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
+      take: 100,
     });
 
     return NextResponse.json({ habits });
@@ -35,21 +39,20 @@ export async function POST(request: NextRequest) {
 
     const { name, description, frequency } = await request.json();
 
-    // Validate frequency — only supported values
-    const VALID_FREQUENCIES = ['daily', 'weekly', 'monthly'];
-    if (frequency && !VALID_FREQUENCIES.includes(frequency)) {
-      return NextResponse.json({ error: 'Invalid frequency' }, { status: 400 });
-    }
-
-    const habit = await db.habitLog.create({
-      data: { userId: user.id, name, description, frequency },
-    });
-
-    // Award XP to disciplina empire
-    await db.empireProgress.upsert({
-      where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-      update: { xp: { increment: 5 } },
-      create: { userId: user.id, empire: 'disciplina', xp: 5 },
+    // PERF-5.2: Wrap habit creation + XP award in a transaction to prevent
+    // silent XP loss if the upsert fails after the habit is created.
+    // This matches the pattern already used in checkin, meditation, wellness,
+    // nutrition, finance, and journal POST routes.
+    const habit = await db.$transaction(async (tx) => {
+      const h = await tx.habitLog.create({
+        data: { userId: user.id, name, description, frequency },
+      });
+      await tx.empireProgress.upsert({
+        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+        update: { xp: { increment: 5 } },
+        create: { userId: user.id, empire: 'disciplina', xp: 5 },
+      });
+      return h;
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
@@ -124,8 +127,8 @@ export async function PATCH(request: NextRequest) {
       if (lastCompleted) {
         const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
         // Compute day diff using date keys (timezone-aware)
-        const todayMs = new Date(todayDateKey + 'T00:00:00').getTime();
-        const lastMs = new Date(lastDateKey + 'T00:00:00').getTime();
+        const todayMs = startOfMadridDay(todayDateKey).getTime();
+        const lastMs = startOfMadridDay(lastDateKey).getTime();
         const diffDays = Math.round((todayMs - lastMs) / 86400000);
         // H-7 FIX: Completion guard respects frequency.
         // Before this fix, the guard only checked lastDateKey === todayDateKey (daily logic),
@@ -178,14 +181,7 @@ export async function PATCH(request: NextRequest) {
       // for a single Madrid day. Now: derive the exact UTC instant of Madrid
       // midnight from the Madrid date key (same approach as startOfMadridDay
       // in insights.ts), so the DB query window matches the real Madrid day.
-      const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-      const madridNoonParts = madridNoonUtc
-        .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-        .split(' ')[1].split(':').map(Number);
-      const msSinceMadridMidnight =
-        (madridNoonParts[0] * 3600 + madridNoonParts[1] * 60 + madridNoonParts[2]) * 1000;
-      const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-      const todayEnd = new Date(todayStart.getTime() + 86400000);
+      const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
       const otherCompletedToday = await tx.habitLog.findFirst({
         where: {
           userId: user.id,
@@ -312,14 +308,7 @@ export async function DELETE(request: NextRequest) {
         const habitDateKey = getMadridDateKey(habit.lastCompletedAt);
         if (habitDateKey === todayDateKey) {
           // Use the same Madrid-aware day boundaries as the H-10/H-11 fix.
-          const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-          const madridNoonParts = madridNoonUtc
-            .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-            .split(' ')[1].split(':').map(Number);
-          const msSinceMadridMidnight =
-            (madridNoonParts[0] * 3600 + madridNoonParts[1] * 60 + madridNoonParts[2]) * 1000;
-          const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-          const todayEnd = new Date(todayStart.getTime() + 86400000);
+          const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
           const otherCompletedToday = await tx.habitLog.findFirst({
             where: {
               userId: user.id,

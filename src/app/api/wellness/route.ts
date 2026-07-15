@@ -5,22 +5,7 @@ import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-
-// E-1/E-2 helper: compute the UTC instants that bound the Madrid calendar day
-// for the given Madrid date key (YYYY-MM-DD). Used by POST and DELETE so the
-// "first energia log today" check aligns with the user's perceived day boundary
-// (same approach as startOfMadridDay in insights.ts, the H-11 fix in habits,
-// and the M-1/M-2 fixes in meditation).
-function madridDayBoundaries(todayDateKey: string): { todayStart: Date; todayEnd: Date } {
-  const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-  const parts = madridNoonUtc
-    .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-    .split(' ')[1].split(':').map(Number);
-  const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
-  const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-  const todayEnd = new Date(todayStart.getTime() + 86400000);
-  return { todayStart, todayEnd };
-}
+import { madridDayBoundaries } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,7 +15,8 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') || '30');
+    // PERF-5.2: Clamp days to prevent unbounded queries (matches finance route pattern)
+    const days = Math.min(Math.max(parseInt(searchParams.get('days') || '30'), 1), 365);
 
     const logs = await db.wellnessLog.findMany({
       where: { userId: user.id },
@@ -87,7 +73,7 @@ export async function POST(request: NextRequest) {
     // todayDateKey, mirroring the finance/route.ts pattern.
     const logDate = new Date(date);
     const logDateKey = getMadridDateKey(logDate);
-    const { todayStart, todayEnd } = madridDayBoundaries(logDateKey);
+    const { start, end } = madridDayBoundaries(logDateKey);
 
     const log = await db.$transaction(async (tx) => {
       // Acquire transaction-scoped advisory lock on (userId, logDateKey).
@@ -118,14 +104,14 @@ export async function POST(request: NextRequest) {
           where: {
             userId: user.id,
             id: { not: result.id },
-            date: { gte: todayStart, lt: todayEnd },
+            date: { gte: start, lt: end },
           },
           select: { id: true },
         });
         const otherNutritionLogToday = !otherEnergiaLogToday ? await tx.nutritionLog.findFirst({
           where: {
             userId: user.id,
-            date: { gte: todayStart, lt: todayEnd },
+            date: { gte: start, lt: end },
           },
           select: { id: true },
         }) : null;
@@ -230,19 +216,19 @@ export async function DELETE(request: NextRequest) {
       let decrementStreak = false;
       const logDateKey = getMadridDateKey(log.date);
       if (logDateKey === todayDateKey) {
-        const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+        const { start, end } = madridDayBoundaries(todayDateKey);
         const otherWellnessToday = await tx.wellnessLog.findFirst({
           where: {
             userId: user.id,
             id: { not: logId },
-            date: { gte: todayStart, lt: todayEnd },
+            date: { gte: start, lt: end },
           },
           select: { id: true },
         });
         const otherNutritionToday = !otherWellnessToday ? await tx.nutritionLog.findFirst({
           where: {
             userId: user.id,
-            date: { gte: todayStart, lt: todayEnd },
+            date: { gte: start, lt: end },
           },
           select: { id: true },
         }) : null;

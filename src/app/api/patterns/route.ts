@@ -14,6 +14,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { detectPatterns } from '@/lib/patterns/detector';
 import type { CrossEmpireData } from '@/lib/patterns/types';
+import { startOf90DaysAgoMadrid } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,8 +28,8 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = user.id;
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const isPremium = user.plan === 'PREMIUM';
+    const ninetyDaysAgo = startOf90DaysAgoMadrid();
 
     const [
       financeLogs,
@@ -56,9 +57,11 @@ export async function GET(request: NextRequest) {
         select: { duration: true, type: true, completedAt: true },
         orderBy: { completedAt: 'desc' },
       }),
+      // PERF-5.2: Added take: 100 — pattern detection only needs recent habits.
       db.habitLog.findMany({
         where: { userId },
         select: { name: true, streak: true, lastCompletedAt: true },
+        take: 100,
       }),
       db.dailyCheckin.findMany({
         where: { userId, date: { gte: ninetyDaysAgo } },
@@ -101,13 +104,23 @@ export async function GET(request: NextRequest) {
 
     // Return: observations + weight (for cache duration on client)
     // NEVER expose confidence, consistency, anomaly count
+    // FREE users: only the first observation (for PremiumGate preview)
+    // ÉLITE users: all observations (unchanged behavior)
+    const allObservations = result.observations.map(o => ({
+      id: o.id,
+      text: o.text,
+      empires: o.empires,
+      weight: o.weight,
+    }));
+
+    const observations = isPremium
+      ? allObservations
+      : allObservations.length > 0
+        ? [allObservations[0]]
+        : [];
+
     return NextResponse.json({
-      observations: result.observations.map(o => ({
-        id: o.id,
-        text: o.text,
-        empires: o.empires,
-        weight: o.weight,
-      })),
+      observations,
       hasEnoughData: result.hasEnoughData,
       totalDataPoints: result.totalDataPoints,
     });

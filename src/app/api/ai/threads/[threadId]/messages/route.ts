@@ -44,10 +44,15 @@ export async function GET(
     // Fix: fetch the NEWEST 50 (orderBy: desc + take: 50), then reverse to
     // chronological order for display. This matches the pattern used by
     // /api/ai/chat (lines 66-71) which does the same desc+take+reverse.
+    // PERF-5.2: Safety cap for PREMIUM path — prevents unbounded memory usage
+    // on extremely long threads. 500 messages covers months of daily conversation.
+    const MESSAGES_LIMIT_PREMIUM = 500;
+
     if (isPremium) {
       const messages = await db.aIMessage.findMany({
         where: { threadId },
         orderBy: { createdAt: 'asc' },
+        take: MESSAGES_LIMIT_PREMIUM,
       });
       return NextResponse.json({
         messages,

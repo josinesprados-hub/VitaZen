@@ -13,7 +13,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys, calcStreakFromKeys } from '@/lib/dates';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -226,13 +226,15 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     }),
 
     // 20. All check-in dates for comeback & distinct month detection
-    // No take limit — hidden_comeback must detect gaps anywhere in history,
-    // and hidden_six_months_present must count all distinct months.
+    // PERF-5.2: Added take: 1095 (~3 years of daily checkins). Hidden achievements
+    // like "comeback after 14+ days" only need recent history. 1095 covers 3 full
+    // years — far beyond any realistic gap detection need.
     // select: { date: true } avoids transferring heavy fields (intention, note).
     db.dailyCheckin.findMany({
       where: { userId },
       select: { date: true },
       orderBy: { date: 'desc' },
+      take: 1095,
     }),
   ]);
 
@@ -317,11 +319,7 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     // Use Madrid calendar days, not raw ms — avoids ±1 day drift from DST/timezone
     const createdKey = getMadridDateKey(new Date(userData.createdAt.getTime()));
     const todayKey = getTodayDateKey();
-    const [cY, cM, cD] = createdKey.split('-').map(Number);
-    const [tY, tM, tD] = todayKey.split('-').map(Number);
-    const createdDate = new Date(cY, cM - 1, cD);
-    const todayDate = new Date(tY, tM - 1, tD);
-    const daysSince = Math.round((todayDate.getTime() - createdDate.getTime()) / 86400000);
+    const daysSince = daysBetweenDateKeys(createdKey, todayKey);
     progress['hidden_one_year'] = Math.min(daysSince, 365);
   } else {
     progress['hidden_one_year'] = 0;
@@ -365,11 +363,7 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     for (let i = 0; i < allCheckinDates.length - 1; i++) {
       const currentKey = getMadridDateKey(new Date(allCheckinDates[i].date));
       const previousKey = getMadridDateKey(new Date(allCheckinDates[i + 1].date));
-      const [curY, curM, curD] = currentKey.split('-').map(Number);
-      const [prevY, prevM, prevD] = previousKey.split('-').map(Number);
-      const curDate = new Date(curY, curM - 1, curD);
-      const prevDate = new Date(prevY, prevM - 1, prevD);
-      const gapDays = Math.round((curDate.getTime() - prevDate.getTime()) / 86400000);
+      const gapDays = daysBetweenDateKeys(currentKey, previousKey);
       if (gapDays >= 7) {
         hasComeback = true;
         break;
@@ -381,25 +375,9 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
   // Siete Mañanas: 7 consecutive check-ins
   // Uses getMadridDateKey() for timezone-safe date normalization — same
   // source of truth as Dashboard, Momentum, Mentor, Silent Memories, Challenges.
-  let consecutiveDays = 0;
-  if (recentCheckins.length > 0) {
-    const uniqueDays = new Set(
-      recentCheckins.map(c => getMadridDateKey(new Date(c.date)))
-    );
-
-    // Start from today (Madrid); if no activity today, start from yesterday
-    let checkDateStr = getTodayDateKey();
-    if (!uniqueDays.has(checkDateStr)) {
-      const todayMs = new Date(checkDateStr + 'T12:00:00Z').getTime();
-      checkDateStr = getMadridDateKey(new Date(todayMs - 86400000));
-    }
-
-    while (uniqueDays.has(checkDateStr)) {
-      consecutiveDays++;
-      const checkMs = new Date(checkDateStr + 'T12:00:00Z').getTime();
-      checkDateStr = getMadridDateKey(new Date(checkMs - 86400000));
-    }
-  }
+  const consecutiveDays = recentCheckins.length > 0
+    ? calcStreakFromKeys(new Set(recentCheckins.map(c => getMadridDateKey(new Date(c.date)))))
+    : 0;
   progress['hidden_streak_7_checkin'] = Math.min(consecutiveDays, 7);
 
   // Trayectoria Económica

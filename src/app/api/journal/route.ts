@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
-import { getTodayDateKey } from '@/lib/deterministic';
 import { onJournalChange } from '@/lib/widgets/triggers';
 
 export async function GET(request: NextRequest) {
@@ -13,9 +12,12 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    // PERF-5.2: Safety cap — list view never needs >100 entries.
+    // Individual entry content is fetched on demand (PUT/GET by id).
     const entries = await db.journalEntry.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
+      take: 100,
     });
 
     // Guard: PrismaPg driver adapter can return null for findMany in edge cases.
@@ -58,23 +60,6 @@ export async function POST(request: NextRequest) {
     // per-day uniqueness, so there is no "first log of the day" concept).
     // This avoids collisions with checkin ('|'), energia ('|energia|'), and
     // riqueza ('|riqueza|') advisory locks.
-    //
-    // I-2 FIX: Also check if this is the first journal entry of the Madrid day
-    // to increment the crecimiento streak — matching the pattern used by
-    // meditation (M-1), habits (H-10), and energy (E-3).
-    const todayDateKey = getTodayDateKey();
-    // J-NEW1 FIX: Use the same madridDayBoundaries calculation as meditation,
-    // wellness, nutrition and habits. The previous code used UTC boundaries
-    // (new Date(key + 'T00:00:00')), which during CEST (UTC+2) misclassified
-    // entries between Madrid 00:00–02:00 as belonging to the previous day.
-    const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-    const parts = madridNoonUtc
-      .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-      .split(' ')[1].split(':').map(Number);
-    const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
-    const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-    const todayEnd = new Date(todayStart.getTime() + 86400000);
-
     const entry = await db.$transaction(async (tx) => {
       // C-1 FIX: advisory lock serializes concurrent journal POSTs and DELETEs
       // for the same user, preventing interleave that could cause XP drift.
@@ -87,26 +72,11 @@ export async function POST(request: NextRequest) {
         data: { userId: user.id, title: title || '', content: content || '', mood, gratitude },
       });
 
-      // Check if any OTHER journal entry was already created today (Madrid).
-      // Only increment streak on the first entry of the day.
-      const otherEntryToday = await tx.journalEntry.findFirst({
-        where: {
-          userId: user.id,
-          id: { not: created.id },
-          createdAt: { gte: todayStart, lt: todayEnd },
-        },
-        select: { id: true },
-      });
-      const isFirstEntryToday = !otherEntryToday;
-
       // Award XP to crecimiento empire
       await tx.empireProgress.upsert({
         where: { userId_empire: { userId: user.id, empire: 'crecimiento' } },
-        update: {
-          xp: { increment: 20 },
-          ...(isFirstEntryToday ? { streak: { increment: 1 } } : {}),
-        },
-        create: { userId: user.id, empire: 'crecimiento', xp: 20, streak: 1 },
+        update: { xp: { increment: 20 } },
+        create: { userId: user.id, empire: 'crecimiento', xp: 20 },
       });
 
       return created;

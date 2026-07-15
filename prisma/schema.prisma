@@ -48,6 +48,10 @@ model User {
   dailyCheckins     DailyCheckin[]
   onboardingData    OnboardingData?
   pushTokens        PushToken[]
+
+  @@index([weeklyEmailSummary, emailVerified]) // PERF-5.2: for weekly email batch cron
+  @@index([dailyReminders]) // PERF-5.2: for daily notification batch cron
+
   notificationPreference NotificationPreference?
   notificationLog   NotificationLog[]
   widgetSnapshots        WidgetSnapshot[]
@@ -85,7 +89,6 @@ model PasswordResetToken {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([token])
 }
 
 model EmailVerificationToken {
@@ -98,7 +101,6 @@ model EmailVerificationToken {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([token])
 }
 
 model Subscription {
@@ -114,6 +116,9 @@ model Subscription {
   updatedAt            DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  @@index([userId]) // PERF-5.2: FK lookup for User->Subscription
 }
 
 // ═══════════════════════════════════════════
@@ -135,15 +140,18 @@ model AIThread {
 }
 
 model AIMessage {
-  id        String   @id @default(cuid())
-  threadId  String
-  role      String   // user | assistant
-  content   String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  threadId    String
+  role        String    // user | assistant
+  content     String
+  isFavorited Boolean   @default(false)
+  favoritedAt DateTime?
+  createdAt   DateTime  @default(now())
 
   thread AIThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
   @@index([threadId, createdAt])
+  @@index([isFavorited, favoritedAt])
 }
 
 model AIUsage {
@@ -184,6 +192,8 @@ model UserChallenge {
   challenge DailyChallenge @relation(fields: [challengeId], references: [id])
 
   @@unique([userId, date])
+
+  @@index([userId, completed, completedAt]) // PERF-5.2: for widget count queries
 }
 
 // ═══════════════════════════════════════════
@@ -254,6 +264,7 @@ model HabitLog {
 
   @@index([userId])
   @@index([userId, lastCompletedAt]) // GLOBAL-18: composite for dashboard/streaks queries
+  @@index([userId, streak]) // PERF-5.2: composite for insights/recap streak ordering
 }
 
 model NutritionLog {
@@ -312,6 +323,8 @@ model EmpireTip {
   content   String
   plan      String   @default("FREE") // FREE | PREMIUM
   createdAt DateTime @default(now())
+
+  @@index([empire, plan]) // PERF-5.2: for tips API and widget shaping
 }
 
 // ═══════════════════════════════════════════
@@ -367,6 +380,7 @@ model AnalyticsEvent {
 
   @@index([event, createdAt])
   @@index([userId, createdAt])
+  @@index([userId, event, createdAt]) // PERF-5.2: composite for daily_session dedup
 }
 
 // ═══════════════════════════════════════════
@@ -386,7 +400,6 @@ model PushToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, active])
-  @@index([token])
 }
 
 model NotificationPreference {
@@ -468,6 +481,8 @@ model WidgetSnapshot {
 
   @@unique([userId, widgetType])
   @@index([userId, widgetType, expiresAt])
+  @@index([expiresAt]) // PERF-5.2: for batch refresh cron
+  @@index([userId, computedAt]) // PERF-5.2: for rate limiting
   @@map("widget_snapshots")
 }
 
