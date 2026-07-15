@@ -1,24 +1,21 @@
 ---
 Task ID: 1
-Agent: Main Agent (Super Z)
-Task: FASE 3.3 — Copiar Respuestas del Mentor IA
+Agent: Super Z (main)
+Task: FASE 3.4 — Input Multilínea Premium para VitaZen Mentor IA
 
 Work Log:
-- Auditada la zona de renderizado de mensajes en MentorChat.tsx (lineas 1150-1176)
-- Evaluadas 4 opciones de ubicacion del boton (dentro de burbuja, debajo de burbuja, menu contextual, barra de acciones)
-- Descartado estado global copiedId en MentorChat por impacto en rendimiento (re-render de 1458 lineas)
-- Creado CopyMessageButton.tsx: componente React.memo con estado interno, stripMarkdown, Clipboard API + fallback execCommand
-- Modificado MentorChat.tsx: import de CopyMessageButton + reestructuracion de mensajes en ramas user/assistant
-- Implementada funcion stripMarkdown que elimina sintaxis Markdown preservando texto legible
-- Boton con feedback premium: icono Copy (13px, opacity 60%) → Check (champagne 70%) durante 2s
-- Accesibilidad: aria-label dinamico, type=button, focus-visible ring
-- Build verificado: 0 errores, 0 warnings nuevos
-- PDF QA: PASS (todas las checks pasadas)
+- Auditoría completa de MentorChat.tsx (1479 líneas): compositor, textarea, eventos teclado, scroll, safe areas, PWA
+- Hallazgo principal: compositor usaba `<input type="text">` monolínea, sin onKeyDown handler
+- Conversión de `<input>` a `<textarea>` con rows={1}, resize-none, overflow-hidden, leading-6
+- Creación de `syncTextareaHeight()` con useCallback para auto-resize fluido (máx 240px = ~8 líneas)
+- Implementación de onKeyDown: Enter → envía, Shift+Enter → nueva línea
+- Alineación del botón enviar con `items-end` en el form
+- Reset de altura post-envío mediante requestAnimationFrame
+- Restauración de altura en 3 puntos de error (403, no-403, red)
+- Validación: 0 errores TypeScript nuevos, 0 ESLint, compilación exitosa
+- Generación de informe forense PDF de 12 secciones (67.5 KB)
 
 Stage Summary:
-- Archivos creados: src/components/mentor/CopyMessageButton.tsx (95 lineas)
-- Archivos modificados: src/components/mentor/MentorChat.tsx (1 import + reestructuracion de zona de mensajes)
-- Archivos NO modificados: API, Prisma, Firebase, Groq, engines, MentorMarkdown.tsx, globals.css
-- Dependencias instaladas: 0
-- Informe forense: /home/z/my-project/download/FASE_3.3_Informe_Forense_Copiar_Respuestas.pdf (48.8 KB, PASS QA)
-- Build: PASS
+- Archivo modificado: src/components/mentor/MentorChat.tsx (5 puntos de edición, ~45 líneas)
+- 0 paquetes nuevos, 0 archivos nuevos, 0 motores modificados
+- PDF informe: /home/z/my-project/download/FASE_3.4_Informe_Forense_Input_Multilinea.pdf
