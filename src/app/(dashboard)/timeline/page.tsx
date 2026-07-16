@@ -195,14 +195,16 @@ export default function TimelinePage() {
 
   const handleFilter = (key: string) => {
     setActiveFilter(key);
-    // Map imperio filters to their activity types for the API
-    const imperioToTypes: Record<string, string> = {
+    // Map imperio filters to their activity types for the API.
+    // Imperios with a single type send that type; multi-type imperios (energia)
+    // skip the server filter and rely on client-side filtering via TYPE_IMPERIO.
+    const imperioToTypes: Record<string, string | undefined> = {
       mente: 'meditation',
-      energia: 'wellness',
+      energia: undefined, // wellness + nutrition → fetch all, filter client-side
       disciplina: 'habits',
       riqueza: 'finance',
     };
-    fetchTimeline(imperioToTypes[key] || undefined);
+    fetchTimeline(imperioToTypes[key]);
   };
 
   // Filter items client-side for imperios that span multiple activity types

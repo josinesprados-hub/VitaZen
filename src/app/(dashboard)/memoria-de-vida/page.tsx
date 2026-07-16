@@ -27,6 +27,7 @@ import { useApi } from '@/hooks/useApi';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
+import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   PAGE_TITLE,
   PAGE_SUBTITLE,
@@ -94,16 +95,22 @@ export default function EtapasPage() {
 
   const [data, setData] = useState<LifeMemoryData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
     try {
       const res = await apiFetch('/api/life-memory');
       if (res.ok) {
         const result = await res.json();
         setData(result);
+      } else {
+        setFetchError(true);
       }
     } catch (error) {
       console.error('[Etapas] Fetch error:', error);
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -120,6 +127,19 @@ export default function EtapasPage() {
         <div className="flex items-center justify-center">
           <div className="h-2 w-2 rounded-full bg-champagne gentle-pulse" />
         </div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20 sm:py-32">
+        <PremiumErrorState
+          variant="loading"
+          title="No se pudo cargar"
+          onRetry={() => fetchData()}
+          size="md"
+        />
       </div>
     );
   }

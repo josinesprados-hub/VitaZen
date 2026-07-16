@@ -290,7 +290,7 @@ export default function CierreMensualPage() {
       )}
 
       {/* Memories gate for FREE */}
-      {!isPremium && digest.financial && (
+      {!isPremium && digest.hasData && (
         <div className="mt-4">
           <PremiumGate isPremium={false} intensity="light" compact label={ELITE_MEMORIES}>
             <div className="h-12" />
