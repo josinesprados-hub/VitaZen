@@ -436,7 +436,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       icon: '🔋',
       title: 'Energía baja',
       description: isPremium
-        ? `Promedio ${summary.checkins.avgEnergy}/5.`
+        ? `Promedio ${summary.checkins.avgEnergy}/5. ${comparison && comparison.energyTrend < 0 ? 'Bajó respecto a la semana pasada.' : comparison && comparison.energyTrend > 0 ? 'Subió desde la semana pasada.' : ''}`
         : `Promedio ${summary.checkins.avgEnergy}/5.`,
     });
   }

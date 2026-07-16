@@ -81,9 +81,7 @@ export function MonthlyClosurePrompt() {
     checkClosure();
   }, [user, apiFetch]);
 
-  const handleDismiss = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDismiss = () => {
     dismissThisMonth();
     setDismissed(true);
     setShow(false);
@@ -93,25 +91,25 @@ export function MonthlyClosurePrompt() {
 
   return (
     <div className="dash-section-enter">
-      <Link
-        href="/cierre-mensual"
-        className="block py-3 hover:opacity-80 transition-all group touch-press"
-      >
-        <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
+        <Link
+          href="/cierre-mensual"
+          className="flex items-center gap-3 flex-1 py-3 hover:opacity-80 transition-all group touch-press"
+        >
           <Calendar size={13} className="text-champagne/25 group-hover:text-champagne/50 transition-colors shrink-0" />
           <p className="text-[11px] text-[#555] group-hover:text-[#777] transition-colors flex-1">
             {message}
           </p>
-          {/* DASH-18/29: Discreet dismiss button — persists until next month */}
-          <button
-            onClick={handleDismiss}
-            className="text-[10px] text-[#333] hover:text-[#555] transition-colors shrink-0 ml-2"
-            aria-label="Ahora no"
-          >
-            <X size={11} />
-          </button>
-        </div>
-      </Link>
+        </Link>
+        {/* DASH-18/29: Discreet dismiss button — persists until next month */}
+        <button
+          onClick={handleDismiss}
+          className="text-[10px] text-[#333] hover:text-[#555] transition-colors shrink-0 ml-2 py-3"
+          aria-label="Ahora no"
+        >
+          <X size={11} />
+        </button>
+      </div>
     </div>
   );
 }

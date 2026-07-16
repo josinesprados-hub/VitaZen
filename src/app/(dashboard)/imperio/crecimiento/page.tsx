@@ -98,6 +98,14 @@ export default function CrecimientoPage() {
   const [editSaving, setEditSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
+  const [actionError, setActionError] = useState('');
+
+  // Auto-dismiss action error toast
+  useEffect(() => {
+    if (!actionError) return;
+    const timer = setTimeout(() => setActionError(''), 4000);
+    return () => clearTimeout(timer);
+  }, [actionError]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -156,9 +164,14 @@ export default function CrecimientoPage() {
         setShowAdd(false);
         setForm({ title: '', content: '', mood: 3, gratitude: '' });
         setShowReward(true);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        const msg = errData.error || errData.message;
+        setActionError(msg === 'Rate limit exceeded' ? 'Has alcanzado el límite de 5 entradas por día' : msg || `Error al guardar (${res.status})`);
       }
     } catch (error) {
       console.error('Error submitting entry:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -187,9 +200,11 @@ export default function CrecimientoPage() {
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Journal PUT failed:', res.status, errData);
+        setActionError(errData.error || errData.message || `Error al guardar (${res.status})`);
       }
     } catch (error) {
       console.error('Error updating entry:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
     } finally {
       setEditSaving(false);
     }
@@ -209,9 +224,11 @@ export default function CrecimientoPage() {
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Journal DELETE failed:', res.status, errData);
+        setActionError(errData.error || errData.message || `Error al eliminar (${res.status})`);
       }
     } catch (error) {
       console.error('Error deleting entry:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
     } finally {
       setPendingDeleteId(null);
     }
@@ -486,6 +503,16 @@ export default function CrecimientoPage() {
       <EmpireTipsSection empire="crecimiento" subtitle="Apuntes para tu crecimiento" />
       {/* Micro-reward for journal entry */}
       <MicroReward trigger={showReward} message="Entrada guardada" onComplete={() => setShowReward(false)} />
+
+      {/* Action error toast — auto-dismisses */}
+      {actionError && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
+          onClick={() => setActionError('')}
+        >
+          {actionError}
+        </div>
+      )}
     </div>
   );
 }

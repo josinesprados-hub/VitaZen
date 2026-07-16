@@ -63,7 +63,15 @@ export default function DisciplinaPage() {
   const [fetchError, setFetchError] = useState(false);
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
+  const [actionError, setActionError] = useState('');
   const justCompletedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-dismiss action error toast
+  useEffect(() => {
+    if (!actionError) return;
+    const timer = setTimeout(() => setActionError(''), 4000);
+    return () => clearTimeout(timer);
+  }, [actionError]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -137,9 +145,13 @@ export default function DisciplinaPage() {
         setNewHabit({ name: '', description: '', frequency: 'daily' });
         setShowAddHabit(false);
         refreshChallenge(); // Creating a habit may auto-complete today's challenge
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setActionError(errData.error || errData.message || `Error al crear (${res.status})`);
       }
     } catch (error) {
       console.error('Error adding habit:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
     }
   };
 
@@ -157,9 +169,13 @@ export default function DisciplinaPage() {
         if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
         justCompletedTimerRef.current = setTimeout(() => setJustCompletedId(null), 600);
         refreshChallenge(); // Completing a habit may auto-complete today's challenge
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setActionError(errData.error || errData.message || `Error al completar (${res.status})`);
       }
     } catch (error) {
       console.error('Error completing habit:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
     }
   };
 
@@ -184,8 +200,12 @@ export default function DisciplinaPage() {
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Habits PUT failed:', res.status, errData);
+        setActionError(errData.error || errData.message || `Error al guardar (${res.status})`);
       }
-    } catch (error) { console.error('Error updating habit:', error); }
+    } catch (error) {
+      console.error('Error updating habit:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
+    }
     finally { setEditSaving(false); }
   };
 
@@ -202,8 +222,12 @@ export default function DisciplinaPage() {
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Habits DELETE failed:', res.status, errData);
+        setActionError(errData.error || errData.message || `Error al eliminar (${res.status})`);
       }
-    } catch (error) { console.error('Error deleting habit:', error); }
+    } catch (error) {
+      console.error('Error deleting habit:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
+    }
     finally { setPendingDeleteId(null); }
   };
 
@@ -346,6 +370,15 @@ export default function DisciplinaPage() {
               onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]"
             />
+            <select
+              value={newHabit.frequency}
+              onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors appearance-none"
+            >
+              <option value="daily">Diario</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
             <div className="flex gap-2">
               <button onClick={addHabit} className="bg-champagne text-black font-semibold px-5 py-2 rounded-xl text-sm hover:bg-champagne-hover transition-colors touch-press">Guardar</button>
               <button onClick={() => setShowAddHabit(false)} className="text-[#999] px-4 py-2 text-sm hover:text-white touch-press">Cancelar</button>
@@ -415,6 +448,16 @@ export default function DisciplinaPage() {
       <EmpireTipsSection empire="disciplina" subtitle="Ideas para tu disciplina" />
       {/* Micro-reward for habit completion */}
       <MicroReward trigger={showReward} message="Hábito completado" onComplete={() => setShowReward(false)} />
+
+      {/* Action error toast — auto-dismisses */}
+      {actionError && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
+          onClick={() => setActionError('')}
+        >
+          {actionError}
+        </div>
+      )}
     </div>
   );
 }
