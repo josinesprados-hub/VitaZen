@@ -61,6 +61,17 @@ async function handler(request: NextRequest) {
         if (activeSub) {
         // H-04 FIX: Wrap restore in a transaction to prevent inconsistent
         // state if a crash occurs between user update and subscription upsert.
+        // F8.4-07 FIX: Guard against empty items.data to prevent corrupted periods.
+        if (!activeSub.items.data.length) {
+          serverLog.warn('stripe/restore', 'Active subscription has no line items', {
+            subscriptionId: activeSub.id,
+          });
+          return NextResponse.json({
+            restored: false,
+            message: 'La suscripción no tiene datos de producto. Contacta soporte.',
+          }, { status: 400 });
+        }
+
         await db.$transaction(async (tx) => {
           // User already has access — ensure plan is PREMIUM
           if (user.plan !== 'PREMIUM') {
@@ -139,8 +150,22 @@ async function handler(request: NextRequest) {
       );
 
       if (activeSub) {
+        // F8.4-07 FIX: Guard against empty items.data
+        if (!activeSub.items.data.length) {
+          serverLog.warn('stripe/restore', 'Active subscription has no line items', {
+            subscriptionId: activeSub.id,
+          });
+          return NextResponse.json({
+            restored: false,
+            message: 'La suscripción no tiene datos de producto. Contacta soporte.',
+          }, { status: 400 });
+        }
+
         // Found a valid subscription — link it to the current user
         // H-04 FIX: Wrap in a transaction for atomicity.
+        // F8.4-06 FIX: Move Stripe metadata update inside the transaction.
+        // If Stripe call fails, the entire transaction rolls back, keeping
+        // DB and Stripe consistent.
         await db.$transaction(async (tx) => {
           await tx.user.update({
             where: { id: user.id },
@@ -172,11 +197,11 @@ async function handler(request: NextRequest) {
               cancelAtPeriodEnd: activeSub.cancel_at_period_end,
             },
           });
-        });
 
-        // Update Stripe customer metadata (outside DB tx — separate system)
-        await stripe.customers.update(customer.id, {
-          metadata: { ...customer.metadata, userId: user.id },
+          // F8.4-06: Update Stripe customer metadata inside the transaction
+          await stripe.customers.update(customer.id, {
+            metadata: { ...customer.metadata, userId: user.id },
+          });
         });
 
         serverLog.info('stripe/restore', 'Restored via email search', {

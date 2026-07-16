@@ -24,8 +24,27 @@ export default function ResetPasswordClient() {
       setValidating(false);
       return;
     }
-    setTokenValid(true);
-    setValidating(false);
+    // F8.4-09 FIX: Validate token against server on mount using a lightweight
+    // GET endpoint that checks existence/expiry without consuming the token.
+    // Previously only checked if the query param existed as a string,
+    // so users with expired/invalid tokens saw the full form and only
+    // discovered the error after submitting.
+    fetch(`/api/auth/reset-password?token=${encodeURIComponent(token)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.valid) {
+          setError(data.error || 'Enlace inválido o expirado.');
+          setTokenValid(false);
+        } else {
+          setTokenValid(true);
+        }
+        setValidating(false);
+      })
+      .catch(() => {
+        // Network error — show form anyway, server will validate on submit
+        setTokenValid(true);
+        setValidating(false);
+      });
   }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {

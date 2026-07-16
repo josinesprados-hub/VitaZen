@@ -80,21 +80,30 @@ export async function GET(request: NextRequest) {
     // had a stale DB email, causing transactional emails and Stripe
     // receipts to go to the wrong address.
     if (decodedToken.email_verified && decodedToken.email && user.email !== decodedToken.email) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { email: decodedToken.email },
+      // F8.4-02 FIX: Check email uniqueness before updating to prevent
+      // P2002 unique constraint violation if another user already has this email.
+      const existingEmail = await db.user.findUnique({
+        where: { email: decodedToken.email },
       });
-      user.email = decodedToken.email;
+      if (existingEmail && existingEmail.id !== user.id) {
+        console.warn('[Session] Email sync skipped — another user already has this email:', decodedToken.email);
+      } else {
+        await db.user.update({
+          where: { id: user.id },
+          data: { email: decodedToken.email },
+        });
+        user.email = decodedToken.email;
 
-      // Also update the Stripe customer email if the user has one
-      if (user.stripeCustomerId) {
-        try {
-          const { stripe } = await import('@/lib/stripe');
-          await stripe.customers.update(user.stripeCustomerId, {
-            email: decodedToken.email,
-          });
-        } catch {
-          // Non-blocking — Stripe email update failure should not prevent login
+        // Also update the Stripe customer email if the user has one
+        if (user.stripeCustomerId) {
+          try {
+            const { stripe } = await import('@/lib/stripe');
+            await stripe.customers.update(user.stripeCustomerId, {
+              email: decodedToken.email,
+            });
+          } catch {
+            // Non-blocking — Stripe email update failure should not prevent login
+          }
         }
       }
     }

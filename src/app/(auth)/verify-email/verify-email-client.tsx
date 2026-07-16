@@ -267,13 +267,16 @@ export default function VerifyEmailClient() {
                     await firebaseUser.reload();
                     if (getAuthInstance().currentUser?.emailVerified) {
                       const idToken = await getAuthInstance().currentUser!.getIdToken();
-                      await fetch('/api/auth/verify-email', {
+                      const res = await fetch('/api/auth/verify-email', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ idToken }),
+                        headers: { 'Authorization': `Bearer ${idToken}` },
                       });
-                      setStatus('success');
-                      await refreshUser();
+                      if (res.ok) {
+                        setStatus('success');
+                        await refreshUser();
+                      } else {
+                        setErrorMessage('No se pudo confirmar la verificación. Inténtalo de nuevo.');
+                      }
                     } else {
                       setErrorMessage('Aún no verificado. Revisa tu email.');
                     }

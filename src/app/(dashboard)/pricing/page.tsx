@@ -47,12 +47,13 @@ export default function PricingPage() {
           // Portal also failed — go to settings
           router.push('/ajustes');
         } else {
-          alert(data.message || data.error || 'No se ha podido procesar. Inténtalo de nuevo.');
+          // F8.4-13 FIX: Replace alert() with router.push — consistent with elite/page.tsx
+          router.push('/pricing?error=checkout');
         }
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('No se ha podido conectar. Inténtalo de nuevo.');
+      router.push('/pricing?error=connection');
     } finally {
       setLoading(false);
     }
@@ -68,11 +69,12 @@ export default function PricingPage() {
           window.location.href = data.url;
         }
       } else {
-        alert('No se ha podido abrir el portal. Inténtalo de nuevo.');
+        // F8.4-13 FIX: Replace alert() with router.push
+        router.push('/ajustes?error=portal');
       }
     } catch (error) {
       console.error('Portal error:', error);
-      alert('No se ha podido conectar. Inténtalo de nuevo.');
+      router.push('/ajustes?error=connection');
     } finally {
       setLoading(false);
     }

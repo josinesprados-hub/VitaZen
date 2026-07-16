@@ -281,9 +281,19 @@ export function useApi() {
             ...(options?.headers as Record<string, string>),
             Authorization: `Bearer ${freshToken}`,
           };
-          const retryRes = await fetch(path, { ...options, headers: retryHeaders });
-          if (retryRes.status !== 401) {
-            return retryRes;
+          // F8.4-04 FIX: Add timeout to 401 retry fetch to prevent infinite hang
+          // if the auth server or API destination is down.
+          const retryAbortController = new AbortController();
+          const retryTimeoutId = setTimeout(() => retryAbortController.abort(), DEFAULT_TIMEOUT_MS);
+          try {
+            const retryRes = await fetch(path, { ...options, headers: retryHeaders, signal: retryAbortController.signal });
+            clearTimeout(retryTimeoutId);
+            if (retryRes.status !== 401) {
+              return retryRes;
+            }
+          } catch (retryErr) {
+            clearTimeout(retryTimeoutId);
+            // Timeout or network error on retry — proceed to sign out
           }
         }
       } catch {

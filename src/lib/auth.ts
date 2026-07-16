@@ -64,6 +64,18 @@ export async function getAuthUser(idToken: string) {
     }
   }
 
+  // F8.4-08 FIX: Sync emailVerified from Firebase token to DB.
+  // Consistent with /api/auth/session which already does this.
+  // Ensures API routes using getAuthUser see up-to-date emailVerified status
+  // even if the user hasn't triggered a session/sync refresh yet.
+  if (user && decodedToken.email_verified && !user.emailVerified) {
+    await db.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true },
+    });
+    user.emailVerified = true;
+  }
+
   return user;
 }
 
@@ -102,6 +114,15 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
         data: { firebaseUid: decodedToken.uid },
       });
     }
+  }
+
+  // F8.4-08 FIX: Sync emailVerified from Firebase token to DB.
+  if (user && decodedToken.email_verified && !user.emailVerified) {
+    await db.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true },
+    });
+    user.emailVerified = true;
   }
 
   // FIX: If user verified in Firebase but not found in DB,

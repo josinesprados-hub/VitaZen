@@ -75,7 +75,7 @@ export default function LoginPage() {
       router.replace('/onboarding');
     } catch (err: any) {
       // If invalid credentials, check if this email belongs to a Google-only account
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+      if (err.code === 'auth/invalid-credential') {
         try {
           const result = await getProviderMismatchMessage(email);
           if (result.provider) {

@@ -80,6 +80,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // F8.4-03 FIX: Second guard — check Stripe directly for active subscriptions.
+    // If DB and Stripe are desynchronized (e.g. webhook delayed, user reactivated
+    // from Stripe portal), the DB check above may miss an active subscription.
+    // Querying Stripe prevents creating a duplicate checkout session / double charge.
+    if (user.stripeCustomerId) {
+      try {
+        const stripeSubs = await stripe.subscriptions.list({
+          customer: user.stripeCustomerId,
+          status: 'active',
+          limit: 1,
+        });
+        if (stripeSubs.data.length > 0) {
+          // Stripe has an active sub that DB doesn't know about — promote and reject checkout
+          if (user.plan !== 'PREMIUM') {
+            await db.user.update({
+              where: { id: user.id },
+              data: { plan: 'PREMIUM' },
+            });
+            console.log('[Checkout] Found active Stripe sub not in DB — promoted:', user.id);
+          }
+          return NextResponse.json(
+            { error: 'already_subscribed', message: 'Ya tienes una suscripción activa. Puedes gestionarla en Ajustes.' },
+            { status: 400 }
+          );
+        }
+      } catch (e) {
+        console.error('[Checkout] Stripe subscription check failed (non-blocking):', e);
+        // Continue with checkout — don't block on Stripe API failure
+      }
+    }
+
     // Create or retrieve Stripe customer
     let customerId = user.stripeCustomerId;
     if (!customerId) {
@@ -88,10 +119,18 @@ export async function POST(request: NextRequest) {
         metadata: { userId: user.id, firebaseUid: user.firebaseUid },
       });
       customerId = customer.id;
-      await db.user.update({
-        where: { id: user.id },
-        data: { stripeCustomerId: customerId },
-      });
+      try {
+        await db.user.update({
+          where: { id: user.id },
+          data: { stripeCustomerId: customerId },
+        });
+      } catch (dbError) {
+        // F8.4-11 FIX: If DB update fails after creating Stripe customer,
+        // clean up the orphaned Stripe customer to prevent duplicates on retry.
+        console.error('[Checkout] DB update failed after customer creation, cleaning up:', dbError);
+        try { await stripe.customers.del(customerId); } catch { /* best-effort */ }
+        throw dbError;
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
