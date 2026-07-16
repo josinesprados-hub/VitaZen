@@ -1,4 +1,5 @@
 import { gatherData, type RawData } from './insights';
+import { startOfMadridDaysAgo } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // EMOTIONAL STATE ENGINE
@@ -185,7 +186,7 @@ function computeProgress(data: RawData): { value: number; prevValue: number } {
 function computeActivity(data: RawData): { value: number; prevValue: number } {
   // Activity from last 3 days vs full week baseline
   // Includes all 6 activity types for consistency with computeProgress and computeConsistency
-  const threeDaysAgo = new Date(Date.now() - 3 * 86400000);
+  const threeDaysAgo = startOfMadridDaysAgo(3);
 
   const recentCheckins = data.thisWeekCheckins.filter((c: any) => new Date(c.date) >= threeDaysAgo).length;
   const recentHabits = data.thisWeekHabits.filter((h: any) => h.lastCompletedAt && new Date(h.lastCompletedAt) >= threeDaysAgo).length;
@@ -224,7 +225,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'enfocado',
       label: 'Enfocado',
-      description: 'Claridad y energía alineadas.',
+      description: 'Energía y claridad alineadas.',
     };
   }
 
@@ -233,7 +234,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'Mucho peso, poca energía.',
+      description: 'Tu nivel de estrés es alto y tu energía, baja.',
     };
   }
 
@@ -242,7 +243,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'sobrecargado',
       label: 'Sobrecargado',
-      description: 'El estrés pesa.',
+      description: 'Tu nivel de estrés es elevado.',
     };
   }
 
@@ -255,7 +256,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
       return {
         status: 'en_progreso',
         label: 'En progreso',
-        description: 'Los hábitos se van asentando.',
+        description: 'Tus hábitos van asentándose.',
       };
     }
   }
@@ -274,7 +275,7 @@ function determineStatus(metrics: Record<string, { value: number; prevValue: num
     return {
       status: 'en_progreso',
       label: 'En progreso',
-      description: 'Va tomando forma.',
+      description: 'Tu actividad va tomando forma.',
     };
   }
 
@@ -376,7 +377,7 @@ function generateSummary(
   }
 
   if (status === 'sobrecargado') {
-    return 'Semana de mucha carga.';
+    return 'El cuerpo pide pausa.';
   }
 
   if (status === 'enfocado') {

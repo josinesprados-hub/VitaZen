@@ -207,7 +207,7 @@ function generateEmailRecommendation(
 //    → Success → claim persists, next run skips
 // ═══════════════════════════════════════════
 
-async function releaseClaim(userId: string, weekKey: string, reason: string): void {
+async function releaseClaim(userId: string, weekKey: string, reason: string): Promise<void> {
   try {
     await db.weeklyEmailLog.deleteMany({
       where: { userId, weekKey },

@@ -15,8 +15,12 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const { searchParams } = new URL(request.url);
-    // PERF-5.2: Clamp days to prevent unbounded queries (matches finance route pattern)
-    const days = Math.min(Math.max(parseInt(searchParams.get('days') || '30'), 1), 365);
+    // M-15 FIX: Validate days is a valid number before using it
+    const daysParam = Math.max(parseInt(searchParams.get('days') || '30'), 1);
+    if (isNaN(daysParam)) {
+      return NextResponse.json({ error: 'El parámetro "days" debe ser un número' }, { status: 400 });
+    }
+    const days = Math.min(daysParam, 365);
 
     // PERF-5.2: Add select to reduce response payload size.
     // Previously returned ALL columns including id and createdAt for every row.
@@ -51,6 +55,31 @@ export async function POST(request: NextRequest) {
 
     const { date, mood, energy, sleep, stress, notes } = await request.json();
 
+    // H-06 FIX: Validate all fields before DB write.
+    // Previously zero validation — any type, any value passed straight to DB.
+    if (!date || typeof date !== 'string') {
+      return NextResponse.json({ error: 'Valid date string is required' }, { status: 400 });
+    }
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+    const SCORE_VALIDATOR = (val: unknown, name: string) => {
+      if (val !== undefined && val !== null) {
+        if (typeof val !== 'number' || !Number.isInteger(val) || val < 1 || val > 5) {
+          return NextResponse.json({ error: `${name} must be an integer 1-5` }, { status: 400 });
+        }
+      }
+      return null;
+    };
+    const scoreErr = SCORE_VALIDATOR(mood, 'mood') || SCORE_VALIDATOR(energy, 'energy') || SCORE_VALIDATOR(sleep, 'sleep') || SCORE_VALIDATOR(stress, 'stress');
+    if (scoreErr) return scoreErr;
+    if (notes !== undefined && notes !== null) {
+      if (typeof notes !== 'string') return NextResponse.json({ error: 'notes must be a string' }, { status: 400 });
+      if (notes.length > 2000) return NextResponse.json({ error: 'notes too long (max 2,000 chars)' }, { status: 400 });
+    }
+    const safeNotes = typeof notes === 'string' ? notes : null;
+
     // E-3 FIX (race condition + double streak from wellness+nutrition).
     // The original code did `findUnique(date) → upsert → if (!existing) award
     // XP+streak` as three separate operations with no transaction. Two
@@ -82,7 +111,7 @@ export async function POST(request: NextRequest) {
     // pattern and prevents streak inflation when backdating logs.
     // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
     // todayDateKey, mirroring the finance/route.ts pattern.
-    const logDate = new Date(date);
+    const logDate = parsedDate;
     const logDateKey = getMadridDateKey(logDate);
     const { start, end } = madridDayBoundaries(logDateKey);
 
@@ -102,8 +131,8 @@ export async function POST(request: NextRequest) {
 
       const result = await tx.wellnessLog.upsert({
         where: { userId_date: { userId: user.id, date: logDate } },
-        update: { mood, energy, sleep, stress, notes },
-        create: { userId: user.id, date: logDate, mood, energy, sleep, stress, notes },
+        update: { mood, energy, sleep, stress, notes: safeNotes },
+        create: { userId: user.id, date: logDate, mood, energy, sleep, stress, notes: safeNotes },
       });
 
       // Award XP and streak to energia empire only on first creation (not on
@@ -167,9 +196,27 @@ export async function PUT(request: NextRequest) {
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    // H-06 FIX: Validate field types and ranges (same as POST)
+    if (mood !== undefined && mood !== null && (typeof mood !== 'number' || !Number.isInteger(mood) || mood < 1 || mood > 5)) {
+      return NextResponse.json({ error: 'mood must be an integer 1-5' }, { status: 400 });
+    }
+    if (energy !== undefined && energy !== null && (typeof energy !== 'number' || !Number.isInteger(energy) || energy < 1 || energy > 5)) {
+      return NextResponse.json({ error: 'energy must be an integer 1-5' }, { status: 400 });
+    }
+    if (sleep !== undefined && sleep !== null && (typeof sleep !== 'number' || !Number.isInteger(sleep) || sleep < 1 || sleep > 5)) {
+      return NextResponse.json({ error: 'sleep must be an integer 1-5' }, { status: 400 });
+    }
+    if (stress !== undefined && stress !== null && (typeof stress !== 'number' || !Number.isInteger(stress) || stress < 1 || stress > 5)) {
+      return NextResponse.json({ error: 'stress must be an integer 1-5' }, { status: 400 });
+    }
+    if (notes !== undefined && notes !== null) {
+      if (typeof notes !== 'string') return NextResponse.json({ error: 'notes must be a string' }, { status: 400 });
+      if (notes.length > 2000) return NextResponse.json({ error: 'notes too long (max 2,000 chars)' }, { status: 400 });
+    }
+
     const updated = await db.wellnessLog.update({
       where: { id: logId },
-      data: { mood, energy, sleep, stress, notes },
+      data: { mood, energy, sleep, stress, notes: typeof notes === 'string' ? notes : null },
     });
 
     // Trigger widget snapshot refresh (non-blocking)

@@ -1,45 +1,118 @@
 ---
 Task ID: 1
-Agent: Super Z (main)
-Task: FASE 3.4 — Input Multilínea Premium para VitaZen Mentor IA
+Agent: Main
+Task: Curación emocional de VitaZen — Fase de pulido de voz
 
 Work Log:
-- Auditoría completa de MentorChat.tsx (1479 líneas): compositor, textarea, eventos teclado, scroll, safe areas, PWA
-- Hallazgo principal: compositor usaba `<input type="text">` monolínea, sin onKeyDown handler
-- Conversión de `<input>` a `<textarea>` con rows={1}, resize-none, overflow-hidden, leading-6
-- Creación de `syncTextareaHeight()` con useCallback para auto-resize fluido (máx 240px = ~8 líneas)
-- Implementación de onKeyDown: Enter → envía, Shift+Enter → nueva línea
-- Alineación del botón enviar con `items-end` en el form
-- Reset de altura post-envío mediante requestAnimationFrame
-- Restauración de altura en 3 puntos de error (403, no-403, red)
-- Validación: 0 errores TypeScript nuevos, 0 ESLint, compilación exitosa
-- Generación de informe forense PDF de 12 secciones (67.5 KB)
+- Leído documento de principios `/docs/vitazen-finanzas-principios.md`
+- Explorado codebase completo: localizadas todas las baterías de frases, tips, microcopy, observaciones (~400+ frases en 28+ archivos)
+- Curado reflections.ts: 308 → 55 reflexiones seleccionadas con criterio humano (eliminadas frases demasiado IA, coach, wellbeing, "profundas artificialmente")
+- Curado emotional-state.ts: descripciones reducidas a observación calmada, recomendaciones y summaries simplificados, eliminado coaching
+- Curado insights.ts: títulos sin adjetivos evaluativos, descripciones sin frases motivacionales, eliminadas recomendaciones de tipo coach
+- Curado notifications/templates.ts: reducido de 20+ a 12 plantillas, eliminado "te echamos de menos", "reflexiona un instante", "cierra el día" y otros coaching/wellbeing, rotación secuencial en vez de aleatoria
+- Curado widgets/shaping.ts: nudges reducidos de 5 a 3, fallback tips simplificados, momentum descriptions sin coaching
+- Curado dashboard components: EmotionalHero ("Tu actividad real" en vez de "Basado en tu actividad real"), WeeklyRecap ("Observación" en vez de "Recomendación del mentor", "Lo que destaca" en vez de "Lo que destaca esta semana"), OnboardingRecommendations ("Para ti" en vez de "Recomendaciones para ti"), eliminado coaching de tips contextuales
+- Curado EmpireTipsSection: "Notas" en vez de "Notas para tu crecimiento", "Más capas / Con Élite" en vez de "Profundiza con Élite / Contenido exclusivo"
+- Curado PremiumBlur: "Más capas aquí" en vez de "Hay más capas aquí"
+- Curado life-memory/stages.ts: labels simplificados ("Calma" en vez de "Un periodo de calma"), observaciones más cortas, transiciones sin narrativa
+- Curado monthly-closure/copy.ts: ritmos simplificados, evolución labels más cortos, entry prompt más calmado
+- Curado weekly-recap-sender.ts: recomendaciones sin coaching
+- Implementado sistema de rotación contemplativo en PremiumReflection: eliminado auto-rotation de 3min, rotación basada en visitas, evitación de repetición cercana (AVOID_RECENT_COUNT=5)
+- Implementado sistema de rotación contemplativo en useEmpireTips: ciclo de 4 días (3-5 días según spec), evitación de repetición cercana tras reshuffle, tracking de recent tips
+- Implementado rotación secuencial en notifications/templates.ts: basada en día actual en vez de Math.random()
+- Implementado evitación de duplicación entre reflection y quote widgets
 
 Stage Summary:
-- Archivo modificado: src/components/mentor/MentorChat.tsx (5 puntos de edición, ~45 líneas)
-- 0 paquetes nuevos, 0 archivos nuevos, 0 motores modificados
-- PDF informe: /home/z/my-project/download/FASE_3.4_Informe_Forense_Input_Multilinea.pdf
+- ~250+ frases eliminadas o refinadas de la batería
+- Sistema de rotación cambiado de algorítmico/aleatorio a contemplativo basado en visitas
+- Toda la app ahora usa observación calmada, no coaching/wellbeing
+- El silencio se protege: strings vacíos donde no hay nada valioso que decir
+- Sin cambios en Stripe, auth, lógica de negocio, arquitectura, navegación, Android/TWA
+---
+Task ID: 1
+Agent: main
+Task: Audit and recover practical empire tips
+
+Work Log:
+- Read /docs/vitazen-finanzas-principios.md (mandatory first step)
+- Audited entire tips system: useEmpireTips hook, EmpireTipsSection component, /api/empire/tips API route, getDeterministicTips server-side rotation, seed data
+- Found tips were NOT eliminated — they existed and worked in 4 of 5 empires
+- Identified RIQUEZA as the only empire missing EmpireTipsSection
+- Found battery was too thin: only 4 tips per empire (2 FREE + 2 PREMIUM)
+- Found existing tips were more contemplative than practical
+- Expanded battery from 20→40 tips (4→8 per empire) with evidence-based practical tips
+- Added EmpireTipsSection to riqueza page with import
+- Made seed idempotent (create → upsert with deterministic IDs)
+- Verified build passes (npm run build successful)
+- Committed and pushed to GitHub
+
+Stage Summary:
+- Tips were NOT eliminated — just thin and missing from riqueza
+- Batería expandida: 20→40 tips, all practical and evidence-based
+- Riqueza page now has EmpireTipsSection
+- Seed is now idempotent (upsert instead of create)
+- Free→2 tips, Élite→3 tips confirmed (server-side deterministic rotation)
+- Cross-device coherence maintained (server-side rotation via getDeterministicTips)
 
 ---
-Task ID: 2
-Agent: Super Z (main)
-Task: FASE 3.5 — Búsqueda Inteligente de Conversaciones para VitaZen Mentor IA
+Task ID: 1
+Agent: main
+Task: Reconstruir biblioteca de tips prácticos de imperios — de 40 a 550 tips curados
 
 Work Log:
-- Auditoría completa: sidebarContent, threads, APIs, Prisma AIThread, responsive, mobile/desktop
-- Decisión: búsqueda 100% en cliente (máx 100 threads, filtrado <0.1ms, sin latencia de API)
-- Nuevo estado searchQuery (useState) en línea 160
-- Nuevo useMemo searchedThreads: filtrado case-insensitive parcial sobre thread.title
-- groupedThreads actualizado para usar searchedThreads en vez de visibleThreads
-- Campo de búsqueda en sidebarContent (entre tabs y thread list) con icono Search y botón limpiar X
-- Estado vacío "Sin resultados" con el query buscado
-- Estados vacíos originales ocultos durante búsqueda activa (!searchQuery)
-- Import de Search de lucide-react
-- Validación: 0 errores TypeScript, 0 ESLint, compilación exitosa (24.6s)
-- Informe forense PDF 12 secciones (62.7 KB)
+- Leí documento de principios (/docs/vitazen-finanzas-principios.md)
+- Audité sistema completo: useEmpireTips hook, EmpireTipsSection, seed.ts, emotional-dashboard-state.ts, API route
+- Encontré que los tips NO fueron eliminados — siempre estuvieron en el sistema, pero con solo 40 tips (8 por imperio) se repetían demasiado rápido
+- Creé 5 baterías JSON independientes en prisma/ con 110 tips cada una (50 FREE + 60 PREMIUM)
+- Total: 550 tips curados basados en evidencia real
+- Cambié rotación de 4→3 días (CYCLE_MS)
+- Aumenté AVOID_RECENT_COUNT de 3→6 para evitar repetición tras reshuffle
+- Eliminé take:10 en API route — ahora carga batería completa
+- Cambié subtítulo Mente de "Reflexiones" → "Notas" (más práctico)
+- Eliminé término "biohacking" — reemplazado por "extremo"
+- Build exitoso, commit limpio, push a GitHub
 
 Stage Summary:
-- Archivo modificado: src/components/mentor/MentorChat.tsx (7 puntos de edición, ~35 líneas)
-- 0 paquetes nuevos, 0 APIs modificadas, 0 Prisma modificado, 0 motores modificados
-- Búsqueda funciona en sidebar desktop y drawer mobile automáticamente (sidebarContent compartido)
-- PDF informe: /home/z/my-project/download/FASE_3.5_Informe_Forense_Busqueda_Conversaciones.pdf
+- 550 tips curados: 5 imperios × (50 FREE + 60 PREMIUM)
+- FREE: observaciones prácticas inmediatamente útiles
+- PREMIUM: más profundidad, rareza, contexto, refinamiento
+- Rotación: 3 días, determinista, server-side, cross-device
+- FREE cycle: 75 días antes de reshuffle (25 ciclos × 3 días)
+- PREMIUM cycle: 180 días antes de reshuffle (60 ciclos × 3 días)
+- Commit: b6e88dd — pushed to main
+---
+Task ID: 1
+Agent: main
+Task: Debug técnico — tips no aparecen en ningún imperio
+
+Work Log:
+- Leído documento de principios /docs/vitazen-finanzas-principios.md
+- Auditado flujo completo end-to-end: seed → DB → API route → getDeterministicTips → useEmpireTips → EmpireTipsSection → empire pages
+- Verificado: EmpireTipsSection montado en TODOS los 5 imperios (mente, energia, disciplina, riqueza, crecimiento)
+- Verificado: JSON tip data correcta (550 tips, 50 FREE + 60 PREMIUM por imperio, 0 colisiones de ID)
+- Verificado: API route /api/empire/tips correcta (auth, filtros, rotación determinista, response format)
+- Verificado: Plan gating correcto (FREE=2 tips, ÉLITE=2+1)
+- Verificado: No hay middleware bloqueando la API
+- Verificado: No hay Suspense/loading.tsx interfiriendo
+- Verificado: Dashboard layout gates auth correctamente antes de renderizar
+- Encontrado BUG #1 CRÍTICO: useEmpireTips.ts — arrays vacíos son truthy en JS
+  - Condición `data.rotatedFreeTips && data.rotatedPremiumTips` era true para [] 
+  - El fallback que usaba data.tips (con tips reales) NUNCA se ejecutaba
+  - Fix: Array.isArray() + length check explícito
+- Encontrado BUG #2: getDeterministicTips — position overflow sin clamping
+  - freePosition/premiumPosition podían exceder freeCount/premiumCount
+  - toShow podía ser negativo → 0 FREE tips seleccionados
+  - Fix: defensive clamping + Math.max(0, remaining)
+- Encontrado BUG #3: getDeterministicTips — upsert sin try/catch
+  - Si el upsert fallaba, la función lanzaba error → API 500 → tips no renderizaban
+  - Fix: try/catch alrededor del upsert, tips se retornan igual
+- Encontrado BUG #4: seed.ts — PrismaClient sin PrismaPg adapter
+  - El seed usaba new PrismaClient() sin adapter, la app usa PrismaPg
+  - Fix: mismo PrismaPg adapter + verificación de conteo post-seed
+- Build exitoso, commit limpio, push a GitHub
+
+Stage Summary:
+- 4 bugs corregidos: 1 crítico (truthy arrays), 2 medium (position overflow, upsert failure), 1 low (seed adapter)
+- BUG #1 era el más probable causante de "tips no aparecen": cuando el servidor devolvía rotated arrays vacíos (seed no ejecutado, DB vacía, o rotation returning []), el cliente aceptaba [] como datos válidos en vez de caer al fallback de data.tips
+- Commit: 9a20fda — pushed to main
+- IMPORTANTE: Si el seed no se ha ejecutado en la DB de producción, ejecutar `npm run db:seed` para que los 550 tips existan en la base de datos

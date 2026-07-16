@@ -259,14 +259,16 @@ button, [role="button"] {
   animation: drawerSlideIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
-/* Mentor chat — mobile: the page wrapper (page.tsx) is already
-   absolute inset-0 filling the viewport, bypassing the dashboard
-   TopBar and main padding. This element fills that wrapper.
-   Desktop: relative flex child inside a h-dvh flex-col wrapper. */
+/* Mentor chat — full viewport on mobile, normal flow on desktop.
+   position:absolute avoids the fixed fullscreen layer that causes
+   compositor deadlocks in Android TWA/WebView. The parent page
+   wrapper provides position:relative + min-height:100dvh so the
+   absolute element still fills the viewport identically. */
 .mentor-full-viewport {
   position: absolute;
-  inset: env(safe-area-inset-top) 0 0 0;
+  inset: 0;
   z-index: 30;
+  height: 100%;
   background: #000;
 }
 @media (min-width: 640px) {
@@ -274,6 +276,7 @@ button, [role="button"] {
     position: relative;
     inset: auto;
     z-index: auto;
+    height: auto;
     background: transparent;
   }
 }
@@ -294,10 +297,11 @@ html { scroll-behavior: smooth; }
   background: #0a0a0a;
   border: 1px solid #1a1a1a;
   border-radius: 0.75rem;
-  transition: border-color var(--transition-smooth);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 .card-primary:hover {
   border-color: rgba(200, 165, 90, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 /* Gold-accent card — challenge, check-in */
@@ -321,6 +325,7 @@ html { scroll-behavior: smooth; }
 }
 .card-inner:hover {
   border-color: rgba(200, 165, 90, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* ═══════════════════════════════════════════
@@ -2096,6 +2101,208 @@ input, textarea, select {
   .xl\:col-span-4 {
     padding-left: 2rem;
   }
+}
+
+/* ═══════════════════════════════════════════
+   FASE 4.1 — Premium Micro-Interactions
+   Subtle, invisible enhancements that make
+   everything feel more alive without changing design.
+   ═══════════════════════════════════════════ */
+
+/* Shimmer card base — universal hover shimmer for interactive cards.
+   Uses pseudo-element so no DOM change is needed. */
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.card-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(200, 165, 90, 0.03) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  transition: background-position 0.6s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.card-shimmer:hover::after {
+  background-position: -50% 0;
+}
+
+/* Input hover — subtle border brightening before focus */
+.hover-border {
+  transition: border-color 0.2s ease;
+}
+.hover-border:hover {
+  border-color: #2a2a2a;
+}
+
+/* Tab trigger hover — gentle background lift for inactive tabs */
+[data-slot="tabs-trigger"] {
+  transition: color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+@media (hover: hover) {
+  [data-slot="tabs-trigger"]:not([data-state="active"]):hover {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+/* Focus visible ring — smooth expansion, not instant pop */
+*:focus-visible {
+  transition: box-shadow 0.2s ease;
+}
+
+/* Select item hover — smooth background transition */
+[data-slot="select-item"] {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Dropdown menu item hover — smooth background transition */
+[data-slot="dropdown-menu-item"] {
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+}
+
+/* Switch hover — subtle brightness indication */
+[data-slot="switch"]:hover:not([disabled]) {
+  filter: brightness(1.15);
+  transition: filter 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+[data-slot="switch"] {
+  transition: filter 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+[data-slot="switch"] [data-slot="switch-thumb"] {
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1), background-color 0.2s ease;
+}
+
+/* Skeleton shimmer — upgrade base skeleton to premium shimmer */
+[data-slot="skeleton"] {
+  background: linear-gradient(
+    110deg,
+    #111111 0%,
+    #111111 40%,
+    #141414 50%,
+    #111111 60%,
+    #111111 100%
+  );
+  background-size: 300% 100%;
+  animation: premiumSkeletonShimmer 3s ease-in-out infinite;
+}
+
+/* Progress indicator — explicit smooth timing */
+[data-slot="progress-indicator"] {
+  transition: transform 0.5s ease-out;
+}
+
+/* Premium gate / blur overlay — fade in instead of instant appear */
+.premium-overlay-animate {
+  animation: premiumOverlayIn 0.35s ease-out;
+}
+
+/* Micro reward exit — fade out before unmount (requires JS to add class) */
+@keyframes microRewardExit {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+}
+.micro-reward-exit {
+  animation: microRewardExit 0.25s ease-in forwards;
+}
+
+/* Empire page header entrance — consistent with dashboard stagger */
+.empire-header-enter {
+  animation: sectionStaggerIn 0.35s ease-out both;
+}
+
+/* Inline form slide-open — for toggleable forms in empire pages */
+@keyframes formSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.form-slide-enter {
+  animation: formSlideDown 0.25s ease-out;
+}
+
+/* Backdrop fade for all conditionally-rendered overlays */
+.backdrop-fade-enter {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Thread item subtle entrance */
+@keyframes threadItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.thread-item-enter {
+  animation: threadItemIn 0.2s ease-out;
+}
+
+/* Mentor message bubble press feedback — desktop */
+@media (hover: hover) {
+  .message-bubble:active {
+    transform: scale(0.995);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Favorite button star pop */
+@keyframes starPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.star-pop {
+  animation: starPop 0.3s ease-out;
+}
+
+/* Tooltip duration — slightly slower for premium feel */
+[data-slot="tooltip-content"] {
+  animation-duration: 0.2s;
+}
+
+/* Respect reduced motion for FASE 4.1 animations */
+@media (prefers-reduced-motion: reduce) {
+  .card-shimmer::after { transition: none; }
+  .hover-border { transition: none; }
+  .hover-border:hover { border-color: inherit; }
+  [data-slot="tabs-trigger"] { transition: none; }
+  [data-slot="select-item"] { transition: none; }
+  [data-slot="dropdown-menu-item"] { transition: none; }
+  [data-slot="switch"] { transition: none; filter: none; }
+  [data-slot="switch"] [data-slot="switch-thumb"] { transition: none; }
+  [data-slot="skeleton"] { animation: none; background: #111111; }
+  [data-slot="progress-indicator"] { transition: none; }
+  .premium-overlay-animate { animation: none; }
+  .micro-reward-exit { animation: none; }
+  .empire-header-enter { animation: none; }
+  .form-slide-enter { animation: none; }
+  .backdrop-fade-enter { animation: none; }
+  .thread-item-enter { animation: none; }
+  .star-pop { animation: none; }
 }
 
 /* ═══════════════════════════════════════════

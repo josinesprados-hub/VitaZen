@@ -3,41 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getMadridDateKey } from '@/lib/deterministic';
-
-function calcStreak(dates: Date[]): number {
-  if (dates.length === 0) return 0;
-
-  // Normalize to unique YYYY-MM-DD strings in Europe/Madrid timezone.
-  // Uses the same getMadridDateKey() as the rest of VitaZen so that
-  // streak boundaries align with the user's perceived day, not UTC midnight.
-  const uniqueDays = new Set<string>();
-  for (const d of dates) {
-    uniqueDays.add(getMadridDateKey(new Date(d)));
-  }
-
-  // Start from today (Madrid); if no activity today, start from yesterday
-  const todayStr = getMadridDateKey(new Date());
-  let checkDateStr = todayStr;
-
-  if (!uniqueDays.has(todayStr)) {
-    // No activity today, check from yesterday — graceful: today still counts if yesterday was active
-    const todayMs = new Date(todayStr + 'T12:00:00Z').getTime();
-    checkDateStr = getMadridDateKey(new Date(todayMs - 86400000));
-  }
-
-  let streak = 0;
-  while (true) {
-    if (uniqueDays.has(checkDateStr)) {
-      streak++;
-      const checkMs = new Date(checkDateStr + 'T12:00:00Z').getTime();
-      checkDateStr = getMadridDateKey(new Date(checkMs - 86400000));
-    } else {
-      break;
-    }
-  }
-
-  return streak;
-}
+import { calcStreak, startOf60DaysAgoMadrid, addDaysToDateKey, getTodayDateKey } from '@/lib/dates';
 
 // Get a human, non-toxic message for streak state
 function getStreakMessage(streak: number, wasActiveYesterday: boolean): { message: string; tone: 'active' | 'warm' | 'gentle' } {
@@ -66,7 +32,7 @@ export async function GET(request: NextRequest) {
     // ═══ PERFORMANCE FIX: Bound queries to 60 days instead of ALL TIME ═══
     // No real streak exceeds 60 days, and unbounded queries grow linearly
     // with user history — becoming slower every month.
-    const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = startOf60DaysAgoMadrid();
 
     // Fetch dates for each category (bounded)
     const [meditationDates, habitDates, journalDates, checkinDates, wellnessDates, nutritionDates] = await Promise.all([
@@ -139,9 +105,8 @@ export async function GET(request: NextRequest) {
 
     // Check if user was active yesterday (for message context)
     // Use Europe/Madrid timezone — same as calcStreak and the rest of VitaZen.
-    const todayStr = getMadridDateKey(new Date());
-    const todayMs = new Date(todayStr + 'T12:00:00Z').getTime();
-    const yesterdayStr = getMadridDateKey(new Date(todayMs - 86400000));
+    const todayStr = getTodayDateKey();
+    const yesterdayStr = addDaysToDateKey(todayStr, -1);
     const uniqueAllDays = new Set<string>();
     for (const d of allDates) {
       uniqueAllDays.add(getMadridDateKey(new Date(d)));

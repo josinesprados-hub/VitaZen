@@ -39,14 +39,14 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
 
   'finanzas-mente': [
     'Semanas con más práctica mental, más tranquilidad.',
-    'Cuando hay sesiones de mente, tranquilidad también está.',
+    'Con más práctica mental, también hay más tranquilidad.',
     'Más mente, más calma en los números.',
     'La práctica mental se nota en las decisiones.',
   ],
 
   'finanzas-estres': [
     'Semanas con más presión, más necesidad en tus gastos.',
-    'Cuando hay presión, necesidad aparece más.',
+    'En las semanas con más presión, tus gastos reflejan más necesidad.',
     'Estrés y necesidad van juntos.',
     'La presión cambia lo que necesitas.',
   ],
@@ -56,6 +56,20 @@ const OBSERVATION_COPY: Record<EmpireConnection, string[]> = {
     'Menos sueño, más necesidad.',
     'No dormir bien cambia lo que necesitas.',
     'El descanso afecta tus prioridades.',
+  ],
+
+  'energia-mente': [
+    'Las semanas con más energía tienen más práctica mental.',
+    'Con más energía, también hay más práctica mental.',
+    'La energía y la práctica mental van juntas.',
+    'Más práctica mental en las semanas de más energía.',
+  ],
+
+  'checkin-mente': [
+    'Las semanas con más enfoque tienen más práctica mental.',
+    'Con más atención diaria, también hay más práctica mental.',
+    'El enfoque y la práctica mental van juntos.',
+    'Más práctica mental en las semanas con más atención.',
   ],
 };
 

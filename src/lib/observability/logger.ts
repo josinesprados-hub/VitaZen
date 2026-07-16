@@ -151,7 +151,7 @@ function scheduleIdleFlush(): void {
     return;
   }
 
-  (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(
+  (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout?: number }) => void }).requestIdleCallback(
     () => {
       flush().catch(() => {});
     },

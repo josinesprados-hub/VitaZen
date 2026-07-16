@@ -13,8 +13,16 @@ import { trackEvent } from '@/lib/analytics-server';
  */
 export async function POST(request: NextRequest) {
   try {
-    const { idToken } = await request.json();
+    // H-10 FIX: Read ID token from Authorization header (consistent with
+    // all other authenticated endpoints). Previously the token was sent
+    // in the request body, which could be logged and is inconsistent
+    // with the rest of the API.
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Token requerido' }, { status: 401 });
+    }
 
+    const idToken = authHeader.split('Bearer ')[1];
     if (!idToken) {
       return NextResponse.json({ error: 'Token requerido' }, { status: 400 });
     }
@@ -35,11 +43,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user in DB — try firebaseUid first, then email as fallback
+    // BUG-A1 FIX: Only fall back to email lookup if the token's email is verified.
+    // Without this check, an attacker could create an unverified Firebase account
+    // with the victim's email and gain access to the victim's DB record.
     let user = await db.user.findUnique({
       where: { firebaseUid: decodedToken.uid },
     });
 
-    if (!user && decodedToken.email) {
+    if (!user && decodedToken.email && decodedToken.email_verified) {
       user = await db.user.findUnique({
         where: { email: decodedToken.email },
       });

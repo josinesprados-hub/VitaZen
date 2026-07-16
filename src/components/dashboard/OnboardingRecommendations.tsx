@@ -24,25 +24,25 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
     name: 'Mente',
     icon: Brain,
     href: '/imperio/mente',
-    tip: 'Menos ruido interno empieza por observar menos.',
+    tip: 'Calma mental.',
   },
   disciplina: {
     name: 'Disciplina',
     icon: Shield,
     href: '/imperio/disciplina',
-    tip: 'Lo que se repite construye más que lo que se intenta una vez.',
+    tip: 'Constancia.',
   },
   energia: {
     name: 'Energía',
     icon: Zap,
     href: '/imperio/energia',
-    tip: 'El descanso no es parar: es dejar que el cuerpo recupere lo que el día gasta.',
+    tip: 'Energía.',
   },
   riqueza: {
     name: 'Finanzas',
     icon: Gem,
     href: '/imperio/riqueza',
-    tip: 'Lo que haces con tu dinero refleja lo que priorizas sin darte cuenta.',
+    tip: 'Finanzas.',
   },
 };
 

@@ -101,7 +101,6 @@ export async function sendVerifyEmail(to: string, name: string, verificationLink
 // ─── Reset password email (X-Priority: 1 — security action) ───
 
 export async function sendResetPasswordEmail(to: string, name: string, resetLink: string) {
-  console.log('[EMAIL] Enviando reset-password a:', to);
   try {
     const { html, text, subject } = resetPasswordTemplate(name, resetLink);
 
@@ -118,24 +117,15 @@ export async function sendResetPasswordEmail(to: string, name: string, resetLink
       },
     });
 
-    if (result?.data?.id) {
-      console.log('[EMAIL] Reset password enviado. ID:', result.data.id);
-      return; // success
+    if (result?.error) {
+      // M-13 FIX: Throw instead of silently swallowing — the caller
+      // (reset-password endpoint) must know the email failed so it can
+      // return an error to the user instead of a false success message.
+      throw new Error(`Resend error: ${JSON.stringify(result.error)}`);
     }
-
-    // P-1 FIX: Resend returned an error — throw so the caller knows it failed.
-    // Previously, errors were silently caught, causing the API route to always
-    // return success even when the email was never sent.
-    const errorMsg = result?.error?.message || JSON.stringify(result?.error) || 'Resend error desconocido';
-    console.error('[EMAIL] Error Resend reset-password:', errorMsg);
-    throw new Error(`Error enviando email de recuperación: ${errorMsg}`);
   } catch (error) {
-    // Re-throw our own errors; wrap unexpected errors
-    if (error instanceof Error && error.message.startsWith('Error enviando email')) {
-      throw error;
-    }
-    console.error('[EMAIL] Excepción reset-password:', error instanceof Error ? error.message : error);
-    throw new Error('No se pudo enviar el email de recuperación. Inténtalo más tarde.');
+    // Re-throw to let the caller handle the failure
+    throw error;
   }
 }
 

@@ -115,7 +115,7 @@
   },
   {
     "empire": "mente",
-    "title": "El sesgo del status quo",
+    "title": "La opción por defecto gana",
     "content": "Las personas tienden a quedarse con la opción preseleccionada, sea cual sea. Es uno de los hallazgos más replicados: cambiar la opción por defecto cambia el comportamiento más que la información.",
     "plan": "FREE"
   },
@@ -170,7 +170,7 @@
   {
     "empire": "mente",
     "title": "Recordar fortalece",
-    "content": "Lo que intentas recordar se fija mejor que lo que relees. El esfuerzo de recuperar activa las conexiones neuronales de forma que la lectura pasiva no logra. No es magia: es cómo se consolida la memoria.",
+    "content": "Intentar recordar algo de memoria consolida más que volver a leer el material. El esfuerzo de recuperar la información es lo que fija.",
     "plan": "FREE"
   },
   {
@@ -206,7 +206,7 @@
   {
     "empire": "mente",
     "title": "Fatiga de decisión: cambio motivacional",
-    "content": "Tras muchas decisiones seguidas, lo que cambia no es que se agote una reserva, sino que tu motivación se desplaza: de «tengo que» a «quiero». Es un cambio de prioridades que puedes anticipar. Las decisiones tempranas del día merecen más atención no porque después te quedes vacío, sino porque después tu motivación habrá cambiado.",
+    "content": "Tras esfuerzo sostenido, no se 'agota' tu voluntad. Lo que cambia es tu motivación: de 'tengo que' a 'quiero'. No es un recurso limitado; es un cambio de prioridades que puedes anticipar y diseñar. Las decisiones tempranas del día merecen más atención no porque después estés vacío, sino porque después tu motivación habrá cambiado.",
     "plan": "FREE"
   },
   {
@@ -296,7 +296,7 @@
   {
     "empire": "mente",
     "title": "La ilusión de profundidad",
-    "content": "Pasar tiempo con un tema no es lo mismo que entenderlo. La exposición prolongada genera una sensación de dominio que no siempre corresponde con la comprensión real. Reconocer esta ilusión es una habilidad metacognitiva: la gente que la detecta aprende mejor porque invierte su esfuerzo donde realmente necesita profundizar. La prueba no es cuánto tiempo pasaste con algo, sino si puedes conectarlo con lo que ya sabes y usarlo en situaciones que no has visto antes.",
+    "content": "Leer sobre un tema no es lo mismo que pensarlo. La profundidad requiere procesamiento activo, no solo exposición. La familiaridad no es comprensión. Kornell y Bjork (2007) mostraron que la relectura genera una fluidez ilusoria: sentir que el material te resulta familiar se confunde con haberlo comprendido. Para distinguir una de otra, cierra el material y trata de explicarlo con tus palabras. Si no puedes, lo que tenías era familiaridad, no comprensión.",
     "plan": "PREMIUM"
   },
   {
@@ -385,7 +385,7 @@
   },
   {
     "empire": "mente",
-    "title": "La asimetría del dolor",
+    "title": "Aversión a la pérdida",
     "content": "Kahneman y Tversky (1979) mostraron que perder duele más de lo que alegra ganar lo mismo. La asimetría es aproximadamente de 2 a 1: el disgusto de perder 100 euros supera al placer de ganar 100 euros. Esto te inclina a conservar, incluso cuando arriesgar tendría ventajas esperadas. La aversión a la pérdida explica desde la resistencia a vender inversiones en pérdida hasta la renuencia a cambiar de trabajo. No es irracionalidad pura: es una asimetría diseñada por evolución para priorizar la conservación. Conocerla te permite revisar tus decisiones cuando conservar ya no es lo más ventajoso.",
     "plan": "PREMIUM"
   },
@@ -404,7 +404,7 @@
   {
     "empire": "mente",
     "title": "La atención se entrena",
-    "content": "La atención sostenida mejora con práctica consistente. No es un rasgo fijo que tienes o no tienes. Posner y Petersen (1990) propusieron un modelo de redes atencionales (alerta, orientación, control ejecutivo) que se entrenan por separado. La práctica de meditación, los ejercicios de lectura prolongada y el entrenamiento en trabajo sin interrupciones mejoran medidas específicas de cada red. La condición es la consistencia: entrenamientos breves y diarios superan a sesiones largas y esporádicas. La atención que tienes hoy no es la que tendrás en seis meses si la entrenas.",
+    "content": "La atención sostenida mejora con práctica consistente, como un músculo. No es un rasgo fijo que tienes o no tienes. Posner y Petersen (1990) propusieron un modelo de redes atencionales (alerta, orientación, control ejecutivo) que se entrenan por separado. La práctica de meditación, los ejercicios de lectura prolongada y el entrenamiento en trabajo sin interrupciones mejoran medidas específicas de cada red. La condición es la consistencia: entrenamientos breves y diarios superan a sesiones largas y esporádicas. La atención que tienes hoy no es la que tendrás en seis meses si la entrenas.",
     "plan": "PREMIUM"
   },
   {
@@ -601,8 +601,8 @@
   },
   {
     "empire": "mente",
-    "title": "La evidencia de haber podido",
-    "content": "Creer en tu capacidad para hacer algo influye directamente en si lo intentas y cuánto persistes. No es optimismo ciego: es la acumulación de veces que ya lo conseguiste. Cada pequeño éxito anterior es la evidencia que tu mente usa para decidir si vale la pena seguir. Bandura llamó a esto autoeficacia: la mejor forma de construirla no es pensar en grande, sino acumular pruebas pequeñas de que puedes.",
+    "title": "Creer que puedes",
+    "content": "Autoeficacia: la creencia en tu capacidad para ejecutar las acciones necesarias influye directamente en si las intentas, cuánto te esfuerzas y cuánto persistes ante obstáculos. No es optimismo ciego; es calibración de capacidad basada en experiencia. Bandura (1977, 1997) mostró que la autoeficacia predice la perseverancia y el rendimiento mejor que la habilidad sola, y que se construye principalmente por experiencia de dominio. Cuanta más evidencia acumulas de haber superado retos similares, más autoeficacia tienes. No es creer que puedes: es saber que has podido.",
     "plan": "FREE"
   },
   {

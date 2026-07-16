@@ -12,7 +12,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, startOfMadridDaysAgo, addDaysToDateKey } from '@/lib/dates';
 import type { SilentMemoryData } from '@/lib/silent-memories/shared';
 
 // ─── Helper ───
@@ -30,7 +30,7 @@ function avg(arr: number[]): number {
  * Returns serializable data — the client decides what to show.
  */
 export async function getSilentMemoryData(userId: string): Promise<SilentMemoryData> {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
+  const thirtyDaysAgo = startOfMadridDaysAgo(30);
 
   // Run all queries in parallel for maximum performance
   const [
@@ -65,7 +65,7 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
 
     // 3. This week checkins (shift + recurrence observation)
     db.dailyCheckin.findMany({
-      where: { userId, date: { gte: new Date(Date.now() - 7 * 86400000) } },
+      where: { userId, date: { gte: startOfMadridDaysAgo(7) } },
       select: { energy: true, stress: true },
     }),
 
@@ -74,8 +74,8 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
       where: {
         userId,
         date: {
-          gte: new Date(Date.now() - 14 * 86400000),
-          lt: new Date(Date.now() - 7 * 86400000),
+          gte: startOfMadridDaysAgo(14),
+          lt: startOfMadridDaysAgo(7),
         },
       },
       select: { energy: true, stress: true },
@@ -86,8 +86,8 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
       where: {
         userId,
         date: {
-          gte: new Date(Date.now() - 35 * 86400000),
-          lt: new Date(Date.now() - 28 * 86400000),
+          gte: startOfMadridDaysAgo(35),
+          lt: startOfMadridDaysAgo(28),
         },
       },
       select: { energy: true, stress: true },
@@ -112,8 +112,7 @@ export async function getSilentMemoryData(userId: string): Promise<SilentMemoryD
   let consecutiveDays = 0;
   const todayStr = getTodayDateKey();
   for (let i = 0; i < 30; i++) {
-    const checkDate = new Date(new Date(todayStr + 'T00:00:00').getTime() - i * 86400000);
-    const dateStr = getMadridDateKey(checkDate);
+    const dateStr = addDaysToDateKey(todayStr, -i);
     if (recentDays.has(dateStr)) {
       consecutiveDays++;
     } else {

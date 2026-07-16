@@ -6,11 +6,17 @@
 // NO scores. NO diagnostics. NO clinical labels.
 // Only gentle observations: calm, growth, intensity, dispersion.
 //
+// Stage narratives can be enriched with connections
+// from the empire connections engine (detectConnections).
+// This module consumes engine results — never calculates
+// correlations on its own.
+//
 // If insufficient data: silence.
 // ═══════════════════════════════════════════
 
 import { db } from '@/lib/db';
-import { getMadridDateKey } from '@/lib/deterministic';
+import { getMadridMonthRange, formatMonthLabel, getPastMonthKeys } from '@/lib/dates';
+import type { EmpireConnectionSignal } from '@/lib/patterns/types';
 
 // ─── Types ───
 
@@ -70,49 +76,10 @@ interface MonthAggregation {
   nutritionLogs: number;
 }
 
-function getMonthRange(yyyyMM: string) {
-  const [year, month] = yyyyMM.split('-').map(Number);
-  // Use Date.UTC to avoid server-local timezone interpretation.
-  // Month boundaries must align with Madrid midnight, not server-local midnight.
-  // Since Prisma compares dates as UTC timestamps, we shift the UTC midnight
-  // by the Madrid offset so the DB query covers the correct Madrid-day range.
-  const startUTC = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
-  const endUTC = new Date(Date.UTC(year, month, 1, 0, 0, 0));
-  // Compute Madrid offset at noon on the 15th of the respective month (avoids DST edge cases)
-  const startOffset = getMadridOffsetMs(startUTC);
-  const endOffset = getMadridOffsetMs(endUTC);
-  return {
-    start: new Date(startUTC.getTime() - startOffset),
-    end: new Date(endUTC.getTime() - endOffset),
-  };
-}
-
-/**
- * Compute the Madrid timezone offset in milliseconds at a given UTC time.
- * Positive offset means Madrid is ahead of UTC (CET = +1h, CEST = +2h).
- * Uses the same technique as getMadridStartOfNextDay() in limits.ts.
- */
-function getMadridOffsetMs(utcDate: Date): number {
-  const madridStr = utcDate.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-  const madridDate = new Date(madridStr.replace(' ', 'T'));
-  return madridDate.getTime() - utcDate.getTime();
-}
-
-const MONTH_NAMES: Record<number, string> = {
-  1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
-  5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
-  9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre',
-};
-
-function formatMonthLabel(yyyyMM: string): string {
-  const [year, month] = yyyyMM.split('-').map(Number);
-  return `${MONTH_NAMES[month] || ''} ${year}`;
-}
-
 // ─── Aggregate a single month ───
 
 async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggregation | null> {
-  const { start, end } = getMonthRange(yyyyMM);
+  const { start, end } = getMadridMonthRange(yyyyMM);
 
   const [wellness, checkins, finances, journals, meditations, habits, nutritions] = await Promise.all([
     db.wellnessLog.findMany({
@@ -223,46 +190,142 @@ function classifyStage(agg: MonthAggregation): StageFlavor {
   return 'dispersion';
 }
 
+// ─── Connection enrichment ───
+// Maps stage flavors to empire connections that provide
+// meaningful context. Only showable connections (high enough
+// confidence) are used. The engine decides quality;
+// this module only selects relevant context.
+
+const STAGE_CONNECTION_MAP: Record<StageFlavor, string[]> = {
+  growth: ['finanzas-mente', 'energia-mente', 'checkin-mente'],
+  stability: ['finanzas-mente', 'energia-mente'],
+  calm: ['finanzas-energia', 'energia-mente'],
+  intensity: ['finanzas-estres'],
+  exhaustion: ['finanzas-energia', 'finanzas-sueno'],
+  dispersion: [],
+  quiet: [],
+};
+
+// Connection → enrichment text (observed, never causal).
+// These are append-only: they follow the base observation.
+const CONNECTION_ENRICHMENT: Record<string, string> = {
+  'finanzas-mente': 'También coincide con una mayor estabilidad en tus decisiones.',
+  'energia-mente': 'También coincide con una mejora de tu energía.',
+  'checkin-mente': 'También coincide con un mayor enfoque en tu día a día.',
+  'finanzas-energia': 'También coincide con cambios en tu nivel de energía.',
+  'finanzas-estres': 'También coincide con un cambio en tu nivel de presión.',
+  'finanzas-sueno': 'También coincide con un cambio en tu descanso.',
+};
+
+function findRelevantConnection(
+  flavor: StageFlavor,
+  connections: EmpireConnectionSignal[],
+): EmpireConnectionSignal | null {
+  const candidates = STAGE_CONNECTION_MAP[flavor] || [];
+  for (const connectionId of candidates) {
+    const match = connections.find(c => c.connection === connectionId && c.showable);
+    if (match) return match;
+  }
+  return null;
+}
+
 // ─── Generate a calm human observation for a stage ───
 
-function stageObservation(flavor: StageFlavor, agg: MonthAggregation): string {
+function stageObservation(
+  flavor: StageFlavor,
+  agg: MonthAggregation,
+  connections: EmpireConnectionSignal[],
+  isPremium: boolean,
+): string {
   const { intentionBalance } = agg;
   const { growth, tranquility, total } = intentionBalance;
+
+  let base: string;
 
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        return 'Calma. Las decisiones desde la quietud.';
-      return 'Un periodo con calma.';
+        base = 'Este fue uno de tus periodos con más calma.';
+      else
+        base = 'Un periodo tranquilo, con poca presión.';
+      break;
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        return 'Crecimiento. Cosas en movimiento.';
-      return 'Movimiento.';
+        base = 'Este fue uno de tus periodos más activos.';
+      else
+        base = 'Tu actividad fue mayor que en meses anteriores.';
+      break;
 
     case 'intensity':
-      return 'Intensidad. Mucho pasó.';
+      base = 'Fue un periodo con mucha actividad y varios cambios.';
+      break;
 
     case 'dispersion':
-      return 'Días muy distintos entre sí.';
+      base = 'Tus días fueron muy distintos entre sí durante este periodo.';
+      break;
 
     case 'exhaustion':
-      return 'Agotamiento. Poco en el tanque.';
+      base = 'Tu energía fue más baja durante estas semanas.';
+      break;
 
     case 'quiet':
-      return 'Silencio.';
+      base = 'Hubo menos registros, por lo que este periodo ofrece menos información.';
+      break;
 
     case 'stability':
-      return 'Estabilidad. Ritmo constante.';
+      base = 'Mantuviste un ritmo constante durante estas semanas.';
+      break;
 
     default:
       return '';
   }
+
+  // FREE: no connection enrichment (brief narrative)
+  if (!isPremium) return base;
+
+  // ÉLITE: enrich with a relevant connection from the engine
+  const relevant = findRelevantConnection(flavor, connections);
+  if (relevant) {
+    const enrichment = CONNECTION_ENRICHMENT[relevant.connection];
+    if (enrichment) return `${base} ${enrichment}`;
+  }
+
+  return base;
 }
+
+// ─── Enrich transition observations with connections ───
+
+const TRANSITION_ENRICHMENT: Record<string, string> = {
+  'exhaustion->calm': 'Tus finanzas también reflejan ese cambio.',
+  'exhaustion->stability': 'Esa estabilidad se nota también en otras áreas.',
+  'intensity->calm': 'Tu práctica mental también se reflejó en ese cambio.',
+  'intensity->stability': 'Ese ritmo más constante se observa en varias áreas.',
+  'quiet->growth': 'Esa actividad aumentó de forma coordinada en varias áreas.',
+  'quiet->stability': 'Encontraste un ritmo constante en varios aspectos de tu vida.',
+  'growth->stability': 'Esa estabilidad abarca varios aspectos de tu vida.',
+  'exhaustion->growth': 'Esa recuperación se observa en varias áreas a la vez.',
+};
+
+// Connections that validate a transition (same empire domains)
+const TRANSITION_CONNECTION_VALIDATION: Record<string, string[]> = {
+  'exhaustion->calm': ['finanzas-energia', 'energia-mente'],
+  'exhaustion->stability': ['finanzas-energia', 'energia-mente'],
+  'intensity->calm': ['finanzas-mente', 'energia-mente'],
+  'intensity->stability': ['finanzas-mente', 'checkin-mente'],
+  'quiet->growth': ['energia-mente', 'checkin-mente', 'finanzas-mente'],
+  'quiet->stability': ['finanzas-mente', 'energia-mente'],
+  'growth->stability': ['energia-mente', 'checkin-mente'],
+  'exhaustion->growth': ['energia-mente'],
+};
 
 // ─── Detect stage transitions ───
 
-function detectTransitions(stages: LifeStage[]): StageTransition[] {
+function detectTransitions(
+  stages: LifeStage[],
+  connections: EmpireConnectionSignal[],
+  isPremium: boolean,
+): StageTransition[] {
   const transitions: StageTransition[] = [];
 
   for (let i = 1; i < stages.length; i++) {
@@ -271,7 +334,7 @@ function detectTransitions(stages: LifeStage[]): StageTransition[] {
 
     if (prev.flavor === curr.flavor) continue;
 
-    const observation = generateTransitionObservation(prev.flavor, curr.flavor);
+    const observation = generateTransitionObservation(prev.flavor, curr.flavor, connections, isPremium);
     if (observation) {
       transitions.push({
         from: prev.flavor,
@@ -286,41 +349,72 @@ function detectTransitions(stages: LifeStage[]): StageTransition[] {
   return transitions;
 }
 
-function generateTransitionObservation(from: StageFlavor, to: StageFlavor): string {
+function generateTransitionObservation(
+  from: StageFlavor,
+  to: StageFlavor,
+  connections: EmpireConnectionSignal[],
+  isPremium: boolean,
+): string {
   // Just changes. Not improvements or setbacks.
   const transitions: Record<string, string> = {
-    'exhaustion->calm': 'Más tranquilidad.',
-    'exhaustion->stability': 'Más estabilidad.',
-    'intensity->calm': 'Después de la intensidad, calma.',
-    'intensity->stability': 'Ritmo más constante.',
-    'dispersion->stability': 'Menos dispersión.',
-    'dispersion->calm': 'Menos dispersión, más calma.',
-    'quiet->growth': 'Después del silencio, movimiento.',
-    'quiet->stability': 'Del silencio al ritmo.',
-    'calm->growth': 'De la calma al movimiento.',
-    'calm->intensity': 'Más intensidad.',
-    'growth->calm': 'Más calma.',
-    'growth->stability': 'El movimiento se asentó.',
-    'stability->intensity': 'Más intensidad.',
-    'stability->dispersion': 'Más dispersión.',
-    'stability->exhaustion': 'Agotamiento.',
-    'calm->dispersion': 'Más dispersión.',
-    'growth->intensity': 'El movimiento trajo intensidad.',
-    'intensity->exhaustion': 'La intensidad desgastó.',
-    'exhaustion->growth': 'Del agotamiento, movimiento.',
-    'quiet->calm': 'Del silencio a la calma.',
+    'exhaustion->calm': 'Tu nivel de tranquilidad aumentó respecto al periodo anterior.',
+    'exhaustion->stability': 'Encontraste un ritmo más estable que antes.',
+    'intensity->calm': 'Después de un periodo intenso, la actividad se calmó.',
+    'intensity->stability': 'Tu ritmo se volvió más constante después de varias semanas activas.',
+    'dispersion->stability': 'Tus días se volvieron más uniformes que antes.',
+    'dispersion->calm': 'La variabilidad entre días disminuyó respecto al periodo anterior.',
+    'quiet->growth': 'Después de un periodo con poca actividad, tu nivel de actividad aumentó.',
+    'quiet->stability': 'Tu ritmo pasó de ser irregular a más constante.',
+    'calm->growth': 'Después de un periodo tranquilo, aumentó tu nivel de actividad.',
+    'calm->intensity': 'Un periodo tranquilo seguido de uno con más cambios y actividad.',
+    'growth->calm': 'Después de un periodo activo, la actividad disminuyó.',
+    'growth->stability': 'Tu actividad se estabilizó tras un periodo de crecimiento.',
+    'stability->intensity': 'Después de un ritmo constante, el nivel de actividad aumentó.',
+    'stability->dispersion': 'Tus días se volvieron más irregulares que en el periodo anterior.',
+    'stability->exhaustion': 'Tu nivel de energía disminuyó respecto al periodo anterior.',
+    'calm->dispersion': 'Tus días se volvieron más distintos entre sí.',
+    'growth->intensity': 'La alta actividad del periodo anterior trajo consigo más intensidad.',
+    'intensity->exhaustion': 'Después de un periodo muy activo, tu energía bajó.',
+    'exhaustion->growth': 'Tras un periodo con poca energía, la actividad volvió a subir.',
+    'quiet->calm': 'Tu nivel de actividad fue mayor tras un periodo con poca información.',
   };
 
   const key = `${from}->${to}`;
-  return transitions[key] || '';
+  const base = transitions[key] || '';
+  if (!base) return '';
+
+  // FREE: no connection enrichment
+  if (!isPremium) return base;
+
+  // ÉLITE: enrich if a relevant connection validates the transition
+  const validConnections = TRANSITION_CONNECTION_VALIDATION[key] || [];
+  const hasValidation = validConnections.some(
+    connId => connections.some(c => c.connection === connId && c.showable),
+  );
+  if (hasValidation) {
+    const enrichment = TRANSITION_ENRICHMENT[key];
+    if (enrichment) return `${base} ${enrichment}`;
+  }
+
+  return base;
 }
 
 // ─── Main: Detect all life stages ───
 
-export async function detectLifeStages(userId: string, months: string[]): Promise<{
+export async function detectLifeStages(
+  userId: string,
+  months: string[],
+  options?: {
+    connections?: EmpireConnectionSignal[];
+    isPremium?: boolean;
+  },
+): Promise<{
   stages: LifeStage[];
   transitions: StageTransition[];
 }> {
+  const connections = options?.connections || [];
+  const isPremium = options?.isPremium ?? false;
+
   // Aggregate each month in parallel
   const aggregations = await Promise.all(
     months.map(m => aggregateMonth(userId, m))
@@ -337,31 +431,17 @@ export async function detectLifeStages(userId: string, months: string[]): Promis
       month: agg.month,
       monthLabel: formatMonthLabel(agg.month),
       flavor,
-      observation: stageObservation(flavor, agg),
+      observation: stageObservation(flavor, agg, connections, isPremium),
       dataPoints: agg.totalActivity,
     });
   }
 
   // Detect transitions between stages
-  const transitions = detectTransitions(stages);
+  const transitions = detectTransitions(stages, connections, isPremium);
 
   return { stages, transitions };
 }
 
 // ─── Generate list of past months ───
 
-export function getPastMonths(count: number = 6): string[] {
-  const months: string[] = [];
-  // Use Madrid timezone to determine the current month — same source of truth
-  // as the rest of the system (deterministic.ts, limits.ts, mentor-context.ts).
-  // Without this, a UTC server at 23:30 Madrid time could compute the wrong month.
-  const todayKey = getMadridDateKey(new Date());
-  const [currentYear, currentMonth] = todayKey.split('-').map(Number);
-  for (let i = 1; i <= count; i++) {
-    const monthIndex = currentMonth - i;
-    const year = currentYear + Math.floor((monthIndex - 1) / 12);
-    const month = ((monthIndex - 1) % 12 + 12) % 12 + 1;
-    months.push(`${year}-${String(month).padStart(2, '0')}`);
-  }
-  return months.reverse(); // oldest first
-}
+export const getPastMonths = getPastMonthKeys;

@@ -18,7 +18,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/imperio/mente': 'Mente',
   '/imperio/energia': 'Energía',
   '/imperio/disciplina': 'Disciplina',
-  '/imperio/riqueza': 'Finanzas',
+  '/imperio/riqueza': 'Riqueza',
   '/imperio/crecimiento': 'Crecimiento',
   '/imperio/mentor': 'Mentor',
 };

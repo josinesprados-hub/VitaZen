@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { Calendar, X } from 'lucide-react';
+import { getCurrentMonthKey, getMadridDayOfMonth } from '@/lib/dates';
 
 // ─── Monthly Closure Prompt ───
 // Appears subtly on the first days of a new month.
@@ -17,12 +18,6 @@ import { Calendar, X } from 'lucide-react';
 // the prompt can appear again (if the closure period is still active).
 
 const DISMISS_KEY_PREFIX = 'vz_monthly_closure_dismissed_';
-
-/** Returns the current month key (YYYY-MM) in Europe/Madrid timezone. */
-function getCurrentMonthKey(): string {
-  const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-  return madridStr.split(' ')[0].slice(0, 7); // YYYY-MM
-}
 
 /** Check if the user dismissed the prompt for the current month. */
 function isDismissedThisMonth(): boolean {
@@ -65,8 +60,7 @@ export function MonthlyClosurePrompt() {
         // DASH-3: Use Madrid timezone for the day-of-month check, not browser-local.
         // The server's isClosurePeriod() uses Madrid time, so the client gate
         // must match to avoid premature hiding for traveling users.
-        const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-        const madridDay = parseInt(madridStr.split('-')[2], 10); // day-of-month
+        const madridDay = getMadridDayOfMonth(); // day-of-month
         if (madridDay > 7) return;
 
         const res = await apiFetch('/api/monthly-closure');

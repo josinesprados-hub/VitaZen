@@ -6,6 +6,7 @@ import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onCheckinChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey } from '@/lib/deterministic';
+import { startOfTodayMadrid, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
 
 // ─── GET: today's checkin + history ─────────────────────
 
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Today's checkin — use Europe/Madrid timezone to match user's perceived "today"
     if (mode === 'today' || !mode) {
-      const today = new Date(getTodayDateKey() + 'T00:00:00');
+      const today = startOfTodayMadrid();
 
       const todayCheckin = await db.dailyCheckin.findUnique({
         where: { userId_date: { userId: user.id, date: today } },
@@ -32,7 +33,11 @@ export async function GET(request: NextRequest) {
 
     // History
     if (mode === 'history') {
-      const days = Math.min(parseInt(searchParams.get('days') || '30'), 90);
+      const daysParam = parseInt(searchParams.get('days') || '30');
+      if (isNaN(daysParam)) {
+        return NextResponse.json({ error: 'El parámetro "days" debe ser un número' }, { status: 400 });
+      }
+      const days = Math.min(daysParam, 90);
       const checkins = await db.dailyCheckin.findMany({
         where: { userId: user.id },
         orderBy: { date: 'desc' },
@@ -44,10 +49,12 @@ export async function GET(request: NextRequest) {
 
     // Trends — last 14 days averages
     if (mode === 'trends') {
-      const days = Math.min(parseInt(searchParams.get('days') || '14'), 30);
-      const todayDate = new Date(getTodayDateKey() + 'T00:00:00');
-      const since = new Date(todayDate);
-      since.setDate(since.getDate() - days);
+      const trendsParam = parseInt(searchParams.get('days') || '14');
+      if (isNaN(trendsParam)) {
+        return NextResponse.json({ error: 'El parámetro "days" debe ser un número' }, { status: 400 });
+      }
+      const days = Math.min(trendsParam, 30);
+      const since = startOfMadridDay(addDaysToDateKey(getTodayDateKey(), -days));
 
       const checkins = await db.dailyCheckin.findMany({
         where: { userId: user.id, date: { gte: since } },
@@ -96,27 +103,36 @@ export async function POST(request: NextRequest) {
 
     const { emotion, energy, focus, stress, intention, note } = await request.json();
 
-    if (!emotion || !energy || !focus || !stress || !intention) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // H-06 FIX: Validate field types and ranges before DB write.
+    // Previously only checked for truthiness — allowed strings, arrays,
+    // out-of-range numbers, etc.
+    if (typeof emotion !== 'number' || !Number.isInteger(emotion) || emotion < 1 || emotion > 5) {
+      return NextResponse.json({ error: 'emotion must be an integer 1-5' }, { status: 400 });
     }
-
-    // C1 FIX: Validate metric ranges (1–5) to prevent data corruption.
-    // Client enforces this via sliders, but server must be the authority.
-    const metrics = { emotion, energy, focus, stress };
-    for (const [name, val] of Object.entries(metrics)) {
-      if (typeof val !== 'number' || !Number.isInteger(val) || val < 1 || val > 5) {
-        return NextResponse.json({ error: `${name} must be an integer between 1 and 5` }, { status: 400 });
-      }
+    if (typeof energy !== 'number' || !Number.isInteger(energy) || energy < 1 || energy > 5) {
+      return NextResponse.json({ error: 'energy must be an integer 1-5' }, { status: 400 });
     }
-
-    // C2 FIX: Validate intention length server-side.
-    if (typeof intention !== 'string' || intention.length > 200 || intention.trim().length === 0) {
-      return NextResponse.json({ error: 'Intention must be 1–200 characters' }, { status: 400 });
+    if (typeof focus !== 'number' || !Number.isInteger(focus) || focus < 1 || focus > 5) {
+      return NextResponse.json({ error: 'focus must be an integer 1-5' }, { status: 400 });
     }
+    if (typeof stress !== 'number' || !Number.isInteger(stress) || stress < 1 || stress > 5) {
+      return NextResponse.json({ error: 'stress must be an integer 1-5' }, { status: 400 });
+    }
+    if (typeof intention !== 'string' || intention.trim().length === 0) {
+      return NextResponse.json({ error: 'intention is required (non-empty string)' }, { status: 400 });
+    }
+    if (intention.length > 500) {
+      return NextResponse.json({ error: 'intention too long (max 500 chars)' }, { status: 400 });
+    }
+    if (note !== undefined && note !== null) {
+      if (typeof note !== 'string') return NextResponse.json({ error: 'note must be a string' }, { status: 400 });
+      if (note.length > 2000) return NextResponse.json({ error: 'note too long (max 2,000 chars)' }, { status: 400 });
+    }
+    const safeNote = typeof note === 'string' ? note : null;
 
     // Use Europe/Madrid timezone — Vercel servers run UTC, so
     // new Date() at 00:30 Madrid = 23:30 UTC = wrong day.
-    const today = new Date(getTodayDateKey() + 'T00:00:00');
+    const today = startOfTodayMadrid();
 
     // M-3 FIX: Race condition during check-in creation.
     // The original code did `findUnique(date) → upsert → if (!existingCheckin)
@@ -163,8 +179,8 @@ export async function POST(request: NextRequest) {
 
       const result = await tx.dailyCheckin.upsert({
         where: { userId_date: { userId: user.id, date: today } },
-        update: { emotion, energy, focus, stress, intention, note },
-        create: { userId: user.id, date: today, emotion, energy, focus, stress, intention, note },
+        update: { emotion, energy, focus, stress, intention, note: safeNote },
+        create: { userId: user.id, date: today, emotion, energy, focus, stress, intention, note: safeNote },
       });
 
       // Award XP to mente empire ONLY on first creation (not on updates).
@@ -208,38 +224,38 @@ export async function PUT(request: NextRequest) {
 
     const { checkinId, emotion, energy, focus, stress, intention, note } = await request.json();
 
-    if (!checkinId) {
-      return NextResponse.json({ error: 'Missing checkinId' }, { status: 400 });
-    }
-
-    // C7 FIX: Validate metric ranges (1–5) on PUT — same as POST.
-    const metrics = { emotion, energy, focus, stress };
-    for (const [name, val] of Object.entries(metrics)) {
-      if (typeof val !== 'number' || !Number.isInteger(val) || val < 1 || val > 5) {
-        return NextResponse.json({ error: `${name} must be an integer between 1 and 5` }, { status: 400 });
-      }
-    }
-
-    // Validate intention on PUT as well.
-    if (typeof intention !== 'string' || intention.length > 200 || intention.trim().length === 0) {
-      return NextResponse.json({ error: 'Intention must be 1–200 characters' }, { status: 400 });
-    }
-
     const existing = await db.dailyCheckin.findUnique({ where: { id: checkinId } });
     if (!existing) return NextResponse.json({ error: 'Checkin not found' }, { status: 404 });
     if (existing.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    // H-06 FIX: Validate field types and ranges (same as POST)
+    if (emotion !== undefined && (typeof emotion !== 'number' || !Number.isInteger(emotion) || emotion < 1 || emotion > 5)) {
+      return NextResponse.json({ error: 'emotion must be an integer 1-5' }, { status: 400 });
+    }
+    if (energy !== undefined && (typeof energy !== 'number' || !Number.isInteger(energy) || energy < 1 || energy > 5)) {
+      return NextResponse.json({ error: 'energy must be an integer 1-5' }, { status: 400 });
+    }
+    if (focus !== undefined && (typeof focus !== 'number' || !Number.isInteger(focus) || focus < 1 || focus > 5)) {
+      return NextResponse.json({ error: 'focus must be an integer 1-5' }, { status: 400 });
+    }
+    if (stress !== undefined && (typeof stress !== 'number' || !Number.isInteger(stress) || stress < 1 || stress > 5)) {
+      return NextResponse.json({ error: 'stress must be an integer 1-5' }, { status: 400 });
+    }
+    if (intention !== undefined) {
+      if (typeof intention !== 'string') return NextResponse.json({ error: 'intention must be a string' }, { status: 400 });
+      if (intention.length > 500) return NextResponse.json({ error: 'intention too long (max 500 chars)' }, { status: 400 });
+    }
+    if (note !== undefined && note !== null) {
+      if (typeof note !== 'string') return NextResponse.json({ error: 'note must be a string' }, { status: 400 });
+      if (note.length > 2000) return NextResponse.json({ error: 'note too long (max 2,000 chars)' }, { status: 400 });
+    }
+
+    const updateData: Record<string, unknown> = { emotion, energy, focus, stress, intention, note: typeof note === 'string' ? note : null };
+
     const updated = await db.dailyCheckin.update({
       where: { id: checkinId },
-      data: { emotion, energy, focus, stress, intention, note },
+      data: updateData,
     });
-
-    // C3 FIX: Trigger widget snapshot refresh after edit (was missing — only
-    // POST and DELETE called this). Widgets would show stale data after edits.
-    onCheckinChange(user.id, user.plan);
-
-    // C4 FIX: Track edit event in analytics (was missing — only POST tracked).
-    trackEvent({ event: 'checkin_edited', userId: user.id, properties: { emotion, energy, focus, stress } });
 
     return NextResponse.json({ checkin: updated });
   } catch (error) {
@@ -283,11 +299,6 @@ export async function DELETE(request: NextRequest) {
 
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);
-
-    // C10 FIX: Track deletion in analytics (was missing — only POST and PUT tracked).
-    // Also fixes that checkin_edited was in the whitelist but never reached this code path;
-    // the PUT handler already calls trackEvent('checkin_edited') from the prior C4 fix.
-    trackEvent({ event: 'checkin_deleted', userId: user.id, properties: { checkinDate: existing.date.toISOString() } });
 
     return NextResponse.json({ success: true });
   } catch (error) {

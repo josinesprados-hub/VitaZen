@@ -20,7 +20,8 @@
 
 import { db } from '@/lib/db';
 import { sendNotification } from '../service';
-import { canSendNotification, isInQuietHours, getUserTodayStart } from '../scheduler';
+import { canSendNotification, isInQuietHours } from '../scheduler';
+import { startOfTodayMadrid } from '@/lib/dates';
 
 // ─── Configuration ──────────────────────────
 
@@ -94,18 +95,15 @@ function isInReflectionWindow(timezone: string): boolean {
  * Uses timezone-aware midnight to match the user's perceived "today".
  */
 export async function hasCheckedInToday(userId: string, timezone: string): Promise<boolean> {
-  const todayStart = getUserTodayStart(timezone);
+  // M-16 FIX: Use the `date` field (Madrid-based logical date) instead of
+  // `createdAt`. Near midnight, createdAt could be tomorrow's UTC timestamp
+  // while `date` correctly reflects the user's perceived check-in day.
+  // Uses the unique index (userId, date) for exact, efficient lookup.
+  const today = startOfTodayMadrid();
 
-  // Look for a check-in whose date is >= today's start in the user's timezone.
-  // The DailyCheckin unique index is (userId, date) where date is a DateTime.
-  // We search by createdAt range instead of the date field to avoid
-  // the UTC midnight mismatch.
-  const checkin = await db.dailyCheckin.findFirst({
-    where: {
-      userId,
-      createdAt: { gte: todayStart },
-    },
-    select: { id: true, createdAt: true },
+  const checkin = await db.dailyCheckin.findUnique({
+    where: { userId_date: { userId, date: today } },
+    select: { id: true },
   });
 
   if (!checkin) return false;

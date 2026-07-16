@@ -19,7 +19,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ interface TrendsData {
 // ─── Helpers ─────────────────────────────────────────────
 
 const METRIC_CONFIG = [
-  { key: 'emotion', label: 'Ánimo', icon: Heart, color: '#c8a55a' },
+  { key: 'emotion', label: 'Emoción', icon: Heart, color: '#c8a55a' },
   { key: 'energy', label: 'Energía', icon: Zap, color: '#c8a55a' },
   { key: 'focus', label: 'Enfoque', icon: Target, color: '#c8a55a' },
   { key: 'stress', label: 'Estrés', icon: AlertTriangle, color: '#c8a55a' },
@@ -59,15 +59,12 @@ function formatDate(dateStr: string): string {
 
   if (checkinKey === todayKey) return 'Hoy';
 
-  // Calculate calendar-day difference using Madrid-normalized dates
-  const [cY, cM, cD] = checkinKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const checkinDate = new Date(cY, cM - 1, cD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diff = Math.round((todayDate.getTime() - checkinDate.getTime()) / 86400000);
+  const diff = daysBetweenDateKeys(checkinKey, todayKey);
 
   if (diff === 1) return 'Ayer';
 
+  const [cY, cM, cD] = checkinKey.split('-').map(Number);
+  const checkinDate = new Date(cY, cM - 1, cD);
   return checkinDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
@@ -165,27 +162,9 @@ export default function CheckinPage() {
   const handleModalClose = useCallback(() => {
     setShowModal(false);
     setEditingCheckin(null);
-    // Refresh history and trends after any mutation (create/edit/delete)
-    // so data is never stale
-    (async () => {
-      try {
-        const [historyRes, trendsRes] = await Promise.all([
-          apiFetch('/api/checkin?mode=history&days=30'),
-          apiFetch('/api/checkin?mode=trends&days=14'),
-        ]);
-        if (historyRes.ok) {
-          const data = await historyRes.json();
-          setCheckins(data.checkins || []);
-        }
-        if (trendsRes.ok) {
-          const data = await trendsRes.json();
-          setTrends(data.trends || null);
-        }
-      } catch (err) {
-        console.error('[CHECKIN PAGE] Error refreshing data:', err);
-      }
-    })();
-  }, [apiFetch]);
+    // Only refetch if data might have changed (new/edited checkin)
+    // The save handler already updates state optimistically
+  }, []);
 
   const handleCheckinSave = useCallback(async (data: { emotion: number; energy: number; focus: number; stress: number; intention: string; note?: string }): Promise<{ xpAwarded: number }> => {
     if (editingCheckin) {
@@ -289,7 +268,7 @@ export default function CheckinPage() {
       <ContextualHelp
         storageKey="vitazen_help_checkin"
         title="Check-in"
-        text="Ánimo, energía, enfoque, estrés."
+        text="Cómo te sientes hoy: emoción, energía, enfoque y estrés."
       />
 
       {/* Header */}
@@ -319,7 +298,7 @@ export default function CheckinPage() {
           <PrivacyMask compact>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { label: 'Ánimo', val: todayCheckin.emotion },
+                { label: 'Emoción', val: todayCheckin.emotion },
                 { label: 'Energía', val: todayCheckin.energy },
                 { label: 'Enfoque', val: todayCheckin.focus },
                 { label: 'Estrés', val: todayCheckin.stress },
@@ -386,7 +365,7 @@ export default function CheckinPage() {
         <PremiumEmptyState
           icon={Sunrise}
           title="Aún no hay check-ins"
-          subtitle="Cuando quieras"
+          subtitle="Empieza cuando quieras"
           cta="Hacer check-in"
           onCta={() => { setEditingCheckin(null); setShowModal(true); }}
           size="md"
@@ -410,7 +389,7 @@ export default function CheckinPage() {
                     <PrivacyMask compact>
                       <div className="flex gap-3 mt-0.5">
                         {[
-                          { label: 'Ánimo', val: c.emotion },
+                          { label: 'Emoción', val: c.emotion },
                           { label: 'Energía', val: c.energy },
                           { label: 'Enfoque', val: c.focus },
                           { label: 'Estrés', val: c.stress },

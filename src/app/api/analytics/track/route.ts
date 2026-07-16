@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { startOfTodayMadrid, startOfNextDayMadrid } from '@/lib/dates';
 
 // ═══════════════════════════════════════════════════════════
 // POST /api/analytics/track
@@ -17,7 +18,20 @@ const VALID_EVENTS = new Set([
 
 export async function POST(request: NextRequest) {
   try {
-    const { event, properties } = await request.json();
+    // M-05 FIX: Limit request body size to prevent DB bloat from abuse
+    const bodyText = await request.text();
+    if (bodyText.length > 2048) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
+
+    let event: string, properties: Record<string, unknown> | undefined;
+    try {
+      const parsed = JSON.parse(bodyText);
+      event = parsed.event;
+      properties = parsed.properties;
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
 
     if (!event || !VALID_EVENTS.has(event)) {
       return NextResponse.json({ error: 'Invalid event' }, { status: 400 });
@@ -37,10 +51,8 @@ export async function POST(request: NextRequest) {
 
     // Deduplicate daily_session: only one per user per calendar day
     if (event === 'daily_session' && userId) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const today = startOfTodayMadrid();
+      const tomorrow = startOfNextDayMadrid();
 
       const existing = await db.analyticsEvent.findFirst({
         where: {

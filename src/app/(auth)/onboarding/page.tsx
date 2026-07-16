@@ -40,7 +40,7 @@ const FOCUS_OPTIONS = [
   { key: 'mente', label: 'Mente', description: 'Claridad, calma y bienestar emocional', icon: Brain, emoji: '🧠' },
   { key: 'disciplina', label: 'Disciplina', description: 'Hábitos sólidos y consistencia diaria', icon: Shield, emoji: '⚔️' },
   { key: 'energia', label: 'Energía', description: 'Vitalidad física y descanso reparador', icon: Zap, emoji: '⚡' },
-  { key: 'riqueza', label: 'Finanzas', description: 'Consciencia y claridad económica', icon: Gem, emoji: '💎' },
+  { key: 'riqueza', label: 'Finanzas', description: 'Consciencia y claridad con tu dinero', icon: Gem, emoji: '💎' },
 ];
 
 const GOAL_OPTIONS = [
@@ -61,7 +61,6 @@ const TOTAL_STEPS = 3;
 // ═══════════════════════════════════════════
 
 export default function OnboardingPage() {
-  console.log('[AUTH-FORENSIC] OnboardingPage MOUNT');
   const { user, loading, refreshUser, firebaseUser, syncError } = useAuth();
   const { apiFetch } = useApi();
   const router = useRouter();
@@ -78,20 +77,12 @@ export default function OnboardingPage() {
 
   // Auth guard: redirect if not logged in or already completed onboarding.
   useEffect(() => {
-    console.log('[AUTH-FORENSIC] Onboarding auth-guard useEffect:', {
-      loading,
-      user: user ? { id: user.id, email: user.email, onboardingCompleted: user.onboardingCompleted } : null,
-      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
-      syncError,
-      completingRef: completingRef.current,
-    });
     if (completingRef.current) return;
+
     if (!loading) {
       if (!user && !firebaseUser) {
-        console.log('[AUTH-FORENSIC] Onboarding → router.replace("/login") — no user, no firebaseUser');
         router.replace('/login');
       } else if (user?.onboardingCompleted && !saving) {
-        console.log('[AUTH-FORENSIC] Onboarding → router.replace("/dashboard") — onboarding completed');
         router.replace('/dashboard');
       }
     }

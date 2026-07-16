@@ -4,6 +4,8 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onJournalChange } from '@/lib/widgets/triggers';
+import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
+import { startOfMadridDay } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,9 +43,51 @@ export async function POST(request: NextRequest) {
 
     const { title, content, mood, gratitude } = await request.json();
 
+    // H-06 FIX: Validate field types and lengths before DB write.
+    // Previously these fields were passed raw from request.json() to Prisma
+    // with zero validation — an attacker could send multi-megabyte strings,
+    // non-string types, or deeply nested objects directly into the database.
+    if (title !== undefined && title !== null) {
+      if (typeof title !== 'string') return NextResponse.json({ error: 'title must be a string' }, { status: 400 });
+      if (title.length > 500) return NextResponse.json({ error: 'title too long (max 500 chars)' }, { status: 400 });
+    }
+    if (content !== undefined && content !== null) {
+      if (typeof content !== 'string') return NextResponse.json({ error: 'content must be a string' }, { status: 400 });
+      if (content.length > 50000) return NextResponse.json({ error: 'content too long (max 50,000 chars)' }, { status: 400 });
+    }
+    if (gratitude !== undefined && gratitude !== null) {
+      if (typeof gratitude !== 'string') return NextResponse.json({ error: 'gratitude must be a string' }, { status: 400 });
+      if (gratitude.length > 5000) return NextResponse.json({ error: 'gratitude too long (max 5,000 chars)' }, { status: 400 });
+    }
+    if (mood !== undefined && mood !== null) {
+      if (typeof mood !== 'number' || !Number.isInteger(mood) || mood < 1 || mood > 5) {
+        return NextResponse.json({ error: 'mood must be an integer 1-5' }, { status: 400 });
+      }
+    }
+
     // At least one field must have content
-    if (!title?.trim() && !content?.trim() && !gratitude?.trim()) {
+    const safeTitle = typeof title === 'string' ? title : '';
+    const safeContent = typeof content === 'string' ? content : '';
+    const safeGratitude = typeof gratitude === 'string' ? gratitude : '';
+    if (!safeTitle.trim() && !safeContent.trim() && !safeGratitude.trim()) {
       return NextResponse.json({ error: 'At least one field is required' }, { status: 400 });
+    }
+
+    // H-05 FIX: Rate limit journal creation to 5 per day to prevent XP farming
+    const todayKey = getTodayDateKey();
+    const todayStart = startOfMadridDay(todayKey);
+    const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const entriesToday = await db.journalEntry.count({
+      where: {
+        userId: user.id,
+        createdAt: { gte: todayStart, lt: todayEnd },
+      },
+    });
+    if (entriesToday >= 5) {
+      return NextResponse.json(
+        { error: 'Has alcanzado el límite de entradas de diario por hoy (5)' },
+        { status: 429 }
+      );
     }
 
     // C-1 FIX: Wrap journalEntry.create + empireProgress.upsert in a
@@ -69,7 +113,7 @@ export async function POST(request: NextRequest) {
         )`;
 
       const created = await tx.journalEntry.create({
-        data: { userId: user.id, title: title || '', content: content || '', mood, gratitude },
+        data: { userId: user.id, title: safeTitle, content: safeContent, mood, gratitude: safeGratitude },
       });
 
       // Award XP to crecimiento empire
@@ -108,14 +152,35 @@ export async function PUT(request: NextRequest) {
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
     if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // At least one field must have content
-    if (!title?.trim() && !content?.trim() && !gratitude?.trim()) {
+    // H-06 FIX: Same type/length validation as POST
+    if (title !== undefined && title !== null) {
+      if (typeof title !== 'string') return NextResponse.json({ error: 'title must be a string' }, { status: 400 });
+      if (title.length > 500) return NextResponse.json({ error: 'title too long (max 500 chars)' }, { status: 400 });
+    }
+    if (content !== undefined && content !== null) {
+      if (typeof content !== 'string') return NextResponse.json({ error: 'content must be a string' }, { status: 400 });
+      if (content.length > 50000) return NextResponse.json({ error: 'content too long (max 50,000 chars)' }, { status: 400 });
+    }
+    if (gratitude !== undefined && gratitude !== null) {
+      if (typeof gratitude !== 'string') return NextResponse.json({ error: 'gratitude must be a string' }, { status: 400 });
+      if (gratitude.length > 5000) return NextResponse.json({ error: 'gratitude too long (max 5,000 chars)' }, { status: 400 });
+    }
+    if (mood !== undefined && mood !== null) {
+      if (typeof mood !== 'number' || !Number.isInteger(mood) || mood < 1 || mood > 5) {
+        return NextResponse.json({ error: 'mood must be an integer 1-5' }, { status: 400 });
+      }
+    }
+
+    const safeTitle = typeof title === 'string' ? title : '';
+    const safeContent = typeof content === 'string' ? content : '';
+    const safeGratitude = typeof gratitude === 'string' ? gratitude : '';
+    if (!safeTitle.trim() && !safeContent.trim() && !safeGratitude.trim()) {
       return NextResponse.json({ error: 'At least one field is required' }, { status: 400 });
     }
 
     const updated = await db.journalEntry.update({
       where: { id: entryId },
-      data: { title: title || '', content: content || '', mood, gratitude },
+      data: { title: safeTitle, content: safeContent, mood, gratitude: safeGratitude },
     });
 
     return NextResponse.json({ entry: updated });

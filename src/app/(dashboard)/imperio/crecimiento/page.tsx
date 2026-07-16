@@ -5,8 +5,8 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_JOURNAL_ENTRIES } from '@/lib/screenshot-data';
-import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock, X, Check } from 'lucide-react';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock } from 'lucide-react';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -32,16 +32,14 @@ function dateGroupLabel(dateStr: string): string {
 
   if (entryKey === todayKey) return 'Hoy';
 
-  // Calculate calendar-day difference using Madrid-normalized dates
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDay = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDay = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffDay === 1) return 'Ayer';
   if (diffDay < 7) return 'Esta semana';
   if (diffDay < 14) return 'Hace 2 semanas';
+
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
   return entryDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
 }
 
@@ -320,7 +318,7 @@ export default function CrecimientoPage() {
       <ContextualHelp
         storageKey="vitazen_help_crecimiento"
         title="Crecimiento"
-        text="Escribe en tu diario personal, refleja tu estado de ánimo y agradece. Tu evolución se construye día a día."
+        text="Escribe en tu diario personal, refleja tu estado de ánimo y agradece."
       />
 
       {/* ═══ Journal Section ═══ */}
@@ -474,7 +472,7 @@ export default function CrecimientoPage() {
         ) : (
           <PremiumEmptyState
             icon={BookOpenText}
-            title="Tu diario espera tus palabras"
+            title="Aún no has escrito en tu diario"
             subtitle="Escribe lo que sientes. No tiene que ser perfecto, solo tuyo."
             cta="Nueva entrada"
             onCta={() => setShowAdd(true)}

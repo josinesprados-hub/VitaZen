@@ -10,7 +10,6 @@ const GoogleIcon = () => (
 );
 
 export default function LoginPage() {
-  console.log('[AUTH-FORENSIC] LoginPage MOUNT — url:', typeof window !== 'undefined' ? window.location.href : 'SSR');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,14 +25,7 @@ export default function LoginPage() {
   // Always send to /onboarding — it is the single gate that decides
   // whether to show questions or redirect to dashboard.
   useEffect(() => {
-    console.log('[AUTH-FORENSIC] Login auth-guard useEffect:', {
-      authLoading,
-      user: user ? { id: user.id, email: user.email } : null,
-      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
-      condition: `!${authLoading} && (${!!user} || ${!!firebaseUser}) = ${!authLoading && (user || firebaseUser)}`,
-    });
     if (!authLoading && (user || firebaseUser)) {
-      console.log('[AUTH-FORENSIC] Login → router.replace("/onboarding") via auth-guard');
       router.replace('/onboarding');
     }
   }, [authLoading, user, firebaseUser, router]);
@@ -104,23 +96,14 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
-    console.log('[AUTH-FORENSIC] handleGoogleLogin() START:', {
-      timestamp: Date.now(),
-      platform: typeof navigator !== 'undefined' ? navigator.platform : 'SSR',
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'SSR',
-      url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-    });
     setError('');
     setProviderHint(null);
     setLoading(true);
 
     try {
-      console.log('[AUTH-FORENSIC] handleGoogleLogin() → calling signInWithGoogle()');
       await signInWithGoogle();
-      console.log('[AUTH-FORENSIC] handleGoogleLogin() → signInWithGoogle() resolved, calling router.replace("/onboarding")');
       router.replace('/onboarding');
     } catch (err: any) {
-      console.log('[AUTH-FORENSIC] handleGoogleLogin() CATCH:', { code: err?.code, message: err?.message });
       if (err.code === 'auth/popup-closed-by-user') {
         setLoading(false);
         return;
@@ -150,7 +133,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-16 h-16 mx-auto mb-4 rounded-[20%]" />
           <h1 className="text-champagne text-3xl font-bold tracking-widest">VITAZEN</h1>
-          <p className="text-champagne/80 mt-3 text-base tracking-wide font-light italic">Muévete, desconecta y vive sin límites.</p>
+          <p className="text-champagne/80 mt-3 text-base tracking-wide font-light italic">Tu espacio para observar.</p>
         </div>
 
         {/* Form Card */}

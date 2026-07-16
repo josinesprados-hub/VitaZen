@@ -19,23 +19,30 @@ const IMPERIO_LABEL: Record<string, string> = {
   mente: 'Mente',
   energia: 'Energía',
   disciplina: 'Disciplina',
-  riqueza: 'Finanzas',
+  riqueza: 'Riqueza',
+  crecimiento: 'Crecimiento',
 };
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
-  if (!user) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  }
+    const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
 
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
-  const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
+  // M-15 FIX: Validate limit is a valid number before using it
+  const limitParam = parseInt(searchParams.get('limit') || '50');
+  if (isNaN(limitParam)) {
+    return NextResponse.json({ error: 'El parámetro "limit" debe ser un número' }, { status: 400 });
+  }
+  const limit = Math.min(limitParam, 100);
 
   interface TimelineItem {
     id: string;
@@ -49,40 +56,14 @@ export async function GET(request: NextRequest) {
 
   const items: TimelineItem[] = [];
 
-  // category can be comma-separated (e.g. 'meditation,journal') for multi-type imperios
-  const categories = category ? category.split(',').map(c => c.trim()) : [];
-  const fetchMeditation = categories.length === 0 || categories.includes('meditation');
-  const fetchJournal = categories.length === 0 || categories.includes('journal');
-  const fetchWellness = categories.length === 0 || categories.includes('wellness');
-  const fetchHabits = categories.length === 0 || categories.includes('habits');
-  const fetchNutrition = categories.length === 0 || categories.includes('nutrition');
-  const fetchFinance = categories.length === 0 || categories.includes('finance');
-
-  const fetchCheckin = categories.length === 0 || categories.includes('checkin');
+  const fetchMeditation = !category || category === 'meditation';
+  const fetchJournal = !category || category === 'journal';
+  const fetchWellness = !category || category === 'wellness';
+  const fetchHabits = !category || category === 'habits';
+  const fetchNutrition = !category || category === 'nutrition';
+  const fetchFinance = !category || category === 'finance';
 
   const queries: Promise<void>[] = [];
-
-  if (fetchCheckin) {
-    queries.push(
-      db.dailyCheckin.findMany({
-        where: { userId: user.id },
-        orderBy: { date: 'desc' },
-        take: limit,
-      }).then((checkins) => {
-        for (const c of checkins) {
-          items.push({
-            id: c.id,
-            type: 'checkin',
-            imperio: 'mente',
-            title: `Check-in · ${c.intention}`,
-            description: `Ánimo ${c.emotion}/5 · Energía ${c.energy}/5 · Enfoque ${c.focus}/5`,
-            date: c.date,
-            meta: { emotion: c.emotion, energy: c.energy, focus: c.focus, stress: c.stress },
-          });
-        }
-      })
-    );
-  }
 
   if (fetchMeditation) {
     queries.push(
@@ -172,7 +153,7 @@ export async function GET(request: NextRequest) {
             type: 'habits',
             imperio: 'disciplina',
             title: h.name,
-            description: h.description || (h.streak > 0 ? `${h.streak} días` : undefined),
+            description: h.description || (h.streak > 0 ? `${h.streak} días` : ''),
             date: h.lastCompletedAt || h.createdAt,
             meta: { streak: h.streak, frequency: h.frequency },
           });
@@ -196,7 +177,7 @@ export async function GET(request: NextRequest) {
             type: 'nutrition',
             imperio: 'energia',
             title: 'Nutrición',
-            description: parts.length > 0 ? parts.join(' · ') : (l.notes || undefined),
+            description: parts.length > 0 ? parts.join(' · ') : (l.notes || ''),
             date: l.date,
             meta: { water: l.water, calories: l.calories, notes: l.notes },
           });
@@ -240,4 +221,8 @@ export async function GET(request: NextRequest) {
   }));
 
   return NextResponse.json({ items: result, total: result.length });
+  } catch (error) {
+    console.error('Timeline GET error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

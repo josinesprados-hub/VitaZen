@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { Zap, Droplets, Flame, Apple, Heart, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
+import { Zap, Droplets, Apple, Heart, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -11,7 +11,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import PrivacyMask from '@/components/ui/PrivacyMask';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { getTodayDateKey } from '@/lib/dates';
 
 interface WellnessLog {
   id: string;
@@ -388,7 +388,7 @@ export default function EnergiaPage() {
           <PremiumEmptyState
             icon={Heart}
             title="Aún sin registros"
-            subtitle="Cuando quieras."
+            subtitle="Empieza cuando quieras."
             cta="Registrar"
             onCta={() => setShowWellness(true)}
             size="sm"
@@ -471,7 +471,7 @@ export default function EnergiaPage() {
           <PremiumEmptyState
             icon={Apple}
             title="Aún sin registros"
-            subtitle="Cuando quieras."
+            subtitle="Empieza cuando quieras."
             cta="Registrar"
             onCta={() => setShowNutrition(true)}
             size="sm"

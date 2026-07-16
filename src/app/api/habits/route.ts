@@ -39,6 +39,40 @@ export async function POST(request: NextRequest) {
 
     const { name, description, frequency } = await request.json();
 
+    // H-06 FIX: Validate habit fields
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'El nombre del hábito es requerido' }, { status: 400 });
+    }
+    if (name.length > 100) {
+      return NextResponse.json({ error: 'El nombre del hábito es demasiado largo (máx. 100 caracteres)' }, { status: 400 });
+    }
+    const VALID_FREQUENCIES = ['daily', 'weekly', 'monthly'];
+    if (frequency && !VALID_FREQUENCIES.includes(frequency)) {
+      return NextResponse.json({ error: 'Frecuencia inválida (daily, weekly, monthly)' }, { status: 400 });
+    }
+    // H-06 FIX: Validate description length — previously unbounded, allowing
+    // arbitrary data storage in the database.
+    if (description !== undefined && description !== null) {
+      if (typeof description !== 'string') return NextResponse.json({ error: 'description must be a string' }, { status: 400 });
+      if (description.length > 500) return NextResponse.json({ error: 'La descripción es demasiado larga (máx. 500 caracteres)' }, { status: 400 });
+    }
+
+    // H-05 FIX: Rate limit habit creation to 5 per day to prevent XP farming
+    const todayStart = startOfMadridDay(getTodayDateKey());
+    const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const habitsCreatedToday = await db.habitLog.count({
+      where: {
+        userId: user.id,
+        createdAt: { gte: todayStart, lt: todayEnd },
+      },
+    });
+    if (habitsCreatedToday >= 5) {
+      return NextResponse.json(
+        { error: 'Has alcanzado el límite de creación de hábitos por hoy (5)' },
+        { status: 429 }
+      );
+    }
+
     // PERF-5.2: Wrap habit creation + XP award in a transaction to prevent
     // silent XP loss if the upsert fails after the habit is created.
     // This matches the pattern already used in checkin, meditation, wellness,
@@ -237,6 +271,20 @@ export async function PUT(request: NextRequest) {
     const habit = await db.habitLog.findUnique({ where: { id: habitId } });
     if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
     if (habit.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    // H-06 FIX: Validate edited fields (same rules as POST)
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim().length === 0) return NextResponse.json({ error: 'name is required' }, { status: 400 });
+      if (name.length > 100) return NextResponse.json({ error: 'name too long (max 100 chars)' }, { status: 400 });
+    }
+    if (frequency !== undefined) {
+      const VALID_FREQUENCIES = ['daily', 'weekly', 'monthly'];
+      if (!VALID_FREQUENCIES.includes(frequency)) return NextResponse.json({ error: 'Invalid frequency' }, { status: 400 });
+    }
+    if (description !== undefined && description !== null) {
+      if (typeof description !== 'string') return NextResponse.json({ error: 'description must be a string' }, { status: 400 });
+      if (description.length > 500) return NextResponse.json({ error: 'description too long (max 500 chars)' }, { status: 400 });
+    }
 
     // H-9 FIX: Reset streak when frequency changes.
     // The streak value is frequency-dependent — a streak of 5 with weekly

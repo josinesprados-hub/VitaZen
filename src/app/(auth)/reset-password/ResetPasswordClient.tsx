@@ -100,7 +100,7 @@ export default function ResetPasswordClient() {
             <>
               <h2 className="text-xl font-semibold text-white mb-4">Contraseña actualizada</h2>
               <p className="text-[#999] text-sm mb-6">
-                Tu acceso está listo. Ya puedes iniciar sesión con tu nueva contraseña.
+                Listo. Ya puedes iniciar sesión con tu nueva contraseña.
               </p>
               <Link
                 href="/login"

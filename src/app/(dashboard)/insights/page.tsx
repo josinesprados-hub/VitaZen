@@ -233,7 +233,7 @@ export default function InsightsPage() {
       {!screenshotMode && (
         <ContextualHelp
           storageKey="vitazen_help_insights"
-          title="Observaciones Semanales"
+          title="Observaciones semanales"
           text="Cada semana se observan tus datos y se generan notas automáticas. Tendencias y patrones, cuando aparecen."
         />
       )}
@@ -320,7 +320,7 @@ export default function InsightsPage() {
           <div className="flex items-center gap-3 mb-5">
             <Lightbulb size={20} className="text-champagne" />
             <h2 className="title-section">Semana a semana</h2>
-            <span className="text-[10px] text-champagne/60">vs. semana anterior</span>
+            <span className="text-[10px] text-champagne/60">frente a la semana anterior</span>
           </div>
           <PrivacyMask compact>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -391,7 +391,7 @@ export default function InsightsPage() {
         <PremiumEmptyState
           icon={Sparkles}
           title="Las observaciones llegarán con el tiempo"
-          subtitle="Con el tiempo."
+          subtitle="Aparecen poco a poco."
           size="md"
           variant="gold"
         />
@@ -421,7 +421,7 @@ export default function InsightsPage() {
             {summary.checkins.count > 0 && (
               <div className="mt-3 space-y-1">
                 <div className="flex justify-between text-[10px]">
-                  <span className="text-[#666]">Ánimo</span>
+                  <span className="text-[#666]">Emoción</span>
                   <span className="text-champagne-soft">{summary.checkins.avgEmotion}/5</span>
                 </div>
                 <div className="flex justify-between text-[10px]">
@@ -480,7 +480,7 @@ export default function InsightsPage() {
           </Link>
 
           {/* Wellness — PREMIUM details */}
-          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle emocional">
+          <PremiumGate isPremium={isPremium} intensity="light" compact showCta={false} label="Detalle emocional">
             <Link href="/imperio/energia" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-champagne/20 transition-colors cursor-pointer group touch-press">
               <div className="flex items-center gap-2 mb-3">
                 <Brain size={16} className="text-champagne" />
@@ -504,7 +504,7 @@ export default function InsightsPage() {
           </PremiumGate>
 
           {/* Nutrition — PREMIUM details */}
-          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle nutrición">
+          <PremiumGate isPremium={isPremium} intensity="light" compact showCta={false} label="Detalle nutrición">
             <Link href="/imperio/energia" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-champagne/20 transition-colors cursor-pointer group">
               <div className="flex items-center gap-2 mb-3">
                 <Star size={16} className="text-champagne" />
@@ -519,7 +519,7 @@ export default function InsightsPage() {
           </PremiumGate>
 
           {/* Finance — PREMIUM details */}
-          <PremiumGate isPremium={isPremium} intensity="light" compact label="Detalle finanzas">
+          <PremiumGate isPremium={isPremium} intensity="light" compact showCta={false} label="Detalle finanzas">
             <Link href="/imperio/riqueza" className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 hover:border-champagne/20 transition-colors cursor-pointer group">
               <div className="flex items-center gap-2 mb-3">
                 <Gem size={16} className="text-champagne" />

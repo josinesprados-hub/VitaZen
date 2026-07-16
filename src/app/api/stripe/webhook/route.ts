@@ -423,88 +423,90 @@ export async function POST(request: NextRequest) {
             });
           }
 
-          await db.subscription.upsert({
-            where: { stripeSubscriptionId: subscription.id },
-            create: {
-              userId,
-              stripeSubscriptionId: subscription.id,
-              stripePriceId: subscription.items.data[0]?.price.id || '',
-              status: subscription.status,
-              currentPeriodStart: typeof itemPeriodStart === 'number' ? new Date(itemPeriodStart * 1000) : new Date(),
-              currentPeriodEnd: typeof itemPeriodEnd === 'number' ? new Date(itemPeriodEnd * 1000) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-              cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            },
-            update: {
-              status: subscription.status,
-              cancelAtPeriodEnd: subscription.cancel_at_period_end,
-              // BUG-C3 FIX: Also update currentPeriodStart on renewal.
-              // Previously only currentPeriodEnd was updated, so the start
-              // date stayed at the original subscription creation date
-              // instead of reflecting the current billing period start.
-              ...(typeof itemPeriodStart === 'number' ? { currentPeriodStart: new Date(itemPeriodStart * 1000) } : {}),
-              ...(typeof itemPeriodEnd === 'number' ? { currentPeriodEnd: new Date(itemPeriodEnd * 1000) } : {}),
-            },
+          // M-01 FIX: Wrap subscription upsert + plan sync in a single
+          // transaction. Previously the upsert was outside the tx, so a
+          // failure between upsert and plan sync left inconsistent state
+          // (subscription record updated but user.plan not synced).
+          const downgradeStatuses = ['canceled', 'unpaid', 'incomplete_expired'];
+
+          await db.$transaction(async (tx) => {
+            // H-03 FIX: Advisory lock prevents race with concurrent webhooks
+            await tx.$executeRaw`
+              SELECT pg_advisory_xact_lock(
+                ('x' || substring(md5(${userId} || '|plan-sync'), 1, 16))::bit(64)::bigint
+              )
+            `;
+
+            // Upsert subscription record (now inside the same tx)
+            await tx.subscription.upsert({
+              where: { stripeSubscriptionId: subscription.id },
+              create: {
+                userId,
+                stripeSubscriptionId: subscription.id,
+                stripePriceId: subscription.items.data[0]?.price.id || '',
+                status: subscription.status,
+                currentPeriodStart: typeof itemPeriodStart === 'number' ? new Date(itemPeriodStart * 1000) : new Date(),
+                currentPeriodEnd: typeof itemPeriodEnd === 'number' ? new Date(itemPeriodEnd * 1000) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                cancelAtPeriodEnd: subscription.cancel_at_period_end,
+              },
+              update: {
+                status: subscription.status,
+                cancelAtPeriodEnd: subscription.cancel_at_period_end,
+                // BUG-C3 FIX: Also update currentPeriodStart on renewal.
+                ...(typeof itemPeriodStart === 'number' ? { currentPeriodStart: new Date(itemPeriodStart * 1000) } : {}),
+                ...(typeof itemPeriodEnd === 'number' ? { currentPeriodEnd: new Date(itemPeriodEnd * 1000) } : {}),
+              },
+            });
+
+            // Sync user.plan with subscription status
+            if (downgradeStatuses.includes(subscription.status)) {
+              const otherActive = await tx.subscription.findFirst({
+                where: {
+                  userId,
+                  status: { in: ['active', 'trialing'] },
+                  stripeSubscriptionId: { not: subscription.id },
+                },
+              });
+              if (!otherActive) {
+                await tx.user.update({
+                  where: { id: userId },
+                  data: { plan: 'FREE' },
+                });
+                serverLog.info('webhook/stripe', 'Subscription terminal-inactive — user downgraded to FREE', {
+                  status: subscription.status,
+                });
+              } else {
+                serverLog.info('webhook/stripe', 'Subscription inactive but another active sub exists — keeping PREMIUM');
+              }
+            } else if (subscription.status === 'active') {
+              const user = await tx.user.findUnique({ where: { id: userId } });
+              if (user && user.plan !== 'PREMIUM') {
+                await tx.user.update({
+                  where: { id: userId },
+                  data: { plan: 'PREMIUM' },
+                });
+                serverLog.info('webhook/stripe', 'Subscription active — user restored to PREMIUM');
+              }
+            } else if (subscription.status === 'trialing') {
+              const user = await tx.user.findUnique({ where: { id: userId } });
+              if (user && user.plan !== 'PREMIUM') {
+                await tx.user.update({
+                  where: { id: userId },
+                  data: { plan: 'PREMIUM' },
+                });
+                serverLog.info('webhook/stripe', 'Subscription trialing — user promoted to PREMIUM');
+              }
+            } else if (subscription.status === 'past_due') {
+              serverLog.info('webhook/stripe', 'Subscription past_due — keeping PREMIUM during Stripe retry period');
+            } else if (subscription.status === 'incomplete') {
+              serverLog.info('webhook/stripe', 'Subscription incomplete — keeping PREMIUM while payment processes');
+            }
           });
+
         } catch (e) {
-          serverLog.error('webhook/stripe', 'Failed to update subscription record', e, {
+          serverLog.error('webhook/stripe', 'Failed to update subscription or sync plan', e, {
             subId: subscription.id,
           });
-        }
-
-        // ─── Sync user.plan with subscription status ───────────────────
-        // BUG-C5 FIX: Removed dead variable keepPremiumStatuses — it was
-        // declared but never referenced. The if-else branches below handle
-        // each status explicitly.
-        const downgradeStatuses = ['canceled', 'unpaid', 'incomplete_expired'];
-
-        if (downgradeStatuses.includes(subscription.status)) {
-          // Check if user has any other active/trialing subscription before downgrading
-          const otherActive = await db.subscription.findFirst({
-            where: {
-              userId,
-              status: { in: ['active', 'trialing'] },
-              stripeSubscriptionId: { not: subscription.id },
-            },
-          });
-          if (!otherActive) {
-            await db.user.update({
-              where: { id: userId },
-              data: { plan: 'FREE' },
-            });
-            serverLog.info('webhook/stripe', 'Subscription terminal-inactive — user downgraded to FREE', {
-              status: subscription.status,
-            });
-          } else {
-            serverLog.info('webhook/stripe', 'Subscription inactive but another active sub exists — keeping PREMIUM');
-          }
-        } else if (subscription.status === 'active') {
-          // Ensure user is marked PREMIUM if subscription is active
-          const user = await db.user.findUnique({ where: { id: userId } });
-          if (user && user.plan !== 'PREMIUM') {
-            await db.user.update({
-              where: { id: userId },
-              data: { plan: 'PREMIUM' },
-            });
-            serverLog.info('webhook/stripe', 'Subscription active — user restored to PREMIUM');
-          }
-        } else if (subscription.status === 'trialing') {
-          // BUG-B4 FIX: Trialing subscriptions must also promote FREE → PREMIUM.
-          // Previously, 'trialing' fell through with no action because
-          // keepPremiumStatuses was declared but never used. If the
-          // checkout.session.completed webhook was lost/delayed, the user
-          // remained FREE during their trial. Now we ensure PREMIUM here too.
-          const user = await db.user.findUnique({ where: { id: userId } });
-          if (user && user.plan !== 'PREMIUM') {
-            await db.user.update({
-              where: { id: userId },
-              data: { plan: 'PREMIUM' },
-            });
-            serverLog.info('webhook/stripe', 'Subscription trialing — user promoted to PREMIUM');
-          }
-        } else if (subscription.status === 'past_due') {
-          serverLog.info('webhook/stripe', 'Subscription past_due — keeping PREMIUM during Stripe retry period');
-        } else if (subscription.status === 'incomplete') {
-          serverLog.info('webhook/stripe', 'Subscription incomplete — keeping PREMIUM while payment processes');
         }
 
         break;
@@ -553,24 +555,35 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // Check if user has any other active subscription before downgrading
-        const otherActive = await db.subscription.findFirst({
-          where: {
-            userId,
-            status: { in: ['active', 'trialing'] },
-            stripeSubscriptionId: { not: subscription.id },
-          },
-        });
+        // H-03 FIX: Wrap downgrade check in a transaction with advisory lock
+        // to prevent race with concurrent checkout.session.completed or
+        // customer.subscription.updated events for the same user.
+        await db.$transaction(async (tx) => {
+          await tx.$executeRaw`
+            SELECT pg_advisory_xact_lock(
+              ('x' || substring(md5(${userId} || '|plan-sync'), 1, 16))::bit(64)::bigint
+            )
+          `;
 
-        if (!otherActive) {
-          await db.user.update({
-            where: { id: userId },
-            data: { plan: 'FREE' },
+          // Check if user has any other active subscription before downgrading
+          const otherActive = await tx.subscription.findFirst({
+            where: {
+              userId,
+              status: { in: ['active', 'trialing'] },
+              stripeSubscriptionId: { not: subscription.id },
+            },
           });
-          serverLog.info('webhook/stripe', 'Subscription canceled, user downgraded to FREE');
-        } else {
-          serverLog.info('webhook/stripe', 'Subscription canceled but another active sub exists — keeping PREMIUM');
-        }
+
+          if (!otherActive) {
+            await tx.user.update({
+              where: { id: userId },
+              data: { plan: 'FREE' },
+            });
+            serverLog.info('webhook/stripe', 'Subscription canceled, user downgraded to FREE');
+          } else {
+            serverLog.info('webhook/stripe', 'Subscription canceled but another active sub exists — keeping PREMIUM');
+          }
+        });
 
         // Mark this subscription as canceled
         await db.subscription.updateMany({
@@ -583,7 +596,7 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = invoice.subscription as string | null;
+        const subscriptionId = (invoice as unknown as { subscription?: string | null }).subscription as string | null;
 
         serverLog.warn('webhook/stripe', 'invoice.payment_failed', {
           invoiceId: invoice.id,

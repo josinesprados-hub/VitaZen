@@ -59,17 +59,22 @@ async function handler(request: NextRequest) {
         );
 
         if (activeSub) {
+        // H-04 FIX: Wrap restore in a transaction to prevent inconsistent
+        // state if a crash occurs between user update and subscription upsert.
+        await db.$transaction(async (tx) => {
           // User already has access — ensure plan is PREMIUM
           if (user.plan !== 'PREMIUM') {
-            await db.user.update({
+            await tx.user.update({
               where: { id: user.id },
               data: { plan: 'PREMIUM' },
             });
           }
 
-          // Ensure subscription record exists
+          // M-03 FIX: Remove userId from update block — prevent cross-user
+          // overwrite if a subscription record is reused across accounts.
+          // userId is only set on create; updates only sync status/period.
           const firstItem = activeSub.items.data[0];
-          await db.subscription.upsert({
+          await tx.subscription.upsert({
             where: { stripeSubscriptionId: activeSub.id },
             create: {
               userId: user.id,
@@ -85,11 +90,11 @@ async function handler(request: NextRequest) {
               cancelAtPeriodEnd: activeSub.cancel_at_period_end,
             },
             update: {
-              userId: user.id,
               status: activeSub.status,
               cancelAtPeriodEnd: activeSub.cancel_at_period_end,
             },
           });
+        });
 
           serverLog.info('stripe/restore', 'Restored via existing stripeCustomerId', {
             userId: user.id,
@@ -135,41 +140,43 @@ async function handler(request: NextRequest) {
 
       if (activeSub) {
         // Found a valid subscription — link it to the current user
-        await db.user.update({
-          where: { id: user.id },
-          data: {
-            plan: 'PREMIUM',
-            stripeCustomerId: customer.id,
-          },
+        // H-04 FIX: Wrap in a transaction for atomicity.
+        await db.$transaction(async (tx) => {
+          await tx.user.update({
+            where: { id: user.id },
+            data: {
+              plan: 'PREMIUM',
+              stripeCustomerId: customer.id,
+            },
+          });
+
+          // M-03 FIX: Remove userId from update block.
+          const firstItem = activeSub.items.data[0];
+          await tx.subscription.upsert({
+            where: { stripeSubscriptionId: activeSub.id },
+            create: {
+              userId: user.id,
+              stripeSubscriptionId: activeSub.id,
+              stripePriceId: firstItem?.price.id || '',
+              status: activeSub.status,
+              currentPeriodStart: firstItem?.current_period_start
+                ? new Date(firstItem.current_period_start * 1000)
+                : new Date(),
+              currentPeriodEnd: firstItem?.current_period_end
+                ? new Date(firstItem.current_period_end * 1000)
+                : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              cancelAtPeriodEnd: activeSub.cancel_at_period_end,
+            },
+            update: {
+              status: activeSub.status,
+              cancelAtPeriodEnd: activeSub.cancel_at_period_end,
+            },
+          });
         });
 
-        // Update customer metadata to point to the new user
+        // Update Stripe customer metadata (outside DB tx — separate system)
         await stripe.customers.update(customer.id, {
           metadata: { ...customer.metadata, userId: user.id },
-        });
-
-        // Create/update subscription record
-        const firstItem = activeSub.items.data[0];
-        await db.subscription.upsert({
-          where: { stripeSubscriptionId: activeSub.id },
-          create: {
-            userId: user.id,
-            stripeSubscriptionId: activeSub.id,
-            stripePriceId: firstItem?.price.id || '',
-            status: activeSub.status,
-            currentPeriodStart: firstItem?.current_period_start
-              ? new Date(firstItem.current_period_start * 1000)
-              : new Date(),
-            currentPeriodEnd: firstItem?.current_period_end
-              ? new Date(firstItem.current_period_end * 1000)
-              : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            cancelAtPeriodEnd: activeSub.cancel_at_period_end,
-          },
-          update: {
-            userId: user.id,
-            status: activeSub.status,
-            cancelAtPeriodEnd: activeSub.cancel_at_period_end,
-          },
         });
 
         serverLog.info('stripe/restore', 'Restored via email search', {

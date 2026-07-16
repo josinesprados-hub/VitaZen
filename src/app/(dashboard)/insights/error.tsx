@@ -38,7 +38,7 @@ export default function InsightsPageError({
       <PremiumErrorState
         variant={isNetworkError ? 'network' : 'loading'}
         title="No se pudieron cargar las observaciones"
-        subtitle="Tu actividad está registrada. Intenta recargar para ver tus datos."
+        subtitle="Tu actividad está guardada. Intenta recargar para ver tus datos."
         onRetry={reset}
         secondaryAction={{
           label: 'Volver al dashboard',

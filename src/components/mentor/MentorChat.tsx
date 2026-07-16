@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
@@ -12,6 +14,7 @@ import {
   Plus,
   Trash2,
   MessageCircle,
+  Lock,
   Pencil,
   Check,
   X,
@@ -29,14 +32,19 @@ import {
   Circle,
   Zap,
   Infinity as InfinityIcon,
+  ShieldCheck,
+  BookOpen,
+  Lightbulb,
   Menu,
+  Search,
+  Star,
+  Copy,
 } from 'lucide-react';
+import FavoriteButton from '@/components/mentor/FavoriteButton';
 import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
-import MentorMarkdown from '@/components/mentor/MentorMarkdown';
-import CopyMessageButton from '@/components/mentor/CopyMessageButton';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 
 // ─────────────────────────────────────────
 // Types
@@ -56,30 +64,7 @@ interface Message {
   role: string;
   content: string;
   createdAt: string;
-}
-
-// ─────────────────────────────────────────
-// Suggestion pool — reuses real strings from the project
-// (3 existing mentor starters + 8 onboarding goals)
-// ─────────────────────────────────────────
-
-const MENTOR_SUGGESTIONS = [
-  '¿Cómo mejorar mi disciplina?',
-  'Crear nuevos hábitos',
-  'Necesito motivación',
-  'Reducir el estrés',
-  'Dormir mejor',
-  'Ser más constante',
-  'Mejorar mi enfoque',
-  'Cuidar mi cuerpo',
-  'Organizar mis finanzas',
-  'Meditar regularmente',
-  'Escribir un diario',
-];
-
-function pickSuggestions(count: number): string[] {
-  const shuffled = [...MENTOR_SUGGESTIONS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+  isFavorited?: boolean;
 }
 
 // ─────────────────────────────────────────
@@ -96,11 +81,7 @@ function getRelativeDate(dateStr: string): string {
   // Calendar-day difference using Madrid-normalized dates
   const entryKey = getMadridDateKey(date);
   const todayKey = getTodayDateKey();
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDays = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffMins < 1 && diffDays === 0) return 'Ahora';
   if (diffMins < 60 && diffDays === 0) return `Hace ${diffMins} min`;
@@ -111,6 +92,8 @@ function getRelativeDate(dateStr: string): string {
     const weeks = Math.floor(diffDays / 7);
     return weeks === 1 ? 'Hace 1 semana' : `Hace ${weeks} semanas`;
   }
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
   return entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
@@ -121,11 +104,7 @@ function getDateGroup(dateStr: string): string {
 
   if (entryKey === todayKey) return 'Hoy';
 
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDays = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffDays === 1) return 'Ayer';
   if (diffDays < 7) return 'Esta semana';
@@ -176,14 +155,21 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [dailyLimit, setDailyLimit] = useState<number>(15);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [suggestions] = useState(() => pickSuggestions(3));
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [historyLimited, setHistoryLimited] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState('');
 
+  // BUG-04: Real thread counts from server (independent of pagination cap)
+  const [totalActiveCount, setTotalActiveCount] = useState<number>(0);
+  const [totalArchivedCount, setTotalArchivedCount] = useState<number>(0);
+
   // Tab: 'active' | 'archived'
-  const [tab, setTab] = useState<'active' | 'archived'>('active');
+  const [tab, setTab] = useState<'active' | 'archived' | 'favorites'>('active');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [favorites, setFavorites] = useState<{ id: string; content: string; favoritedAt: string; thread: { id: string; title: string } }[]>([]);
+  const [favoritesLoaded, setFavoritesLoaded] = useState(false);
 
   // Mobile drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -202,9 +188,31 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [isContextual, setIsContextual] = useState(false);
   const [showContextTooltip, setShowContextTooltip] = useState(false);
 
+  // Copy response feedback state
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Debounce feedback state
+  const [debounceBlocked, setDebounceBlocked] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
+
+  /** Sync textarea height with content (no-op if empty → collapses to 1 line) */
+  const syncTextareaHeight = useCallback(() => {
+    const ta = chatInputRef.current;
+    if (!ta) return;
+    if (!ta.value) {
+      ta.style.height = 'auto';
+      ta.style.overflowY = 'hidden';
+      return;
+    }
+    const maxH = 10 * 24; // ~6-8 visible lines at leading-6 (24px)
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, maxH) + 'px';
+    ta.style.overflowY = ta.scrollHeight > maxH ? 'auto' : 'hidden';
+  }, []);
   const sendingRef = useRef(false);
   const activeThreadRef = useRef<string | null>(null);
   const fetchIdRef = useRef(0);
@@ -232,13 +240,26 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         const data = await res.json();
         const allThreads: Thread[] = data.threads;
         setThreads(allThreads);
+        setHistoryLimited(!!data.historyLimited);
+        // BUG-04: Store real counts from server for tab badges
+        if (data.totalActiveCount !== undefined) setTotalActiveCount(data.totalActiveCount);
+        if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
         // Initialize remaining/limit from server if available
         if (data.remaining !== undefined && data.remaining !== null) {
           setRemaining(data.remaining);
           setDailyLimit(data.limit || 15);
         }
-        // Clear stale localStorage if no threads exist
-        if (allThreads.length === 0) {
+        // Only set active thread on initial load (when none is set)
+        if (allThreads.length > 0 && !activeThreadRef.current) {
+          let savedThreadId: string | null = null;
+          try { savedThreadId = localStorage.getItem(storageKey); } catch {}
+
+          // Only restore if saved thread is active (not archived)
+          const savedExists = savedThreadId && allThreads.some((t: Thread) => t.id === savedThreadId && !t.archived);
+          const activeThreads = allThreads.filter((t: Thread) => !t.archived);
+          setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
+        } else if (allThreads.length === 0 && !activeThreadRef.current) {
+          // No threads at all — clear stale localStorage
           try { localStorage.removeItem(storageKey); } catch {}
         }
       } else if (!isRetry) {
@@ -256,11 +277,21 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           if (res.ok) {
             const data = await res.json();
             setThreads(data.threads);
+            setHistoryLimited(!!data.historyLimited);
+            // BUG-04: Store real counts from server for tab badges
+            if (data.totalActiveCount !== undefined) setTotalActiveCount(data.totalActiveCount);
+            if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
             if (data.remaining !== undefined && data.remaining !== null) {
               setRemaining(data.remaining);
               setDailyLimit(data.limit || 15);
             }
-
+            if (data.threads.length > 0 && !activeThreadRef.current) {
+              let savedThreadId: string | null = null;
+              try { savedThreadId = localStorage.getItem(storageKey); } catch {}
+              const savedExists = savedThreadId && data.threads.some((t: Thread) => t.id === savedThreadId && !t.archived);
+              const activeThreads = data.threads.filter((t: Thread) => !t.archived);
+              setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
+            }
             setLoadError(false);
             setLoading(false);
             return;
@@ -277,12 +308,34 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     try {
       const res = await apiFetch(`/api/ai/threads/${threadId}/messages`);
       // Only apply if this is still the latest fetch (prevents stale overwrites on rapid thread switching)
-      if (res.ok && fetchIdRef.current === thisFetchId) {
+      // and no message is currently in flight (prevents overwriting the optimistic user message
+      // that hasn't been saved to DB yet — the API saves both user + assistant atomically
+      // AFTER Groq returns, so a fetch that started before the send will return stale data).
+      if (res.ok && fetchIdRef.current === thisFetchId && !sendingRef.current) {
         const data = await res.json();
         setMessages(data.messages);
+        setHistoryLimited(!!data.historyLimited);
       }
     } catch (e) { console.error(e); }
   }, [apiFetch]);
+
+  // Fetch favorites when tab switches to 'favorites'
+  const fetchFavorites = useCallback(async () => {
+    try {
+      const res = await apiFetch('/api/ai/favorites');
+      if (res.ok) {
+        const data = await res.json();
+        setFavorites(data.favorites || []);
+        setFavoritesLoaded(true);
+      }
+    } catch (e) { console.error(e); }
+  }, [apiFetch]);
+
+  useEffect(() => {
+    if (tab === 'favorites' && !favoritesLoaded) {
+      fetchFavorites();
+    }
+  }, [tab, favoritesLoaded, fetchFavorites]);
 
   // ─────────────────────────────────────────
   // Effects (defined AFTER useCallback hooks that they reference)
@@ -530,7 +583,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     if (!content || !activeThread || sendingRef.current) return;
 
     const now = Date.now();
-    if (now - lastSendTime.current < 1000) return; // Debounce: 1s between sends
+    if (now - lastSendTime.current < 1000) {
+      // BUG-06: Show discrete feedback when blocked by debounce
+      setDebounceBlocked(true);
+      setTimeout(() => setDebounceBlocked(false), 800);
+      return;
+    }
     lastSendTime.current = now;
 
     const sentThreadId = activeThread;
@@ -544,6 +602,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    requestAnimationFrame(syncTextareaHeight);
     setSending(true);
 
     try {
@@ -562,13 +621,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         // L-4 FIX: Restore the input text so the user doesn't lose their message.
         // Previously the input was cleared (line 547) and never restored on 403.
         setInput(content);
+        requestAnimationFrame(syncTextareaHeight);
         return;
       }
 
       if (res.ok) {
         const data = await res.json();
         const assistantMessage: Message = {
-          id: 'resp-' + Date.now(),
+          id: data.messageId || 'resp-' + Date.now(),
           role: 'assistant',
           content: data.message,
           createdAt: new Date().toISOString(),
@@ -586,12 +646,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         if (threadsRes.ok) {
           const threadsData = await threadsRes.json();
           setThreads(threadsData.threads);
+          setHistoryLimited(!!threadsData.historyLimited);
         }
       } else if (res.status !== 403) {
         // Non-403 error: remove optimistic message and show error
         if (activeThreadRef.current === sentThreadId) {
           setMessages(prev => prev.filter(m => m.id !== userMessage.id));
           setInput(content);
+          requestAnimationFrame(syncTextareaHeight);
           setActionError('Error al enviar. Inténtalo de nuevo.');
         }
       }
@@ -601,6 +663,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (activeThreadRef.current === sentThreadId) {
         setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         setInput(content); // Restore input so user can retry
+        requestAnimationFrame(syncTextareaHeight);
         setActionError('Sin conexión. Tu mensaje se ha restaurado.');
       }
     }
@@ -617,14 +680,19 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const activeThreads = useMemo(() => threads.filter(t => !t.archived), [threads]);
   const archivedThreads = useMemo(() => threads.filter(t => t.archived), [threads]);
   const visibleThreads = useMemo(() => tab === 'active' ? activeThreads : archivedThreads, [tab, activeThreads, archivedThreads]);
+  const searchedThreads = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return visibleThreads;
+    return visibleThreads.filter(t => t.title.toLowerCase().includes(q));
+  }, [visibleThreads, searchQuery]);
 
   // Group visible threads by date
-  const groupedThreads = useMemo(() => visibleThreads.reduce<Record<string, Thread[]>>((acc, thread) => {
+  const groupedThreads = useMemo(() => searchedThreads.reduce<Record<string, Thread[]>>((acc, thread) => {
     const group = getDateGroup(thread.updatedAt);
     if (!acc[group]) acc[group] = [];
     acc[group].push(thread);
     return acc;
-  }, {}), [visibleThreads]);
+  }, {}), [searchedThreads]);
 
   const activeThreadData = useMemo(() => threads.find(t => t.id === activeThread) ?? null, [threads, activeThread]);
 
@@ -665,7 +733,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         </button>
       </div>
 
-      {/* Tab selector: Todas / Archivadas */}
+      {/* Tab selector: Todas / Archivadas / Favoritos */}
       <div className="flex border-b border-[#1a1a1a]">
         <button
           onClick={() => setTab('active')}
@@ -676,11 +744,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           }`}
         >
           Todas
-          {activeThreads.length > 0 && (
+          {totalActiveCount > 0 && (
             <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
               tab === 'active' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
             }`}>
-              {activeThreads.length}
+              {totalActiveCount}
             </span>
           )}
           {tab === 'active' && (
@@ -696,28 +764,109 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           }`}
         >
           Archivadas
-          {archivedThreads.length > 0 && (
+          {totalArchivedCount > 0 && (
             <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
               tab === 'archived' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
             }`}>
-              {archivedThreads.length}
+              {totalArchivedCount}
             </span>
           )}
           {tab === 'archived' && (
             <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
           )}
         </button>
+        <button
+          onClick={() => setTab('favorites')}
+          className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
+            tab === 'favorites'
+              ? 'text-champagne'
+              : 'text-[#666] hover:text-[#999]'
+          }`}
+        >
+          <Star size={12} className="inline -mt-px" />
+          {tab === 'favorites' && (
+            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
+          )}
+        </button>
       </div>
 
-      {/* Thread list grouped by date */}
+      {/* Search bar (hidden in favorites tab) */}
+      {tab !== 'favorites' && (
+      <div className="px-3 py-2 border-b border-[#1a1a1a]">
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar conversación..."
+            className="w-full bg-[#111] border border-[#1a1a1a] rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-[#555] focus:border-champagne/40 focus:outline-none transition-colors"
+            aria-label="Buscar conversaciones por título"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#555] hover:text-white transition-colors p-0.5"
+              aria-label="Limpiar búsqueda"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      </div>
+      )}
+
+      {/* Thread list / Favorites list */}
       <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-hide">
-        {DATE_GROUP_ORDER.map((group, groupIdx) => {
+        {tab === 'favorites' ? (
+          // Favorites list
+          <>
+            {favorites.length === 0 && (
+              <div className="text-center py-12 animate-in">
+                <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
+                  <Star size={24} className="text-[#444]" />
+                </div>
+                <p className="text-[#555] text-sm font-medium mb-1">Sin favoritos</p>
+                <p className="text-[#444] text-xs">Marca respuestas del mentor para guardarlas aqui</p>
+              </div>
+            )}
+            {favorites.map((fav) => {
+              // BUG-05: Check if the thread is archived to navigate to correct tab
+              const favThread = threads.find(t => t.id === fav.thread.id);
+              const isArchived = favThread?.archived ?? false;
+              return (
+              <div
+                key={fav.id}
+                className="rounded-lg px-3 py-2.5 cursor-pointer text-[#ccc] hover:bg-[#1a1a1a]/60 transition-all duration-200"
+                onClick={() => {
+                  setActiveThread(fav.thread.id);
+                  // BUG-05: If the thread is archived, switch to the archived tab
+                  // so the user can see the selected thread
+                  setTab(isArchived ? 'archived' : 'active');
+                  setDrawerOpen(false);
+                }}
+              >
+                <p className="text-xs text-champagne/70 mb-1 truncate">{fav.thread.title}</p>
+                <p className="text-[13px] leading-snug line-clamp-2">{fav.content.slice(0, 120)}</p>
+                <p className="text-[10px] text-[#555] mt-1">{getRelativeDate(fav.favoritedAt)}</p>
+              {isArchived && (
+                <span className="inline-block mt-1 text-[9px] bg-champagne/10 text-champagne/60 px-1.5 py-0.5 rounded-full border border-champagne/15">
+                  Archivada
+                </span>
+              )}
+              </div>
+              );
+            })}
+          </>
+        ) : (
+          // Thread list grouped by date (only for active/archived tabs)
+          DATE_GROUP_ORDER.map((group, groupIdx) => {
           const groupThreads = groupedThreads[group];
           if (!groupThreads || groupThreads.length === 0) return null;
           // FREE users: blur groups beyond "Esta semana" (index 3+)
           const isOldGroup = !isPremium && groupIdx >= 3;
           return (
-            <div key={group}>
+            <div key={group} className="animate-in" style={{ animationDelay: '50ms' }}>
               <div className="flex items-center justify-between px-3 py-1.5">
                 <p className="text-[10px] text-[#555] uppercase tracking-widest font-semibold">
                   {group}
@@ -736,7 +885,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       >
                         <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#555]" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm truncate leading-tight">{thread.title.replace(/[*#_`~]/g, '')}</p>
+                          <p className="text-sm truncate leading-tight">{thread.title}</p>
                           <p className="text-[10px] text-[#555] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
                         </div>
                       </div>
@@ -802,7 +951,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         ) : (
                           <>
                             <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
-                              {thread.title.replace(/[*#_`~]/g, '')}
+                              {thread.title}
                             </p>
                             <p className="text-[10px] text-[#555] mt-0.5">
                               {getRelativeDate(thread.updatedAt)}
@@ -826,15 +975,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               )}
             </div>
           );
-        })}
+        })
+        )}
 
         {/* Premium history gate at bottom of sidebar */}
         {!isPremium && tab === 'active' && activeThreads.length > 3 && (
           <PremiumHistoryGate isPremium={isPremium} label="historial completo de conversaciones" />
         )}
 
-        {/* Empty state: active tab */}
-        {tab === 'active' && activeThreads.length === 0 && (
+        {/* Empty state: active tab (hide when searching) */}
+        {tab === 'active' && activeThreads.length === 0 && !searchQuery && (
           <div className="text-center py-12 animate-in">
             <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
               <Inbox size={24} className="text-[#444]" />
@@ -844,14 +994,25 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </div>
         )}
 
-        {/* Empty state: archived tab */}
-        {tab === 'archived' && archivedThreads.length === 0 && (
+        {/* Empty state: archived tab (hide when searching) */}
+        {tab === 'archived' && archivedThreads.length === 0 && !searchQuery && (
           <div className="text-center py-12 animate-in">
             <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
               <MessageSquareOff size={24} className="text-[#444]" />
             </div>
             <p className="text-[#555] text-sm font-medium mb-1">Sin archivadas</p>
             <p className="text-[#444] text-xs">Las conversaciones archivadas aparecerán aquí</p>
+          </div>
+        )}
+
+        {/* Empty state: search no results */}
+        {searchQuery.trim() && searchedThreads.length === 0 && (
+          <div className="text-center py-12 animate-in">
+            <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
+              <Search size={24} className="text-[#444]" />
+            </div>
+            <p className="text-[#555] text-sm font-medium mb-1">Sin resultados</p>
+            <p className="text-[#444] text-xs">No se encontró "{searchQuery.trim()}"</p>
           </div>
         )}
       </div>
@@ -942,7 +1103,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }
 
   return (
-    <div className="mentor-full-viewport flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0 sm:gap-4">
+    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
         <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
@@ -962,7 +1123,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           </Link>
           <IconComponent size={16} className="text-champagne shrink-0" />
           <p className="text-sm font-semibold text-white truncate">
-            {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Mentor IA'}
+            {activeThreadData?.title || 'Mentor IA'}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -1050,218 +1211,332 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* ═══════════════════════════════════════════
           MAIN CONTENT AREA
-          Mobile: chat fills full width
+          Mobile: only chat (full width)
           Desktop: sidebar + chat (flex-row)
           ═══════════════════════════════════════════ */}
+      <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-hidden sm:gap-4">
 
-      {/* ────────── Desktop Sidebar ────────── */}
-      <div
-        className={`hidden sm:flex shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
-          sidebarOpen ? 'w-72' : 'w-0 border-0'
-        }`}
-      >
-        {sidebarContent}
-      </div>
+        {/* ────────── Desktop Sidebar ────────── */}
+        <div
+          className={`hidden sm:flex shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
+            sidebarOpen ? 'w-72' : 'w-0 border-0'
+          }`}
+        >
+          {sidebarContent}
+        </div>
 
-      {/* ────────── Chat Area — full width on mobile, card on desktop ────────── */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
-        {activeThread ? (
-          <>
-            {/* Desktop: Chat header bar inside chat card */}
-            <div className="hidden sm:flex px-5 py-3 border-b border-[#1a1a1a] items-center justify-between shrink-0">
-              <div className="flex items-center gap-2 min-w-0">
-                <MessageCircle size={14} className="text-champagne shrink-0" />
-                <p className="text-sm text-white truncate">
-                  {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Conversación'}
-                </p>
-                {activeThreadData?.archived && (
-                  <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
-                    Archivada
-                  </span>
-                )}
-              </div>
-              {/* Contextual indicator — desktop only */}
-              {isContextual && (
-                <div className="relative shrink-0">
-                  <button
-                    onMouseEnter={() => setShowContextTooltip(true)}
-                    onMouseLeave={() => setShowContextTooltip(false)}
-                    className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
-                      isPremium
-                        ? 'text-champagne/80 hover:text-champagne border-champagne/20 hover:border-champagne/40'
-                        : 'text-champagne/60 hover:text-champagne border-champagne/15 hover:border-champagne/30'
-                    }`}
-                  >
-                    <BrainCircuit size={12} className="shrink-0" />
-                    <span>
-                      {isPremium ? 'Memoria contextual' : 'Contexto activo'}
+        {/* ────────── Chat Area — full width on both mobile and desktop ────────── */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
+          {activeThread ? (
+            <>
+              {/* Desktop: Chat header bar inside chat card */}
+              <div className="hidden sm:flex px-5 py-3 border-b border-[#1a1a1a] items-center justify-between shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <MessageCircle size={14} className="text-champagne shrink-0" />
+                  <p className="text-sm text-white truncate">
+                    {activeThreadData?.title || 'Conversación'}
+                  </p>
+                  {activeThreadData?.archived && (
+                    <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
+                      Archivada
                     </span>
-                  </button>
-                  {showContextTooltip && (
-                    <div className="absolute right-0 top-full mt-2 w-60 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 shadow-xl context-menu z-10">
-                      <p className="text-[11px] text-[#999] leading-relaxed">
-                        {isPremium
-                          ? 'El mentor usa tu actividad, emociones y conversaciones previas para ofrecerte respuestas profundas y personalizadas.'
-                          : 'El mentor usa tu actividad reciente para personalizar respuestas.'}
-                      </p>
-                    </div>
                   )}
                 </div>
-              )}
-            </div>
-
-            {/* Messages — single scroll container */}
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overscroll-contain scroll-smooth">
-              {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full p-3 sm:p-5">
-                  <div className="text-center animate-in">
-                    <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
-                      <IconComponent size={32} className="text-champagne" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
-                    <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
-                      {isPremium
-                        ? 'Tu mentor con memoria profunda. Pregúntame lo que necesites.'
-                        : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-2 mt-4">
-                      {suggestions.map((suggestion) => (
-                        <button
-                          key={suggestion}
-                          onClick={() => {
-                            setInput(suggestion);
-                            setTimeout(() => chatInputRef.current?.focus(), 50);
-                          }}
-                          className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-champagne/30 hover:text-champagne transition-colors"
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-                    {!isPremium && (
-                      <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
-                        <Circle size={3} fill="currentColor" className="text-champagne/30" />
-                        El mentor recuerda más cuando profundizas
-                      </p>
+                {/* Contextual indicator — desktop only */}
+                {isContextual && (
+                  <div className="relative shrink-0">
+                    <button
+                      onMouseEnter={() => setShowContextTooltip(true)}
+                      onMouseLeave={() => setShowContextTooltip(false)}
+                      className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
+                        isPremium
+                          ? 'text-champagne/80 hover:text-champagne border-champagne/20 hover:border-champagne/40'
+                          : 'text-champagne/60 hover:text-champagne border-champagne/15 hover:border-champagne/30'
+                      }`}
+                    >
+                      <BrainCircuit size={12} className="shrink-0" />
+                      <span>
+                        {isPremium ? 'Memoria contextual' : 'Contexto activo'}
+                      </span>
+                    </button>
+                    {showContextTooltip && (
+                      <div className="absolute right-0 top-full mt-2 w-60 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 shadow-xl context-menu z-10">
+                        <p className="text-[11px] text-[#999] leading-relaxed">
+                          {isPremium
+                            ? 'El mentor usa tu actividad, emociones y conversaciones previas para ofrecerte respuestas profundas y personalizadas.'
+                            : 'El mentor usa tu actividad reciente para personalizar respuestas.'}
+                        </p>
+                      </div>
                     )}
                   </div>
-                </div>
-              ) : (
-                <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
-                  {messages.map((msg, idx) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in`}
-                      style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
-                    >
-                      {msg.role === 'assistant' ? (
-                        <div className="max-w-[88%] sm:max-w-[80%]">
-                          <div className={`rounded-2xl p-3 sm:p-4 ${
-                            isPremium
-                              ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
-                              : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
-                          }`}>
-                            <MentorMarkdown content={msg.content} />
-                          </div>
-                          <div className="flex justify-end pr-1 pt-0.5">
-                            <CopyMessageButton content={msg.content} />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 bg-champagne/10 border border-champagne/20 rounded-br-md">
-                          <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
-                        </div>
+                )}
+              </div>
+
+              {/* Messages — single scroll container with overscroll containment */}
+              <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
+                {messages.length === 0 && (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center animate-in">
+                      <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                        <IconComponent size={32} className="text-champagne" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
+                      <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
+                        {isPremium
+                          ? 'Tu mentor con memoria profunda. Pregúntame lo que necesites.'
+                          : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-2 mt-4">
+                        {[
+                          '¿Cómo mantener la constancia?',
+                          'Crear nuevos hábitos',
+                          '¿Cómo manejar el estrés?',
+                        ].map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            onClick={() => {
+                              setInput(suggestion);
+                              setTimeout(() => chatInputRef.current?.focus(), 50);
+                            }}
+                            className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-champagne/30 hover:text-champagne transition-colors"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                      {!isPremium && (
+                        <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
+                          <Circle size={3} fill="currentColor" className="text-champagne/30" />
+                          El mentor recuerda más cuando profundizas
+                        </p>
                       )}
                     </div>
-                  ))}
-                  {sending && (
-                    <div className="flex justify-start animate-in">
-                      <div className={`border rounded-2xl rounded-bl-md p-4 ${
-                        isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
-                      }`}>
-                        <div className="flex gap-1.5">
-                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                        </div>
+                  </div>
+                )}
+                {messages.map((msg, idx) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in`}
+                    style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
+                  >
+                    <div
+                      className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
+                        msg.role === 'user'
+                          ? 'bg-champagne/10 border border-champagne/20 rounded-br-md'
+                          : isPremium
+                          ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
+                          : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
+                      }`}
+                    >
+                      {msg.role === 'assistant' ? (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => (
+                              <p className="text-sm text-white leading-relaxed break-words mb-2 last:mb-0">{children}</p>
+                            ),
+                            strong: ({ children }) => (
+                              <strong className="font-semibold text-white">{children}</strong>
+                            ),
+                            em: ({ children }) => (
+                              <em className="italic text-champagne/90">{children}</em>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="list-disc list-outside ml-4 mb-2 space-y-1">{children}</ul>
+                            ),
+                            ol: ({ children }) => (
+                              <ol className="list-decimal list-outside ml-4 mb-2 space-y-1">{children}</ol>
+                            ),
+                            li: ({ children }) => (
+                              <li className="text-sm text-white leading-relaxed">{children}</li>
+                            ),
+                            a: ({ href, children }) => (
+                              <a href={href} target="_blank" rel="noopener noreferrer" className="text-champagne hover:text-champagne-hover underline underline-offset-2">{children}</a>
+                            ),
+                            code: ({ className, children, ...props }) => {
+                              const isInline = !className;
+                              if (isInline) {
+                                return (
+                                  <code className="bg-[#1a1a1a] text-champagne/80 px-1.5 py-0.5 rounded text-[13px] font-mono">{children}</code>
+                                );
+                              }
+                              return (
+                                <code className={`${className} block text-sm font-mono`} {...props}>{children}</code>
+                              );
+                            },
+                            pre: ({ children }) => (
+                              <pre className="bg-[#111] border border-[#1a1a1a] rounded-lg p-3 my-2 overflow-x-auto text-sm font-mono text-[#ccc]">{children}</pre>
+                            ),
+                            table: ({ children }) => (
+                              <div className="overflow-x-auto my-2">
+                                <table className="min-w-full text-sm border-collapse">{children}</table>
+                              </div>
+                            ),
+                            thead: ({ children }) => (
+                              <thead className="border-b border-[#333]">{children}</thead>
+                            ),
+                            th: ({ children }) => (
+                              <th className="px-3 py-1.5 text-left text-champagne/80 font-medium text-xs uppercase tracking-wider">{children}</th>
+                            ),
+                            td: ({ children }) => (
+                              <td className="px-3 py-1.5 text-white border-b border-[#1a1a1a]">{children}</td>
+                            ),
+                            blockquote: ({ children }) => (
+                              <blockquote className="border-l-2 border-champagne/30 pl-3 my-2 text-[#aaa] italic">{children}</blockquote>
+                            ),
+                            h1: ({ children }) => (
+                              <h1 className="text-lg font-bold text-white mt-3 mb-1">{children}</h1>
+                            ),
+                            h2: ({ children }) => (
+                              <h2 className="text-base font-bold text-white mt-3 mb-1">{children}</h2>
+                            ),
+                            h3: ({ children }) => (
+                              <h3 className="text-sm font-bold text-white mt-2 mb-1">{children}</h3>
+                            ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (
+                        <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
+                      )}
+                    </div>
+                    {msg.role === 'assistant' && (
+                      <div className="flex justify-end pr-1 pt-0.5 gap-0.5">
+                        {/* BUG-02: Copy response button */}
+                        <button
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(msg.content);
+                              setCopiedId(msg.id);
+                              setTimeout(() => setCopiedId(null), 2000);
+                            } catch {}
+                          }}
+                          aria-label={copiedId === msg.id ? 'Copiado' : 'Copiar respuesta'}
+                          className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-champagne/50 focus-visible:outline-none ${
+                            copiedId === msg.id
+                              ? 'text-green-400 opacity-100'
+                              : 'text-[#333] opacity-60 hover:opacity-100 hover:text-champagne/50'
+                          }`}
+                        >
+                          {copiedId === msg.id ? (
+                            <Check size={13} className="text-green-400" />
+                          ) : (
+                            <Copy size={13} />
+                          )}
+                        </button>
+                        <FavoriteButton
+                          messageId={msg.id}
+                          isFavorited={msg.isFavorited ?? false}
+                          apiFetch={apiFetch}
+                          onToggle={(id, fav) => {
+                            setFavorites(prev => fav
+                              ? prev
+                              : prev.filter(f => f.id !== id));
+                            setFavoritesLoaded(false);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {sending && (
+                  <div className="flex justify-start animate-in">
+                    <div className={`border rounded-2xl rounded-bl-md p-4 ${
+                      isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
+                    }`}>
+                      <div className="flex gap-1.5">
+                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Composer — safe-area for iPhone home indicator */}
-            <div className="p-3 sm:p-4 shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-              {/* Low message warning */}
-              {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
-                <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
-                  <Zap size={10} className="shrink-0" />
-                  <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
-                  <button
-                    onClick={() => setShowLimitModal(true)}
-                    className="ml-auto text-champagne hover:text-champagne-hover flex items-center gap-1"
-                  >
-                    <Circle size={3} fill="currentColor" className="text-champagne/40" />
-                    Conocer Élite
-                  </button>
-                </div>
-              )}
-              <form
-                onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                className="flex gap-2"
-              >
-                <input
-                  ref={chatInputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  enterKeyHint="send"
-                  autoComplete="off"
-                  placeholder={
-                    activeThreadData?.archived
-                      ? 'Conversación archivada'
-                      : !isPremium && remaining === 0
-                      ? 'Límite diario alcanzado'
-                      : 'Escribe tu mensaje...'
-                  }
-                  className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base placeholder-[#555] transition-colors ${
-                    activeThreadData?.archived
-                      ? 'border-[#333] cursor-not-allowed opacity-40'
-                      : !isPremium && remaining === 0
-                      ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
-                      : 'border-[#1a1a1a] focus:border-champagne focus:outline-none'
-                  }`}
-                  disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
-                />
-                <button
-                  type="submit"
-                  disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
-                  className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
-                >
-                  <Send size={18} />
-                </button>
-              </form>
-            </div>
-          </>
-        ) : (
-          /* No active thread — empty state */
-          <div className="flex items-center justify-center flex-1 min-h-0">
-            <div className="text-center animate-in px-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
-                <IconComponent size={28} className="text-champagne sm:size-8" />
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
-              <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
-              <button
-                onClick={createThread}
-                className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
-              >
-                <Plus size={16} /> Nueva conversación
-              </button>
+
+              {/* Input area — safe-area for iPhone home indicator */}
+              <div className="p-3 sm:p-4 border-t border-[#1a1a1a] shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                {/* Low message warning */}
+                {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
+                  <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
+                    <Zap size={10} className="shrink-0" />
+                    <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
+                    <button
+                      onClick={() => setShowLimitModal(true)}
+                      className="ml-auto text-champagne hover:text-champagne-hover flex items-center gap-1"
+                    >
+                      <Circle size={3} fill="currentColor" className="text-champagne/40" />
+                      Conocer Élite
+                    </button>
+                  </div>
+                )}
+                <form
+                  onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+                  className="flex gap-2 items-end"
+                >
+                  <textarea
+                    ref={chatInputRef}
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      syncTextareaHeight();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
+                    enterKeyHint="send"
+                    autoComplete="off"
+                    placeholder={
+                      activeThreadData?.archived
+                        ? 'Conversación archivada'
+                        : !isPremium && remaining === 0
+                        ? 'Límite diario alcanzado'
+                        : 'Escribe tu mensaje...'
+                    }
+                    rows={1}
+                    className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base sm:text-sm placeholder-[#555] resize-none overflow-hidden leading-6 transition-colors ${
+                      activeThreadData?.archived
+                        ? 'border-[#333] cursor-not-allowed opacity-40'
+                        : !isPremium && remaining === 0
+                        ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
+                        : 'border-[#1a1a1a] focus:border-champagne focus:outline-none'
+                    }`}
+                    disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
+                  />
+                  <button
+                    type="submit"
+                    disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
+                    className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
+                  >
+                    <Send size={18} />
+                  </button>
+                </form>
+              </div>
+            </>
+          ) : (
+            /* No active thread — empty state */
+            <div className="flex items-center justify-center flex-1 min-h-0">
+              <div className="text-center animate-in px-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                  <IconComponent size={28} className="text-champagne sm:size-8" />
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
+                <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
+                <button
+                  onClick={createThread}
+                  className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
+                >
+                  <Plus size={16} /> Nueva conversación
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* ═══════════════════════════════════════════
@@ -1275,7 +1550,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             onClick={() => setDrawerOpen(false)}
           />
           {/* Drawer panel — slides from left */}
-          <div className="fixed bottom-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area" style={{ top: 'env(safe-area-inset-top)' }}>
+          <div className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area">
             {/* Drawer header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a] shrink-0">
               <h2 className="text-sm font-semibold text-white">Conversaciones</h2>
@@ -1394,6 +1669,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* BUG-06: Debounce blocked feedback — subtle and discrete */}
+      {debounceBlocked && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#2a2a2a] text-[#666] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in">
+          Espera un momento entre mensajes
         </div>
       )}
 

@@ -13,7 +13,7 @@
 // ─── Page ───
 
 export const PAGE_TITLE = 'Tu evolución';
-export const PAGE_SUBTITLE = 'Descubre cómo ha evolucionado tu vida.';
+export const PAGE_SUBTITLE = 'Cómo ha evolucionado tu vida con el tiempo.';
 
 // ─── Section titles ───
 
@@ -24,7 +24,7 @@ export const MEMORIES_TITLE = 'Momentos';
 export const MEMORIES_SUBTITLE = 'Fragmentos de tu vida';
 
 export const TRANSITIONS_TITLE = 'Transiciones';
-export const TRANSITIONS_SUBTITLE = 'Cambios entre etapas';
+export const TRANSITIONS_SUBTITLE = 'Cambios entre periodos';
 
 export const PATTERNS_TITLE = 'Conexiones';
 export const PATTERNS_SUBTITLE = 'Relaciones entre partes de tu vida';
@@ -39,13 +39,13 @@ export const LITTLE_DATA_SUBTITLE = 'Poco a poco.';
 
 // ─── FREE vs Profundidad ───
 
-export const ELITE_STAGES = 'Etapas de vida';
+export const ELITE_STAGES = 'Evolución personal';
 export const ELITE_TRANSITIONS = 'Transiciones personales';
 export const ELITE_CONNECTIONS = 'Conexiones históricas';
 export const ELITE_EVOLUTION = 'Evolución personal';
 export const ELITE_BADGE = 'Élite';
 
-export const FREE_LIMIT_MESSAGE = 'Las etapas de vida aparecen con el tiempo';
+export const FREE_LIMIT_MESSAGE = 'Tu evolución se revela con el tiempo';
 
 // ─── Time labels ───
 

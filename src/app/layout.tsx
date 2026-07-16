@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/AuthContext';
 import { ScreenshotModeProvider } from '@/context/ScreenshotModeContext';
 import { ObservabilityInit } from '@/components/observability/ObservabilityInit';
+
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
@@ -13,7 +14,6 @@ const inter = Inter({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: 'cover',
 };
 

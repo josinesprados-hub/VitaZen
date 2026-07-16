@@ -33,14 +33,22 @@ export async function POST(request: NextRequest) {
       select: { id: true, userId: true },
     });
 
-    // If token belongs to another user, reassign it.
-    // This prevents the old user from receiving the new user's notifications
-    // (security/privacy bug: token upsert without userId update kept the old owner).
+    // H-09 FIX: Do NOT reassign tokens across users.
+    // Previously, if a token belonged to another user, it was silently reassigned.
+    // Any authenticated user could steal another user's notification channel
+    // by sending their FCM token. Now: deactivate the old token instead,
+    // and let the new user create their own fresh record.
     if (existingToken && existingToken.userId !== user.id) {
       await db.pushToken.update({
         where: { id: existingToken.id },
+        data: { active: false },
+      });
+      // Fall through to create a new token for this user below
+    } else if (existingToken) {
+      // Same user — refresh the existing token
+      await db.pushToken.update({
+        where: { id: existingToken.id },
         data: {
-          userId: user.id,
           active: true,
           platform: platform || 'web',
           userAgent: userAgent || null,
@@ -48,28 +56,17 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Enforce device limit for the new user (now including the reassigned token)
-      const userActiveTokens = await db.pushToken.findMany({
-        where: { userId: user.id, active: true },
-        orderBy: { createdAt: 'asc' },
-      });
-      if (userActiveTokens.length > 5) {
-        const toDeactivate = userActiveTokens.slice(0, userActiveTokens.length - 5);
-        await db.pushToken.updateMany({
-          where: { id: { in: toDeactivate.map(t => t.id) } },
-          data: { active: false },
-        });
-      }
-
-      // Ensure notification preferences exist and pushEnabled is true
+      // Auto-create notification preferences if they don't exist
       await db.notificationPreference.upsert({
         where: { userId: user.id },
-        update: { pushEnabled: true },
+        update: {},
         create: { userId: user.id, pushEnabled: true },
       });
 
       return NextResponse.json({ success: true, tokenId: existingToken.id });
     }
+
+    // No existing token (or old one was deactivated) — create new
 
     // Limit tokens per user to prevent abuse (max 5 devices)
     const existingTokens = await db.pushToken.count({
@@ -108,10 +105,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Ensure notification preferences exist and pushEnabled is true
+    // Auto-create notification preferences if they don't exist
     await db.notificationPreference.upsert({
       where: { userId: user.id },
-      update: { pushEnabled: true },
+      update: {},
       create: {
         userId: user.id,
         pushEnabled: true,

@@ -5,21 +5,7 @@ import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onMeditationChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-
-// M-1/M-2 helper: compute the UTC instants that bound the Madrid calendar day
-// for the given Madrid date key (YYYY-MM-DD). Used by POST and DELETE so the
-// "first meditation today" check aligns with the user's perceived day boundary
-// (same approach as startOfMadridDay in insights.ts and the H-11 fix in habits).
-function madridDayBoundaries(todayDateKey: string): { todayStart: Date; todayEnd: Date } {
-  const madridNoonUtc = new Date(todayDateKey + 'T12:00:00Z');
-  const parts = madridNoonUtc
-    .toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' })
-    .split(' ')[1].split(':').map(Number);
-  const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
-  const todayStart = new Date(madridNoonUtc.getTime() - msSinceMadridMidnight);
-  const todayEnd = new Date(todayStart.getTime() + 86400000);
-  return { todayStart, todayEnd };
-}
+import { madridDayBoundaries } from '@/lib/dates';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -35,9 +21,24 @@ export async function PUT(request: NextRequest) {
     if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     if (session.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    // H-06 FIX: Validate duration and type (same as POST)
+    if (duration !== undefined && (typeof duration !== 'number' || duration < 1 || duration > 1440)) {
+      return NextResponse.json({ error: 'duration must be a number 1-1440 minutes' }, { status: 400 });
+    }
+    if (type !== undefined) {
+      const VALID_MEDITATION_TYPES = ['respiracion', 'cuerpo', 'mindfulness', 'visualizacion', 'gratitud', 'otro'];
+      if (typeof type !== 'string' || !VALID_MEDITATION_TYPES.includes(type)) {
+        return NextResponse.json({ error: 'Invalid meditation type' }, { status: 400 });
+      }
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (duration !== undefined) updateData.duration = duration;
+    if (type !== undefined) updateData.type = type;
+
     const updated = await db.meditationSession.update({
       where: { id: sessionId },
-      data: { duration, type },
+      data: updateData,
     });
 
     return NextResponse.json({ session: updated });
@@ -91,12 +92,12 @@ export async function DELETE(request: NextRequest) {
       if (session.completedAt) {
         const sessionDateKey = getMadridDateKey(session.completedAt);
         if (sessionDateKey === todayDateKey) {
-          const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+          const { start, end } = madridDayBoundaries(todayDateKey);
           const otherSessionToday = await tx.meditationSession.findFirst({
             where: {
               userId: user.id,
               id: { not: sessionId },
-              completedAt: { gte: todayStart, lt: todayEnd },
+              completedAt: { gte: start, lt: end },
             },
             select: { id: true },
           });
@@ -152,6 +153,16 @@ export async function POST(request: NextRequest) {
 
     const { duration, type } = await request.json();
 
+    // H-06 FIX: Validate duration and type before DB write.
+    // Previously zero validation — any value passed straight to DB.
+    if (typeof duration !== 'number' || duration < 1 || duration > 1440) {
+      return NextResponse.json({ error: 'duration must be a number 1-1440 minutes' }, { status: 400 });
+    }
+    const VALID_MEDITATION_TYPES = ['diaphragmatic', 'coherence', 'mindfulness', 'nadi_shodhana', 'box'];
+    if (typeof type !== 'string' || !VALID_MEDITATION_TYPES.includes(type)) {
+      return NextResponse.json({ error: 'Invalid meditation type' }, { status: 400 });
+    }
+
     // M-1 FIX: Empire streak must only increment once per active Madrid day,
     // not once per meditation session. The previous code did
     // `streak: { increment: 1 }` on every POST, so a user doing 5 meditations
@@ -168,7 +179,7 @@ export async function POST(request: NextRequest) {
     // The whole operation (session create + empire progress upsert) runs inside
     // a transaction so partial failures cannot leave inconsistent state (M-4).
     const todayDateKey = getTodayDateKey();
-    const { todayStart, todayEnd } = madridDayBoundaries(todayDateKey);
+    const { start, end } = madridDayBoundaries(todayDateKey);
 
     const session = await db.$transaction(async (tx) => {
       // CERT-1 FIX: Acquire transaction-scoped advisory lock on (userId, today)
@@ -195,7 +206,7 @@ export async function POST(request: NextRequest) {
         where: {
           userId: user.id,
           id: { not: created.id },
-          completedAt: { gte: todayStart, lt: todayEnd },
+          completedAt: { gte: start, lt: end },
         },
         select: { id: true },
       });

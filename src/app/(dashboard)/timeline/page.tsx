@@ -12,7 +12,6 @@ import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import {
-  Sunrise,
   Wind,
   BookOpen,
   Heart,
@@ -25,7 +24,7 @@ import {
   Target,
   Gem,
 } from 'lucide-react';
-import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -83,13 +82,12 @@ const IMPERIO_CONFIG: Record<string, {
     accent: 'text-champagne',
     accentSubtle: 'text-champagne/60',
     dot: 'bg-champagne/25 border-champagne/50',
-    label: 'Finanzas',
+    label: 'Riqueza',
   },
 };
 
 // Activity type → imperio fallback (in case API doesn't send imperio)
 const TYPE_IMPERIO: Record<string, string> = {
-  checkin: 'mente',
   meditation: 'mente',
   journal: 'mente',
   wellness: 'energia',
@@ -99,7 +97,6 @@ const TYPE_IMPERIO: Record<string, string> = {
 };
 
 const TYPE_ICON: Record<string, any> = {
-  checkin: Sunrise,
   meditation: Wind,
   journal: BookOpen,
   wellness: Heart,
@@ -116,7 +113,7 @@ const FILTERS = [
   { key: 'mente', label: 'Mente', icon: Brain },
   { key: 'energia', label: 'Energía', icon: Flame },
   { key: 'disciplina', label: 'Disciplina', icon: Target },
-  { key: 'riqueza', label: 'Finanzas', icon: Gem },
+  { key: 'riqueza', label: 'Riqueza', icon: Gem },
 ] as const;
 
 // ─── Date Grouping ───────────────────────────────────────
@@ -131,15 +128,12 @@ function dayLabel(dateStr: string): { label: string; sublabel?: string } {
 
   if (entryKey === todayKey) return { label: 'Hoy' };
 
-  // Calculate calendar-day difference using Madrid-normalized dates
-  const [eY, eM, eD] = entryKey.split('-').map(Number);
-  const [tY, tM, tD] = todayKey.split('-').map(Number);
-  const entryDate = new Date(eY, eM - 1, eD);
-  const todayDate = new Date(tY, tM - 1, tD);
-  const diffDay = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+  const diffDay = daysBetweenDateKeys(entryKey, todayKey);
 
   if (diffDay === 1) return { label: 'Ayer' };
 
+  const [eY, eM, eD] = entryKey.split('-').map(Number);
+  const entryDate = new Date(eY, eM - 1, eD);
   const dayName = entryDate.toLocaleDateString('es-ES', { weekday: 'long' });
   const dateStr2 = entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 
@@ -201,16 +195,14 @@ export default function TimelinePage() {
 
   const handleFilter = (key: string) => {
     setActiveFilter(key);
-    // Map imperio filters to ALL their activity types.
-    // An imperio can span multiple types (e.g. mente = meditation + journal).
-    // The API accepts comma-separated categories.
-    const imperioToTypes: Record<string, string | undefined> = {
-      mente: 'meditation,journal,checkin',
-      energia: 'wellness,nutrition',
+    // Map imperio filters to their activity types for the API
+    const imperioToTypes: Record<string, string> = {
+      mente: 'meditation',
+      energia: 'wellness',
       disciplina: 'habits',
       riqueza: 'finance',
     };
-    fetchTimeline(imperioToTypes[key]);
+    fetchTimeline(imperioToTypes[key] || undefined);
   };
 
   // Filter items client-side for imperios that span multiple activity types

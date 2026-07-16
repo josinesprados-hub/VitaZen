@@ -535,7 +535,7 @@ export default function MentePage() {
             <p className="text-xs text-champagne uppercase tracking-widest mb-2">{selectedType.label}</p>
             <p className={`text-5xl font-bold mb-1 font-mono text-champagne ${!paused ? 'breathing-counter' : ''}`}>{formatTime(timer)}</p>
             {paused && <p className="text-champagne text-xs uppercase tracking-widest mb-1">En pausa</p>}
-            <p className="text-[#666] text-sm mb-8">Objetivo: {selectedType.duration} min</p>
+            <p className="text-[#666] text-sm mb-8">Duración sugerida: {selectedType.duration} min</p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setPaused(!paused)}
@@ -681,7 +681,7 @@ export default function MentePage() {
           <PremiumEmptyState
             icon={Wind}
             title="Aún sin sesiones"
-            subtitle="Cuando quieras."
+            subtitle="Empieza cuando quieras."
             size="sm"
             variant="gold"
           />

@@ -15,6 +15,7 @@
 //   - Refresh storms when widgets wake up simultaneously
 
 import { db } from '@/lib/db';
+import { startOfTodayMadrid } from '@/lib/dates';
 import {
   WidgetType,
   WIDGET_TYPES,
@@ -83,8 +84,7 @@ export async function refreshWidgetSnapshot(
   }
 
   // ── 2. DB-based daily cap check ──
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+  const todayStart = startOfTodayMadrid();
 
   // Count refreshes today by checking snapshot version increments.
   // We use the snapshot's computedAt timestamp as a proxy:

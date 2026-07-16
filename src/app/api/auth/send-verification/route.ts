@@ -22,11 +22,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user in database — try firebaseUid first, then email
+    // BUG-A1 FIX: Only fall back to email lookup if the token's email is verified.
+    // Without this check, an attacker with an unverified Firebase account
+    // using the victim's email could trigger verification emails on behalf
+    // of the victim.
     let user = await db.user.findUnique({
       where: { firebaseUid: decodedToken.uid },
     });
 
-    if (!user && decodedToken.email) {
+    if (!user && decodedToken.email && decodedToken.email_verified) {
       user = await db.user.findUnique({
         where: { email: decodedToken.email },
       });

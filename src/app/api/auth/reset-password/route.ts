@@ -11,10 +11,7 @@ const TOKEN_EXPIRY_HOURS = 1;
 // POST — Request password reset (generates token + sends email)
 export async function POST(request: NextRequest) {
   try {
-    // [RESET DEBUG] Verificar que Prisma reconoce el modelo
-    console.log('[RESET DEBUG] db.passwordResetToken exists:', !!db.passwordResetToken);
     if (!db.passwordResetToken) {
-      console.error('[RESET DEBUG] db.passwordResetToken is undefined — Prisma Client desactualizado');
       return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
     }
 
@@ -24,7 +21,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
     }
 
-    console.log('[RESET PASSWORD] Solicitud de reset para:', email);
+    // ─── Rate limiting: max 3 requests per 15 minutes per email ───
+    const FIFTEEN_MIN_AGO = new Date(Date.now() - 15 * 60 * 1000);
+    const recentRequests = await db.passwordResetToken.count({
+      where: {
+        user: { email: email.toLowerCase().trim() },
+        createdAt: { gte: FIFTEEN_MIN_AGO },
+      },
+    });
+    if (recentRequests >= 3) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Inténtalo en 15 minutos.', retryAfter: 900 },
+        { status: 429 }
+      );
+    }
 
     // Find user by email
     const user = await db.user.findUnique({
@@ -33,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      console.log('[RESET PASSWORD] No se encontró usuario para:', email);
       return NextResponse.json({ message: 'Si el email existe, recibirás un enlace de recuperación.' });
     }
 
@@ -56,28 +65,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('[RESET PASSWORD] Token creado para user:', user.id, 'expira:', expiresAt.toISOString());
-
     // Build reset link
     const resetLink = `${APP_URL}/reset-password?token=${token}`;
 
     // Send email via Resend
-    // P-1 FIX: sendResetPasswordEmail now throws on failure instead of
-    // silently swallowing errors. We catch it here and return a generic
-    // error message that does NOT reveal whether the user exists.
-    try {
-      await sendResetPasswordEmail(user.email, user.name || 'Amigo', resetLink);
-    } catch (emailError) {
-      console.error('[RESET PASSWORD] Error enviando email:', emailError instanceof Error ? emailError.message : emailError);
-      // Return generic error — do not reveal user existence
-      return NextResponse.json({ error: 'No se pudo enviar el email. Inténtalo de nuevo.' }, { status: 500 });
-    }
-
-    console.log('[RESET PASSWORD] Email enviado a:', user.email);
+    await sendResetPasswordEmail(user.email, user.name || 'Amigo', resetLink);
 
     return NextResponse.json({ message: 'Si el email existe, recibirás un enlace de recuperación.' });
   } catch (error) {
-    console.error('[RESET PASSWORD] Error en POST:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -85,10 +80,7 @@ export async function POST(request: NextRequest) {
 // PUT — Validate token + update password
 export async function PUT(request: NextRequest) {
   try {
-    // [RESET DEBUG] Verificar que Prisma reconoce el modelo
-    console.log('[RESET DEBUG] db.passwordResetToken exists:', !!db.passwordResetToken);
     if (!db.passwordResetToken) {
-      console.error('[RESET DEBUG] db.passwordResetToken is undefined — Prisma Client desactualizado');
       return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
     }
 
@@ -102,7 +94,20 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'La contraseña debe tener al menos 6 caracteres' }, { status: 400 });
     }
 
-    console.log('[RESET PASSWORD] Intentando reset con token:', token.substring(0, 8) + '...');
+    // ─── Rate limiting: global safety net against brute-force token guessing ───
+    const FIFTEEN_MIN_AGO = new Date(Date.now() - 15 * 60 * 1000);
+    const recentAttempts = await db.passwordResetToken.count({
+      where: {
+        createdAt: { gte: FIFTEEN_MIN_AGO },
+      },
+    });
+    // Global safety net: if too many reset attempts across all users in 15 min, throttle
+    if (recentAttempts > 50) {
+      return NextResponse.json(
+        { error: 'Demasiados intentos en el sistema. Inténtalo más tarde.', retryAfter: 900 },
+        { status: 429 }
+      );
+    }
 
     // Find valid token
     const resetToken = await db.passwordResetToken.findUnique({
@@ -111,19 +116,16 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!resetToken) {
-      console.log('[RESET PASSWORD] Token no encontrado');
       return NextResponse.json({ error: 'Token inválido o expirado' }, { status: 400 });
     }
 
     // Check if already used
     if (resetToken.used) {
-      console.log('[RESET PASSWORD] Token ya utilizado');
       return NextResponse.json({ error: 'Token inválido o expirado' }, { status: 400 });
     }
 
     // Check expiry
     if (new Date() > resetToken.expiresAt) {
-      console.log('[RESET PASSWORD] Token expirado');
       // Mark as used so it can't be retried
       await db.passwordResetToken.update({
         where: { id: resetToken.id },
@@ -137,9 +139,7 @@ export async function PUT(request: NextRequest) {
       await adminAuth.updateUser(resetToken.user.firebaseUid, {
         password: newPassword,
       });
-      console.log('[RESET PASSWORD] Contraseña actualizada en Firebase para uid:', resetToken.user.firebaseUid);
     } catch (firebaseError) {
-      console.error('[RESET PASSWORD] Error actualizando contraseña en Firebase:', firebaseError);
       return NextResponse.json({ error: 'No se pudo actualizar la contraseña' }, { status: 500 });
     }
 
@@ -149,11 +149,8 @@ export async function PUT(request: NextRequest) {
       data: { used: true },
     });
 
-    console.log('[RESET PASSWORD] Token invalidado. Reset completado para:', resetToken.user.email);
-
     return NextResponse.json({ message: 'Contraseña actualizada correctamente' });
   } catch (error) {
-    console.error('[RESET PASSWORD] Error en PUT:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

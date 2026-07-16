@@ -1,6 +1,6 @@
 import { db } from './db';
 import { formatCurrency } from './utils';
-import { getMadridDateKey } from './deterministic';
+import { getTodayDateKey, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // WEEKLY INSIGHTS ENGINE
@@ -84,11 +84,9 @@ export async function gatherData(userId: string): Promise<RawData> {
   //
   // Now: compute Madrid date keys and convert to UTC midnight boundaries,
   // consistent with habits, streaks, achievements, widgets, mentor, etc.
-  const now = new Date();
-  const todayKey = getMadridDateKey(now);
-  const todayNoon = new Date(todayKey + 'T12:00:00Z');
-  const sevenDaysAgoKey = getMadridDateKey(new Date(todayNoon.getTime() - 7 * 86400000));
-  const fourteenDaysAgoKey = getMadridDateKey(new Date(todayNoon.getTime() - 14 * 86400000));
+  const todayKey = getTodayDateKey();
+  const sevenDaysAgoKey = addDaysToDateKey(todayKey, -7);
+  const fourteenDaysAgoKey = addDaysToDateKey(todayKey, -14);
   const sevenDaysAgo = startOfMadridDay(sevenDaysAgoKey);
   const fourteenDaysAgo = startOfMadridDay(fourteenDaysAgoKey);
 
@@ -120,9 +118,11 @@ export async function gatherData(userId: string): Promise<RawData> {
     }),
     db.habitLog.findMany({
       where: { userId, lastCompletedAt: { gte: sevenDaysAgo } },
+      select: { id: true, lastCompletedAt: true },
     }),
     db.habitLog.findMany({
       where: { userId, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+      select: { id: true },
     }),
     db.habitLog.findMany({
       where: { userId, streak: { gt: 0 } },
@@ -134,12 +134,15 @@ export async function gatherData(userId: string): Promise<RawData> {
     }),
     db.meditationSession.findMany({
       where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+      select: { id: true, completedAt: true },
     }),
     db.journalEntry.findMany({
       where: { userId, createdAt: { gte: sevenDaysAgo } },
+      select: { id: true, createdAt: true },
     }),
     db.journalEntry.findMany({
       where: { userId, createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+      select: { id: true, createdAt: true },
     }),
     db.wellnessLog.findMany({
       where: { userId, date: { gte: sevenDaysAgo } },
@@ -191,37 +194,7 @@ export async function gatherData(userId: string): Promise<RawData> {
 // Helper functions
 // ─────────────────────────────────────────
 
-/**
- * Convert a Madrid date key (YYYY-MM-DD) to a UTC Date at midnight Madrid time.
- * Used for DB query boundaries so that date ranges align with the user's
- * perceived day boundary in Europe/Madrid — not UTC midnight.
- *
- * Every other module in VitaZen (habits, streaks, achievements, widgets,
- * mentor, check-in, challenges, finance, monthly closure) uses
- * getMadridDateKey() for timezone consistency. This helper brings the
- * insights engine into alignment by computing the exact UTC instant
- * when a given Madrid calendar day begins.
- */
-function startOfMadridDay(dateKey: string): Date {
-  // Create a reference point at noon UTC on the given date.
-  // Noon UTC is guaranteed to fall on the same calendar date in Madrid
-  // (Madrid is at most UTC+2, so noon UTC = 14:00 Madrid at latest).
-  const noonUtc = new Date(dateKey + 'T12:00:00Z');
 
-  // Determine what time it is in Madrid at noon UTC.
-  // Uses the same sv-SE locale trick as getMadridDateKey().
-  const madridTimeStr = noonUtc.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-  // e.g., "2026-07-06 14:00:00" (CEST, UTC+2)
-
-  // Parse the hours, minutes, seconds in Madrid
-  const timePart = madridTimeStr.split(' ')[1]; // "14:00:00"
-  const [hours, minutes, seconds] = timePart.split(':').map(Number);
-
-  // Midnight in Madrid is (h*3600 + m*60 + s) milliseconds before noonUtc
-  const msSinceMidnight = (hours * 3600 + minutes * 60 + seconds) * 1000;
-
-  return new Date(noonUtc.getTime() - msSinceMidnight);
-}
 
 function avg(arr: number[]): number {
   if (arr.length === 0) return 0;
@@ -304,11 +277,10 @@ function buildSummary(data: RawData): WeeklySummary {
   // Previously used toLocaleDateString without timeZone option, which
   // formats in the server's local timezone (typically UTC in production).
   // Now explicitly uses Europe/Madrid, consistent with gatherData() boundaries.
-  const now = new Date();
-  const todayKey = getMadridDateKey(now);
-  const todayNoon = new Date(todayKey + 'T12:00:00Z');
-  const weekAgoKey = getMadridDateKey(new Date(todayNoon.getTime() - 7 * 86400000));
+  const todayKey = getTodayDateKey();
+  const weekAgoKey = addDaysToDateKey(todayKey, -7);
   const madridDateOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', timeZone: 'Europe/Madrid' };
+  const now = new Date();
   const weekLabel = `${startOfMadridDay(weekAgoKey).toLocaleDateString('es-ES', madridDateOpts)} — ${now.toLocaleDateString('es-ES', madridDateOpts)}`;
 
   return {
@@ -487,7 +459,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'estrés',
       icon: '🌿',
-      title: 'Estrés bajo',
+      title: 'Poca presión',
       description: `Promedio ${summary.checkins.avgStress}/5.`,
     });
   }
@@ -608,7 +580,7 @@ function generateInsights(summary: WeeklySummary, comparison: WeeklyComparison |
       type: 'positive',
       category: 'nutrición',
       icon: '💧',
-      title: 'Hidratación constante',
+      title: 'Buena hidratación',
       description: `Promedio de ${summary.nutrition.avgWater} vasos diarios.`,
     });
   }

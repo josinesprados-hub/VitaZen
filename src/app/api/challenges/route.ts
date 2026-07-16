@@ -2,8 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { startOfDay } from 'date-fns';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { startOfTodayMadrid } from '@/lib/dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +11,7 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const today = new Date(getTodayDateKey() + 'T00:00:00');
+    const today = startOfTodayMadrid();
 
     // Check if user already has a challenge for today
     let userChallenge = await db.userChallenge.findFirst({
@@ -31,28 +30,27 @@ export async function GET(request: NextRequest) {
 
       const excludeIds = recentChallenges.map((rc) => rc.challengeId);
 
-      // Select a random challenge, excluding recent ones
-      const totalChallenges = await db.dailyChallenge.count();
-      const availableChallenges = excludeIds.length > 0
-        ? await db.dailyChallenge.findMany({
-            where: { id: { notIn: excludeIds } },
-          })
-        : await db.dailyChallenge.findMany();
-
-      const pool = availableChallenges.length > 0 ? availableChallenges : await db.dailyChallenge.findMany();
-      const randomIndex = Math.floor(Math.random() * pool.length);
-      const selectedChallenge = pool[randomIndex];
-
+      // PERF-5.2: Use count + skip for O(1) random selection instead of
+      // loading all challenge rows into memory and picking one.
+      const totalCount = excludeIds.length > 0
+        ? await db.dailyChallenge.count({ where: { id: { notIn: excludeIds } } })
+        : await db.dailyChallenge.count();
+      if (totalCount === 0) {
+        return NextResponse.json({ error: 'No challenges available' }, { status: 404 });
+      }
+      const skip = Math.floor(Math.random() * totalCount);
+      const candidates = await db.dailyChallenge.findMany({
+        where: excludeIds.length > 0 ? { id: { notIn: excludeIds } } : undefined,
+        skip,
+        take: 1,
+      });
+      const selectedChallenge = candidates[0];
       if (!selectedChallenge) {
         return NextResponse.json({ error: 'No challenges available' }, { status: 404 });
       }
 
       userChallenge = await db.userChallenge.create({
-        data: {
-          userId: user.id,
-          challengeId: selectedChallenge.id,
-          date: today,
-        },
+        data: { userId: user.id, challengeId: selectedChallenge.id, date: today },
         include: { challenge: true },
       });
     }

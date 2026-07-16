@@ -416,7 +416,7 @@ export function WeeklyRecap() {
             </Link>
 
             {/* Emotional State — PREMIUM details */}
-            <PremiumGate isPremium={isPremium} intensity="light" compact label="Métricas profundas">
+            <PremiumGate isPremium={isPremium} intensity="light" compact showCta={false} label="Métricas profundas">
               <div className="bg-[#000000] border border-[#1a1a1a] rounded-xl p-3 sm:p-6 hover:border-[#1a1a1a] transition-colors">
                 <div className="flex items-center justify-between mb-2 sm:mb-4">
                   <div className="flex items-center gap-1.5 sm:gap-2">
@@ -541,7 +541,7 @@ export function WeeklyRecap() {
               <div className="bg-[#000000] border border-champagne/10 rounded-xl p-3 sm:p-6 hover:border-champagne/20 transition-colors">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-5">
                   <TrendingUp size={13} className="text-champagne sm:w-[15px] sm:h-[15px]" />
-                  <p className="text-xs sm:text-sm font-semibold text-white">Evolución vs. semana anterior</p>
+                  <p className="text-xs sm:text-sm font-semibold text-white">Evolución frente a la semana anterior</p>
                 </div>
                 <PrivacyMask compact>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">

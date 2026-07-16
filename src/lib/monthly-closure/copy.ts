@@ -71,9 +71,8 @@ export const EVOLUTION_SAME = 'Tu mes fue parecido al anterior';
 export const EVOLUTION_QUIETER = 'Más tranquilo';
 export const EVOLUTION_MORE_ACTIVE = 'Más movimiento';
 
-export const PATTERNS_TITLE = 'Conexiones del mes';
-export const PATTERNS_INTRO = 'Durante este mes, tu vida muestra estas relaciones.';
-export const PATTERNS_INTRO_FREE = 'Este mes aparece una conexión en tus datos.';
+export const PATTERNS_TITLE = 'Conexiones';
+export const PATTERNS_NONE = '';
 
 export const MEMORIES_TITLE = 'Momentos';
 

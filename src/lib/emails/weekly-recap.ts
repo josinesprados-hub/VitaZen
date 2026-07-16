@@ -8,6 +8,16 @@
 
 import type { EmailContent } from './types';
 
+// ─── HTML entity escaping for user-supplied values in email templates ───
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 // ─── V Logo: public URL for maximum email client compatibility ───
@@ -103,7 +113,7 @@ function sectionLabel(text: string): string {
 
 export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
   const subject = `Resumen de tu semana en VitaZen`;
-  const preheader = `${data.name}, tu puntuación de bienestar: ${data.score}/100.`;
+  const preheader = `${escapeHtml(data.name)}, tu puntuación de bienestar: ${data.score}/100.`;
 
   const hasHabits = data.topHabits.length > 0;
   const hasInsight = data.mainInsight !== null;
@@ -115,7 +125,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
       <td class="content-cell" style="padding:24px 0 0;background-color:#080808;" bgcolor="#080808">
         ${sectionLabel('HÁBITOS')}
         <table width="100%" cellpadding="0" cellspacing="0">
-          ${data.topHabits.map(h => metricRow(h.name, `${h.streak} días`)).join('')}
+          ${data.topHabits.map(h => metricRow(escapeHtml(h.name), `${h.streak} días`)).join('')}
         </table>
       </td>
     </tr>`
@@ -126,9 +136,9 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     ? `
     <tr>
       <td class="content-cell" style="padding:24px 0 0;background-color:#080808;" bgcolor="#080808">
-        ${sectionLabel('OBSERVACIÓN')}
-        <p class="white-text" style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:${FONT_STACK_CSS};">${data.mainInsight!.title}</p>
-        <p class="secondary-text" style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:${FONT_STACK_CSS};">${data.mainInsight!.description}</p>
+        ${sectionLabel('INSIGHT')}
+        <p class="white-text" style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:${FONT_STACK_CSS};">${escapeHtml(data.mainInsight!.title)}</p>
+        <p class="secondary-text" style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:${FONT_STACK_CSS};">${escapeHtml(data.mainInsight!.description)}</p>
       </td>
     </tr>`
     : '';
@@ -193,8 +203,8 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <tr>
             <td class="content-cell" style="padding:32px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               <p class="label-text" style="color:#777;font-size:11px;letter-spacing:2px;margin:0 0 8px;font-family:${FONT_STACK_CSS};">RECAP SEMANAL</p>
-              <h1 class="heading-text" style="color:#ffffff;font-size:20px;font-weight:400;margin:0 0 4px;line-height:1.3;letter-spacing:0.3px;font-family:${FONT_STACK_CSS};">Tu semana, ${data.name}.</h1>
-              <p class="muted-text" style="color:#666;font-size:12px;margin:0;font-family:${FONT_STACK_CSS};">${data.weekLabel}</p>
+              <h1 class="heading-text" style="color:#ffffff;font-size:20px;font-weight:400;margin:0 0 4px;line-height:1.3;letter-spacing:0.3px;font-family:${FONT_STACK_CSS};">Tu semana, ${escapeHtml(data.name)}.</h1>
+              <p class="muted-text" style="color:#666;font-size:12px;margin:0;font-family:${FONT_STACK_CSS};">${escapeHtml(data.weekLabel)}</p>
             </td>
           </tr>
 
@@ -203,7 +213,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
             <td class="content-cell" style="padding:28px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('BIENESTAR')}
               <p style="color:#ffffff;font-size:32px;font-weight:300;margin:0;line-height:1;font-family:${FONT_STACK_CSS};">
-                <span class="white-text">${data.score}</span><span class="muted-text" style="color:#666;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};"> / 100 · </span><span class="champagne-text" style="color:#c8a55a;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};">${data.scoreLabel}</span>
+                <span class="white-text">${data.score}</span><span class="muted-text" style="color:#666;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};"> / 100 · </span><span class="champagne-text" style="color:#c8a55a;font-size:13px;font-weight:400;font-family:${FONT_STACK_CSS};">${escapeHtml(data.scoreLabel)}</span>
               </p>
             </td>
           </tr>
@@ -226,7 +236,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
             <td class="content-cell" style="padding:24px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('ESTADO EMOCIONAL')}
               <table width="100%" cellpadding="0" cellspacing="0">
-                ${metricRow('Estado', data.emotionalState.statusLabel)}
+                ${metricRow('Estado', escapeHtml(data.emotionalState.statusLabel))}
                 ${metricRow('Energía', `${data.emotionalState.energy}/100`)}
                 ${metricRow('Consistencia', `${data.emotionalState.consistency}/100`)}
               </table>
@@ -243,7 +253,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           <tr>
             <td class="content-cell" style="padding:24px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('RECOMENDACIÓN')}
-              <p class="body-text" style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;font-family:${FONT_STACK_CSS};">${data.mentorRecommendation}</p>
+              <p class="body-text" style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;font-family:${FONT_STACK_CSS};">${escapeHtml(data.mentorRecommendation)}</p>
             </td>
           </tr>
 
@@ -290,7 +300,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     : '';
 
   const insightText = hasInsight
-    ? `\nObservación: ${data.mainInsight!.title}\n${data.mainInsight!.description}`
+    ? `\nInsight: ${data.mainInsight!.title}\n${data.mainInsight!.description}`
     : '';
 
   const text = `Tu semana, ${data.name}.

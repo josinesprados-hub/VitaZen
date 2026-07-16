@@ -34,8 +34,7 @@ export default function VerifyEmailClient() {
           const idToken = await getAuthInstance().currentUser!.getIdToken();
           const res = await fetch('/api/auth/verify-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken }),
+            headers: { 'Authorization': `Bearer ${idToken}` },
           });
 
           if (res.ok) {
@@ -49,7 +48,7 @@ export default function VerifyEmailClient() {
             }
           } else {
             setStatus('error');
-            setErrorMessage('Error al sincronizar la verificación.');
+            setErrorMessage('No se ha podido completar la verificación.');
           }
         } else {
           // Firebase says not verified — user may not have clicked the link yet
@@ -217,8 +216,7 @@ export default function VerifyEmailClient() {
                     const idToken = await getAuthInstance().currentUser!.getIdToken();
                     await fetch('/api/auth/verify-email', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ idToken }),
+                      headers: { 'Authorization': `Bearer ${idToken}` },
                     });
                     setStatus('success');
                     await refreshUser();

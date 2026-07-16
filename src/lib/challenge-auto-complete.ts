@@ -19,7 +19,7 @@
  */
 
 import { db } from '@/lib/db';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { startOfTodayMadrid } from '@/lib/dates';
 
 // Which challenge categories can be auto-completed by each action
 const ACTION_CATEGORIES: Record<string, string[]> = {
@@ -42,7 +42,7 @@ export async function tryAutoCompleteChallenge(
   habitName?: string
 ): Promise<void> {
   try {
-    const today = new Date(getTodayDateKey() + 'T00:00:00');
+    const today = startOfTodayMadrid();
     const categories = ACTION_CATEGORIES[action];
     if (!categories || categories.length === 0) return;
 

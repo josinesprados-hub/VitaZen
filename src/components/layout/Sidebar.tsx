@@ -20,7 +20,6 @@ import {
   LogOut,
   X,
   Lightbulb,
-  Sparkles,
   UserCircle,
   Settings,
 } from 'lucide-react';
@@ -29,9 +28,8 @@ const EMPIRES = [
   { name: 'Disciplina', href: '/imperio/disciplina', icon: Shield },
   { name: 'Mente', href: '/imperio/mente', icon: Brain },
   { name: 'Energía', href: '/imperio/energia', icon: Zap },
-  { name: 'Finanzas', href: '/imperio/riqueza', icon: Gem },
+  { name: 'Riqueza', href: '/imperio/riqueza', icon: Gem },
   { name: 'Crecimiento', href: '/imperio/crecimiento', icon: TrendingUp },
-  { name: 'Mentor', href: '/imperio/mentor', icon: Sparkles },
 ];
 
 interface SidebarProps {

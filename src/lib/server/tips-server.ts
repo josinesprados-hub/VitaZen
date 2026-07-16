@@ -29,6 +29,7 @@ import {
   deterministicShuffle,
   getTodayDateKey,
 } from '@/lib/deterministic';
+import { startOfMadridDay } from '@/lib/dates';
 
 const FREE_TIPS_VISIBLE = 2;
 
@@ -54,7 +55,7 @@ export async function getDeterministicTips(
   // Uses getTodayDateKey() (Europe/Madrid) so the cycle boundary
   // aligns with the user's perceived midnight, not UTC midnight.
   const todayKey = getTodayDateKey();
-  const todayMs = new Date(todayKey).getTime();
+  const todayMs = startOfMadridDay(todayKey).getTime();
   const daysSinceEpoch = Math.floor((todayMs - TIPS_EPOCH) / 86400000);
   const cycleIndex = Math.floor(daysSinceEpoch / CYCLE_DAYS);
 

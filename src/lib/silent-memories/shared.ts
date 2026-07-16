@@ -88,7 +88,7 @@ export function observeReturn(daysSince: number): SilentMemory | null {
   if (daysSince <= 30) {
     return { observation: 'Aquí estás de nuevo.', type: 'return', rarity: 'very_rare' };
   }
-  return { observation: 'Hacía mucho.', type: 'return', rarity: 'very_rare' };
+  return { observation: 'Hacía tiempo sin pasar por aquí.', type: 'return', rarity: 'very_rare' };
 }
 
 /**

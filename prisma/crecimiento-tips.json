@@ -115,8 +115,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "La identidad de quien aprende",
-    "content": "Pensar «soy alguien que aprende» cambia cómo reaccionas ante los obstáculos: se vuelven información, no señales de parar. La diferencia entre «tengo que aprender esto» y «aprendo porque es lo que hago» no es solo palabras — cambia lo que haces cuando se pone difícil. Dweck (2006) demostró que la creencia de que tus capacidades mejoran con esfuerzo predice la persistencia real.",
+    "title": "Lo que repites eres",
+    "content": "Pensar «soy alguien que aprende» cambia más que pensar «tengo que aprender esto». La identidad sostiene lo que la obligación abandona.",
     "plan": "FREE"
   },
   {
@@ -187,8 +187,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "Ritual de práctica",
-    "content": "Crear un ritual antes de practicar —misma hora, mismo lugar, misma preparación— reduce la fricción para empezar. El cerebro asocia esa secuencia con el modo aprendizaje y se activa antes de que tú decidas. No se trata de rigidez: se trata de que el coste de empezar sea tan bajo que no encuentres excusas. Para que lo aprendido funcione fuera de ese contexto, alterna con sesiones en entornos distintos.",
+    "title": "Mismo tiempo, mismo lugar",
+    "content": "Practicar siempre en el mismo contexto ayuda a que el cerebro active el modo aprendizaje automáticamente. El entorno es parte del ritual.",
     "plan": "FREE"
   },
   {
@@ -313,8 +313,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "La confianza prematura",
-    "content": "Cuando empiezas a aprender algo, la confianza suele crecer antes que la competencia. Es el momento más peligroso: crees que sabes más de lo que sabes. A medida que avanzas, la confianza se ajusta a la realidad y la duda aparece. Los que más saben son los que más dudan, porque ven todo lo que les falta. Kruger y Dunning (1999) mostraron que la competencia necesaria para hacer algo bien es la misma que se necesita para evaluar si se ha hecho bien. La consecuencia para el aprendizaje es clara: si no sientes duda, probablemente aún estás en la fase inicial.",
+    "title": "El efecto Dunning-Kruger",
+    "content": "Los principiantes sobreestiman su competencia. Los expertos la subestiman. Es el efecto Dunning-Kruger: la confianza sin base es la señal de que aún falta mucho por aprender. Kruger y Dunning (1999) mostraron que los individuos con menor competencia sobreestiman su nivel, mientras que los más competentes tienden a subestimarse. El mecanismo es doble: la competencia necesaria para hacer algo bien es la misma que se necesita para evaluar si se ha hecho bien.",
     "plan": "PREMIUM"
   },
   {
@@ -451,8 +451,8 @@
   },
   {
     "empire": "crecimiento",
-    "title": "El segundo orden en el aprendizaje",
-    "content": "Elegir el camino fácil tiene una consecuencia inmediata (alivio) y una de segundo orden (no desarrollas la habilidad que necesitarás después). Preguntar «¿y después qué?» antes de tomar un atajo en tu aprendizaje revela el coste real de la comodidad. Saltarte la práctica profunda ahorra tiempo hoy, pero te hace más lento mañana. La mayoría de los atajos se pagan con interés compuesto: el coste no aparece al instante, pero se acumula.",
+    "title": "El segundo orden",
+    "content": "Las decisiones tienen efectos inmediatos y consecuencias de segundo orden. Lo importante suele estar en el segundo nivel. Preguntar «¿y después qué?» revela lo que la primera respuesta oculta. Howard Marks popularizó esta distinción: el pensamiento de primer orden pregunta «¿qué pasa si hago X?»; el de segundo orden pregunta «¿y qué pasará después de eso?». La mayoría de los errores no están en el primer nivel, donde la consecuencia inmediata era previsible, sino en el segundo, donde la cadena posterior no se anticipó.",
     "plan": "PREMIUM"
   },
   {

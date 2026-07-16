@@ -145,8 +145,8 @@ export function SubscriptionManager() {
           <Circle size={5} fill="currentColor" className="text-champagne/40" />
         </div>
         <div className="text-left flex-1">
-          <p className="text-sm font-medium">Más conexiones con Élite</p>
-          <p className="text-xs text-[#777]">Más contexto entre lo que vives</p>
+          <p className="text-sm font-medium">Élite</p>
+          <p className="text-xs text-[#777]">Más detalle y profundidad en tu experiencia</p>
         </div>
         <ChevronRight size={16} className="text-[#444] group-hover:text-champagne transition-colors" />
       </button>

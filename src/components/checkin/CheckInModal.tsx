@@ -19,7 +19,7 @@ const EMOTION_LABELS: Record<number, { label: string; emoji: string }> = {
 const ENERGY_LABELS: Record<number, { label: string }> = {
   1: { label: 'Agotado' },
   2: { label: 'Bajo' },
-  3: { label: 'Estable' },
+  3: { label: 'Normal' },
   4: { label: 'Activo' },
   5: { label: 'Pleno' },
 };
@@ -27,15 +27,15 @@ const ENERGY_LABELS: Record<number, { label: string }> = {
 const FOCUS_LABELS: Record<number, { label: string }> = {
   1: { label: 'Disperso' },
   2: { label: 'Distraído' },
-  3: { label: 'Adecuado' },
+  3: { label: 'Normal' },
   4: { label: 'Concentrado' },
-  5: { label: 'Profundo' },
+  5: { label: 'Muy concentrado' },
 };
 
 const STRESS_LABELS: Record<number, { label: string }> = {
   1: { label: 'En calma' },
   2: { label: 'Relajado' },
-  3: { label: 'Equilibrado' },
+  3: { label: 'Normal' },
   4: { label: 'Tenso' },
   5: { label: 'Sobrepasado' },
 };
@@ -246,7 +246,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
               <p id="checkin-modal-desc" className="text-xs text-[#666]">Sin juicio</p>
             </div>
 
-            <ValueSlider label="Ánimo" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} sliderId="emotion" />
+            <ValueSlider label="Estado emocional" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} sliderId="emotion" />
             <ValueSlider label="Energía" value={energy} onChange={setEnergy} labels={ENERGY_LABELS} sliderId="energy" />
             <ValueSlider label="Enfoque" value={focus} onChange={setFocus} labels={FOCUS_LABELS} sliderId="focus" />
             <ValueSlider label="Estrés" value={stress} onChange={setStress} labels={STRESS_LABELS} sliderId="stress" />
@@ -308,7 +308,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             <div className="w-16 h-16 rounded-2xl bg-champagne/15 flex items-center justify-center mx-auto mb-5 micro-celebrate">
               <span className="text-3xl">✓</span>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Anotado</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Guardado</h2>
             {/* DASH-38: Discreet XP feedback — only shown when XP was actually awarded (first check-in of the day) */}
             {xpAwarded > 0 && (
               <p className="text-xs text-champagne/60 mb-2">

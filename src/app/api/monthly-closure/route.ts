@@ -32,6 +32,10 @@ export async function GET(request: NextRequest) {
     }
 
     const month = request.nextUrl.searchParams.get('month') || getPreviousMonthForClosure();
+    // M-18 FIX: Validate month format in GET (matches POST validation)
+    if (!/^\d{4}-\d{2}$/.test(month)) {
+      return NextResponse.json({ error: 'Formato de mes inválido (YYYY-MM)' }, { status: 400 });
+    }
     const isPremium = user.plan === 'PREMIUM';
 
     // Check if closure exists
@@ -125,21 +129,12 @@ export async function POST(request: NextRequest) {
 
 // ─── FREE trim ───
 // FREE users see basic summary.
-// Élite users see full depth: evolution, memories, connections.
-//
-// FREE connections: only profunda/relevante, max 1, no empire labels.
-// Élite connections: all weights, up to 2, with empire context.
+// Élite users see full depth: evolution, memories, patterns.
 
 function trimDigestForFree(digest: MonthlyDigest) {
-  // FREE: only show the strongest, most trustworthy connection
-  const eliteConnections = digest.connections.filter(
-    c => c.weight === 'profunda' || c.weight === 'relevante'
-  );
-
   return {
     ...digest,
-    evolution: null,                        // Élite only
-    memories: [],                           // Élite only
-    connections: eliteConnections.slice(0, 1), // FREE: max 1, high confidence only
+    evolution: null,  // Élite only
+    memories: [],     // Élite only
   };
 }

@@ -7,8 +7,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   fetchSignInMethodsForEmail,
@@ -17,59 +15,6 @@ import {
 import { getAuthInstance } from '@/lib/firebase';
 import { trackAuthSyncFailure } from '@/lib/observability/server-tracking';
 import { setAuthToken } from '@/lib/observability';
-
-// ─── TEMPORARY DEBUG PANEL STATE (remove after diagnosis) ───
-interface __AuthDebugState {
-  step: number;
-  stepLabel: string;
-  loading: boolean;
-  hasFirebaseUser: boolean;
-  hasUser: boolean;
-  onboardingCompleted: boolean | undefined;
-  syncStatus: 'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'ERROR';
-  errorCode: string | null;
-  errorMessage: string | null;
-}
-function __setDebug(update: Partial<__AuthDebugState>) {
-  if (typeof window === 'undefined') return;
-  if (!(window as any).__authDebug) {
-    (window as any).__authDebug = {
-      step: 0, stepLabel: '', loading: true,
-      hasFirebaseUser: false, hasUser: false,
-      onboardingCompleted: undefined,
-      syncStatus: 'NOT_STARTED' as const,
-      errorCode: null, errorMessage: null,
-    };
-  }
-  Object.assign((window as any).__authDebug, update);
-}
-
-/**
- * Returns true when the current environment cannot reliably use
- * `signInWithPopup` due to running as an installed PWA or TWA.
- *
- * Detection uses only three reliable, non-UA signals:
- *  1. `window.navigator.standalone` — iOS PWA indicator (Safari-only)
- *  2. `display-mode: standalone` via matchMedia — cross-browser PWA
- *  3. `document.referrer` containing `android-app://` — Android TWA
- *
- * All other contexts (desktop browsers, normal mobile browsers)
- * return false and use signInWithPopup.
- */
-function shouldUseRedirect(): boolean {
-  if (typeof window === 'undefined') return false;
-
-  // iOS PWA (Safari-only property)
-  if ((window.navigator as any).standalone === true) return true;
-
-  // Cross-browser PWA (Chrome, Edge, Firefox)
-  if (window.matchMedia?.('(display-mode: standalone)').matches) return true;
-
-  // Android TWA — referrer contains the package URI scheme
-  if (document.referrer.startsWith('android-app://')) return true;
-
-  return false;
-}
 
 interface SubscriptionData {
   id: string;
@@ -123,17 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState(false);
   const syncInFlight = useRef(false);
 
-  // TEMPORARY: sync auth state to debug panel
-  useEffect(() => {
-    __setDebug({ loading, hasFirebaseUser: !!firebaseUser, hasUser: !!user, onboardingCompleted: user?.onboardingCompleted });
-  }, [loading, firebaseUser, user]);
-
   const syncUser = useCallback(async (fbUser: FirebaseUser) => {
-    console.warn('[POST-LOGIN-TRACE] syncUser() CALLED', { uid: fbUser.uid, email: fbUser.email, syncInFlight: syncInFlight.current });
-    __setDebug({ step: 4, stepLabel: 'syncUser iniciado', syncStatus: 'RUNNING' });
     // Prevent concurrent sync calls (e.g., onAuthStateChanged fires rapidly on mobile)
     if (syncInFlight.current) {
-      console.warn('[POST-LOGIN-TRACE] syncUser() ABORTED — syncInFlight already true');
       return;
     }
     syncInFlight.current = true;
@@ -142,31 +79,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         setSyncError(false);
         const idToken = await fbUser.getIdToken();
-        console.warn('[POST-LOGIN-TRACE] /api/auth/sync REQUEST start', { attempt });
         const res = await fetch('/api/auth/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken }),
         });
 
-        console.warn('[POST-LOGIN-TRACE] /api/auth/sync RESPONSE', { attempt, status: res.status, ok: res.ok });
-
         if (res.ok) {
           const data = await res.json();
-          console.warn('[POST-LOGIN-TRACE] /api/auth/sync JSON', { userId: data.user?.id, email: data.user?.email, onboardingCompleted: data.user?.onboardingCompleted });
-          __setDebug({ step: 5, stepLabel: '/api/auth/sync OK', syncStatus: 'SUCCESS' });
           setUser(data.user);
-          __setDebug({ step: 6, stepLabel: 'user actualizado', hasUser: true, onboardingCompleted: data.user?.onboardingCompleted });
           return true;
         } else {
           console.error(`[Auth] sync failed (attempt ${attempt}):`, res.status);
-          __setDebug({ syncStatus: 'ERROR', errorCode: 'HTTP_' + res.status, errorMessage: '/api/auth/sync returned ' + res.status });
           trackAuthSyncFailure(attempt, res.status);
           return false;
         }
       } catch (error) {
-        console.warn('[POST-LOGIN-TRACE] /api/auth/sync ERROR', { attempt, message: error instanceof Error ? error.message : String(error) });
-        __setDebug({ syncStatus: 'ERROR', errorCode: 'FETCH_ERROR', errorMessage: error instanceof Error ? error.message : String(error) });
         console.error(`[Auth] sync error (attempt ${attempt}):`, error);
         trackAuthSyncFailure(attempt, undefined, error);
         return false;
@@ -184,10 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (retryOk) return;
 
       // Both attempts failed
-      console.warn('[POST-LOGIN-TRACE] syncUser() BOTH ATTEMPTS FAILED');
-      __setDebug({ syncStatus: 'ERROR', errorCode: 'SYNC_FAILED_2X', errorMessage: 'Both sync attempts failed' });
       setSyncError(true);
     } finally {
+      // ALWAYS reset — even if an unexpected error occurs.
+      // Without this, a single unhandled rejection would lock
+      // syncInFlight forever, blocking all future syncs.
       syncInFlight.current = false;
     }
   }, []);
@@ -259,8 +188,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let authResolved = false;
     let mounted = true;
-    let onAuthCount = 0;
-    __setDebug({ step: 1, stepLabel: 'AuthContext mounted' });
 
     // Defensive timeout: if onAuthStateChanged never fires (e.g. Firebase
     // init hangs in Android TWA/WebView), force loading=false after 8s to
@@ -272,34 +199,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }, 8000);
 
-    // Resolve redirect result from signInWithRedirect().
-    // Called early so the OAuth credential is processed and onAuthStateChanged
-    // fires with the authenticated user. Resolves to null when no redirect
-    // operation occurred (e.g. on desktop or fresh page load).
-    getRedirectResult(getAuthInstance()).catch((err) => {
-      console.error('[Auth] getRedirectResult error:', err?.message);
-    });
-
     const unsubscribe = onAuthStateChanged(getAuthInstance(), (fbUser) => {
-      onAuthCount++;
-      console.warn('[POST-LOGIN-TRACE] onAuthStateChanged #' + onAuthCount, {
-        uid: fbUser?.uid ?? null,
-        email: fbUser?.email ?? null,
-        isNull: fbUser === null,
-      });
-      __setDebug({ step: 2, stepLabel: 'onAuthStateChanged', hasFirebaseUser: !!fbUser });
       authResolved = true;
       clearTimeout(timeoutId);
       if (!mounted) return; // Don't update state after unmount
-
       setFirebaseUser(fbUser);
       if (fbUser) {
-        __setDebug({ step: 3, stepLabel: 'firebaseUser recibido', hasFirebaseUser: true });
         // Fire-and-forget: sync user data in background.
         // Don't block the loading state — the UI can render immediately
         // once Firebase auth is confirmed. Server sync (DB lookup, emails,
         // analytics) all run independently and update `user` when done.
-        console.warn('[POST-LOGIN-TRACE] calling syncUser() for', fbUser.uid);
         syncUser(fbUser);
       } else {
         setUser(null);
@@ -308,7 +217,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Components should check both `firebaseUser` and `user`:
       //   - firebaseUser: Firebase auth confirmed (instant)
       //   - user: Server sync completed (background, 1-5s)
-      console.warn('[POST-LOGIN-TRACE] setLoading(false)');
       setLoading(false);
     });
 
@@ -343,28 +251,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    const isIOSPWA = typeof window !== 'undefined'
-      && (window.navigator as any).standalone === true;
-
-    if (isIOSPWA) {
-      // iOS PWA: intentar popup primero (soportado en iOS 17.4+).
-      // Si el popup es bloqueado por el entorno, hacer fallback a redirect.
-      try {
-        await signInWithPopup(getAuthInstance(), provider);
-      } catch (err: any) {
-        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {
-          await signInWithRedirect(getAuthInstance(), provider);
-        } else {
-          throw err;
-        }
-      }
-    } else if (shouldUseRedirect()) {
-      // Android TWA / Chrome standalone — full-page redirect
-      await signInWithRedirect(getAuthInstance(), provider);
-    } else {
-      // Desktop / Safari normal / otros navegadores — popup
-      await signInWithPopup(getAuthInstance(), provider);
-    }
+    await signInWithPopup(getAuthInstance(), provider);
+    // syncUser handled by onAuthStateChanged
   };
 
   const signOut = useCallback(async () => {
@@ -420,17 +308,17 @@ export async function getProviderMismatchMessage(email: string): Promise<Provide
     }
     if (methods.includes('password')) {
       return {
-        message: 'Esta cuenta ya fue creada con correo y contraseña. Continúa usando ese método para acceder.',
+        message: 'Esta cuenta usa correo y contraseña. Inicia sesión desde ahí.',
         provider: 'password',
       };
     }
     return {
-      message: 'Este correo ya está registrado. Usa el método original para acceder.',
+      message: 'Este correo ya está registrado. Inicia sesión con tu cuenta.',
       provider: null,
     };
   } catch {
     return {
-      message: 'Este correo ya está registrado. Usa el método original para acceder.',
+      message: 'Este correo ya está registrado. Inicia sesión con tu cuenta.',
       provider: null,
     };
   }

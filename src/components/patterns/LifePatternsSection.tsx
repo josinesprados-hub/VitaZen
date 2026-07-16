@@ -26,6 +26,7 @@ import { useApi } from '@/hooks/useApi';
 import { Circle, Link2 } from 'lucide-react';
 import { EMPTY_STATE_MESSAGE, SECTION_TITLE, SECTION_SUBTITLE } from '@/lib/patterns/copy';
 import type { ObservationWeight } from '@/lib/patterns/types';
+import { getMadridWeekKey } from '@/lib/dates';
 
 // ─── Types ───
 
@@ -40,22 +41,6 @@ interface PatternsResponse {
   observations: ObservationData[];
   hasEnoughData: boolean;
   totalDataPoints: number;
-}
-
-// ─── Week helper ───
-// DASH-4: Must use Madrid timezone to match the server-side detector
-// (src/lib/patterns/detector.ts getWeekKey). Previously used browser-local
-// time, causing cache expiry drift for traveling users at week boundaries.
-
-function getISOWeekKey(): string {
-  // Normalize to Madrid date first (same as server's getMadridDateKey)
-  const madridStr = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' });
-  const madridDateKey = madridStr.split(' ')[0]; // YYYY-MM-DD
-  // Build a noon-UTC date from the Madrid date key to avoid day-boundary issues
-  const d = new Date(madridDateKey + 'T12:00:00Z');
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  return `${d.getFullYear()}-W${1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7)}`;
 }
 
 // ─── Weight-based cache ───
@@ -100,7 +85,7 @@ function getValidCachedObservations(userId: string): CachedPatterns | null {
     if (!raw) return null;
     const cached: CachedPatterns = JSON.parse(raw);
 
-    const currentWeek = getISOWeekKey();
+    const currentWeek = getMadridWeekKey();
 
     // Filter: keep observations that haven't exceeded their weight duration
     const valid = cached.observations.filter(obs => {
@@ -125,7 +110,7 @@ function getValidCachedObservations(userId: string): CachedPatterns | null {
 
 function setCachedObservations(userId: string, data: PatternsResponse): void {
   try {
-    const currentWeek = getISOWeekKey();
+    const currentWeek = getMadridWeekKey();
     const cached: CachedPatterns = {
       observations: data.observations.map(obs => ({
         ...obs,

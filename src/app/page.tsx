@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const router = useRouter();
-  const { user, firebaseUser, loading } = useAuth();
+  const { user, firebaseUser, loading, syncError } = useAuth();
 
   useEffect(() => {
     if (loading) return;
@@ -22,6 +22,10 @@ export default function Home() {
     // the correct destination. Redirecting to /onboarding before knowing
     // causes the onboarding flash for returning users.
     if (firebaseUser && !user) {
+      if (syncError) {
+        router.replace('/login');
+        return;
+      }
       return; // wait for syncUser to complete
     }
 
@@ -31,7 +35,7 @@ export default function Home() {
     } else {
       router.replace('/onboarding');
     }
-  }, [user, firebaseUser, loading, router]);
+  }, [user, firebaseUser, loading, syncError, router]);
 
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center">

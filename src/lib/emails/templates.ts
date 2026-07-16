@@ -8,6 +8,18 @@
 
 import type { EmailContent } from './types';
 
+// ─── HTML entity escaping for user-supplied values in email templates ───
+// Prevents XSS when user-controlled strings (name, planName) are
+// interpolated into HTML. Safe for all email clients.
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 // ─── V Logo: public URL for maximum email client compatibility ───
@@ -187,14 +199,16 @@ const secondaryStyleNoMargin = `color:#aaa;font-size:16px;line-height:1.6;margin
 export function welcomeEmail(name: string): EmailContent {
   const subject = 'Cuenta creada en VitaZen';
   const preheader = 'Tu cuenta se ha creado correctamente.';
-  const html = emailWrapper('<h1 class="heading-text" style="' + headingStyle + '">Hola, ' + name + '.</h1><p class="body-text" style="' + textMain + '">Tu cuenta en VitaZen se ha creado correctamente. Ya puedes acceder cuando quieras.</p>' + ctaButton(APP_URL + '/dashboard', 'ACCEDER') + '<p class="muted-text" style="' + mutedStyle + '">Si no creaste esta cuenta, puedes ignorar este mensaje.</p>', preheader);
+  const safeName = escapeHtml(name);
+  const html = emailWrapper('<h1 class="heading-text" style="' + headingStyle + '">Hola, ' + safeName + '.</h1><p class="body-text" style="' + textMain + '">Tu cuenta en VitaZen se ha creado correctamente. Ya puedes acceder cuando quieras.</p>' + ctaButton(APP_URL + '/dashboard', 'ACCEDER') + '<p class="muted-text" style="' + mutedStyle + '">Si no creaste esta cuenta, puedes ignorar este mensaje.</p>', preheader);
   const text = 'Hola, ' + name + '.\n\nTu cuenta en VitaZen se ha creado correctamente. Ya puedes acceder cuando quieras.\n\nAcceder: ' + APP_URL + '/dashboard\n\nSi no creaste esta cuenta, puedes ignorar este mensaje.';
   return { html, text, subject };
 }
 
 export function verifyEmailTemplate(name: string, verificationLink: string): EmailContent {
   const subject = 'Verifica tu email para VitaZen';
-  const preheader = name + ', confirma tu dirección de email.';
+  const safeName = escapeHtml(name);
+  const preheader = safeName + ', confirma tu dirección de email.';
   const html = emailWrapper('<h1 class="heading-text" style="' + headingStyle + '">Confirma tu email.</h1><p class="secondary-text" style="' + secondaryStyle + '">Un paso más.</p><p class="secondary-text" style="' + secondaryStyleNoMargin + '">Verifica tu acceso y entra.</p>' + ctaButton(verificationLink, 'CONFIRMAR') + '<p class="muted-text" style="' + mutedStyle + '">Este enlace caduca en 24 horas. Si no solicitaste esta verificación, ignora este mensaje.</p>', preheader);
   const text = 'Confirma tu email.\n\nUn paso más. Verifica tu acceso y entra.\n\nConfirmar: ' + verificationLink + '\n\nEste enlace caduca en 24 horas. Si no solicitaste esta verificación, ignora este mensaje.';
   return { html, text, subject };
@@ -202,7 +216,8 @@ export function verifyEmailTemplate(name: string, verificationLink: string): Ema
 
 export function resetPasswordTemplate(name: string, resetLink: string): EmailContent {
   const subject = 'Restablece tu contraseña de VitaZen';
-  const preheader = name + ', se solicitó un cambio de contraseña.';
+  const safeName = escapeHtml(name);
+  const preheader = safeName + ', se solicitó un cambio de contraseña.';
   const html = emailWrapper('<h1 class="heading-text" style="' + headingStyle + '">Restablece tu contraseña.</h1><p class="body-text" style="' + textMain + '">Recibimos una solicitud para cambiar la contraseña de tu cuenta.</p>' + ctaButton(resetLink, 'RESTABLECER') + '<p class="muted-text" style="' + mutedStyle + '">Este enlace caduca en 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá sin cambios.</p>', preheader);
   const text = 'Restablece tu contraseña.\n\nRecibimos una solicitud para cambiar la contraseña de tu cuenta.\n\nRestablecer contraseña: ' + resetLink + '\n\nEste enlace caduca en 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá sin cambios.';
   return { html, text, subject };
@@ -210,8 +225,10 @@ export function resetPasswordTemplate(name: string, resetLink: string): EmailCon
 
 export function subscriptionConfirmedTemplate(name: string, planName: string): EmailContent {
   const subject = 'Tu suscripción a VitaZen está activa';
-  const preheader = name + ', tu plan ' + planName + ' está activo.';
-  const html = emailWrapper('<h1 class="heading-text" style="' + headingStyle + '">Tu suscripción está activa.</h1><p class="body-text" style="' + textMain + '">Tu plan ' + planName + ' de VitaZen se ha activado correctamente.</p>' + ctaButton(APP_URL + '/dashboard', 'ACCEDER') + '<p class="muted-text" style="' + mutedStyle + '">Si tienes alguna pregunta, responde a este email.</p>', preheader);
+  const safeName = escapeHtml(name);
+  const safePlanName = escapeHtml(planName);
+  const preheader = safeName + ', tu plan ' + safePlanName + ' está activo.';
+  const html = emailWrapper('<h1 class="heading-text" style="' + headingStyle + '">Tu suscripción está activa.</h1><p class="body-text" style="' + textMain + '">Tu plan ' + safePlanName + ' de VitaZen se ha activado correctamente.</p>' + ctaButton(APP_URL + '/dashboard', 'ACCEDER') + '<p class="muted-text" style="' + mutedStyle + '">Si tienes alguna pregunta, responde a este email.</p>', preheader);
   const text = 'Tu suscripción está activa.\n\nTu plan ' + planName + ' de VitaZen se ha activado correctamente.\n\nAcceder: ' + APP_URL + '/dashboard\n\nSi tienes alguna pregunta, responde a este email.';
   return { html, text, subject };
 }

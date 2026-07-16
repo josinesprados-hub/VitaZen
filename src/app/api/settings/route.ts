@@ -49,11 +49,9 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { weeklyEmailSummary, dailyReminders, privacyStatsVisible } = body;
 
-    // SETTINGS CONSUMERS:
-    //   weeklyEmailSummary  → CONSUMED by weekly-recap cron (email via Resend)
-    //   dailyReminders      → CONSUMED by daily-reminder cron (push via FCM)
-    //     processDailyBatch() in src/lib/notifications/reminders/daily.ts
-    //     reads User.dailyReminders as pre-filter before sending push notifications.
+    // NOTE (settings):
+    //   weeklyEmailSummary  → CONSUMED by weekly-recap-sender.ts (cron)
+    //   dailyReminders      → CONSUMED by notifications/reminders/daily.ts:188 (cron pre-filter)
     //   privacyStatsVisible → CONSUMED by usePrivacy() hook → <PrivacyMask> component
     //     Controls visual masking of personal metrics (scores, streaks, counts, balances).
     //     When false (= private), sensitive numbers are gently blurred in the UI.

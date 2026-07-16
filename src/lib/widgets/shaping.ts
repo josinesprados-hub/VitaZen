@@ -24,18 +24,7 @@ import {
 
 // ─── Helpers ────────────────────────────────
 
-/** Deterministic daily index from date — same selection all day */
-function getDailyIndex(dateKey: string, arrayLength: number): number {
-  let hash = 0;
-  for (let i = 0; i < dateKey.length; i++) {
-    const char = dateKey.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return Math.abs(hash) % arrayLength;
-}
-
-import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
+import { deterministicIndex, getTodayDateKey, getMadridDateKey, startOf7DaysAgoMadrid, startOf14DaysAgoMadrid, calcStreakFromKeys, startOfTodayMadrid } from '@/lib/dates';
 
 // ─── Reflection Widget ──────────────────────
 //
@@ -53,9 +42,9 @@ export async function shapeReflectionPayload(
   _plan: string,
 ): Promise<ReflectionWidgetPayload> {
   const dateKey = getTodayDateKey();
-  const index = getDailyIndex(dateKey + userId, DAILY_QUOTES.length);
+  const index = deterministicIndex(dateKey + userId, DAILY_QUOTES.length);
   const text = DAILY_QUOTES[index].text;
-  const categoryIndex = getDailyIndex(dateKey, REFLECTION_CATEGORIES.length);
+  const categoryIndex = deterministicIndex(dateKey, REFLECTION_CATEGORIES.length);
 
   const payload: ReflectionWidgetPayload = {
     text,
@@ -87,9 +76,8 @@ export async function shapeMomentumPayload(
   userId: string,
   _plan: string,
 ): Promise<MomentumWidgetPayload> {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = startOf7DaysAgoMadrid();
+  const fourteenDaysAgo = startOf14DaysAgoMadrid();
 
   // Fetch 7-day activity counts
   const [
@@ -243,23 +231,7 @@ export async function shapeMomentumPayload(
     uniqueDays.add(getMadridDateKey(new Date(d)));
   }
 
-  const todayStr = getTodayDateKey();
-  let checkDateStr = todayStr;
-  if (!uniqueDays.has(todayStr)) {
-    const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-    checkDateStr = getMadridDateKey(yesterday);
-  }
-
-  let streak = 0;
-  while (true) {
-    if (uniqueDays.has(checkDateStr)) {
-      streak++;
-      const prev = new Date(new Date(checkDateStr + 'T00:00:00').getTime() - 24 * 60 * 60 * 1000);
-      checkDateStr = getMadridDateKey(prev);
-    } else {
-      break;
-    }
-  }
+  const streak = calcStreakFromKeys(uniqueDays);
 
   // ─── Calculate Score (same algorithm as /api/dashboard/momentum) ───
   const activityScore = Math.min(25, Math.round((activeDays / 7) * 25));
@@ -311,7 +283,7 @@ export async function shapeCheckinPayload(
   userId: string,
   _plan: string,
 ): Promise<CheckinWidgetPayload> {
-  const today = new Date(getTodayDateKey() + 'T00:00:00');
+  const today = startOfTodayMadrid();
 
   const checkin = await db.dailyCheckin.findUnique({
     where: { userId_date: { userId, date: today } },
@@ -330,7 +302,7 @@ export async function shapeCheckinPayload(
 
   // Not checked in — pick a calm nudge (deterministic per day)
   const dateKey = getTodayDateKey();
-  const nudgeIndex = getDailyIndex(dateKey, CHECKIN_NUDGES.length);
+  const nudgeIndex = deterministicIndex(dateKey, CHECKIN_NUDGES.length);
 
   return {
     checkedIn: false,
@@ -352,7 +324,7 @@ const EMPIRE_LABELS: Record<string, string> = {
   disciplina: 'Disciplina',
   mente: 'Mente',
   energia: 'Energía',
-  riqueza: 'Finanzas',
+  riqueza: 'Riqueza',
   crecimiento: 'Crecimiento',
 };
 
@@ -361,7 +333,7 @@ export async function shapeDailyFocusPayload(
   _plan: string,
 ): Promise<DailyFocusWidgetPayload> {
   const dateKey = getTodayDateKey();
-  const empireIndex = getDailyIndex(dateKey + userId, EMPIRES.length);
+  const empireIndex = deterministicIndex(dateKey + userId, EMPIRES.length);
   const empire = EMPIRES[empireIndex];
 
   // Fetch a tip for this empire
@@ -427,8 +399,8 @@ export async function shapeCalmQuotePayload(
 
   // Use a different seed AND offset from the reflection index
   // to ensure the quote and reflection are different each day
-  const reflectionIndex = getDailyIndex(dateKey + userId, DAILY_QUOTES.length);
-  let quoteIndex = getDailyIndex(dateKey + userId + '_quote', DAILY_QUOTES.length);
+  const reflectionIndex = deterministicIndex(dateKey + userId, DAILY_QUOTES.length);
+  let quoteIndex = deterministicIndex(dateKey + userId + '_quote', DAILY_QUOTES.length);
 
   // Avoid showing the same reflection as the quote
   if (quoteIndex === reflectionIndex && DAILY_QUOTES.length > 1) {
@@ -436,7 +408,7 @@ export async function shapeCalmQuotePayload(
   }
 
   const quote = DAILY_QUOTES[quoteIndex].text;
-  const categoryIndex = getDailyIndex(dateKey + '_cat', QUOTE_CATEGORIES.length);
+  const categoryIndex = deterministicIndex(dateKey + '_cat', QUOTE_CATEGORIES.length);
 
   return {
     quote,

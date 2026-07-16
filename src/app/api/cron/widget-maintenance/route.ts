@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const start = Date.now();
 
   // ── Auth: verify cron secret ──
-  const authHeader = request.headers.get('Authorization');
+  const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {

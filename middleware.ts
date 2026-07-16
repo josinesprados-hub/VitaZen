@@ -1,45 +1,64 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Routes that don't require authentication
-// GLOBAL-10 FIX: Use exact match for terminal routes and prefix match with
-// trailing slash for routes that may have sub-paths. Previously, startsWith
-// was used for all routes, which meant '/api/auth/sync' would also match
-// '/api/auth/sync-malicious' — a latent security risk for future routes.
-const publicRoutes = ['/login', '/register', '/onboarding', '/verify-email', '/privacy'];
-const publicApiRoutes = [
-  '/api/auth/sync',
-  '/api/auth/session',
-  '/api/auth/verify-email',
-  '/api/auth/send-verification',
-  '/api/auth/reset-password',
-  '/api/stripe/webhook',
-];
+// ─── AUTH ARCHITECTURE ─────────────────────────────────────────────────
+// VitaZen uses a client-side auth model:
+// - API routes verify Firebase ID tokens via Authorization: Bearer header
+//   (each route handler calls getAuthUser/getAuthUserBasic independently).
+// - Page routes are protected by client-side AuthContext (Firebase onAuthStateChanged)
+//   which redirects unauthenticated users to /login.
+//
+// This middleware exists as a lightweight edge guard ONLY for static assets
+// and Next.js internals. It does NOT perform token verification because
+// Firebase Admin SDK (required for token verification) is not available in
+// Next.js Edge Runtime.
+//
+// Page-route protection at the edge would require either:
+// (a) A JWT verification library compatible with Edge Runtime (new dependency), or
+// (b) Rotating short-lived session cookies (architectural change).
+// Both are out of scope for this security fix phase.
+// ─────────────────────────────────────────────────────────────────────
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public routes (exact match for page routes, prefix for API routes)
-  if (publicRoutes.includes(pathname) || publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-    return NextResponse.next();
-  }
-  if (publicApiRoutes.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // Allow static files and Next.js internals
+  // Allow static files and Next.js internals (no auth needed)
   if (pathname.startsWith('/_next') || pathname.startsWith('/images') || pathname === '/favicon.ico') {
     return NextResponse.next();
   }
 
-  // API routes handle their own auth via Bearer tokens
-  if (pathname.startsWith('/api/')) {
-    return NextResponse.next();
+  // ─── H-01 FIX: Security headers ─────────────────────────────────────
+  // The middleware cannot verify Firebase tokens (Edge Runtime limitation),
+  // but it CAN inject security response headers on all non-static responses.
+  // These headers are defense-in-depth measures that cost nothing and
+  // mitigate entire classes of client-side attacks.
+  const response = NextResponse.next();
+
+  // Prevent MIME type sniffing — browsers must respect the declared Content-Type
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+
+  // Prevent clickjacking — VitaZen is a web app, never embedded in iframes
+  response.headers.set('X-Frame-Options', 'DENY');
+
+  // Control referrer information leaked to external sites on navigation
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // Restrict browser features not used by VitaZen (camera, microphone, etc.)
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=()'
+  );
+
+  // HSTS: force HTTPS for 1 year, include subdomains
+  // Only set in production — localhost development uses HTTP
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains'
+    );
   }
 
-  // For dashboard routes, the client-side AuthContext handles redirects
-  // This middleware is a fallback for direct URL access
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

@@ -44,18 +44,25 @@ export async function GET(request: NextRequest) {
     // (only role + createdAt needed for thread list preview).
     const threadLimit = isPremium ? MAX_THREADS_PREMIUM : HISTORY_LIMIT_FREE;
 
-    const threads = await db.aIThread.findMany({
-      where,
-      orderBy: { updatedAt: 'desc' },
-      take: threadLimit,
-      include: {
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          select: { role: true, createdAt: true },
+    // BUG-04 FIX: Fetch real thread counts in parallel so the sidebar tab
+    // badges show the actual number of conversations, not the pagination cap.
+    // These are lightweight COUNT queries — no data transfer overhead.
+    const [totalActiveCount, totalArchivedCount, threads] = await Promise.all([
+      db.aIThread.count({ where: { userId: user.id, archived: false } }),
+      db.aIThread.count({ where: { userId: user.id, archived: true } }),
+      db.aIThread.findMany({
+        where,
+        orderBy: { updatedAt: 'desc' },
+        take: threadLimit,
+        include: {
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            select: { role: true, createdAt: true },
+          },
         },
-      },
-    });
+      }),
+    ]);
 
     return NextResponse.json({
       threads,
@@ -63,6 +70,8 @@ export async function GET(request: NextRequest) {
       historyLimit: HISTORY_LIMIT_FREE,
       remaining: usageInfo.remaining,
       limit: usageInfo.limit,
+      totalActiveCount,
+      totalArchivedCount,
     });
   } catch (error) {
     console.error('Get threads error:', error);

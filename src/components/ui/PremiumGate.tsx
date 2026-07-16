@@ -28,6 +28,8 @@ interface PremiumGateProps {
   compact?: boolean;
   /** custom label — ignored in favor of contemplative copy */
   label?: string;
+  /** whether to show the CTA link (default true for backward compat) */
+  showCta?: boolean;
   children: React.ReactNode;
 }
 
@@ -36,6 +38,7 @@ export default function PremiumGate({
   intensity: _intensity,
   compact = false,
   label,
+  showCta = true,
   children,
 }: PremiumGateProps) {
   if (isPremium) return <>{children}</>;
@@ -43,9 +46,9 @@ export default function PremiumGate({
   const displayLabel = label || '';
 
   return (
-    <div className="relative overflow-hidden group/depth-gate">
-      {/* Content hidden — occupies layout space but invisible */}
-      <div className="opacity-0 select-none pointer-events-none" aria-hidden="true">
+    <div className="relative group/depth-gate">
+      {/* Content visible but gently dimmed — not blurred, not hidden */}
+      <div className="opacity-40 select-none pointer-events-none" aria-hidden="true">
         {children}
       </div>
 
@@ -69,14 +72,16 @@ export default function PremiumGate({
               {displayLabel}
             </p>
           )}
-          <Link
-            href="/elite"
-            className={`text-champagne/50 hover:text-champagne/80 transition-colors text-center leading-snug ${
-              compact ? 'text-[9px]' : 'text-[10px]'
-            }`}
-          >
-            Descubre más · Élite
-          </Link>
+          {showCta && (
+            <Link
+              href="/elite"
+              className={`text-champagne/50 hover:text-champagne/80 transition-colors text-center leading-snug ${
+                compact ? 'text-[9px]' : 'text-[10px]'
+              }`}
+            >
+              Descubre más · Élite
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -91,7 +96,7 @@ export default function PremiumGate({
 
 interface PremiumInlineBadgeProps {
   isPremium: boolean;
-  /** FREE label text, e.g. "7 días" or "3 insights" */
+  /** FREE label text, e.g. "7 días" or "3 observaciones" */
   freeLabel: string;
   /** Premium label text — now more contemplative */
   premiumLabel?: string;

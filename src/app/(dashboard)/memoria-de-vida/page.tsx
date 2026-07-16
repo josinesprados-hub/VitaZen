@@ -24,7 +24,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
 import {
@@ -94,21 +94,16 @@ export default function EtapasPage() {
 
   const [data, setData] = useState<LifeMemoryData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   const fetchData = useCallback(async () => {
-    setError(false);
     try {
       const res = await apiFetch('/api/life-memory');
       if (res.ok) {
         const result = await res.json();
         setData(result);
-      } else {
-        setError(true);
       }
-    } catch (err) {
-      console.error('[Etapas] Fetch error:', err);
-      setError(true);
+    } catch (error) {
+      console.error('[Etapas] Fetch error:', error);
     } finally {
       setLoading(false);
     }
@@ -124,24 +119,6 @@ export default function EtapasPage() {
       <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20 sm:py-32">
         <div className="flex items-center justify-center">
           <div className="h-2 w-2 rounded-full bg-champagne gentle-pulse" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!data && error) {
-    return (
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20 sm:py-32">
-        <div className="text-center">
-          <div className="w-2.5 h-2.5 rounded-full bg-champagne/15 mx-auto mb-6" />
-          <p className="text-[#555] text-sm mb-6">No se pudo cargar la memoria de vida</p>
-          <button
-            onClick={fetchData}
-            className="inline-flex items-center gap-2 text-champagne/60 hover:text-champagne text-xs transition-colors"
-          >
-            <RefreshCw size={13} />
-            Reintentar
-          </button>
         </div>
       </div>
     );
@@ -267,7 +244,7 @@ export default function EtapasPage() {
       {/* ─── Transitions gate for FREE — aspirational ─── */}
       {!isPremium && stages.length > 0 && (
         <div className="mb-14 sm:mb-20">
-          <PremiumGate isPremium={false} intensity="light" compact label={ELITE_TRANSITIONS}>
+          <PremiumGate isPremium={false} intensity="light" compact showCta={false} label={ELITE_TRANSITIONS}>
             <div className="h-12" />
           </PremiumGate>
         </div>
@@ -302,7 +279,7 @@ export default function EtapasPage() {
       {/* ─── Memories gate for FREE — aspirational ─── */}
       {!isPremium && stages.length > 0 && (
         <div className="mb-14 sm:mb-20">
-          <PremiumGate isPremium={false} intensity="light" compact label="Momentos destacados">
+          <PremiumGate isPremium={false} intensity="light" compact showCta={false} label="Momentos destacados">
             <div className="h-12" />
           </PremiumGate>
         </div>

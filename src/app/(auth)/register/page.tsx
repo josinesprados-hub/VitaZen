@@ -91,7 +91,7 @@ export default function RegisterPage() {
           setError(result.message);
           setProviderHint(result.provider);
         } catch {
-          setError('Este correo ya está registrado. Inicia sesión con el método original.');
+          setError('Este correo ya está registrado. Inicia sesión con tu cuenta.');
           setProviderHint(null);
         }
       } else if (err.code === 'auth/weak-password') {
@@ -123,7 +123,7 @@ export default function RegisterPage() {
           setError(result.message);
           setProviderHint(result.provider);
         } else {
-          setError('Esta cuenta ya fue creada con correo y contraseña. Continúa usando ese método para acceder.');
+          setError('Esta cuenta usa correo y contraseña. Inicia sesión desde ahí.');
           setProviderHint('password');
         }
         setLoading(false);
@@ -268,7 +268,7 @@ export default function RegisterPage() {
                   }}
                   required
                   className={`w-full bg-[#000000] border rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors ${passwordMatch ? 'border-[#1a1a1a]' : 'border-red-500'}`}
-                  placeholder="Repite tu contraseña para verificar"
+                  placeholder="Repite tu contraseña"
                 />
                 <button
                   type="button"
