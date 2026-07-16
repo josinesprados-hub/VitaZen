@@ -14,6 +14,7 @@
 // ═══════════════════════════════════════════
 
 import { db } from './db';
+import { getMadridWeekKey, startOf7DaysAgoMadrid } from '@/lib/dates';
 import { generateWeeklyInsights, gatherData } from './insights';
 import { getEmotionalState } from './emotional-state';
 import { weeklyRecapEmail, type WeeklyRecapEmailData } from './emails/weekly-recap';
@@ -30,41 +31,11 @@ const REPLY_TO = 'hola@vitazen.cc';
 // app's timezone standard (getTodayDateKey).
 // ═══════════════════════════════════════════
 
-export function getWeekKey(timezone: string = 'Europe/Madrid'): string {
-  const now = new Date();
-
-  // Get current date components in the target timezone
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(now);
-
-  const year = Number(parts.find(p => p.type === 'year')!.value);
-  const month = Number(parts.find(p => p.type === 'month')!.value);
-  const day = Number(parts.find(p => p.type === 'day')!.value);
-
-  // ISO 8601 week number calculation
-  // Step 1: Create a UTC date matching the local date
-  const d = new Date(Date.UTC(year, month - 1, day));
-
-  // Step 2: Adjust to nearest Thursday (ISO weeks start Monday,
-  // and the week containing Jan 4 is always week 1)
-  const dayOfWeek = d.getUTCDay() || 7; // Sunday = 7
-  d.setUTCDate(d.getUTCDate() + 4 - dayOfWeek);
-
-  // Step 3: Get the year of the Thursday (ISO week year)
-  const isoYear = d.getUTCFullYear();
-
-  // Step 4: Calculate days from Jan 1 of that year to the Thursday
-  const jan1 = new Date(Date.UTC(isoYear, 0, 1));
-  const dayOfYear = Math.floor((d.getTime() - jan1.getTime()) / 86400000) + 1;
-
-  // Step 5: Week number = ceil(dayOfYear / 7)
-  const weekNo = Math.ceil(dayOfYear / 7);
-
-  return `${isoYear}-W${String(weekNo).padStart(2, '0')}`;
+// Backward-compatible re-export: getWeekKey() now delegates to the unified dates utility.
+// The old timezone parameter is ignored — Madrid is always used.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getWeekKey(_timezone?: string): string {
+  return getMadridWeekKey();
 }
 
 // ─────────────────────────────────────────
@@ -93,10 +64,13 @@ interface EligibleUser {
 }
 
 async function getEligibleUsers(): Promise<EligibleUser[]> {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
+  const sevenDaysAgo = startOf7DaysAgoMadrid();
 
   // Users who: have weeklyEmailSummary ON, email verified,
   // and have been active in the last 7 days (at least 1 check-in or activity)
+  // PERF-5.2: Safety cap to prevent unbounded user fetch.
+  // In production with thousands of users this query could return
+  // a very large result set. 500 is a safe upper bound for a weekly batch.
   const users = await db.user.findMany({
     where: {
       weeklyEmailSummary: true,
@@ -115,6 +89,7 @@ async function getEligibleUsers(): Promise<EligibleUser[]> {
       name: true,
       plan: true,
     },
+    take: 500,
   });
 
   return users;
@@ -334,10 +309,26 @@ export interface WeeklyRecapResult {
 
 export async function sendWeeklyRecaps(): Promise<WeeklyRecapResult> {
   const startTime = Date.now();
-  const weekKey = getWeekKey();
+  const weekKey = getMadridWeekKey();
   console.log(`[WEEKLY-RECAP] Starting weekly recap send for week ${weekKey}...`);
 
-  const users = await getEligibleUsers();
+  // PERF-5.2: Outer try/catch so that if getEligibleUsers() itself throws,
+  // the cron route receives a structured error instead of an unhandled exception.
+  let users: EligibleUser[];
+  try {
+    users = await getEligibleUsers();
+  } catch (error) {
+    console.error('[WEEKLY-RECAP] Fatal error fetching eligible users:', error);
+    return {
+      totalEligible: 0,
+      sent: 0,
+      skipped: 0,
+      idempotentSkips: 0,
+      errors: 1,
+      duration: Date.now() - startTime,
+      weekKey,
+    };
+  }
   console.log(`[WEEKLY-RECAP] Found ${users.length} eligible users for week ${weekKey}.`);
 
   let sent = 0;

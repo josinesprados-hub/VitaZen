@@ -57,59 +57,67 @@ export async function GET(request: NextRequest) {
       eventCounts[row.event] = row._count.id;
     }
 
-    // ─── Unique users per event type (separate groupBy) ──
-    const uniquePerEvent = await db.analyticsEvent.groupBy({
-      by: ['event', 'userId'],
-      where: { createdAt: { gte: since }, userId: { not: null } },
-      _count: { id: true },
-    });
+    // ─── Unique users per event type (raw SQL COUNT DISTINCT) ──
+    // PERF-5.2: Previously materialized ALL (event, userId) pairs into JS
+    // then counted. Now the DB does the counting — only tiny result set.
+    const uniquePerEventRows = await db.$queryRaw<Array<{ event: string; unique_users: bigint }>>`
+      SELECT event, COUNT(DISTINCT "userId")::bigint AS unique_users
+      FROM "AnalyticsEvent"
+      WHERE "createdAt" >= ${since} AND "userId" IS NOT NULL
+      GROUP BY event
+    `;
     const uniqueUsersPerEvent: Record<string, number> = {};
-    for (const row of uniquePerEvent) {
-      uniqueUsersPerEvent[row.event] = (uniqueUsersPerEvent[row.event] || 0) + 1;
+    for (const row of uniquePerEventRows) {
+      uniqueUsersPerEvent[row.event] = Number(row.unique_users);
     }
 
-    // ─── DAU trend (daily_session events grouped by day) ──
-    // PERF-5.2: Use raw SQL for DATE truncation (PostgreSQL-specific but this is
-    // a Neon/PostgreSQL project). Prisma groupBy can't truncate timestamps.
-    const dauRows = await db.$queryRaw<Array<{ day: string; user_id: string }>>`
-      SELECT DATE("createdAt" AT TIME ZONE 'UTC') as day, "userId" as user_id
+    // ─── DAU trend (daily_session events: COUNT DISTINCT per day) ──
+    // PERF-5.2: Previously materialized ALL (day, userId) pairs into a JS Map<day, Set>,
+    // which for 90 days × thousands of users could be tens of thousands of rows.
+    // Now the DB computes COUNT(DISTINCT userId) per day — only ~90 rows returned.
+    const dauRows = await db.$queryRaw<Array<{ day: string; dau: bigint }>>`
+      SELECT DATE("createdAt" AT TIME ZONE 'UTC') as day, COUNT(DISTINCT "userId")::bigint AS dau
       FROM "AnalyticsEvent"
       WHERE "createdAt" >= ${since} AND "event" = 'daily_session' AND "userId" IS NOT NULL
-      GROUP BY day, "userId"
+      GROUP BY day
+      ORDER BY day
     `;
-    const dauMap: Record<string, Set<string>> = {};
-    for (const row of dauRows) {
-      if (!dauMap[row.day]) dauMap[row.day] = new Set();
-      dauMap[row.day].add(row.user_id);
-    }
-    const dauTrend = Object.entries(dauMap)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, users]) => ({ date, dau: users.size }));
+    const dauTrend = dauRows.map(row => ({ date: row.day, dau: Number(row.dau) }));
 
-    // ─── Total unique users (single query) ──
-    const totalUniqueResult = await db.analyticsEvent.groupBy({
-      by: ['userId'],
-      where: { createdAt: { gte: since }, userId: { not: null } },
-    });
-    const totalUniqueUsers = totalUniqueResult.length;
+    // ─── Total unique users (single COUNT DISTINCT query) ──
+    // PERF-5.2: Previously materialized one row per unique userId.
+    // Now DB returns a single scalar.
+    const totalUniqueResult = await db.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(DISTINCT "userId")::bigint AS count
+      FROM "AnalyticsEvent"
+      WHERE "createdAt" >= ${since} AND "userId" IS NOT NULL
+    `;
+    const totalUniqueUsers = Number(totalUniqueResult[0]?.count ?? 0);
 
     // ─── Total event count (single query) ──
     const totalEvents = await db.analyticsEvent.count({
       where: { createdAt: { gte: since } },
     });
 
-    // ─── Retention (simplified: registered users still active) ──
+    // ─── Retention (registered users still active) ──
+    // PERF-5.2: Use a single SQL query with COUNT(DISTINCT ... INTERSECT)
+    // instead of materializing two full sets and computing intersection in JS.
     const registeredCount = eventCounts['user_registered'] || 0;
-    const activeUserIds = new Set(
-      totalUniqueResult.map(r => r.userId).filter(Boolean)
-    );
-    // Count registered users who are also in the active set
-    const registeredEvents = await db.analyticsEvent.findMany({
-      where: { createdAt: { gte: since }, event: 'user_registered', userId: { not: null } },
-      select: { userId: true },
-      distinct: ['userId'],
-    });
-    const retainedCount = registeredEvents.filter(r => activeUserIds.has(r.userId!)).length;
+    const retainedResult = await db.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(DISTINCT a."userId")::bigint AS count
+      FROM "AnalyticsEvent" a
+      WHERE a."createdAt" >= ${since}
+        AND a."userId" IS NOT NULL
+        AND a.event = 'user_registered'
+        AND EXISTS (
+          SELECT 1 FROM "AnalyticsEvent" b
+          WHERE b."userId" = a."userId"
+            AND b."createdAt" >= ${since}
+            AND b."userId" IS NOT NULL
+            AND b.event != 'user_registered'
+        )
+    `;
+    const retainedCount = Number(retainedResult[0]?.count ?? 0);
 
     // ─── Feature usage ranking ──
     const featureUsage = Object.entries(eventCounts)

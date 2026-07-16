@@ -18,10 +18,21 @@ export async function GET(request: NextRequest) {
     // PERF-5.2: Clamp days to prevent unbounded queries (matches finance route pattern)
     const days = Math.min(Math.max(parseInt(searchParams.get('days') || '30'), 1), 365);
 
+    // PERF-5.2: Add select to reduce response payload size.
+    // Previously returned ALL columns including id and createdAt for every row.
     const logs = await db.wellnessLog.findMany({
       where: { userId: user.id },
       orderBy: { date: 'desc' },
       take: days,
+      select: {
+        id: true,
+        date: true,
+        mood: true,
+        energy: true,
+        sleep: true,
+        stress: true,
+        notes: true,
+      },
     });
 
     return NextResponse.json({ logs });

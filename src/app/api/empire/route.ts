@@ -14,8 +14,15 @@ async function handler(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    // PERF-5.2: Add select — only 4 rows per user, but avoids returning
+    // unused columns (id, userId, updatedAt).
     const progress = await db.empireProgress.findMany({
       where: { userId: user.id },
+      select: {
+        empire: true,
+        xp: true,
+        streak: true,
+      },
     });
 
     // Calculate levels from XP

@@ -112,85 +112,93 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update user name if provided and current name is default (email prefix)
-    if (name && typeof name === 'string' && name.trim()) {
-      const currentName = user.name || '';
-      const emailPrefix = user.email?.split('@')[0] || '';
-      const isDefaultName = !currentName || currentName === emailPrefix;
-      if (isDefaultName) {
-        await db.user.update({
-          where: { id: user.id },
-          data: { name: name.trim() },
+    // PERF-5.2: Wrap all onboarding writes in a single transaction.
+    // Previously these were 5 separate DB operations — if any intermediate
+    // step failed, the user ended up in a partially-onboarded state
+    // (e.g., onboarding marked complete but habits not created).
+    const onboardingData = await db.$transaction(async (tx) => {
+      // Update user name if provided and current name is default (email prefix)
+      if (name && typeof name === 'string' && name.trim()) {
+        const currentName = user.name || '';
+        const emailPrefix = user.email?.split('@')[0] || '';
+        const isDefaultName = !currentName || currentName === emailPrefix;
+        if (isDefaultName) {
+          await tx.user.update({
+            where: { id: user.id },
+            data: { name: name.trim() },
+          });
+        }
+      }
+
+      // Save onboarding data
+      const data = await tx.onboardingData.upsert({
+        where: { userId: user.id },
+        update: {
+          goals: JSON.stringify(goals || []),
+          primaryFocus,
+          stressLevel,
+          energyLevel,
+          focusLevel,
+          initialHabits: JSON.stringify(initialHabits || []),
+        },
+        create: {
+          userId: user.id,
+          goals: JSON.stringify(goals || []),
+          primaryFocus,
+          stressLevel,
+          energyLevel,
+          focusLevel,
+          initialHabits: JSON.stringify(initialHabits || []),
+        },
+      });
+
+      // Mark onboarding as completed
+      await tx.user.update({
+        where: { id: user.id },
+        data: { onboardingCompleted: true },
+      });
+
+      // Create initial habits from selection
+      if (initialHabits && Array.isArray(initialHabits) && initialHabits.length > 0) {
+        const existingHabits = await tx.habitLog.findMany({
+          where: { userId: user.id, name: { in: initialHabits } },
+          select: { name: true },
+        });
+        const existingNames = new Set(existingHabits.map((h) => h.name));
+        const newHabits = initialHabits.filter((hName: string) => !existingNames.has(hName));
+
+        if (newHabits.length > 0) {
+          await tx.habitLog.createMany({
+            data: newHabits.map((hName: string) => ({
+              userId: user.id,
+              name: hName,
+              frequency: 'daily',
+            })),
+          });
+        }
+      }
+
+      // Boost XP for the primary focus empire
+      const empireMap: Record<string, string> = {
+        mente: 'mente',
+        disciplina: 'disciplina',
+        energia: 'energia',
+        riqueza: 'riqueza',
+      };
+
+      const focusEmpire = empireMap[primaryFocus];
+      if (focusEmpire) {
+        await tx.empireProgress.updateMany({
+          where: { userId: user.id, empire: focusEmpire },
+          data: { xp: { increment: 25 } },
         });
       }
-    }
 
-    // Save onboarding data
-    const onboardingData = await db.onboardingData.upsert({
-      where: { userId: user.id },
-      update: {
-        goals: JSON.stringify(goals || []),
-        primaryFocus,
-        stressLevel,
-        energyLevel,
-        focusLevel,
-        initialHabits: JSON.stringify(initialHabits || []),
-      },
-      create: {
-        userId: user.id,
-        goals: JSON.stringify(goals || []),
-        primaryFocus,
-        stressLevel,
-        energyLevel,
-        focusLevel,
-        initialHabits: JSON.stringify(initialHabits || []),
-      },
+      return data;
     });
 
-    // Mark onboarding as completed
-    await db.user.update({
-      where: { id: user.id },
-      data: { onboardingCompleted: true },
-    });
-
-    // Track onboarding completion
+    // Track onboarding completion (fire-and-forget, outside transaction)
     trackEvent({ event: 'onboarding_completed', userId: user.id, properties: { primaryFocus } });
-
-    // Create initial habits from selection
-    if (initialHabits && Array.isArray(initialHabits) && initialHabits.length > 0) {
-      const existingHabits = await db.habitLog.findMany({
-        where: { userId: user.id, name: { in: initialHabits } },
-        select: { name: true },
-      });
-      const existingNames = new Set(existingHabits.map((h) => h.name));
-      const newHabits = initialHabits.filter((name: string) => !existingNames.has(name));
-
-      if (newHabits.length > 0) {
-        await db.habitLog.createMany({
-          data: newHabits.map((name: string) => ({
-            userId: user.id,
-            name,
-            frequency: 'daily',
-          })),
-        });
-      }
-    }
-
-    // Boost XP for the primary focus empire
-    const empireMap: Record<string, string> = {
-      mente: 'mente',
-      disciplina: 'disciplina',
-      energia: 'energia',
-      riqueza: 'riqueza',
-    };
-
-    const focusEmpire = empireMap[primaryFocus];
-    if (focusEmpire) {
-      await db.empireProgress.updateMany({
-        where: { userId: user.id, empire: focusEmpire },
-        data: { xp: { increment: 25 } },
-      });
-    }
 
     return NextResponse.json({
       success: true,
