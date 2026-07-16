@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/46261453/firebase-auth-not-work-with-pwa-installed-on-android-desktop",
+    "name": "firebase auth not work with PWA installed on Android desktop",
+    "snippet": "I have built a SPA that works in the browser in that on load it provides an auth option, I click google signin and the firebase auth flow continues until I ... Safari cannot open the page because it could not connect to the server React PWA is handling auth redirect for custom domain instead of ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/FirebaseExtended/polymerfire/issues/332",
+    "name": "<firebase-auth> fail to signInWithRedirect() from both mobile",
+    "snippet": "signInWithRedirect() should properly authenticate and redirect to mobile Chrome and installed PWA correspondingly. Actual outcome. When sign ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://firebase.google.com/docs/auth/web/redirect-best-practices",
+    "name": "Best practices for using signInWithRedirect on browsers that block",
+    "snippet": "This document describes the best practices for using redirect sign-ins on browsers that block third-party cookies.",
+    "host_name": "firebase.google.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.ionicframework.com/t/firebase-ui-ios-redirect/169249",
+    "name": "Firebase UI iOS redirect - Ionic Framework",
+    "snippet": "Anyone using Firebase UI? What are you using as redirect URL for iOS? I'm following the Google documentation https://firebase.google.com/docs/ ... Ionic React Firebase authentication with redirect returns to browser ... Firebase google auth not authorised on ios, but is on android More results from forum.ionicframework.com",
+    "host_name": "forum.ionicframework.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://groups.google.com/g/firebase-talk/c/NVADjeUCxiA",
+    "name": "firebase.auth().signInWithPopup - Google Groups",
+    "snippet": "There is a error using the firebase.auth().signInWithPopup on mobile devices. The popup appears for a quick second and then disappears.",
+    "host_name": "groups.google.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://firebaseopensource.com/projects/firebase/quickstart-ios/authentication/readme",
+    "name": "Firebase Auth Quickstart",
+    "snippet": "In this quickstart, we demonstrate how you can use Firebase Auth to authenticate users by providing implementations for the various authentication flows.",
+    "host_name": "firebaseopensource.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/firebase/firebase-js-sdk/issues/77",
+    "name": "Google as an Auth provider doesn't work on iOS saved to homescreen",
+    "snippet": "Unfortunately, it is currently impossible if you wish to use Google Sign in. If you are using other providers, you can use the recommended signInWithRedirect ...",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/canopas/firebase-authentication-google-apple-and-phone-login-to-ios-app-4535e84c585f",
+    "name": "Firebase Authentication: Google, Apple, and Phone Login to iOS App",
+    "snippet": "1. Enable Google Login in Firebase Console (if you haven't): Navigate to Authentication > Sign-in Method and enable the Google sign-in provider.",
+    "host_name": "medium.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.captaincodeman.com/firebase-signinwithredirect-localhost-and-sveltekit",
+    "name": "Firebase signInWithRedirect, localhost, and SvelteKit",
+    "snippet": "They improved the security of Firebase Auth so much it completely stopped working. Learn how to fix it.",
+    "host_name": "www.captaincodeman.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/Firebase/comments/1doskev/signinwithredirect_is_not_signing_in_but",
+    "name": "signInWithRedirect is not signing in but signInWithPopup does - Reddit",
+    "snippet": "Hey guys, I'm still stuck on a Firebase login issue. im using signInWithRedirect. I've tried multiple things, but it's not working as expected.",
+    "host_name": "www.reddit.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

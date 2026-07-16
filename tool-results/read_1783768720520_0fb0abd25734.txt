@@ -1,0 +1,802 @@
+     1→     1→import { db } from './db';
+     2→     2→import { getMadridDateKey, getTodayDateKey } from './deterministic';
+     3→     3→import { getEmotionalState } from './emotional-state';
+     4→     4→import type { RawData } from './insights';
+     5→     5→import { detectPatterns } from './patterns/detector';
+     6→     6→import type { CrossEmpireData } from './patterns/types';
+     7→     7→import { detectLifeStages, getPastMonths, type LifeStage, type StageTransition, type StageFlavor } from './life-memory/stages';
+     8→     8→import type { SilentMemoryType } from './silent-memories/shared';
+     9→     9→
+    10→    10→// ═══════════════════════════════════════════
+    11→    11→// MENTOR CONTEXT BUILDER
+    12→    12→// Gathers recent user activity to personalize
+    13→    13→// AI mentor responses with soft contextual awareness
+    14→    14→//
+    15→    15→// FREE: basic context (recent check-in, streaks summary)
+    16→    16→// PREMIUM: full context (emotional trends, habits detail,
+    17→    17→//   meditations, conversations, empire progress, weekly activity)
+    18→    18→// ═══════════════════════════════════════════
+    19→    19→
+    20→    20→interface UserContext {
+    21→    21→  userName: string | null;
+    22→    22→  plan: string;
+    23→    23→  recentCheckins: {
+    24→    24→    date: Date;
+    25→    25→    emotion: number;
+    26→    26→    energy: number;
+    27→    27→    focus: number;
+    28→    28→    stress: number;
+    29→    29→    intention: string;
+    30→    30→    note: string | null;
+    31→    31→  }[];
+    32→    32→  habitStreaks: {
+    33→    33→    name: string;
+    34→    34→    streak: number;
+    35→    35→    lastCompletedAt: Date | null;
+    36→    36→  }[];
+    37→    37→  recentMeditations: {
+    38→    38→    duration: number;
+    39→    39→    type: string;
+    40→    40→    completedAt: Date;
+    41→    41→  }[];
+    42→    42→  recentJournals: {
+    43→    43→    title: string;
+    44→    44→    content: string;
+    45→    45→    mood: number | null;
+    46→    46→    createdAt: Date;
+    47→    47→  }[];
+    48→    48→  recentConversations: {
+    49→    49→    title: string;
+    50→    50→    updatedAt: Date;
+    51→    51→  }[];
+    52→    52→  empireProgress: {
+    53→    53→    empire: string;
+    54→    54→    level: number;
+    55→    55→    xp: number;
+    56→    56→    streak: number;
+    57→    57→  }[];
+    58→    58→  weeklyActivity: {
+    59→    59→    meditations: number;
+    60→    60→    habits: number;
+    61→    61→    journals: number;
+    62→    62→    checkins: number;
+    63→    63→    wellness: number;
+    64→    64→    nutrition: number;
+    65→    65→  };
+    66→    66→  consistency: {
+    67→    67→    activeDaysThisWeek: number;
+    68→    68→    trend: 'improving' | 'stable' | 'declining' | 'starting';
+    69→    69→  };
+    70→    70→  onboardingData: {
+    71→    71→    goals: string[];
+    72→    72→    primaryFocus: string | null;
+    73→    73→    stressLevel: number | null;
+    74→    74→    energyLevel: number | null;
+    75→    75→    focusLevel: number | null;
+    76→    76→    initialHabits: string[];
+    77→    77→  } | null;
+    78→    78→  wellnessLogs: {
+    79→    79→    date: Date;
+    80→    80→    sleep: number;
+    81→    81→    mood: number;
+    82→    82→    stress: number;
+    83→    83→    notes: string | null;
+    84→    84→  }[];
+    85→    85→  financeLogs: {
+    86→    86→    type: string;
+    87→    87→    category: string;
+    88→    88→    mood: string | null;
+    89→    89→    contexto: string | null;
+    90→    90→    date: Date;
+    91→    91→  }[];
+    92→    92→  emotionalState: {
+    93→    93→    status: string;
+    94→    94→    statusLabel: string;
+    95→    95→    statusDescription: string;
+    96→    96→    summary: string;
+    97→    97→    recommendation: string;
+    98→    98→  } | null;
+    99→    99→  patternObservations: {
+   100→   100→    id: string;
+   101→   101→    connection: string;
+   102→   102→    text: string;
+   103→   103→    empires: string[];
+   104→   104→    weight: string;
+   105→   105→  }[] | null;
+   106→   106→  lifeStage: {
+   107→   107→    flavor: StageFlavor;
+   108→   108→    label: string;
+   109→   109→    observation: string;
+   110→   110→    monthLabel: string;
+   111→   111→    transition: string | null;
+   112→   112→  } | null;
+   113→   113→  monthlyClosures: {
+   114→   114→    month: string;
+   115→   115→    hasReflection: boolean;
+   116→   116→    reflectedAt: Date | null;
+   117→   117→    summaryViewedAt: Date | null;
+   118→   118→  }[];
+   119→   119→  silentMemories: string[];
+   120→   120→}
+   121→   121→
+   122→   122→/**
+   123→   123→ * Fetch recent user activity for contextual mentor responses.
+   124→   124→ * FREE users get basic context, PREMIUM users get full advanced context.
+   125→   125→ * Only pulls the most recent and relevant data — keeps it lightweight.
+   126→   126→ */
+   127→   127→export async function buildMentorContext(userId: string, plan: string = 'FREE'): Promise<UserContext> {
+   128→   128→  const isPremium = plan === 'PREMIUM';
+   129→   129→  const now = new Date();
+   130→   130→  const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
+   131→   131→  const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
+   132→   132→  const ninetyDaysAgo = new Date(now.getTime() - 90 * 86400000);
+   133→   133→
+   134→   134→  // Previous week window for trend comparison
+   135→   135→  const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);
+   136→   136→
+   137→   137→  // Run all queries in parallel for performance
+   138→   138→  const [
+   139→   139→    recentCheckins,
+   140→   140→    habitStreaks,
+   141→   141→    recentMeditations,
+   142→   142→    recentJournals,
+   143→   143→    recentThreads,
+   144→   144→    empireProgress,
+   145→   145→    weeklyMeditations,
+   146→   146→    weeklyJournals,
+   147→   147→    weeklyCheckins,
+   148→   148→    weeklyHabitLogs,
+   149→   149→    prevWeekCheckins,
+   150→   150→    user,
+   151→   151→    onboardingRow,
+   152→   152→    wellnessLogRows,
+   153→   153→    financeLogRows,
+   154→   154→    weeklyWellnessLogs,
+   155→   155→    weeklyNutritionLogs,
+   156→   156→    prevWeekHabitLogs,
+   157→   157→    prevWeekMeditations,
+   158→   158→    prevWeekJournals,
+   159→   159→    prevWeekNutritionLogs,
+   160→   160→  ] = await Promise.all([
+   161→   161→    // Last check-ins: FREE gets 2, PREMIUM gets 5
+   162→   162→    db.dailyCheckin.findMany({
+   163→   163→      where: { userId, date: { gte: thirtyDaysAgo } },
+   164→   164→      orderBy: { date: 'desc' },
+   165→   165→      take: isPremium ? 5 : 2,
+   166→   166→    }),
+   167→   167→
+   168→   168→    // Active habits with streaks: FREE gets 4, PREMIUM gets 8
+   169→   169→    db.habitLog.findMany({
+   170→   170→      where: { userId, streak: { gt: 0 } },
+   171→   171→      orderBy: { streak: 'desc' },
+   172→   172→      take: isPremium ? 8 : 4,
+   173→   173→    }),
+   174→   174→
+   175→   175→    // Meditation sessions: FREE gets 1, PREMIUM gets 5
+   176→   176→    db.meditationSession.findMany({
+   177→   177→      where: { userId, completedAt: { gte: thirtyDaysAgo } },
+   178→   178→      orderBy: { completedAt: 'desc' },
+   179→   179→      take: isPremium ? 5 : 1,
+   180→   180→    }),
+   181→   181→
+   182→   182→    // Recent journal entries: FREE gets 1, PREMIUM gets 3
+   183→   183→    // M-5 FIX: FREE users don't need 'content' — formatBasicContext only uses 'title'.
+   184→   184→    // Only PREMIUM loads 'content' for intelligent fragment extraction.
+   185→   185→    db.journalEntry.findMany({
+   186→   186→      where: { userId, createdAt: { gte: thirtyDaysAgo } },
+   187→   187→      orderBy: { createdAt: 'desc' },
+   188→   188→      take: isPremium ? 3 : 1,
+   189→   189→      select: isPremium
+   190→   190→        ? { title: true, content: true, mood: true, createdAt: true }
+   191→   191→        : { title: true, mood: true, createdAt: true },
+   192→   192→    }),
+   193→   193→
+   194→   194→    // Recent conversation threads: FREE gets 1, PREMIUM gets 3
+   195→   195→    // L-7 FIX: Removed 'include: { messages: ... }' — lastMessage was fetched
+   196→   196→    // but never used in any context formatter. The join was wasted DB work
+   197→   197→    // on every chat message.
+   198→   198→    db.aIThread.findMany({
+   199→   199→      where: { userId, archived: false },
+   200→   200→      orderBy: { updatedAt: 'desc' },
+   201→   201→      take: isPremium ? 3 : 1,
+   202→   202→      select: { id: true, title: true, updatedAt: true, archived: true },
+   203→   203→    }),
+   204→   204→
+   205→   205→    // Empire progress: PREMIUM only
+   206→   206→    isPremium
+   207→   207→      ? db.empireProgress.findMany({ where: { userId } })
+   208→   208→      : Promise.resolve([]),
+   209→   209→
+   210→   210→    // Weekly meditation dates: PREMIUM only (for distinct-day counting)
+   211→   211→    isPremium
+   212→   212→      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: sevenDaysAgo } }, select: { completedAt: true } })
+   213→   213→      : Promise.resolve([] as { completedAt: Date }[]),
+   214→   214→
+   215→   215→    // Weekly journal dates: PREMIUM only (for distinct-day counting)
+   216→   216→    isPremium
+   217→   217→      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } })
+   218→   218→      : Promise.resolve([] as { createdAt: Date }[]),
+   219→   219→
+   220→   220→    // Weekly checkins: both tiers (for consistency + distinct-day counting + emotional state)
+   221→   221→    db.dailyCheckin.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true, emotion: true, energy: true, focus: true, stress: true } }),
+   222→   222→
+   223→   223→    // Weekly habit log dates: last 7 days (for distinct-day counting)
+   224→   224→    db.habitLog.findMany({
+   225→   225→      where: { userId, lastCompletedAt: { gte: sevenDaysAgo } },
+   226→   226→      select: { lastCompletedAt: true },
+   227→   227→    }),
+   228→   228→
+   229→   229→    // Previous week checkins (for trend + emotional state): both tiers
+   230→   230→    db.dailyCheckin.findMany({
+   231→   231→      where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+   232→   232→      select: { date: true, emotion: true, energy: true, focus: true, stress: true },
+   233→   233→    }),
+   234→   234→
+   235→   235→    // User data
+   236→   236→    db.user.findUnique({
+   237→   237→      where: { id: userId },
+   238→   238→      select: { name: true, plan: true },
+   239→   239→    }),
+   240→   240→
+   241→   241→    // Onboarding data: PREMIUM only
+   242→   242→    isPremium
+   243→   243→      ? db.onboardingData.findUnique({
+   244→   244→          where: { userId },
+   245→   245→          select: {
+   246→   246→            goals: true,
+   247→   247→            primaryFocus: true,
+   248→   248→            stressLevel: true,
+   249→   249→            energyLevel: true,
+   250→   250→            focusLevel: true,
+   251→   251→            initialHabits: true,
+   252→   252→          },
+   253→   253→        })
+   254→   254→      : Promise.resolve(null),
+   255→   255→
+   256→   256→    // Wellness logs: PREMIUM only — sleep quality + notes (dedup: mood/energy/stress already in DailyCheckin)
+   257→   257→    // No take limit: full 14-day data needed for emotional state; display is sliced to 7 later
+   258→   258→    isPremium
+   259→   259→      ? db.wellnessLog.findMany({
+   260→   260→          where: { userId, date: { gte: fourteenDaysAgo } },
+   261→   261→          orderBy: { date: 'desc' },
+   262→   262→          select: { date: true, sleep: true, mood: true, stress: true, notes: true },
+   263→   263→        })
+   264→   264→      : Promise.resolve([]),
+   265→   265→
+   266→   266→    // Finance logs: PREMIUM only — spending mood patterns + contexto
+   267→   267→    isPremium
+   268→   268→      ? db.financeLog.findMany({
+   269→   269→          where: { userId, date: { gte: thirtyDaysAgo }, type: 'expense' },
+   270→   270→          orderBy: { date: 'desc' },
+   271→   271→          take: 15,
+   272→   272→          select: { type: true, category: true, mood: true, contexto: true, date: true },
+   273→   273→        })
+   274→   274→      : Promise.resolve([]),
+   275→   275→
+   276→   276→    // Weekly wellness log dates: PREMIUM only (for distinct-day counting)
+   277→   277→    isPremium
+   278→   278→      ? db.wellnessLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
+   279→   279→      : Promise.resolve([] as { date: Date }[]),
+   280→   280→
+   281→   281→    // Weekly nutrition log dates: PREMIUM only (for distinct-day counting)
+   282→   282→    isPremium
+   283→   283→      ? db.nutritionLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
+   284→   284→      : Promise.resolve([] as { date: Date }[]),
+   285→   285→
+   286→   286→    // Previous week habit logs: PREMIUM only (for emotional state prevWeekHabits)
+   287→   287→    isPremium
+   288→   288→      ? db.habitLog.findMany({ where: { userId, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { lastCompletedAt: true } })
+   289→   289→      : Promise.resolve([] as { lastCompletedAt: Date | null }[]),
+   290→   290→
+   291→   291→    // Previous week meditations: PREMIUM only (for emotional state prevWeekMeditations)
+   292→   292→    isPremium
+   293→   293→      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { completedAt: true } })
+   294→   294→      : Promise.resolve([] as { completedAt: Date }[]),
+   295→   295→
+   296→   296→    // Previous week journals: PREMIUM only (for emotional state prevWeekJournals)
+   297→   297→    isPremium
+   298→   298→      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { createdAt: true } })
+   299→   299→      : Promise.resolve([] as { createdAt: Date }[]),
+   300→   300→
+   301→   301→    // Previous week nutrition logs: PREMIUM only (for emotional state prevWeekNutrition)
+   302→   302→    isPremium
+   303→   303→      ? db.nutritionLog.findMany({ where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { date: true } })
+   304→   304→      : Promise.resolve([] as { date: Date }[]),
+   305→   305→  ]);
+   306→   306→
+   307→   307→  // Derive counts from date arrays (for weeklyActivity display)
+   308→   308→  const weeklyMeditationCount = weeklyMeditations.length;
+   309→   309→  const weeklyJournalCount = weeklyJournals.length;
+   310→   310→  const weeklyCheckinCount = weeklyCheckins.length;
+   311→   311→  const weeklyHabitLogCount = weeklyHabitLogs.length;
+   312→   312→  const weeklyWellnessCount = weeklyWellnessLogs.length;
+   313→   313→  const weeklyNutritionCount = weeklyNutritionLogs.length;
+   314→   314→
+   315→   315→  // Weekly habit completions (PREMIUM only for display, but count for consistency)
+   316→   316→  const weeklyHabits = isPremium
+   317→   317→    ? habitStreaks.filter(h => {
+   318→   318→        if (!h.lastCompletedAt) return false;
+   319→   319→        return h.lastCompletedAt >= sevenDaysAgo;
+   320→   320→      }).length
+   321→   321→    : weeklyHabitLogCount;
+   322→   322→
+   323→   323→  // Compute consistency signal: count DISTINCT days with any activity
+   324→   324→  const activeDaySet = new Set<string>();
+   325→   325→  for (const c of weeklyCheckins) activeDaySet.add(toDateKey(c.date));
+   326→   326→  for (const h of weeklyHabitLogs) {
+   327→   327→    if (h.lastCompletedAt) activeDaySet.add(toDateKey(h.lastCompletedAt));
+   328→   328→  }
+   329→   329→  for (const m of weeklyMeditations) activeDaySet.add(toDateKey(m.completedAt));
+   330→   330→  for (const j of weeklyJournals) activeDaySet.add(toDateKey(j.createdAt));
+   331→   331→  for (const w of weeklyWellnessLogs) activeDaySet.add(toDateKey(w.date));
+   332→   332→  for (const n of weeklyNutritionLogs) activeDaySet.add(toDateKey(n.date));
+   333→   333→  const activeDaysThisWeek = Math.min(activeDaySet.size, 7);
+   334→   334→
+   335→   335→  const prevWeekCheckinCount = prevWeekCheckins.length;
+   336→   336→
+   337→   337→  // M-7: Compute trend based on aggregate activity, not just check-ins.
+   338→   338→  // PREMIUM has full prev-week data → compare activeDaysThisWeek vs activeDaysPrevWeek.
+   339→   339→  // FREE only has prev-week checkins → keep checkin-based trend (no other prev-week data available).
+   340→   340→  let trend: 'improving' | 'stable' | 'declining' | 'starting' = 'stable';
+   341→   341→  if (isPremium) {
+   342→   342→    const prevActiveDaySet = new Set<string>();
+   343→   343→    for (const c of prevWeekCheckins) prevActiveDaySet.add(toDateKey(c.date));
+   344→   344→    for (const h of prevWeekHabitLogs) {
+   345→   345→      if (h.lastCompletedAt) prevActiveDaySet.add(toDateKey(h.lastCompletedAt));
+   346→   346→    }
+   347→   347→    for (const m of prevWeekMeditations) prevActiveDaySet.add(toDateKey(m.completedAt));
+   348→   348→    for (const j of prevWeekJournals) prevActiveDaySet.add(toDateKey(j.createdAt));
+   349→   349→    const prevWeekWellnessEntries = wellnessLogRows.filter(w => w.date < sevenDaysAgo);
+   350→   350→    for (const w of prevWeekWellnessEntries) prevActiveDaySet.add(toDateKey(w.date));
+   351→   351→    for (const n of prevWeekNutritionLogs) prevActiveDaySet.add(toDateKey(n.date));
+   352→   352→    const activeDaysPrevWeek = Math.min(prevActiveDaySet.size, 7);
+   353→   353→
+   354→   354→    if (activeDaysThisWeek <= 1 && activeDaysPrevWeek <= 1) {
+   355→   355→      trend = 'starting';
+   356→   356→    } else if (activeDaysThisWeek > activeDaysPrevWeek + 1) {
+   357→   357→      trend = 'improving';
+   358→   358→    } else if (activeDaysThisWeek < activeDaysPrevWeek - 1) {
+   359→   359→      trend = 'declining';
+   360→   360→    }
+   361→   361→  } else {
+   362→   362→    if (weeklyCheckinCount <= 1 && prevWeekCheckinCount <= 1) {
+   363→   363→      trend = 'starting';
+   364→   364→    } else if (weeklyCheckinCount > prevWeekCheckinCount + 1) {
+   365→   365→      trend = 'improving';
+   366→   366→    } else if (weeklyCheckinCount < prevWeekCheckinCount - 1) {
+   367→   367→      trend = 'declining';
+   368→   368→    }
+   369→   369→  }
+   370→   370→
+   371→   371→  // Parse onboarding data safely (PREMIUM only; null for FREE)
+   372→   372→  let onboardingData: UserContext['onboardingData'] = null;
+   373→   373→  if (onboardingRow) {
+   374→   374→    let parsedGoals: string[] = [];
+   375→   375→    try { parsedGoals = JSON.parse(onboardingRow.goals); } catch { /* keep empty */ }
+   376→   376→    let parsedHabits: string[] = [];
+   377→   377→    try { parsedHabits = JSON.parse(onboardingRow.initialHabits); } catch { /* keep empty */ }
+   378→   378→    onboardingData = {
+   379→   379→      goals: Array.isArray(parsedGoals) ? parsedGoals : [],
+   380→   380→      primaryFocus: onboardingRow.primaryFocus || null,
+   381→   381→      stressLevel: onboardingRow.stressLevel,
+   382→   382→      energyLevel: onboardingRow.energyLevel,
+   383→   383→      focusLevel: onboardingRow.focusLevel,
+   384→   384→      initialHabits: Array.isArray(parsedHabits) ? parsedHabits : [],
+   385→   385→    };
+   386→   386→  }
+   387→   387→
+   388→   388→  // Fetch emotional state from the official engine (PREMIUM only; null for FREE)
+   389→   389→  // This is the single source of truth — no recalculation, no duplication.
+   390→   390→  // M-6: Reuse data already fetched in this Promise.all to avoid redundant gatherData() call.
+   391→   391→  let emotionalState: UserContext['emotionalState'] = null;
+   392→   392→  if (isPremium) {
+   393→   393→    try {
+   394→   394→      // Build RawData from already-fetched queries — no extra DB access
+   395→   395→      const rawDataForEmotionalState: RawData = {
+   396→   396→        thisWeekCheckins: weeklyCheckins,
+   397→   397→        prevWeekCheckins,
+   398→   398→        thisWeekHabits: weeklyHabitLogs,
+   399→   399→        prevWeekHabits: prevWeekHabitLogs,
+   400→   400→        allHabits: [],
+   401→   401→        thisWeekMeditations: weeklyMeditations,
+   402→   402→        prevWeekMeditations,
+   403→   403→        thisWeekJournals: weeklyJournals,
+   404→   404→        prevWeekJournals,
+   405→   405→        thisWeekWellness: wellnessLogRows.filter(w => w.date >= sevenDaysAgo),
+   406→   406→        prevWeekWellness: wellnessLogRows.filter(w => w.date < sevenDaysAgo),
+   407→   407→        thisWeekNutrition: weeklyNutritionLogs,
+   408→   408→        prevWeekNutrition: prevWeekNutritionLogs,
+   409→   409→        thisWeekFinance: [],
+   410→   410→        prevWeekFinance: [],
+   411→   411→        empireProgress: [],
+   412→   412→      };
+   413→   413→
+   414→   414→      const es = await getEmotionalState(userId, plan, rawDataForEmotionalState);
+   415→   415→      emotionalState = {
+   416→   416→        status: es.status,
+   417→   417→        statusLabel: es.statusLabel,
+   418→   418→        statusDescription: es.statusDescription,
+   419→   419→        summary: es.summary,
+   420→   420→        recommendation: es.recommendation,
+   421→   421→      };
+   422→   422→    } catch {
+   423→   423→      // Non-blocking: if emotional state fails, continue without it
+   424→   424→    }
+   425→   425→  }
+   426→   426→
+   427→   427→  // Monthly closure records: consume existing closure records (PREMIUM only; empty for FREE)
+   428→   428→  // No recalculation, no summaries — just the fact that closures exist.
+   429→   429→  const recentClosures = isPremium
+   430→   430→    ? await db.monthlyClosure.findMany({
+   431→   431→        where: { userId },
+   432→   432→        select: {
+   433→   433→          month: true,
+   434→   434→          reflection: true,
+   435→   435→          reflectedAt: true,
+   436→   436→          summaryViewedAt: true,
+   437→   437→        },
+   438→   438→        orderBy: { month: 'desc' },
+   439→   439→        take: 3,
+   440→   440→      })
+   441→   441→    : [];
+   442→   442→
+   443→   443→  // Life stage detection: consume the official engine result (PREMIUM only; null for FREE)
+   444→   444→  // No recalculation, no inference — the engine is the single source of truth for life stages.
+   445→   445→  let lifeStage: UserContext['lifeStage'] = null;
+   446→   446→  if (isPremium) {
+   447→   447→    try {
+   448→   448→      const months = getPastMonths(3); // last 3 months
+   449→   449→      const { stages, transitions } = await detectLifeStages(userId, months);
+   450→   450→      if (stages.length > 0) {
+   451→   451→        const current = stages[stages.length - 1]; // most recent month
+   452→   452→        const STAGE_FLAVOR_LABELS: Record<StageFlavor, string> = {
+   453→   453→          calm: 'Calma',
+   454→   454→          growth: 'Crecimiento',
+   455→   455→          intensity: 'Intensidad',
+   456→   456→          dispersion: 'Dispersión',
+   457→   457→          exhaustion: 'Agotamiento',
+   458→   458→          quiet: 'Silencio',
+   459→   459→          stability: 'Estabilidad',
+   460→   460→        };
+   461→   461→        // Find the most recent transition (if any)
+   462→   462→        const latestTransition = transitions.length > 0 ? transitions[transitions.length - 1] : null;
+   463→   463→        lifeStage = {
+   464→   464→          flavor: current.flavor,
+   465→   465→          label: STAGE_FLAVOR_LABELS[current.flavor] || current.flavor,
+   466→   466→          observation: current.observation,
+   467→   467→          monthLabel: current.monthLabel,
+   468→   468→          transition: latestTransition ? latestTransition.observation : null,
+   469→   469→        };
+   470→   470→      }
+   471→   471→    } catch {
+   472→   472→      // Non-blocking: if life stage detection fails, continue without it
+   473→   473→    }
+   474→   474→  }
+   475→   475→
+   476→   476→  // Pattern detection: consume the official engine result (PREMIUM only; null for FREE)
+   477→   477→  // No recalculation, no cross-referencing — the engine is the single source of truth.
+   478→   478→  let patternObservations: UserContext['patternObservations'] = null;
+   479→   479→  if (isPremium) {
+   480→   480→    try {
+   481→   481→      const [
+   482→   482→        pFinance,
+   483→   483→        pWellness,
+   484→   484→        pMeditation,
+   485→   485→        pHabits,
+   486→   486→        pCheckins,
+   487→   487→        pJournals,
+   488→   488→      ] = await Promise.all([
+   489→   489→        db.financeLog.findMany({
+   490→   490→          where: { userId, date: { gte: ninetyDaysAgo } },
+   491→   491→          select: { date: true, type: true, category: true, amount: true, mood: true, contexto: true },
+   492→   492→          orderBy: { date: 'desc' },
+   493→   493→          take: 200,
+   494→   494→        }),
+   495→   495→        db.wellnessLog.findMany({
+   496→   496→          where: { userId, date: { gte: ninetyDaysAgo } },
+   497→   497→          select: { date: true, mood: true, energy: true, sleep: true, stress: true },
+   498→   498→          orderBy: { date: 'desc' },
+   499→   499→          take: 90,
+   500→   500→        }),
+   501→   501→        db.meditationSession.findMany({
+   502→   502→          where: { userId, completedAt: { gte: ninetyDaysAgo } },
+   503→   503→          select: { duration: true, type: true, completedAt: true },
+   504→   504→          orderBy: { completedAt: 'desc' },
+   505→   505→          take: 90,
+   506→   506→        }),
+   507→   507→        db.habitLog.findMany({
+   508→   508→          where: { userId },
+   509→   509→          select: { name: true, streak: true, lastCompletedAt: true },
+   510→   510→          orderBy: { lastCompletedAt: 'desc' },
+   511→   511→          take: 50,
+   512→   512→        }),
+   513→   513→        db.dailyCheckin.findMany({
+   514→   514→          where: { userId, date: { gte: ninetyDaysAgo } },
+   515→   515→          select: { date: true, emotion: true, energy: true, focus: true, stress: true },
+   516→   516→          orderBy: { date: 'desc' },
+   517→   517→          take: 90,
+   518→   518→        }),
+   519→   519→        db.journalEntry.findMany({
+   520→   520→          where: { userId, createdAt: { gte: ninetyDaysAgo } },
+   521→   521→          select: { content: true, mood: true, createdAt: true },
+   522→   522→          orderBy: { createdAt: 'desc' },
+   523→   523→          take: 90,
+   524→   524→        }),
+   525→   525→      ]);
+   526→   526→
+   527→   527→      const crossEmpireData: CrossEmpireData = {
+   528→   528→        financeLogs: pFinance.map(l => ({
+   529→   529→          date: l.date.toISOString(), type: l.type, category: l.category,
+   530→   530→          amount: l.amount, mood: l.mood, contexto: l.contexto,
+   531→   531→        })),
+   532→   532→        wellnessLogs: pWellness.map(l => ({
+   533→   533→          date: l.date.toISOString(), mood: l.mood, energy: l.energy,
+   534→   534→          sleep: l.sleep, stress: l.stress,
+   535→   535→        })),
+   536→   536→        meditationSessions: pMeditation.map(s => ({
+   537→   537→          duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
+   538→   538→        })),
+   539→   539→        habitLogs: pHabits.map(h => ({
+   540→   540→          name: h.name, streak: h.streak,
+   541→   541→          lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
+   542→   542→        })),
+   543→   543→        checkins: pCheckins.map(c => ({
+   544→   544→          date: c.date.toISOString(), emotion: c.emotion, energy: c.energy,
+   545→   545→          focus: c.focus, stress: c.stress,
+   546→   546→        })),
+   547→   547→        journalEntries: pJournals.map(j => ({
+   548→   548→          content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString(),
+   549→   549→        })),
+   550→   550→      };
+   551→   551→
+   552→   552→      const result = detectPatterns(crossEmpireData);
+   553→   553→      if (result.observations.length > 0) {
+   554→   554→        patternObservations = result.observations.map(o => ({
+   555→   555→          id: o.id,
+   556→   556→          connection: o.connection,
+   557→   557→          text: o.text,
+   558→   558→          empires: o.empires,
+   559→   559→          weight: o.weight,
+   560→   560→        }));
+   561→   561→      }
+   562→   562→    } catch {
+   563→   563→      // Non-blocking: if pattern detection fails, continue without it
+   564→   564→    }
+   565→   565→  }
+   566→   566→
+   567→   567→  // Silent Memories: consume official observations (PREMIUM only; empty for FREE)
+   568→   568→  // Read from EmotionalDashboardState.memoryState.shown[] — no recalculation, no side effects.
+   569→   569→  // These are observations that the Silent Memories engine has already generated
+   570→   570→  // and displayed to the user on the dashboard. The mentor only consumes them.
+   571→   571→  let silentMemories: string[] = [];
+   572→   572→  if (isPremium) {
+   573→   573→    try {
+   574→   574→      const dashboardState = await db.emotionalDashboardState.findUnique({
+   575→   575→        where: { userId },
+   576→   576→        select: { memoryState: true },
+   577→   577→      });
+   578→   578→      if (dashboardState?.memoryState) {
+   579→   579→        const memState = JSON.parse(dashboardState.memoryState);
+   580→   580→        if (Array.isArray(memState.shown)) {
+   581→   581→          // shown[] is chronological (oldest first). We want the most recent.
+   582→   582→          silentMemories = memState.shown;
+   583→   583→        }
+   584→   584→      }
+   585→   585→    } catch {
+   586→   586→      // Non-blocking: if silent memories aren't available, continue without them
+   587→   587→    }
+   588→   588→  }
+   589→   589→
+   590→   590→  return {
+   591→   591→    userName: user?.name || null,
+   592→   592→    plan: user?.plan || 'FREE',
+   593→   593→    recentCheckins: recentCheckins.map(c => ({
+   594→   594→      date: c.date,
+   595→   595→      emotion: c.emotion,
+   596→   596→      energy: c.energy,
+   597→   597→      focus: c.focus,
+   598→   598→      stress: c.stress,
+   599→   599→      intention: c.intention,
+   600→   600→      note: c.note,
+   601→   601→    })),
+   602→   602→    habitStreaks: habitStreaks.map(h => ({
+   603→   603→      name: h.name,
+   604→   604→      streak: h.streak,
+   605→   605→      lastCompletedAt: h.lastCompletedAt,
+   606→   606→    })),
+   607→   607→    recentMeditations: recentMeditations.map(m => ({
+   608→   608→      duration: m.duration,
+   609→   609→      type: m.type,
+   610→   610→      completedAt: m.completedAt,
+   611→   611→    })),
+   612→   612→    // M-5 FIX: 'content' may not exist for FREE users (excluded from select).
+   613→   613→    // Use optional access — formatBasicContext only uses 'title' for FREE.
+   614→   614→    recentJournals: recentJournals.map(j => ({
+   615→   615→      title: j.title,
+   616→   616→      content: ('content' in j ? String(j.content) : ''),
+   617→   617→      mood: j.mood,
+   618→   618→      createdAt: j.createdAt,
+   619→   619→    })),
+   620→   620→    // L-7 FIX: lastMessage removed — was never used by any context formatter.
+   621→   621→    recentConversations: recentThreads.map(t => ({
+   622→   622→      title: t.title,
+   623→   623→      updatedAt: t.updatedAt,
+   624→   624→    })),
+   625→   625→    empireProgress: empireProgress.map(e => ({
+   626→   626→      empire: e.empire,
+   627→   627→      level: Math.floor(e.xp / 100) + 1,
+   628→   628→      xp: e.xp,
+   629→   629→      streak: e.streak,
+   630→   630→    })),
+   631→   631→    weeklyActivity: {
+   632→   632→      meditations: weeklyMeditationCount,
+   633→   633→      habits: weeklyHabits,
+   634→   634→      journals: weeklyJournalCount,
+   635→   635→      checkins: weeklyCheckinCount,
+   636→   636→      wellness: weeklyWellnessCount,
+   637→   637→      nutrition: weeklyNutritionCount,
+   638→   638→    },
+   639→   639→    consistency: {
+   640→   640→      activeDaysThisWeek,
+   641→   641→      trend,
+   642→   642→    },
+   643→   643→    onboardingData,
+   644→   644→    wellnessLogs: wellnessLogRows.slice(0, 7).map(w => ({
+   645→   645→      date: w.date,
+   646→   646→      sleep: w.sleep,
+   647→   647→      mood: w.mood,
+   648→   648→      stress: w.stress,
+   649→   649→      notes: w.notes,
+   650→   650→    })),
+   651→   651→    financeLogs: financeLogRows.map(f => ({
+   652→   652→      type: f.type,
+   653→   653→      category: f.category,
+   654→   654→      mood: f.mood,
+   655→   655→      contexto: f.contexto,
+   656→   656→      date: f.date,
+   657→   657→    })),
+   658→   658→    emotionalState,
+   659→   659→    patternObservations,
+   660→   660→    lifeStage,
+   661→   661→    monthlyClosures: recentClosures.map(c => ({
+   662→   662→      month: c.month,
+   663→   663→      hasReflection: !!c.reflection,
+   664→   664→      reflectedAt: c.reflectedAt,
+   665→   665→      summaryViewedAt: c.summaryViewedAt,
+   666→   666→    })),
+   667→   667→    silentMemories,
+   668→   668→  };
+   669→   669→}
+   670→   670→
+   671→   671→// ═══════════════════════════════════════════
+   672→   672→// CONTEXT FORMATTER
+   673→   673→// Converts raw data into a concise text block
+   674→   674→// for the AI system prompt.
+   675→   675→// FREE: basic summary, PREMIUM: full detailed context.
+   676→   676→// ═══════════════════════════════════════════
+   677→   677→
+   678→   678→const EMPIRE_NAMES: Record<string, string> = {
+   679→   679→  disciplina: 'Disciplina',
+   680→   680→  mente: 'Mente',
+   681→   681→  energia: 'Energía',
+   682→   682→  riqueza: 'Finanzas',
+   683→   683→  crecimiento: 'Crecimiento',
+   684→   684→};
+   685→   685→
+   686→   686→const EMOTION_LABELS: Record<number, string> = {
+   687→   687→  1: 'muy bajo',
+   688→   688→  2: 'bajo',
+   689→   689→  3: 'neutral',
+   690→   690→  4: 'bien',
+   691→   691→  5: 'excelente',
+   692→   692→};
+   693→   693→
+   694→   694→// ─── Silent Memories: observation → meta lookup ───
+   695→   695→// Maps each fixed observation text to its type and rarity.
+   696→   696→// Derived from the observer functions in silent-memories/shared.ts.
+   697→   697→// Used for deduplication and prioritization in the mentor context.
+   698→   698→
+   699→   699→const OBSERVATION_META: Record<string, { type: SilentMemoryType; rarity: 'rare' | 'very_rare' }> = {
+   700→   700→  // Return after silence
+   701→   701→  'Hacía unos días.': { type: 'return', rarity: 'rare' },
+   702→   702→  'Vuelves después de un tiempo.': { type: 'return', rarity: 'rare' },
+   703→   703→  'Aquí estás de nuevo.': { type: 'return', rarity: 'very_rare' },
+   704→   704→  'Hacía mucho.': { type: 'return', rarity: 'very_rare' },
+   705→   705→  // Recurring pattern
+   706→   706→  'Este ritmo ya te había acompañado antes.': { type: 'recurrence', rarity: 'very_rare' },
+   707→   707→  'Ya habías estado así.': { type: 'recurrence', rarity: 'rare' },
+   708→   708→  // Stage shift
+   709→   709→  'La energía cambió estas semanas.': { type: 'shift', rarity: 'rare' },
+   710→   710→  'Menos energía últimamente.': { type: 'shift', rarity: 'rare' },
+   711→   711→  'Menos peso últimamente.': { type: 'shift', rarity: 'rare' },
+   712→   712→  // Presence milestone
+   713→   713→  'Un mes así.': { type: 'presence', rarity: 'very_rare' },
+   714→   714→  'Un año así.': { type: 'presence', rarity: 'very_rare' },
+   715→   715→  // Temporal milestone
+   716→   716→  'Ya tres meses.': { type: 'temporal', rarity: 'very_rare' },
+   717→   717→  'Medio año.': { type: 'temporal', rarity: 'very_rare' },
+   718→   718→  'Un año.': { type: 'temporal', rarity: 'very_rare' },
+   719→   719→};
+   720→   720→
+   721→   721→// Priority by type: higher = more persistent, deeper, more useful for the mentor
+   722→   722→const TYPE_PRIORITY: Record<SilentMemoryType, number> = {
+   723→   723→  temporal: 5,    // Longest persistence (months), marks life chapters
+   724→   724→  presence: 4,    // Milestone persistence (30/365 days), unique signal
+   725→   725→  return: 3,      // Temporal continuity signal, unique
+   726→   726→  recurrence: 2,  // Temporal echo, partially overlaps with ESE
+   727→   727→  shift: 1,       // Short-lived, already covered by ESE + check-in trends
+   728→   728→};
+   729→   729→
+   730→   730→const RARITY_MULTIPLIER: Record<'rare' | 'very_rare', number> = {
+   731→   731→  rare: 1,
+   732→   732→  very_rare: 2,
+   733→   733→};
+   734→   734→
+   735→   735→function daysAgo(date: Date): number {
+   736→   736→  const todayKey = getTodayDateKey();
+   737→   737→  const dateKey = getMadridDateKey(date);
+   738→   738→  const todayMs = new Date(todayKey + 'T00:00:00').getTime();
+   739→   739→  const dateMs = new Date(dateKey + 'T00:00:00').getTime();
+   740→   740→  return Math.round((todayMs - dateMs) / 86400000);
+   741→   741→}
+   742→   742→
+   743→   743→/** Normalize a Date to a YYYY-MM-DD string for day-level comparison using Europe/Madrid timezone. */
+   744→   744→function toDateKey(date: Date): string {
+   745→   745→  return getMadridDateKey(date);
+   746→   746→}
+   747→   747→
+   748→   748→/**
+   749→   749→ * Extract a fragment from journal content for the mentor context.
+   750→   750→ * Returns null if the content doesn't add information beyond the title.
+   751→   751→ *
+   752→   752→ * Rules:
+   753→   753→ * - Max 180 characters
+   754→   754→ * - Never cut words
+   755→   755→ * - Remove line breaks and repeated spaces
+   756→   756→ * - End with "…" when truncated
+   757→   757→ * - No summarization, no reinterpretation — exact user text only
+   758→   758→ * - Skip if content only repeats what the title already says
+   759→   759→ */
+   760→   760→function extractJournalFragment(title: string, content: string): string | null {
+   761→   761→  // Clean content: remove line breaks, collapse repeated spaces, trim
+   762→   762→  const cleaned = content
+   763→   763→    .replace(/\n/g, ' ')
+   764→   764→    .replace(/\s+/g, ' ')
+   765→   765→    .trim();
+   766→   766→
+   767→   767→  if (!cleaned) return null;
+   768→   768→
+   769→   769→  // Normalize title for comparison (lowercase, no punctuation, collapsed spaces)
+   770→   770→  const normalizeForComparison = (s: string) =>
+   771→   771→    s.toLowerCase().replace(/[^\wáéíóúñü]/g, ' ').replace(/\s+/g, ' ').trim();
+   772→   772→
+   773→   773→  const normalizedTitle = normalizeForComparison(title);
+   774→   774→  const normalizedCleaned = normalizeForComparison(cleaned);
+   775→   775→
+   776→   776→  // If content starts with the title (user often repeats title as first line),
+   777→   777→  // strip the title prefix from content for comparison
+   778→   778→  let contentForComparison = normalizedCleaned;
+   779→   779→  if (normalizedCleaned.startsWith(normalizedTitle)) {
+   780→   780→    contentForComparison = normalizedCleaned.slice(normalizedTitle.length).trim();
+   781→   781→  }
+   782→   782→
+   783→   783→  // If what remains is empty or too short, content doesn't add information
+   784→   784→  if (contentForComparison.length < 10) return null;
+   785→   785→
+   786→   786→  // Truncate to 180 chars without cutting words
+   787→   787→  const MAX_LEN = 180;
+   788→   788→  if (cleaned.length <= MAX_LEN) return cleaned;
+   789→   789→
+   790→   790→  // Find the last space before the limit
+   791→   791→  const truncated = cleaned.slice(0, MAX_LEN);
+   792→   792→  const lastSpace = truncated.lastIndexOf(' ');
+   793→   793→  if (lastSpace <= 0) return cleaned.slice(0, MAX_LEN) + '…';
+   794→   794→
+   795→   795→  return truncated.slice(0, lastSpace) + '…';
+   796→   796→}
+   797→   797→
+   798→   798→/**
+   799→   799→ * Format context for FREE users — concise with basic continuity signals.
+   800→   800→ */
+
+[showing lines 1-800 of 1416; use offset=801 with limit to continue reading]

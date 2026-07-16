@@ -1,0 +1,858 @@
+     1→     1→// ═══════════════════════════════════════════
+     2→     2→// DECISION ENGINE — Core
+     3→     3→//
+     4→     4→// The brain that decides which context the
+     5→     5→// mentor should use and which it should ignore.
+     6→     6→//
+     7→     7→// Architecture:
+     8→     8→//   - Zero DB queries
+     9→     9→//   - Zero API calls
+    10→    10→//   - Zero new context generation
+    11→    11→//   - Pure string analysis + deterministic filtering
+    12→    12→//   - <1ms execution time
+    13→    13→//
+    14→    14→// Integrates at the assembly point in route.ts,
+    15→    15→// AFTER all context is built but BEFORE it's
+    16→    16→// sent to Groq.
+    17→    17→// ═══════════════════════════════════════════
+    18→    18→
+    19→    19→import type {
+    20→    20→  ContextBlock,
+    21→    21→  ContextBlockId,
+    22→    22→  DecisionBudget,
+    23→    23→  DecisionResult,
+    24→    24→  DomainSignal,
+    25→    25→  RelevanceDomain,
+    26→    26→} from './types';
+    27→    27→
+    28→    28→// ═══════════════════════════════════════════
+    29→    29→// 1. BUDGET CONFIGURATION
+    30→    30→// ═══════════════════════════════════════════
+    31→    31→
+    32→    32→const BUDGETS: Record<string, DecisionBudget> = {
+    33→    33→  FREE: {
+    34→    34→    maxContextChars: 800,
+    35→    35→    maxActiveBlocks: 3,
+    36→    36→    blockMax: {
+    37→    37→      identity: 200,
+    38→    38→      emotional_state: 150,
+    39→    39→      lived_experience: 200,
+    40→    40→      behavioral: 200,
+    41→    41→      conversational: 100,
+    42→    42→      understanding: 80,
+    43→    43→    },
+    44→    44→  },
+    45→    45→  PREMIUM: {
+    46→    46→    maxContextChars: 2200,
+    47→    47→    maxActiveBlocks: 8,
+    48→    48→    blockMax: {
+    49→    49→      identity: 350,
+    50→    50→      emotional_state: 250,
+    51→    51→      life_stage: 200,
+    52→    52→      patterns: 250,
+    53→    53→      silent_memories: 150,
+    54→    54→      lived_experience: 400,
+    55→    55→      behavioral: 350,
+    56→    56→      conversational: 200,
+    57→    57→      understanding: 300,
+    58→    58→    },
+    59→    59→  },
+    60→    60→};
+    61→    61→
+    62→    62→// ═══════════════════════════════════════════
+    63→    63→// 2. DOMAIN CLASSIFICATION
+    64→    64→// Determines what the user's message is about.
+    65→    65→// Pure keyword matching — no AI, no latency.
+    66→    66→// ═══════════════════════════════════════════
+    67→    67→
+    68→    68→interface DomainRule {
+    69→    69→  domain: RelevanceDomain;
+    70→    70→  /** Keywords that signal this domain. More matches = higher strength. */
+    71→    71→  keywords: RegExp[];
+    72→    72→  /** Boost when ANY keyword matches (added once, not per match) */
+    73→    73→  boost: number;
+    74→    74→}
+    75→    75→
+    76→    76→const DOMAIN_RULES: DomainRule[] = [
+    77→    77→  {
+    78→    78→    domain: 'crisis',
+    79→    79→    keywords: [
+    80→    80→      /\bno (puedo|más|aguanto|soporto|resisto)\b/i,
+    81→    81→      /\b(?:me siento|estoy) (completamente|totalmente|absolutamente) (saturado|agotado|perdido|rostizado| hundido|vencido|superado|desbordado)\b/i,
+    82→    82→      /\bno (sé|se) (qué hacer|por dónde empezar|cómo seguir|qué más hacer)\b/i,
+    83→    83→      /\b(?:quiero|voy a) (dejarlo|abandonar|cerrar|terminar con todo)\b/i,
+    84→    84→      /\bno vale (la pena|nada|la pena intentar)\b/i,
+    85→    85→      /\bestoy al (límite|borde|final)\b/i,
+    86→    86→    ],
+    87→    87→    boost: 30,
+    88→    88→  },
+    89→    89→  {
+    90→    90→    domain: 'emotional',
+    91→    91→    keywords: [
+    92→    92→      /\b(?:me siento|estoy|está) (triste|contento|feliz|frustrado|ansioso|nervioso|preocupado|contento|agradecido|enfadado|molesto|ilusionado|decepcionado|esperanzado|perdido|confundido|solo|sola|acompañado)\b/i,
+    93→    93→      /\b(?:mi |el )?(pareja|relación|ex|novio|novia|marido|mujer|esposo|esposa)\b/i,
+    94→    94→      /\b(?:he )?(discutido|peleado|reñido|llorado)\b/i,
+    95→    95→      /\b(?:tengo|miedo|siento) (miedo|culpa|vergüenza|celos|inseguridad)\b/i,
+    96→    96→      /\b(?:estoy pasando por|atravesando) (un|una) (mal|difícil) (momento|rato|etapa|época)\b/i,
+    97→    97→      /\b(?:me )?(duele|dolió|hace daño|cuesta)\b/i,
+    98→    98→    ],
+    99→    99→    boost: 20,
+   100→   100→  },
+   101→   101→  {
+   102→   102→    domain: 'relational',
+   103→   103→    keywords: [
+   104→   104→      /\b(?:mi |los |las )?(hij[oa]|hijos|familia|madre|padre|herman[oa]|amig[oa]|amigos|jefe|compañer[oa]s|compañeros)\b/i,
+   105→   105→      /\b(?:mi |nuestra )?(pareja|relación|matrimonio|boda|divorcio|separación)\b/i,
+   106→   106→      /\b(?:convi|viv[oi]|habl[oe]) con (mi |su |la |el )?(pareja|familia|herman[oa]|madre|padre|amig[oa])\b/i,
+   107→   107→      /\b(?:mi |nuestro) (hijo|hija|bebé|niño|niña)\b/i,
+   108→   108→    ],
+   109→   109→    boost: 20,
+   110→   110→  },
+   111→   111→  {
+   112→   112→    domain: 'progress',
+   113→   113→    keywords: [
+   114→   114→      /\b(?:he )?(logrado|conseguido|avanzado|mejorado|completado|terminado|empezado|iniciado)\b/i,
+   115→   115→      /\b(?:mi |la )?(racha|constancia|progreso|avance|mejora|éxito|meta|objetivo|goal)\b/i,
+   116→   116→      /\b(?:estoy |venir|sigo) (constante|consistente|mejorando|avanzando|progresando)\b/i,
+   117→   117→      /\b(?:pasos|días|semanas) (seguidos|consecutivos|de|racha)\b/i,
+   118→   118→      /\b(?:quiero|necesito) (mejorar|avanzar|progresar|crecer|evolucionar)\b/i,
+   119→   119→      /\b(?:hábito|rutina|disciplina|hábitos|rutina)\b/i,
+   120→   120→      /\b(?:cómo|como) (sigo|sigo con|mantengo|sostengo)\b/i,
+   121→   121→    ],
+   122→   122→    boost: 15,
+   123→   123→  },
+   124→   124→  {
+   125→   125→    domain: 'energy',
+   126→   126→    keywords: [
+   127→   127→      /\b(?:estoy|me siento) (cansado|agotado|sin energía|muerto|rendido|sin fuerzas|fatigado|letárgico|somnoliento)\b/i,
+   128→   128→      /\b(?:no )?(he )?(dormido|descansado|podido dormir)\b/i,
+   129→   129→      /\b(?:el )?(sueño|descanso|cama|noche|dormir|insomnio)\b/i,
+   130→   130→      /\bpasos\b/i,
+   131→   131→      /\bcaminado\b/i,
+   132→   132→      /\b(?:mucho|bastante) (cansancio|agotamiento|fatiga)\b/i,
+   133→   133→    ],
+   134→   134→    boost: 20,
+   135→   135→  },
+   136→   136→  {
+   137→   137→    domain: 'financial',
+   138→   138→    keywords: [
+   139→   139→      /\b(?:dinero|gasto|gastos|ahorro|ahorros|ingreso|ingresos|sueldo|salario|precio|compra|compras|deuda|deudas|préstamo|inversión|inversiones|finanzas|presupuesto)\b/i,
+   140→   140→      /\b(?:pagué|pagar|cuesta|cuesta|caro|barato|costoso|economico)\b/i,
+   141→   141→      /\b(?:mi |el )?(banco|cuenta|tarjeta|factura|recibo|alquiler|hipoteca|seguro)\b/i,
+   142→   142→    ],
+   143→   143→    boost: 20,
+   144→   144→  },
+   145→   145→  {
+   146→   146→    domain: 'reflective',
+   147→   147→    keywords: [
+   148→   148→      /\b(?:qué|que) (sentido|significado|importancia|valor) (tiene|tiene|hay)\b/i,
+   149→   149→      /\b(?:estoy |me estoy) (preguntando|cuestionando|reflexionando|pensando|planteando)\b/i,
+   150→   150→      /\b(?:no sé|no se) (si|sí|qué|que) (quiero|debo|hacer|busco)\b/i,
+   151→   151→      /\b(?:mi )?(propósito|sentido|dirección|camino|vida|futuro|pasado)\b/i,
+   152→   152→      /\b(?:para qué|para que) (todo|esto|lo|hago|intentarlo)\b/i,
+   153→   153→    ],
+   154→   154→    boost: 15,
+   155→   155→  },
+   156→   156→  {
+   157→   157→    domain: 'practical',
+   158→   158→    keywords: [
+   159→   159→      /\b(?:dame|dame|dar|propon|sugiere|indica) (un )?(plan|método|sistema|rutina|estructura|paso|guía|estrategia)\b/i,
+   160→   160→      /\b(?:cómo|como) (empiezo|hago|puedo|debo|funciona|mejoro|avanzo|organizo)\b/i,
+   161→   161→      /\b(?:qué|que) (puedo|hago|debo) (hacer|intentar|probar)\b/i,
+   162→   162→      /\b(?:necesito|quiero) (un )?(plan|método|sistema|estrategia|pautas)\b/i,
+   163→   163→      /\b(?:rutina|horario|agenda|planificación|organizar|estructurar)\b/i,
+   164→   164→    ],
+   165→   165→    boost: 15,
+   166→   166→  },
+   167→   167→];
+   168→   168→
+   169→   169→/**
+   170→   170→ * Classify the user message into relevance domains.
+   171→   171→ * Returns domain signals sorted by strength (descending).
+   172→   172→ * Pure keyword matching — zero latency.
+   173→   173→ */
+   174→   174→function classifyDomain(userMessage: string): DomainSignal[] {
+   175→   175→  const msg = userMessage.toLowerCase();
+   176→   176→  const signals: DomainSignal[] = [];
+   177→   177→
+   178→   178→  for (const rule of DOMAIN_RULES) {
+   179→   179→    let matchCount = 0;
+   180→   180→    for (const kw of rule.keywords) {
+   181→   181→      if (kw.test(msg)) matchCount++;
+   182→   182→    }
+   183→   183→
+   184→   184→    if (matchCount > 0) {
+   185→   185→      // Strength = boost + (matches * 15), capped at 100
+   186→   186→      const strength = Math.min(rule.boost + matchCount * 15, 100);
+   187→   187→      signals.push({ domain: rule.domain, strength });
+   188→   188→    }
+   189→   189→  }
+   190→   190→
+   191→   191→  // Sort by strength descending
+   192→   192→  signals.sort((a, b) => b.strength - a.strength);
+   193→   193→  return signals;
+   194→   194→}
+   195→   195→
+   196→   196→// ═══════════════════════════════════════════
+   197→   197→// 3. RELEVANCE SCORING
+   198→   198→// Maps domains to context block relevance.
+   199→   199→// Each domain makes certain blocks more/less relevant.
+   200→   200→// ═══════════════════════════════════════════
+   201→   201→
+   202→   202→/**
+   203→   203→ * Relevance matrix: domain → block → weight.
+   204→   204→ * Positive = block is relevant for this domain.
+   205→   205→ * Negative = block is less relevant (can be filtered).
+   206→   206→ * 0 = neutral (kept if budget allows).
+   207→   207→ */
+   208→   208→const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, number>>> = {
+   209→   209→  crisis: {
+   210→   210→    emotional_state: 90,
+   211→   211→    understanding: 85,
+   212→   212→    identity: 40,
+   213→   213→    life_stage: 50,
+   214→   214→    lived_experience: -30,
+   215→   215→    behavioral: -20,
+   216→   216→    patterns: -40,
+   217→   217→    silent_memories: -30,
+   218→   218→    conversational: -40,
+   219→   219→    financial: -50,
+   220→   220→  },
+   221→   221→  emotional: {
+   222→   222→    emotional_state: 95,
+   223→   223→    understanding: 90,
+   224→   224→    life_stage: 70,
+   225→   225→    silent_memories: 50,
+   226→   226→    identity: 60,
+   227→   227→    conversational: 40,
+   228→   228→    lived_experience: 30,
+   229→   229→    behavioral: -10,
+   230→   230→    patterns: -30,
+   231→   231→    financial: -40,
+   232→   232→  },
+   233→   233→  relational: {
+   234→   234→    understanding: 80,
+   235→   235→    emotional_state: 70,
+   236→   236→    identity: 60,
+   237→   237→    silent_memories: 40,
+   238→   238→    conversational: 30,
+   239→   239→    life_stage: 20,
+   240→   240→    lived_experience: 10,
+   241→   241→    behavioral: -20,
+   242→   242→    patterns: -40,
+   243→   243→    financial: -50,
+   244→   244→  },
+   245→   245→  progress: {
+   246→   246→    behavioral: 95,
+   247→   247→    lived_experience: 80,
+   248→   248→    emotional_state: 60,
+   249→   249→    patterns: 70,
+   250→   250→    identity: 50,
+   251→   251→    understanding: 55,
+   252→   252→    life_stage: 40,
+   253→   253→    conversational: 30,
+   254→   254→    silent_memories: 20,
+   255→   255→    financial: -20,
+   256→   256→  },
+   257→   257→  energy: {
+   258→   258→    emotional_state: 90,
+   259→   259→    lived_experience: 80,
+   260→   260→    life_stage: 60,
+   261→   261→    understanding: 60,
+   262→   262→    behavioral: 50,
+   263→   263→    patterns: 50,
+   264→   264→    identity: 30,
+   265→   265→    conversational: -10,
+   266→   266→    silent_memories: -10,
+   267→   267→    financial: -30,
+   268→   268→  },
+   269→   269→  financial: {
+   270→   270→    patterns: 95,
+   271→   271→    lived_experience: 80,
+   272→   272→    behavioral: 60,
+   273→   273→    emotional_state: 40,
+   274→   274→    identity: 30,
+   275→   275→    understanding: 30,
+   276→   276→    conversational: 20,
+   277→   277→    life_stage: 10,
+   278→   278→    silent_memories: -20,
+   279→   279→  },
+   280→   280→  reflective: {
+   281→   281→    understanding: 90,
+   282→   282→    life_stage: 80,
+   283→   283→    identity: 70,
+   284→   284→    silent_memories: 60,
+   285→   285→    emotional_state: 60,
+   286→   286→    conversational: 50,
+   287→   287→    lived_experience: 40,
+   288→   288→    patterns: 30,
+   289→   289→    behavioral: 20,
+   290→   290→    financial: -20,
+   291→   291→  },
+   292→   292→  practical: {
+   293→   293→    behavioral: 90,
+   294→   294→    lived_experience: 80,
+   295→   295→    identity: 50,
+   296→   296→    emotional_state: 30,
+   297→   297→    understanding: 60,
+   298→   298→    conversational: 30,
+   299→   299→    patterns: 20,
+   300→   300→    life_stage: 10,
+   301→   301→    silent_memories: -10,
+   302→   302→    financial: -20,
+   303→   303→  },
+   304→   304→};
+   305→   305→
+   306→   306→/**
+   307→   307→ * Score a context block based on domain signals.
+   308→   308→ * Weighted average across all detected domains.
+   309→   309→ */
+   310→   310→function scoreBlock(
+   311→   311→  blockId: ContextBlockId,
+   312→   312→  domains: DomainSignal[],
+   313→   313→  totalDomainStrength: number
+   314→   314→): number {
+   315→   315→  if (totalDomainStrength === 0) return 50; // neutral default
+   316→   316→
+   317→   317→  let weightedScore = 0;
+   318→   318→  let hasOpinion = false;
+   319→   319→
+   320→   320→  for (const signal of domains) {
+   321→   321→    const matrix = RELEVANCE_MATRIX[signal.domain];
+   322→   322→    if (!matrix) continue;
+   323→   323→
+   324→   324→    const weight = matrix[blockId];
+   325→   325→    if (weight === undefined) continue;
+   326→   326→
+   327→   327→    // Weight the matrix score by the domain's strength
+   328→   328→    weightedScore += weight * (signal.strength / 100);
+   329→   329→    hasOpinion = true;
+   330→   330→  }
+   331→   331→
+   332→   332→  if (!hasOpinion) return 50; // no domain has an opinion about this block
+   333→   333→
+   334→   334→  // Normalize: weighted average
+   335→   335→  const avgStrength = domains.reduce((s, d) => s + d.strength, 0) / domains.length;
+   336→   336→  return Math.round(weightedScore / (avgStrength / 100));
+   337→   337→}
+   338→   338→
+   339→   339→// ═══════════════════════════════════════════
+   340→   340→// 4. CONTEXT BLOCK PARSING
+   341→   341→// Splits the assembled system prompt into
+   342→   342→// identifiable blocks for scoring/filtering.
+   343→   343→// ═══════════════════════════════════════════
+   344→   344→
+   345→   345→/** Markers used in the prompt to delimit the context section */
+   346→   346→const CONTEXT_START_MARKER = '── Lo que sabes de esta persona ──';
+   347→   347→const CONTEXT_END_MARKER = '── Fin ──';
+   348→   348→
+   349→   349→/** Keywords that signal the start of each layer/block within the context */
+   350→   350→const BLOCK_INDICATORS: { id: ContextBlockId; patterns: RegExp[] }[] = [
+   351→   351→  {
+   352→   352→    id: 'identity',
+   353→   353→    patterns: [
+   354→   354→      /^Se llama\s+/m,
+   355→   355→      /^Comenzó VitaZen/m,
+   356→   356→      /^Su foco principal es/m,
+   357→   357→      /^Al comenzar describía/m,
+   358→   358→      /^Su nivel de estrés inicial/m,
+   359→   359→      /^Su capacidad de enfoque inicial/m,
+   360→   360→      /^Los hábitos que quería construir/m,
+   361→   361→    ],
+   362→   362→  },
+   363→   363→  {
+   364→   364→    id: 'emotional_state',
+   365→   365→    patterns: [
+   366→   366→      /^Actualmente se encuentra en un estado\s+/m,
+   367→   367→      /^Actualmente se encuentra en un estado /m,
+   368→   368→      /^Un periodo con calma/m,
+   369→   369→      /^Calma\./m,
+   370→   370→      /^Crecimiento\./m,
+   371→   371→      /^Intensidad\./m,
+   372→   372→      /^Agotamiento\./m,
+   373→   373→      /^Silencio\./m,
+   374→   374→      /^Estabilidad\./m,
+   375→   375→      /^Días muy distintos/m,
+   376→   376→    ],
+   377→   377→  },
+   378→   378→  {
+   379→   379→    id: 'life_stage',
+   380→   380→    patterns: [
+   381→   381→      /^Actualmente atraviesa una etapa de\s+/m,
+   382→   382→    ],
+   383→   383→  },
+   384→   384→  {
+   385→   385→    id: 'patterns',
+   386→   386→    patterns: [
+   387→   387→      /^VitaZen ha detectado una conexión entre\s+/m,
+   388→   388→    ],
+   389→   389→  },
+   390→   390→  {
+   391→   391→    id: 'silent_memories',
+   392→   392→    patterns: [
+   393→   393→      /^Hacía unos días\./m,
+   394→   394→      /^Vuelves después de un tiempo\./m,
+   395→   395→      /^Aquí estás de nuevo\./m,
+   396→   396→      /^Hacía mucho\./m,
+   397→   397→      /^Este ritmo ya te había acompañado antes\./m,
+   398→   398→      /^Ya habías estado así\./m,
+   399→   399→      /^La energía cambió estas semanas\./m,
+   400→   400→      /^Menos energía últimamente\./m,
+   401→   401→      /^Menos peso últimamente\./m,
+   402→   402→      /^Un mes así\./m,
+   403→   403→      /^Un año así\./m,
+   404→   404→      /^Ya tres meses\./m,
+   405→   405→      /^Medio año\./m,
+   406→   406→      /^Un año\.\s*$/m,
+   407→   407→    ],
+   408→   408→  },
+   409→   409→  {
+   410→   410→    id: 'lived_experience',
+   411→   411→    patterns: [
+   412→   412→      /^Último check-in\s+/m,
+   413→   413→      /^Su intención del día/m,
+   414→   414→      /^En los últimos días ha descansado/m,
+   415→   415→      /^Su descanso ha sido irregular/m,
+   416→   416→      /^Calidad del descanso/m,
+   417→   417→      /^Ha anotado sobre su bienestar/m,
+   418→   418→      /^Reflexiones recientes en su diario/m,
+   419→   419→      /^En su última reflexión escribió/m,
+   420→   420→      /^Últimamente la mayoría de sus gastos/m,
+   421→   421→      /^Ha registrado varias decisiones/m,
+   422→   422→      /^Sus gastos recientes reflejan/m,
+   423→   423→      /^Se aprecia una etapa de mayor prudencia/m,
+   424→   424→      /^Ha explicado que un gasto/m,
+   425→   425→      /^Viene realizando cierres personales/m,
+   426→   426→      /^Su última reflexión mensual/m,
+   427→   427→      /^Revisó su cierre mensual/m,
+   428→   428→      /^Suele reflexionar sobre su evolución/m,
+   429→   429→      /^Hace poco revisó cómo le fue/m,
+   430→   430→      /^Hace tiempo que no realiza un cierre/m,
+   431→   431→    ],
+   432→   432→  },
+   433→   433→  {
+   434→   434→    id: 'behavioral',
+   435→   435→    patterns: [
+   436→   436→      /^Hábitos activos/m,
+   437→   437→      /^Última meditación/m,
+   438→   438→      /^Esta semana/m,
+   439→   439→      /^Viene siendo más constante/m,
+   440→   440→      /^Últimamente menos activo/m,
+   441→   441→      /^Está empezando a usar la app/m,
+   442→   442→      /^Progreso de imperios/m,
+   443→   443→    ],
+   444→   444→  },
+   445→   445→  {
+   446→   446→    id: 'conversational',
+   447→   447→    patterns: [
+   448→   448→      /^Temas recientes de conversación/m,
+   449→   449→    ],
+   450→   450→  },
+   451→   451→];
+   452→   452→
+   453→   453→/**
+   454→   454→ * Parse the assembled system prompt into identifiable blocks.
+   455→   455→ *
+   456→   456→ * Strategy:
+   457→   457→ * 1. The base prompt (everything before CONTEXT_START_MARKER) is always protected.
+   458→   458→ * 2. The context section (between markers) is split into blocks.
+   459→   459→ * 3. Everything after CONTEXT_END_MARKER (rules, understanding) is separate.
+   460→   460→ */
+   461→   461→function parseBlocks(systemPrompt: string): {
+   462→   462→  basePrompt: string;
+   463→   463→  contextBlocks: ContextBlock[];
+   464→   464→  rulesBlock: string;
+   465→   465→  understandingBlock: string;
+   466→   466→} {
+   467→   467→  const startIdx = systemPrompt.indexOf(CONTEXT_START_MARKER);
+   468→   468→  const endIdx = systemPrompt.indexOf(CONTEXT_END_MARKER);
+   469→   469→
+   470→   470→  // Case 1: No context markers at all — return as-is
+   471→   471→  if (startIdx === -1 || endIdx === -1) {
+   472→   472→    // Check if there's an understanding block appended after the base prompt
+   473→   473→    const understandingIdx = systemPrompt.lastIndexOf('\n\n');
+   474→   474→
+   475→   475→    return {
+   476→   476→      basePrompt: systemPrompt,
+   477→   477→      contextBlocks: [],
+   478→   478→      rulesBlock: '',
+   479→   479→      understandingBlock: '',
+   480→   480→    };
+   481→   481→  }
+   482→   482→
+   483→   483→  // Extract sections
+   484→   484→  const basePrompt = systemPrompt.substring(0, startIdx).trim();
+   485→   485→  const contextSection = systemPrompt.substring(
+   486→   486→    startIdx + CONTEXT_START_MARKER.length,
+   487→   487→    endIdx
+   488→   488→  ).trim();
+   489→   489→  const afterContext = systemPrompt.substring(endIdx + CONTEXT_END_MARKER.length).trim();
+   490→   490→
+   491→   491→  // Split context section into lines and assign to blocks
+   492→   492→  const lines = contextSection.split('\n');
+   493→   493→  const blockTexts: Partial<Record<ContextBlockId, string[]>> = {};
+   494→   494→  const unassignedLines: string[] = [];
+   495→   495→
+   496→   496→  for (const line of lines) {
+   497→   497→    const trimmed = line.trim();
+   498→   498→    if (!trimmed) continue;
+   499→   499→
+   500→   500→    let assigned = false;
+   501→   501→    for (const indicator of BLOCK_INDICATORS) {
+   502→   502→      if (indicator.patterns.some(p => p.test(trimmed))) {
+   503→   503→        if (!blockTexts[indicator.id]) blockTexts[indicator.id] = [];
+   504→   504→        blockTexts[indicator.id]!.push(trimmed);
+   505→   505→        assigned = true;
+   506→   506→        break;
+   507→   507→      }
+   508→   508→    }
+   509→   509→
+   510→   510→    if (!assigned) {
+   511→   511→      // Try to attach to the most recent block
+   512→   512→      unassignedLines.push(trimmed);
+   513→   513→    }
+   514→   514→  }
+   515→   515→
+   516→   516→  // Attach unassigned lines to the most recent preceding block
+   517→   517→  if (unassignedLines.length > 0) {
+   518→   518→    // Find the last block that was assigned
+   519→   519→    const blockOrder: ContextBlockId[] = [
+   520→   520→      'identity', 'emotional_state', 'life_stage', 'patterns',
+   521→   521→      'silent_memories', 'lived_experience', 'behavioral', 'conversational',
+   522→   522→    ];
+   523→   523→
+   524→   524→    let lastBlock: ContextBlockId | null = null;
+   525→   525→    for (let i = lines.length - 1; i >= 0; i--) {
+   526→   526→      const trimmed = lines[i].trim();
+   527→   527→      if (!trimmed) continue;
+   528→   528→      for (const indicator of BLOCK_INDICATORS) {
+   529→   529→        if (indicator.patterns.some(p => p.test(trimmed))) {
+   530→   530→          lastBlock = indicator.id;
+   531→   531→          break;
+   532→   532→        }
+   533→   533→      }
+   534→   534→      if (lastBlock) break;
+   535→   535→    }
+   536→   536→
+   537→   537→    if (lastBlock && blockTexts[lastBlock]) {
+   538→   538→      blockTexts[lastBlock]!.push(...unassignedLines);
+   539→   539→    }
+   540→   540→  }
+   541→   541→
+   542→   542→  // Build context blocks
+   543→   543→  const contextBlocks: ContextBlock[] = Object.entries(blockTexts).map(([id, texts]) => ({
+   544→   544→    id: id as ContextBlockId,
+   545→   545→    text: texts!.join('\n'),
+   546→   546→    charCount: texts!.join('\n').length,
+   547→   547→    protected: false,
+   548→   548→    relevance: 0, // scored later
+   549→   549→    budget: 0,   // set later
+   550→   550→  }));
+   551→   551→
+   552→   552→  // Split afterContext into rules and understanding
+   553→   553→  // Rules contain "CÓMO USAR ESTE CONTEXTO" and "CONTROL DE EVIDENCIA"
+   554→   554→  let rulesBlock = '';
+   555→   555→  let understandingBlock = '';
+   556→   556→
+   557→   557→  // The understanding block was injected after the context block
+   558→   558→  // in route.ts: systemPrompt = systemPrompt + '\n\n' + adaptationSnippet
+   559→   559→  // So it's the last part of afterContext
+   560→   560→  const rulesEndMarker = 'CONTROL DE EVIDENCIA:';
+   561→   561→  const rulesEndIdx = afterContext.indexOf(rulesEndMarker);
+   562→   562→
+   563→   563→  if (rulesEndIdx !== -1) {
+   564→   564→    // There's a "CONTROL DE EVIDENCIA" section (PREMIUM)
+   565→   565→    const afterEvidence = afterContext.substring(rulesEndIdx + rulesEndMarker.length);
+   566→   566→    // The understanding block comes after the rules — it's the last \n\n separated block
+   567→   567→    // that doesn't contain "CÓMO USAR" or "CONTROL DE EVIDENCIA"
+   568→   568→    const rulesPart = afterContext.substring(0, rulesEndIdx + rulesEndMarker.length);
+   569→   569→    rulesBlock = rulesPart;
+   570→   570→
+   571→   571→    // Understanding is everything after the evidence rules that looks like adaptation
+   572→   572→    const evidenceEnd = afterEvidence.indexOf('\n\n');
+   573→   573→    if (evidenceEnd !== -1) {
+   574→   574→      const afterEvidenceRules = afterEvidence.substring(evidenceEnd + 2).trim();
+   575→   575→      if (afterEvidenceRules.length > 0 && !afterEvidenceRules.includes('CÓMO USAR')) {
+   576→   576→        understandingBlock = afterEvidenceRules;
+   577→   577→      }
+   578→   578→    }
+   579→   579→  } else {
+   580→   580→    // No CONTROL DE EVIDENCIA — could be FREE or PREMIUM without that section
+   581→   581→    // Check if there's content after "CÓMO USAR ESTE CONTEXTO" rules
+   582→   582→    const comoUsarEnd = afterContext.indexOf('CÓMO USAR ESTE CONTEXTO:');
+   583→   583→    if (comoUsarEnd !== -1) {
+   584→   584→      // Find the end of the rules section (next double newline after rules)
+   585→   585→      const rulesSection = afterContext.substring(comoUsarEnd);
+   586→   586→      // Rules end at the next section or at the understanding block
+   587→   587→      const potentialUnderstanding = afterContext.substring(comoUsarEnd).split('\n\n').pop()?.trim() || '';
+   588→   588→      // The understanding block is the last paragraph if it doesn't contain rule keywords
+   589→   589→      if (
+   590→   590→        potentialUnderstanding.length > 0 &&
+   591→   591→        !potentialUnderstanding.includes('CÓMO USAR') &&
+   592→   592→        !potentialUnderstanding.includes('integrar de forma invisible') &&
+   593→   593→        !potentialUnderstanding.includes('máximo UNA referencia')
+   594→   594→      ) {
+   595→   595→        rulesBlock = afterContext.substring(0, afterContext.lastIndexOf(potentialUnderstanding)).trim();
+   596→   596→        understandingBlock = potentialUnderstanding;
+   597→   597→      } else {
+   598→   598→        rulesBlock = afterContext;
+   599→   599→      }
+   600→   600→    } else {
+   601→   601→      rulesBlock = afterContext;
+   602→   602→    }
+   603→   603→  }
+   604→   604→
+   605→   605→  return { basePrompt, contextBlocks, rulesBlock, understandingBlock };
+   606→   606→}
+   607→   607→
+   608→   608→// ═══════════════════════════════════════════
+   609→   609→// 5. CONFLICT RESOLUTION
+   610→   610→// When two blocks propose incompatible
+   611→   611→// approaches, the higher-relevance block wins.
+   612→   612→// ═══════════════════════════════════════════
+   613→   613→
+   614→   614→/**
+   615→   615→ * Known conflict pairs. When both blocks are active and their
+   616→   616→ * signals conflict, the block with higher relevance wins and
+   617→   617→ * the other gets its relevance reduced.
+   618→   618→ */
+   619→   619→interface ConflictRule {
+   620→   620→  blockA: ContextBlockId;
+   621→   621→  blockB: ContextBlockId;
+   622→   622→  /** When A's relevance is > threshold AND B's relevance is < threshold, B is suppressed */
+   623→   623→  aDominanceThreshold: number;
+   624→   624→  /** How much to reduce B's relevance when suppressed */
+   625→   625→  suppressionPenalty: number;
+   626→   626→  /** Condition: which domain must be dominant for this conflict to apply */
+   627→   627→  triggerDomain: RelevanceDomain;
+   628→   628→}
+   629→   629→
+   630→   630→const CONFLICT_RULES: ConflictRule[] = [
+   631→   631→  {
+   632→   632→    // When user is in crisis, behavioral/push context is counterproductive
+   633→   633→    blockA: 'emotional_state',
+   634→   634→    blockB: 'behavioral',
+   635→   635→    aDominanceThreshold: 70,
+   636→   636→    suppressionPenalty: 60,
+   637→   637→    triggerDomain: 'crisis',
+   638→   638→  },
+   639→   639→  {
+   640→   640→    // When user talks about emotions, detailed financial context is noise
+   641→   641→    blockA: 'understanding',
+   642→   642→    blockB: 'patterns',
+   643→   643→    aDominanceThreshold: 70,
+   644→   644→    suppressionPenalty: 50,
+   645→   645→    triggerDomain: 'emotional',
+   646→   646→  },
+   647→   647→  {
+   648→   648→    // When user talks about practical steps, silent memories add no value
+   649→   649→    blockA: 'behavioral',
+   650→   650→    blockB: 'silent_memories',
+   651→   651→    aDominanceThreshold: 70,
+   652→   652→    suppressionPenalty: 50,
+   653→   653→    triggerDomain: 'practical',
+   654→   654→  },
+   655→   655→];
+   656→   656→
+   657→   657→function resolveConflicts(
+   658→   658→  blocks: ContextBlock[],
+   659→   659→  domains: DomainSignal[]
+   660→   660→): ContextBlock[] {
+   661→   661→  const dominantDomain = domains.length > 0 ? domains[0].domain : null;
+   662→   662→
+   663→   663→  for (const rule of CONFLICT_RULES) {
+   664→   664→    // Only apply if the dominant domain matches
+   665→   665→    if (!dominantDomain || dominantDomain !== rule.triggerDomain) continue;
+   666→   666→
+   667→   667→    const blockA = blocks.find(b => b.id === rule.blockA);
+   668→   668→    const blockB = blocks.find(b => b.id === rule.blockB);
+   669→   669→
+   670→   670→    if (!blockA || !blockB) continue;
+   671→   671→
+   672→   672→    if (blockA.relevance >= rule.aDominanceThreshold) {
+   673→   673→      blockB.relevance = Math.max(0, blockB.relevance - rule.suppressionPenalty);
+   674→   674→    }
+   675→   675→  }
+   676→   676→
+   677→   677→  return blocks;
+   678→   678→}
+   679→   679→
+   680→   680→// ═══════════════════════════════════════════
+   681→   681→// 6. BLOCK TRUNCATION
+   682→   682→// When a block exceeds its budget,
+   683→   683→// truncate intelligently (keep first lines).
+   684→   684→// ═══════════════════════════════════════════
+   685→   685→
+   686→   686→function truncateBlock(block: ContextBlock, maxChars: number): ContextBlock {
+   687→   687→  if (block.charCount <= maxChars) return block;
+   688→   688→
+   689→   689→  const lines = block.text.split('\n');
+   690→   690→  let totalChars = 0;
+   691→   691→  const keptLines: string[] = [];
+   692→   692→
+   693→   693→  for (const line of lines) {
+   694→   694→    if (totalChars + line.length > maxChars) break;
+   695→   695→    keptLines.push(line);
+   696→   696→    totalChars += line.length + 1; // +1 for newline
+   697→   697→  }
+   698→   698→
+   699→   699→  return {
+   700→   700→    ...block,
+   701→   701→    text: keptLines.join('\n'),
+   702→   702→    charCount: totalChars,
+   703→   703→  };
+   704→   704→}
+   705→   705→
+   706→   706→// ═══════════════════════════════════════════
+   707→   707→// 7. MAIN ENTRY POINT
+   708→   708→// The only exported function. Called once
+   709→   709→// per message in route.ts.
+   710→   710→// ═══════════════════════════════════════════
+   711→   711→
+   712→   712→/**
+   713→   713→ * Optimize the assembled system prompt for the current user message.
+   714→   714→ *
+   715→   715→ * This is the Decision Engine's sole public function.
+   716→   716→ * It takes the already-assembled system prompt and the user's message,
+   717→   717→ * then returns an optimized version that uses only the most relevant
+   718→   718→ * context blocks.
+   719→   719→ *
+   720→   720→ * Integration point: route.ts, AFTER buildContextualSystemPrompt
+   721→   721→ * and getUnderstandingContext, BEFORE assembling groqMessages.
+   722→   722→ *
+   723→   723→ * @param systemPrompt - The fully assembled system prompt
+   724→   724→ * @param userMessage - The current user message
+   725→   725→ * @param plan - User's plan ('FREE' or 'PREMIUM')
+   726→   726→ * @returns Optimized system prompt + decision metadata
+   727→   727→ */
+   728→   728→export function optimizeContext(
+   729→   729→  systemPrompt: string,
+   730→   730→  userMessage: string,
+   731→   731→  plan: string
+   732→   732→): DecisionResult {
+   733→   733→  const budget = BUDGETS[plan] || BUDGETS.FREE;
+   734→   734→
+   735→   735→  // Step 1: Parse the prompt into blocks
+   736→   736→  const { basePrompt, contextBlocks, rulesBlock, understandingBlock } = parseBlocks(systemPrompt);
+   737→   737→
+   738→   738→  // If no context blocks exist, return as-is
+   739→   739→  if (contextBlocks.length === 0) {
+   740→   740→    return {
+   741→   741→      systemPrompt,
+   742→   742→      activeBlocks: ['base_prompt'],
+   743→   743→      filteredBlocks: [],
+   744→   744→      truncatedBlocks: [],
+   745→   745→      charsSaved: 0,
+   746→   746→    };
+   747→   747→  }
+   748→   748→
+   749→   749→  // Step 2: Classify user message into domains
+   750→   750→  const domains = classifyDomain(userMessage);
+   751→   751→  const totalDomainStrength = domains.reduce((s, d) => s + d.strength, 0);
+   752→   752→
+   753→   753→  // Step 3: Score each block
+   754→   754→  const scoredBlocks = contextBlocks.map(block => ({
+   755→   755→    ...block,
+   756→   756→    relevance: scoreBlock(block.id, domains, totalDomainStrength),
+   757→   757→    budget: budget.blockMax[block.id] || budget.maxContextChars,
+   758→   758→  }));
+   759→   759→
+   760→   760→  // Step 4: Resolve conflicts between blocks
+   761→   761→  const resolvedBlocks = resolveConflicts(scoredBlocks, domains);
+   762→   762→
+   763→   763→  // Step 5: Filter — remove blocks with negative relevance, respect maxActiveBlocks
+   764→   764→  // Sort by relevance descending
+   765→   765→  const sorted = [...resolvedBlocks].sort((a, b) => b.relevance - a.relevance);
+   766→   766→
+   767→   767→  // Separate positive-relevance blocks from negative
+   768→   768→  const positive = sorted.filter(b => b.relevance > 0);
+   769→   769→  const negative = sorted.filter(b => b.relevance <= 0);
+   770→   770→
+   771→   771→  // Keep top N blocks by relevance
+   772→   772→  const kept = positive.slice(0, budget.maxActiveBlocks);
+   773→   773→
+   774→   774→  // Track filtered blocks
+   775→   775→  const filteredIds: ContextBlockId[] = [
+   776→   776→    ...negative.map(b => b.id),
+   777→   777→    ...positive.slice(budget.maxActiveBlocks).map(b => b.id),
+   778→   778→  ];
+   779→   779→
+   780→   780→  // Step 6: Truncate kept blocks to their budget
+   781→   781→  const truncatedIds: ContextBlockId[] = [];
+   782→   782→  const finalBlocks = kept.map(block => {
+   783→   783→    const truncated = truncateBlock(block, block.budget);
+   784→   784→    if (truncated.charCount < block.charCount) {
+   785→   785→      truncatedIds.push(block.id);
+   786→   786→    }
+   787→   787→    return truncated;
+   788→   788→  });
+   789→   789→
+   790→   790→  // Step 7: Apply global context budget
+   791→   791→  let totalContextChars = finalBlocks.reduce((s, b) => s + b.charCount, 0);
+   792→   792→  if (totalContextChars > budget.maxContextChars) {
+   793→   793→    // Remove lowest-relevance blocks until within budget
+   794→   794→    finalBlocks.sort((a, b) => b.relevance - a.relevance);
+   795→   795→    while (totalContextChars > budget.maxContextChars && finalBlocks.length > 1) {
+   796→   796→      const removed = finalBlocks.pop()!;
+   797→   797→      filteredIds.push(removed.id);
+   798→   798→      totalContextChars -= removed.charCount;
+   799→   799→    }
+   800→   800→  }
+   801→   801→
+   802→   802→  // Step 8: Handle understanding block
+   803→   803→  let finalUnderstanding = understandingBlock;
+   804→   804→  const understandingBudget = budget.blockMax.understanding || 150;
+   805→   805→  if (understandingBlock.length > understandingBudget) {
+   806→   806→    // Truncate understanding to first N lines that fit
+   807→   807→    const lines = understandingBlock.split('\n');
+   808→   808→    let chars = 0;
+   809→   809→    const keptLines: string[] = [];
+   810→   810→    for (const line of lines) {
+   811→   811→      if (chars + line.length > understandingBudget) break;
+   812→   812→      keptLines.push(line);
+   813→   813→      chars += line.length + 1;
+   814→   814→    }
+   815→   815→    finalUnderstanding = keptLines.join('\n');
+   816→   816→    if (finalUnderstanding.length < understandingBlock.length) {
+   817→   817→      truncatedIds.push('understanding');
+   818→   818→    }
+   819→   819→  }
+   820→   820→
+   821→   821→  // Step 9: Reassemble the system prompt
+   822→   822→  const activeIds: ContextBlockId[] = [...finalBlocks.map(b => b.id)];
+   823→   823→  if (finalUnderstanding) activeIds.push('understanding');
+   824→   824→  activeIds.push('base_prompt');
+   825→   825→
+   826→   826→  const contextText = finalBlocks.map(b => b.text).join('\n');
+   827→   827→
+   828→   828→  let finalPrompt: string;
+   829→   829→  if (contextText.trim().length > 0) {
+   830→   830→    finalPrompt = `${basePrompt}\n\n── Lo que sabes de esta persona ──\n${contextText.trim()}\n── Fin ──`;
+   831→   831→    if (rulesBlock) {
+   832→   832→      finalPrompt += `\n\n${rulesBlock}`;
+   833→   833→    }
+   834→   834→    if (finalUnderstanding.trim()) {
+   835→   835→      finalPrompt += `\n\n${finalUnderstanding.trim()}`;
+   836→   836→    }
+   837→   837→  } else {
+   838→   838→    // No context survived filtering — use base prompt only
+   839→   839→    finalPrompt = basePrompt;
+   840→   840→    if (rulesBlock) {
+   841→   841→      // Keep a minimal version of rules
+   842→   842→      finalPrompt += `\n\n${rulesBlock}`;
+   843→   843→    }
+   844→   844→  }
+   845→   845→
+   846→   846→  // Calculate chars saved
+   847→   847→  const originalContextChars = contextBlocks.reduce((s, b) => s + b.charCount, 0) + understandingBlock.length;
+   848→   848→  const finalContextChars = finalBlocks.reduce((s, b) => s + b.charCount, 0) + finalUnderstanding.length;
+   849→   849→  const charsSaved = Math.max(0, originalContextChars - finalContextChars);
+   850→   850→
+   851→   851→  return {
+   852→   852→    systemPrompt: finalPrompt,
+   853→   853→    activeBlocks: activeIds,
+   854→   854→    filteredBlocks: filteredIds,
+   855→   855→    truncatedBlocks: truncatedIds,
+   856→   856→    charsSaved,
+   857→   857→  };
+   858→   858→}

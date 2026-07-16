@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=794px, initial-scale=1.0">
+<title>VitaZen - FASE 5.1</title>
+<style>
+@page { size: 794px 1123px; margin: 0; }
+
+:root {
+  --bg: #131311;
+  --c-accent: #dab549;
+  --c-muted: #87857d;
+  --c-text: #f2f2f1;
+  --c-mid: #58503a;
+  --c-surface: #2a2821;
+  --c-border: #514b39;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 794px; height: 1123px; background: var(--bg); font-family: 'Inter', sans-serif; }
+
+.cover {
+  position: relative;
+  width: 794px;
+  height: 1123px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Layer 1 - Background */
+.cover-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(218,181,73,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(218,181,73,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.accent-bar {
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 4px;
+  background: var(--c-accent);
+}
+
+.glow {
+  position: absolute;
+  left: 20px;
+  top: 35%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(218,181,73,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* Layer 2 - Structure */
+.cover-structure {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.hline-top {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 10%;
+  height: 0.5px;
+  background: var(--c-border);
+  opacity: 0.5;
+}
+
+.hline-bottom {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  bottom: 3%;
+  height: 0.5px;
+  background: var(--c-border);
+  opacity: 0.5;
+}
+
+/* Layer 3 - Content */
+.cover-content {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 0 60px;
+}
+
+.kicker {
+  position: absolute;
+  top: 15%;
+  left: 60px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  color: var(--c-accent);
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.hero-title {
+  position: absolute;
+  top: 26%;
+  left: 60px;
+  right: 60px;
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--c-text);
+  letter-spacing: -1px;
+}
+
+.hero-title span {
+  color: var(--c-accent);
+}
+
+.summary {
+  position: absolute;
+  top: 50%;
+  left: 60px;
+  right: 100px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--c-muted);
+  max-width: 520px;
+}
+
+.meta {
+  position: absolute;
+  top: 78%;
+  left: 60px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--c-muted);
+  line-height: 1.8;
+}
+
+.meta strong {
+  color: var(--c-text);
+  font-weight: 700;
+}
+
+.footer-label {
+  position: absolute;
+  bottom: 7%;
+  left: 60px;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  color: var(--c-muted);
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.stats-row {
+  position: absolute;
+  top: 82%;
+  left: 60px;
+  right: 60px;
+  display: flex;
+  gap: 40px;
+}
+
+.stat {
+  text-align: left;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--c-accent);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--c-muted);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="cover-bg">
+    <div class="grid"></div>
+    <div class="accent-bar"></div>
+    <div class="glow"></div>
+  </div>
+  <div class="cover-structure">
+    <div class="hline-top"></div>
+    <div class="hline-bottom"></div>
+  </div>
+  <div class="cover-content">
+    <div class="kicker">VitaZen - FASE 5.1</div>
+    <div class="hero-title">Auditoria Forense<br>de <span>Rendimiento</span></div>
+    <div class="summary">
+      Analisis exhaustivo sin implementacion. Deteccion de cuellos de botella reales, clasificacion por prioridad, y propuesta de roadmap de optimizacion para la aplicacion VitaZen.
+    </div>
+    <div class="meta">
+      <strong>Proyecto:</strong> VitaZen — github.com/josinesprados-hub/VitaZen<br>
+      <strong>Tecnologia:</strong> Next.js + React + Prisma + Neon + Firebase + Groq<br>
+      <strong>Fecha:</strong> Julio 2026
+    </div>
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-value">3.8/10</div>
+        <div class="stat-label">Puntuacion Global</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">28</div>
+        <div class="stat-label">Archivos Afectados</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">6</div>
+        <div class="stat-label">Mejoras Criticas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">12</div>
+        <div class="stat-label">Fases Roadmap</div>
+      </div>
+    </div>
+    <div class="footer-label">Sin implementacion — Solo auditoria</div>
+  </div>
+</div>
+</body>
+</html>

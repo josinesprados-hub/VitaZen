@@ -1,0 +1,2002 @@
+     1→@import "tailwindcss";
+     2→
+     3→@theme {
+     4→  --color-background: #000000;
+     5→  --color-foreground: #FFFFFF;
+     6→  --color-card: #0a0a0a;
+     7→  --color-card-border: #1a1a1a;
+     8→  --color-muted: #666666;
+     9→  --color-muted-foreground: #999999;
+    10→  --color-destructive: #ef4444;
+    11→  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    12→
+    13→  /* ── Champagne Editorial Palette ──────────────────────
+    14→     One family. One tone. Zero orange accidents.
+    15→     Primary: warm champagne — editorial, calm, premium
+    16→     Soft:    whisper-light champagne for subtle accents
+    17→     Muted:   desaturated champagne for secondary text/scores
+    18→     Warm:    slightly warmer champagne for warning/caution
+    19→     Deep:    dark champagne for overloaded/pressed states
+    20→     Hover:   lighter champagne for interactive hover states
+    21→     ──────────────────────────────────────────────────── */
+    22→  --color-champagne: #c8a55a;
+    23→  --color-champagne-hover: #d4b468;
+    24→  --color-champagne-soft: #b8995e;
+    25→  --color-champagne-warm: #d4a84e;
+    26→  --color-champagne-deep: #8b6f3a;
+    27→
+    28→  /* Legacy aliases — existing code still works */
+    29→  --color-gold: var(--color-champagne);
+    30→  --color-gold-hover: var(--color-champagne-hover);
+    31→
+    32→  /* Unified transition timings — calm, deliberate, premium.
+    33→     Fast: micro-feedback (focus, active states)
+    34→     Base: standard transitions (borders, colors, visibility)
+    35→     Smooth: content changes (modals, sections, data updates)
+    36→     Slow: structural changes (progress bars, ring animations) */
+    37→  --transition-fast: 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    38→  --transition-base: 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    39→  --transition-smooth: 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    40→  --transition-slow: 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    41→}
+    42→
+    43→@layer base {
+    44→  * {
+    45→    border-color: var(--color-card-border);
+    46→  }
+    47→}
+    48→
+    49→body {
+    50→  background-color: var(--color-background);
+    51→  color: var(--color-foreground);
+    52→  font-family: var(--font-sans);
+    53→  -webkit-font-smoothing: antialiased;
+    54→  -moz-osx-font-smoothing: grayscale;
+    55→  /* Safe area handling is done per-element (safe-top, safe-bottom classes)
+    56→     on fixed/sticky elements like TopBar, Sidebar, and modal content.
+    57→     Body-level padding is intentionally NOT applied here to prevent
+    58→     double safe-area padding when both body and element add env() values. */
+    59→}
+    60→
+    61→/* Prevent iOS bounce overscroll revealing background */
+    62→html, body {
+    63→  overscroll-behavior: none;
+    64→}
+    65→
+    66→/* Ensure html/body fill viewport on mobile without awkward bounce gaps */
+    67→html, body {
+    68→  min-height: 100dvh;
+    69→}
+    70→
+    71→/* Custom scrollbar */
+    72→::-webkit-scrollbar {
+    73→  width: 6px;
+    74→}
+    75→::-webkit-scrollbar-track {
+    76→  background: #000000;
+    77→}
+    78→::-webkit-scrollbar-thumb {
+    79→  background: #1a1a1a;
+    80→  border-radius: 3px;
+    81→}
+    82→::-webkit-scrollbar-thumb:hover {
+    83→  background: var(--color-champagne);
+    84→}
+    85→
+    86→/* Custom focus styles — calm, present, not flashy */
+    87→input:focus, textarea:focus, select:focus {
+    88→  outline: none;
+    89→  border-color: var(--color-champagne);
+    90→  box-shadow: 0 0 0 1px rgba(200, 165, 90, 0.3);
+    91→  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    92→}
+    93→/* Error state borders must not be overridden by focus gold */
+    94→input.border-red-500:focus, textarea.border-red-500:focus, select.border-red-500:focus {
+    95→  border-color: #ef4444;
+    96→  box-shadow: 0 0 0 1px #ef4444;
+    97→}
+    98→
+    99→/* ═══════════════════════════════════════════
+   100→   Mobile Touch & Interaction
+   101→   ═══════════════════════════════════════════ */
+   102→
+   103→/* Minimum touch target — 44px Apple HIG guideline.
+   104→   Applied to buttons and explicit interactive roles.
+   105→   <a> tags are excluded from the blanket 44px rule because inline links
+   106→   in text contexts get bloated. Block/flex <a> links (cards, nav items)
+   107→   already have sufficient padding for their tap target. */
+   108→button, [role="button"], input[type="checkbox"], input[type="radio"] {
+   109→  min-height: 44px;
+   110→}
+   111→
+   112→/* Touch target for small inline elements — ensure tap area via padding */
+   113→.pill, .badge-premium, .badge-free {
+   114→  min-height: 32px;
+   115→}
+   116→
+   117→/* Intentionally small UI elements — override min-height:44px */
+   118→.rating-btn, .value-btn {
+   119→  min-height: auto;
+   120→}
+   121→.pill {
+   122→  padding-top: 0.375rem;
+   123→  padding-bottom: 0.375rem;
+   124→}
+   125→
+   126→/* Disable tap highlight on mobile for cleaner feel */
+   127→button, a, [role="button"] {
+   128→  -webkit-tap-highlight-color: transparent;
+   129→}
+   130→
+   131→/* Prevent text selection on interactive elements */
+   132→button, [role="button"] {
+   133→  -webkit-user-select: none;
+   134→  user-select: none;
+   135→}
+   136→
+   137→/* Prevent iOS input zoom (font-size >= 16px prevents auto-zoom) */
+   138→@media (max-width: 767px) {
+   139→  input[type="text"],
+   140→  input[type="email"],
+   141→  input[type="password"],
+   142→  input[type="search"],
+   143→  input[type="tel"],
+   144→  input[type="url"],
+   145→  textarea,
+   146→  select {
+   147→    font-size: 16px;
+   148→  }
+   149→}
+   150→
+   151→/* Smooth horizontal scroll for pill containers */
+   152→.scroll-snap-x {
+   153→  -webkit-overflow-scrolling: touch;
+   154→  scroll-snap-type: x mandatory;
+   155→}
+   156→.scroll-snap-x > * {
+   157→  scroll-snap-align: start;
+   158→}
+   159→
+   160→/* Horizontal pill/filters scroll — momentum + snap + hide scrollbar */
+   161→.scroll-pills {
+   162→  -webkit-overflow-scrolling: touch;
+   163→  scroll-snap-type: x proximity;
+   164→  overflow-x: auto;
+   165→  overscroll-behavior-x: contain;
+   166→}
+   167→.scroll-pills::-webkit-scrollbar { display: none; }
+   168→.scroll-pills { -ms-overflow-style: none; scrollbar-width: none; }
+   169→.scroll-pills > * {
+   170→  scroll-snap-align: start;
+   171→}
+   172→
+   173→/* ═══════════════════════════════════════════
+   174→   Page Transitions
+   175→   ═══════════════════════════════════════════ */
+   176→
+   177→/* Page transition — DISABLED.
+   178→   Previously used opacity:0 + animation-fill-mode:both which caused
+   179→   the entire page to stay invisible until user clicked/tapped.
+   180→   (WebKit/Chromium compositing bug with nested opacity:0 layers.)
+   181→   Content now renders immediately for guaranteed visibility. */
+   182→@keyframes pageTransitionEnter {
+   183→  from {
+   184→    transform: translateY(4px);
+   185→  }
+   186→  to {
+   187→    transform: translateY(0);
+   188→  }
+   189→}
+   190→
+   191→.page-transition {
+   192→  /* No animation — renders immediately */
+   193→}
+   194→
+   195→/* Respect reduced motion preferences */
+   196→@media (prefers-reduced-motion: reduce) {
+   197→  .page-transition {
+   198→    animation: none;
+   199→  }
+   200→}
+   201→
+   202→/* ═══════════════════════════════════════════
+   203→   Core Animations
+   204→   ═══════════════════════════════════════════ */
+   205→
+   206→@keyframes fadeIn {
+   207→  from { opacity: 0; }
+   208→  to { opacity: 1; }
+   209→}
+   210→
+   211→/* Modal entrance — transform only, never opacity:0.
+   212→   Previous version used opacity:0 + animation-fill-mode:both which caused
+   213→   the same WebKit/Chromium compositing bug documented in page transitions
+   214→   and dashboard sections, where modals could stay permanently invisible
+   215→   on low-end Android devices. Now uses transform-only like sectionStaggerIn. */
+   216→@keyframes scaleIn {
+   217→  from { transform: scale(0.97); }
+   218→  to { transform: scale(1); }
+   219→}
+   220→
+   221→@keyframes slideInUp {
+   222→  from { transform: translateY(4px); }
+   223→  to { transform: translateY(0); }
+   224→}
+   225→
+   226→/* Context menu entrance — transform only, never opacity:0.
+   227→   Same compositing bug fix as scaleIn above. */
+   228→@keyframes contextMenuIn {
+   229→  from { transform: scale(0.97) translateY(-2px); }
+   230→  to { transform: scale(1) translateY(0); }
+   231→}
+   232→
+   233→/* Route transition progress bar animation */
+   234→@keyframes routeProgressSlide {
+   235→  0% { width: 0%; }
+   236→  50% { width: 70%; }
+   237→  100% { width: 100%; }
+   238→}
+   239→.route-progress-bar {
+   240→  animation: routeProgressSlide 0.5s ease-out forwards;
+   241→}
+   242→
+   243→/* Unified entrance animation — slow, deliberate, barely perceptible */
+   244→.animate-in {
+   245→  animation: slideInUp 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+   246→}
+   247→
+   248→/* Context menu animation — measured, not snappy */
+   249→.context-menu {
+   250→  animation: contextMenuIn 0.22s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+   251→}
+   252→
+   253→/* Mobile drawer — slide in from left */
+   254→@keyframes drawerSlideIn {
+   255→  from { transform: translateX(-100%); }
+   256→  to { transform: translateX(0); }
+   257→}
+   258→.drawer-enter {
+   259→  animation: drawerSlideIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+   260→}
+   261→
+   262→/* Mentor chat — full viewport on mobile, normal flow on desktop.
+   263→   position:absolute avoids the fixed fullscreen layer that causes
+   264→   compositor deadlocks in Android TWA/WebView. The parent page
+   265→   wrapper provides position:relative + min-height:100dvh so the
+   266→   absolute element still fills the viewport identically. */
+   267→.mentor-full-viewport {
+   268→  position: absolute;
+   269→  inset: 0;
+   270→  z-index: 30;
+   271→  height: 100%;
+   272→  background: #000;
+   273→}
+   274→@media (min-width: 640px) {
+   275→  .mentor-full-viewport {
+   276→    position: relative;
+   277→    inset: auto;
+   278→    z-index: auto;
+   279→    height: auto;
+   280→    background: transparent;
+   281→  }
+   282→}
+   283→
+   284→/* Smooth scroll */
+   285→html { scroll-behavior: smooth; }
+   286→
+   287→/* Hide scrollbar utility */
+   288→.scrollbar-hide::-webkit-scrollbar { display: none; }
+   289→.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+   290→
+   291→/* ═══════════════════════════════════════════
+   292→   Unified Card System
+   293→   ═══════════════════════════════════════════ */
+   294→
+   295→/* Primary card — used across all modules */
+   296→.card-primary {
+   297→  background: #0a0a0a;
+   298→  border: 1px solid #1a1a1a;
+   299→  border-radius: 0.75rem;
+   300→  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+   301→}
+   302→.card-primary:hover {
+   303→  border-color: rgba(200, 165, 90, 0.06);
+   304→  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+   305→}
+   306→
+   307→/* Gold-accent card — challenge, check-in */
+   308→.card-accent {
+   309→  background: #0a0a0a;
+   310→  border: 1px solid rgba(200, 165, 90, 0.2);
+   311→  border-radius: 0.75rem;
+   312→  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+   313→}
+   314→.card-accent:hover {
+   315→  border-color: rgba(200, 165, 90, 0.25);
+   316→  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+   317→}
+   318→
+   319→/* Inner card — list items, sub-sections */
+   320→.card-inner {
+   321→  background: #000000;
+   322→  border: 1px solid #1a1a1a;
+   323→  border-radius: 0.5rem;
+   324→  transition: border-color var(--transition-base);
+   325→}
+   326→.card-inner:hover {
+   327→  border-color: rgba(200, 165, 90, 0.08);
+   328→  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+   329→}
+   330→
+   331→/* ═══════════════════════════════════════════
+   332→   Unified Modal System
+   333→   ═══════════════════════════════════════════ */
+   334→
+   335→/* Modal backdrop — consistent across all modals */
+   336→.modal-backdrop {
+   337→  background: rgba(0, 0, 0, 0.7);
+   338→  backdrop-filter: blur(4px);
+   339→  -webkit-backdrop-filter: blur(4px);
+   340→  animation: fadeIn 0.25s ease-out;
+   341→}
+   342→
+   343→/* Modal content — consistent entrance */
+   344→.modal-content {
+   345→  background: #0a0a0a;
+   346→  border: 1px solid rgba(200, 165, 90, 0.2);
+   347→  border-radius: 1rem;
+   348→  animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+   349→}
+   350→
+   351→/* Mobile: bottom-sheet style modal for small screens */
+   352→@media (max-width: 767px) {
+   353→  .modal-content {
+   354→    border-radius: 1.25rem 1.25rem 0 0;
+   355→    max-height: 92dvh;
+   356→    margin-top: auto;
+   357→    width: 100%;
+   358→    /* safe area for home indicator */
+   359→    padding-bottom: env(safe-area-inset-bottom, 0px);
+   360→  }
+   361→  .modal-content-destructive {
+   362→    border-radius: 1.25rem 1.25rem 0 0;
+   363→    max-height: 92dvh;
+   364→    margin-top: auto;
+   365→    width: 100%;
+   366→    padding-bottom: env(safe-area-inset-bottom, 0px);
+   367→  }
+   368→
+   369→  /* Disable backdrop-filter on mobile to prevent GPU exhaustion.
+   370→     On low-end Android phones, full-screen backdrop-filter:blur() combined
+   371→     with the overlay layer creates a compositor stall that freezes the main
+   372→     thread. The semi-transparent background alone provides sufficient visual
+   373→     separation. Desktop and tablet retain the blur effect. */
+   374→  .modal-backdrop {
+   375→    backdrop-filter: none;
+   376→    -webkit-backdrop-filter: none;
+   377→  }
+   378→  .premium-modal-backdrop {
+   379→    backdrop-filter: none;
+   380→    -webkit-backdrop-filter: none;
+   381→  }
+   382→}
+   383→
+   384→/* Delete modal variant */
+   385→.modal-content-destructive {
+   386→  background: #0a0a0a;
+   387→  border: 1px solid rgba(239, 68, 68, 0.2);
+   388→  border-radius: 1rem;
+   389→  animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+   390→}
+   391→
+   392→/* Premium modal backdrop — calm, not aggressive.
+   393→   Uses same depth as regular modal, no extra blur. */
+   394→.premium-modal-backdrop {
+   395→  background: rgba(0, 0, 0, 0.7);
+   396→  backdrop-filter: blur(4px);
+   397→  -webkit-backdrop-filter: blur(4px);
+   398→  animation: fadeIn 0.3s ease-out;
+   399→}
+   400→
+   401→/* Premium modal entrance — same as regular modal */
+   402→.premium-modal {
+   403→  animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+   404→}
+   405→
+   406→/* ═══════════════════════════════════════════
+   407→   Unified Badge/Pill System
+   408→   ═══════════════════════════════════════════ */
+   409→
+   410→/* Depth badge — quiet presence for premium plan indicator.
+   411→   Not a badge. Not promotional. Just a quiet label. */
+   412→.badge-premium {
+   413→  display: inline-flex;
+   414→  align-items: center;
+   415→  gap: 0.25rem;
+   416→  font-size: 9px;
+   417→  font-weight: 500;
+   418→  text-transform: none;
+   419→  letter-spacing: 0.02em;
+   420→  color: rgba(200, 165, 90, 0.5);
+   421→  background: transparent;
+   422→  border: none;
+   423→  padding: 0.125rem 0.5rem;
+   424→  border-radius: 9999px;
+   425→}
+   426→
+   427→/* FREE plan indicator — same quiet treatment */
+   428→.badge-free {
+   429→  display: inline-flex;
+   430→  align-items: center;
+   431→  font-size: 9px;
+   432→  font-weight: 500;
+   433→  text-transform: none;
+   434→  letter-spacing: 0.02em;
+   435→  color: #555;
+   436→  background: transparent;
+   437→  border: none;
+   438→  padding: 0.125rem 0.5rem;
+   439→  border-radius: 9999px;
+   440→}
+   441→
+   442→/* Category/status pill */
+   443→.pill {
+   444→  display: inline-flex;
+   445→  align-items: center;
+   446→  font-size: 11px;
+   447→  font-weight: 500;
+   448→  padding: 0.25rem 0.625rem;
+   449→  border-radius: 9999px;
+   450→  transition: all var(--transition-base);
+   451→}
+   452→.pill:active {
+   453→  transform: scale(0.97);
+   454→  transition: transform 0.12s ease;
+   455→}
+   456→
+   457→/* ═══════════════════════════════════════════
+   458→   Unified Icon Container System
+   459→   ═══════════════════════════════════════════ */
+   460→
+   461→/* Small icon container — metric cards */
+   462→.icon-sm {
+   463→  width: 2.25rem;
+   464→  height: 2.25rem;
+   465→  border-radius: 0.5rem;
+   466→  background: rgba(200, 165, 90, 0.1);
+   467→  display: flex;
+   468→  align-items: center;
+   469→  justify-content: center;
+   470→  flex-shrink: 0;
+   471→}
+   472→
+   473→/* Medium icon container — page headers, empire cards */
+   474→.icon-md {
+   475→  width: 2.5rem;
+   476→  height: 2.5rem;
+   477→  border-radius: 0.5rem;
+   478→  background: rgba(200, 165, 90, 0.1);
+   479→  display: flex;
+   480→  align-items: center;
+   481→  justify-content: center;
+   482→  flex-shrink: 0;
+   483→}
+   484→
+   485→/* Large icon container — modal headers, empty states */
+   486→.icon-lg {
+   487→  width: 3rem;
+   488→  height: 3rem;
+   489→  border-radius: 0.75rem;
+   490→  background: rgba(200, 165, 90, 0.1);
+   491→  display: flex;
+   492→  align-items: center;
+   493→  justify-content: center;
+   494→  flex-shrink: 0;
+   495→}
+   496→
+   497→/* XL icon container — hero sections */
+   498→.icon-xl {
+   499→  width: 3.5rem;
+   500→  height: 3.5rem;
+   501→  border-radius: 0.75rem;
+   502→  background: rgba(200, 165, 90, 0.1);
+   503→  display: flex;
+   504→  align-items: center;
+   505→  justify-content: center;
+   506→  flex-shrink: 0;
+   507→}
+   508→
+   509→/* ═══════════════════════════════════════════
+   510→   Unified Button System
+   511→   ═══════════════════════════════════════════ */
+   512→
+   513→/* Primary button */
+   514→.btn-primary {
+   515→  background: var(--color-champagne);
+   516→  color: #000000;
+   517→  font-weight: 600;
+   518→  padding: 0.625rem 1.25rem;
+   519→  border-radius: 0.5rem;
+   520→  font-size: 0.875rem;
+   521→  transition: background-color var(--transition-base), box-shadow var(--transition-smooth);
+   522→}
+   523→.btn-primary:hover {
+   524→  background: var(--color-champagne-hover);
+   525→  box-shadow: 0 2px 12px rgba(200, 165, 90, 0.12);
+   526→}
+   527→.btn-primary:active:not(:disabled) {
+   528→  transform: scale(0.98);
+   529→  transition: transform 0.12s ease, background-color 0.2s ease;
+   530→}
+   531→.btn-primary:disabled {
+   532→  opacity: 0.5;
+   533→  cursor: not-allowed;
+   534→}
+   535→
+   536→/* ═══════════════════════════════════════════
+   537→   Unified Progress Bar
+   538→   ═══════════════════════════════════════════ */
+   539→
+   540→.progress-bar-track {
+   541→  background: #1a1a1a;
+   542→  border-radius: 9999px;
+   543→  overflow: hidden;
+   544→}
+   545→
+   546→.progress-bar-fill {
+   547→  background: var(--color-champagne);
+   548→  border-radius: 9999px;
+   549→  transition: width 0.7s ease-out, background-color 0.5s ease;
+   550→}
+   551→
+   552→/* ═══════════════════════════════════════════
+   553→   Depth Indicators — calm, not promotional
+   554→   ═══════════════════════════════════════════ */
+   555→
+   556→/* Depth indicator — quiet presence, no shimmer, no pulse */
+   557→.depth-indicator {
+   558→  animation: none;
+   559→}
+   560→
+   561→/* Premium skeleton shimmer — gold-tinted sweep on dark surface.
+   562→   KEPT for loading states only, not for badges.
+   563→   Very subtle — barely perceptible sweep. */
+   564→.premium-shimmer {
+   565→  background: linear-gradient(
+   566→    110deg,
+   567→    #111111 0%,
+   568→    #111111 40%,
+   569→    #141414 50%,
+   570→    #111111 60%,
+   571→    #111111 100%
+   572→  );
+   573→  background-size: 300% 100%;
+   574→  animation: premiumSkeletonShimmer 3s ease-in-out infinite;
+   575→}
+   576→
+   577→/* Subtle gold-tinted shimmer variant for accent elements */
+   578→.premium-shimmer-gold {
+   579→  background: linear-gradient(
+   580→    110deg,
+   581→    #111111 0%,
+   582→    #111111 40%,
+   583→    #161410 50%,
+   584→    #111111 60%,
+   585→    #111111 100%
+   586→  );
+   587→  background-size: 300% 100%;
+   588→  animation: premiumSkeletonShimmer 3s ease-in-out infinite;
+   589→}
+   590→
+   591→@keyframes premiumSkeletonShimmer {
+   592→  0% { transform: translateX(100%); }
+   593→  100% { transform: translateX(-100%); }
+   594→}
+   595→
+   596→/* Skeleton entrance — transform only, never opacity:0 */
+   597→.skeleton-entrance {
+   598→  animation: skeletonEntrance 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+   599→}
+   600→@keyframes skeletonEntrance {
+   601→  from {
+   602→    transform: translateY(2px);
+   603→  }
+   604→  to {
+   605→    transform: translateY(0);
+   606→  }
+   607→}
+   608→
+   609→/* ═══════════════════════════════════════════
+   610→   Premium Empty State Animation
+   611→   ═══════════════════════════════════════════ */
+   612→
+   613→/* Gentle entrance for empty states — transform only, never opacity:0 */
+   614→@keyframes emptyStateEnter {
+   615→  from {
+   616→    transform: translateY(3px);
+   617→  }
+   618→  to {
+   619→    transform: translateY(0);
+   620→  }
+   621→}
+   622→.empty-state-enter {
+   623→  animation: emptyStateEnter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+   624→}
+   625→
+   626→/* ═══════════════════════════════════════════
+   627→   Premium Error State Animations
+   628→   ═══════════════════════════════════════════ */
+   629→
+   630→/* Gentle entrance for error states — transform only, never opacity:0 */
+   631→@keyframes errorStateEnter {
+   632→  from {
+   633→    transform: translateY(3px);
+   634→  }
+   635→  to {
+   636→    transform: translateY(0);
+   637→  }
+   638→}
+   639→.error-state-enter {
+   640→  animation: errorStateEnter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+   641→}
+   642→
+   643→/* Subtle pulse for error icon — calm breathing, not urgent */
+   644→@keyframes errorIconPulse {
+   645→  0%, 100% { opacity: 0.5; }
+   646→  50% { opacity: 0.7; }
+   647→}
+   648→.error-icon-pulse {
+   649→  animation: errorIconPulse 3s ease-in-out infinite;
+   650→}
+   651→
+   652→/* Retry button press feedback */
+   653→@keyframes retryPress {
+   654→  0% { transform: scale(1); }
+   655→  50% { transform: scale(0.96); }
+   656→  100% { transform: scale(1); }
+   657→}
+   658→.retry-press {
+   659→  animation: retryPress 0.2s ease-out;
+   660→}
+   661→
+   662→/* Retry spinner for loading retry state */
+   663→@keyframes retrySpin {
+   664→  from { transform: rotate(0deg); }
+   665→  to { transform: rotate(360deg); }
+   666→}
+   667→.retry-spin {
+   668→  animation: retrySpin 0.8s linear infinite;
+   669→}
+   670→
+   671→/* Respect reduced motion preferences — disable error animations */
+   672→@media (prefers-reduced-motion: reduce) {
+   673→  .error-state-enter {
+   674→    animation: none;
+   675→  }
+   676→  .error-icon-pulse {
+   677→    animation: none;
+   678→  }
+   679→}
+   680→
+   681→/* Archive badge pulse */
+   682→.archive-badge {
+   683→  animation: archivePulse 2s ease-in-out infinite;
+   684→}
+   685→@keyframes archivePulse {
+   686→  0%, 100% { opacity: 0.7; }
+   687→  50% { opacity: 1; }
+   688→}
+   689→
+   690→/* Thread hover glow */
+   691→.thread-item:hover {
+   692→  box-shadow: inset 0 0 0 1px rgba(200, 165, 90, 0.08);
+   693→}
+   694→
+   695→/* ═══════════════════════════════════════════
+   696→   Sidebar Transitions
+   697→   ═══════════════════════════════════════════ */
+   698→
+   699→.sidebar-transition {
+   700→  transition: width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+   701→}
+   702→
+   703→/* ═══════════════════════════════════════════
+   704→   Component-specific
+   705→   ═══════════════════════════════════════════ */
+   706→
+   707→/* Message counter pill hover */
+   708→.message-counter-pill {
+   709→  transition: all var(--transition-base);
+   710→}
+   711→.message-counter-pill:hover {
+   712→  border-color: #3a3a3a;
+   713→  background-color: #1a1a1a;
+   714→}
+   715→
+   716→/* Insight card — border-only hover, no transform (avoids stuck :hover on mobile) */
+   717→.insight-card {
+   718→  transition: border-color var(--transition-base);
+   719→  /* Override global min-height:44px on <a> — card padding provides sufficient tap target */
+   720→  min-height: 0;
+   721→}
+   722→/* Prevent inherited border-color from creating visible borders on insight card children.
+   723→   The global * { border-color } + preflight border:0 solid means any child that
+   724→   accidentally gets a non-zero border-width would show a dark #1a1a1a rectangle. */
+   725→.insight-card > * {
+   726→  border-width: 0;
+   727→}
+   728→@media (hover: hover) {
+   729→  .insight-card:hover {
+   730→    border-color: rgba(200, 165, 90, 0.15);
+   731→  }
+   732→}
+   733→/* Override global a:active opacity — insight cards use touch-press scale instead */
+   734→@media (hover: none) and (pointer: coarse) {
+   735→  .insight-card:active {
+   736→    opacity: 1;
+   737→  }
+   738→}
+   739→
+   740→/* Progress bar smooth animation — uses dedicated class instead of
+   741→   broad .h-1.5 > div selector which could affect non-progress children */
+   742→.progress-bar-fill-animated {
+   743→  transition: width 0.7s ease-out, background-color 0.5s ease;
+   744→}
+   745→/* Legacy selector retained for existing usage, scoped more tightly */
+   746→.progress-bar-track > div,
+   747→.h-1\.5 > div {
+   748→  transition: width 0.7s ease-out, background-color 0.5s ease;
+   749→}
+   750→
+   751→/* Line clamp utility */
+   752→.line-clamp-2 {
+   753→  display: -webkit-box;
+   754→  -webkit-line-clamp: 2;
+   755→  -webkit-box-orient: vertical;
+   756→  overflow: hidden;
+   757→}
+   758→
+   759→/* ═══════════════════════════════════════════
+   760→   Emotional Hero Section
+   761→   ═══════════════════════════════════════════ */
+   762→
+   763→/* Hero container */
+   764→.hero-section-container {
+   765→  position: relative;
+   766→}
+   767→
+   768→/* Hero card */
+   769→.hero-section-card {
+   770→  position: relative;
+   771→  background: #0a0a0a;
+   772→  border: 1px solid #1a1a1a;
+   773→  border-radius: 1rem;
+   774→  padding: 1.75rem 2rem;
+   775→  overflow: hidden;
+   776→}
+   777→
+   778→/* Hero entrance — transform only, never opacity:0 */
+   779→@keyframes heroFadeIn {
+   780→  from {
+   781→    transform: translateY(3px);
+   782→  }
+   783→  to {
+   784→    transform: translateY(0);
+   785→  }
+   786→}
+   787→.hero-fade-in {
+   788→  animation: heroFadeIn 0.55s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+   789→}
+   790→
+   791→/* Subtle gold pulse for status icon */
+   792→@keyframes heroPulseGold {
+   793→  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+   794→  50% { box-shadow: 0 0 0 6px rgba(200, 165, 90, 0.06); }
+   795→}
+   796→.hero-pulse-gold {
+   797→  animation: heroPulseGold 3s ease-in-out infinite;
+   798→}
+   799→
+   800→/* Warm pulse for overloaded state */
+   801→@keyframes heroPulseWarm {
+   802→  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 111, 58, 0); }
+   803→  50% { box-shadow: 0 0 0 6px rgba(139, 111, 58, 0.06); }
+   804→}
+   805→.hero-pulse-warm {
+   806→  animation: heroPulseWarm 3s ease-in-out infinite;
+   807→}
+   808→
+   809→/* Ring transition for metric circles */
+   810→.hero-ring-transition {
+   811→  transition: stroke-dashoffset 1s ease-out, stroke 0.5s ease;
+   812→}
+   813→
+   814→/* Hero subtle inner glow line */
+   815→.hero-glow {
+   816→  border-radius: 1rem;
+   817→}
+   818→
+   819→/* ═══════════════════════════════════════════
+   820→   Onboarding Animations
+   821→   ═══════════════════════════════════════════ */
+   822→
+   823→/* Step entrance animation */
+   824→@keyframes onboardingStepIn {
+   825→  from {
+   826→    opacity: 0;
+   827→    transform: translateX(24px);
+   828→  }
+   829→  to {
+   830→    opacity: 1;
+   831→    transform: translateX(0);
+   832→  }
+   833→}
+   834→
+   835→/* Step exit animation */
+   836→@keyframes onboardingStepOut {
+   837→  from {
+   838→    opacity: 1;
+   839→    transform: translateX(0);
+   840→  }
+   841→  to {
+   842→    opacity: 0;
+   843→    transform: translateX(-24px);
+   844→  }
+   845→}
+   846→
+   847→.onboarding-step-enter {
+   848→  animation: onboardingStepIn 0.4s ease-out both;
+   849→}
+   850→
+   851→.onboarding-step-exit {
+   852→  animation: onboardingStepOut 0.25s ease-in both;
+   853→}
+   854→
+   855→/* Welcome logo entrance */
+   856→@keyframes onboardingLogoIn {
+   857→  from {
+   858→    opacity: 0;
+   859→    transform: scale(0.8);
+   860→  }
+   861→  to {
+   862→    opacity: 1;
+   863→    transform: scale(1);
+   864→  }
+   865→}
+   866→.onboarding-logo-enter {
+   867→  animation: onboardingLogoIn 0.6s ease-out both;
+   868→}
+   869→
+   870→/* Option card pop on selection */
+   871→@keyframes onboardingOptionPop {
+   872→  0% { transform: scale(1); }
+   873→  50% { transform: scale(1.04); }
+   874→  100% { transform: scale(1); }
+   875→}
+   876→.onboarding-option-pop {
+   877→  animation: onboardingOptionPop 0.3s ease-out;
+   878→}
+   879→
+   880→/* Completion glow */
+   881→@keyframes onboardingCompleteGlow {
+   882→  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+   883→  50% { box-shadow: 0 0 40px 8px rgba(200, 165, 90, 0.1); }
+   884→}
+   885→.onboarding-complete-glow {
+   886→  animation: onboardingCompleteGlow 2s ease-in-out infinite;
+   887→}
+   888→
+   889→/* Progress bar for onboarding steps */
+   890→.onboarding-progress-fill {
+   891→  transition: width 0.5s ease-out;
+   892→}
+   893→
+   894→/* ═══════════════════════════════════════════
+   895→   Weekly Recap Section
+   896→   ═══════════════════════════════════════════ */
+   897→
+   898→/* Recap entrance — transform only, never opacity:0, no delay */
+   899→@keyframes recapFadeIn {
+   900→  from {
+   901→    transform: translateY(3px);
+   902→  }
+   903→  to {
+   904→    transform: translateY(0);
+   905→  }
+   906→}
+   907→.recap-fade-in {
+   908→  animation: recapFadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+   909→}
+   910→
+   911→/* Ring transition for recap score circle */
+   912→.recap-ring-transition {
+   913→  transition: stroke-dashoffset 1.2s ease-out, stroke 0.5s ease;
+   914→}
+   915→
+   916→/* Bar transition for recap metric bars */
+   917→.recap-bar-transition {
+   918→  transition: width 0.8s ease-out, background-color 0.5s ease;
+   919→}
+   920→
+   921→/* ═══════════════════════════════════════════
+   922→   Editorial Typography System
+   923→   ═══════════════════════════════════════════ */
+   924→
+   925→/* Page title — emotional presence */
+   926→.title-page {
+   927→  font-size: 1.5rem;
+   928→  font-weight: 700;
+   929→  letter-spacing: -0.02em;
+   930→  line-height: 1.2;
+   931→  color: #FFFFFF;
+   932→}
+   933→@media (min-width: 640px) {
+   934→  .title-page {
+   935→    font-size: 1.875rem;
+   936→  }
+   937→}
+   938→
+   939→/* Section title — quiet authority */
+   940→.title-section {
+   941→  font-size: 1.125rem;
+   942→  font-weight: 600;
+   943→  letter-spacing: -0.01em;
+   944→  line-height: 1.3;
+   945→  color: #FFFFFF;
+   946→}
+   947→@media (min-width: 640px) {
+   948→  .title-section {
+   949→    font-size: 1.25rem;
+   950→  }
+   951→}
+   952→
+   953→/* Subtitle — silent accompaniment */
+   954→.subtitle-silent {
+   955→  font-size: 0.8125rem;
+   956→  font-weight: 400;
+   957→  color: #777;
+   958→  line-height: 1.5;
+   959→  letter-spacing: 0.01em;
+   960→}
+   961→@media (min-width: 640px) {
+   962→  .subtitle-silent {
+   963→    font-size: 0.875rem;
+   964→  }
+   965→}
+   966→
+   967→/* Label — discrete, uppercase */
+   968→.label-discrete {
+   969→  font-size: 0.625rem;
+   970→  font-weight: 600;
+   971→  text-transform: uppercase;
+   972→  letter-spacing: 0.08em;
+   973→  color: #555;
+   974→}
+   975→
+   976→/* Number with emotional weight */
+   977→.number-emotional {
+   978→  font-size: 1.5rem;
+   979→  font-weight: 700;
+   980→  letter-spacing: -0.03em;
+   981→  line-height: 1;
+   982→  font-variant-numeric: tabular-nums;
+   983→}
+   984→@media (min-width: 640px) {
+   985→  .number-emotional {
+   986→    font-size: 2rem;
+   987→  }
+   988→}
+   989→
+   990→/* Observation — human, with space */
+   991→.text-observation {
+   992→  font-size: 0.8125rem;
+   993→  font-weight: 400;
+   994→  color: #888;
+   995→  line-height: 1.65;
+   996→  letter-spacing: 0.01em;
+   997→}
+   998→
+   999→/* Contextual hint — the quietest text */
+  1000→.text-whisper {
+  1001→  font-size: 0.6875rem;
+  1002→  color: #444;
+  1003→  line-height: 1.5;
+  1004→}
+  1005→
+  1006→/* ═══════════════════════════════════════════
+  1007→   Editorial Spacing System — breathe, rhythm
+  1008→   ═══════════════════════════════════════════ */
+  1009→
+  1010→/* Vertical rhythm between sections */
+  1011→.rhythm-section {
+  1012→  margin-top: 2.5rem;
+  1013→}
+  1014→@media (min-width: 640px) {
+  1015→  .rhythm-section {
+  1016→    margin-top: 3.5rem;
+  1017→  }
+  1018→}
+  1019→
+  1020→/* Vertical rhythm between elements within a section */
+  1021→.rhythm-element {
+  1022→  margin-top: 1.25rem;
+  1023→}
+  1024→@media (min-width: 640px) {
+  1025→  .rhythm-element {
+  1026→    margin-top: 1.5rem;
+  1027→  }
+  1028→}
+  1029→
+  1030→/* Breathing space — intentional emptiness */
+  1031→.space-breathe {
+  1032→  padding-top: 1rem;
+  1033→  padding-bottom: 1rem;
+  1034→}
+  1035→@media (min-width: 640px) {
+  1036→  .space-breathe {
+  1037→    padding-top: 1.5rem;
+  1038→    padding-bottom: 1.5rem;
+  1039→  }
+  1040→}
+  1041→
+  1042→/* Unified page container — consistent max-width */
+  1043→.page-container {
+  1044→  max-width: 42rem;
+  1045→  margin-left: auto;
+  1046→  margin-right: auto;
+  1047→}
+  1048→
+  1049→/* Wide page container — for data-heavy pages like Finanzas */
+  1050→.page-container-wide {
+  1051→  max-width: 64rem;
+  1052→  margin-left: auto;
+  1053→  margin-right: auto;
+  1054→}
+  1055→
+  1056→/* ═══════════════════════════════════════════
+  1057→   Borderless Surface System — less boxes, more air
+  1058→   ═══════════════════════════════════════════ */
+  1059→
+  1060→/* Surface — replaces card when you want section
+  1061→   separation without visible borders */
+  1062→.surface {
+  1063→  background: #0a0a0a;
+  1064→  border-radius: 1rem;
+  1065→  padding: 1.5rem;
+  1066→}
+  1067→@media (min-width: 640px) {
+  1068→  .surface {
+  1069→    padding: 2rem;
+  1070→  }
+  1071→}
+  1072→
+  1073→/* Surface with subtle border — for sections that need
+  1074→   minimal visual containment */
+  1075→.surface-bordered {
+  1076→  background: #0a0a0a;
+  1077→  border: 1px solid #1a1a1a;
+  1078→  border-radius: 1rem;
+  1079→  padding: 1.5rem;
+  1080→}
+  1081→@media (min-width: 640px) {
+  1082→  .surface-bordered {
+  1083→    padding: 2rem;
+  1084→  }
+  1085→}
+  1086→
+  1087→/* Surface with gold accent — for premium/emphasis sections */
+  1088→.surface-accent {
+  1089→  background: #0a0a0a;
+  1090→  border: 1px solid rgba(200, 165, 90, 0.12);
+  1091→  border-radius: 1rem;
+  1092→  padding: 1.5rem;
+  1093→}
+  1094→@media (min-width: 640px) {
+  1095→  .surface-accent {
+  1096→    padding: 2rem;
+  1097→  }
+  1098→}
+  1099→
+  1100→/* Divider — editorial, not UI */
+  1101→.divider-editorial {
+  1102→  border: none;
+  1103→  height: 1px;
+  1104→  background: #1a1a1a;
+  1105→  margin: 2rem 0;
+  1106→}
+  1107→
+  1108→/* ═══════════════════════════════════════════
+  1109→   Depth Overlay — not paywall, depth
+  1110→   ═══════════════════════════════════════════ */
+  1111→
+  1112→/* Depth gate — replaces "paywall" feeling with "deeper layers" */
+  1113→.depth-gate-overlay {
+  1114→  background: linear-gradient(
+  1115→    180deg,
+  1116→    rgba(0, 0, 0, 0) 0%,
+  1117→    rgba(0, 0, 0, 0.6) 30%,
+  1118→    rgba(0, 0, 0, 0.85) 100%
+  1119→  );
+  1120→}
+  1121→
+  1122→/* ═══════════════════════════════════════════
+  1123→   Mobile Responsive Helpers
+  1124→   ═══════════════════════════════════════════ */
+  1125→
+  1126→/* Reduce card padding on mobile for better density */
+  1127→@media (max-width: 767px) {
+  1128→  .card-primary {
+  1129→    border-radius: 0.875rem;
+  1130→  }
+  1131→  .hero-section-card {
+  1132→    padding: 1.125rem;
+  1133→    border-radius: 0.875rem;
+  1134→  }
+  1135→  .pill {
+  1136→    font-size: 10px;
+  1137→    padding: 0.375rem 0.75rem;
+  1138→  }
+  1139→  /* Smaller icon containers on mobile */
+  1140→  .icon-sm {
+  1141→    width: 2rem;
+  1142→    height: 2rem;
+  1143→  }
+  1144→  .icon-md {
+  1145→    width: 2.25rem;
+  1146→    height: 2.25rem;
+  1147→  }
+  1148→  .icon-lg {
+  1149→    width: 2.5rem;
+  1150→    height: 2.5rem;
+  1151→  }
+  1152→  .icon-xl {
+  1153→    width: 2.75rem;
+  1154→    height: 2.75rem;
+  1155→  }
+  1156→}
+  1157→
+  1158→/* iPhone bottom safe area padding for fixed elements */
+  1159→.safe-bottom {
+  1160→  padding-bottom: env(safe-area-inset-bottom, 0px);
+  1161→}
+  1162→
+  1163→/* iPhone top safe area padding for fixed elements */
+  1164→.safe-top {
+  1165→  padding-top: env(safe-area-inset-top, 0px);
+  1166→}
+  1167→
+  1168→/* ═══════════════════════════════════════════
+  1169→   Premium Mobile Refinements
+  1170→   ═══════════════════════════════════════════ */
+  1171→
+  1172→/* Prevent iOS bounce overscroll on scroll containers */
+  1173→@media (max-width: 767px) {
+  1174→  .scroll-contain {
+  1175→    overscroll-behavior-y: contain;
+  1176→  }
+  1177→}
+  1178→
+  1179→/* Keyboard-aware layout: when virtual keyboard is open on iOS,
+  1180→   dvh units adjust. This class ensures content doesn't get hidden. */
+  1181→@media (max-width: 767px) {
+  1182→  .keyboard-aware {
+  1183→    position: relative;
+  1184→  }
+  1185→  /* When input is focused, ensure the parent scrolls to reveal it */
+  1186→  .keyboard-aware:has(input:focus, textarea:focus) {
+  1187→    scroll-padding-bottom: 200px;
+  1188→  }
+  1189→}
+  1190→
+  1191→/* Active press state for touch feedback — subtle scale-down */
+  1192→@media (hover: none) and (pointer: coarse) {
+  1193→  .touch-press:active {
+  1194→    transform: scale(0.98);
+  1195→    transition: transform 0.12s ease;
+  1196→  }
+  1197→  .touch-press-sm:active {
+  1198→    transform: scale(0.96);
+  1199→    transition: transform 0.12s ease;
+  1200→  }
+  1201→}
+  1202→
+  1203→/* Improved mobile text readability */
+  1204→@media (max-width: 767px) {
+  1205→  /* Prevent awkward text breaks on small screens */
+  1206→  h1, h2, h3 {
+  1207→    hyphens: auto;
+  1208→    overflow-wrap: break-word;
+  1209→  }
+  1210→  /* Slightly tighter line-height on mobile for density */
+  1211→  .text-mobile-compact {
+  1212→    line-height: 1.35;
+  1213→  }
+  1214→}
+  1215→
+  1216→/* Mobile-specific: reduce section spacing for denser layout */
+  1217→@media (max-width: 767px) {
+  1218→  .mobile-space-y > * + * {
+  1219→    margin-top: 0.75rem;
+  1220→  }
+  1221→}
+  1222→
+  1223→/* Fix: prevent horizontal overflow from edge-to-edge elements */
+  1224→.overflow-x-contain {
+  1225→  overflow-x: hidden;
+  1226→}
+  1227→
+  1228→/* ═══════════════════════════════════════════
+  1229→   Premium Mobile Responsive Refinements — Phase 6
+  1230→   ═══════════════════════════════════════════ */
+  1231→
+  1232→/* Better modal scrolling on mobile — ensure overlay content scrolls when keyboard is open */
+  1233→@media (max-width: 767px) {
+  1234→  .modal-content {
+  1235→    overflow-y: auto;
+  1236→    -webkit-overflow-scrolling: touch;
+  1237→    overscroll-behavior-y: contain;
+  1238→  }
+  1239→  .modal-content-destructive {
+  1240→    overflow-y: auto;
+  1241→    -webkit-overflow-scrolling: touch;
+  1242→    overscroll-behavior-y: contain;
+  1243→  }
+  1244→}
+  1245→
+  1246→/* Landscape phone adjustments — prevent overly stretched layouts */
+  1247→@media (max-height: 500px) and (orientation: landscape) {
+  1248→  .hero-section-card {
+  1249→    padding: 0.875rem 1.25rem;
+  1250→  }
+  1251→}
+  1252→
+  1253→/* Tablet landscape — slightly larger grid cells for better visual density */
+  1254→@media (min-width: 768px) and (max-width: 1023px) {
+  1255→  .icon-md {
+  1256→    width: 2.75rem;
+  1257→    height: 2.75rem;
+  1258→  }
+  1259→}
+  1260→
+  1261→/* Ensure history card rows don't clip on narrow phones (< 360px) */
+  1262→@media (max-width: 359px) {
+  1263→  .card-inner {
+  1264→    padding: 0.625rem;
+  1265→  }
+  1266→}
+  1267→
+  1268→/* ═══════════════════════════════════════════
+  1269→   Mobile Scroll Locking
+  1270→   ═══════════════════════════════════════════ */
+  1271→
+  1272→/* When sidebar or modal is open, lock body scroll to prevent
+  1273→   background scrolling on mobile. Applied via JS class toggle. */
+  1274→body.scroll-locked {
+  1275→  overflow: hidden;
+  1276→  /* NOTE: position:fixed was removed — it caused viewport collapse and
+  1277→     touch input issues in Android TWA/WebView. When <body> gets
+  1278→     position:fixed, the entire document leaves the scroll context,
+  1279→     which breaks Chrome's compositor in TWA mode and can freeze the
+  1280→     app. overflow:hidden alone is sufficient to prevent background
+  1281→     scrolling behind modals and overlays on all platforms. */
+  1282→}
+  1283→
+  1284→/* REMOVED: CSS :has() scroll-lock mechanism.
+  1285→   Previously, body:has(.modal-backdrop) and body:has(.premium-modal-backdrop)
+  1286→   applied overflow:hidden on mobile, creating a DUPLICATE scroll-lock that
+  1287→   raced with the JS body.scroll-locked mechanism. This caused race conditions
+  1288→   on Android where the CSS lock persisted briefly after JS cleanup, triggering
+  1289→   reflow loops. The JS scroll-locked system is now the single source of truth. */
+  1290→
+  1291→/* ═══════════════════════════════════════════
+  1292→   iPhone Safari Bottom Bar Fix
+  1293→   ═══════════════════════════════════════════ */
+  1294→
+  1295→/* On iOS Safari, the bottom bar can overlap fixed elements.
+  1296→   Use dvh for heights to account for dynamic viewport. */
+  1297→@supports (height: 100dvh) {
+  1298→  .h-screen-safe {
+  1299→    height: 100dvh;
+  1300→  }
+  1301→  .min-h-screen-safe {
+  1302→    min-height: 100dvh;
+  1303→  }
+  1304→}
+  1305→
+  1306→/* ═══════════════════════════════════════════
+  1307→   Premium Mobile Engagement Polish
+  1308→   ═══════════════════════════════════════════ */
+  1309→
+  1310→/* Staggered entrance — transform only, never opacity:0.
+  1311→   Reduced delays to prevent compositing stalls. */
+  1312→@keyframes staggerIn {
+  1313→  from {
+  1314→    transform: translateY(3px);
+  1315→  }
+  1316→  to {
+  1317→    transform: translateY(0);
+  1318→  }
+  1319→}
+  1320→.stagger-1 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.03s; }
+  1321→.stagger-2 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.06s; }
+  1322→.stagger-3 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.09s; }
+  1323→.stagger-4 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.12s; }
+  1324→.stagger-5 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.15s; }
+  1325→.stagger-6 { animation: staggerIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; animation-delay: 0.18s; }
+  1326→
+  1327→/* Micro-celebration — brief scale pop for completed actions.
+  1328→   Applied via JS class toggle for 0.4s then removed. */
+  1329→@keyframes microCelebrate {
+  1330→  0% { transform: scale(1); }
+  1331→  50% { transform: scale(1.03); }
+  1332→  100% { transform: scale(1); }
+  1333→}
+  1334→.micro-celebrate {
+  1335→  animation: microCelebrate 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  1336→}
+  1337→
+  1338→/* Streak pulse — gentle breathing glow for streak indicators (🔥) */
+  1339→@keyframes streakPulse {
+  1340→  0%, 100% { opacity: 1; transform: scale(1); }
+  1341→  50% { opacity: 0.9; transform: scale(1.04); }
+  1342→}
+  1343→.streak-pulse {
+  1344→  animation: streakPulse 3.5s ease-in-out infinite;
+  1345→  display: inline-block;
+  1346→}
+  1347→
+  1348→/* Gentle card entrance — transform only, never opacity:0 */
+  1349→@keyframes cardEnter {
+  1350→  from {
+  1351→    transform: translateY(3px);
+  1352→  }
+  1353→  to {
+  1354→    transform: translateY(0);
+  1355→  }
+  1356→}
+  1357→.card-enter {
+  1358→  animation: cardEnter 0.45s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  1359→}
+  1360→
+  1361→/* Button active press feedback — stronger than touch-press, for primary actions */
+  1362→.btn-primary:active:not(:disabled) {
+  1363→  transform: scale(0.98);
+  1364→  transition: transform 0.12s ease, background-color 0.2s ease;
+  1365→}
+  1366→
+  1367→/* Value slider button active feedback */
+  1368→.value-btn:active {
+  1369→  transform: scale(0.95);
+  1370→  transition: transform 0.12s ease;
+  1371→}
+  1372→
+  1373→/* Link tap feedback — subtle opacity shift on mobile.
+  1374→   Excludes links that already have touch-press scale feedback
+  1375→   to avoid double visual feedback (scale + opacity). */
+  1376→@media (hover: none) and (pointer: coarse) {
+  1377→  a:active:not(.touch-press):not(.touch-press-sm):not(.insight-card) {
+  1378→    opacity: 0.7;
+  1379→    transition: opacity 0.1s ease;
+  1380→  }
+  1381→}
+  1382→
+  1383→/* Gentle breathing pulse for loading/waiting states */
+  1384→@keyframes gentlePulse {
+  1385→  0%, 100% { opacity: 0.4; }
+  1386→  50% { opacity: 0.8; }
+  1387→}
+  1388→.gentle-pulse {
+  1389→  animation: gentlePulse 3s ease-in-out infinite;
+  1390→}
+  1391→
+  1392→/* Check mark celebration — small pop when a check appears */
+  1393→@keyframes checkPop {
+  1394→  0% { transform: scale(0); opacity: 0; }
+  1395→  60% { transform: scale(1.2); opacity: 1; }
+  1396→  100% { transform: scale(1); opacity: 1; }
+  1397→}
+  1398→.check-pop {
+  1399→  animation: checkPop 0.35s ease-out both;
+  1400→}
+  1401→
+  1402→/* Warmer fallback text style — for "No disponible" states */
+  1403→.fallback-warm {
+  1404→  color: #555;
+  1405→  font-style: italic;
+  1406→  font-size: 0.6875rem;
+  1407→}
+  1408→
+  1409→/* Progress bar subtle glow when at 100% */
+  1410→@keyframes progressGlow {
+  1411→  0%, 100% { box-shadow: 0 0 4px rgba(200, 165, 90, 0); }
+  1412→  50% { box-shadow: 0 0 8px rgba(200, 165, 90, 0.3); }
+  1413→}
+  1414→.progress-complete {
+  1415→  animation: progressGlow 2s ease-in-out infinite;
+  1416→}
+  1417→
+  1418→/* Respect reduced motion for all engagement polish */
+  1419→@media (prefers-reduced-motion: reduce) {
+  1420→  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6 {
+  1421→    animation: none;
+  1422→  }
+  1423→  .micro-celebrate {
+  1424→    animation: none;
+  1425→  }
+  1426→  .streak-pulse {
+  1427→    animation: none;
+  1428→  }
+  1429→  .card-enter {
+  1430→    animation: none;
+  1431→  }
+  1432→  .check-pop {
+  1433→    animation: none;
+  1434→  }
+  1435→  .progress-complete {
+  1436→    animation: none;
+  1437→  }
+  1438→  .gentle-pulse {
+  1439→    animation: none;
+  1440→  }
+  1441→}
+  1442→
+  1443→/* Onboarding option touch feedback — same as touch-press but for
+  1444→   the selection cards that don't have the class */
+  1445→@media (hover: none) and (pointer: coarse) {
+  1446→  .onboarding-option-press:active {
+  1447→    transform: scale(0.97);
+  1448→    transition: transform 0.1s ease;
+  1449→  }
+  1450→}
+  1451→
+  1452→/* ═══════════════════════════════════════════
+  1453→   Premium Mobile Engagement Polish — Phase 2
+  1454→   ═══════════════════════════════════════════ */
+  1455→
+  1456→/* Smooth expand/collapse — for form sections that toggle visibility.
+  1457→   Wrap content in this class; toggle with max-height + opacity via JS or
+  1458→   use with grid-template-rows: 0fr → 1fr pattern. */
+  1459→.smooth-expand {
+  1460→  display: grid;
+  1461→  grid-template-rows: 1fr;
+  1462→  transition: grid-template-rows 0.3s ease-out, opacity 0.25s ease-out;
+  1463→  opacity: 1;
+  1464→}
+  1465→.smooth-expand.collapsed {
+  1466→  grid-template-rows: 0fr;
+  1467→  opacity: 0;
+  1468→}
+  1469→.smooth-expand > div {
+  1470→  overflow: hidden;
+  1471→}
+  1472→
+  1473→/* Success flash — brief green-gold highlight for saved/completed actions */
+  1474→@keyframes successFlash {
+  1475→  0% { background-color: rgba(200, 165, 90, 0); }
+  1476→  30% { background-color: rgba(200, 165, 90, 0.08); }
+  1477→  100% { background-color: rgba(200, 165, 90, 0); }
+  1478→}
+  1479→.success-flash {
+  1480→  animation: successFlash 0.8s ease-out;
+  1481→}
+  1482→
+  1483→/* ═══════════════════════════════════════════
+  1484→   Breathing Timer — Premium Stable Experience
+  1485→   ═══════════════════════════════════════════
+  1486→   Strategy: EVERYTHING stays 100% solid and stable.
+  1487→   Only the outer ring border animates — extremely subtle.
+  1488→   Counter, buttons, text, background: all FIXED.
+  1489→   NO background fill of any kind. Pure black.
+  1490→   Premium = calm, stable, elegant. */
+  1491→
+  1492→/* Ring glow — the ONLY animated element. Border only, NO fill.
+  1493→   A very faint gold border that breathes. Background stays black. */
+  1494→@keyframes breathingRingGlow {
+  1495→  0%, 100% { opacity: 0.15; }
+  1496→  50% { opacity: 0.35; }
+  1497→}
+  1498→
+  1499→.breathing-ring {
+  1500→  position: relative;
+  1501→  /* NO animation on parent — keeps all child text solid */
+  1502→}
+  1503→.breathing-ring::after {
+  1504→  content: '';
+  1505→  position: absolute;
+  1506→  inset: -8px;
+  1507→  border-radius: 1rem;
+  1508→  border: 1px solid rgba(200, 165, 90, 1);
+  1509→  background: none;
+  1510→  z-index: -1;
+  1511→  animation: breathingRingGlow 4s ease-in-out infinite;
+  1512→}
+  1513→
+  1514→/* Counter — STATIC. Gentle constant aura, no animation. */
+  1515→.breathing-counter {
+  1516→  text-shadow: 0 0 12px rgba(200, 165, 90, 0.20);
+  1517→}
+  1518→
+  1519→/* Pause button — STATIC. Constant border, no animation. */
+  1520→.breathing-btn-outline {
+  1521→  border-color: rgba(200, 165, 90, 0.30);
+  1522→}
+  1523→
+  1524→/* Breathing completion overlay — instant, sharp, no blur */
+  1525→.breathing-complete-backdrop {
+  1526→  background: rgba(0, 0, 0, 0.85);
+  1527→  -webkit-backdrop-filter: none;
+  1528→  backdrop-filter: none;
+  1529→  z-index: 60; /* Above MicroReward z-50 */
+  1530→}
+  1531→.breathing-complete-content {
+  1532→  background: #0a0a0a;
+  1533→  border: 1px solid rgba(200, 165, 90, 0.3);
+  1534→  border-radius: 1rem;
+  1535→  /* No animation — instant render for crisp text */
+  1536→}
+  1537→@media (max-width: 767px) {
+  1538→  .breathing-complete-content {
+  1539→    border-radius: 1.25rem 1.25rem 0 0;
+  1540→    max-height: 85dvh;
+  1541→    overflow-y: auto;
+  1542→    margin-top: auto;
+  1543→    width: 100%;
+  1544→    padding: 1.5rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
+  1545→  }
+  1546→}
+  1547→
+  1548→/* Warm loading message — for empire page skeletons */
+  1549→.warm-loading-msg {
+  1550→  color: var(--color-champagne);
+  1551→  font-size: 0.6875rem;
+  1552→  letter-spacing: 0.08em;
+  1553→  text-transform: uppercase;
+  1554→  font-weight: 500;
+  1555→  opacity: 0.5;
+  1556→}
+  1557→
+  1558→/* Section enter — transform only, reduced delays */
+  1559→.section-enter-1 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.03s; }
+  1560→.section-enter-2 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.06s; }
+  1561→.section-enter-3 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.09s; }
+  1562→.section-enter-4 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.12s; }
+  1563→.section-enter-5 { animation: cardEnter 0.3s ease-out forwards; animation-delay: 0.15s; }
+  1564→
+  1565→/* Observation enter — gentle fade + slight rise for Patrones de Vida */
+  1566→@keyframes observationEnter {
+  1567→  from {
+  1568→    opacity: 0;
+  1569→    transform: translateY(8px);
+  1570→  }
+  1571→  to {
+  1572→    opacity: 1;
+  1573→    transform: translateY(0);
+  1574→  }
+  1575→}
+  1576→.observation-enter {
+  1577→  animation: observationEnter 0.5s ease-out forwards;
+  1578→}
+  1579→
+  1580→/* ═══════════════════════════════════════════
+  1581→   Etapas — Contemplative Timeline
+  1582→   ═══════════════════════════════════════════ */
+  1583→
+  1584→/* Header gradient accent — editorial presence */
+  1585→.etapas-header {
+  1586→  position: relative;
+  1587→}
+  1588→.etapas-header::after {
+  1589→  content: '';
+  1590→  position: absolute;
+  1591→  bottom: -8px;
+  1592→  left: 0;
+  1593→  width: 48px;
+  1594→  height: 1px;
+  1595→  background: linear-gradient(90deg, rgba(200, 165, 90, 0.25), transparent);
+  1596→}
+  1597→
+  1598→/* Stage card — glassmorphism whisper */
+  1599→.etapas-stage-card {
+  1600→  opacity: 0;
+  1601→  animation: etapasStageEnter 0.5s ease-out forwards;
+  1602→}
+  1603→@keyframes etapasStageEnter {
+  1604→  from {
+  1605→    opacity: 0;
+  1606→    transform: translateY(6px);
+  1607→  }
+  1608→  to {
+  1609→    opacity: 1;
+  1610→    transform: translateY(0);
+  1611→  }
+  1612→}
+  1613→
+  1614→/* Transition item — gentle fade */
+  1615→.etapas-transition-item {
+  1616→  opacity: 0;
+  1617→  animation: etapasSubtleEnter 0.4s ease-out forwards;
+  1618→}
+  1619→
+  1620→/* Memory item — gentle fade */
+  1621→.etapas-memory-item {
+  1622→  opacity: 0;
+  1623→  animation: etapasSubtleEnter 0.4s ease-out forwards;
+  1624→}
+  1625→
+  1626→/* Pattern item — gentle fade */
+  1627→.etapas-pattern-item {
+  1628→  opacity: 0;
+  1629→  animation: etapasSubtleEnter 0.4s ease-out forwards;
+  1630→}
+  1631→
+  1632→@keyframes etapasSubtleEnter {
+  1633→  from {
+  1634→    opacity: 0;
+  1635→  }
+  1636→  to {
+  1637→    opacity: 1;
+  1638→  }
+  1639→}
+  1640→
+  1641→/* Respect reduced motion for Etapas animations */
+  1642→@media (prefers-reduced-motion: reduce) {
+  1643→  .etapas-stage-card,
+  1644→  .etapas-transition-item,
+  1645→  .etapas-memory-item,
+  1646→  .etapas-pattern-item {
+  1647→    animation: none;
+  1648→    opacity: 1;
+  1649→  }
+  1650→}
+  1651→
+  1652→/* Rating button feedback — tactile press for 1-5 selectors */
+  1653→@media (hover: none) and (pointer: coarse) {
+  1654→  .rating-btn:active {
+  1655→    transform: scale(0.9);
+  1656→    transition: transform 0.08s ease;
+  1657→  }
+  1658→}
+  1659→
+  1660→/* ═══════════════════════════════════════════
+  1661→   Premium Motion & Interaction Polish
+  1662→   ═══════════════════════════════════════════ */
+  1663→
+  1664→/* Sidebar overlay fade */
+  1665→@keyframes overlayFadeIn {
+  1666→  from { opacity: 0; }
+  1667→  to { opacity: 1; }
+  1668→}
+  1669→.sidebar-overlay {
+  1670→  animation: overlayFadeIn 0.25s ease-out;
+  1671→}
+  1672→
+  1673→/* Checkbox check animation */
+  1674→@keyframes checkScale {
+  1675→  0% { transform: scale(0); opacity: 0; }
+  1676→  60% { transform: scale(1.15); }
+  1677→  100% { transform: scale(1); opacity: 1; }
+  1678→}
+  1679→[data-state="checked"] [data-slot="checkbox-indicator"] {
+  1680→  animation: checkScale 0.2s ease-out;
+  1681→}
+  1682→
+  1683→/* Tab content transition */
+  1684→[data-slot="tabs-content"] {
+  1685→  animation: tabContentIn 0.2s ease-out;
+  1686→}
+  1687→@keyframes tabContentIn {
+  1688→  from {
+  1689→    opacity: 0;
+  1690→    transform: translateY(2px);
+  1691→  }
+  1692→  to {
+  1693→    opacity: 1;
+  1694→    transform: translateY(0);
+  1695→  }
+  1696→}
+  1697→
+  1698→/* Premium overlay entrance — animate opacity only, apply blur instantly.
+  1699→   Animating backdrop-filter forces expensive full-screen paint on every frame. */
+  1700→@keyframes premiumOverlayIn {
+  1701→  from {
+  1702→    opacity: 0;
+  1703→  }
+  1704→  to {
+  1705→    opacity: 1;
+  1706→  }
+  1707→}
+  1708→.premium-overlay-enter {
+  1709→  animation: premiumOverlayIn 0.35s ease-out;
+  1710→  backdrop-filter: blur(6px);
+  1711→  -webkit-backdrop-filter: blur(6px);
+  1712→}
+  1713→
+  1714→/* Auth page entrance */
+  1715→@keyframes authPageIn {
+  1716→  from {
+  1717→    opacity: 0;
+  1718→    transform: translateY(8px);
+  1719→  }
+  1720→  to {
+  1721→    opacity: 1;
+  1722→    transform: translateY(0);
+  1723→  }
+  1724→}
+  1725→.auth-page-enter {
+  1726→  animation: authPageIn 0.4s ease-out;
+  1727→}
+  1728→
+  1729→/* Dashboard section stagger — transform only, never opacity:0.
+  1730→   Previous version used opacity:0 with animation-fill-mode:both which
+  1731→   caused the same WebKit/Chromium compositing bug where sections could
+  1732→   stay permanently invisible on low-end devices. */
+  1733→@keyframes sectionStaggerIn {
+  1734→  from {
+  1735→    transform: translateY(6px);
+  1736→  }
+  1737→  to {
+  1738→    transform: translateY(0);
+  1739→  }
+  1740→}
+  1741→.dash-section-enter {
+  1742→  animation: sectionStaggerIn 0.35s ease-out both;
+  1743→}
+  1744→.dash-section-delay-1 { animation-delay: 0.04s; }
+  1745→.dash-section-delay-2 { animation-delay: 0.08s; }
+  1746→.dash-section-delay-3 { animation-delay: 0.12s; }
+  1747→.dash-section-delay-4 { animation-delay: 0.16s; }
+  1748→.dash-section-delay-5 { animation-delay: 0.20s; }
+  1749→.dash-section-delay-6 { animation-delay: 0.24s; }
+  1750→.dash-section-delay-7 { animation-delay: 0.28s; }
+  1751→.dash-section-delay-8 { animation-delay: 0.32s; }
+  1752→.dash-section-delay-9 { animation-delay: 0.36s; }
+  1753→.dash-section-delay-10 { animation-delay: 0.40s; }
+  1754→
+  1755→/* Subtle press feedback for any interactive element */
+  1756→.press-subtle {
+  1757→  transition: transform 0.1s ease, opacity 0.1s ease;
+  1758→}
+  1759→.press-subtle:active {
+  1760→  transform: scale(0.97);
+  1761→}
+  1762→
+  1763→/* Context menu item press feedback */
+  1764→[data-slot="context-menu-item"] {
+  1765→  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+  1766→}
+  1767→[data-slot="context-menu-item"]:active {
+  1768→  transform: scale(0.98);
+  1769→}
+  1770→
+  1771→/* Close button press feedback */
+  1772→.close-btn {
+  1773→  transition: color 0.15s ease, background-color 0.15s ease, transform 0.08s ease;
+  1774→}
+  1775→.close-btn:active {
+  1776→  transform: scale(0.92);
+  1777→}
+  1778→
+  1779→/* Modal close button touch-press on mobile */
+  1780→@media (hover: none) and (pointer: coarse) {
+  1781→  .close-btn:active {
+  1782→    transform: scale(0.88);
+  1783→  }
+  1784→}
+  1785→
+  1786→/* Input focus transition smoothness */
+  1787→input, textarea, select {
+  1788→  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  1789→}
+  1790→
+  1791→/* Respect reduced motion for premium motion polish */
+  1792→@media (prefers-reduced-motion: reduce) {
+  1793→  .sidebar-overlay { animation: none; }
+  1794→  [data-state="checked"] [data-slot="checkbox-indicator"] { animation: none; }
+  1795→  [data-slot="tabs-content"] { animation: none; }
+  1796→  .premium-overlay-enter { animation: none; }
+  1797→  .auth-page-enter { animation: none; }
+  1798→  .dash-section-enter { animation: none; }
+  1799→  .press-subtle:active { transform: none; }
+  1800→  .context-menu-item:active { transform: none; }
+  1801→  .close-btn:active { transform: none; }
+  1802→  .card-accent { transition: none; }
+  1803→  .card-inner { transition: none; }
+  1804→  .btn-primary:hover { box-shadow: none; }
+  1805→  input, textarea, select { transition: none; }
+  1806→}
+  1807→
+  1808→/* Respect reduced motion for phase 2 animations */
+  1809→@media (prefers-reduced-motion: reduce) {
+  1810→  .smooth-expand { transition: none; }
+  1811→  .success-flash { animation: none; }
+  1812→  .breathing-ring::after { animation: none; }
+  1813→  .breathing-counter { text-shadow: none; }
+  1814→  .section-enter-1, .section-enter-2, .section-enter-3, .section-enter-4, .section-enter-5 {
+  1815→    animation: none;
+  1816→  }
+  1817→}
+  1818→
+  1819→/* ═══════════════════════════════════════════
+  1820→   Auth Transition — Register → Onboarding
+  1821→   ═══════════════════════════════════════════ */
+  1822→
+  1823→/* Auth success transition overlay — calm, premium entrance */
+  1824→@keyframes authTransitionEnter {
+  1825→  from {
+  1826→    opacity: 0;
+  1827→    transform: scale(0.96);
+  1828→  }
+  1829→  to {
+  1830→    opacity: 1;
+  1831→    transform: scale(1);
+  1832→  }
+  1833→}
+  1834→.auth-transition-enter {
+  1835→  animation: authTransitionEnter 0.5s ease-out both;
+  1836→}
+  1837→
+  1838→/* Success pulse — gentle gold glow for the success indicator */
+  1839→@keyframes authSuccessPulse {
+  1840→  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  1841→  50% { box-shadow: 0 0 16px 4px rgba(200, 165, 90, 0.15); }
+  1842→}
+  1843→.auth-success-pulse {
+  1844→  animation: authSuccessPulse 2s ease-in-out infinite;
+  1845→}
+  1846→
+  1847→/* Respect reduced motion for auth transitions */
+  1848→@media (prefers-reduced-motion: reduce) {
+  1849→  .auth-transition-enter { animation: none; }
+  1850→  .auth-success-pulse { animation: none; }
+  1851→}
+  1852→
+  1853→/* ═══════════════════════════════════════════
+  1854→   Actionable Card Affordance
+  1855→   ═══════════════════════════════════════════ */
+  1856→
+  1857→/* Actionable card — cards that navigate somewhere.
+  1858→   Provides clear visual affordance: cursor, hover border, subtle lift. */
+  1859→.actionable-card {
+  1860→  cursor: pointer;
+  1861→  transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  1862→}
+  1863→.actionable-card:hover {
+  1864→  border-color: rgba(200, 165, 90, 0.25);
+  1865→  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  1866→}
+  1867→.actionable-card:active {
+  1868→  transform: scale(0.98);
+  1869→  transition: transform 80ms ease;
+  1870→}
+  1871→
+  1872→/* Mobile: stronger tap feedback for actionable cards */
+  1873→@media (hover: none) and (pointer: coarse) {
+  1874→  .actionable-card:active {
+  1875→    transform: scale(0.97);
+  1876→    border-color: rgba(200, 165, 90, 0.35);
+  1877→  }
+  1878→}
+  1879→
+  1880→/* Respect reduced motion for actionable cards */
+  1881→@media (prefers-reduced-motion: reduce) {
+  1882→  .actionable-card {
+  1883→    transition: border-color 200ms ease;
+  1884→  }
+  1885→  .actionable-card:active {
+  1886→    transform: none;
+  1887→  }
+  1888→}
+  1889→
+  1890→/* Line clamp utilities for mobile text truncation */
+  1891→.line-clamp-3 {
+  1892→  display: -webkit-box;
+  1893→  -webkit-line-clamp: 3;
+  1894→  -webkit-box-orient: vertical;
+  1895→  overflow: hidden;
+  1896→}
+  1897→
+  1898→/* ═══════════════════════════════════════════
+  1899→   Momentum & Retention System — Phase 3
+  1900→   ═══════════════════════════════════════════ */
+  1901→
+  1902→/* Micro-reward toast entrance — transform only */
+  1903→@keyframes microRewardEnter {
+  1904→  from {
+  1905→    transform: translate(-50%, 12px);
+  1906→  }
+  1907→  to {
+  1908→    transform: translate(-50%, 0);
+  1909→  }
+  1910→}
+  1911→.micro-reward-enter {
+  1912→  animation: microRewardEnter 0.3s ease-out both;
+  1913→}
+  1914→
+  1915→/* Micro-reward glow — subtle gold box-shadow */
+  1916→@keyframes microRewardGlow {
+  1917→  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  1918→  50% { box-shadow: 0 0 16px 2px rgba(200, 165, 90, 0.12); }
+  1919→}
+  1920→.micro-reward-glow {
+  1921→  animation: microRewardGlow 1.2s ease-out;
+  1922→}
+  1923→
+  1924→/* Completion shimmer — elegant sweep across completed items */
+  1925→@keyframes completionShimmer {
+  1926→  0% { background-position: -200% 0; }
+  1927→  100% { background-position: 200% 0; }
+  1928→}
+  1929→.completion-shimmer {
+  1930→  background: linear-gradient(
+  1931→    90deg,
+  1932→    transparent 0%,
+  1933→    transparent 40%,
+  1934→    rgba(200, 165, 90, 0.06) 50%,
+  1935→    transparent 60%,
+  1936→    transparent 100%
+  1937→  );
+  1938→  background-size: 200% 100%;
+  1939→  animation: completionShimmer 1.2s ease-out;
+  1940→}
+  1941→
+  1942→/* Streak milestone glow — for streak milestones (3, 7, 14, 30...) */
+  1943→@keyframes streakMilestoneGlow {
+  1944→  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 165, 90, 0); }
+  1945→  50% { box-shadow: 0 0 12px 2px rgba(200, 165, 90, 0.15); }
+  1946→}
+  1947→.streak-milestone-glow {
+  1948→  animation: streakMilestoneGlow 2s ease-in-out infinite;
+  1949→}
+  1950→
+  1951→/* Momentum bar pulse — when momentum is "fuerte" */
+  1952→@keyframes momentumPulse {
+  1953→  0%, 100% { opacity: 1; }
+  1954→  50% { opacity: 0.85; }
+  1955→}
+  1956→.momentum-pulse {
+  1957→  animation: momentumPulse 3s ease-in-out infinite;
+  1958→}
+  1959→
+  1960→/* Return trigger accent bar animation */
+  1961→@keyframes returnAccentPulse {
+  1962→  0%, 100% { opacity: 0.2; }
+  1963→  50% { opacity: 0.5; }
+  1964→}
+  1965→.return-accent-pulse {
+  1966→  animation: returnAccentPulse 3s ease-in-out infinite;
+  1967→}
+  1968→
+  1969→/* Respect reduced motion for momentum system */
+  1970→@media (prefers-reduced-motion: reduce) {
+  1971→  .micro-reward-enter { animation: none; }
+  1972→  .micro-reward-glow { animation: none; }
+  1973→  .completion-shimmer { animation: none; }
+  1974→  .streak-milestone-glow { animation: none; }
+  1975→  .momentum-pulse { animation: none; }
+  1976→  .return-accent-pulse { animation: none; }
+  1977→}
+  1978→
+  1979→/* ═══════════════════════════════════════════
+  1980→   Mobile Density Polish — Phase 3
+  1981→   ═══════════════════════════════════════════ */
+  1982→
+  1983→/* Reduce vertical spacing on mobile for key pages */
+  1984→@media (max-width: 767px) {
+  1985→  /* Dashboard: tighter section gaps */
+  1986→  .space-y-3 > * + * {
+  1987→    margin-top: 0.5rem;
+  1988→  }
+  1989→
+  1990→  /* Empire pages: reduce section padding */
+  1991→  .max-w-4xl.space-y-8 > * + * {
+  1992→    margin-top: 1.25rem;
+  1993→  }
+  1994→
+  1995→  /* Insights page: tighter grid gaps */
+  1996→  .max-w-5xl.space-y-8 > * + * {
+  1997→    margin-top: 1.25rem;
+  1998→  }
+  1999→
+  2000→  /* Cards on mobile: slightly less vertical padding */
+
+[showing lines 1-2000 of 2380; use offset=2001 with limit to continue reading]

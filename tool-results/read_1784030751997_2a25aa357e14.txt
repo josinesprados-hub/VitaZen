@@ -1,0 +1,1464 @@
+     1→'use client';
+     2→
+     3→import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+     4→import { useApi } from '@/hooks/useApi';
+     5→import { useAuth } from '@/context/AuthContext';
+     6→import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+     7→import { MentorSkeleton } from '@/components/ui/PremiumSkeleton';
+     8→import PremiumErrorState from '@/components/ui/PremiumErrorState';
+     9→import {
+    10→  Brain,
+    11→  Send,
+    12→  Plus,
+    13→  Trash2,
+    14→  MessageCircle,
+    15→  Lock,
+    16→  Pencil,
+    17→  Check,
+    18→  X,
+    19→  ChevronLeft,
+    20→  Sparkles,
+    21→  PanelLeftClose,
+    22→  PanelLeft,
+    23→  Archive,
+    24→  ArchiveRestore,
+    25→  MoreVertical,
+    26→  AlertTriangle,
+    27→  Inbox,
+    28→  MessageSquareOff,
+    29→  BrainCircuit,
+    30→  Circle,
+    31→  Zap,
+    32→  Infinity as InfinityIcon,
+    33→  ShieldCheck,
+    34→  BookOpen,
+    35→  Lightbulb,
+    36→  Menu,
+    37→} from 'lucide-react';
+    38→import Link from 'next/link';
+    39→import ContextualHelp from '@/components/ui/ContextualHelp';
+    40→import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
+    41→import { getMadridDateKey, getTodayDateKey } from '@/lib/deterministic';
+    42→
+    43→// ─────────────────────────────────────────
+    44→// Types
+    45→// ─────────────────────────────────────────
+    46→
+    47→interface Thread {
+    48→  id: string;
+    49→  title: string;
+    50→  archived: boolean;
+    51→  updatedAt: string;
+    52→  createdAt: string;
+    53→  messages?: { content: string; role: string; createdAt: string }[];
+    54→}
+    55→
+    56→interface Message {
+    57→  id: string;
+    58→  role: string;
+    59→  content: string;
+    60→  createdAt: string;
+    61→}
+    62→
+    63→// ─────────────────────────────────────────
+    64→// Suggestion pool — reuses real strings from the project
+    65→// (3 existing mentor starters + 8 onboarding goals)
+    66→// ─────────────────────────────────────────
+    67→
+    68→const MENTOR_SUGGESTIONS = [
+    69→  '¿Cómo mejorar mi disciplina?',
+    70→  'Crear nuevos hábitos',
+    71→  'Necesito motivación',
+    72→  'Reducir el estrés',
+    73→  'Dormir mejor',
+    74→  'Ser más constante',
+    75→  'Mejorar mi enfoque',
+    76→  'Cuidar mi cuerpo',
+    77→  'Organizar mis finanzas',
+    78→  'Meditar regularmente',
+    79→  'Escribir un diario',
+    80→];
+    81→
+    82→function pickSuggestions(count: number): string[] {
+    83→  const shuffled = [...MENTOR_SUGGESTIONS].sort(() => Math.random() - 0.5);
+    84→  return shuffled.slice(0, count);
+    85→}
+    86→
+    87→// ─────────────────────────────────────────
+    88→// Relative date helper
+    89→// ─────────────────────────────────────────
+    90→
+    91→function getRelativeDate(dateStr: string): string {
+    92→  const date = new Date(dateStr);
+    93→  const now = new Date();
+    94→  const diffMs = now.getTime() - date.getTime();
+    95→  const diffMins = Math.floor(diffMs / 60000);
+    96→  const diffHours = Math.floor(diffMs / 3600000);
+    97→
+    98→  // Calendar-day difference using Madrid-normalized dates
+    99→  const entryKey = getMadridDateKey(date);
+   100→  const todayKey = getTodayDateKey();
+   101→  const [eY, eM, eD] = entryKey.split('-').map(Number);
+   102→  const [tY, tM, tD] = todayKey.split('-').map(Number);
+   103→  const entryDate = new Date(eY, eM - 1, eD);
+   104→  const todayDate = new Date(tY, tM - 1, tD);
+   105→  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+   106→
+   107→  if (diffMins < 1 && diffDays === 0) return 'Ahora';
+   108→  if (diffMins < 60 && diffDays === 0) return `Hace ${diffMins} min`;
+   109→  if (diffHours < 24 && diffDays === 0) return `Hace ${diffHours}h`;
+   110→  if (diffDays === 1) return 'Ayer';
+   111→  if (diffDays < 7) return `Hace ${diffDays} días`;
+   112→  if (diffDays < 30) {
+   113→    const weeks = Math.floor(diffDays / 7);
+   114→    return weeks === 1 ? 'Hace 1 semana' : `Hace ${weeks} semanas`;
+   115→  }
+   116→  return entryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+   117→}
+   118→
+   119→function getDateGroup(dateStr: string): string {
+   120→  // Calendar-day difference using Madrid-normalized dates
+   121→  const entryKey = getMadridDateKey(new Date(dateStr));
+   122→  const todayKey = getTodayDateKey();
+   123→
+   124→  if (entryKey === todayKey) return 'Hoy';
+   125→
+   126→  const [eY, eM, eD] = entryKey.split('-').map(Number);
+   127→  const [tY, tM, tD] = todayKey.split('-').map(Number);
+   128→  const entryDate = new Date(eY, eM - 1, eD);
+   129→  const todayDate = new Date(tY, tM - 1, tD);
+   130→  const diffDays = Math.round((todayDate.getTime() - entryDate.getTime()) / 86400000);
+   131→
+   132→  if (diffDays === 1) return 'Ayer';
+   133→  if (diffDays < 7) return 'Esta semana';
+   134→  if (diffDays < 30) return 'Este mes';
+   135→  return 'Anterior';
+   136→}
+   137→
+   138→// ─────────────────────────────────────────
+   139→// Component Props
+   140→// ─────────────────────────────────────────
+   141→
+   142→interface MentorChatProps {
+   143→  backHref: string;
+   144→  headerIcon?: 'brain' | 'sparkles';
+   145→}
+   146→
+   147→// ─────────────────────────────────────────
+   148→// Module-level constants & helpers
+   149→// ─────────────────────────────────────────
+   150→
+   151→const STORAGE_KEY_PREFIX = 'vitazen_active_thread';
+   152→const VISIBILITY_DEBOUNCE_MS = 1500;
+   153→const DATE_GROUP_ORDER = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Anterior'];
+   154→
+   155→function getProgressColor(rem: number, limit: number): string {
+   156→  if (!isFinite(limit)) return '#c8a55a';
+   157→  const pct = rem / limit;
+   158→  if (pct > 0.5) return '#c8a55a';
+   159→  if (pct > 0.25) return '#e8a849';
+   160→  return '#ef4444';
+   161→}
+   162→
+   163→// ─────────────────────────────────────────
+   164→// Main Component
+   165→// ─────────────────────────────────────────
+   166→
+   167→export default function MentorChat({ backHref, headerIcon = 'sparkles' }: MentorChatProps) {
+   168→  const { apiFetch } = useApi();
+   169→  const { user } = useAuth();
+   170→  const { displayUser } = useScreenshotMode();
+   171→  const [threads, setThreads] = useState<Thread[]>([]);
+   172→  const [activeThread, setActiveThread] = useState<string | null>(null);
+   173→  const [messages, setMessages] = useState<Message[]>([]);
+   174→  const [input, setInput] = useState('');
+   175→  const [sending, setSending] = useState(false);
+   176→  const [loading, setLoading] = useState(true);
+   177→  const [remaining, setRemaining] = useState<number | null>(null);
+   178→  const [dailyLimit, setDailyLimit] = useState<number>(15);
+   179→  const [showLimitModal, setShowLimitModal] = useState(false);
+   180→  const [sidebarOpen, setSidebarOpen] = useState(true);
+   181→  const [suggestions] = useState(() => pickSuggestions(3));
+   182→  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
+   183→  const [editTitle, setEditTitle] = useState('');
+   184→  const [historyLimited, setHistoryLimited] = useState(false);
+   185→  const [loadError, setLoadError] = useState(false);
+   186→  const [actionError, setActionError] = useState('');
+   187→
+   188→  // Tab: 'active' | 'archived'
+   189→  const [tab, setTab] = useState<'active' | 'archived'>('active');
+   190→
+   191→  // Mobile drawer
+   192→  const [drawerOpen, setDrawerOpen] = useState(false);
+   193→
+   194→  // Context menu
+   195→  const [contextMenu, setContextMenu] = useState<{
+   196→    threadId: string;
+   197→    x: number;
+   198→    y: number;
+   199→  } | null>(null);
+   200→
+   201→  // Delete confirmation modal
+   202→  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+   203→
+   204→  // Contextual indicator
+   205→  const [isContextual, setIsContextual] = useState(false);
+   206→  const [showContextTooltip, setShowContextTooltip] = useState(false);
+   207→
+   208→  const messagesEndRef = useRef<HTMLDivElement>(null);
+   209→  const scrollContainerRef = useRef<HTMLDivElement>(null);
+   210→  const editInputRef = useRef<HTMLInputElement>(null);
+   211→  const chatInputRef = useRef<HTMLInputElement>(null);
+   212→  const sendingRef = useRef(false);
+   213→  const activeThreadRef = useRef<string | null>(null);
+   214→  const fetchIdRef = useRef(0);
+   215→  const lastSendTime = useRef(0);
+   216→  const prevUserIdRef = useRef<string | null>(null);
+   217→  const visibilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+   218→
+   219→  const isPremium = displayUser?.plan === 'PREMIUM';
+   220→
+   221→  // User-scoped storage key: prevents cross-user thread leaks on shared devices
+   222→  const storageKey = user?.id ? `${STORAGE_KEY_PREFIX}_${user.id}` : STORAGE_KEY_PREFIX;
+   223→
+   224→  // ─────────────────────────────────────────
+   225→  // Data fetching (MUST be defined BEFORE useEffect hooks that reference them)
+   226→  // ─────────────────────────────────────────
+   227→  // NOTE: useCallback hooks must be defined BEFORE useEffect hooks that
+   228→  // reference them in dependency arrays. Otherwise, the dependency array
+   229→  // evaluates the const variable before it's initialized → TDZ crash:
+   230→  //   "Cannot access 'eB' before initialization"
+   231→
+   232→  const fetchThreads = useCallback(async (isRetry = false) => {
+   233→    try {
+   234→      const res = await apiFetch('/api/ai/threads');
+   235→      if (res.ok) {
+   236→        const data = await res.json();
+   237→        const allThreads: Thread[] = data.threads;
+   238→        setThreads(allThreads);
+   239→        setHistoryLimited(!!data.historyLimited);
+   240→        // Initialize remaining/limit from server if available
+   241→        if (data.remaining !== undefined && data.remaining !== null) {
+   242→          setRemaining(data.remaining);
+   243→          setDailyLimit(data.limit || 15);
+   244→        }
+   245→        // Clear stale localStorage if no threads exist
+   246→        if (allThreads.length === 0) {
+   247→          try { localStorage.removeItem(storageKey); } catch {}
+   248→        }
+   249→      } else if (!isRetry) {
+   250→        // Auto-retry once on server error (transient failures)
+   251→        await new Promise(r => setTimeout(r, 1000));
+   252→        return fetchThreads(true);
+   253→      }
+   254→    } catch (e) { 
+   255→      console.error(e); 
+   256→      if (!isRetry) {
+   257→        // Auto-retry once on network error
+   258→        await new Promise(r => setTimeout(r, 1500));
+   259→        try {
+   260→          const res = await apiFetch('/api/ai/threads');
+   261→          if (res.ok) {
+   262→            const data = await res.json();
+   263→            setThreads(data.threads);
+   264→            setHistoryLimited(!!data.historyLimited);
+   265→            if (data.remaining !== undefined && data.remaining !== null) {
+   266→              setRemaining(data.remaining);
+   267→              setDailyLimit(data.limit || 15);
+   268→            }
+   269→
+   270→            setLoadError(false);
+   271→            setLoading(false);
+   272→            return;
+   273→          }
+   274→        } catch {}
+   275→      }
+   276→      setLoadError(true);
+   277→    }
+   278→    finally { setLoading(false); }
+   279→  }, [apiFetch, storageKey]);
+   280→
+   281→  const fetchMessages = useCallback(async (threadId: string) => {
+   282→    const thisFetchId = ++fetchIdRef.current;
+   283→    try {
+   284→      const res = await apiFetch(`/api/ai/threads/${threadId}/messages`);
+   285→      // Only apply if this is still the latest fetch (prevents stale overwrites on rapid thread switching)
+   286→      if (res.ok && fetchIdRef.current === thisFetchId) {
+   287→        const data = await res.json();
+   288→        setMessages(data.messages);
+   289→        setHistoryLimited(!!data.historyLimited);
+   290→      }
+   291→    } catch (e) { console.error(e); }
+   292→  }, [apiFetch]);
+   293→
+   294→  // ─────────────────────────────────────────
+   295→  // Effects (defined AFTER useCallback hooks that they reference)
+   296→  // ─────────────────────────────────────────
+   297→
+   298→  // Lock body scroll when any modal (delete confirm or limit modal) is open — save/restore scroll position
+   299→  useEffect(() => {
+   300→    if (deleteConfirm || showLimitModal || drawerOpen) {
+   301→      document.body.classList.add('scroll-locked');
+   302→      return () => {
+   303→        document.body.classList.remove('scroll-locked');
+   304→      };
+   305→    }
+   306→  }, [deleteConfirm, showLimitModal, drawerOpen]);
+   307→
+   308→  // Close context menu on click outside
+   309→  useEffect(() => {
+   310→    const handler = () => setContextMenu(null);
+   311→    if (contextMenu) {
+   312→      document.addEventListener('click', handler);
+   313→      return () => document.removeEventListener('click', handler);
+   314→    }
+   315→  }, [contextMenu]);
+   316→
+   317→  // Initial thread fetch
+   318→  useEffect(() => {
+   319→    fetchThreads();
+   320→  }, [fetchThreads]);
+   321→
+   322→  // Detect user change and clean up stale state
+   323→  useEffect(() => {
+   324→    if (user?.id && user.id !== prevUserIdRef.current) {
+   325→      // User changed (login/logout/different account) — clear stale thread state
+   326→      if (prevUserIdRef.current) {
+   327→        setActiveThread(null);
+   328→        setMessages([]);
+   329→        setThreads([]);
+   330→      }
+   331→      prevUserIdRef.current = user.id;
+   332→    }
+   333→  }, [user?.id]);
+   334→
+   335→  // Fetch messages when active thread changes
+   336→  useEffect(() => {
+   337→    activeThreadRef.current = activeThread;
+   338→    if (activeThread) {
+   339→      setMessages([]); // Clear immediately to avoid flash of old messages
+   340→      setLoadError(false); // Clear any previous load error when switching threads
+   341→      fetchMessages(activeThread);
+   342→      try { localStorage.setItem(storageKey, activeThread); } catch {}
+   343→      // Close drawer on mobile when selecting a thread
+   344→      setDrawerOpen(false);
+   345→    }
+   346→  }, [activeThread, fetchMessages, storageKey]);
+   347→
+   348→  // Auto-scroll to bottom on new messages
+   349→  useEffect(() => {
+   350→    const container = scrollContainerRef.current;
+   351→    if (container) {
+   352→      requestAnimationFrame(() => {
+   353→        container.scrollTop = container.scrollHeight;
+   354→      });
+   355→    }
+   356→  }, [messages]);
+   357→
+   358→  // Focus edit input when editing
+   359→  useEffect(() => {
+   360→    if (editingThreadId && editInputRef.current) {
+   361→      editInputRef.current.focus();
+   362→      editInputRef.current.select();
+   363→    }
+   364→  }, [editingThreadId]);
+   365→
+   366→  // Auto-dismiss action errors after 3s
+   367→  useEffect(() => {
+   368→    if (!actionError) return;
+   369→    const timer = setTimeout(() => setActionError(''), 3000);
+   370→    return () => clearTimeout(timer);
+   371→  }, [actionError]);
+   372→
+   373→  // Network status detection for mobile resilience
+   374→  const [isOffline, setIsOffline] = useState(false);
+   375→
+   376→  useEffect(() => {
+   377→    const handleOnline = () => setIsOffline(false);
+   378→    const handleOffline = () => setIsOffline(true);
+   379→    
+   380→    // Set initial state
+   381→    setIsOffline(typeof navigator !== 'undefined' && !navigator.onLine);
+   382→    
+   383→    window.addEventListener('online', handleOnline);
+   384→    window.addEventListener('offline', handleOffline);
+   385→    return () => {
+   386→      window.removeEventListener('online', handleOnline);
+   387→      window.removeEventListener('offline', handleOffline);
+   388→    };
+   389→  }, []);
+   390→
+   391→  // Refresh data when app comes back to foreground (mobile resume)
+   392→  // Debounced to prevent race conditions from rapid visibility changes
+   393→  // M-4 FIX: Skip the messages refetch if a message is currently in flight
+   394→  // (sendingRef.current = true). Previously, the visibilitychange handler
+   395→  // could overwrite the optimistic user message that hasn't been saved to
+   396→  // the DB yet (messages are saved atomically with the assistant response
+   397→  // AFTER Groq returns). Now we only refetch threads (which is safe) and
+   398→  // skip fetchMessages when sending. We also check activeThreadRef.current
+   399→  // to ensure we only refetch for the thread that's still active when the
+   400→  // debounce fires — the user may have switched threads during the 1.5s delay.
+   401→  useEffect(() => {
+   402→    const handleVisibilityChange = () => {
+   403→      if (document.visibilityState === 'visible' && activeThread) {
+   404→        // Clear any pending refresh from previous visibility change
+   405→        if (visibilityTimerRef.current) {
+   406→          clearTimeout(visibilityTimerRef.current);
+   407→        }
+   408→        // Debounce the refresh to avoid rapid re-fetches
+   409→        visibilityTimerRef.current = setTimeout(() => {
+   410→          // M-4 FIX: Only fetch messages if no message is in flight AND
+   411→          // the active thread hasn't changed during the debounce delay.
+   412→          if (!sendingRef.current && activeThreadRef.current === activeThread) {
+   413→            fetchMessages(activeThread);
+   414→          }
+   415→          fetchThreads();
+   416→        }, VISIBILITY_DEBOUNCE_MS);
+   417→      }
+   418→    };
+   419→
+   420→    document.addEventListener('visibilitychange', handleVisibilityChange);
+   421→    return () => {
+   422→      document.removeEventListener('visibilitychange', handleVisibilityChange);
+   423→      if (visibilityTimerRef.current) {
+   424→        clearTimeout(visibilityTimerRef.current);
+   425→      }
+   426→    };
+   427→  }, [activeThread, fetchMessages, fetchThreads]);
+   428→
+   429→  // ─────────────────────────────────────────
+   430→  // Thread actions
+   431→  // ─────────────────────────────────────────
+   432→
+   433→  const createThread = async () => {
+   434→    try {
+   435→      const res = await apiFetch('/api/ai/threads', {
+   436→        method: 'POST',
+   437→        body: JSON.stringify({ title: 'Nueva conversación' }),
+   438→      });
+   439→      if (res.ok) {
+   440→        const data = await res.json();
+   441→        setThreads(prev => [data.thread, ...prev]);
+   442→        setActiveThread(data.thread.id);
+   443→        setMessages([]);
+   444→        setTab('active');
+   445→        setDrawerOpen(false);
+   446→        setTimeout(() => chatInputRef.current?.focus(), 100);
+   447→      } else {
+   448→        const data = await res.json();
+   449→        if (data.error?.includes('Maximum')) {
+   450→          setActionError('Límite de conversaciones alcanzado');
+   451→        }
+   452→      }
+   453→    } catch (e) { console.error(e); setActionError('No se pudo crear la conversación'); }
+   454→  };
+   455→
+   456→  const deleteThread = async (threadId: string) => {
+   457→    try {
+   458→      const res = await apiFetch('/api/ai/threads', {
+   459→        method: 'DELETE',
+   460→        body: JSON.stringify({ threadId }),
+   461→      });
+   462→      if (res.ok) {
+   463→        // M-3 FIX: Calculate nextActiveId from the CURRENT threads state
+   464→        // BEFORE calling setThreads. Previously, nextActiveId was assigned
+   465→        // inside the setThreads updater as a side effect, but React 19's
+   466→        // automatic batching defers updater execution — the variable was
+   467→        // read as null before the updater ran.
+   468→        const remaining = threads.filter(t => t.id !== threadId);
+   469→        const nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
+   470→        setThreads(remaining);
+   471→        if (activeThread === threadId) {
+   472→          setActiveThread(nextActiveId);
+   473→          setMessages([]);
+   474→          try { localStorage.removeItem(storageKey); } catch {}
+   475→        }
+   476→      }
+   477→    } catch (e) { console.error(e); setActionError('No se pudo eliminar'); }
+   478→    finally { setDeleteConfirm(null); }
+   479→  };
+   480→
+   481→  const archiveThread = async (threadId: string) => {
+   482→    try {
+   483→      const res = await apiFetch('/api/ai/threads', {
+   484→        method: 'PATCH',
+   485→        body: JSON.stringify({ threadId, archived: true }),
+   486→      });
+   487→      if (res.ok) {
+   488→        // M-3 FIX: Calculate nextActiveId from the CURRENT threads state
+   489→        // BEFORE calling setThreads. Same fix as deleteThread.
+   490→        const updated = threads.map(t => t.id === threadId ? { ...t, archived: true } : t);
+   491→        const nextActiveId = updated.filter(t => !t.archived)[0]?.id ?? null;
+   492→        setThreads(updated);
+   493→        // If the archived thread was active, switch to the next active one
+   494→        if (activeThread === threadId) {
+   495→          if (nextActiveId) {
+   496→            setActiveThread(nextActiveId);
+   497→          } else {
+   498→            setActiveThread(null);
+   499→            setMessages([]);
+   500→          }
+   501→        }
+   502→      }
+   503→    } catch (e) { console.error(e); setActionError('No se pudo archivar'); }
+   504→  };
+   505→
+   506→  const unarchiveThread = async (threadId: string) => {
+   507→    try {
+   508→      const res = await apiFetch('/api/ai/threads', {
+   509→        method: 'PATCH',
+   510→        body: JSON.stringify({ threadId, archived: false }),
+   511→      });
+   512→      if (res.ok) {
+   513→        setThreads(prev => prev.map(t => t.id === threadId ? { ...t, archived: false } : t));
+   514→      }
+   515→    } catch (e) { console.error(e); setActionError('No se pudo restaurar'); }
+   516→  };
+   517→
+   518→  const renameThread = async (threadId: string, newTitle: string) => {
+   519→    if (!newTitle.trim()) {
+   520→      setEditingThreadId(null);
+   521→      return;
+   522→    }
+   523→    try {
+   524→      const res = await apiFetch('/api/ai/threads', {
+   525→        method: 'PATCH',
+   526→        body: JSON.stringify({ threadId, title: newTitle.trim() }),
+   527→      });
+   528→      if (res.ok) {
+   529→        setThreads(prev => prev.map(t => t.id === threadId ? { ...t, title: newTitle.trim() } : t));
+   530→      }
+   531→    } catch (e) { console.error(e); setActionError('No se pudo renombrar'); }
+   532→    finally { setEditingThreadId(null); }
+   533→  };
+   534→
+   535→  const sendMessage = async () => {
+   536→    const content = input.trim();
+   537→    if (!content || !activeThread || sendingRef.current) return;
+   538→
+   539→    const now = Date.now();
+   540→    if (now - lastSendTime.current < 1000) return; // Debounce: 1s between sends
+   541→    lastSendTime.current = now;
+   542→
+   543→    const sentThreadId = activeThread;
+   544→    sendingRef.current = true;
+   545→
+   546→    const userMessage: Message = {
+   547→      id: 'temp-' + Date.now(),
+   548→      role: 'user',
+   549→      content,
+   550→      createdAt: new Date().toISOString(),
+   551→    };
+   552→    setMessages(prev => [...prev, userMessage]);
+   553→    setInput('');
+   554→    setSending(true);
+   555→
+   556→    try {
+   557→      const res = await apiFetch('/api/ai/chat', {
+   558→        method: 'POST',
+   559→        body: JSON.stringify({ threadId: sentThreadId, content }),
+   560→      });
+   561→
+   562→      if (res.status === 403) {
+   563→        const data = await res.json();
+   564→        setShowLimitModal(true);
+   565→        setRemaining(0);
+   566→        setDailyLimit(data.limit || 15);
+   567→        // Remove the optimistic user message since it was blocked
+   568→        setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+   569→        // L-4 FIX: Restore the input text so the user doesn't lose their message.
+   570→        // Previously the input was cleared (line 547) and never restored on 403.
+   571→        setInput(content);
+   572→        return;
+   573→      }
+   574→
+   575→      if (res.ok) {
+   576→        const data = await res.json();
+   577→        const assistantMessage: Message = {
+   578→          id: 'resp-' + Date.now(),
+   579→          role: 'assistant',
+   580→          content: data.message,
+   581→          createdAt: new Date().toISOString(),
+   582→        };
+   583→        // Only add response if still on the same thread
+   584→        if (activeThreadRef.current === sentThreadId) {
+   585→          setMessages(prev => [...prev, assistantMessage]);
+   586→          setRemaining(data.remaining);
+   587→          setDailyLimit(data.limit || 15);
+   588→          setIsContextual(!!data.contextual);
+   589→        }
+   590→
+   591→        // Refresh threads to get updated title and updatedAt
+   592→        const threadsRes = await apiFetch('/api/ai/threads');
+   593→        if (threadsRes.ok) {
+   594→          const threadsData = await threadsRes.json();
+   595→          setThreads(threadsData.threads);
+   596→          setHistoryLimited(!!threadsData.historyLimited);
+   597→        }
+   598→      } else if (res.status !== 403) {
+   599→        // Non-403 error: remove optimistic message and show error
+   600→        if (activeThreadRef.current === sentThreadId) {
+   601→          setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+   602→          setInput(content);
+   603→          setActionError('Error al enviar. Inténtalo de nuevo.');
+   604→        }
+   605→      }
+   606→    } catch (e) {
+   607→      console.error(e);
+   608→      // Remove optimistic user message on network error if still on same thread
+   609→      if (activeThreadRef.current === sentThreadId) {
+   610→        setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+   611→        setInput(content); // Restore input so user can retry
+   612→        setActionError('Sin conexión. Tu mensaje se ha restaurado.');
+   613→      }
+   614→    }
+   615→    finally {
+   616→      setSending(false);
+   617→      sendingRef.current = false;
+   618→    }
+   619→  };
+   620→
+   621→  // ─────────────────────────────────────────
+   622→  // Computed (memoized to avoid re-filtering on every render)
+   623→  // ─────────────────────────────────────────
+   624→
+   625→  const activeThreads = useMemo(() => threads.filter(t => !t.archived), [threads]);
+   626→  const archivedThreads = useMemo(() => threads.filter(t => t.archived), [threads]);
+   627→  const visibleThreads = useMemo(() => tab === 'active' ? activeThreads : archivedThreads, [tab, activeThreads, archivedThreads]);
+   628→
+   629→  // Group visible threads by date
+   630→  const groupedThreads = useMemo(() => visibleThreads.reduce<Record<string, Thread[]>>((acc, thread) => {
+   631→    const group = getDateGroup(thread.updatedAt);
+   632→    if (!acc[group]) acc[group] = [];
+   633→    acc[group].push(thread);
+   634→    return acc;
+   635→  }, {}), [visibleThreads]);
+   636→
+   637→  const activeThreadData = useMemo(() => threads.find(t => t.id === activeThread) ?? null, [threads, activeThread]);
+   638→
+   639→  const IconComponent = useMemo(() => headerIcon === 'brain' ? Brain : Sparkles, [headerIcon]);
+   640→
+   641→  // ─────────────────────────────────────────
+   642→  // Context menu handler
+   643→  // ─────────────────────────────────────────
+   644→
+   645→  const handleContextMenu = (e: React.MouseEvent, threadId: string) => {
+   646→    e.stopPropagation();
+   647→    e.preventDefault();
+   648→    const rect = (e.currentTarget as HTMLElement).closest('.sidebar-area')?.getBoundingClientRect();
+   649→    const x = rect ? e.clientX - rect.left : e.clientX;
+   650→    const y = rect ? e.clientY - rect.top : e.clientY;
+   651→    setContextMenu({ threadId, x, y });
+   652→  };
+   653→
+   654→  // ─────────────────────────────────────────
+   655→  // Shared: Sidebar content (used in desktop sidebar & mobile drawer)
+   656→  // ─────────────────────────────────────────
+   657→
+   658→  const sidebarContent = (
+   659→    <>
+   660→      {/* Back + New button */}
+   661→      <div className="p-3 border-b border-[#1a1a1a] space-y-2">
+   662→        <Link
+   663→          href={backHref}
+   664→          className="text-[#666] text-xs hover:text-champagne flex items-center gap-1 transition-colors"
+   665→        >
+   666→          <ChevronLeft size={12} /> Volver
+   667→        </Link>
+   668→        <button
+   669→          onClick={createThread}
+   670→          className="w-full flex items-center justify-center gap-2 bg-champagne text-black font-semibold py-2.5 rounded-lg hover:bg-champagne-hover transition-colors text-sm"
+   671→        >
+   672→          <Plus size={16} /> Nueva conversación
+   673→        </button>
+   674→      </div>
+   675→
+   676→      {/* Tab selector: Todas / Archivadas */}
+   677→      <div className="flex border-b border-[#1a1a1a]">
+   678→        <button
+   679→          onClick={() => setTab('active')}
+   680→          className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
+   681→            tab === 'active'
+   682→              ? 'text-champagne'
+   683→              : 'text-[#666] hover:text-[#999]'
+   684→          }`}
+   685→        >
+   686→          Todas
+   687→          {activeThreads.length > 0 && (
+   688→            <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+   689→              tab === 'active' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
+   690→            }`}>
+   691→              {activeThreads.length}
+   692→            </span>
+   693→          )}
+   694→          {tab === 'active' && (
+   695→            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
+   696→          )}
+   697→        </button>
+   698→        <button
+   699→          onClick={() => setTab('archived')}
+   700→          className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
+   701→            tab === 'archived'
+   702→              ? 'text-champagne'
+   703→              : 'text-[#666] hover:text-[#999]'
+   704→          }`}
+   705→        >
+   706→          Archivadas
+   707→          {archivedThreads.length > 0 && (
+   708→            <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+   709→              tab === 'archived' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
+   710→            }`}>
+   711→              {archivedThreads.length}
+   712→            </span>
+   713→          )}
+   714→          {tab === 'archived' && (
+   715→            <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
+   716→          )}
+   717→        </button>
+   718→      </div>
+   719→
+   720→      {/* Thread list grouped by date */}
+   721→      <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-hide">
+   722→        {DATE_GROUP_ORDER.map((group, groupIdx) => {
+   723→          const groupThreads = groupedThreads[group];
+   724→          if (!groupThreads || groupThreads.length === 0) return null;
+   725→          // FREE users: blur groups beyond "Esta semana" (index 3+)
+   726→          const isOldGroup = !isPremium && groupIdx >= 3;
+   727→          return (
+   728→            <div key={group}>
+   729→              <div className="flex items-center justify-between px-3 py-1.5">
+   730→                <p className="text-[10px] text-[#555] uppercase tracking-widest font-semibold">
+   731→                  {group}
+   732→                </p>
+   733→                {groupIdx === 0 && !isPremium && visibleThreads.length > 5 && (
+   734→                  <PremiumInlineBadge isPremium={isPremium} freeLabel="7 días" premiumLabel="Ilimitado" />
+   735→                )}
+   736→              </div>
+   737→              {isOldGroup ? (
+   738→                <PremiumGate isPremium={isPremium} intensity="medium" compact label="Historial completo">
+   739→                  <div className="space-y-0.5">
+   740→                    {groupThreads.map((thread) => (
+   741→                      <div
+   742→                        key={thread.id}
+   743→                        className="group flex items-center rounded-lg px-3 py-2.5 text-[#ccc]"
+   744→                      >
+   745→                        <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#555]" />
+   746→                        <div className="flex-1 min-w-0">
+   747→                          <p className="text-sm truncate leading-tight">{thread.title.replace(/[*#_`~]/g, '')}</p>
+   748→                          <p className="text-[10px] text-[#555] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
+   749→                        </div>
+   750→                      </div>
+   751→                    ))}
+   752→                  </div>
+   753→                </PremiumGate>
+   754→              ) : (
+   755→                <div className="space-y-0.5">
+   756→                  {groupThreads.map((thread) => (
+   757→                    <div
+   758→                      key={thread.id}
+   759→                      className={`group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ${
+   760→                        activeThread === thread.id
+   761→                          ? 'bg-champagne/10 text-champagne'
+   762→                          : tab === 'archived'
+   763→                          ? 'text-[#888] hover:bg-[#1a1a1a]/40'
+   764→                          : 'text-[#ccc] hover:bg-[#1a1a1a]/60'
+   765→                      }`}
+   766→                      onClick={() => {
+   767→                        if (editingThreadId !== thread.id) {
+   768→                          setActiveThread(thread.id);
+   769→                        }
+   770→                      }}
+   771→                    >
+   772→                      {thread.archived ? (
+   773→                        <Archive size={14} className="shrink-0 mr-2.5 text-[#555]" />
+   774→                      ) : (
+   775→                        <MessageCircle
+   776→                          size={14}
+   777→                          className={`shrink-0 mr-2.5 ${
+   778→                            activeThread === thread.id ? 'text-champagne' : 'text-[#555]'
+   779→                          }`}
+   780→                        />
+   781→                      )}
+   782→                      <div className="flex-1 min-w-0">
+   783→                        {editingThreadId === thread.id ? (
+   784→                          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+   785→                            <input
+   786→                              ref={editInputRef}
+   787→                              type="text"
+   788→                              value={editTitle}
+   789→                              onChange={(e) => setEditTitle(e.target.value)}
+   790→                              onKeyDown={(e) => {
+   791→                                if (e.key === 'Enter') renameThread(thread.id, editTitle);
+   792→                                if (e.key === 'Escape') setEditingThreadId(null);
+   793→                              }}
+   794→                              className="flex-1 bg-[#000] border border-champagne rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
+   795→                              maxLength={100}
+   796→                            />
+   797→                            <button
+   798→                              onClick={() => renameThread(thread.id, editTitle)}
+   799→                              className="text-champagne hover:text-champagne-hover p-0.5"
+   800→                            >
+   801→                              <Check size={12} />
+   802→                            </button>
+   803→                            <button
+   804→                              onClick={() => setEditingThreadId(null)}
+   805→                              className="text-[#666] hover:text-white p-0.5"
+   806→                            >
+   807→                              <X size={12} />
+   808→                            </button>
+   809→                          </div>
+   810→                        ) : (
+   811→                          <>
+   812→                            <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
+   813→                              {thread.title.replace(/[*#_`~]/g, '')}
+   814→                            </p>
+   815→                            <p className="text-[10px] text-[#555] mt-0.5">
+   816→                              {getRelativeDate(thread.updatedAt)}
+   817→                            </p>
+   818→                          </>
+   819→                        )}
+   820→                      </div>
+   821→                      {/* Context menu trigger (⋯) */}
+   822→                      {editingThreadId !== thread.id && (
+   823→                        <button
+   824→                          onClick={(e) => handleContextMenu(e, thread.id)}
+   825→                          className="text-[#444] hover:text-champagne p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
+   826→                          title="Más opciones"
+   827→                        >
+   828→                          <MoreVertical size={14} />
+   829→                        </button>
+   830→                      )}
+   831→                    </div>
+   832→                  ))}
+   833→                </div>
+   834→              )}
+   835→            </div>
+   836→          );
+   837→        })}
+   838→
+   839→        {/* Premium history gate at bottom of sidebar */}
+   840→        {!isPremium && tab === 'active' && activeThreads.length > 3 && (
+   841→          <PremiumHistoryGate isPremium={isPremium} label="historial completo de conversaciones" />
+   842→        )}
+   843→
+   844→        {/* Empty state: active tab */}
+   845→        {tab === 'active' && activeThreads.length === 0 && (
+   846→          <div className="text-center py-12 animate-in">
+   847→            <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
+   848→              <Inbox size={24} className="text-[#444]" />
+   849→            </div>
+   850→            <p className="text-[#555] text-sm font-medium mb-1">Sin conversaciones</p>
+   851→            <p className="text-[#444] text-xs">Crea una nueva para empezar</p>
+   852→          </div>
+   853→        )}
+   854→
+   855→        {/* Empty state: archived tab */}
+   856→        {tab === 'archived' && archivedThreads.length === 0 && (
+   857→          <div className="text-center py-12 animate-in">
+   858→            <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
+   859→              <MessageSquareOff size={24} className="text-[#444]" />
+   860→            </div>
+   861→            <p className="text-[#555] text-sm font-medium mb-1">Sin archivadas</p>
+   862→            <p className="text-[#444] text-xs">Las conversaciones archivadas aparecerán aquí</p>
+   863→          </div>
+   864→        )}
+   865→      </div>
+   866→
+   867→      {/* Message counter for FREE users — elegant bottom bar */}
+   868→      {!isPremium && remaining !== null && (
+   869→        <div className="p-3 border-t border-[#1a1a1a]">
+   870→          <div className="flex items-center justify-between text-xs mb-1.5">
+   871→            <span className="text-[#666] flex items-center gap-1.5">
+   872→              <Zap size={10} />
+   873→              Mensajes hoy
+   874→            </span>
+   875→            <span className={`font-semibold ${
+   876→              remaining === 0 ? 'text-red-400' :
+   877→              remaining <= 3 ? 'text-champagne-warm' :
+   878→              'text-champagne'
+   879→            }`}>
+   880→              {remaining}/{dailyLimit}
+   881→            </span>
+   882→          </div>
+   883→          <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+   884→            <div
+   885→              className="h-full rounded-full transition-all duration-700 ease-out"
+   886→              style={{
+   887→                width: `${Math.max((remaining / dailyLimit) * 100, 0)}%`,
+   888→                backgroundColor: getProgressColor(remaining, dailyLimit),
+   889→              }}
+   890→            />
+   891→          </div>
+   892→          {remaining <= 3 && remaining > 0 && (
+   893→            <p className="text-[10px] text-champagne-warm mt-1.5 flex items-center gap-1">
+   894→              <Circle size={3} fill="currentColor" className="text-champagne/40" />
+   895→              Más conexiones con Élite
+   896→            </p>
+   897→          )}
+   898→          {remaining === 0 && (
+   899→            <button
+   900→              onClick={() => setShowLimitModal(true)}
+   901→              className="w-full mt-2 text-[10px] text-champagne bg-champagne/10 border border-champagne/20 rounded-lg py-1.5 hover:bg-champagne/15 transition-colors flex items-center justify-center gap-1"
+   902→            >
+   903→              <Circle size={3} fill="currentColor" className="text-champagne/40" />
+   904→              Conversaciones sin límite
+   905→            </button>
+   906→          )}
+   907→        </div>
+   908→      )}
+   909→
+   910→      {/* Premium contextual memory indicator in sidebar */}
+   911→      {isPremium && (
+   912→        <div className="p-3 border-t border-[#1a1a1a]">
+   913→          <div className="flex items-center gap-2 text-[10px] text-champagne/70">
+   914→            <BrainCircuit size={12} className="shrink-0" />
+   915→            <span>Memoria contextual profunda</span>
+   916→          </div>
+   917→        </div>
+   918→      )}
+   919→    </>
+   920→  );
+   921→
+   922→  // ─────────────────────────────────────────
+   923→  // Render
+   924→  // ─────────────────────────────────────────
+   925→
+   926→  if (loading) {
+   927→    return <MentorSkeleton />;
+   928→  }
+   929→
+   930→  if (loadError) {
+   931→    return (
+   932→      <div className="max-w-6xl mx-auto min-h-[60dvh] flex items-center justify-center">
+   933→        <PremiumErrorState
+   934→          variant="loading"
+   935→          title="El mentor no está disponible"
+   936→          subtitle="No se pudo conectar con el asistente. Tu historial está a salvo."
+   937→          onRetry={() => {
+   938→            setLoadError(false);
+   939→            setLoading(true);
+   940→            fetchThreads();
+   941→          }}
+   942→          secondaryAction={{
+   943→            label: 'Volver al dashboard',
+   944→            href: backHref,
+   945→          }}
+   946→          size="lg"
+   947→        />
+   948→      </div>
+   949→    );
+   950→  }
+   951→
+   952→  return (
+   953→    <div className="mentor-full-viewport flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0 sm:gap-4">
+   954→      {/* Offline indicator — subtle top banner */}
+   955→      {isOffline && (
+   956→        <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
+   957→          Sin conexión — los mensajes se enviarán cuando vuelva la red
+   958→        </div>
+   959→      )}
+   960→
+   961→      {/* ═══════════════════════════════════════════
+   962→          MOBILE LAYOUT: Single panel, full viewport
+   963→          ═══════════════════════════════════════════ */}
+   964→
+   965→      {/* Mobile header — ultra compact */}
+   966→      <div className="flex sm:hidden items-center justify-between px-3 py-2 border-b border-[#1a1a1a] shrink-0 bg-[#0a0a0a]">
+   967→        <div className="flex items-center gap-2 min-w-0">
+   968→          <Link href={backHref} className="p-1.5 -ml-1 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors shrink-0">
+   969→            <ChevronLeft size={20} />
+   970→          </Link>
+   971→          <IconComponent size={16} className="text-champagne shrink-0" />
+   972→          <p className="text-sm font-semibold text-white truncate">
+   973→            {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Mentor IA'}
+   974→          </p>
+   975→        </div>
+   976→        <div className="flex items-center gap-2 shrink-0">
+   977→          {/* Message counter pill — mobile compact */}
+   978→          {!isPremium && remaining !== null && (
+   979→            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+   980→              remaining <= 3 ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#1a1a1a] text-champagne border border-[#2a2a2a]'
+   981→            }`}>
+   982→              {remaining}
+   983→            </span>
+   984→          )}
+   985→          {isPremium && (
+   986→            <InfinityIcon size={14} className="text-champagne" />
+   987→          )}
+   988→          {/* Drawer toggle */}
+   989→          <button
+   990→            onClick={() => setDrawerOpen(true)}
+   991→            className="p-1.5 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+   992→          >
+   993→            <Menu size={20} />
+   994→          </button>
+   995→        </div>
+   996→      </div>
+   997→
+   998→      {/* ═══════════════════════════════════════════
+   999→          DESKTOP LAYOUT: Header + sidebar + chat
+  1000→          ═══════════════════════════════════════════ */}
+  1001→
+  1002→      {/* Desktop header */}
+  1003→      <div className="hidden sm:flex items-center justify-between mb-5 shrink-0">
+  1004→        <div className="flex items-center gap-4">
+  1005→          <div className="w-14 h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
+  1006→            <IconComponent size={28} className="text-champagne" />
+  1007→          </div>
+  1008→          <div>
+  1009→            <div className="flex items-center gap-2">
+  1010→              <h1 className="text-2xl font-bold text-white">Mentor IA</h1>
+  1011→              {isPremium && (
+  1012→                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-champagne/50 px-2 py-0.5">
+  1013→                  <Circle size={3} fill="currentColor" className="text-champagne/40" />
+  1014→                  Élite
+  1015→                </span>
+  1016→              )}
+  1017→            </div>
+  1018→            <p className="text-[#999] text-sm">
+  1019→              {isPremium
+  1020→                ? 'Tu mentor con memoria profunda'
+  1021→                : 'Tu guía de desarrollo personal'}
+  1022→            </p>
+  1023→          </div>
+  1024→        </div>
+  1025→        <div className="flex items-center gap-2">
+  1026→          {!isPremium && remaining !== null && (
+  1027→            <div className="message-counter-pill flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a]">
+  1028→              <Zap size={12} className={remaining <= 3 ? 'text-red-400' : 'text-champagne'} />
+  1029→              <span className={remaining <= 3 ? 'text-red-400' : 'text-champagne'}>
+  1030→                {remaining}/{dailyLimit}
+  1031→              </span>
+  1032→            </div>
+  1033→          )}
+  1034→          {isPremium && (
+  1035→            <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-champagne/5 border border-champagne/15">
+  1036→              <InfinityIcon size={12} className="text-champagne" />
+  1037→              <span className="text-champagne">Sin límite</span>
+  1038→            </div>
+  1039→          )}
+  1040→          <button
+  1041→            onClick={() => setSidebarOpen(!sidebarOpen)}
+  1042→            className="p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+  1043→            title={sidebarOpen ? 'Ocultar sidebar' : 'Mostrar sidebar'}
+  1044→          >
+  1045→            {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+  1046→          </button>
+  1047→        </div>
+  1048→      </div>
+  1049→
+  1050→      {/* Contextual Help — desktop only */}
+  1051→      <div className="hidden sm:block">
+  1052→        <ContextualHelp
+  1053→          storageKey="vitazen_help_mentor"
+  1054→          title="Mentor IA"
+  1055→          text="Escribe tu pregunta y el mentor te responderá. Crea nuevas conversaciones, renómbralas o archívalas desde el menú lateral."
+  1056→        />
+  1057→      </div>
+  1058→
+  1059→      {/* ═══════════════════════════════════════════
+  1060→          MAIN CONTENT AREA
+  1061→          Mobile: chat fills full width
+  1062→          Desktop: sidebar + chat (flex-row)
+  1063→          ═══════════════════════════════════════════ */}
+  1064→
+  1065→      {/* ────────── Desktop Sidebar ────────── */}
+  1066→      <div
+  1067→        className={`hidden sm:flex shrink-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl flex-col transition-all duration-300 ease-in-out overflow-hidden relative sidebar-area ${
+  1068→          sidebarOpen ? 'w-72' : 'w-0 border-0'
+  1069→        }`}
+  1070→      >
+  1071→        {sidebarContent}
+  1072→      </div>
+  1073→
+  1074→      {/* ────────── Chat Area — full width on mobile, card on desktop ────────── */}
+  1075→      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden sm:bg-[#0a0a0a] sm:border sm:border-[#1a1a1a] sm:rounded-xl">
+  1076→        {activeThread ? (
+  1077→          <>
+  1078→            {/* Desktop: Chat header bar inside chat card */}
+  1079→            <div className="hidden sm:flex px-5 py-3 border-b border-[#1a1a1a] items-center justify-between shrink-0">
+  1080→              <div className="flex items-center gap-2 min-w-0">
+  1081→                <MessageCircle size={14} className="text-champagne shrink-0" />
+  1082→                <p className="text-sm text-white truncate">
+  1083→                  {activeThreadData?.title?.replace(/[*#_`~]/g, '') || 'Conversación'}
+  1084→                </p>
+  1085→                {activeThreadData?.archived && (
+  1086→                  <span className="shrink-0 text-[10px] bg-champagne/10 text-champagne px-2 py-0.5 rounded-full border border-champagne/20">
+  1087→                    Archivada
+  1088→                  </span>
+  1089→                )}
+  1090→              </div>
+  1091→              {/* Contextual indicator — desktop only */}
+  1092→              {isContextual && (
+  1093→                <div className="relative shrink-0">
+  1094→                  <button
+  1095→                    onMouseEnter={() => setShowContextTooltip(true)}
+  1096→                    onMouseLeave={() => setShowContextTooltip(false)}
+  1097→                    className={`flex items-center gap-1.5 text-[10px] transition-colors px-2 py-1 rounded-full border ${
+  1098→                      isPremium
+  1099→                        ? 'text-champagne/80 hover:text-champagne border-champagne/20 hover:border-champagne/40'
+  1100→                        : 'text-champagne/60 hover:text-champagne border-champagne/15 hover:border-champagne/30'
+  1101→                    }`}
+  1102→                  >
+  1103→                    <BrainCircuit size={12} className="shrink-0" />
+  1104→                    <span>
+  1105→                      {isPremium ? 'Memoria contextual' : 'Contexto activo'}
+  1106→                    </span>
+  1107→                  </button>
+  1108→                  {showContextTooltip && (
+  1109→                    <div className="absolute right-0 top-full mt-2 w-60 bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 shadow-xl context-menu z-10">
+  1110→                      <p className="text-[11px] text-[#999] leading-relaxed">
+  1111→                        {isPremium
+  1112→                          ? 'El mentor usa tu actividad, emociones y conversaciones previas para ofrecerte respuestas profundas y personalizadas.'
+  1113→                          : 'El mentor usa tu actividad reciente para personalizar respuestas.'}
+  1114→                      </p>
+  1115→                    </div>
+  1116→                  )}
+  1117→                </div>
+  1118→              )}
+  1119→            </div>
+  1120→
+  1121→            {/* Messages — single scroll container */}
+  1122→            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overscroll-contain scroll-smooth">
+  1123→              {messages.length === 0 ? (
+  1124→                <div className="flex items-center justify-center h-full p-3 sm:p-5">
+  1125→                  <div className="text-center animate-in">
+  1126→                    <div className="w-16 h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+  1127→                      <IconComponent size={32} className="text-champagne" />
+  1128→                    </div>
+  1129→                    <h3 className="text-lg font-semibold text-white mb-2">Tu Mentor IA</h3>
+  1130→                    <p className="text-[#999] text-sm max-w-sm mx-auto leading-relaxed">
+  1131→                      {isPremium
+  1132→                        ? 'Tu mentor con memoria profunda. Pregúntame lo que necesites.'
+  1133→                        : 'Tu asistente de bienestar. Pregúntame sobre hábitos y bienestar.'}
+  1134→                    </p>
+  1135→                    <div className="flex flex-wrap justify-center gap-2 mt-4">
+  1136→                      {suggestions.map((suggestion) => (
+  1137→                        <button
+  1138→                          key={suggestion}
+  1139→                          onClick={() => {
+  1140→                            setInput(suggestion);
+  1141→                            setTimeout(() => chatInputRef.current?.focus(), 50);
+  1142→                          }}
+  1143→                          className="text-xs text-[#999] bg-[#1a1a1a] border border-[#222] px-3 py-1.5 rounded-full hover:border-champagne/30 hover:text-champagne transition-colors"
+  1144→                        >
+  1145→                          {suggestion}
+  1146→                        </button>
+  1147→                      ))}
+  1148→                    </div>
+  1149→                    {!isPremium && (
+  1150→                      <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
+  1151→                        <Circle size={3} fill="currentColor" className="text-champagne/30" />
+  1152→                        El mentor recuerda más cuando profundizas
+  1153→                      </p>
+  1154→                    )}
+  1155→                  </div>
+  1156→                </div>
+  1157→              ) : (
+  1158→                <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
+  1159→                  {messages.map((msg, idx) => (
+  1160→                    <div
+  1161→                      key={msg.id}
+  1162→                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in`}
+  1163→                      style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
+  1164→                    >
+  1165→                      <div
+  1166→                        className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
+  1167→                          msg.role === 'user'
+  1168→                            ? 'bg-champagne/10 border border-champagne/20 rounded-br-md'
+  1169→                            : isPremium
+  1170→                            ? 'bg-[#080808] border border-champagne/10 rounded-bl-md'
+  1171→                            : 'bg-[#000000] border border-[#1a1a1a] rounded-bl-md'
+  1172→                        }`}
+  1173→                      >
+  1174→                        <p className="text-sm text-white whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
+  1175→                      </div>
+  1176→                    </div>
+  1177→                  ))}
+  1178→                  {sending && (
+  1179→                    <div className="flex justify-start animate-in">
+  1180→                      <div className={`border rounded-2xl rounded-bl-md p-4 ${
+  1181→                        isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
+  1182→                      }`}>
+  1183→                        <div className="flex gap-1.5">
+  1184→                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+  1185→                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+  1186→                          <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+  1187→                        </div>
+  1188→                      </div>
+  1189→                    </div>
+  1190→                  )}
+  1191→                  <div ref={messagesEndRef} />
+  1192→                </div>
+  1193→              )}
+  1194→            </div>
+  1195→
+  1196→            {/* Composer — safe-area for iPhone home indicator */}
+  1197→            <div className="p-3 sm:p-4 shrink-0 bg-[#0a0a0a] sm:bg-transparent" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+  1198→              {/* Low message warning */}
+  1199→              {!isPremium && remaining !== null && remaining <= 3 && remaining > 0 && (
+  1200→                <div className="mb-2 flex items-center gap-2 text-[10px] text-champagne-warm bg-champagne-warm/5 border border-champagne-warm/10 rounded-lg px-3 py-1.5">
+  1201→                  <Zap size={10} className="shrink-0" />
+  1202→                  <span>Te quedan {remaining} mensaje{remaining !== 1 ? 's' : ''} hoy</span>
+  1203→                  <button
+  1204→                    onClick={() => setShowLimitModal(true)}
+  1205→                    className="ml-auto text-champagne hover:text-champagne-hover flex items-center gap-1"
+  1206→                  >
+  1207→                    <Circle size={3} fill="currentColor" className="text-champagne/40" />
+  1208→                    Conocer Élite
+  1209→                  </button>
+  1210→                </div>
+  1211→              )}
+  1212→              <form
+  1213→                onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+  1214→                className="flex gap-2"
+  1215→              >
+  1216→                <input
+  1217→                  ref={chatInputRef}
+  1218→                  type="text"
+  1219→                  value={input}
+  1220→                  onChange={(e) => setInput(e.target.value)}
+  1221→                  enterKeyHint="send"
+  1222→                  autoComplete="off"
+  1223→                  placeholder={
+  1224→                    activeThreadData?.archived
+  1225→                      ? 'Conversación archivada'
+  1226→                      : !isPremium && remaining === 0
+  1227→                      ? 'Límite diario alcanzado'
+  1228→                      : 'Escribe tu mensaje...'
+  1229→                  }
+  1230→                  className={`flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base placeholder-[#555] transition-colors ${
+  1231→                    activeThreadData?.archived
+  1232→                      ? 'border-[#333] cursor-not-allowed opacity-40'
+  1233→                      : !isPremium && remaining === 0
+  1234→                      ? 'border-[#ef4444]/30 cursor-not-allowed opacity-50'
+  1235→                      : 'border-[#1a1a1a] focus:border-champagne focus:outline-none'
+  1236→                  }`}
+  1237→                  disabled={sending || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
+  1238→                />
+  1239→                <button
+  1240→                  type="submit"
+  1241→                  disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
+  1242→                  className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
+  1243→                >
+  1244→                  <Send size={18} />
+  1245→                </button>
+  1246→              </form>
+  1247→            </div>
+  1248→          </>
+  1249→        ) : (
+  1250→          /* No active thread — empty state */
+  1251→          <div className="flex items-center justify-center flex-1 min-h-0">
+  1252→            <div className="text-center animate-in px-4">
+  1253→              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+  1254→                <IconComponent size={28} className="text-champagne sm:size-8" />
+  1255→              </div>
+  1256→              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
+  1257→              <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
+  1258→              <button
+  1259→                onClick={createThread}
+  1260→                className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
+  1261→              >
+  1262→                <Plus size={16} /> Nueva conversación
+  1263→              </button>
+  1264→            </div>
+  1265→          </div>
+  1266→        )}
+  1267→      </div>
+  1268→
+  1269→      {/* ═══════════════════════════════════════════
+  1270→          MOBILE DRAWER — slide-in conversations panel
+  1271→          ═══════════════════════════════════════════ */}
+  1272→      {drawerOpen && (
+  1273→        <>
+  1274→          {/* Backdrop */}
+  1275→          <div
+  1276→            className="fixed inset-0 z-40 bg-black/60 sm:hidden"
+  1277→            onClick={() => setDrawerOpen(false)}
+  1278→          />
+  1279→          {/* Drawer panel — slides from left */}
+  1280→          <div className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area">
+  1281→            {/* Drawer header */}
+  1282→            <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a] shrink-0">
+  1283→              <h2 className="text-sm font-semibold text-white">Conversaciones</h2>
+  1284→              <button
+  1285→                onClick={() => setDrawerOpen(false)}
+  1286→                className="p-1.5 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+  1287→              >
+  1288→                <X size={18} />
+  1289→              </button>
+  1290→            </div>
+  1291→            {/* Reuse sidebar content */}
+  1292→            {sidebarContent}
+  1293→          </div>
+  1294→        </>
+  1295→      )}
+  1296→
+  1297→      {/* ────────── Context Menu ────────── */}
+  1298→      {contextMenu && (
+  1299→        <>
+  1300→          {/* Backdrop */}
+  1301→          <div
+  1302→            className="fixed inset-0 z-40"
+  1303→            onClick={() => setContextMenu(null)}
+  1304→          />
+  1305→          {/* Menu */}
+  1306→          <div
+  1307→            className="fixed z-50 bg-[#111] border border-[#2a2a2a] rounded-xl py-1.5 shadow-2xl shadow-black/60 min-w-[180px] animate-in context-menu"
+  1308→            style={{
+  1309→              top: Math.min(contextMenu.y + 50, window.innerHeight - 200),
+  1310→              left: Math.max(8, Math.min(contextMenu.x + 16, window.innerWidth - 200)),
+  1311→            }}
+  1312→          >
+  1313→            {(() => {
+  1314→              const thread = threads.find(t => t.id === contextMenu.threadId);
+  1315→              if (!thread) return null;
+  1316→              return (
+  1317→                <>
+  1318→                  <button
+  1319→                    onClick={() => {
+  1320→                      setEditingThreadId(thread.id);
+  1321→                      setEditTitle(thread.title);
+  1322→                      setContextMenu(null);
+  1323→                    }}
+  1324→                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-white transition-colors"
+  1325→                  >
+  1326→                    <Pencil size={14} className="text-[#666]" />
+  1327→                    Renombrar
+  1328→                  </button>
+  1329→
+  1330→                  {thread.archived ? (
+  1331→                    <button
+  1332→                      onClick={() => {
+  1333→                        unarchiveThread(thread.id);
+  1334→                        setContextMenu(null);
+  1335→                      }}
+  1336→                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
+  1337→                    >
+  1338→                      <ArchiveRestore size={14} className="text-[#666]" />
+  1339→                      Restaurar
+  1340→                    </button>
+  1341→                  ) : (
+  1342→                    <button
+  1343→                      onClick={() => {
+  1344→                        archiveThread(thread.id);
+  1345→                        setContextMenu(null);
+  1346→                      }}
+  1347→                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
+  1348→                    >
+  1349→                      <Archive size={14} className="text-[#666]" />
+  1350→                      Archivar
+  1351→                    </button>
+  1352→                  )}
+  1353→
+  1354→                  <div className="my-1.5 border-t border-[#1a1a1a]" />
+  1355→
+  1356→                  <button
+  1357→                    onClick={() => {
+  1358→                      setDeleteConfirm(thread.id);
+  1359→                      setContextMenu(null);
+  1360→                    }}
+  1361→                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-red-500/10 hover:text-red-400 transition-colors"
+  1362→                  >
+  1363→                    <Trash2 size={14} className="text-[#666]" />
+  1364→                    Eliminar
+  1365→                  </button>
+  1366→                </>
+  1367→              );
+  1368→            })()}
+  1369→          </div>
+  1370→        </>
+  1371→      )}
+  1372→
+  1373→      {/* ────────── Delete Confirmation Modal ────────── */}
+  1374→      {deleteConfirm && (
+  1375→        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setDeleteConfirm(null)}>
+  1376→          <div className="modal-content-destructive p-8 max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
+  1377→            <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+  1378→              <AlertTriangle size={28} className="text-red-400" />
+  1379→            </div>
+  1380→            <h3 className="text-lg font-bold text-white mb-2">Eliminar conversación</h3>
+  1381→            <p className="text-[#999] mb-6 text-sm leading-relaxed">
+  1382→              Esta acción eliminará la conversación y todos sus mensajes de forma permanente. No se puede deshacer.
+  1383→            </p>
+  1384→            <div className="flex gap-3 justify-center">
+  1385→              <button
+  1386→                onClick={() => deleteThread(deleteConfirm)}
+  1387→                className="bg-red-500/90 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-red-500 transition-colors text-sm"
+  1388→              >
+  1389→                Eliminar
+  1390→              </button>
+  1391→              <button
+  1392→                onClick={() => setDeleteConfirm(null)}
+  1393→                className="text-[#999] px-5 py-2.5 hover:text-white transition-colors text-sm"
+  1394→              >
+  1395→                Cancelar
+  1396→              </button>
+  1397→            </div>
+  1398→          </div>
+  1399→        </div>
+  1400→      )}
+  1401→
+  1402→      {/* Action error toast — auto-dismisses */}
+  1403→      {actionError && (
+  1404→        <div
+  1405→          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
+  1406→          onClick={() => setActionError('')}
+  1407→        >
+  1408→          {actionError}
+  1409→        </div>
+  1410→      )}
+  1411→
+  1412→      {/* ────────── Premium Limit Modal ────────── */}
+  1413→      {showLimitModal && (
+  1414→        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+  1415→          <div className="modal-content bg-[#0a0a0a] border border-champagne/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
+  1416→            <div className="p-8 text-center">
+  1417→              <div className="w-10 h-10 rounded-xl bg-champagne/8 flex items-center justify-center mx-auto mb-5">
+  1418→                <Circle size={5} fill="currentColor" className="text-champagne/40" />
+  1419→              </div>
+  1420→
+  1421→              <h3 className="text-xl font-bold text-white mb-2">
+  1422→                Tu ritmo de hoy se ha completado
+  1423→              </h3>
+  1424→              <p className="text-[#999] mb-6 text-sm leading-relaxed">
+  1425→                Has conversado lo que corresponde a hoy. Si quieres seguir profundizando, hay un camino.
+  1426→              </p>
+  1427→
+  1428→              <div className="space-y-3 mb-6 text-left">
+  1429→                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
+  1430→                  <p className="text-xs text-[#999] font-medium mb-0.5">Conversaciones sin límite diario</p>
+  1431→                  <p className="text-[10px] text-[#555]">El mentor está cuando lo necesitas</p>
+  1432→                </div>
+  1433→                <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
+  1434→                  <p className="text-xs text-[#999] font-medium mb-0.5">Memoria que acumula contexto</p>
+  1435→                  <p className="text-[10px] text-[#555]">Cada conversación profundiza la anterior</p>
+  1436→                </div>
+  1437→              </div>
+  1438→
+  1439→              <div className="space-y-3">
+  1440→                <Link
+  1441→                  href="/elite"
+  1442→                  className="block w-full bg-champagne/10 border border-champagne/20 text-champagne font-medium py-3 rounded-xl hover:bg-champagne/15 transition-colors text-sm text-center"
+  1443→                  onClick={() => setShowLimitModal(false)}
+  1444→                >
+  1445→                  <span className="flex items-center justify-center gap-2">
+  1446→                    <Circle size={4} fill="currentColor" />
+  1447→                    Conocer Élite
+  1448→                  </span>
+  1449→                </Link>
+  1450→                <button
+  1451→                  onClick={() => setShowLimitModal(false)}
+  1452→                  className="w-full text-[#666] py-2.5 hover:text-[#999] transition-colors text-sm"
+  1453→                >
+  1454→                  Volver mañana
+  1455→                </button>
+  1456→              </div>
+  1457→            </div>
+  1458→          </div>
+  1459→        </div>
+  1460→      )}
+  1461→    </div>
+  1462→  );
+  1463→}
+  1464→

@@ -1,0 +1,791 @@
+     1→// ═══════════════════════════════════════════════════════════════════
+     2→// REASONING ENGINE — Capa de decisión ligera
+     3→//
+     4→// FILOSOFÍA:
+     5→//   No genera respuestas. No llama a Groq. No consulta la base de datos.
+     6→//   Solo decide: qué necesita el usuario, qué información utilizar,
+     7→//   qué tono priorizar, qué motores tienen mayor relevancia.
+     8→//
+     9→// INTEGRACIÓN:
+    10→//   Se invoca en route.ts DESPUÉS de construir el contexto y ANTES
+    11→//   de la llamada a Groq. Su salida se inyecta como bloque de
+    12→//   instrucciones en el prompt del sistema.
+    13→//
+    14→// RENDIMIENTO:
+    15→//   0 consultas nuevas. 0 llamadas externas. Latencia < 1 ms.
+    16→//   Solo procesa datos que ya existen en memoria durante el request.
+    17→//
+    18→// SEGURIDAD:
+    19→//   Si falla, retorna null. El chat continúa exactamente igual.
+    20→// ═══════════════════════════════════════════════════════════════════
+    21→
+    22→// ─── Tipos públicos ───
+    23→
+    24→export type PrimaryNeed =
+    25→  | 'orientacion'
+    26→  | 'descarga_emocional'
+    27→  | 'progreso'
+    28→  | 'reflexion'
+    29→  | 'informacion'
+    30→  | 'celebracion'
+    31→  | 'desafio'
+    32→  | 'continuidad'
+    33→  | 'urgencia'
+    34→  | 'exploracion';
+    35→
+    36→export type ResponseObjective =
+    37→  | 'dar_paso_concreto'
+    38→  | 'validar_y_avanzar'
+    39→  | 'escuchar_y_contener'
+    40→  | 'reconocer_progreso'
+    41→  | 'provocar_reflexion'
+    42→  | 'informar_con_claridad'
+    43→  | 'ajustar_rumbo'
+    44→  | 'celebrar_logro'
+    45→  | 'desafiar_complacencia'
+    46→  | 'reconectar_historia';
+    47→
+    48→export type RecommendedTone =
+    49→  | 'directo'
+    50→  | 'empatico'
+    51→  | 'desafiante'
+    52→  | 'contemplativo'
+    53→  | 'celebrativo'
+    54→  | 'pragmatico'
+    55→  | 'sutil'
+    56→  | 'calmado';
+    57→
+    58→export type ReasoningDepth = 'superficial' | 'moderado' | 'profundo';
+    59→export type RecommendedLength = 'corta' | 'media' | 'larga';
+    60→export type Domain = 'disciplina' | 'mente' | 'energia' | 'riqueza' | 'emocional' | 'relaciones' | 'general';
+    61→export type SystemId =
+    62→  | 'emotional_state'
+    63→  | 'life_stage'
+    64→  | 'silent_memories'
+    65→  | 'goals'
+    66→  | 'continuity'
+    67→  | 'patterns'
+    68→  | 'monthly_closure'
+    69→  | 'habits'
+    70→  | 'meditation'
+    71→  | 'nutrition'
+    72→  | 'finances';
+    73→
+    74→export interface ReasoningInput {
+    75→  /** Mensaje del usuario */
+    76→  message: string;
+    77→  /** Estado emocional (del mentor-context) */
+    78→  emotionalState: {
+    79→    status: string;
+    80→    statusLabel: string;
+    81→    summary: string;
+    82→  } | null;
+    83→  /** Etapa de vida (del mentor-context) */
+    84→  lifeStage: {
+    85→    flavor: string;
+    86→    label: string;
+    87→    observation: string;
+    88→  } | null;
+    89→  /** Silent Memories (del mentor-context) */
+    90→  silentMemories: string[];
+    91→  /** Goals snippet ya calculado (se pasa como flag de disponibilidad) */
+    92→  hasGoals: boolean;
+    93→  /** Continuity snippet ya calculado */
+    94→  hasContinuity: boolean;
+    95→  /** Patrones detectados disponibles */
+    96→  hasPatterns: boolean;
+    97→  /** Monthly closure disponible */
+    98→  hasMonthlyClosure: boolean;
+    99→  /** Plan del usuario */
+   100→  plan: 'FREE' | 'PREMIUM';
+   101→  /** Historial reciente (para detectar repetición) */
+   102→  recentHistory: { role: string; content: string }[];
+   103→}
+   104→
+   105→export interface ReasoningOutput {
+   106→  primaryNeed: PrimaryNeed;
+   107→  secondaryNeed: PrimaryNeed | null;
+   108→  mainIntent: string;
+   109→  secondaryIntent: string | null;
+   110→  priorityDomain: Domain;
+   111→  secondaryDomain: Domain | null;
+   112→  reasoningDepth: ReasoningDepth;
+   113→  responseObjective: ResponseObjective;
+   114→  recommendedTone: RecommendedTone;
+   115→  recommendedLength: RecommendedLength;
+   116→  relevantSystems: SystemId[];
+   117→  ignoredSystems: SystemId[];
+   118→  askQuestion: boolean;
+   119→  maxQuestions: 0 | 1;
+   120→  shouldCelebrate: boolean;
+   121→  shouldChallenge: boolean;
+   122→  shouldReflect: boolean;
+   123→  shouldBePractical: boolean;
+   124→  confidence: number;
+   125→}
+   126→
+   127→// ─── Mapas de palabras por dominio ───
+   128→
+   129→const DOMAIN_KEYWORDS: Record<string, string[]> = {
+   130→  disciplina: [
+   131→    'hábito', 'constancia', 'rutina', 'disciplina', 'racha', 'procrastinar',
+   132→    'procrastinación', 'comprometer', 'mantener', 'organizar', 'planificar',
+   133→    'productividad', 'tarea', 'agenda', 'plan', 'horario', ' schedules ',
+   134→  ],
+   135→  mente: [
+   136→    'meditar', 'meditación', 'mindfulness', 'leer', 'estudiar', 'concentrar',
+   137→    'enfoque', 'mental', 'claridad', 'aprender', 'libro', 'lectura',
+   138→    'visualización', 'atención', 'pensar', 'creer', 'mentalidad',
+   139→  ],
+   140→  energia: [
+   141→    'dormir', 'sueño', 'descanso', 'cansado', 'cansancio', 'fatiga',
+   142→    'caminar', 'pasos', 'correr', 'gimnasio', 'ejercicio', 'entrenar',
+   143→    'energía', 'vitalidad', 'cuerpo', 'forma física', 'yoga',
+   144→  ],
+   145→  riqueza: [
+   146→    'ahorrar', 'ahorro', 'gastar', 'dinero', 'invertir', 'finanzas',
+   147→    'presupuesto', 'vivienda', 'hipoteca', 'deuda', 'ingresos',
+   148→    'sueldo', 'etf', 'inversión', 'precio', 'compra', 'pago',
+   149→  ],
+   150→  emocional: [
+   151→    'estrés', 'ansiedad', 'miedo', 'frustrado', 'triste', 'feliz',
+   152→    'contento', 'agobio', 'presión', 'angustia', 'quemado', 'burnout',
+   153→    'agotado', 'emocional', 'sentir', 'llorar', 'nervioso',
+   154→  ],
+   155→  relaciones: [
+   156→    'pareja', 'relación', 'familia', 'amigos', 'amistad', 'hijos',
+   157→    'compañeros', 'jefe', 'equipo', 'conflicto', 'comunicación',
+   158→    'límites', 'persona', 'conocer', 'social',
+   159→  ],
+   160→};
+   161→
+   162→// ─── Patrones de intención ───
+   163→
+   164→interface IntentPattern {
+   165→  regex: RegExp;
+   166→  need: PrimaryNeed;
+   167→  intent: string;
+   168→  objective: ResponseObjective;
+   169→  tone: RecommendedTone;
+   170→  domains: Domain[];
+   171→}
+   172→
+   173→const INTENT_PATTERNS: IntentPattern[] = [
+   174→  // Orientación / pedir ayuda
+   175→  {
+   176→    regex: /(?:cómo\s+(?:puedo|puedes|hago)|qué\s+(?:me\s+)?recomiendas|qué\s+hago|necesito\s+(?:consejo|ayuda|orientación)|dame\s+(?:un\s+)?consejo|sugiére|ayúdame|qué\s+pasaría\s+si)/i,
+   177→    need: 'orientacion',
+   178→    intent: 'solicitar_orientacion',
+   179→    objective: 'dar_paso_concreto',
+   180→    tone: 'directo',
+   181→    domains: ['general'],
+   182→  },
+   183→  // Descarga emocional
+   184→  {
+   185→    regex: /(?:estoy\s+(?:muy\s+)?(?:cansado|agotado|triste|frustrado|harto|sobrecargado|abrumado)|no\s+(?:aguanto|puedo\s+más|soporto)|me\s+(?:siento\s+(?:mal|perdido|sin\s+energía|vacío)|estoy\s+(?:riendiendo|derrumbando))|ya\s+no\s+(?:puedo|aguanto|soporto)|no\s+(?:sé|tengo\s+claro)\s+(?:qué\s+hacer|cómo\s+seguir))/i,
+   186→    need: 'descarga_emocional',
+   187→    intent: 'expresar_dolor',
+   188→    objective: 'escuchar_y_contener',
+   189→    tone: 'empatico',
+   190→    domains: ['emocional', 'energia'],
+   191→  },
+   192→  // Progreso / logro
+   193→  {
+   194→    regex: /(?:he\s+(?:logrado|conseguido|hecho|completado|terminado|mantenido)|ya\s+(?:lo|lo\s+he)\s+(?:hice|logré|conseguí|terminé)|conseguí|(?:estoy\s+)?(?:content[oa]|orgulloso)\s+con|(?:voy\s+)?(?:bien|por\s+buen\s+camino|avanzando|progresando))/i,
+   195→    need: 'progreso',
+   196→    intent: 'compartir_logro',
+   197→    objective: 'reconocer_progreso',
+   198→    tone: 'directo',
+   199→    domains: ['disciplina'],
+   200→  },
+   201→  // Reflexión
+   202→  {
+   203→    regex: /(?:no\s+sé\s+si|(?:pienso|me\s+pregunto)\s+(?:si|qué|por\s+qué)|a\s+veces\s+(?:siento|pienso)|no\s+entiendo\s+por\s+qué|será\s+que|quizás\s+debería|(?:tengo|tengo\s+que)\s+(?:duda|que\s+decidir))/i,
+   204→    need: 'reflexion',
+   205→    intent: 'cuestionar_situacion',
+   206→    objective: 'provocar_reflexion',
+   207→    tone: 'contemplativo',
+   208→    domains: ['emocional', 'mente'],
+   209→  },
+   210→  // Celebración explícita
+   211→  {
+   212→    regex: /(?:lo\s+(?:logré|conseguí|terminé|completé|finalicé)|¡(?:lo|hice|conseguí)|meta\s+(?:cumplida|alcanzada|lograda)|objetivo\s+(?:cumplido|alcanzado))/i,
+   213→    need: 'celebracion',
+   214→    intent: 'celebrar_logro',
+   215→    objective: 'celebrar_logro',
+   216→    tone: 'celebrativo',
+   217→    domains: ['disciplina'],
+   218→  },
+   219→  // Desafío / complacencia
+   220→  {
+   221→    regex: /(?:ya\s+estoy\s+(?:bien|conforme|cómodo)|no\s+(?:necesito|tengo\s+que)\s+cambiar|estoy\s+(?:tranquilo|conforme|en\s+paz)|todo\s+(?:va\s+bien|está\s+bien)|no\s+quiero\s+(?:cambiar|más))/i,
+   222→    need: 'desafio',
+   223→    intent: 'expresar_conformidad',
+   224→    objective: 'desafiar_complacencia',
+   225→    tone: 'desafiante',
+   226→    domains: ['general'],
+   227→  },
+   228→  // Continuidad / seguimiento
+   229→  {
+   230→    regex: /(?:lo\s+(?:que\s+)?(?:dijiste|hablamos|comentamos)|(?:el\s+otro\s+)?(?:día|vez)\s+(?:mencioné|te\s+dije|hablé)|como\s+(?:te\s+)?(?:dije|comenté)|estuve\s+(?:pensando|reflexionando)\s+en\s+(?:lo\s+)?que|(?:sigo|continúo|sigo\s+sin))/i,
+   231→    need: 'continuidad',
+   232→    intent: 'retomar_hilo',
+   233→    objective: 'reconectar_historia',
+   234→    tone: 'sutil',
+   235→    domains: ['general'],
+   236→  },
+   237→  // Urgencia
+   238→  {
+   239→    regex: /(?:es\s+urgente|tengo\s+que\s+(?:ya|ahora|mismo)|(?:no\s+puedo\s+)?esperar\s+más|es\s+una\s+emergencia|necesito\s+(?:ya|ahora|mismo)|estoy\s+al\s+(?:límite|borde)|no\s+(?:sé|puedo)\s+seguir\s+así)/i,
+   240→    need: 'urgencia',
+   241→    intent: 'pedir_ayuda_inmediata',
+   242→    objective: 'dar_paso_concreto',
+   243→    tone: 'calmado',
+   244→    domains: ['emocional'],
+   245→  },
+   246→  // Exploración
+   247→  {
+   248→    regex: /(?:qué\s+(?:opinas|piensas)|me\s+gustaría\s+(?:saber|explorar|entender)|qué\s+(?:tan|tal)\s+(?:buena|mala|útil)\s+(?:idea|es)|(?:sería|estaría)\s+(?:bueno|bien)\s+(?:idea)?|tienes\s+(?:alguna|alguna)\s+(?:idea|sugerencia))/i,
+   249→    need: 'exploracion',
+   250→    intent: 'explorar_possibilidades',
+   251→    objective: 'provocar_reflexion',
+   252→    tone: 'contemplativo',
+   253→    domains: ['general'],
+   254→  },
+   255→  // Información directa
+   256→  {
+   257→    regex: /(?:cuál\s+es\s+la\s+diferencia|qué\s+es\s+(?:un|una|el|la)|para\s+qué\s+(?:sirve|vale|es)|cuándo\s+(?:es|debo|debería)|cuánt[oa]s?\s+(?:veces|horas|días)|explica(?:r)?\s+(?:me\s+)?(?:qué|cómo))/i,
+   258→    need: 'informacion',
+   259→    intent: 'pedir_datos',
+   260→    objective: 'informar_con_claridad',
+   261→    tone: 'directo',
+   262→    domains: ['general'],
+   263→  },
+   264→];
+   265→
+   266→// ─── Patrones de mensajes híbridos ───
+   267→
+   268→interface HybridPattern {
+   269→  regex: RegExp;
+   270→  primaryNeed: PrimaryNeed;
+   271→  secondaryNeed: PrimaryNeed;
+   272→  description: string;
+   273→}
+   274→
+   275→const HYBRID_PATTERNS: HybridPattern[] = [
+   276→  // Progreso + frustración: "He caminado 8000 pasos pero sigo sintiéndome un fracaso"
+   277→  {
+   278→    regex: /(?:he\s+(?:logrado|conseguido|caminado|corrido|hecho|completado).{5,80}(?:pero|sin\s+embargo|aunque).{5,80}(?:fracaso|frustrad|mal|insatisfecho|no\s+(?:soy|me\s+siento)\s+bien|no\s+(?:es\s+)?suficiente))/i,
+   279→    primaryNeed: 'progreso',
+   280→    secondaryNeed: 'descarga_emocional',
+   281→    description: 'progreso_con_autoestima_baja',
+   282→  },
+   283→  {
+   284→    regex: /(?:pero|sin\s+embargo|aunque).{5,80}(?:he\s+(?:logrado|conseguido|hecho|avanzado)|estoy\s+(?:mejor|avanzando|progresa))/i,
+   285→    primaryNeed: 'descarga_emocional',
+   286→    secondaryNeed: 'progreso',
+   287→    description: 'dolor_con_resiliencia',
+   288→  },
+   289→  // Orientación + urgencia: "Necesito ayuda urgente con..."
+   290→  {
+   291→    regex: /(?:necesito\s+(?:ayuda|consejo|orientación)).{0,30}(?:urgente|ya|ahora|mismo|rápido)/i,
+   292→    primaryNeed: 'urgencia',
+   293→    secondaryNeed: 'orientacion',
+   294→    description: 'orientacion_urgente',
+   295→  },
+   296→  // Reflexión + orientación: "No sé si debería X o Y, qué me recomiendas"
+   297→  {
+   298→    regex: /(?:no\s+sé\s+(?:si|qué)).{5,60}(?:recomiendas|sugieres|harías|piensas)/i,
+   299→    primaryNeed: 'reflexion',
+   300→    secondaryNeed: 'orientacion',
+   301→    description: 'indecision_con_peticion',
+   302→  },
+   303→];
+   304→
+   305→// ─── Palabras que indican la necesidad de pregunta ───
+   306→
+   307→const ASK_QUESTION_INDICATORS = [
+   308→  /(?:no\s+sé|no\s+tengo\s+claro|no\s+estoy\s+seguro)/i,
+   309→  /(?:qué\s+(?:opinas|piensas|me\s+recomiendas))/i,
+   310→  /(?:es\s+(?:mejor|peor|buena\s+idea))\s+(?:hacer|intentar|probar)/i,
+   311→  /(?:debería\s+(?:yo\s+)?(?:hacerlo|intentarlo|probarlo))/i,
+   312→  /(?:estoy\s+(?:dudando|indeciso|entre))/i,
+   313→];
+   314→
+   315→// ─── Detección de repetición en historial ───
+   316→
+   317→function detectRepetition(message: string, history: { role: string; content: string }[]): boolean {
+   318→  const lower = message.toLowerCase();
+   319→  const words = new Set(lower.split(/\s+/).filter(w => w.length >= 4));
+   320→  if (words.size === 0) return false;
+   321→
+   322→  // Check last 3 user messages for high overlap
+   323→  const recentUser = history
+   324→    .filter(m => m.role === 'user')
+   325→    .slice(-3);
+   326→
+   327→  for (const msg of recentUser) {
+   328→    const msgLower = msg.content.toLowerCase();
+   329→    const msgWords = new Set(msgLower.split(/\s+/).filter(w => w.length >= 4));
+   330→    if (msgWords.size === 0) continue;
+   331→
+   332→    let overlap = 0;
+   333→    for (const w of words) {
+   334→      if (msgWords.has(w)) overlap++;
+   335→    }
+   336→
+   337→    const similarity = overlap / Math.min(words.size, msgWords.size);
+   338→    if (similarity > 0.7) return true;
+   339→  }
+   340→
+   341→  return false;
+   342→}
+   343→
+   344→// ─── Detección de dominios en un texto ───
+   345→
+   346→function detectDomains(text: string): Domain[] {
+   347→  const lower = text.toLowerCase();
+   348→  const detected: { domain: Domain; score: number }[] = [];
+   349→
+   350→  for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
+   351→    let score = 0;
+   352→    for (const kw of keywords) {
+   353→      if (lower.includes(kw)) score++;
+   354→    }
+   355→    if (score > 0) {
+   356→      detected.push({ domain: domain as Domain, score });
+   357→    }
+   358→  }
+   359→
+   360→  detected.sort((a, b) => b.score - a.score);
+   361→  return detected.map(d => d.domain);
+   362→}
+   363→
+   364→// ─── Evaluación de relevancia de sistemas ───
+   365→
+   366→function evaluateSystems(input: ReasoningInput, domains: Domain[]): {
+   367→  relevant: SystemId[];
+   368→  ignored: SystemId[];
+   369→} {
+   370→  const isPremium = input.plan === 'PREMIUM';
+   371→  const messageLower = input.message.toLowerCase();
+   372→
+   373→  const allSystems: SystemId[] = [
+   374→    'emotional_state',
+   375→    'life_stage',
+   376→    'silent_memories',
+   377→    'goals',
+   378→    'continuity',
+   379→    'patterns',
+   380→    'monthly_closure',
+   381→    'habits',
+   382→    'meditation',
+   383→    'nutrition',
+   384→    'finances',
+   385→  ];
+   386→
+   387→  const scores = new Map<SystemId, number>();
+   388→
+   389→  // Emotional state: relevante cuando hay señales emocionales o el estado es negativo
+   390→  scores.set('emotional_state', 0.2);
+   391→  if (input.emotionalState) {
+   392→    if (input.emotionalState.status === 'sobrecargado') scores.set('emotional_state', 0.9);
+   393→    else if (input.emotionalState.status === 'en_progreso') scores.set('emotional_state', 0.5);
+   394→    else if (input.emotionalState.status === 'enfocado') scores.set('emotional_state', 0.3);
+   395→  }
+   396→  if (/(?:estrés|ansiedad|miedo|frustrado|triste|agotado|abrumado|cansado|nervioso)/i.test(messageLower)) {
+   397→    scores.set('emotional_state', 1.0);
+   398→  }
+   399→
+   400→  // Life stage: relevante cuando hay contexto temporal amplio o cambio
+   401→  scores.set('life_stage', 0.1);
+   402→  if (input.lifeStage) {
+   403→    if (['exhaustion', 'intensity', 'dispersion'].includes(input.lifeStage.flavor)) {
+   404→      scores.set('life_stage', 0.6);
+   405→    }
+   406→  }
+   407→  if (/(?:últimamente|estas\s+(?:semanas|últimas)|mes\s+pasado|tiempo|hace\s+(?:un\s+rato|tiempo))/i.test(messageLower)) {
+   408→    scores.set('life_stage', 0.7);
+   409→  }
+   410→
+   411→  // Silent memories: baja relevancia por defecto, más si habla de tiempo/presencia
+   412→  scores.set('silent_memories', 0.1);
+   413→  if (input.silentMemories.length > 0 && /(?:regreso|volví|hace\s+(?:tiempo|mucho)|otra\s+vez|otra\s+vez)/i.test(messageLower)) {
+   414→    scores.set('silent_memories', 0.7);
+   415→  }
+   416→
+   417→  // Goals: muy relevante cuando habla de objetivos/hábitos/compromisos
+   418→  scores.set('goals', 0.15);
+   419→  if (input.hasGoals && /(?:objetivo|meta|compromiso|quiero|voy\s+a|estoy\s+intentando|mi\s+propósito|racha|constancia|hábito)/i.test(messageLower)) {
+   420→    scores.set('goals', 0.95);
+   421→  }
+   422→  if (domains.includes('disciplina')) scores.set('goals', Math.max(scores.get('goals') ?? 0, 0.7));
+   423→
+   424→  // Continuity: relevante cuando retoma temas o hay conexión histórica
+   425→  scores.set('continuity', 0.1);
+   426→  if (input.hasContinuity) scores.set('continuity', 0.6);
+   427→  if (/(?:lo\s+(?:que\s+)?(?:dijiste|hablamos)|el\s+otro\s+día|como\s+(?:te\s+)?dije|estuve\s+pensando)/i.test(messageLower)) {
+   428→    scores.set('continuity', 0.9);
+   429→  }
+   430→
+   431→  // Patterns: relevante cuando habla de conexiones entre áreas
+   432→  scores.set('patterns', 0.05);
+   433→  if (input.hasPatterns && domains.length >= 2) {
+   434→    scores.set('patterns', 0.6);
+   435→  }
+   436→
+   437→  // Monthly closure: baja relevancia, solo si habla del mes/cierre
+   438→  scores.set('monthly_closure', 0.05);
+   439→  if (input.hasMonthlyClosure && /(?:mes\s+pasado|este\s+mes|cierre|resumen\s+mensual|balance)/i.test(messageLower)) {
+   440→    scores.set('monthly_closure', 0.8);
+   441→  }
+   442→
+   443→  // Domain-specific systems
+   444→  scores.set('habits', domains.includes('disciplina') ? 0.8 : 0.1);
+   445→  scores.set('meditation', domains.includes('mente') ? 0.7 : 0.1);
+   446→  scores.set('nutrition', domains.includes('energia') ? 0.5 : 0.05);
+   447→  scores.set('finances', domains.includes('riqueza') ? 0.8 : 0.05);
+   448→
+   449→  // FREE: reducir número de sistemas relevantes
+   450→  const threshold = isPremium ? 0.4 : 0.7;
+   451→  const maxRelevant = isPremium ? 7 : 3;
+   452→
+   453→  const relevant = allSystems
+   454→    .filter(s => (scores.get(s) ?? 0) >= threshold)
+   455→    .sort((a, b) => (scores.get(b) ?? 0) - (scores.get(a) ?? 0))
+   456→    .slice(0, maxRelevant);
+   457→
+   458→  const ignored = allSystems.filter(s => !relevant.includes(s));
+   459→
+   460→  return { relevant, ignored };
+   461→}
+   462→
+   463→// ─── Calcular profundidad del razonamiento ───
+   464→
+   465→function computeDepth(input: ReasoningInput, domains: Domain[], isHybrid: boolean): ReasoningDepth {
+   466→  const isPremium = input.plan === 'PREMIUM';
+   467→  const msgLen = input.message.length;
+   468→
+   469→  let depthScore = 0;
+   470→
+   471→  // Mensajes largos y de múltiples dominios → más profundidad
+   472→  if (msgLen > 200) depthScore += 1;
+   473→  if (domains.length >= 2) depthScore += 1;
+   474→  if (isHybrid) depthScore += 1;
+   475→
+   476→  // Estado emocional negativo → más profundidad necesaria
+   477→  if (input.emotionalState?.status === 'sobrecargado') depthScore += 1;
+   478→  if (input.emotionalState?.status === 'en_progreso') depthScore += 0.5;
+   479→
+   480→  // FREE: limitar profundidad
+   481→  if (!isPremium) {
+   482→    return depthScore >= 1.5 ? 'moderado' : 'superficial';
+   483→  }
+   484→
+   485→  // PREMIUM: toda la profundidad disponible
+   486→  if (depthScore >= 2.5) return 'profundo';
+   487→  if (depthScore >= 1) return 'moderado';
+   488→  return 'superficial';
+   489→}
+   490→
+   491→// ─── Calcular longitud recomendada ───
+   492→
+   493→function computeLength(need: PrimaryNeed, depth: ReasoningDepth, isPremium: boolean, isRepetition: boolean): RecommendedLength {
+   494→  // Repetición: más corto siempre
+   495→  if (isRepetition) return 'corta';
+   496→
+   497→  // FREE: priorizar respuestas cortas
+   498→  if (!isPremium) {
+   499→    if (need === 'descarga_emocional') return 'media';
+   500→    if (need === 'celebracion') return 'corta';
+   501→    return 'corta';
+   502→  }
+   503→
+   504→  // PREMIUM
+   505→  if (depth === 'profundo') return need === 'descarga_emocional' ? 'media' : 'larga';
+   506→  if (depth === 'moderado') return 'media';
+   507→  return 'corta';
+   508→}
+   509→
+   510→// ─── Determinar si hay celebración ───
+   511→
+   512→function detectCelebration(message: string, history: { role: string; content: string }[]): boolean {
+   513→  // Verificar que el usuario no celebró lo mismo recientemente
+   514→  const isCelebrationMsg = /(?:he\s+(?:logrado|conseguido|completado|terminado|finalicé)|ya\s+(?:lo|lo\s+he)\s+(?:hice|logré|conseguí|terminé)|meta\s+(?:cumplida|alcanzada|lograda)|objetivo\s+(?:cumplido|alcanzado))/i.test(message);
+   515→
+   516→  if (!isCelebrationMsg) return false;
+   517→
+   518→  // No celebrar si ya se celebró el mismo tema en las últimas 3 interacciones
+   519→  const recentAssistant = history.filter(m => m.role === 'assistant').slice(-3);
+   520→  for (const msg of recentAssistant) {
+   521→    if (/(?:bien\s+hecho|enhorabuena|excelente|genial| Increíble|eso\s+es\s+gran|mereces|muy\s+bien|felicitaciones)/i.test(msg.content)) {
+   522→      return false;
+   523→    }
+   524→  }
+   525→
+   526→  return true;
+   527→}
+   528→
+   529→// ─── Determinar si hay que desafiar ───
+   530→
+   531→function detectChallenge(message: string, emotionalState: ReasoningInput['emotionalState']): boolean {
+   532→  if (emotionalState?.status === 'sobrecargado') return false;
+   533→
+   534→  return /(?:ya\s+estoy\s+(?:bien|conforme)|no\s+(?:necesito|tengo)\s+cambiar|estoy\s+tranquilo|todo\s+(?:va|está)\s+bien|estoy\s+conforme)/i.test(message);
+   535→}
+   536→
+   537→// ─── Determinar si hay que reflexionar ───
+   538→
+   539→function detectReflection(message: string, need: PrimaryNeed): boolean {
+   540→  if (need === 'reflexion') return true;
+   541→  if (need === 'exploracion') return true;
+   542→
+   543→  return /(?:no\s+sé\s+si|a\s+veces\s+(?:siento|pienso)|me\s+pregunto|será\s+que|quizás|no\s+entiendo\s+por\s+qué)/i.test(message);
+   544→}
+   545→
+   546→// ─── Calcular confianza ───
+   547→
+   548→function computeConfidence(
+   549→  hasPrimaryMatch: boolean,
+   550→  domainCount: number,
+   551→  isHybrid: boolean
+   552→): number {
+   553→  let confidence = 0.3; // base
+   554→
+   555→  if (hasPrimaryMatch) confidence += 0.35;
+   556→  if (domainCount > 0) confidence += 0.15;
+   557→  if (isHybrid) confidence += 0.1;
+   558→  if (domainCount >= 2) confidence += 0.1;
+   559→
+   560→  return Math.min(confidence, 1.0);
+   561→}
+   562→
+   563→// ─── Determinar si debe hacer pregunta ───
+   564→
+   565→function determineAskQuestion(message: string, need: PrimaryNeed, isPremium: boolean): { ask: boolean; max: 0 | 1 } {
+   566→  // Nunca preguntar en estos casos
+   567→  if (need === 'celebracion') return { ask: false, max: 0 };
+   568→  if (need === 'urgencia') return { ask: false, max: 0 };
+   569→  if (need === 'descarga_emocional') return { ask: false, max: 0 };
+   570→
+   571→  // Preguntas directas: responder, no preguntar
+   572→  if (/\?$/.test(message.trim())) return { ask: false, max: 0 };
+   573→  if (/^(?:qué|cómo|cuál|cuándo|dónde|quién|cuánto|por\s+qué)/i.test(message.trim())) {
+   574→    return { ask: false, max: 0 };
+   575→  }
+   576→
+   577→  // FREE: minimizar preguntas (mensajes limitados)
+   578→  if (!isPremium) return { ask: false, max: 0 };
+   579→
+   580→  // Detectar si el usuario está pidiendo implícitamente una pregunta
+   581→  const shouldAsk = ASK_QUESTION_INDICATORS.some(p => p.test(message));
+   582→  return { ask: shouldAsk, max: 1 };
+   583→}
+   584→
+   585→// ─── Formatear salida para inyección en prompt ───
+   586→
+   587→export function formatReasoningForPrompt(decision: ReasoningOutput): string {
+   588→  const parts: string[] = [
+   589→    '',
+   590→    '── Decisión de razonamiento ──',
+   591→    `Necesidad: ${decision.primaryNeed}${decision.secondaryNeed ? ` + ${decision.secondaryNeed}` : ''}`,
+   592→    `Objetivo de respuesta: ${decision.responseObjective}`,
+   593→    `Tono: ${decision.recommendedTone}`,
+   594→    `Profundidad: ${decision.reasoningDepth}`,
+   595→    `Longitud: ${decision.recommendedLength}`,
+   596→  ];
+   597→
+   598→  // Flags de comportamiento
+   599→  const flags: string[] = [];
+   600→  if (decision.shouldCelebrate) flags.push('celebrar');
+   601→  if (decision.shouldChallenge) flags.push('desafiar');
+   602→  if (decision.shouldReflect) flags.push('reflexionar');
+   603→  if (decision.shouldBePractical) flags.push('ser_práctico');
+   604→  if (flags.length > 0) {
+   605→    parts.push(`Prioridades: ${flags.join(', ')}`);
+   606→  }
+   607→
+   608→  // Instrucciones de pregunta
+   609→  if (decision.askQuestion) {
+   610→    parts.push('Puedes hacer una pregunta para avanzar si es necesario.');
+   611→  } else {
+   612→    parts.push('No hagas preguntas. Propone directamente.');
+   613→  }
+   614→
+   615→  // Sistemas relevantes para contexto
+   616→  if (decision.relevantSystems.length > 0) {
+   617→    const systemLabels: Record<SystemId, string> = {
+   618→      emotional_state: 'estado emocional',
+   619→      life_stage: 'etapa de vida',
+   620→      silent_memories: 'memorias silenciosas',
+   621→      goals: 'objetivos activos',
+   622→      continuity: 'continuidad contextual',
+   623→      patterns: 'patrones detectados',
+   624→      monthly_closure: 'cierre mensual',
+   625→      habits: 'hábitos',
+   626→      meditation: 'meditación',
+   627→      nutrition: 'nutrición',
+   628→      finances: 'finanzas',
+   629→    };
+   630→    const labels = decision.relevantSystems.map(s => systemLabels[s]).filter(Boolean);
+   631→    parts.push(`Contexto disponible y relevante: ${labels.join(', ')}.`);
+   632→  }
+   633→
+   634→  parts.push('── Fin de razonamiento ──');
+   635→  parts.push('');
+   636→
+   637→  return parts.join('\n');
+   638→}
+   639→
+   640→// ─── Función principal ───
+   641→
+   642→/**
+   643→ * Reasoning Engine
+   644→ *
+   645→ * Analiza el mensaje del usuario y el contexto disponible para decidir
+   646→ * cómo debe responder el mentor. No genera texto. Solo devuelve una
+   647→ * estructura de decisión que se inyecta en el prompt del sistema.
+   648→ *
+   649→ * REGLAS:
+   650→ * 1. No hace consultas nuevas — usa solo datos del request actual
+   651→ * 2. No llama a Groq ni a ningún modelo externo
+   652→ * 3. Si falla, retorna null (non-blocking)
+   653→ * 4. Latencia < 1 ms (solo lógica de strings)
+   654→ * 5. FREE: razonamiento simplificado
+   655→ * 6. PREMIUM: toda la inteligencia disponible
+   656→ */
+   657→export function reason(input: ReasoningInput): ReasoningOutput | null {
+   658→  try {
+   659→    const message = input.message;
+   660→    const isPremium = input.plan === 'PREMIUM';
+   661→
+   662→    // ── Paso 1: Detectar si es un mensaje híbrido ──
+   663→    let isHybrid = false;
+   664→    let hybridOverride: { primary: PrimaryNeed; secondary: PrimaryNeed } | null = null;
+   665→
+   666→    for (const hp of HYBRID_PATTERNS) {
+   667→      if (hp.regex.test(message)) {
+   668→        isHybrid = true;
+   669→        hybridOverride = { primary: hp.primaryNeed, secondary: hp.secondaryNeed };
+   670→        break;
+   671→      }
+   672→    }
+   673→
+   674→    // ── Paso 2: Detectar necesidad principal por patrones ──
+   675→    let matchedPattern: IntentPattern | null = null;
+   676→    let primaryNeed: PrimaryNeed = 'orientacion'; // default
+   677→    let secondaryNeed: PrimaryNeed | null = null;
+   678→
+   679→    if (hybridOverride) {
+   680→      primaryNeed = hybridOverride.primary;
+   681→      secondaryNeed = hybridOverride.secondary;
+   682→    } else {
+   683→      for (const pattern of INTENT_PATTERNS) {
+   684→        if (pattern.regex.test(message)) {
+   685→          matchedPattern = pattern;
+   686→          primaryNeed = pattern.need;
+   687→          break;
+   688→        }
+   689→      }
+   690→    }
+   691→
+   692→    // ── Paso 3: Detectar dominios ──
+   693→    const domains = detectDomains(message);
+   694→    const priorityDomain = domains[0] || 'general';
+   695→    const secondaryDomain = domains[1] || null;
+   696→
+   697→    // ── Paso 4: Evaluar sistemas relevantes ──
+   698→    const { relevant, ignored } = evaluateSystems(input, domains);
+   699→
+   700→    // ── Paso 5: Calcular profundidad ──
+   701→    const depth = computeDepth(input, domains, isHybrid);
+   702→
+   703→    // ── Paso 6: Detectar repetición ──
+   704→    const isRepetition = detectRepetition(message, input.recentHistory);
+   705→
+   706→    // ── Paso 7: Determinar flags de comportamiento ──
+   707→    const shouldCelebrate = detectCelebration(message, input.recentHistory);
+   708→    const shouldChallenge = detectChallenge(message, input.emotionalState);
+   709→    const shouldReflect = detectReflection(message, primaryNeed);
+   710→    const shouldBePractical = primaryNeed === 'orientacion' || primaryNeed === 'urgencia';
+   711→
+   712→    // ── Paso 8: Determinar tono ──
+   713→    let tone: RecommendedTone = matchedPattern?.tone || 'directo';
+   714→
+   715→    // Ajustar tono según estado emocional
+   716→    if (input.emotionalState?.status === 'sobrecargado' && tone !== 'empatico') {
+   717→      tone = 'empatico';
+   718→    }
+   719→    if (isRepetition && tone === 'desafiante') {
+   720→      tone = 'directo';
+   721→    }
+   722→
+   723→    // ── Paso 9: Determinar longitud ──
+   724→    const length = computeLength(primaryNeed, depth, isPremium, isRepetition);
+   725→
+   726→    // ── Paso 10: Preguntas ──
+   727→    const { ask, max } = determineAskQuestion(message, primaryNeed, isPremium);
+   728→
+   729→    // ── Paso 11: Objetivo de respuesta ──
+   730→    let objective: ResponseObjective = matchedPattern?.objective || 'dar_paso_concreto';
+   731→
+   732→    // Ajustes finos
+   733→    if (isRepetition) objective = 'ajustar_rumbo';
+   734→    if (isHybrid && primaryNeed === 'progreso' && secondaryNeed === 'descarga_emocional') {
+   735→      objective = 'validar_y_avanzar';
+   736→    }
+   737→
+   738→    // ── Paso 12: Confidence ──
+   739→    const confidence = computeConfidence(!!matchedPattern, domains.length, isHybrid);
+   740→
+   741→    // ── Paso 13: FREE simplificación ──
+   742→    if (!isPremium) {
+   743→      // FREE: reducir sistemas relevantes al máximo 3
+   744→      if (relevant.length > 3) {
+   745→        relevant.length = 3;
+   746→      }
+   747→      // FREE: nunca desafiar
+   748→      if (shouldChallenge) {
+   749→        // No hay campo mutable, se refleja en el output
+   750→      }
+   751→    }
+   752→
+   753→    // ── Construir intent descriptivo ──
+   754→    const intentMap: Record<PrimaryNeed, string> = {
+   755→      orientacion: 'solicitar_orientacion',
+   756→      descarga_emocional: 'expresar_dolor',
+   757→      progreso: 'compartir_progreso',
+   758→      reflexion: 'cuestionar_situacion',
+   759→      informacion: 'pedir_informacion',
+   760→      celebracion: 'celebrar_logro',
+   761→      desafio: 'expresar_conformidad',
+   762→      continuidad: 'retomar_hilo_anterior',
+   763→      urgencia: 'pedir_ayuda_inmediata',
+   764→      exploracion: 'explorar_possibilidades',
+   765→    };
+   766→
+   767→    return {
+   768→      primaryNeed,
+   769→      secondaryNeed,
+   770→      mainIntent: matchedPattern?.intent || intentMap[primaryNeed] || 'general',
+   771→      secondaryIntent: secondaryNeed ? intentMap[secondaryNeed] || null : null,
+   772→      priorityDomain,
+   773→      secondaryDomain,
+   774→      reasoningDepth: depth,
+   775→      responseObjective: objective,
+   776→      recommendedTone: tone,
+   777→      recommendedLength: length,
+   778→      relevantSystems: relevant,
+   779→      ignoredSystems: ignored,
+   780→      askQuestion: ask,
+   781→      maxQuestions: max,
+   782→      shouldCelebrate,
+   783→      shouldChallenge,
+   784→      shouldReflect,
+   785→      shouldBePractical,
+   786→      confidence,
+   787→    };
+   788→  } catch {
+   789→    return null;
+   790→  }
+   791→}
