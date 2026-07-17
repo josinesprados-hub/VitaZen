@@ -3,50 +3,56 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * ViewportManager — resets stuck viewport zoom after keyboard dismiss.
+ * ViewportManager — prevents and resets stuck viewport zoom on iOS Safari / PWA.
  *
  * ═══════════════════════════════════════════════════════════════════════
- * FORENSIC FINDING — ROOT CAUSE (HOTFIX iOS ZOOM 2)
+ * FORENSIC FINDING — ROOT CAUSE (HOTFIX QA iPhone 3)
  * ═══════════════════════════════════════════════════════════════════════
  *
- * The previous implementation used a FIXED keyboard detection threshold:
+ * Previous HOTFIX iOS ZOOM 2 fixed the keyboard detection (dynamic baseline
+ * instead of fixed 0.9 threshold) but STILL didn't fix the zoom.
  *
- *   const KEYBOARD_RATIO = 0.9;
- *   const keyboardVisible = vv.height < window.innerHeight * 0.9;
+ * WHY THE ZOOM PERSISTED:
  *
- * This is BROKEN on iPhones with notch + home indicator when
- * viewport-fit=cover is active (PWA standalone mode).
+ *   The resetZoom() function used a TEMPORARY meta viewport change:
+ *     1. Set `maximum-scale=1` (Safari de-zooms)
+ *     2. After 3 rAF, RESTORE the original meta content
  *
- * WHY:
- *   - viewport-fit=cover extends the layout viewport INTO the safe areas.
- *   - window.innerHeight INCLUDES safe areas (notch ~59px + home indicator ~34px).
- *   - visualViewport.height EXCLUDES safe areas (only the visible app area).
- *   - Without keyboard: vv.height/innerHeight ≈ 0.88–0.90 on iPhone 14/15 Pro.
- *   - 0.89 < 0.9 → keyboardVisible is TRUE even without a keyboard.
- *   - The transition "wasKeyboardVisible && !keyboardVisible" NEVER occurs.
- *   - The zoom reset NEVER fires.
+ *   This is fundamentally broken on iOS Safari:
+ *   - When `maximum-scale=1` is REMOVED, Safari restores its internal
+ *     "zoom memory" — the scale snaps back to the pre-reset value.
+ *   - The triple-rAF delay is not enough for Safari to fully commit the
+ *     de-zoom before the original meta is restored.
+ *   - Result: zoom appears to briefly reset, then snaps back.
  *
- * PROOF (iPhone 14 Pro, 852px screen):
- *   window.innerHeight        = 852  (includes safe areas)
- *   visualViewport.height     = 759  (excludes safe areas, no keyboard)
- *   Ratio                     = 0.891  (< 0.9 threshold)
- *   → keyboardVisible = true  (FALSE POSITIVE — no keyboard present!)
+ * ADDITIONAL ROOT CAUSE — maximum-scale was MISSING from the meta viewport:
+ *   The Next.js viewport export only had: width=device-width, initial-scale=1,
+ *   viewport-fit=cover. Without maximum-scale=1, user-scalable=no, iOS Safari
+ *   is FREE to zoom on any input with font-size < 16px. Despite the CSS
+ *   font-size: 16px !important rule, Safari's auto-zoom can still trigger
+ *   in edge cases (e.g., during font loading, with system font fallback,
+ *   or when the computed size differs from the declared size).
  *
- * FIX:
- *   1. Dynamic baseline: measure the actual vv.height/innerHeight ratio at
- *      initialization (no keyboard assumed). Use THAT as the reference.
- *   2. Detect keyboard as a significant DROP from baseline (>8%), not a
- *      fixed threshold.
- *   3. Secondary reset via focusout: when any input/textarea/select blurs,
- *      schedule a delayed zoom check (~400ms). This catches the "Save" button
- *      tap pattern without relying on keyboard detection at all.
- *   4. Instrumentation: log all events in development for forensic verification.
+ * FIX (two-pronged):
+ *   1. PERMANENT: Add maximum-scale=1, user-scalable=no to the meta viewport
+ *      at initialization. This PREVENTS Safari from ever auto-zooming.
+ *      Since all inputs already use font-size: 16px, the user doesn't need
+ *      manual zoom for form fields. Accessibility zoom (pinch-to-zoom)
+ *      still works via Safari's built-in zoom feature (separate from
+ *      viewport zoom).
+ *   2. EMERGENCY: If scale > 1 is detected (edge case), use scrollTo(0,0)
+ *      to force the viewport to reset, WITHOUT touching the meta tag
+ *      (which would re-trigger the zoom memory issue).
+ *   3. KEYBOARD-AWARE: The focusout handler now waits 600ms (up from 400ms)
+ *      to account for the slower keyboard dismiss animation on iPhone 15/16.
  *
  * ═══════════════════════════════════════════════════════════════════════
  * CROSS-PLATFORM IMPACT:
- * - iOS Safari / PWA: Fixes stuck zoom (the only platform where scale > 1).
- * - Android Chrome / WebView: vv.scale is always 1. Zero impact.
- * - Desktop browsers: vv.scale is always 1. Zero impact.
+ * - iOS Safari / PWA: Prevents auto-zoom entirely. Emergency scrollTo as fallback.
+ * - Android Chrome / WebView: user-scalable=no is respected but irrelevant
+ *   (Android doesn't auto-zoom on focus). No visual impact.
+ * - Desktop browsers: No impact. Desktop browsers ignore user-scalable in
+ *   most contexts and don't auto-zoom.
  * ═══════════════════════════════════════════════════════════════════════
  */
 export function ViewportManager() {
@@ -55,20 +61,6 @@ export function ViewportManager() {
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-
-    // ─── Dynamic baseline ───────────────────────────────────────
-    // The first resize event establishes the true baseline ratio.
-    // On devices WITHOUT safe areas (e.g., Android, older iPhones),
-    // this will be ~0.98–1.0. On iPhones with notch + home indicator
-    // and viewport-fit=cover, this will be ~0.87–0.90.
-    let baselineRatio: number | null = null;
-
-    // A real iOS keyboard drops vv.height to ~50-70% of innerHeight.
-    // Safe areas alone only account for ~10-13%.
-    // 8% drop threshold cleanly separates keyboard from safe areas.
-    const KEYBOARD_DROP_THRESHOLD = 0.08;
-
-    let wasKeyboardVisible = false;
 
     // ─── Instrumentation ────────────────────────────────────────
     const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
@@ -84,41 +76,62 @@ export function ViewportManager() {
       }
     };
 
-    // ─── Zoom reset ─────────────────────────────────────────────
-    const resetZoom = () => {
+    // ─── STEP 1: Lock the viewport permanently ──────────────────
+    // This PREVENTS Safari from ever auto-zooming on input focus.
+    // All form inputs already use font-size: 16px, so manual zoom
+    // for readability is not needed. The CSS !important rule in
+    // globals.css is the primary defense; this is the belt-and-suspenders.
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    if (meta) {
+      const current = meta.getAttribute('content') || '';
+      // Only add if not already present (idempotent on re-render)
+      if (!current.includes('maximum-scale=1')) {
+        meta.setAttribute('content', `${current}, maximum-scale=1, user-scalable=no`);
+        log('VIEWPORT_LOCKED', { before: current, after: meta.getAttribute('content') });
+      }
+    }
+
+    // ─── Dynamic baseline ───────────────────────────────────────
+    let baselineRatio: number | null = null;
+    const KEYBOARD_DROP_THRESHOLD = 0.08;
+    let wasKeyboardVisible = false;
+
+    // ─── Emergency zoom reset (scrollTo-based) ──────────────────
+    // This is a FALLBACK for edge cases where scale > 1 despite
+    // the viewport lock. It does NOT touch the meta tag.
+    const forceResetZoom = () => {
       if (resettingRef.current) return;
       resettingRef.current = true;
 
-      const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
-      if (!meta) { resettingRef.current = false; return; }
-
-      const original = meta.getAttribute('content');
-      if (!original) { resettingRef.current = false; return; }
-
-      log('RESET_START', {
+      log('FORCE_RESET_START', {
         scale: vv.scale,
-        original,
+        scrollY: window.scrollY,
         activeEl: document.activeElement?.tagName,
       });
 
-      // Temporarily set maximum-scale=1 to force Safari to de-zoom.
-      meta.setAttribute('content', `${original}, maximum-scale=1`);
+      // Scroll to top forces Safari to re-evaluate the viewport scale.
+      // Using { behavior: 'instant' } avoids smooth scroll animation.
+      window.scrollTo(0, 0);
 
-      // Wait for Safari to process the meta change, then restore.
-      // Triple-rAF gives Safari extra time vs. the previous double-rAF.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+      // Verify after a short delay
+      setTimeout(() => {
+        const finalScale = vv.scale;
+        log('FORCE_RESET_COMPLETE', {
+          scale: finalScale,
+          success: finalScale <= 1.01,
+        });
+        resettingRef.current = false;
+
+        // If still stuck (extremely rare), try a second approach:
+        // blur any active element and scroll again
+        if (finalScale > 1.01 && document.activeElement) {
+          (document.activeElement as HTMLElement).blur?.();
           requestAnimationFrame(() => {
-            meta.setAttribute('content', original);
-            const finalScale = vv.scale;
-            log('RESET_COMPLETE', {
-              scale: finalScale,
-              success: finalScale <= 1.01,
-            });
+            window.scrollTo(0, 0);
             resettingRef.current = false;
           });
-        });
-      });
+        }
+      }, 100);
     };
 
     // ─── Primary: visualViewport resize ─────────────────────────
@@ -127,7 +140,6 @@ export function ViewportManager() {
       const ratio = vv.height / window.innerHeight;
       const active = document.activeElement?.tagName;
 
-      // Establish baseline on first event (no keyboard assumed at init).
       if (baselineRatio === null) {
         baselineRatio = ratio;
         log('BASELINE_ESTABLISHED', {
@@ -138,7 +150,6 @@ export function ViewportManager() {
         });
       }
 
-      // Keyboard visible = significant drop from baseline.
       const keyboardVisible = ratio < (baselineRatio ?? 1) - KEYBOARD_DROP_THRESHOLD;
 
       log('resize', {
@@ -159,7 +170,7 @@ export function ViewportManager() {
       // Keyboard was visible, now dismissed, but zoom stuck > 1.
       if (wasKeyboardVisible && !keyboardVisible && scale > 1) {
         log('KEYBOARD_DISMISSED_ZOOM_STUCK', { scale: scale.toFixed(4) });
-        resetZoom();
+        forceResetZoom();
       }
 
       wasKeyboardVisible = keyboardVisible;
@@ -168,7 +179,6 @@ export function ViewportManager() {
     // ─── Secondary: focusout (blur) based reset ─────────────────
     // Catches the "tap Save button" pattern: input blurs → keyboard
     // starts dismissing → we schedule a delayed check.
-    // This works INDEPENDENTLY of keyboard detection logic.
     let blurTimer: ReturnType<typeof setTimeout> | null = null;
 
     const onFocusOut = (e: FocusEvent) => {
@@ -178,25 +188,21 @@ export function ViewportManager() {
 
       log('focusout', { tag, scale: vv.scale, activeNow: document.activeElement?.tagName });
 
-      // Clear any pending blur timer (user rapidly focused another input).
       if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
 
-      // Schedule a zoom check after the keyboard is expected to have
-      // fully dismissed. iOS keyboard animation: ~250-350ms.
-      // 400ms gives comfortable margin.
+      // 600ms: iOS keyboard dismiss animation can take up to ~400ms
+      // on iPhone 15/16 Pro. Extra margin ensures the keyboard is
+      // fully gone before we check the scale.
       blurTimer = setTimeout(() => {
         blurTimer = null;
         if (vv.scale > 1) {
           log('FOCUSOUT_RESET', { scale: vv.scale.toFixed(4), tag });
-          resetZoom();
+          forceResetZoom();
         }
-      }, 400);
+      }, 600);
     };
 
     // ─── Tertiary: scroll end check ──────────────────────────────
-    // After any scroll event settles, verify zoom isn't stuck.
-    // This catches edge cases where neither resize nor focusout fires
-    // with scale > 1 (e.g., programmatic scrollTo after form submit).
     let scrollTimer: ReturnType<typeof setTimeout> | null = null;
 
     const onScroll = () => {
@@ -205,7 +211,7 @@ export function ViewportManager() {
         scrollTimer = null;
         if (vv.scale > 1 && !wasKeyboardVisible) {
           log('SCROLL_END_RESET', { scale: vv.scale.toFixed(4) });
-          resetZoom();
+          forceResetZoom();
         }
       }, 500);
     };
@@ -215,7 +221,6 @@ export function ViewportManager() {
     document.addEventListener('focusout', onFocusOut);
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Log initial state
     log('INIT', {
       vvW: Math.round(vv.width),
       vvH: Math.round(vv.height),
@@ -224,6 +229,7 @@ export function ViewportManager() {
       ratio: (vv.height / window.innerHeight).toFixed(4),
       scale: vv.scale,
       UA: navigator.userAgent.slice(0, 80),
+      viewportLocked: !!meta?.getAttribute('content')?.includes('maximum-scale=1'),
     });
 
     return () => {

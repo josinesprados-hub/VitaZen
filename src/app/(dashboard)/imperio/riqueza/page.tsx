@@ -514,11 +514,11 @@ export default function RiquezaPage() {
   }, []);
 
   useEffect(() => {
-    if (pendingDeleteId || editingLog) {
+    if (pendingDeleteId || editingLog || showAdd) {
       document.body.classList.add('scroll-locked');
       return () => { document.body.classList.remove('scroll-locked'); };
     }
-  }, [pendingDeleteId, editingLog]);
+  }, [pendingDeleteId, editingLog, showAdd]);
 
   useEffect(() => {
     if (showAdd && addFormRef.current) {
@@ -1178,7 +1178,11 @@ export default function RiquezaPage() {
       {/* ── FAB Overlay ── */}
       {showAdd && !editingLog && !pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop" onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }}>
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md section-enter-1" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md safe-bottom overflow-y-auto overscroll-contain section-enter-1"
+            style={{ maxHeight: 'min(85dvh, calc(100dvh - 4rem))' }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
               <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
@@ -1202,7 +1206,7 @@ export default function RiquezaPage() {
                 <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
                 <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
                 {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-                <div className="flex gap-2 pt-1">
+                <div className="flex gap-2 pt-1 pb-2">
                   <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
                   <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
                 </div>

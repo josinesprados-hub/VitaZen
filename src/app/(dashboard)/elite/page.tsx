@@ -224,8 +224,8 @@ export default function ElitePage() {
                 <Eye size={16} className="text-[#555]" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Free</h3>
-                <p className="text-[#444] text-sm">0€/mes</p>
+                <h3 className="text-white font-semibold text-lg">Free</h3>
+                <p className="text-[#666] text-xl font-bold tracking-tight">0€<span className="text-sm font-normal text-[#444]">/mes</span></p>
               </div>
             </div>
 
@@ -267,8 +267,8 @@ export default function ElitePage() {
                 <Circle size={5} fill="currentColor" className="text-champagne/50" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Élite</h3>
-                <p className="text-champagne/40 text-sm">5€/mes</p>
+                <h3 className="text-white font-semibold text-lg">Élite</h3>
+                <p className="text-champagne text-xl font-bold tracking-tight">5€<span className="text-sm font-normal text-champagne/50">/mes</span></p>
               </div>
             </div>
 
