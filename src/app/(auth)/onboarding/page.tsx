@@ -9,6 +9,7 @@ import {
   Brain,
   Zap,
   Gem,
+  TrendingUp,
   Sparkles,
   ArrowRight,
   Check,
@@ -41,6 +42,7 @@ const FOCUS_OPTIONS = [
   { key: 'disciplina', label: 'Disciplina', description: 'Hábitos sólidos y consistencia diaria', icon: Shield, emoji: '⚔️' },
   { key: 'energia', label: 'Energía', description: 'Vitalidad física y descanso reparador', icon: Zap, emoji: '⚡' },
   { key: 'riqueza', label: 'Finanzas', description: 'Consciencia y claridad con tu dinero', icon: Gem, emoji: '💎' },
+  { key: 'crecimiento', label: 'Crecimiento', description: 'Reflexión, diario y evolución personal', icon: TrendingUp, emoji: '📈' },
 ];
 
 const GOAL_OPTIONS = [

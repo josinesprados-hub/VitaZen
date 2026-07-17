@@ -33,15 +33,15 @@ export async function POST(request: NextRequest) {
       select: { id: true, userId: true },
     });
 
-    // H-09 FIX: Do NOT reassign tokens across users.
-    // Previously, if a token belonged to another user, it was silently reassigned.
-    // Any authenticated user could steal another user's notification channel
-    // by sending their FCM token. Now: deactivate the old token instead,
-    // and let the new user create their own fresh record.
+    // H-09 / F7.5-01/F7.5-10 FIX: Do NOT reassign tokens across users.
+    // Previously, if a token belonged to another user, the old fix deactivated
+    // it, but the upsert below would re-activate the SAME record (still
+    // belonging to the other user) because the @unique token value still
+    // existed. Now: DELETE the old token entirely so the upsert takes the
+    // CREATE path for the new user.
     if (existingToken && existingToken.userId !== user.id) {
-      await db.pushToken.update({
+      await db.pushToken.delete({
         where: { id: existingToken.id },
-        data: { active: false },
       });
       // Fall through to create a new token for this user below
     } else if (existingToken) {

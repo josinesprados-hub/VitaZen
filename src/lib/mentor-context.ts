@@ -923,6 +923,7 @@ function formatAdvancedContext(ctx: UserContext): string {
       disciplina: 'Disciplina',
       energia: 'Energía',
       riqueza: 'Finanzas',
+      crecimiento: 'Crecimiento',
     };
 
     if (ob.goals.length > 0) {

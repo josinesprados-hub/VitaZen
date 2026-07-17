@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
-import { Brain, Shield, Zap, Gem, Sparkles, ArrowRight } from 'lucide-react';
+import { Brain, Shield, Zap, Gem, TrendingUp, Sparkles, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface OnboardingInfo {
@@ -43,6 +43,12 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
     icon: Gem,
     href: '/imperio/riqueza',
     tip: 'Finanzas.',
+  },
+  crecimiento: {
+    name: 'Crecimiento',
+    icon: TrendingUp,
+    href: '/imperio/crecimiento',
+    tip: 'Reflexión y evolución.',
   },
 };
 

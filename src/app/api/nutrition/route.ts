@@ -36,6 +36,35 @@ export async function POST(request: NextRequest) {
 
     const { date, meals, water, calories, notes } = await request.json();
 
+    // F7.5-02 FIX: Validate all input fields (types, ranges, lengths).
+    if (typeof date !== 'string' || !date.trim()) {
+      return NextResponse.json({ error: 'date is required and must be a non-empty string' }, { status: 400 });
+    }
+    const logDate = new Date(date);
+    if (isNaN(logDate.getTime())) {
+      return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+    if (water !== undefined && water !== null) {
+      if (typeof water !== 'number' || !Number.isInteger(water) || water < 0 || water > 30) {
+        return NextResponse.json({ error: 'water must be an integer 0-30' }, { status: 400 });
+      }
+    } else {
+      return NextResponse.json({ error: 'water is required' }, { status: 400 });
+    }
+    if (calories !== undefined && calories !== null) {
+      if (typeof calories !== 'number' || calories < 0 || calories > 10000) {
+        return NextResponse.json({ error: 'calories must be 0-10000' }, { status: 400 });
+      }
+    }
+    if (meals !== undefined && meals !== null) {
+      if (typeof meals !== 'string') return NextResponse.json({ error: 'meals must be a string' }, { status: 400 });
+      if (meals.length > 5000) return NextResponse.json({ error: 'meals too long (max 5,000 chars)' }, { status: 400 });
+    }
+    if (notes !== undefined && notes !== null) {
+      if (typeof notes !== 'string') return NextResponse.json({ error: 'notes must be a string' }, { status: 400 });
+      if (notes.length > 2000) return NextResponse.json({ error: 'notes too long (max 2,000 chars)' }, { status: 400 });
+    }
+
     // E-3 FIX (race condition + double streak from wellness+nutrition).
     // The original code did `findUnique(date) → upsert → if (!existing) award
     // XP+streak` as three separate operations with no transaction. Two
@@ -66,7 +95,6 @@ export async function POST(request: NextRequest) {
     // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
     // todayDateKey, mirroring the finance/route.ts pattern and matching
     // the wellness/route.ts fix.
-    const logDate = new Date(date);
     const logDateKey = getMadridDateKey(logDate);
     const { start, end } = madridDayBoundaries(logDateKey);
 
@@ -146,6 +174,27 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { logId, meals, water, calories, notes } = body;
+
+    // F7.5-08 FIX: Validate all input fields before DB write.
+    if (water !== undefined && water !== null) {
+      if (typeof water !== 'number' || !Number.isInteger(water) || water < 0 || water > 30) {
+        return NextResponse.json({ error: 'water must be an integer 0-30' }, { status: 400 });
+      }
+    }
+    if (calories !== undefined && calories !== null) {
+      if (typeof calories !== 'number' || calories < 0 || calories > 10000) {
+        return NextResponse.json({ error: 'calories must be 0-10000' }, { status: 400 });
+      }
+    }
+    if (meals !== undefined && meals !== null) {
+      if (typeof meals !== 'string') return NextResponse.json({ error: 'meals must be a string' }, { status: 400 });
+      if (meals.length > 5000) return NextResponse.json({ error: 'meals too long (max 5,000 chars)' }, { status: 400 });
+    }
+    if (notes !== undefined && notes !== null) {
+      if (typeof notes !== 'string') return NextResponse.json({ error: 'notes must be a string' }, { status: 400 });
+      if (notes.length > 2000) return NextResponse.json({ error: 'notes too long (max 2,000 chars)' }, { status: 400 });
+    }
+
     const log = await db.nutritionLog.findUnique({ where: { id: logId } });
     if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 });
     if (log.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

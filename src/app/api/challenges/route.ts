@@ -49,10 +49,27 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'No challenges available' }, { status: 404 });
       }
 
-      userChallenge = await db.userChallenge.create({
-        data: { userId: user.id, challengeId: selectedChallenge.id, date: today },
-        include: { challenge: true },
-      });
+      // F7.5-07 FIX: Catch P2002 unique constraint violation from concurrent
+      // GET requests. Two tabs loading the dashboard simultaneously both see
+      // no challenge, both try to create — second hits P2002. Now we re-read
+      // the existing record instead of returning 500.
+      try {
+        userChallenge = await db.userChallenge.create({
+          data: { userId: user.id, challengeId: selectedChallenge.id, date: today },
+          include: { challenge: true },
+        });
+      } catch (e: unknown) {
+        const prismaError = e as { code?: string };
+        if (prismaError.code === 'P2002') {
+          userChallenge = await db.userChallenge.findFirst({
+            where: { userId: user.id, date: today },
+            include: { challenge: true },
+          });
+          if (!userChallenge) throw e;
+        } else {
+          throw e;
+        }
+      }
     }
 
     return NextResponse.json({ challenge: userChallenge });

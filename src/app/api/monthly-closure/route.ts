@@ -85,32 +85,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid month format (YYYY-MM)' }, { status: 400 });
     }
 
-    // Upsert the closure record
-    const existing = await db.monthlyClosure.findUnique({
-      where: { userId_month: { userId: user.id, month } },
-    });
-
-    if (existing) {
-      const updateData: Record<string, unknown> = {};
-
-      if (reflection !== undefined) {
-        updateData.reflection = reflection;
-        updateData.reflectedAt = new Date();
+    // F7.5-05 FIX: Validate reflection type and length.
+    if (reflection !== undefined && reflection !== null) {
+      if (typeof reflection !== 'string') {
+        return NextResponse.json({ error: 'reflection must be a string' }, { status: 400 });
       }
-
-      if (markSummaryViewed) {
-        updateData.summaryViewedAt = new Date();
+      if (reflection.length > 10000) {
+        return NextResponse.json({ error: 'Reflection too long (max 10,000 chars)' }, { status: 400 });
       }
+    }
 
-      if (Object.keys(updateData).length > 0) {
-        await db.monthlyClosure.update({
-          where: { id: existing.id },
-          data: updateData,
-        });
-      }
-    } else {
-      await db.monthlyClosure.create({
-        data: {
+    // F7.5-06 FIX: Use upsert to prevent race condition on concurrent POSTs.
+    // Previously: findUnique → create (two concurrent requests both see null,
+    // both try to create → second fails with P2002 unique constraint violation).
+    const updateData: Record<string, unknown> = {};
+    if (reflection !== undefined) {
+      updateData.reflection = reflection;
+      updateData.reflectedAt = new Date();
+    }
+    if (markSummaryViewed) {
+      updateData.summaryViewedAt = new Date();
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await db.monthlyClosure.upsert({
+        where: { userId_month: { userId: user.id, month } },
+        update: updateData,
+        create: {
           userId: user.id,
           month,
           reflection: reflection || null,

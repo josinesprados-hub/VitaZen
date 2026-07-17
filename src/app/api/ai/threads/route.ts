@@ -106,12 +106,38 @@ export async function POST(request: NextRequest) {
 
     const { title } = await request.json();
 
-    const thread = await db.aIThread.create({
-      data: {
-        userId: user.id,
-        title: title || 'Nueva conversación',
-      },
-    });
+    // F7.5-12 FIX: Validate title type and length.
+    if (title !== undefined && title !== null) {
+      if (typeof title !== 'string') {
+        return NextResponse.json({ error: 'title must be a string' }, { status: 400 });
+      }
+      if (title.length > 100) {
+        return NextResponse.json({ error: 'title too long (max 100 chars)' }, { status: 400 });
+      }
+    }
+
+    // F7.5-12 FIX: Handle race condition on concurrent thread creation.
+    // Two simultaneous POSTs can both pass the count check. Wrap in try/catch
+    // to handle unique constraint violations gracefully.
+    let thread;
+    try {
+      thread = await db.aIThread.create({
+        data: {
+          userId: user.id,
+          title: (typeof title === 'string' ? title.slice(0, 100) : '') || 'Nueva conversación',
+        },
+      });
+    } catch (e: unknown) {
+      // If it's a constraint error, re-check the count and return a clear error
+      const prismaError = e as { code?: string };
+      if (prismaError.code === 'P2002') {
+        return NextResponse.json(
+          { error: 'Rate limited — please try again' },
+          { status: 429 }
+        );
+      }
+      throw e;
+    }
 
     return NextResponse.json({ thread });
   } catch (error) {

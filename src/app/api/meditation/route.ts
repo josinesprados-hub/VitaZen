@@ -6,6 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onMeditationChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
+import { VALID_MEDITATION_TYPES } from '@/lib/meditation-types';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -22,12 +23,12 @@ export async function PUT(request: NextRequest) {
     if (session.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     // H-06 FIX: Validate duration and type (same as POST)
+    // F7.5-03 FIX: Validate type using shared constant.
     if (duration !== undefined && (typeof duration !== 'number' || duration < 1 || duration > 1440)) {
       return NextResponse.json({ error: 'duration must be a number 1-1440 minutes' }, { status: 400 });
     }
     if (type !== undefined) {
-      const VALID_MEDITATION_TYPES = ['respiracion', 'cuerpo', 'mindfulness', 'visualizacion', 'gratitud', 'otro'];
-      if (typeof type !== 'string' || !VALID_MEDITATION_TYPES.includes(type)) {
+      if (typeof type !== 'string' || !VALID_MEDITATION_TYPES.includes(type as any)) {
         return NextResponse.json({ error: 'Invalid meditation type' }, { status: 400 });
       }
     }
@@ -158,8 +159,7 @@ export async function POST(request: NextRequest) {
     if (typeof duration !== 'number' || duration < 1 || duration > 1440) {
       return NextResponse.json({ error: 'duration must be a number 1-1440 minutes' }, { status: 400 });
     }
-    const VALID_MEDITATION_TYPES = ['diaphragmatic', 'coherence', 'mindfulness', 'nadi_shodhana', 'box'];
-    if (typeof type !== 'string' || !VALID_MEDITATION_TYPES.includes(type)) {
+    if (typeof type !== 'string' || !VALID_MEDITATION_TYPES.includes(type as any)) {
       return NextResponse.json({ error: 'Invalid meditation type' }, { status: 400 });
     }
 

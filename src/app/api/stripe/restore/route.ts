@@ -72,6 +72,7 @@ async function handler(request: NextRequest) {
           }, { status: 400 });
         }
 
+
         await db.$transaction(async (tx) => {
           // User already has access — ensure plan is PREMIUM
           if (user.plan !== 'PREMIUM') {
@@ -103,6 +104,13 @@ async function handler(request: NextRequest) {
             update: {
               status: activeSub.status,
               cancelAtPeriodEnd: activeSub.cancel_at_period_end,
+              stripePriceId: firstItem?.price.id || '',
+              currentPeriodStart: firstItem?.current_period_start
+                ? new Date(firstItem.current_period_start * 1000)
+                : undefined,
+              currentPeriodEnd: firstItem?.current_period_end
+                ? new Date(firstItem.current_period_end * 1000)
+                : undefined,
             },
           });
         });
@@ -176,6 +184,7 @@ async function handler(request: NextRequest) {
           });
 
           // M-03 FIX: Remove userId from update block.
+          // F7.5-09 FIX: Sync period fields in update block.
           const firstItem = activeSub.items.data[0];
           await tx.subscription.upsert({
             where: { stripeSubscriptionId: activeSub.id },
@@ -195,6 +204,13 @@ async function handler(request: NextRequest) {
             update: {
               status: activeSub.status,
               cancelAtPeriodEnd: activeSub.cancel_at_period_end,
+              stripePriceId: firstItem?.price.id || '',
+              currentPeriodStart: firstItem?.current_period_start
+                ? new Date(firstItem.current_period_start * 1000)
+                : undefined,
+              currentPeriodEnd: firstItem?.current_period_end
+                ? new Date(firstItem.current_period_end * 1000)
+                : undefined,
             },
           });
 

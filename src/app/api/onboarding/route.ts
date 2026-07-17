@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate primaryFocus
-    const validFocuses = ['mente', 'disciplina', 'energia', 'riqueza'];
+    // F7.5-04 FIX: Include 'crecimiento' in valid focuses.
+    const validFocuses = ['mente', 'disciplina', 'energia', 'riqueza', 'crecimiento'];
     if (!validFocuses.includes(primaryFocus)) {
       return NextResponse.json({ error: 'Invalid primary focus' }, { status: 400 });
     }
@@ -178,19 +179,23 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Boost XP for the primary focus empire
+      // F7.5-04/F7.5-11 FIX: Include 'crecimiento' and use upsert so new users
+      // get their 25 XP bonus (updateMany silently affects 0 rows if no
+      // EmpireProgress record exists yet).
       const empireMap: Record<string, string> = {
         mente: 'mente',
         disciplina: 'disciplina',
         energia: 'energia',
         riqueza: 'riqueza',
+        crecimiento: 'crecimiento',
       };
 
       const focusEmpire = empireMap[primaryFocus];
       if (focusEmpire) {
-        await tx.empireProgress.updateMany({
-          where: { userId: user.id, empire: focusEmpire },
-          data: { xp: { increment: 25 } },
+        await tx.empireProgress.upsert({
+          where: { userId_empire: { userId: user.id, empire: focusEmpire } },
+          update: { xp: { increment: 25 } },
+          create: { userId: user.id, empire: focusEmpire, xp: 25, streak: 0 },
         });
       }
 
