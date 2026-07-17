@@ -10,6 +10,7 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
+import { safeFormatDate, safeFormatTime } from '@/lib/dates';
 
 interface Meditation {
   id: string;
@@ -709,9 +710,9 @@ export default function MentePage() {
                       <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
                         <span className="text-[#333] text-xs">·</span>
-                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(session.completedAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(session.completedAt)}</span>
                         <span className="text-[#333] text-xs">·</span>
-                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(session.completedAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(session.completedAt)}</span>
                       </div>
                     </div>
                   </div>

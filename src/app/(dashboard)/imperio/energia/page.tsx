@@ -11,7 +11,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import PrivacyMask from '@/components/ui/PrivacyMask';
-import { getTodayDateKey } from '@/lib/dates';
+import { getTodayDateKey, safeFormatDate, safeFormatTime } from '@/lib/dates';
 
 interface WellnessLog {
   id: string;
@@ -367,9 +367,9 @@ export default function EnergiaPage() {
                         <span className="text-champagne">Sueño: <PrivacyMask compact>{log.sleep}</PrivacyMask></span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(log.date)}</span>
                         <span className="text-[#333] text-xs">·</span>
-                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(log.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -443,9 +443,9 @@ export default function EnergiaPage() {
                         <span className="text-champagne"><PrivacyMask compact>{log.calories || 0}</PrivacyMask> kcal</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(log.date).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(log.date)}</span>
                         <span className="text-[#333] text-xs">·</span>
-                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(log.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(log.createdAt)}</span>
                       </div>
                     </div>
                   </div>

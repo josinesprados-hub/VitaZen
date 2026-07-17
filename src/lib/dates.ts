@@ -249,6 +249,58 @@ export function getMadridYear(): number {
 // ─── Formatting ───────────────────────────────────────────────
 
 /**
+ * Safely parse a date string and format it.
+ * Returns the fallback string if the input is null, undefined, or invalid.
+ *
+ * ROOT CAUSE of "Invalid Date" UI bug: Multiple pages call
+ * `new Date(dateStr).toLocaleDateString(...)` without guarding against
+ * null/undefined/invalid strings. If the API returns a null field or
+ * a corrupted date string, JavaScript renders "Invalid Date" literally.
+ *
+ * Usage: replace raw `new Date(x).toLocaleDateString(...)` calls with
+ *   safeFormatDate(x) or safeFormatTime(x).
+ */
+function isValidDate(d: Date): boolean {
+  return d instanceof Date && !isNaN(d.getTime());
+}
+
+export function safeFormatDate(
+  dateStr: string | null | undefined,
+  options?: Intl.DateTimeFormatOptions,
+  fallback: string = '—',
+): string {
+  if (!dateStr) return fallback;
+  const d = new Date(dateStr);
+  if (!isValidDate(d)) return fallback;
+  return d.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    ...options,
+  });
+}
+
+export function safeFormatTime(
+  dateStr: string | null | undefined,
+  fallback: string = '—',
+): string {
+  if (!dateStr) return fallback;
+  const d = new Date(dateStr);
+  if (!isValidDate(d)) return fallback;
+  return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+export function safeFormatDateShort(
+  dateStr: string | null | undefined,
+  fallback: string = '—',
+): string {
+  if (!dateStr) return fallback;
+  const d = new Date(dateStr);
+  if (!isValidDate(d)) return fallback;
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+}
+
+/**
  * Format a date for display in Spanish, using Madrid timezone.
  */
 export function formatMadridDate(date: Date, options?: Intl.DateTimeFormatOptions): string {

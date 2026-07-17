@@ -8,6 +8,7 @@ import { Circle, ArrowLeft } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
+import { safeFormatDateShort } from '@/lib/dates';
 import {
   REFLECTION_TITLE,
   REFLECTION_PRIVACY_NOTE,
@@ -281,7 +282,7 @@ export default function CierreMensualPage() {
               <div key={i} className="border-l border-[#151515] pl-3">
                 <p className="text-[#777] text-xs italic leading-relaxed">{memory.text}</p>
                 <p className="text-[9px] text-[#2a2a2a] mt-1">
-                  {memory.empire} · {new Date(memory.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                  {memory.empire} · {safeFormatDateShort(memory.date)}
                 </p>
               </div>
             ))}

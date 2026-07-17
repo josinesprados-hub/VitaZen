@@ -15,7 +15,7 @@ import { NumericInput } from '@/components/ui/NumericInput';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { formatCurrency } from '@/lib/utils';
-import { getTodayDateKey, getMadridMonthRange, getCurrentMonthKey } from '@/lib/dates';
+import { getTodayDateKey, getMadridMonthRange, getCurrentMonthKey, safeFormatDateShort } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // Types
@@ -228,6 +228,7 @@ const DAY_NAMES_ES = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
 
 function formatDateLabel(dateStr: string): string {
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
   const day = DAY_NAMES_ES[d.getDay()];
   const date = d.getDate();
   const month = MONTH_NAMES_ES[d.getMonth()];

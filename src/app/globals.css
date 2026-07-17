@@ -136,7 +136,13 @@ button, [role="button"] {
 
 /* Prevent iOS input zoom (font-size >= 16px prevents auto-zoom).
    Unlayered rule: always wins over Tailwind @layer utilities regardless of specificity.
-   Covers ALL text-entry input types. */
+   Covers ALL text-entry input types.
+   Also prevents Safari's automatic text size adjustment on orientation change,
+   which can interact with viewport-fit=cover to trigger unexpected zoom. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 @media (max-width: 767px) {
   input[type="text"],
   input[type="email"],
@@ -148,9 +154,17 @@ button, [role="button"] {
   input[type="date"],
   input[type="time"],
   input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"],
   textarea,
   select {
-    font-size: 16px;
+    font-size: 16px !important;
+  }
+  /* Also cover inputs with no explicit type (defaults to "text")
+     and any input not caught by the type list above. */
+  input:not([type]),
+  input[type=""] {
+    font-size: 16px !important;
   }
 }
 

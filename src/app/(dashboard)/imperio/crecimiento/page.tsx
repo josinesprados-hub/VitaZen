@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_JOURNAL_ENTRIES } from '@/lib/screenshot-data';
 import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock } from 'lucide-react';
-import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
+import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys, safeFormatDate, safeFormatTime } from '@/lib/dates';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -44,11 +44,11 @@ function dateGroupLabel(dateStr: string): string {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  return safeFormatDate(dateStr);
 }
 
 function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  return safeFormatTime(dateStr);
 }
 
 function groupEntriesByDate(entries: JournalEntry[]): { label: string; entries: JournalEntry[] }[] {

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
-import { getMadridDateKey, daysBetweenDateKeys } from '@/lib/dates';
+import { getMadridDateKey, daysBetweenDateKeys, safeFormatDate, safeFormatTime } from '@/lib/dates';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_HABITS, SCREENSHOT_CHALLENGE as SCREENSHOT_HABIT_CHALLENGE } from '@/lib/screenshot-data';
 import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
@@ -417,9 +417,9 @@ export default function DisciplinaPage() {
                     <p className="text-white text-sm font-medium">{habit.name}</p>
                     {habit.description && <p className="text-[#666] text-xs">{habit.description}</p>}
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{new Date(habit.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(habit.createdAt)}</span>
                       <span className="text-[#333] text-xs">·</span>
-                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{new Date(habit.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(habit.createdAt)}</span>
                     </div>
                   </div>
                 </div>
