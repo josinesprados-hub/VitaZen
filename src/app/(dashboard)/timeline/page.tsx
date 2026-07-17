@@ -82,7 +82,7 @@ const IMPERIO_CONFIG: Record<string, {
     accent: 'text-champagne',
     accentSubtle: 'text-champagne/60',
     dot: 'bg-champagne/25 border-champagne/50',
-    label: 'Riqueza',
+    label: 'Finanzas',
   },
 };
 
@@ -113,7 +113,7 @@ const FILTERS = [
   { key: 'mente', label: 'Mente', icon: Brain },
   { key: 'energia', label: 'Energía', icon: Flame },
   { key: 'disciplina', label: 'Disciplina', icon: Target },
-  { key: 'riqueza', label: 'Riqueza', icon: Gem },
+  { key: 'riqueza', label: 'Finanzas', icon: Gem },
 ] as const;
 
 // ─── Date Grouping ───────────────────────────────────────

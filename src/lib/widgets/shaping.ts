@@ -324,7 +324,7 @@ const EMPIRE_LABELS: Record<string, string> = {
   disciplina: 'Disciplina',
   mente: 'Mente',
   energia: 'Energía',
-  riqueza: 'Riqueza',
+  riqueza: 'Finanzas',
   crecimiento: 'Crecimiento',
 };
 

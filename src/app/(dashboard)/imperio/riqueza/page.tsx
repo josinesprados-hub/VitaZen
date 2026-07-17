@@ -5,7 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import {
   Gem, Plus, Pencil, Trash2, Wallet,
-  ChevronLeft, ChevronRight, CalendarDays, X, Check
+  ChevronLeft, ChevronRight, CalendarDays, X, Check, ArrowUpRight
 } from 'lucide-react';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import ContextualHelp from '@/components/ui/ContextualHelp';
@@ -352,7 +352,7 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
 function SaveToast({ show, message }: { show: boolean; message: string }) {
   return (
     <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] transition-all duration-300 ${
         show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
@@ -365,8 +365,17 @@ function SaveToast({ show, message }: { show: boolean; message: string }) {
 }
 
 // ═══════════════════════════════════════════
-// Quick Capture Component
+// Quick Capture Component (Redesigned — FASE 8)
 // ═══════════════════════════════════════════
+//
+// UX DESIGN:
+// - Single input field for natural language capture ("Café 3,50")
+// - Live preview of parsed result (type, category, amount)
+// - Inline OK button appears when a valid amount is detected
+// - Context field below (optional, collapsible feel)
+// - "Formulario completo" link at bottom
+// - All fields use font-size: 16px on mobile (no zoom)
+// - No scroll-into-view hacking — parent handles positioning
 
 function QuickCapture({
   onCapture,
@@ -381,6 +390,8 @@ function QuickCapture({
 }) {
   const [input, setInput] = useState('');
   const [contexto, setContexto] = useState('');
+  const [showContexto, setShowContexto] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const parsed = useMemo(() => parseQuickCapture(input, historyMap), [input, historyMap]);
 
   const handleSubmit = () => {
@@ -394,6 +405,9 @@ function QuickCapture({
     });
     setInput('');
     setContexto('');
+    setShowContexto(false);
+    // Re-focus input after successful capture for rapid entry
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -404,9 +418,11 @@ function QuickCapture({
   };
 
   return (
-    <div>
+    <div className="space-y-3">
+      {/* Main capture input */}
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -419,48 +435,203 @@ function QuickCapture({
         />
       </div>
 
+      {/* Live preview + inline OK button */}
       {parsed && parsed.amount > 0 ? (
-        <div className="mt-2 flex items-center justify-between px-0.5">
-          <div className="flex items-center gap-1.5">
-            <span className={`text-[11px] font-medium ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
+        <div className="flex items-center justify-between px-0.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={`text-[11px] font-medium flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? 'Ingreso' : 'Gasto'}
             </span>
             <span className="text-[#222] text-[11px]">·</span>
-            <span className="text-[11px] text-[#666]">{parsed.category}</span>
+            <span className="text-[11px] text-[#666] truncate">{parsed.category}</span>
             <span className="text-[#222] text-[11px]">·</span>
-            <span className={`text-[11px] font-medium tabular-nums ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
+            <span className={`text-[11px] font-medium tabular-nums flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? '+' : '-'}{formatCurrency(parsed.amount)}
             </span>
           </div>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="bg-champagne text-black px-3 py-1 rounded-lg text-xs font-semibold hover:bg-champagne-hover active:scale-95 transition-all disabled:opacity-50"
+            className="bg-champagne text-black px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-champagne-hover active:scale-95 transition-all disabled:opacity-50 flex-shrink-0 ml-2"
           >
             {submitting ? '...' : 'OK'}
           </button>
         </div>
       ) : (
-        <p className="mt-2 text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
+        <p className="text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
       )}
 
-      <div className="mt-3">
+      {/* Contexto — optional, shown on tap */}
+      {showContexto ? (
         <input
           type="text"
           value={contexto}
           onChange={(e) => setContexto(e.target.value)}
           placeholder="¿Qué pasó? (opcional)"
-          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-sm text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
+          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-base text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
           autoComplete="off"
         />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowContexto(true)}
+          className="text-[10px] text-[#333] hover:text-[#555] transition-colors tracking-wide"
+        >
+          + Añadir contexto
+        </button>
+      )}
+
+      {/* Link to full form */}
+      <button
+        type="button"
+        onClick={onFullForm}
+        className="text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
+      >
+        Formulario completo →
+      </button>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// Full Form Component (Redesigned — FASE 8)
+// ═══════════════════════════════════════════
+//
+// UX DESIGN:
+// - Scrollable within its container (overscroll-contain)
+// - All inputs use text-base (16px) on mobile — no zoom
+// - Save button sticky at bottom of the scroll container
+// - Category chips for quick selection
+// - Intention selector at bottom
+// - Keyboard-aware: the parent bottom sheet handles positioning
+
+function FullForm({
+  form,
+  setForm,
+  onSubmit,
+  onBackToQuick,
+  submitting,
+  submitError,
+  userCategories,
+  mode,
+}: {
+  form: { type: string; category: string; amount: number; description: string; date: string; mood: string; contexto: string };
+  setForm: React.Dispatch<React.SetStateAction<typeof form>>;
+  onSubmit: () => void;
+  onBackToQuick: () => void;
+  submitting: boolean;
+  submitError: string | null;
+  userCategories: string[];
+  mode: 'create' | 'edit';
+}) {
+  const inputClass = "w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/40 transition-colors";
+
+  return (
+    <div className="space-y-4">
+      {/* Type toggle */}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setForm(f => ({ ...f, type: 'income' }))}
+          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            form.type === 'income'
+              ? 'bg-champagne text-black'
+              : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'
+          }`}
+        >
+          Ingreso
+        </button>
+        <button
+          type="button"
+          onClick={() => setForm(f => ({ ...f, type: 'expense' }))}
+          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            form.type === 'expense'
+              ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+              : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'
+          }`}
+        >
+          Gasto
+        </button>
       </div>
 
-      <button
-        onClick={onFullForm}
-        className="mt-2 text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
-      >
-        Formulario completo
-      </button>
+      {/* Date — only in edit mode */}
+      {mode === 'edit' && (
+        <input
+          type="date"
+          value={form.date}
+          onChange={(e) => setForm(f => ({ ...f, date: e.target.value }))}
+          className={inputClass}
+        />
+      )}
+
+      {/* Category */}
+      <div>
+        <input
+          type="text"
+          placeholder="Categoría"
+          value={form.category}
+          onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}
+          className={inputClass}
+        />
+        <div className="mt-2">
+          <CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm(f => ({ ...f, category: v }))} />
+        </div>
+      </div>
+
+      {/* Amount */}
+      <NumericInput
+        value={form.amount}
+        onChange={(v) => setForm(f => ({ ...f, amount: v }))}
+        placeholder="Cantidad (€)"
+        inputMode="decimal"
+        allowDecimal={true}
+        className={inputClass}
+      />
+
+      {/* Description */}
+      <input
+        type="text"
+        placeholder="Descripción (opcional)"
+        value={form.description}
+        onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+        className={inputClass}
+      />
+
+      {/* Context */}
+      <input
+        type="text"
+        placeholder="¿Qué pasó? (opcional)"
+        value={form.contexto}
+        onChange={(e) => setForm(f => ({ ...f, contexto: e.target.value }))}
+        className={`${inputClass} italic`}
+      />
+
+      {/* Intention */}
+      <IntentionSelector value={form.mood} onChange={(v) => setForm(f => ({ ...f, mood: v }))} />
+
+      {/* Error */}
+      {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
+
+      {/* Actions — sticky feel */}
+      <div className="flex items-center gap-3 pt-2 pb-1">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={submitting}
+          className="flex-1 bg-champagne text-black font-semibold py-3 rounded-xl text-sm hover:bg-champagne-hover active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {submitting ? 'Guardando...' : mode === 'edit' ? 'Actualizar' : 'Guardar'}
+        </button>
+        {mode === 'create' && (
+          <button
+            type="button"
+            onClick={onBackToQuick}
+            className="text-[#999] py-3 px-4 text-sm hover:text-champagne transition-colors"
+          >
+            Captura rápida
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -474,7 +645,7 @@ export default function RiquezaPage() {
   const { user } = useAuth();
   const [logs, setLogs] = useState<FinanceLog[]>([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+  const [form, setForm] = useState({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [editingLog, setEditingLog] = useState<FinanceLog | null>(null);
@@ -488,8 +659,8 @@ export default function RiquezaPage() {
   const [viewingMonth, setViewingMonth] = useState<Date | null>(null);
   const [toast, setToast] = useState({ show: false, message: '' });
   const [quickMode, setQuickMode] = useState(true);
-  const addFormRef = useRef<HTMLDivElement>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const addSheetRef = useRef<HTMLDivElement>(null);
 
   // Cleanup toast timer on unmount
   useEffect(() => {
@@ -498,7 +669,7 @@ export default function RiquezaPage() {
     };
   }, []);
 
-  // Hydration guard — only render date-dependent content after mount
+  // Hydration guard
   useEffect(() => {
     setMounted(true);
     setViewingMonth(new Date());
@@ -513,19 +684,16 @@ export default function RiquezaPage() {
     }, 2000);
   }, []);
 
+  // ── Body scroll lock for modals/sheets ──
   useEffect(() => {
-    if (pendingDeleteId || editingLog || showAdd) {
+    const anyOverlayOpen = pendingDeleteId || editingLog || showAdd;
+    if (anyOverlayOpen) {
       document.body.classList.add('scroll-locked');
       return () => { document.body.classList.remove('scroll-locked'); };
     }
   }, [pendingDeleteId, editingLog, showAdd]);
 
-  useEffect(() => {
-    if (showAdd && addFormRef.current) {
-      addFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, [showAdd]);
-
+  // ── Data fetching ──
   const fetchData = useCallback(async () => {
     setLoading(true);
     setFetchError(false);
@@ -568,7 +736,7 @@ export default function RiquezaPage() {
   }, [logs]);
 
   // ═══════════════════════════════════════════
-  // Computed — month ranges (safe with null viewingMonth)
+  // Computed — month ranges
   // ═══════════════════════════════════════════
 
   const [currentMonthRange, prevMonthRange] = useMemo(() => {
@@ -603,7 +771,7 @@ export default function RiquezaPage() {
   const cmBalance = cmIncome - cmExpense;
 
   // ═══════════════════════════════════════════
-  // Computed — Intention Balance (the home)
+  // Computed — Intention Balance
   // ═══════════════════════════════════════════
 
   const intentionFlows = useMemo(() => {
@@ -640,7 +808,6 @@ export default function RiquezaPage() {
 
   const hasIntentions = intentionFlows.some(f => f.amount > 0 && f.intention !== 'unassigned');
 
-  // Dominant intention — for observational insight
   const dominantIntention = useMemo(() => {
     if (!hasIntentions) return null;
     const withIntention = intentionFlows.filter(f => f.intention !== 'unassigned' && f.amount > 0);
@@ -691,7 +858,8 @@ export default function RiquezaPage() {
         const data = await res.json();
         setLogs(prev => [data.log, ...prev]);
         setShowAdd(false);
-        setForm({ type: 'expense', category: '', amount: 0, description: '', mood: '', contexto: '' });
+        setForm({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+        setQuickMode(true);
         showToast('Registrado');
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -801,9 +969,6 @@ export default function RiquezaPage() {
   // Loading / Error / Hydration guard
   // ═══════════════════════════════════════════
 
-  // Before mount: show FinanzasSkeleton to prevent hydration mismatch
-  // from Date-dependent content. This skeleton mirrors the exact page
-  // structure so there is no layout shift when content loads.
   if (!mounted || loading) {
     return <FinanzasSkeleton />;
   }
@@ -827,48 +992,112 @@ export default function RiquezaPage() {
 
   const isEmpty = logs.length === 0;
 
+  // Shared close handler for the add sheet
+  const closeAddSheet = () => {
+    setShowAdd(false);
+    setSubmitError(null);
+    setQuickMode(true);
+    setForm({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-24">
       <SaveToast show={toast.show} message={toast.message} />
 
-      {/* ── Edit Overlay ── */}
+      {/* ═══════════════════════════════════════════
+          ADD MOVEMENT BOTTOM SHEET (FASE 8 — Redesigned)
+          ═══════════════════════════════════════════
+          UX FIXES:
+          - items-center justify-end on mobile → sheet sticks to bottom
+          - items-center on sm+ → centered modal
+          - max-h uses dvh for keyboard awareness
+          - overflow-y-auto + overscroll-contain for inner scroll
+          - safe-bottom for home indicator
+          - All inputs text-base (16px) to prevent zoom
+          - No scrollIntoView hack — sheet is already visible
+          - pb-2 on inner content prevents last field being cut by safe area
+          ═══════════════════════════════════════════ */}
+      {showAdd && !editingLog && !pendingDeleteId && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop"
+          onClick={closeAddSheet}
+        >
+          <div
+            ref={addSheetRef}
+            className="bg-[#0a0a0a] border border-[#1a1a1a] sm:border-champagne/20 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md safe-bottom overflow-y-auto overscroll-contain section-enter-1"
+            style={{ maxHeight: 'min(90dvh, calc(100dvh - 3rem))' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5 sm:p-6 pb-6">
+              {/* Handle bar (mobile bottom sheet affordance) */}
+              <div className="sm:hidden flex justify-center mb-3">
+                <div className="w-8 h-1 rounded-full bg-[#333]" />
+              </div>
+
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
+                <button
+                  onClick={closeAddSheet}
+                  className="text-[#555] hover:text-[#999] transition-colors p-1"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {quickMode ? (
+                <QuickCapture
+                  onCapture={submitQuickCapture}
+                  onFullForm={() => { setSubmitError(null); setQuickMode(false); }}
+                  submitting={submitting}
+                  historyMap={descriptionCategoryMap}
+                />
+              ) : (
+                <FullForm
+                  form={form}
+                  setForm={setForm}
+                  onSubmit={submitFinance}
+                  onBackToQuick={() => { setSubmitError(null); setQuickMode(true); }}
+                  submitting={submitting}
+                  submitError={submitError}
+                  userCategories={userCategories}
+                  mode="create"
+                />
+              )}
+
+              {submitError && quickMode && (
+                <p className="text-red-400 text-xs py-1 mt-3">{submitError}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Overlay (uses modal-content class for centered bottom-sheet on mobile) ── */}
       {editingLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
-          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
+          <div
+            className="modal-content p-5 sm:p-8 w-full sm:max-w-md safe-bottom overflow-y-auto overscroll-contain"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sm:hidden flex justify-center mb-3">
+              <div className="w-8 h-1 rounded-full bg-[#333]" />
+            </div>
+            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-4 sm:mb-5">
               <Pencil size={20} className="text-champagne" />
             </div>
-            <h3 className="text-lg font-bold text-white text-center mb-6">Editar registro</h3>
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                <button onClick={() => setEditForm({ ...editForm, type: 'income' })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                  Ingreso
-                </button>
-                <button onClick={() => setEditForm({ ...editForm, type: 'expense' })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${editForm.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>
-                  Gasto
-                </button>
-              </div>
-              <input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
-              <div>
-                <input type="text" placeholder="Categoría" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
-                <CategoryChips categories={userCategories} value={editForm.category} onChange={(v) => setEditForm({ ...editForm, category: v })} />
-              </div>
-              <NumericInput value={editForm.amount} onChange={(v) => setEditForm({ ...editForm, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
-              <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
-              <input type="text" placeholder="¿Qué pasó? (opcional)" value={editForm.contexto} onChange={(e) => setEditForm({ ...editForm, contexto: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#444] italic" />
-              <IntentionSelector value={editForm.mood} onChange={(v) => setEditForm({ ...editForm, mood: v })} />
-              {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-            </div>
-            <div className="flex items-center justify-center gap-3 mt-7">
-              <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={saveEdit} disabled={editSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editSaving ? 'Guardando...' : 'Guardar'}</button>
+            <h3 className="text-lg font-bold text-white text-center mb-5 sm:mb-6">Editar registro</h3>
+            <FullForm
+              form={editForm}
+              setForm={setEditForm}
+              onSubmit={saveEdit}
+              onBackToQuick={() => {}}
+              submitting={editSaving}
+              submitError={submitError}
+              userCategories={userCategories}
+              mode="edit"
+            />
+            <div className="flex justify-center mt-3 sm:mt-5">
+              <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="text-[#999] px-5 py-2.5 text-sm hover:text-white transition-colors">Cancelar</button>
             </div>
           </div>
         </div>
@@ -876,13 +1105,13 @@ export default function RiquezaPage() {
 
       {/* ── Delete Confirmation ── */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
-          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => setPendingDeleteId(null)}>
+          <div className="modal-content-destructive p-6 sm:p-8 w-full sm:max-w-md safe-bottom" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Eliminar registro</h3>
-            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <h3 className="text-lg font-bold text-white text-center mb-2">Eliminar registro</h3>
+            <p className="text-[#999] text-sm text-center mb-6">Esta acción no se puede deshacer</p>
             <div className="flex items-center justify-center gap-3">
               <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
@@ -904,7 +1133,7 @@ export default function RiquezaPage() {
         </div>
       </div>
 
-      {/* Contextual Help — progressive disclosure */}
+      {/* Contextual Help */}
       <ContextualHelp
         storageKey="vitazen_help_riqueza"
         title="Finanzas"
@@ -913,16 +1142,9 @@ export default function RiquezaPage() {
 
       {/* ═══════════════════════════════════════════
           SINGLE STABLE LAYOUT
-          The same structure is ALWAYS present.
-          Sections gracefully handle empty data
-          without appearing, disappearing, or
-          changing the visual hierarchy.
-          
-          "No importa cuándo entro.
-           Siempre vuelvo al mismo espacio."
           ═══════════════════════════════════════════ */}
 
-      {/* ── Month Navigation — always present ── */}
+      {/* ── Month Navigation ── */}
       <div className="flex items-center justify-between">
         <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
           <ChevronLeft size={18} />
@@ -939,7 +1161,7 @@ export default function RiquezaPage() {
         </button>
       </div>
 
-      {/* ── 1. Balance de Intenciones — the emotional center of Finanzas ── */}
+      {/* ── 1. Balance de Intenciones ── */}
       {isEmpty ? (
         <PremiumEmptyState
           icon={Wallet}
@@ -963,7 +1185,7 @@ export default function RiquezaPage() {
         </div>
       )}
 
-      {/* ── 2. Saldo neto — reserved space, invisible when empty ── */}
+      {/* ── 2. Saldo neto ── */}
       {!isEmpty && currentMonthLogs.length > 0 && (
         <div className="py-1">
           <PrivacyMask compact>
@@ -981,7 +1203,7 @@ export default function RiquezaPage() {
         </div>
       )}
 
-      {/* ── 3. Insight — reserved space, only visible when meaningful ── */}
+      {/* ── 3. Insight ── */}
       {!isEmpty && dominantIntention && currentMonthLogs.length >= 5 && (
         <div className="bg-champagne/5 border border-champagne/15 rounded-2xl p-5 sm:p-6 lg:p-7">
           <p className="text-champagne/80 text-sm sm:text-base italic leading-relaxed">
@@ -990,55 +1212,19 @@ export default function RiquezaPage() {
         </div>
       )}
 
-      {/* ── 4. Historial — always present when has data ── */}
+      {/* ── 4. Historial ── */}
       {!isEmpty && (
       <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-5 sm:p-6 lg:p-8">
         <div className="flex items-center justify-between mb-5 sm:mb-6">
           <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">Movimientos</h2>
-          <button onClick={() => { setQuickMode(true); setShowAdd(!showAdd); }} className="flex items-center gap-1 text-sm text-champagne hover:text-champagne-hover touch-press transition-colors">
+          <button onClick={() => { setQuickMode(true); setShowAdd(true); }} className="flex items-center gap-1 text-sm text-champagne hover:text-champagne-hover touch-press transition-colors">
             <Plus size={16} /> <span className="hidden sm:inline">Añadir</span>
           </button>
         </div>
 
-        {/* Quick Capture / Full Form */}
-        {showAdd && (
-          <div ref={addFormRef} className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-[#555] uppercase tracking-wider">Nuevo movimiento</span>
-              <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
-                <X size={16} />
-              </button>
-            </div>
-            {quickMode ? (
-              <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
-            ) : (
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
-                  <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
-                </div>
-                <div>
-                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                  <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
-                </div>
-                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2.5 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
-                <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
-                {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-                <div className="flex gap-2 pt-1">
-                  <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover touch-press disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2 text-sm hover:text-champagne transition-colors">Captura rápida</button>
-                </div>
-              </div>
-            )}
-            {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
-          </div>
-        )}
-
         {/* Period Filter */}
         {logs.length > 0 && (
-          <div className="flex gap-2 mb-4 overflow-x-auto">
+          <div className="flex gap-2 mb-5 overflow-x-auto">
             {([
               { key: 'month' as Period, label: 'Este mes' },
               { key: 'prev' as Period, label: 'Mes anterior' },
@@ -1061,7 +1247,7 @@ export default function RiquezaPage() {
 
         {/* Grouped History */}
         {Object.keys(groupedHistory).length > 0 ? (
-          <div className="space-y-5 max-h-[600px] overflow-y-auto">
+          <div className="space-y-5 max-h-[600px] overflow-y-auto overscroll-contain">
             {Object.entries(groupedHistory).map(([dateLabel, dateLogs]) => {
               const dayIncome = dateLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
               const dayExpense = dateLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
@@ -1128,93 +1314,15 @@ export default function RiquezaPage() {
       </div>
       )}
 
-      {/* ── Empty state form overlay ── */}
-      {isEmpty && showAdd && (
-        <div ref={addFormRef} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-white">Nuevo movimiento</h3>
-            <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
-              <X size={18} />
-            </button>
-          </div>
-          {quickMode ? (
-            <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
-          ) : (
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
-                <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
-              </div>
-              <div>
-                <input type="text" placeholder="Categoría (ej: Ocio, Transporte...)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
-              </div>
-              <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-              <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-              <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
-              <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
-              {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-              <div className="flex gap-2 pt-1">
-                <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
-              </div>
-            </div>
-          )}
-          {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
-        </div>
-      )}
-
-      {/* ── FAB ── */}
-      {!editingLog && !pendingDeleteId && (
+      {/* ── FAB (hidden when overlays are open) ── */}
+      {!editingLog && !pendingDeleteId && !showAdd && (
         <button
           onClick={() => { setQuickMode(true); setShowAdd(true); }}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-champagne text-black rounded-2xl shadow-lg shadow-champagne/25 flex items-center justify-center hover:bg-champagne-hover active:scale-95 transition-all touch-press"
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-champagne text-black rounded-2xl shadow-lg shadow-champagne/25 flex items-center justify-center hover:bg-champagne-hover active:scale-95 transition-all touch-press safe-bottom"
           title="Añadir movimiento"
         >
           <Plus size={24} />
         </button>
-      )}
-
-      {/* ── FAB Overlay ── */}
-      {showAdd && !editingLog && !pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop" onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }}>
-          <div
-            className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 w-full max-w-md safe-bottom overflow-y-auto overscroll-contain section-enter-1"
-            style={{ maxHeight: 'min(85dvh, calc(100dvh - 4rem))' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
-              <button onClick={() => { setShowAdd(false); setSubmitError(null); setQuickMode(true); }} className="text-[#555] hover:text-[#999] transition-colors">
-                <X size={18} />
-              </button>
-            </div>
-            {quickMode ? (
-              <QuickCapture onCapture={submitQuickCapture} onFullForm={() => setQuickMode(false)} submitting={submitting} historyMap={descriptionCategoryMap} />
-            ) : (
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <button onClick={() => setForm({ ...form, type: 'income' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'income' ? 'bg-champagne text-black' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Ingreso</button>
-                  <button onClick={() => setForm({ ...form, type: 'expense' })} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === 'expense' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#000000] border border-[#1a1a1a] text-[#999]'}`}>Gasto</button>
-                </div>
-                <div>
-                  <input type="text" placeholder="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                  <div className="mt-2"><CategoryChips categories={userCategories} value={form.category} onChange={(v) => setForm({ ...form, category: v })} /></div>
-                </div>
-                <NumericInput value={form.amount} onChange={(v) => setForm({ ...form, amount: v })} placeholder="Cantidad (€)" inputMode="decimal" allowDecimal={true} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/50 transition-colors" />
-                <input type="text" placeholder="¿Qué pasó? (opcional)" value={form.contexto} onChange={(e) => setForm({ ...form, contexto: e.target.value })} className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/50 transition-colors italic" />
-                <IntentionSelector value={form.mood} onChange={(v) => setForm({ ...form, mood: v })} />
-                {submitError && <p className="text-red-400 text-xs py-1">{submitError}</p>}
-                <div className="flex gap-2 pt-1 pb-2">
-                  <button onClick={submitFinance} disabled={submitting} className="bg-champagne text-black font-semibold px-4 py-2.5 rounded-xl text-sm hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{submitting ? 'Guardando...' : 'Guardar'}</button>
-                  <button onClick={() => setQuickMode(true)} className="text-[#999] px-4 py-2.5 text-sm hover:text-champagne transition-colors">Captura rápida</button>
-                </div>
-              </div>
-            )}
-            {submitError && quickMode && <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>}
-          </div>
-        </div>
       )}
 
       {/* Tips */}

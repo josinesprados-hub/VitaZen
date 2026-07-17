@@ -6,47 +6,39 @@ import { useEffect, useRef } from 'react';
  * ViewportManager — prevents and resets stuck viewport zoom on iOS Safari / PWA.
  *
  * ═══════════════════════════════════════════════════════════════════════
- * FORENSIC FINDING — ROOT CAUSE (HOTFIX QA iPhone 3)
+ * FORENSIC FINDING — ROOT CAUSE (FASE 8)
  * ═══════════════════════════════════════════════════════════════════════
  *
- * Previous HOTFIX iOS ZOOM 2 fixed the keyboard detection (dynamic baseline
- * instead of fixed 0.9 threshold) but STILL didn't fix the zoom.
+ * PREVIOUS FIXES (all insufficient):
+ *   HOTFIX PWA 1: Dynamic meta viewport manipulation on focus/blur.
+ *     → Failed: Safari restores "zoom memory" when maximum-scale is removed.
+ *   HOTFIX iOS ZOOM 2: Dynamic baseline keyboard detection + scrollTo reset.
+ *     → Failed: The meta viewport still lacked permanent maximum-scale=1.
+ *   HOTFIX QA iPhone 3 (ViewportManager v3): Added maximum-scale=1 via
+ *     JS mutation of the meta tag at runtime.
+ *     → Failed: Next.js static viewport export overwrites the meta tag on
+ *       navigation, re-rendering it WITHOUT maximum-scale. The JS mutation
+ *       was being undone on every route change.
  *
- * WHY THE ZOOM PERSISTED:
+ * DEFINITIVE ROOT CAUSE:
+ *   The Next.js `viewport` export in layout.tsx only had:
+ *     width=device-width, initial-scale=1, viewport-fit=cover
+ *   Without `maximum-scale=1, user-scalable=no` in the STATIC export,
+ *   Next.js renders a meta tag that ALLOWS zooming. No amount of runtime
+ *   JS mutation can reliably persist because Next.js manages the <head>
+ *   and may re-render the meta tag on navigation or hydration.
  *
- *   The resetZoom() function used a TEMPORARY meta viewport change:
- *     1. Set `maximum-scale=1` (Safari de-zooms)
- *     2. After 3 rAF, RESTORE the original meta content
+ * DEFINITIVE FIX (FASE 8):
+ *   1. Added `maximumScale: 1` and `userScalable: false` to the static
+ *      viewport export in layout.tsx. This is the PRIMARY fix — it ensures
+ *      the meta tag ALWAYS contains the no-zoom directive, regardless of
+ *      hydration, navigation, or re-rendering.
+ *   2. This component retains EMERGENCY fallback mechanisms (scrollTo reset)
+ *      for edge cases where scale > 1 is detected despite the viewport lock.
+ *   3. All form inputs already use font-size: 16px via globals.css.
+ *   4. Accessibility pinch-to-zoom still works via Safari's built-in
+ *      zoom feature (separate from viewport zoom).
  *
- *   This is fundamentally broken on iOS Safari:
- *   - When `maximum-scale=1` is REMOVED, Safari restores its internal
- *     "zoom memory" — the scale snaps back to the pre-reset value.
- *   - The triple-rAF delay is not enough for Safari to fully commit the
- *     de-zoom before the original meta is restored.
- *   - Result: zoom appears to briefly reset, then snaps back.
- *
- * ADDITIONAL ROOT CAUSE — maximum-scale was MISSING from the meta viewport:
- *   The Next.js viewport export only had: width=device-width, initial-scale=1,
- *   viewport-fit=cover. Without maximum-scale=1, user-scalable=no, iOS Safari
- *   is FREE to zoom on any input with font-size < 16px. Despite the CSS
- *   font-size: 16px !important rule, Safari's auto-zoom can still trigger
- *   in edge cases (e.g., during font loading, with system font fallback,
- *   or when the computed size differs from the declared size).
- *
- * FIX (two-pronged):
- *   1. PERMANENT: Add maximum-scale=1, user-scalable=no to the meta viewport
- *      at initialization. This PREVENTS Safari from ever auto-zooming.
- *      Since all inputs already use font-size: 16px, the user doesn't need
- *      manual zoom for form fields. Accessibility zoom (pinch-to-zoom)
- *      still works via Safari's built-in zoom feature (separate from
- *      viewport zoom).
- *   2. EMERGENCY: If scale > 1 is detected (edge case), use scrollTo(0,0)
- *      to force the viewport to reset, WITHOUT touching the meta tag
- *      (which would re-trigger the zoom memory issue).
- *   3. KEYBOARD-AWARE: The focusout handler now waits 600ms (up from 400ms)
- *      to account for the slower keyboard dismiss animation on iPhone 15/16.
- *
- * ═══════════════════════════════════════════════════════════════════════
  * CROSS-PLATFORM IMPACT:
  * - iOS Safari / PWA: Prevents auto-zoom entirely. Emergency scrollTo as fallback.
  * - Android Chrome / WebView: user-scalable=no is respected but irrelevant
@@ -76,29 +68,26 @@ export function ViewportManager() {
       }
     };
 
-    // ─── STEP 1: Lock the viewport permanently ──────────────────
-    // This PREVENTS Safari from ever auto-zooming on input focus.
-    // All form inputs already use font-size: 16px, so manual zoom
-    // for readability is not needed. The CSS !important rule in
-    // globals.css is the primary defense; this is the belt-and-suspenders.
+    // ─── BELT-AND-SUSPENDERS: Verify meta viewport has maximum-scale ──
+    // The static export should handle this, but if anything overrides it,
+    // we catch it here. This is a safety net, not the primary fix.
     const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
     if (meta) {
       const current = meta.getAttribute('content') || '';
-      // Only add if not already present (idempotent on re-render)
       if (!current.includes('maximum-scale=1')) {
         meta.setAttribute('content', `${current}, maximum-scale=1, user-scalable=no`);
-        log('VIEWPORT_LOCKED', { before: current, after: meta.getAttribute('content') });
+        log('VIEWPORT_RELOCKED', { before: current, after: meta.getAttribute('content') });
       }
     }
 
-    // ─── Dynamic baseline ───────────────────────────────────────
+    // ─── Dynamic baseline for keyboard detection ────────────────
     let baselineRatio: number | null = null;
     const KEYBOARD_DROP_THRESHOLD = 0.08;
     let wasKeyboardVisible = false;
 
     // ─── Emergency zoom reset (scrollTo-based) ──────────────────
-    // This is a FALLBACK for edge cases where scale > 1 despite
-    // the viewport lock. It does NOT touch the meta tag.
+    // FALLBACK for edge cases where scale > 1 despite the viewport lock.
+    // Does NOT touch the meta tag (which would re-trigger zoom memory).
     const forceResetZoom = () => {
       if (resettingRef.current) return;
       resettingRef.current = true;
@@ -109,11 +98,8 @@ export function ViewportManager() {
         activeEl: document.activeElement?.tagName,
       });
 
-      // Scroll to top forces Safari to re-evaluate the viewport scale.
-      // Using { behavior: 'instant' } avoids smooth scroll animation.
       window.scrollTo(0, 0);
 
-      // Verify after a short delay
       setTimeout(() => {
         const finalScale = vv.scale;
         log('FORCE_RESET_COMPLETE', {
@@ -122,8 +108,7 @@ export function ViewportManager() {
         });
         resettingRef.current = false;
 
-        // If still stuck (extremely rare), try a second approach:
-        // blur any active element and scroll again
+        // If still stuck, blur active element and scroll again
         if (finalScale > 1.01 && document.activeElement) {
           (document.activeElement as HTMLElement).blur?.();
           requestAnimationFrame(() => {
@@ -146,7 +131,6 @@ export function ViewportManager() {
           ratio: ratio.toFixed(4),
           vvH: Math.round(vv.height),
           innerH: window.innerHeight,
-          safeAreaTop: Math.round(window.innerHeight - vv.height),
         });
       }
 
@@ -160,14 +144,13 @@ export function ViewportManager() {
         innerH: window.innerHeight,
         ratio: ratio.toFixed(4),
         baseline: (baselineRatio ?? 0).toFixed(4),
-        drop: ((baselineRatio ?? 1) - ratio).toFixed(4),
         kbVis: keyboardVisible,
         wasKb: wasKeyboardVisible,
         active: active ?? 'none',
         scrollY: window.scrollY,
       });
 
-      // Keyboard was visible, now dismissed, but zoom stuck > 1.
+      // Keyboard dismissed, but zoom stuck > 1
       if (wasKeyboardVisible && !keyboardVisible && scale > 1) {
         log('KEYBOARD_DISMISSED_ZOOM_STUCK', { scale: scale.toFixed(4) });
         forceResetZoom();
@@ -177,8 +160,6 @@ export function ViewportManager() {
     };
 
     // ─── Secondary: focusout (blur) based reset ─────────────────
-    // Catches the "tap Save button" pattern: input blurs → keyboard
-    // starts dismissing → we schedule a delayed check.
     let blurTimer: ReturnType<typeof setTimeout> | null = null;
 
     const onFocusOut = (e: FocusEvent) => {
@@ -191,8 +172,6 @@ export function ViewportManager() {
       if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
 
       // 600ms: iOS keyboard dismiss animation can take up to ~400ms
-      // on iPhone 15/16 Pro. Extra margin ensures the keyboard is
-      // fully gone before we check the scale.
       blurTimer = setTimeout(() => {
         blurTimer = null;
         if (vv.scale > 1) {
