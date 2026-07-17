@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
-import { Check, Loader2, Link2, Circle, Eye } from 'lucide-react';
+import { Check, Loader2, Circle, Eye } from 'lucide-react';
 
 // ═══════════════════════════════════════════
 // Pricing Page — Élite identity, contemplative tone
@@ -196,47 +196,10 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* What depth feels like — not "features" */}
-      <div className="mt-12 sm:mt-16 mb-8">
-        <div className="flex items-center gap-2 mb-6 justify-center">
-          <Link2 size={12} className="text-champagne/30" />
-          <p className="text-champagne/30 text-[10px] uppercase tracking-[0.2em] font-medium">Así se ve</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            {
-              text: 'Tus semanas con menos descanso coinciden con más gasto impulsivo.',
-              empires: 'Energía · Finanzas',
-            },
-            {
-              text: 'Cuando tus hábitos mentales se estabilizan, tu energía financiera cambia.',
-              empires: 'Mente · Finanzas',
-            },
-            {
-              text: 'Los periodos de más disciplina también son los de mejor descanso.',
-              empires: 'Disciplina · Energía',
-            },
-          ].map((example, i) => (
-            <div
-              key={i}
-              className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5"
-            >
-              <p className="text-champagne/60 text-sm italic leading-relaxed mb-3">
-                &ldquo;{example.text}&rdquo;
-              </p>
-              <p className="text-[10px] text-[#2a2a2a] tracking-wide">{example.empires}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Silent philosophy — not sales copy */}
-      <div className="text-center mt-6 mb-2">
+      <div className="text-center mt-12 sm:mt-16 mb-2">
         <div className="max-w-md mx-auto">
-          <p className="text-[#555] text-sm leading-relaxed">
-            Todo lo esencial ya está en Free. Élite conecta más cosas con el tiempo.
-          </p>
-          <p className="text-[#333] text-xs mt-3">
+          <p className="text-[#333] text-xs">
             Sin compromiso. Cancela cuando quieras.
           </p>
         </div>

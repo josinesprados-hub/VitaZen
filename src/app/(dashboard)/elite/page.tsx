@@ -14,7 +14,6 @@ import {
   Brain,
   Heart,
   Loader2,
-  Sparkles,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════
@@ -208,43 +207,6 @@ export default function ElitePage() {
         </div>
       </div>
 
-      {/* ─── What depth feels like — real examples ─── */}
-      <div className="mb-14 sm:mb-20">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <Sparkles size={12} className="text-champagne/25" />
-          <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
-            Ejemplos
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            {
-              text: 'Tus semanas con menos descanso coinciden con más gasto impulsivo.',
-              empires: 'Energía · Finanzas',
-            },
-            {
-              text: 'Cuando tus hábitos mentales se estabilizan, tu energía financiera cambia.',
-              empires: 'Mente · Finanzas',
-            },
-            {
-              text: 'Los periodos de más disciplina también son los de mejor descanso.',
-              empires: 'Disciplina · Energía',
-            },
-          ].map((example, i) => (
-            <div
-              key={i}
-              className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5"
-            >
-              <p className="text-champagne/60 text-sm italic leading-relaxed mb-3">
-                &ldquo;{example.text}&rdquo;
-              </p>
-              <p className="text-[10px] text-[#2a2a2a] tracking-wide">{example.empires}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ─── Free vs Élite — human, not SaaS ─── */}
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -338,18 +300,6 @@ export default function ElitePage() {
               </ul>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ─── Quiet philosophy ─── */}
-      <div className="text-center mb-10 sm:mb-14">
-        <div className="max-w-md mx-auto">
-          <p className="text-[#555] text-sm leading-relaxed">
-            Todo lo esencial ya está en Free. Élite conecta más cosas con el tiempo.
-          </p>
-          <p className="text-[#333] text-xs mt-3">
-            Sin compromiso. Cancela cuando quieras.
-          </p>
         </div>
       </div>
 
