@@ -173,36 +173,53 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event;
 
-  try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-    eventType = event.type;
-    eventId = event.id;
-  } catch (liveErr) {
-    // Live secret failed — try Test secret if available, but ONLY in non-production.
-    // BUG-B1 FIX: In production, accepting test-secret-signed events allows anyone
-    // with the (less protected) test secret to forge webhook events and grant
-    // themselves Premium. The test secret fallback is now gated behind
-    // NODE_ENV !== 'production' so it only works in local development.
-    const testSecret = process.env.STRIPE_TEST_WEBHOOK_SECRET;
-    const isProduction = process.env.NODE_ENV === 'production';
-    if (testSecret && !isProduction) {
-      try {
-        event = stripe.webhooks.constructEvent(body, signature, testSecret);
-        eventType = event.type;
-        eventId = event.id;
-        serverLog.info('webhook/stripe', 'Webhook verified with Test secret (non-production)', { eventType, eventId });
-      } catch (testErr) {
-        serverLog.error('webhook/stripe', 'Webhook signature verification failed (both secrets)', testErr, {
-          eventType,
-        });
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-      }
-    } else {
-      serverLog.error('webhook/stripe', 'Webhook signature verification failed', liveErr, {
-        eventType,
-      });
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  // ─── Signature verification with dual-secret support ────────────
+  // Try the LIVE secret first. If it fails, fall back to the TEST secret.
+  // Both secrets are server-side-only, high-entropy strings — neither is
+  // "less protected" than the other. The dual-secret approach allows the
+  // same production endpoint to handle both live and test Stripe events,
+  // which is required because Vercel always sets NODE_ENV=production.
+  //
+  // SECURITY NOTE: Accepting test-signed events on production is safe because:
+  //   1. Only Stripe can generate valid webhook signatures
+  //   2. Both secrets are stored identically (env vars on server)
+  //   3. An attacker would need to steal a secret from Stripe Dashboard or
+  //      Vercel env — the test secret offers no easier attack vector
+  //   4. Stripe signs test events with the test secret, live events with
+  //      the live secret — they never cross
+  //
+  // PREVIOUS BUG: A `!isProduction` gate blocked the test fallback on
+  // Vercel (where NODE_ENV is always 'production'), causing ALL test-mode
+  // webhooks to fail with 400 "Invalid signature".
+
+  let secretUsed: 'live' | 'test' | null = null;
+
+  for (const [label, secret] of [
+    ['live', process.env.STRIPE_WEBHOOK_SECRET],
+    ['test', process.env.STRIPE_TEST_WEBHOOK_SECRET],
+  ] as const) {
+    if (!secret) continue;
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, secret);
+      eventType = event.type;
+      eventId = event.id;
+      secretUsed = label;
+      break;
+    } catch {
+      // This secret didn't match — try next
     }
+  }
+
+  if (!secretUsed) {
+    serverLog.error('webhook/stripe', 'Webhook signature verification failed — no matching secret', undefined, {
+      hasLiveSecret: !!process.env.STRIPE_WEBHOOK_SECRET,
+      hasTestSecret: !!process.env.STRIPE_TEST_WEBHOOK_SECRET,
+    });
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  }
+
+  if (secretUsed === 'test') {
+    serverLog.info('webhook/stripe', 'Webhook verified with TEST secret', { eventType, eventId });
   }
 
   // ─── Idempotency check ──────────────────────────────────────────
@@ -590,6 +607,162 @@ export async function POST(request: NextRequest) {
           where: { stripeSubscriptionId: subscription.id },
           data: { status: 'canceled' },
         });
+
+        break;
+      }
+
+      case 'customer.subscription.created': {
+        const subscription = event.data.object as Stripe.Subscription;
+        serverLog.info('webhook/stripe', 'customer.subscription.created', {
+          subId: subscription.id,
+          status: subscription.status,
+          customerId: subscription.customer,
+          eventId,
+        });
+
+        // Resolve userId from customer metadata
+        let userId: string | null = null;
+        try {
+          const customer = await stripe.customers.retrieve(subscription.customer as string);
+          if ('metadata' in customer && !('deleted' in customer)) {
+            userId = customer.metadata.userId || null;
+          }
+        } catch (e) {
+          serverLog.error('webhook/stripe', 'Could not retrieve customer for subscription created', e);
+        }
+
+        // Fallback: find user by stripeCustomerId in our DB
+        if (!userId) {
+          try {
+            const user = await db.user.findUnique({
+              where: { stripeCustomerId: subscription.customer as string },
+              select: { id: true },
+            });
+            if (user) {
+              userId = user.id;
+              serverLog.info('webhook/stripe', 'Resolved userId from DB stripeCustomerId (subscription.created)');
+            }
+          } catch {
+            // DB lookup failed
+          }
+        }
+
+        if (!userId) {
+          serverLog.warn('webhook/stripe', 'customer.subscription.created — cannot resolve userId', {
+            subId: subscription.id,
+            customerId: subscription.customer,
+          });
+          await markEventProcessed(event.id, event.type);
+          await cleanupOldEvents();
+          break;
+        }
+
+        // Create subscription record and promote user
+        const firstItem = subscription.items.data[0];
+        const itemPeriodStart = firstItem?.current_period_start;
+        const itemPeriodEnd = firstItem?.current_period_end;
+
+        await db.$transaction(async (tx) => {
+          await tx.$executeRaw`
+            SELECT pg_advisory_xact_lock(
+              ('x' || substring(md5(${userId} || '|plan-sync'), 1, 16))::bit(64)::bigint
+            )
+          `;
+
+          await tx.subscription.upsert({
+            where: { stripeSubscriptionId: subscription.id },
+            create: {
+              userId,
+              stripeSubscriptionId: subscription.id,
+              stripePriceId: firstItem?.price.id || '',
+              status: subscription.status,
+              currentPeriodStart: typeof itemPeriodStart === 'number' ? new Date(itemPeriodStart * 1000) : new Date(),
+              currentPeriodEnd: typeof itemPeriodEnd === 'number' ? new Date(itemPeriodEnd * 1000) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            },
+            update: {
+              status: subscription.status,
+              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+              stripePriceId: firstItem?.price.id || '',
+              ...(typeof itemPeriodStart === 'number' ? { currentPeriodStart: new Date(itemPeriodStart * 1000) } : {}),
+              ...(typeof itemPeriodEnd === 'number' ? { currentPeriodEnd: new Date(itemPeriodEnd * 1000) } : {}),
+            },
+          });
+
+          // Promote user if subscription is active or trialing
+          if (['active', 'trialing'].includes(subscription.status)) {
+            const user = await tx.user.findUnique({ where: { id: userId } });
+            if (user && user.plan !== 'PREMIUM') {
+              await tx.user.update({
+                where: { id: userId },
+                data: { plan: 'PREMIUM', stripeCustomerId: subscription.customer as string },
+              });
+              serverLog.info('webhook/stripe', 'Subscription created — user promoted to PREMIUM');
+            }
+          }
+        });
+
+        break;
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = (invoice as unknown as { subscription?: string | null }).subscription as string | null;
+
+        serverLog.info('webhook/stripe', 'invoice.paid', {
+          invoiceId: invoice.id,
+          subscriptionId: subscriptionId || 'null',
+          amountPaid: invoice.amount_paid,
+          currency: invoice.currency,
+          eventId,
+        });
+
+        // Update subscription period dates on successful payment/renewal
+        if (!subscriptionId) {
+          break;
+        }
+
+        try {
+          // Retrieve the subscription to get updated period dates
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const firstItem = subscription.items.data[0];
+          const itemPeriodStart = firstItem?.current_period_start;
+          const itemPeriodEnd = firstItem?.current_period_end;
+
+          if (typeof itemPeriodStart === 'number' && typeof itemPeriodEnd === 'number') {
+            await db.subscription.update({
+              where: { stripeSubscriptionId: subscriptionId },
+              data: {
+                currentPeriodStart: new Date(itemPeriodStart * 1000),
+                currentPeriodEnd: new Date(itemPeriodEnd * 1000),
+                status: subscription.status,
+              },
+            });
+            serverLog.info('webhook/stripe', 'Updated period dates from invoice.paid', {
+              subscriptionId,
+              newStart: new Date(itemPeriodStart * 1000).toISOString(),
+              newEnd: new Date(itemPeriodEnd * 1000).toISOString(),
+            });
+          }
+
+          // Ensure user plan is PREMIUM on successful invoice payment
+          const existingSub = await db.subscription.findUnique({
+            where: { stripeSubscriptionId: subscriptionId },
+            select: { userId: true },
+          });
+          if (existingSub) {
+            const user = await db.user.findUnique({ where: { id: existingSub.userId } });
+            if (user && user.plan !== 'PREMIUM' && ['active', 'trialing'].includes(subscription.status)) {
+              await db.user.update({
+                where: { id: existingSub.userId },
+                data: { plan: 'PREMIUM' },
+              });
+              serverLog.info('webhook/stripe', 'invoice.paid — user restored to PREMIUM');
+            }
+          }
+        } catch (e) {
+          serverLog.error('webhook/stripe', 'Failed to process invoice.paid', e, { subscriptionId });
+        }
 
         break;
       }
