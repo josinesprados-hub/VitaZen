@@ -216,7 +216,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     patterns: -40,
     silent_memories: -30,
     conversational: -40,
-    financial: -50,
   },
   emotional: {
     emotional_state: 95,
@@ -228,7 +227,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     lived_experience: 30,
     behavioral: -10,
     patterns: -30,
-    financial: -40,
   },
   relational: {
     understanding: 80,
@@ -240,7 +238,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     lived_experience: 10,
     behavioral: -20,
     patterns: -40,
-    financial: -50,
   },
   progress: {
     behavioral: 95,
@@ -252,7 +249,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     life_stage: 40,
     conversational: 30,
     silent_memories: 20,
-    financial: -20,
   },
   energy: {
     emotional_state: 90,
@@ -264,7 +260,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     identity: 30,
     conversational: -10,
     silent_memories: -10,
-    financial: -30,
   },
   financial: {
     patterns: 95,
@@ -287,7 +282,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     lived_experience: 40,
     patterns: 30,
     behavioral: 20,
-    financial: -20,
   },
   practical: {
     behavioral: 90,
@@ -299,7 +293,6 @@ const RELEVANCE_MATRIX: Record<RelevanceDomain, Partial<Record<ContextBlockId, n
     patterns: 20,
     life_stage: 10,
     silent_memories: -10,
-    financial: -20,
   },
 };
 

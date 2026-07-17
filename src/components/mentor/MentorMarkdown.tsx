@@ -165,7 +165,7 @@ const mentorComponents = {
   // Block: className contains "language-xxx" → lazy-loaded syntax highlighter
   // Inline: no className → styled <code> element
   code: ({ className, children, ...props }: React.HTMLAttributes<HTMLElement>) => {
-    const isBlock = className?.includes('language-');
+    const isBlock = typeof className === 'string' && className.includes('language-');
     if (isBlock) {
       const lang = className.replace(/language-/, '') || 'text';
       const code = String(children).replace(/\n$/, '');
