@@ -800,7 +800,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar conversación..."
-            className="w-full bg-[#111] border border-[#1a1a1a] rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-[#555] focus:border-champagne/40 focus:outline-none transition-colors"
+            className="w-full bg-[#111] border border-[#1a1a1a] rounded-lg pl-9 pr-8 py-2 text-sm text-white placeholder-[#555] focus:border-champagne/40 focus:outline-none transition-colors"
             aria-label="Buscar conversaciones por título"
           />
           {searchQuery && (
@@ -932,7 +932,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                                 if (e.key === 'Enter') renameThread(thread.id, editTitle);
                                 if (e.key === 'Escape') setEditingThreadId(null);
                               }}
-                              className="flex-1 bg-[#000] border border-champagne rounded px-2 py-0.5 text-base sm:text-xs text-white focus:outline-none"
+                              className="flex-1 bg-[#000] border border-champagne rounded px-2 py-0.5 text-base sm:text-sm text-white focus:outline-none"
                               maxLength={100}
                             />
                             <button

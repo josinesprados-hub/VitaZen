@@ -305,7 +305,7 @@ export function NotificationPreferences() {
                 type="time"
                 value={preferences.quietHoursStart}
                 onChange={(e) => handleFieldChange('quietHoursStart', e.target.value)}
-                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-champagne focus:outline-none"
+                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-base sm:text-sm text-white focus:border-champagne focus:outline-none"
               />
             </div>
             <div className="flex items-center gap-3">
@@ -314,7 +314,7 @@ export function NotificationPreferences() {
                 type="time"
                 value={preferences.quietHoursEnd}
                 onChange={(e) => handleFieldChange('quietHoursEnd', e.target.value)}
-                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-sm text-white focus:border-champagne focus:outline-none"
+                className="bg-[#111] border border-[#333] rounded-md px-3 py-1.5 text-base sm:text-sm text-white focus:border-champagne focus:outline-none"
               />
             </div>
           </div>

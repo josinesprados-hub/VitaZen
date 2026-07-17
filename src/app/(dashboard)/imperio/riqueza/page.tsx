@@ -449,7 +449,7 @@ function QuickCapture({
           value={contexto}
           onChange={(e) => setContexto(e.target.value)}
           placeholder="¿Qué pasó? (opcional)"
-          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-[12px] text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
+          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-sm text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
           autoComplete="off"
         />
       </div>

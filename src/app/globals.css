@@ -134,7 +134,9 @@ button, [role="button"] {
   user-select: none;
 }
 
-/* Prevent iOS input zoom (font-size >= 16px prevents auto-zoom) */
+/* Prevent iOS input zoom (font-size >= 16px prevents auto-zoom).
+   Unlayered rule: always wins over Tailwind @layer utilities regardless of specificity.
+   Covers ALL text-entry input types. */
 @media (max-width: 767px) {
   input[type="text"],
   input[type="email"],
@@ -142,6 +144,10 @@ button, [role="button"] {
   input[type="search"],
   input[type="tel"],
   input[type="url"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
   textarea,
   select {
     font-size: 16px;

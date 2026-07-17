@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/AuthContext';
 import { ScreenshotModeProvider } from '@/context/ScreenshotModeContext';
 import { ObservabilityInit } from '@/components/observability/ObservabilityInit';
+import { ViewportManager } from '@/components/layout/ViewportManager';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -65,6 +66,7 @@ export default function RootLayout({
         <AuthProvider>
           <ScreenshotModeProvider>
             <ObservabilityInit />
+            <ViewportManager />
             {children}
             <Toaster />
           </ScreenshotModeProvider>
