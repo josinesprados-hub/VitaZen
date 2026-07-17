@@ -225,7 +225,7 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold">Free</h3>
-                <p className="text-[#444] text-[10px]">0€/mes</p>
+                <p className="text-[#444] text-xs">0€/mes</p>
               </div>
             </div>
 
@@ -268,7 +268,7 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold">Élite</h3>
-                <p className="text-champagne/40 text-[10px]">5€/mes</p>
+                <p className="text-champagne/40 text-xs">5€/mes</p>
               </div>
             </div>
 
