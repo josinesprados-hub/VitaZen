@@ -221,6 +221,8 @@ export default function MentePage() {
 
   // Ref for auto-scrolling into view when meditation starts
   const breathingSectionRef = useRef<HTMLDivElement>(null);
+  // Ref for the page header — used as scroll target to preserve context
+  const headerRef = useRef<HTMLDivElement>(null);
 
   // Lock body scroll when any modal is open — save/restore scroll position
   useEffect(() => {
@@ -266,10 +268,17 @@ export default function MentePage() {
     setTimer(0);
     setPaused(false);
     setMeditating(true);
-    // Scroll to breathing section after render — requestAnimationFrame ensures
-    // the DOM has updated (guide unmounted, timer mounted) before scrolling
+    // Scroll to the page header so the user keeps context ("Mente" + subtitle +
+    // top of the breathing card).  We measure the sticky TopBar height at runtime
+    // to correctly handle safe-area-inset-top on notched iPhones.
     requestAnimationFrame(() => {
-      breathingSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const el = headerRef.current;
+      if (!el) return;
+      const topBar = document.querySelector<HTMLElement>('header.sticky');
+      const topBarH = topBar ? topBar.getBoundingClientRect().height : 56;
+      const offset = topBarH + 8;
+      const y = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     });
   };
 
@@ -502,7 +511,7 @@ export default function MentePage() {
       )}
 
       {/* ─── Header ─── */}
-      <div className="flex items-center gap-4">
+      <div ref={headerRef} className="flex items-center gap-4">
         <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-champagne/10 flex items-center justify-center">
           <Brain size={28} className="text-champagne" />
         </div>
