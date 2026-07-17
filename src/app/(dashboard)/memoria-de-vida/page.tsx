@@ -39,7 +39,6 @@ import {
   NO_DATA_SUBTITLE,
   LITTLE_DATA_TITLE,
   LITTLE_DATA_SUBTITLE,
-  ELITE_TRANSITIONS,
   ELITE_CONNECTIONS,
   FREE_LIMIT_MESSAGE,
   getTimeRangeLabel,
@@ -261,14 +260,8 @@ export default function EtapasPage() {
         </div>
       )}
 
-      {/* ─── Transitions gate for FREE — aspirational ─── */}
-      {!isPremium && stages.length > 0 && (
-        <div className="mb-14 sm:mb-20">
-          <PremiumGate isPremium={false} intensity="light" compact showCta={false} label={ELITE_TRANSITIONS}>
-            <div className="h-12" />
-          </PremiumGate>
-        </div>
-      )}
+      {/* Transitions: Premium-only content. FREE users see nothing —
+          no empty placeholders, no incomplete feeling. */}
 
       {/* ═══════════════════════════════════════
           MEMORIES / MOMENTOS
@@ -296,14 +289,8 @@ export default function EtapasPage() {
         </div>
       )}
 
-      {/* ─── Memories gate for FREE — aspirational ─── */}
-      {!isPremium && stages.length > 0 && (
-        <div className="mb-14 sm:mb-20">
-          <PremiumGate isPremium={false} intensity="light" compact showCta={false} label="Momentos destacados">
-            <div className="h-12" />
-          </PremiumGate>
-        </div>
-      )}
+      {/* Memories: Premium-only content. FREE users see nothing —
+          no empty placeholders, no incomplete feeling. */}
 
       {/* ═══════════════════════════════════════
           PATTERNS / CONEXIONES

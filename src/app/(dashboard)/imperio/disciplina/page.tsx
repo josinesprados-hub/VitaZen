@@ -264,11 +264,11 @@ export default function DisciplinaPage() {
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar hábito</h3>
             <div className="space-y-3">
               <input type="text" placeholder="Nombre del hábito" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
               <select value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors appearance-none">
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors appearance-none">
                 <option value="daily">Diario</option>
                 <option value="weekly">Semanal</option>
                 <option value="monthly">Mensual</option>
@@ -361,19 +361,19 @@ export default function DisciplinaPage() {
               placeholder="Nombre del hábito"
               value={newHabit.name}
               onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder-[#666]"
             />
             <input
               type="text"
               placeholder="Descripción (opcional)"
               value={newHabit.description}
               onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder-[#666]"
             />
             <select
               value={newHabit.frequency}
               onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors appearance-none"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors appearance-none"
             >
               <option value="daily">Diario</option>
               <option value="weekly">Semanal</option>
