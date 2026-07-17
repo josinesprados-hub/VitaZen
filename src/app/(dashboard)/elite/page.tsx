@@ -225,7 +225,7 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold">Free</h3>
-                <p className="text-[#444] text-xs">0€/mes</p>
+                <p className="text-[#444] text-sm">0€/mes</p>
               </div>
             </div>
 
@@ -268,7 +268,7 @@ export default function ElitePage() {
               </div>
               <div>
                 <h3 className="text-white font-semibold">Élite</h3>
-                <p className="text-champagne/40 text-xs">5€/mes</p>
+                <p className="text-champagne/40 text-sm">5€/mes</p>
               </div>
             </div>
 
@@ -288,9 +288,9 @@ export default function ElitePage() {
                   'Mentor sin límite diario, con más contexto',
                   'Memoria que acumula y conecta',
                   'Historial completo de conversaciones',
-                  'Notas con más detalle de cada imperio',
+                  'Una nota adicional en cada imperio',
                   'Observaciones semanales con más detalle',
-                  'Cierres mensuales con evolución',
+                  'Evolución en tus cierres mensuales',
                 ].map((item) => (
                   <li key={item} className="text-[#aaa] text-xs flex items-start gap-2">
                     <span className="text-champagne/40 mt-0.5">·</span>
