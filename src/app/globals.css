@@ -228,6 +228,14 @@ html {
   to { opacity: 1; }
 }
 
+/* Premium Bottom Sheet — slide-up from bottom edge.
+   Transform-only: avoids WebKit compositing bug where opacity:0
+   start causes permanently invisible modals on low-end devices. */
+@keyframes bottomSheetIn {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
 /* Modal entrance — transform only, never opacity:0.
    Previous version used opacity:0 + animation-fill-mode:both which caused
    the same WebKit/Chromium compositing bug documented in page transitions
@@ -1183,6 +1191,180 @@ html { scroll-behavior: smooth; }
 /* iPhone top safe area padding for fixed elements */
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ═══════════════════════════════════════════
+   Premium Bottom Sheet — Structural Layout
+   ═══════════════════════════════════════════
+
+   Design reference: Apple Maps / Revolut bottom sheets.
+   - Slides up from bottom with spring-like animation
+   - Height: ~55dvh on mobile (enough for quick capture, not full screen)
+   - Respects safe-area-inset-bottom via margin (not padding, to avoid
+     internal layout shift)
+   - Backdrop: blur on desktop, solid on mobile (GPU safety)
+   - Handle bar: centered pill at top (iOS native affordance)
+   - Inner scroll: overscroll-contain prevents page bounce
+   - Keyboard: VisualViewport API adjusts max-height dynamically
+*/
+
+.bs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Disable backdrop blur on mobile to prevent GPU exhaustion */
+@media (max-width: 767px) {
+  .bs-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.75);
+  }
+}
+
+.bs-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-bottom: none;
+  border-radius: 1.25rem 1.25rem 0 0;
+  /* Height: ~55% of dynamic viewport height.
+     When keyboard opens, VisualViewport API sets --bs-max-h
+     which overrides this via max-height. */
+  height: 55dvh;
+  max-height: 55dvh;
+  min-height: 0;
+  /* Safe area: margin-bottom pushes the sheet above the home indicator.
+     This is structurally correct — the sheet sits ON TOP of the safe area
+     rather than having internal padding that shrinks content. */
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Slide-up animation with iOS-like spring feel */
+  animation: bottomSheetIn 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform;
+  /* VisualViewport keyboard override: when keyboard opens, --bs-max-h
+     is set by JS to a smaller value. min() picks the smaller of 55dvh
+     or the keyboard-constrained height. When no keyboard, --bs-max-h
+     defaults to 9999px, so 55dvh wins. */
+  max-height: min(55dvh, var(--bs-max-h, 9999px));
+}
+
+/* Desktop: center as a card, not bottom sheet */
+@media (min-width: 640px) {
+  .bs-overlay {
+    align-items: center;
+  }
+  .bs-sheet {
+    border-radius: 1.25rem;
+    border-bottom: 1px solid #1a1a1a;
+    height: auto;
+    max-height: min(85dvh, 40rem);
+    margin-bottom: 0;
+    animation: scaleIn 0.25s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  }
+}
+
+/* Handle bar — the drag affordance pill at top of bottom sheets.
+   Visually identical to Apple Maps / iOS native sheets. */
+.bs-handle {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+  padding-bottom: 6px;
+  flex-shrink: 0;
+}
+.bs-handle-pill {
+  width: 2.25rem;
+  height: 0.25rem;
+  border-radius: 9999px;
+  background: #444;
+}
+
+/* Scrollable content area — fills remaining space after header */
+.bs-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1.25rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .bs-body {
+    padding: 0 1.5rem 1.5rem;
+  }
+}
+
+/* ─── Premium FAB — Floating Action Button ───
+   Positioned with safe-area-aware bottom offset.
+   The safe area is handled via margin-bottom (not padding)
+   to keep the icon perfectly centered within the button. */
+
+.fab-premium {
+  position: fixed;
+  z-index: 40;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  /* Safe area: margin pushes button above home indicator */
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  background: var(--color-champagne);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 24px -4px rgba(200, 165, 90, 0.35),
+              0 0 0 0 rgba(200, 165, 90, 0);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  cursor: pointer;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.fab-premium:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 12px -2px rgba(200, 165, 90, 0.25);
+}
+
+/* Quick capture action row — two clearly separated actions */
+.bs-action-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #222 20%, #222 80%, transparent);
+  margin: 0.75rem 0;
+}
+
+/* Full form link — styled as a distinct navigation action */
+.bs-full-form-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.875rem 0;
+  color: #666;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  transition: color 0.15s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.bs-full-form-link:hover,
+.bs-full-form-link:active {
+  color: #999;
 }
 
 /* ═══════════════════════════════════════════

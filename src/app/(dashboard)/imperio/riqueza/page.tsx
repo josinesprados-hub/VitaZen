@@ -5,7 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import {
   Gem, Plus, Pencil, Trash2, Wallet,
-  ChevronLeft, ChevronRight, CalendarDays, X, Check, ArrowUpRight
+  ChevronLeft, ChevronRight, CalendarDays, X, Check, ArrowUpRight, ChevronRight as ArrowRight
 } from 'lucide-react';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import ContextualHelp from '@/components/ui/ContextualHelp';
@@ -406,7 +406,6 @@ function QuickCapture({
     setInput('');
     setContexto('');
     setShowContexto(false);
-    // Re-focus input after successful capture for rapid entry
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -418,8 +417,8 @@ function QuickCapture({
   };
 
   return (
-    <div className="space-y-3">
-      {/* Main capture input */}
+    <div className="space-y-4">
+      {/* Main capture input — premium feel with subtle border glow on focus */}
       <div className="relative">
         <input
           ref={inputRef}
@@ -427,67 +426,74 @@ function QuickCapture({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Café 3,50 · Taxi 14 · Nómina 1250"
-          className="w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3.5 text-white text-base placeholder-[#444] focus:outline-none focus:border-champagne/40 transition-colors"
+          placeholder="Café 3,50"
+          className="w-full bg-[#050505] border border-[#1a1a1a] rounded-2xl pl-4 pr-4 py-4 text-white text-base placeholder-[#333] focus:outline-none focus:border-champagne/30 transition-colors"
           autoFocus
           inputMode="text"
           autoComplete="off"
         />
       </div>
 
-      {/* Live preview + inline OK button */}
+      {/* Live preview row + inline OK button */}
       {parsed && parsed.amount > 0 ? (
-        <div className="flex items-center justify-between px-0.5">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className={`text-[11px] font-medium flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className={`text-xs font-medium flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? 'Ingreso' : 'Gasto'}
             </span>
-            <span className="text-[#222] text-[11px]">·</span>
-            <span className="text-[11px] text-[#666] truncate">{parsed.category}</span>
-            <span className="text-[#222] text-[11px]">·</span>
-            <span className={`text-[11px] font-medium tabular-nums flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
+            <span className="text-[#1a1a1a]">·</span>
+            <span className="text-xs text-[#555] truncate">{parsed.category}</span>
+            <span className="text-[#1a1a1a]">·</span>
+            <span className={`text-xs font-medium tabular-nums flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? '+' : '-'}{formatCurrency(parsed.amount)}
             </span>
           </div>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="bg-champagne text-black px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-champagne-hover active:scale-95 transition-all disabled:opacity-50 flex-shrink-0 ml-2"
+            className="bg-champagne text-black px-4 py-2 rounded-xl text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50 flex-shrink-0 ml-3"
           >
             {submitting ? '...' : 'OK'}
           </button>
         </div>
       ) : (
-        <p className="text-[10px] text-[#333] px-0.5">Escribe concepto y cantidad</p>
+        <p className="text-[11px] text-[#333]">Escribe concepto y cantidad</p>
       )}
 
-      {/* Contexto — optional, shown on tap */}
-      {showContexto ? (
-        <input
-          type="text"
-          value={contexto}
-          onChange={(e) => setContexto(e.target.value)}
-          placeholder="¿Qué pasó? (opcional)"
-          className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-1.5 text-base text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors italic"
-          autoComplete="off"
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setShowContexto(true)}
-          className="text-[10px] text-[#333] hover:text-[#555] transition-colors tracking-wide"
-        >
-          + Añadir contexto
-        </button>
-      )}
+      {/* ─── Two clearly separated actions ─── */}
+      {/* Action 1: Add context (expands inline) */}
+      <div>
+        {showContexto ? (
+          <input
+            type="text"
+            value={contexto}
+            onChange={(e) => setContexto(e.target.value)}
+            placeholder="¿Qué pasó? (opcional)"
+            className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-2 text-base text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors"
+            autoComplete="off"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowContexto(true)}
+            className="text-[11px] text-[#555] active:text-[#888] transition-colors tracking-wide"
+          >
+            + Añadir contexto
+          </button>
+        )}
+      </div>
 
-      {/* Link to full form */}
+      {/* Divider — clear visual separation between the two actions */}
+      <div className="bs-action-divider" />
+
+      {/* Action 2: Full form — separate, distinct navigation action */}
       <button
         type="button"
         onClick={onFullForm}
-        className="text-[10px] text-[#444] hover:text-[#666] transition-colors tracking-wide"
+        className="bs-full-form-link"
       >
-        Formulario completo →
+        <span>Formulario completo</span>
+        <ArrowRight size={14} />
       </button>
     </div>
   );
@@ -683,6 +689,30 @@ export default function RiquezaPage() {
       toastTimerRef.current = null;
     }, 2000);
   }, []);
+
+  // ── VisualViewport: dynamically resize add-sheet when keyboard opens ──
+  useEffect(() => {
+    if (!showAdd) return;
+    const sheet = addSheetRef.current;
+    if (!sheet) return;
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    if (!vv) return;
+
+    const onResize = () => {
+      // When keyboard opens, visualViewport.height shrinks.
+      // We set a CSS custom property so .bs-sheet max-height adapts.
+      // Formula: sheet can use up to 85% of the visible viewport.
+      const maxH = Math.max(vv.height * 0.85, 200);
+      sheet.style.setProperty('--bs-max-h', `${maxH}px`);
+    };
+
+    vv.addEventListener('resize', onResize);
+    onResize();
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      sheet.style.removeProperty('--bs-max-h');
+    };
+  }, [showAdd]);
 
   // ── Body scroll lock for modals/sheets ──
   useEffect(() => {
@@ -1005,45 +1035,44 @@ export default function RiquezaPage() {
       <SaveToast show={toast.show} message={toast.message} />
 
       {/* ═══════════════════════════════════════════
-          ADD MOVEMENT BOTTOM SHEET (FASE 8 — Redesigned)
+          ADD MOVEMENT — Premium Bottom Sheet
           ═══════════════════════════════════════════
-          UX FIXES:
-          - items-center justify-end on mobile → sheet sticks to bottom
-          - items-center on sm+ → centered modal
-          - max-h uses dvh for keyboard awareness
-          - overflow-y-auto + overscroll-contain for inner scroll
-          - safe-bottom for home indicator
-          - All inputs text-base (16px) to prevent zoom
-          - No scrollIntoView hack — sheet is already visible
-          - pb-2 on inner content prevents last field being cut by safe area
+          Structural approach (no device-specific hacks):
+          - bs-overlay: fixed fullscreen backdrop
+          - bs-sheet: flex column, 55dvh height, safe-area via margin
+          - bs-handle: iOS-native-style drag affordance pill
+          - bs-body: flex-1 overflow scroll, VisualViewport-aware
+          - fab-premium: safe-area via margin (not padding)
           ═══════════════════════════════════════════ */}
       {showAdd && !editingLog && !pendingDeleteId && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop"
+          className="bs-overlay"
           onClick={closeAddSheet}
         >
           <div
             ref={addSheetRef}
-            className="bg-[#0a0a0a] border border-[#1a1a1a] sm:border-champagne/20 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md safe-bottom overflow-y-auto overscroll-contain section-enter-1"
-            style={{ maxHeight: 'min(90dvh, calc(100dvh - 3rem))' }}
+            className="bs-sheet"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-5 sm:p-6 pb-6">
-              {/* Handle bar (mobile bottom sheet affordance) */}
-              <div className="sm:hidden flex justify-center mb-3">
-                <div className="w-8 h-1 rounded-full bg-[#333]" />
-              </div>
+            {/* Handle bar — iOS native affordance */}
+            <div className="bs-handle">
+              <div className="bs-handle-pill" />
+            </div>
 
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-white">Nuevo movimiento</span>
-                <button
-                  onClick={closeAddSheet}
-                  className="text-[#555] hover:text-[#999] transition-colors p-1"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+            {/* Sheet header — compact, clean */}
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
+              <span className="text-sm font-semibold text-white tracking-tight">Nuevo movimiento</span>
+              <button
+                onClick={closeAddSheet}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#555] active:text-white active:bg-[#1a1a1a] transition-colors -mr-1"
+                aria-label="Cerrar"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
+            {/* Scrollable body — VisualViewport-aware via CSS var */}
+            <div className="bs-body">
               {quickMode ? (
                 <QuickCapture
                   onCapture={submitQuickCapture}
@@ -1065,39 +1094,48 @@ export default function RiquezaPage() {
               )}
 
               {submitError && quickMode && (
-                <p className="text-red-400 text-xs py-1 mt-3">{submitError}</p>
+                <p className="text-red-400 text-xs py-1 mt-2">{submitError}</p>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Edit Overlay (uses modal-content class for centered bottom-sheet on mobile) ── */}
+      {/* ── Edit Overlay — reuses bs-sheet for consistency ── */}
       {editingLog && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
+        <div className="bs-overlay" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
           <div
-            className="modal-content p-5 sm:p-8 w-full sm:max-w-md safe-bottom overflow-y-auto overscroll-contain"
+            className="bs-sheet"
+            style={{ height: 'auto', maxHeight: 'min(85dvh, var(--bs-max-h, 9999px))' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sm:hidden flex justify-center mb-3">
-              <div className="w-8 h-1 rounded-full bg-[#333]" />
+            <div className="bs-handle">
+              <div className="bs-handle-pill" />
             </div>
-            <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-4 sm:mb-5">
-              <Pencil size={20} className="text-champagne" />
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
+              <span className="text-sm font-semibold text-white tracking-tight">Editar registro</span>
+              <button
+                onClick={() => { setEditingLog(null); setSubmitError(null); }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#555] active:text-white active:bg-[#1a1a1a] transition-colors -mr-1"
+                aria-label="Cerrar"
+              >
+                <X size={16} />
+              </button>
             </div>
-            <h3 className="text-lg font-bold text-white text-center mb-5 sm:mb-6">Editar registro</h3>
-            <FullForm
-              form={editForm}
-              setForm={setEditForm}
-              onSubmit={saveEdit}
-              onBackToQuick={() => {}}
-              submitting={editSaving}
-              submitError={submitError}
-              userCategories={userCategories}
-              mode="edit"
-            />
-            <div className="flex justify-center mt-3 sm:mt-5">
-              <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="text-[#999] px-5 py-2.5 text-sm hover:text-white transition-colors">Cancelar</button>
+            <div className="bs-body">
+              <FullForm
+                form={editForm}
+                setForm={setEditForm}
+                onSubmit={saveEdit}
+                onBackToQuick={() => {}}
+                submitting={editSaving}
+                submitError={submitError}
+                userCategories={userCategories}
+                mode="edit"
+              />
+              <div className="flex justify-center pt-3 pb-2">
+                <button onClick={() => { setEditingLog(null); setSubmitError(null); }} className="text-[#999] px-5 py-2.5 text-sm active:text-white transition-colors">Cancelar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1314,14 +1352,14 @@ export default function RiquezaPage() {
       </div>
       )}
 
-      {/* ── FAB (hidden when overlays are open) ── */}
+      {/* ── FAB — Premium floating action button ── */}
       {!editingLog && !pendingDeleteId && !showAdd && (
         <button
           onClick={() => { setQuickMode(true); setShowAdd(true); }}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-champagne text-black rounded-2xl shadow-lg shadow-champagne/25 flex items-center justify-center hover:bg-champagne-hover active:scale-95 transition-all touch-press safe-bottom"
-          title="Añadir movimiento"
+          className="fab-premium"
+          aria-label="Añadir movimiento"
         >
-          <Plus size={24} />
+          <Plus size={22} />
         </button>
       )}
 
