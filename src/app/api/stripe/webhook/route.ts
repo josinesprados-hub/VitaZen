@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No signature' }, { status: 400 });
   }
 
-  let event: Stripe.Event;
+  let event: Stripe.Event | null = null;
 
   // ─── Signature verification with dual-secret support ────────────
   // Try the LIVE secret first. If it fails, fall back to the TEST secret.
@@ -193,27 +193,51 @@ export async function POST(request: NextRequest) {
   // webhooks to fail with 400 "Invalid signature".
 
   let secretUsed: 'live' | 'test' | null = null;
+  const attemptErrors: Array<{ label: string; error: string; secretLen: number }> = [];
 
   for (const [label, secret] of [
     ['live', process.env.STRIPE_WEBHOOK_SECRET],
     ['test', process.env.STRIPE_TEST_WEBHOOK_SECRET],
   ] as const) {
-    if (!secret) continue;
+    if (!secret) {
+      attemptErrors.push({ label, error: 'MISSING from env', secretLen: 0 });
+      continue;
+    }
     try {
       event = stripe.webhooks.constructEvent(body, signature, secret);
       eventType = event.type;
       eventId = event.id;
       secretUsed = label;
       break;
-    } catch {
-      // This secret didn't match — try next
+    } catch (err) {
+      attemptErrors.push({
+        label,
+        error: err instanceof Error ? err.message : String(err),
+        secretLen: secret.length,
+      });
     }
   }
 
   if (!secretUsed) {
+    // Parse body safely (no throw) to extract livemode/type for diagnosis
+    let eventLivemode: boolean | null = null;
+    let eventTypeFromBody: string | null = null;
+    try {
+      const parsed = JSON.parse(body) as Record<string, unknown>;
+      eventLivemode = typeof parsed.livemode === 'boolean' ? parsed.livemode : null;
+      eventTypeFromBody = typeof parsed.type === 'string' ? parsed.type : null;
+    } catch { /* body not parseable, skip */ }
+
     serverLog.error('webhook/stripe', 'Webhook signature verification failed — no matching secret', undefined, {
       hasLiveSecret: !!process.env.STRIPE_WEBHOOK_SECRET,
       hasTestSecret: !!process.env.STRIPE_TEST_WEBHOOK_SECRET,
+      liveSecretLength: process.env.STRIPE_WEBHOOK_SECRET?.length ?? 0,
+      testSecretLength: process.env.STRIPE_TEST_WEBHOOK_SECRET?.length ?? 0,
+      eventLivemode,
+      eventTypeFromBody,
+      attempts: attemptErrors,
+      bodyLength: body.length,
+      signaturePresent: true,
     });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
@@ -222,16 +246,20 @@ export async function POST(request: NextRequest) {
     serverLog.info('webhook/stripe', 'Webhook verified with TEST secret', { eventType, eventId });
   }
 
+  // TypeScript guard: event is guaranteed non-null here because
+  // the !secretUsed check above returns 400 if event was never constructed.
+  const verifiedEvent = event!;
+
   // ─── Idempotency check ──────────────────────────────────────────
-  if (await isEventProcessed(event.id)) {
+  if (await isEventProcessed(verifiedEvent.id)) {
     serverLog.info('webhook/stripe', 'Duplicate event skipped', { eventType, eventId });
     return NextResponse.json({ received: true, deduplicated: true });
   }
 
   try {
-    switch (event.type) {
+    switch (verifiedEvent.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = verifiedEvent.data.object as Stripe.Checkout.Session;
         const customerId = session.customer as string | null;
         const userId = await resolveUserId(session);
 
@@ -255,7 +283,7 @@ export async function POST(request: NextRequest) {
             eventType,
           });
           // Still mark as processed to avoid infinite retries
-          await markEventProcessed(event.id, event.type);
+          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
           await cleanupOldEvents();
           break;
         }
@@ -380,7 +408,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = verifiedEvent.data.object as Stripe.Subscription;
         serverLog.info('webhook/stripe', 'customer.subscription.updated', {
           subId: subscription.id,
           status: subscription.status,
@@ -418,7 +446,7 @@ export async function POST(request: NextRequest) {
           serverLog.warn('webhook/stripe', 'customer.subscription.updated — cannot resolve userId', {
             subId: subscription.id,
           });
-          await markEventProcessed(event.id, event.type);
+          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
           await cleanupOldEvents();
           break;
         }
@@ -530,7 +558,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = verifiedEvent.data.object as Stripe.Subscription;
         serverLog.info('webhook/stripe', 'customer.subscription.deleted', {
           subId: subscription.id,
           eventId,
@@ -567,7 +595,7 @@ export async function POST(request: NextRequest) {
           serverLog.warn('webhook/stripe', 'customer.subscription.deleted — cannot resolve userId', {
             subId: subscription.id,
           });
-          await markEventProcessed(event.id, event.type);
+          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
           await cleanupOldEvents();
           break;
         }
@@ -612,7 +640,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.created': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = verifiedEvent.data.object as Stripe.Subscription;
         serverLog.info('webhook/stripe', 'customer.subscription.created', {
           subId: subscription.id,
           status: subscription.status,
@@ -652,7 +680,7 @@ export async function POST(request: NextRequest) {
             subId: subscription.id,
             customerId: subscription.customer,
           });
-          await markEventProcessed(event.id, event.type);
+          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
           await cleanupOldEvents();
           break;
         }
@@ -706,7 +734,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.paid': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = verifiedEvent.data.object as Stripe.Invoice;
         const subscriptionId = (invoice as unknown as { subscription?: string | null }).subscription as string | null;
 
         serverLog.info('webhook/stripe', 'invoice.paid', {
@@ -768,7 +796,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = verifiedEvent.data.object as Stripe.Invoice;
         const subscriptionId = (invoice as unknown as { subscription?: string | null }).subscription as string | null;
 
         serverLog.warn('webhook/stripe', 'invoice.payment_failed', {
@@ -786,7 +814,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        serverLog.info('webhook/stripe', 'Unhandled event type', { eventType: event.type, eventId: event.id });
+        serverLog.info('webhook/stripe', 'Unhandled event type', { eventType: verifiedEvent.type, eventId: verifiedEvent.id });
     }
   } catch (error) {
     const durationMs = Date.now() - start;
@@ -807,7 +835,7 @@ export async function POST(request: NextRequest) {
   // ─── Mark event as processed + cleanup old events ────────────────
   // Only mark as processed if the handler succeeded (no throw).
   // This way, Stripe retries are useful for actual failures.
-  await markEventProcessed(event.id, event.type);
+  await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
   await cleanupOldEvents();
 
   const durationMs = Date.now() - start;
