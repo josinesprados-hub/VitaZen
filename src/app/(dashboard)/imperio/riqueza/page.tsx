@@ -690,29 +690,43 @@ export default function RiquezaPage() {
     }, 2000);
   }, []);
 
-  // ── VisualViewport: dynamically resize add-sheet when keyboard opens ──
+  // ── VisualViewport: reposition + resize sheet when keyboard opens ──
+  // ROOT CAUSE (PREVIOUS): --bs-max-h shrank the sheet height, but the sheet
+  // remained anchored at the bottom of the full layout viewport (behind the
+  // keyboard). The sheet was partially hidden. FIX: also set --bs-keyboard-h
+  // which adds to margin-bottom, pushing the sheet ABOVE the keyboard.
+  const anySheetOpen = showAdd || !!editingLog;
   useEffect(() => {
-    if (!showAdd) return;
-    const sheet = addSheetRef.current;
-    if (!sheet) return;
+    if (!anySheetOpen) return;
     const vv = typeof window !== 'undefined' ? window.visualViewport : null;
     if (!vv) return;
 
     const onResize = () => {
-      // When keyboard opens, visualViewport.height shrinks.
-      // We set a CSS custom property so .bs-sheet max-height adapts.
-      // Formula: sheet can use up to 85% of the visible viewport.
-      const maxH = Math.max(vv.height * 0.85, 200);
-      sheet.style.setProperty('--bs-max-h', `${maxH}px`);
+      const vvHeight = vv.height;
+      const vvOffsetTop = vv.offsetTop;
+      const windowH = window.innerHeight;
+      const keyboardH = Math.max(0, windowH - vvHeight - vvOffsetTop);
+      const maxH = Math.max(vvHeight * 0.85, 200);
+      const safeBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-bottom').trim() || '0', 10);
+
+      // Set on document root so BOTH add-sheet and edit-sheet inherit it
+      document.documentElement.style.setProperty('--bs-max-h', `${maxH}px`);
+      document.documentElement.style.setProperty('--bs-keyboard-h', `${keyboardH}px`);
+
+      // Diagnostic logs — visible in Safari Web Inspector on real iPhone
+      console.log('[BS-DEBUG] vv.height=%d vv.offsetTop=%d window.innerHeight=%d keyboardH=%d --bs-max-h=%dpx --bs-keyboard-h=%dpx safeArea=%d',
+        Math.round(vvHeight), Math.round(vvOffsetTop), Math.round(windowH),
+        Math.round(keyboardH), Math.round(maxH), Math.round(keyboardH), safeBottom);
     };
 
     vv.addEventListener('resize', onResize);
     onResize();
     return () => {
       vv.removeEventListener('resize', onResize);
-      sheet.style.removeProperty('--bs-max-h');
+      document.documentElement.style.removeProperty('--bs-max-h');
+      document.documentElement.style.removeProperty('--bs-keyboard-h');
     };
-  }, [showAdd]);
+  }, [anySheetOpen]);
 
   // ── Body scroll lock for modals/sheets ──
   useEffect(() => {

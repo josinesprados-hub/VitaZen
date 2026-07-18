@@ -1244,10 +1244,13 @@ html { scroll-behavior: smooth; }
   height: 55dvh;
   max-height: 55dvh;
   min-height: 0;
-  /* Safe area: margin-bottom pushes the sheet above the home indicator.
-     This is structurally correct — the sheet sits ON TOP of the safe area
-     rather than having internal padding that shrinks content. */
-  margin-bottom: env(safe-area-inset-bottom, 0px);
+  /* Safe area + keyboard offset: margin-bottom pushes the sheet above
+     the home indicator AND above the keyboard. When keyboard opens,
+     VisualViewport API sets --bs-keyboard-h on :root, and this calc
+     adds it to the safe-area inset, repositioning the sheet upward.
+     Without this, the sheet stays anchored at the bottom of the full
+     layout viewport (behind the keyboard) even though max-height shrinks. */
+  margin-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--bs-keyboard-h, 0px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
