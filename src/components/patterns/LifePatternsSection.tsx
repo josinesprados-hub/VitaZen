@@ -162,17 +162,34 @@ function WaitingState() {
 }
 
 // ─── Premium Preview ───
+// Stacked layout: faded observation in its own space,
+// then a separator, then the CTA as an independent block.
+// No absolute overlays — both elements must breathe separately.
 
 function PremiumPreview({ observation }: { observation: ObservationData }) {
   return (
-    <div className="relative">
-      <div className="opacity-35 select-none pointer-events-none">
-        <ObservationCard observation={observation} />
+    <div className="py-5 sm:py-6">
+      {/* Observation preview — faded whisper, its own vertical space */}
+      <div className="opacity-25 select-none pointer-events-none line-clamp-2">
+        <p className="text-champagne/70 text-base sm:text-lg italic leading-relaxed">
+          {observation.text}
+        </p>
       </div>
-      <div className="absolute inset-0 flex items-center justify-center depth-gate-overlay">
-        <div className="flex items-center gap-1.5">
-          <Circle size={3} className="text-champagne/25" fill="currentColor" />
-          <span className="text-[10px] text-[#444]">Más conexiones con el tiempo</span>
+
+      {/* Separator — visual boundary between free analysis and premium */}
+      <div className="flex items-center gap-3 my-5 sm:my-6">
+        <div className="flex-1 h-px bg-[#1a1a1a]" />
+        <Circle size={2.5} className="text-champagne/15" fill="currentColor" />
+        <div className="flex-1 h-px bg-[#1a1a1a]" />
+      </div>
+
+      {/* Premium CTA — independent visual block */}
+      <div className="border border-[#161616] rounded-2xl px-5 py-4 bg-[#0c0c0c]/50">
+        <div className="flex items-center justify-center gap-2">
+          <Circle size={3} className="text-champagne/20" fill="currentColor" />
+          <span className="text-[10px] sm:text-[11px] text-[#444] tracking-wide">
+            Más conexiones con el tiempo
+          </span>
         </div>
       </div>
     </div>
