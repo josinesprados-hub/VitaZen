@@ -5,7 +5,8 @@
 // Pure data + types. No DB. No server. No client.
 // Just the quote collection and its type definitions.
 //
-// 300 original quotes — the definitive VitaZen collection.
+// 400 quotes — the expanded VitaZen collection.
+// 300 original + 100 new premium quotes (FASE 8.6).
 //
 // ─── ARCHITECTURE CONTRACT ────────────────
 // To add new quotes in the future:
@@ -39,9 +40,13 @@ export interface DailyQuoteState {
 }
 
 // ─── Definitive Collection ────────────────
-// 300 original quotes. VitaZen editorial voice.
+// 300 original + 100 new premium quotes (FASE 8.6).
+// VitaZen editorial voice.
 
 export const DAILY_QUOTES: readonly DailyQuote[] = [
+  // ═══════════════════════════════════════════
+  // 300 FRASES ORIGINALES
+  // ═══════════════════════════════════════════
   { text: 'La claridad llega cuando dejas de buscarla.' },
   { text: 'No hace falta correr cuando sabes adónde vas.' },
   { text: 'El orden exterior empieza por el interior.' },
@@ -342,4 +347,125 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'La paciencia bien practicada no es espera. Es preparación.' },
   { text: 'Lo que se hace cuando nadie ve muestra quién se es de verdad.' },
   { text: 'La serenidad ante lo imprevisto es la señal de un interior sólido.' },
+
+  // ═══════════════════════════════════════════
+  // 100 FRASES NUEVAS — FASE 8.6
+  // Colección Premium VitaZen
+  // Clasificación por Imperios:
+  //   Disciplina: 1-20
+  //   Mente: 21-40
+  //   Energía: 41-60
+  //   Finanzas: 61-80
+  //   Crecimiento: 81-100
+  // ═══════════════════════════════════════════
+
+  // ─── DISCIPLINA (20 frases) ───
+  { text: 'La diferencia entre un día cualquiera y un día que cuenta está en lo que decides antes de desayunar.' },
+  { text: 'Un hábito sostenido durante un año transforma más que una decisión tomada bajo presión.' },
+  { text: 'La rutina no te limita: te libera de tener que decidir lo mismo cada mañana.' },
+  { text: 'No necesitas motivación para cumplir lo que ya has decidido.' },
+  { text: 'Lo que repites sin pensar es lo que al final te define.' },
+  { text: 'La disciplina no aparece un lunes: se construye en las decisiones que nadie observa.' },
+  { text: 'Cada día que cumples lo prometido refuerzas la confianza en ti mismo.' },
+  { text: 'Las grandes transformaciones empiezan por hacer algo pequeño durante tiempo suficiente.' },
+  { text: 'No es fuerza de voluntad lo que necesitas. Es un sistema que la reemplace.' },
+  { text: 'Cuando el hábito forma parte de tu identidad, dejar de hacerlo te resulta extraño.' },
+  { text: 'Avanzar un poco cada día parece poco hasta que miras atrás.' },
+  { text: 'La clave no es la intensidad del esfuerzo. Es la ausencia de interrupciones.' },
+  { text: 'Quien domina sus mañanas no necesita que el resto del día le sorprenda.' },
+  { text: 'Lo difícil de mantener no es la primera vez. Es la trigésima.' },
+  { text: 'La constancia no necesita entusiasmo. Necesita decisión.' },
+  { text: 'Tu entorno tiene más poder sobre tus hábitos que tu fuerza de voluntad.' },
+  { text: 'No cambias tu vida cambiando lo que haces una vez. La cambias cambiando lo que haces siempre.' },
+  { text: 'El primer paso de un hábito nunca es perfecto. Y no necesita serlo.' },
+  { text: 'La mejor rutina es aquella que no requiere que pienses en seguirla.' },
+  { text: 'Cada vez que cumples una promesa pequeña, te haces más grande.' },
+
+  // ─── MENTE (20 frases) ───
+  { text: 'Lo que crees que piensas y lo que realmente piensas rara vez son lo mismo.' },
+  { text: 'Observar un pensamiento sin reaccionar a él ya es libertad.' },
+  { text: 'Tu mente no es tu enemiga. Simplemente no ha aprendido a estar quieta.' },
+  { text: 'La calma no llega cuando se acaba el problema. Llega cuando dejas de necesitar que acabe.' },
+  { text: 'Respirar no es un descanso. Es el acto más consciente del día.' },
+  { text: 'No puedes controlar lo que te ocurre, pero sí lo que ocurre después dentro de ti.' },
+  { text: 'La ansiedad es la mente intentando resolver un problema que aún no existe.' },
+  { text: 'Sentir no es debilidad. Ignorar lo que sientes, sí.' },
+  { text: 'Cuando te permites estar mal sin intentar arreglarlo, el malestar empieza a moverse.' },
+  { text: 'No necesitas silenciar tus pensamientos. Necesitas dejar de creerte todos.' },
+  { text: 'La meditación no es dejar la mente en blanco. Es observar sin juzgar lo que pasa.' },
+  { text: 'Quien se toma cinco minutos para respirar antes de responder gana la conversación.' },
+  { text: 'La serenidad no es no sentir. Es sentir sin que eso te arrastre.' },
+  { text: 'Tu bienestar emocional no depende de que todo vaya bien. Depende de cómo lo atraviesas.' },
+  { text: 'Hablar contigo mismo con amabilidad no es egoísmo. Es el principio de la salud mental.' },
+  { text: 'Los pensamientos repetitivos pierden fuerza cuando los miras como si fueran nubes.' },
+  { text: 'La claridad mental no se logra pensando más. Se logra retirando lo innecesario.' },
+  { text: 'Aprender a estar incómodo emocionalmente sin huir es una de las habilidades más valiosas que existen.' },
+  { text: 'No estás triste sin motivo. A veces el motivo es simplemente que necesitas pausar.' },
+  { text: 'El silencio interior no se consigue luchando contra el ruido. Se consigue dejándolo pasar.' },
+
+  // ─── ENERGÍA (20 frases) ───
+  { text: 'No comes solo para alimentarte. Comes para decidir cómo te vas a sentir esta tarde.' },
+  { text: 'Tu cuerpo no pide dietas extremas. Pide coherencia entre lo que le das y lo que esperas de él.' },
+  { text: 'Dormir bien no es un lujo. Es la base sobre la que se construye todo lo demás.' },
+  { text: 'La energía que tienes mañana depende de las decisiones que tomas después de cenar.' },
+  { text: 'No hay suplemento que sustituya lo que una noche de sueño reparador hace por tu mente.' },
+  { text: 'Moverse no es una obligación. Es la forma en que tu cuerpo agradece estar vivo.' },
+  { text: 'Lo que bebes cada día influye más en tu estado de ánimo de lo que imaginas.' },
+  { text: 'Cuidar tu energía no es egoísmo. Es la condición para poder cuidar lo demás.' },
+  { text: 'Un cuerpo bien nutrido no piensa en comer constantemente. Piensa en vivir.' },
+  { text: 'El descanso no se gana. Se planifica.' },
+  { text: 'No necesitas entrenar como un atleta. Necesitas moverte como alguien que respeta su cuerpo.' },
+  { text: 'La comida no es premio ni castigo. Es combustible para la persona que quieres ser.' },
+  { text: 'Cuando duermes lo suficiente, las decisiones difíciles se vuelven más claras.' },
+  { text: 'Tu cuerpo te habla todo el tiempo. El problema es que rara vez te detienes a escucharlo.' },
+  { text: 'La fatiga crónica no se cura con café. Se cura con decisiones distintas.' },
+  { text: 'Hidratarse es el acto más simple y más ignorado del cuidado personal.' },
+  { text: 'La diferencia entre sentirse bien y sentirse extraordinario está en la consistencia de los pequeños cuidados.' },
+  { text: 'No eres lo que comes. Eres lo que tu cuerpo consigue hacer con lo que comes.' },
+  { text: 'El movimiento diario no necesita ser intenso. Necesita ser habitual.' },
+  { text: 'Cada comida es una oportunidad para construir o destruir tu bienestar de esta semana.' },
+
+  // ─── FINANZAS (20 frases) ───
+  { text: 'Gastar menos de lo que ganas no es restricción. Es la primera forma de libertad real.' },
+  { text: 'El dinero que no tienes aún no existe. No tomes decisiones actuales basándote en dinero futuro.' },
+  { text: 'Ahorrar no es lo que sobra al final del mes. Es lo primero que haces con lo que entra.' },
+  { text: 'No necesitas ganar más para empezar a construir algo sólido. Necesitas gastar con más consciencia.' },
+  { text: 'La tranquilidad financiera no llega con una cifra en el banco. Llega cuando tus gastos están alineados con tus valores.' },
+  { text: 'Cada euro que gastas sin pensar es un euro que no trabaja para tu futuro.' },
+  { text: 'La mejor inversión no es la que más rentabilidad promete. Es la que puedes mantener sin sacrificar tu paz.' },
+  { text: 'El verdadero patrimonio no se mide en lo que tienes. Se mide en lo que no necesitas tener.' },
+  { text: 'No te endeudes por algo que pierde valor desde el momento en que lo compras.' },
+  { text: 'Un presupuesto no te limita. Te muestra dónde está yendo tu libertad.' },
+  { text: 'La riqueza invisible es aquella que te permite decir no cuando quieres decir no.' },
+  { text: 'Construir seguridad financiera es aburrido, lento y necesario. Casi todo lo que vale la pena lo es.' },
+  { text: 'No compares tu economía con la imagen que los demás proyectan. Casi siempre es una ilusión.' },
+  { text: 'El primer paso hacia el control financiero es saber exactamente a dónde va tu dinero.' },
+  { text: 'Separar lo que necesitas de lo que quieres te ahorra años de preocupación.' },
+  { text: 'Invertir en tu formación es la única gasta que siempre paga dividendos.' },
+  { text: 'El dinero es una herramienta. Cuando se convierte en el objetivo, pierde su utilidad.' },
+  { text: 'No necesitas ser rico para estar tranquilo. Necesitas que tus números tengan sentido.' },
+  { text: 'Una emergencia financiera no se resuelve cuando llega. Se previene mucho antes.' },
+  { text: 'Lo que no sabes sobre tu propio dinero es exactamente lo que te genera inquietud.' },
+
+  // ─── CRECIMIENTO (20 frases) ───
+  { text: 'Aprender algo nuevo no solo te añade conocimiento. Te quita un miedo.' },
+  { text: 'La persona que eras hace un año no reconocería lo que ahora te resulta natural.' },
+  { text: 'No creces cuando todo va bien. Creces cuando lo difícil te encuentra preparado.' },
+  { text: 'El crecimiento personal no necesita audiencia. Necesita honestidad.' },
+  { text: 'Lo que no te desafía no te cambia.' },
+  { text: 'La mejor versión de uno mismo no se alcanza. Se mantiene.' },
+  { text: 'Cada vez que te equivocas y lo aceptas, ganas una libertad que no tenías antes.' },
+  { text: 'Desafiarte a ti mismo no es castigo. Es el respeto más grande que puedes mostrarte.' },
+  { text: 'No necesitas saber todo el camino. Necesitas la voluntad de dar el siguiente paso.' },
+  { text: 'Aprender de los demás acelera el proceso. Aprender de uno mismo lo profundiza.' },
+  { text: 'El conocimiento que no se aplica es solo información almacenada.' },
+  { text: 'La vulnerabilidad no es debilidad. Es el espacio donde ocurre el verdadero crecimiento.' },
+  { text: 'Cuando dejas de compararte, por fin puedes medir tu propio progreso.' },
+  { text: 'No hay crecimiento sin la disposición a sentirse principiante otra vez.' },
+  { text: 'Los obstáculos no están ahí para detenerte. Están para mostrarte qué necesitas aprender.' },
+  { text: 'Lo que te resulta fácil hoy costó trabajo antes de convertirse en natural.' },
+  { text: 'La resiliencia no significa no caer. Significa saber qué hacer después de caer.' },
+  { text: 'Crecer es aceptar que siempre habrá algo que no sabes y decidir averiguarlo.' },
+  { text: 'La experiencia no te hace mejor. Te hace más consciente de lo que te falta por mejorar.' },
+  { text: 'No esperes a sentirte preparado para dar un paso. El paso es lo que te prepara.' },
 ] as const;
