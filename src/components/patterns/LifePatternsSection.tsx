@@ -169,7 +169,7 @@ function PremiumPreview({ observation }: { observation: ObservationData }) {
       <div className="opacity-35 select-none pointer-events-none">
         <ObservationCard observation={observation} />
       </div>
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center depth-gate-overlay">
         <div className="flex items-center gap-1.5">
           <Circle size={3} className="text-champagne/25" fill="currentColor" />
           <span className="text-[10px] text-[#444]">Más conexiones con el tiempo</span>

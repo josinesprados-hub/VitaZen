@@ -7,7 +7,7 @@ import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { TimelineSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
-import PremiumGate, { PremiumHistoryGate, PremiumInlineBadge } from '@/components/ui/PremiumGate';
+import PremiumGate, { PremiumInlineBadge } from '@/components/ui/PremiumGate';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
@@ -453,7 +453,7 @@ export default function TimelinePage() {
                   <div className="h-16 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl" />
                 </div>
               </PremiumGate>
-              <PremiumHistoryGate isPremium={isPremium} label="historial completo" />
+
             </div>
           )}
         </div>

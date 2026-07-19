@@ -1066,6 +1066,7 @@ export default function RiquezaPage() {
           <div
             ref={addSheetRef}
             className="bs-sheet"
+            style={!quickMode ? { height: 'auto', maxHeight: 'min(90dvh, var(--bs-max-h, 9999px))' } : undefined}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle bar — iOS native affordance */}
