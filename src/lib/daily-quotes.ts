@@ -5,8 +5,8 @@
 // Pure data + types. No DB. No server. No client.
 // Just the quote collection and its type definitions.
 //
-// 395 quotes — the VitaZen editorial collection.
-// 295 original + 100 new premium quotes (FASE 8.6).
+// 495 quotes — the expanded VitaZen editorial collection.
+// 295 original + 100 new premium (FASE 8.6) + 100 new premium (FASE 8.7).
 // 5 originals removed in FASE 8.6.2 (editorial de-duplication).
 //
 // ─── ARCHITECTURE CONTRACT ────────────────
@@ -41,7 +41,7 @@ export interface DailyQuoteState {
 }
 
 // ─── Definitive Collection ────────────────
-// 295 original (post FASE 8.6.2 de-dup) + 100 new premium (FASE 8.6).
+// 295 original (post 8.6.2) + 100 new (8.6) + 100 new (8.7) = 495 total.
 // VitaZen editorial voice.
 
 export const DAILY_QUOTES: readonly DailyQuote[] = [
@@ -469,4 +469,175 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Crecer es aceptar que siempre habrá algo que no sabes y decidir averiguarlo.' },
   { text: 'La experiencia no te hace mejor. Te hace más consciente de lo que te falta por mejorar.' },
   { text: 'No esperes a sentirte preparado para dar un paso. El paso es lo que te prepara.' },
+
+  // ═══════════════════════════════════════════
+  // 100 FRASES NUEVAS — FASE 8.7
+  // Colección Premium VitaZen — Expansión editorial
+  // Prioridad: temas infra-representados
+  // Distribución por temas:
+  //   Creatividad: 7
+  //   Naturaleza: 6
+  //   Humildad: 5
+  //   Servicio: 5
+  //   Coraje: 6
+  //   Responsabilidad: 5
+  //   Autocontrol: 5
+  //   Gratitud: 5
+  //   Propósito: 5
+  //   Visión: 5
+  //   Liderazgo: 5
+  //   Sabiduría práctica: 5
+  //   Nutrición: 5
+  //   Aprendizaje: 5
+  //   Relaciones: 5
+  //   Carácter: 4
+  //   Finanzas: 4
+  //   Autenticidad: 4
+  //   Tiempo y priorización: 3
+  //   Presencia: 3
+  //   Silencio y entorno: 3
+  // ═══════════════════════════════════════════
+
+  // ─── CREATIVIDAD (7) ───
+  { text: 'Crear sin juzgar el resultado es el acto más libre que existe.' },
+  { text: 'La creatividad exige espacio vacío antes de llenarlo.' },
+  { text: 'Toda obra empieza por una mano que se atreve a mancharse.' },
+  { text: 'El borrador imperfecto siempre supera a la idea perfecta que nunca existió.' },
+  { text: 'Inventar es permitir que lo que no tiene sentido encuentre el suyo.' },
+  { text: 'La rutina protege al cuerpo pero ahoga lo que aún no tiene forma.' },
+  { text: 'Las ideas que no ejecutas se convierten en deuda creativa.' },
+
+  // ─── NATURALEZA (6) ───
+  { text: 'Un paseo sin objetivo a veces resuelve más que una hora de deliberación.' },
+  { text: 'Ningún árbol crece deprisa y sin embargo llega a dar sombra.' },
+  { text: 'El silencio de un bosque tiene más respuestas que una sala llena de ruido.' },
+  { text: 'Moverse al aire libre cambia algo que permanece inmóvil en una oficina.' },
+  { text: 'La luz natural no solo ilumina. Reordena lo que la artificial desordena.' },
+  { text: 'Poner los pies descalzos sobre la tierra devuelve algo que las pantallas quitan.' },
+
+  // ─── HUMILDAD (5) ───
+  { text: 'Reconocer lo que ignoras es la puerta más estrecha y la más honesta.' },
+  { text: 'Quien presume de saberlo todo ya dejó de aprender en silencio.' },
+  { text: 'La grandeza más silenciosa es la que no necesita testigos.' },
+  { text: 'Admitir un error delante de otros libera más que ocultarlo durante años.' },
+  { text: 'Saber que queda mucho por descubrir no debilita. Ensancha.' },
+
+  // ─── SERVICIO (5) ───
+  { text: 'Dar sin esperar nada a cambio es la inversión con mayor retorno invisible.' },
+  { text: 'Ayudar a otro a avanzar no te retrasa. Te muestra un atajo que ignorabas.' },
+  { text: 'La marca más profunda que dejas no está en tus logros. Está en las personas.' },
+  { text: 'Estar presente cuando alguien te necesita vale más que cualquier recurso que puedas ofrecer.' },
+  { text: 'Tu mayor riqueza no se mide en lo que acumulas. Se mide en lo que ofreces.' },
+
+  // ─── CORAJE (6) ───
+  { text: 'Atravesar el miedo con los pies temblando es más valiente que no sentirlo.' },
+  { text: 'Hablar la verdad cuando todos callan cuesta caro. Pero el silencio cuesta más.' },
+  { text: 'Dar un paso hacia lo desconocido siempre se siente como un salto al vacío.' },
+  { text: 'La fragilidad que mostraste ayer se convirtió en la fuerza que te define hoy.' },
+  { text: 'Elegir lo difícil cuando lo fácil te tentaba forja algo que la comodidad jamás tocará.' },
+  { text: 'Iniciar algo sabiendo que podrías fracasar es la forma más pura de confianza en ti.' },
+
+  // ─── RESPONSABILIDAD (5) ───
+  { text: 'Asumir la consecuencia de tus actos te libera de la carga de la excusa.' },
+  { text: 'Echar la culpa al contexto te devuelve el poder de cambiarlo.' },
+  { text: 'La persona que te devolvió la confianza fue aquella que asumió su error sin condiciones.' },
+  { text: 'Elegir conscientemente qué sostener revela más madurez que intentar sostenerlo todo.' },
+  { text: 'Cuando dejas de justificarte empiezas a solucionar.' },
+
+  // ─── AUTOCONTROL (5) ───
+  { text: 'Dominar el impulso de responder cuando estás enfadado es la victoria más silenciosa.' },
+  { text: 'La diferencia entre reaccionar y responder mide la distancia entre instinto e inteligencia.' },
+  { text: 'Elegir lo que comes cuando estás cansado revela más que cualquier test de personalidad.' },
+  { text: 'Cerrar la boca a tiempo evita batallas que ni siquiera debieron comenzar.' },
+  { text: 'Elegir tu próxima acción en lugar de reaccionar es la forma más práctica de libertad.' },
+
+  // ─── GRATITUD (5) ───
+  { text: 'Agradecer lo que tienes agranda la visión de lo que es posible.' },
+  { text: 'La persona más rica es aquella que se sorprende de lo que ya posee.' },
+  { text: 'Dar las gracias por lo ordinario transforma lo invisible en evidente.' },
+  { text: 'Un día agradecido produce más que una semana quejándose.' },
+  { text: 'Aquello que das por sentado fue alguna vez lo que pedías con desesperación.' },
+
+  // ─── PROPÓSITO (5) ───
+  { text: 'Tener un propósito no te libra de dudar. Te da un lugar al que volver después.' },
+  { text: 'Construir algo que te sobreviva es la forma más humilde de inmortalidad.' },
+  { text: 'Cuando lo que haces se alinea con lo que te importa, el esfuerzo deja de pesarte.' },
+  { text: 'El propósito no se anuncia. Se nota en la energía con la que te levantas.' },
+  { text: 'Perder la dirección no significa haberla perdido para siempre. Significa que es hora de parar.' },
+
+  // ─── VISIÓN (5) ───
+  { text: 'Ver algo que otros aún no perciben requiere una atención entrenada durante años.' },
+  { text: 'La persona que imagina un futuro mejor y trabaja en el hoy construye el puente más largo.' },
+  { text: 'Soñar sin actuar es entretenimiento. Actuar sin soñar es agotamiento.' },
+  { text: 'Tu visión del futuro vale exactamente lo que estás dispuesto a sacrificar por ella.' },
+  { text: 'Aquello que imaginas con nitidez ya empieza a tomar forma en tus decisiones.' },
+
+  // ─── LIDERAZGO (5) ───
+  { text: 'Hacer que otros confíen en sí mismos es el acto más profundo de liderazgo.' },
+  { text: 'El mejor líder es aquel cuya ausencia no interrumpe el funcionamiento del equipo.' },
+  { text: 'Dar ejemplo cuando nadie observa es la prueba definitiva de liderazgo.' },
+  { text: 'Un equipo que piensa por sí mismo es el logro más grande de un líder.' },
+  { text: 'Demostrar con coherencia inspira más que mil discursos motivacionales.' },
+
+  // ─── SABIDURÍA PRÁCTICA (5) ───
+  { text: 'La experiencia más cara es aquella que podrías haber aprendido observando.' },
+  { text: 'Saber cuándo parar es tan valioso como saber cuándo insistir.' },
+  { text: 'Los peores momentos enseñan lo que los mejores jamás podrían.' },
+  { text: 'Un buen consejo llega tarde cuando la decisión ya se tomó por impulso.' },
+  { text: 'La persona que lee dos horas al día se separa de la que no lo hace de forma invisible.' },
+
+  // ─── NUTRICIÓN (5) ───
+  { text: 'Lo que comes en secreto revela más sobre ti que lo que comes en público.' },
+  { text: 'Tu plato de hoy construye o destruye tu energía de mañana.' },
+  { text: 'Cocinar para ti mismo es el acto más concreto de respeto propio que existe.' },
+  { text: 'La primera comida del día dicta el ritmo del resto.' },
+  { text: 'Elegir agua antes que cualquier otra bebida es la decisión más pequeña con mayor impacto.' },
+
+  // ─── APRENDIZAJE (5) ───
+  { text: 'La curiosidad que no se alimenta se convierte en conformidad.' },
+  { text: 'Un libro que te incomoda te enseña más que diez que te confirman.' },
+  { text: 'Volver a lo básico cuando crees saberlo todo es la señal de un verdadero aprendiz.' },
+  { text: 'La velocidad a la que aprendes depende de la velocidad a la que preguntas.' },
+  { text: 'Aquello que no entiendes hoy puede ser la clave de lo que construyas mañana.' },
+
+  // ─── RELACIONES (5) ───
+  { text: 'Una conversación honesta vale más que cien interacciones correctas.' },
+  { text: 'Elegir con quién compartes tu tiempo es elegir quién te influye.' },
+  { text: 'La persona que te escucha sin interrumpirte te está dando el regalo más raro.' },
+  { text: 'Elegir que el pasado no escriba tu futuro es la forma más valiente de avanzar.' },
+  { text: 'Las relaciones que atraviesan el conflicto sin romperse son las más sólidas.' },
+
+  // ─── CARÁCTER (4) ───
+  { text: 'Tu carácter se revela cuando nadie te observa y tienes algo que ganar haciendo lo incorrecto.' },
+  { text: 'Hacer lo correcto cuando nadie aplaude construye algo que los aplausos jamás construirían.' },
+  { text: 'La coherencia entre tu palabra privada y tu acción pública es la medida más exacta de quién eres.' },
+  { text: 'La integridad se nota cuando cumplir tu palabra te cuesta más que romperla.' },
+
+  // ─── FINANZAS (4) ───
+  { text: 'Tu historial de compras cuenta una historia más honesta que tus intenciones de ahorro.' },
+  { text: 'La primera vez que dijiste no a una compra impulsiva nació algo dentro de ti.' },
+  { text: 'Vivir por debajo de tus posibilidades protege tu futuro de forma silenciosa y constante.' },
+  { text: 'Un gasto pequeño repetido cada día es la fuga más invisible de tu patrimonio.' },
+
+  // ─── AUTENTICIDAD (4) ───
+  { text: 'La primera versión de cualquier cosa siempre es torpe. La perfección es una excusa para no empezar.' },
+  { text: 'Tu cuerpo guarda memoria de cada decisión que tomas. Tarde o temprano la muestra.' },
+  { text: 'La persona que dice lo que piensa sin lastimar construye la confianza más sólida.' },
+  { text: 'Dejar de interpretar un papel que no te corresponde es la transformación más radical que existe.' },
+
+  // ─── TIEMPO Y PRIORIZACIÓN (3) ───
+  { text: 'Elegir una sola prioridad y sostenerla durante un mes produce más que diez objetivos simultáneos.' },
+  { text: 'Tu energía se agota en proporción directa a las decisiones que pospones.' },
+  { text: 'La mejor versión de tu día empieza con una decisión que tomas antes de que el mundo te exija algo.' },
+
+  // ─── PRESENCIA (3) ───
+  { text: 'El aburrimiento productivo es el estado en el que las mejores ideas encuentran espacio para nacer.' },
+  { text: 'Hacer una sola cosa con toda tu atención transforma lo ordinario en memorable.' },
+  { text: 'Tu presencia física sin tu atención mental es una ausencia disfrazada.' },
+
+  // ─── SILENCIO Y ENTORNO (3) ───
+  { text: 'Rodearte de personas que te desafían es la estrategia de crecimiento más infrautilizada.' },
+  { text: 'El silencio que creas alrededor de tus decisiones determina su calidad.' },
+  { text: 'Aquello que toleras en silencio acaba convirtiéndose en tu estándar mínimo.' },
+
 ] as const;
