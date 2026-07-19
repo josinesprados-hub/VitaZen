@@ -169,8 +169,8 @@ function WaitingState() {
 function PremiumPreview({ observation }: { observation: ObservationData }) {
   return (
     <div className="py-5 sm:py-6">
-      {/* Observation preview — faded whisper, its own vertical space */}
-      <div className="opacity-25 select-none pointer-events-none line-clamp-2">
+      {/* Observation preview — faded but legible, its own vertical space */}
+      <div className="opacity-50 select-none pointer-events-none line-clamp-2">
         <p className="text-champagne/70 text-base sm:text-lg italic leading-relaxed">
           {observation.text}
         </p>
