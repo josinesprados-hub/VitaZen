@@ -5,8 +5,9 @@
 // Pure data + types. No DB. No server. No client.
 // Just the quote collection and its type definitions.
 //
-// 400 quotes — the expanded VitaZen collection.
-// 300 original + 100 new premium quotes (FASE 8.6).
+// 395 quotes — the VitaZen editorial collection.
+// 295 original + 100 new premium quotes (FASE 8.6).
+// 5 originals removed in FASE 8.6.2 (editorial de-duplication).
 //
 // ─── ARCHITECTURE CONTRACT ────────────────
 // To add new quotes in the future:
@@ -40,12 +41,12 @@ export interface DailyQuoteState {
 }
 
 // ─── Definitive Collection ────────────────
-// 300 original + 100 new premium quotes (FASE 8.6).
+// 295 original (post FASE 8.6.2 de-dup) + 100 new premium (FASE 8.6).
 // VitaZen editorial voice.
 
 export const DAILY_QUOTES: readonly DailyQuote[] = [
   // ═══════════════════════════════════════════
-  // 300 FRASES ORIGINALES
+  // 295 FRASES ORIGINALES (5 eliminadas en FASE 8.6.2)
   // ═══════════════════════════════════════════
   { text: 'La claridad llega cuando dejas de buscarla.' },
   { text: 'No hace falta correr cuando sabes adónde vas.' },
@@ -239,7 +240,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Cada decisión pequeña es un voto por quién quieres ser.' },
   { text: 'Lo visible es resultado de lo invisible.' },
   { text: 'La paciencia con el resultado no es paciencia con el esfuerzo.' },
-  { text: 'El descanso sin culpa multiplica la energía.' },
+
   { text: 'Quien no se permite pausar no se permite pensar.' },
   { text: 'La honestidad radical consigo mismo es liberadora.' },
   { text: 'Lo que se construye con paciencia resiste las tormentas.' },
@@ -291,7 +292,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'La calma después de la tormenta también se prepara antes.' },
   { text: 'El enfoque claro es el antídoto contra la dispersión.' },
   { text: 'No confundas la pausa con el abandono.' },
-  { text: 'La madurez se mide por lo que ya no necesitas discutir.' },
+
   { text: 'Lo que no se valora se pierde.' },
   { text: 'La rutina bien vivida es el secreto mejor guardado.' },
   { text: 'El aprendizaje constante es la mejor defensa contra la irrelevancia.' },
@@ -313,12 +314,12 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'El crecimiento real casi nunca es visible desde fuera.' },
   { text: 'La coherencia interior genera paz exterior.' },
   { text: 'Lo que se practica con intención se convierte en maestría.' },
-  { text: 'La libertad verdadera es elegir con qué comprometerse.' },
+
   { text: 'La constancia en lo pequeño construye lo grande.' },
   { text: 'La calma se pierde cuando se confunde urgencia con importancia.' },
   { text: 'Lo que no se habla se agranda.' },
   { text: 'La disciplina personal es la base de toda libertad real.' },
-  { text: 'No necesitas ver el final para dar el siguiente paso.' },
+
   { text: 'La paciencia con el proceso transforma la ansiedad en confianza.' },
   { text: 'Lo que se construye con honestidad no necesita defensa.' },
   { text: 'La atención es la puerta entre tu intención y tu acción.' },
@@ -335,7 +336,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'El propósito claro elimina la necesidad de motivación.' },
   { text: 'La calma no se impone. Se cultiva.' },
   { text: 'No necesitas hacer más. Necesitas hacer lo que importa con más presencia.' },
-  { text: 'La paciencia con el resultado y urgencia con la acción.' },
+
   { text: 'Lo que se hace con gracia se siente ligero.' },
   { text: 'La vida que tienes es la que estás construyendo con tus decisiones de hoy.' },
   { text: 'Quien no ordena su día deja que el azar lo ordene.' },
