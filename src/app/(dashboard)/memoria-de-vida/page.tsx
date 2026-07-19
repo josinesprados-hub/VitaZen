@@ -45,6 +45,16 @@ import {
   getTimeRangeLabel,
 } from '@/lib/life-memory/copy';
 
+// ─── Empire label mapping ───
+
+const EMPIRE_LABELS: Record<string, string> = {
+  disciplina: 'Disciplina',
+  mente: 'Mente',
+  energia: 'Energía',
+  riqueza: 'Finanzas',
+  crecimiento: 'Crecimiento',
+};
+
 // ─── Types ───
 
 interface LifeMemoryObservation {
@@ -281,7 +291,7 @@ export default function EtapasPage() {
                 <div className="bg-[#0a0a0a]/40 border border-[#111] rounded-lg px-4.5 py-3.5 sm:px-5 sm:py-4">
                   <p className="text-[#777] text-xs sm:text-sm italic leading-relaxed">{memory.text}</p>
                   <p className="text-[10px] text-[#2a2a2a] mt-2">
-                    {memory.empire} · {safeFormatDateShort(memory.date)}
+                    {EMPIRE_LABELS[memory.empire] || memory.empire} · {safeFormatDateShort(memory.date)}
                   </p>
                 </div>
               </div>

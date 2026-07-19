@@ -33,6 +33,16 @@ import type {
   EvolutionData,
 } from '@/lib/monthly-closure/digest';
 
+// ─── Empire label mapping ───
+
+const EMPIRE_LABELS: Record<string, string> = {
+  disciplina: 'Disciplina',
+  mente: 'Mente',
+  energia: 'Energía',
+  riqueza: 'Finanzas',
+  crecimiento: 'Crecimiento',
+};
+
 // ─── Types ───
 
 type Phase = 'loading' | 'reflection' | 'summary';
@@ -282,7 +292,7 @@ export default function CierreMensualPage() {
               <div key={i} className="border-l border-[#151515] pl-3">
                 <p className="text-[#777] text-xs italic leading-relaxed">{memory.text}</p>
                 <p className="text-[9px] text-[#2a2a2a] mt-1">
-                  {memory.empire} · {safeFormatDateShort(memory.date)}
+                  {EMPIRE_LABELS[memory.empire] || memory.empire} · {safeFormatDateShort(memory.date)}
                 </p>
               </div>
             ))}
