@@ -60,7 +60,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'El hábito es la forma que toma la intención.' },
   { text: 'Hay silencios que enseñan más que cualquier palabra.' },
   { text: 'Lo que evitas crece. Lo que miras pierde poder.' },
-  { text: 'La consistencia vence al talento cuando el talento no es constante.' },
+  { text: 'El talento que no se repite se apaga. La consistencia, no.' },
   { text: 'El tiempo no perdona la indecisión.' },
   { text: 'Aprender es reconocer lo que no sabías que ignorabas.' },
   { text: 'Las relaciones crecen donde hay presencia real.' },
@@ -141,7 +141,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Quien respeta sus pausas dura más.' },
   { text: 'No confundas movimiento con dirección.' },
   { text: 'La coherencia entre lo que piensas y lo que haces es poder.' },
-  { text: 'El tiempo invertido en entender ahorra el tiempo gastado en repetir.' },
+  { text: 'Entender bien al principio evita tener que repetir después.' },
   { text: 'La humildad no es debilidad. Es precisión.' },
   { text: 'Hay más fuerza en la contención que en la explosión.' },
   { text: 'Lo que practicas cada día se convierte en ti.' },
@@ -239,7 +239,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'La disciplina no necesita audiencia.' },
   { text: 'Cada decisión pequeña es un voto por quién quieres ser.' },
   { text: 'Lo visible es resultado de lo invisible.' },
-  { text: 'La paciencia con el resultado no es paciencia con el esfuerzo.' },
+  { text: 'Espera el resultado con calma. Pero no esperes para actuar.' },
 
   { text: 'Quien no se permite pausar no se permite pensar.' },
   { text: 'La honestidad radical consigo mismo es liberadora.' },
@@ -308,7 +308,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'La disciplina no es limitación. Es dirección.' },
   { text: 'El descanso merecido no necesita justificación.' },
   { text: 'No subestimes el efecto acumulativo de las pequeñas acciones.' },
-  { text: 'La atención bien dirigida resuelve lo que la prisa complica.' },
+  { text: 'La prisa crea errores. La atención los evita.' },
   { text: 'Lo que te define no es la caída sino cómo te levantas.' },
   { text: 'La presencia genuina no tiene atajos.' },
   { text: 'El crecimiento real casi nunca es visible desde fuera.' },
@@ -322,7 +322,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
 
   { text: 'La paciencia con el proceso transforma la ansiedad en confianza.' },
   { text: 'Lo que se construye con honestidad no necesita defensa.' },
-  { text: 'La atención es la puerta entre tu intención y tu acción.' },
+  { text: 'Sin atención, la intención nunca se convierte en acción.' },
   { text: 'Cada persona que te escucha merece que hables con verdad.' },
   { text: 'El descanso es tan importante como el esfuerzo.' },
   { text: 'No hay vergüenza en ir despacio si vas en la dirección correcta.' },
@@ -400,7 +400,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Hablar contigo mismo con amabilidad no es egoísmo. Es el principio de la salud mental.' },
   { text: 'Los pensamientos repetitivos pierden fuerza cuando los miras como si fueran nubes.' },
   { text: 'La claridad mental no se logra pensando más. Se logra retirando lo innecesario.' },
-  { text: 'Aprender a estar incómodo emocionalmente sin huir es una de las habilidades más valiosas que existen.' },
+  { text: 'Estar incómodo sin huir es una de las habilidades más valiosas que existen.' },
   { text: 'No estás triste sin motivo. A veces el motivo es simplemente que necesitas pausar.' },
   { text: 'El silencio interior no se consigue luchando contra el ruido. Se consigue dejándolo pasar.' },
 
@@ -421,17 +421,17 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Tu cuerpo te habla todo el tiempo. El problema es que rara vez te detienes a escucharlo.' },
   { text: 'La fatiga crónica no se cura con café. Se cura con decisiones distintas.' },
   { text: 'Hidratarse es el acto más simple y más ignorado del cuidado personal.' },
-  { text: 'La diferencia entre sentirse bien y sentirse extraordinario está en la consistencia de los pequeños cuidados.' },
+  { text: 'Sentirse extraordinario se construye con la constancia de lo pequeño.' },
   { text: 'No eres lo que comes. Eres lo que tu cuerpo consigue hacer con lo que comes.' },
   { text: 'El movimiento diario no necesita ser intenso. Necesita ser habitual.' },
   { text: 'Cada comida es una oportunidad para construir o destruir tu bienestar de esta semana.' },
 
   // ─── FINANZAS (20 frases) ───
   { text: 'Gastar menos de lo que ganas no es restricción. Es la primera forma de libertad real.' },
-  { text: 'El dinero que no tienes aún no existe. No tomes decisiones actuales basándote en dinero futuro.' },
+  { text: 'El dinero que aún no tienes no debería decidir lo que haces hoy.' },
   { text: 'Ahorrar no es lo que sobra al final del mes. Es lo primero que haces con lo que entra.' },
   { text: 'No necesitas ganar más para empezar a construir algo sólido. Necesitas gastar con más consciencia.' },
-  { text: 'La tranquilidad financiera no llega con una cifra en el banco. Llega cuando tus gastos están alineados con tus valores.' },
+  { text: 'La tranquilidad financiera no es una cifra. Es que tus gastos reflejen tus valores.' },
   { text: 'Cada euro que gastas sin pensar es un euro que no trabaja para tu futuro.' },
   { text: 'La mejor inversión no es la que más rentabilidad promete. Es la que puedes mantener sin sacrificar tu paz.' },
   { text: 'El verdadero patrimonio no se mide en lo que tienes. Se mide en lo que no necesitas tener.' },
@@ -442,7 +442,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'No compares tu economía con la imagen que los demás proyectan. Casi siempre es una ilusión.' },
   { text: 'El primer paso hacia el control financiero es saber exactamente a dónde va tu dinero.' },
   { text: 'Separar lo que necesitas de lo que quieres te ahorra años de preocupación.' },
-  { text: 'Invertir en tu formación es la única gasta que siempre paga dividendos.' },
+  { text: 'Invertir en tu formación es el único gasto que siempre paga dividendos.' },
   { text: 'El dinero es una herramienta. Cuando se convierte en el objetivo, pierde su utilidad.' },
   { text: 'No necesitas ser rico para estar tranquilo. Necesitas que tus números tengan sentido.' },
   { text: 'Una emergencia financiera no se resuelve cuando llega. Se previene mucho antes.' },
@@ -516,7 +516,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Poner los pies descalzos sobre la tierra devuelve algo que las pantallas quitan.' },
 
   // ─── HUMILDAD (5) ───
-  { text: 'Reconocer lo que ignoras es la puerta más estrecha y la más honesta.' },
+  { text: 'Reconocer lo que ignoras es el primer acto de honestidad.' },
   { text: 'Quien presume de saberlo todo ya dejó de aprender en silencio.' },
   { text: 'La grandeza más silenciosa es la que no necesita testigos.' },
   { text: 'Admitir un error delante de otros libera más que ocultarlo durante años.' },
@@ -546,7 +546,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
 
   // ─── AUTOCONTROL (5) ───
   { text: 'Dominar el impulso de responder cuando estás enfadado es la victoria más silenciosa.' },
-  { text: 'La diferencia entre reaccionar y responder mide la distancia entre instinto e inteligencia.' },
+  { text: 'Reaccionar es instinto. Responder es inteligencia.' },
   { text: 'Elegir lo que comes cuando estás cansado revela más que cualquier test de personalidad.' },
   { text: 'Cerrar la boca a tiempo evita batallas que ni siquiera debieron comenzar.' },
   { text: 'Elegir tu próxima acción en lugar de reaccionar es la forma más práctica de libertad.' },
@@ -563,7 +563,7 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Construir algo que te sobreviva es la forma más humilde de inmortalidad.' },
   { text: 'Cuando lo que haces se alinea con lo que te importa, el esfuerzo deja de pesarte.' },
   { text: 'El propósito no se anuncia. Se nota en la energía con la que te levantas.' },
-  { text: 'Perder la dirección no significa haberla perdido para siempre. Significa que es hora de parar.' },
+  { text: 'Perder la dirección no es perderlo todo. Es la señal para parar y pensar.' },
 
   // ─── VISIÓN (5) ───
   { text: 'Ver algo que otros aún no perciben requiere una atención entrenada durante años.' },
@@ -608,9 +608,9 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Las relaciones que atraviesan el conflicto sin romperse son las más sólidas.' },
 
   // ─── CARÁCTER (4) ───
-  { text: 'Tu carácter se revela cuando nadie te observa y tienes algo que ganar haciendo lo incorrecto.' },
-  { text: 'Hacer lo correcto cuando nadie aplaude construye algo que los aplausos jamás construirían.' },
-  { text: 'La coherencia entre tu palabra privada y tu acción pública es la medida más exacta de quién eres.' },
+  { text: 'Tu carácter se muestra cuando nadie mira y hacer lo incorrecto tiene premio.' },
+  { text: 'Hacer lo correcto sin público construye algo que el reconocimiento jamás lograría.' },
+  { text: 'La distancia entre lo que dices en privado y lo que haces en público define quién eres.' },
   { text: 'La integridad se nota cuando cumplir tu palabra te cuesta más que romperla.' },
 
   // ─── FINANZAS (4) ───
@@ -626,12 +626,12 @@ export const DAILY_QUOTES: readonly DailyQuote[] = [
   { text: 'Dejar de interpretar un papel que no te corresponde es la transformación más radical que existe.' },
 
   // ─── TIEMPO Y PRIORIZACIÓN (3) ───
-  { text: 'Elegir una sola prioridad y sostenerla durante un mes produce más que diez objetivos simultáneos.' },
+  { text: 'Una sola prioridad sostenida un mes logra más que diez objetivos a la vez.' },
   { text: 'Tu energía se agota en proporción directa a las decisiones que pospones.' },
-  { text: 'La mejor versión de tu día empieza con una decisión que tomas antes de que el mundo te exija algo.' },
+  { text: 'Tu día se gana o se pierde en la primera decisión de la mañana.' },
 
   // ─── PRESENCIA (3) ───
-  { text: 'El aburrimiento productivo es el estado en el que las mejores ideas encuentran espacio para nacer.' },
+  { text: 'El aburrimiento no es tiempo perdido. Es cuando las ideas encuentran espacio.' },
   { text: 'Hacer una sola cosa con toda tu atención transforma lo ordinario en memorable.' },
   { text: 'Tu presencia física sin tu atención mental es una ausencia disfrazada.' },
 
