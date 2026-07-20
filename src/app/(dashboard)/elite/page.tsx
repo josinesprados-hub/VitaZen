@@ -230,19 +230,19 @@ export default function ElitePage() {
             </div>
 
             <p className="text-[#777] text-sm leading-relaxed mb-5">
-              Todo lo esencial ya está aquí.
+              Lo primero para empezar a entenderte.
               Hábitos, estados, notas, el mentor, los 5 imperios.
-              Lo necesario para empezar a entenderse.
+              Un buen punto de partida.
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
-              <p className="text-[#333] text-[10px] uppercase tracking-wider font-medium mb-3">Lo que ya tienes</p>
+              <p className="text-[#333] text-[10px] uppercase tracking-wider font-medium mb-3">Lo primero</p>
               <ul className="space-y-2">
                 {[
                   'Registro manual de hábitos y estados',
                   'Mentor IA con ritmo diario',
                   'Acceso a los 5 imperios',
-                  'Notas básicas de cada imperio',
+                  'Notas de cada imperio',
                   'Check-in y seguimiento emocional',
                   'Memoria de tu vida',
                 ].map((item) => (
@@ -288,7 +288,7 @@ export default function ElitePage() {
                   'Mentor sin límite diario, con más contexto',
                   'Memoria que acumula y conecta',
                   'Historial completo de conversaciones',
-                  'Una nota adicional en cada imperio',
+                  'Notas con más contexto en cada imperio',
                   'Observaciones semanales con más detalle',
                   'Evolución en tus cierres mensuales',
                 ].map((item) => (
