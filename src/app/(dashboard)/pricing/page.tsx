@@ -116,12 +116,12 @@ export default function PricingPage() {
           </div>
 
           <div className="space-y-3 mb-8">
-            <p className="text-[#444] text-[10px] uppercase tracking-wider font-medium">Lo esencial</p>
+            <p className="text-[#444] text-[10px] uppercase tracking-wider font-medium">El comienzo</p>
             {[
               'Registro manual de hábitos y estados',
               'Mentor IA con ritmo diario',
               'Acceso a los 5 imperios',
-              'Notas básicas de cada imperio',
+              'Notas de cada imperio',
               'Check-in y seguimiento emocional',
               'Memoria de tu vida',
             ].map((feature) => (
@@ -158,7 +158,7 @@ export default function PricingPage() {
           </div>
 
           <div className="space-y-3 mb-6">
-            <p className="text-champagne/30 text-[10px] uppercase tracking-wider font-medium">Todo lo anterior, y más conexiones</p>
+            <p className="text-champagne/30 text-[10px] uppercase tracking-wider font-medium">Todo lo anterior, con más profundidad</p>
             {[
               'Conexiones entre tus imperios',
               'Patrones de vida: lo que se repite',
@@ -166,7 +166,7 @@ export default function PricingPage() {
               'Memoria que acumula contexto',
               'Historial completo de conversaciones',
               'Notas con más detalle de cada imperio',
-              'Recomendaciones del mentor completas',
+              'Recomendaciones del mentor con más contexto',
               'Observaciones semanales con más detalle',
             ].map((feature) => (
               <div key={feature} className="flex items-start gap-3">
