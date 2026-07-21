@@ -125,8 +125,23 @@ export async function requestPushToken(): Promise<string | null> {
  */
 export async function deactivatePushToken(): Promise<void> {
   try {
-    if (currentToken) {
-      await unregisterTokenWithServer(currentToken);
+    // Deactivate ALL server-side tokens for this user, not just the one
+    // in the module-level currentToken variable. This covers cases where
+    // currentToken is null (HMR, error recovery) or tokens were registered
+    // in other tabs/sessions.
+    const { getAuth } = await import('firebase/auth');
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      const idToken = await currentUser.getIdToken();
+      await fetch('/api/notifications/deactivate-all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
     }
 
     if (messagingInstance) {
