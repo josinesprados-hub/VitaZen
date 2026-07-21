@@ -116,7 +116,7 @@ export default function PricingPage() {
           </div>
 
           <div className="space-y-3 mb-8">
-            <p className="text-[#444] text-[10px] uppercase tracking-wider font-medium">El comienzo</p>
+            <p className="text-[#444] text-[10px] uppercase tracking-wider font-medium">Para empezar</p>
             {[
               'Registro manual de hábitos y estados',
               'Mentor IA con ritmo diario',

@@ -236,7 +236,7 @@ export default function ElitePage() {
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
-              <p className="text-[#333] text-[10px] uppercase tracking-wider font-medium mb-3">Lo primero</p>
+              <p className="text-[#333] text-[10px] uppercase tracking-wider font-medium mb-3">Para empezar</p>
               <ul className="space-y-2">
                 {[
                   'Registro manual de hábitos y estados',
