@@ -10,7 +10,6 @@ import { NotificationPreferences } from '@/components/notifications/Notification
 import { SubscriptionManager } from '@/components/settings/SubscriptionManager';
 import {
   Mail,
-  Bell,
   Eye,
   LogOut,
   Info,
@@ -146,8 +145,7 @@ export default function AjustesPage() {
       </div>
 
       {/* Email Notifications Section */}
-      {/* NOTE: Both toggles are functional. 'Resumen semanal' → weekly-recap-sender.ts (cron).
-          'Recordatorios diarios' → notifications/reminders/daily.ts:188 (cron pre-filter). */}
+      {/* NOTE: 'Resumen semanal' → weekly-recap-sender.ts (cron). */}
       <div className="card-primary p-6 sm:p-8 space-y-5">
         <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Mail size={14} />
@@ -177,33 +175,6 @@ export default function AjustesPage() {
             <Switch
               checked={settings.weeklyEmailSummary}
               onCheckedChange={(v) => handleToggle('weeklyEmailSummary', v)}
-            />
-          </div>
-        </div>
-
-        {/* Daily Reminders (email) */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="icon-sm mt-0.5">
-              <Bell size={14} className="text-champagne" />
-            </div>
-            <div>
-              <p className="text-sm text-white font-medium">Recordatorios diarios</p>
-              <p className="text-xs text-[#999] mt-0.5">
-                Un aviso para tu check-in y hábitos
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {savingKey === 'dailyReminders' && (
-              <Loader2 size={14} className="animate-spin text-champagne" />
-            )}
-            {savedKeys.has('dailyReminders') && (
-              <Check size={14} className="text-champagne" />
-            )}
-            <Switch
-              checked={settings.dailyReminders}
-              onCheckedChange={(v) => handleToggle('dailyReminders', v)}
             />
           </div>
         </div>
