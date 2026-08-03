@@ -84,9 +84,8 @@
 # -----------------------------------------------------------------------------
 # 6. SplashScreen strategy classes (used dynamically by LauncherActivity)
 #    PwaWrapperSplashScreenStrategy is instantiated conditionally when
-#    SPLASH_IMAGE_DRAWABLE meta-data is present. Even though VitaZen
-#    removed that meta-data, the class is still referenced in code and
-#    ProGuard must not alter its internal structure.
+#    SPLASH_IMAGE_DRAWABLE meta-data is present. The splash drawable
+#    provides the VitaZen logo during the TWA launch transition.
 # -----------------------------------------------------------------------------
 -keep class com.google.androidbrowserhelper.trusted.splashscreens.** { *; }
 
