@@ -11,11 +11,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- LauncherActivity theme - uses AppCompat directly to avoid Theme.SplashScreen -->
-    <!-- crash on Android 12+ real devices. androidbrowserhelper:2.5.0 handles splash -->
-    <!-- via SPLASH_IMAGE_DRAWABLE meta-data with its own SimpleSplashScreenStrategy. -->
-    <!-- On Android 12+, the system shows a default splash based on the app icon, then -->
-    <!-- androidbrowserhelper shows its splash while the TWA is connecting. -->
+    <!-- LauncherActivity theme. Uses AppCompat directly.
+         The splash screen is handled by androidbrowserhelper's
+         SimpleSplashScreenStrategy via SPLASH_IMAGE_DRAWABLE meta-data.
+         On Android 12+, the system splash (app icon + windowBackground) shows first,
+         then the library's splash (VitaZen logo) takes over seamlessly.
+         On Android < 12, only the library's splash is shown. -->
     <style name="Theme.LauncherActivity" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>

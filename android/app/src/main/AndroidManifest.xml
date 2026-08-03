@@ -74,15 +74,18 @@
                  but does not serve assetlinks.json, causing TWA verification to fail.
                  Only vitazen.cc is now trusted. If vitazen.app needs TWA in the future,
                  serve assetlinks.json there and re-add this metadata. -->
-            <!-- SPLASH_IMAGE_DRAWABLE and SPLASH_SCREEN_BACKGROUND_COLOR removed.
-                 splash.xml is a LayerDrawable containing only a ColorDrawable,
-                 which has getIntrinsicWidth()/Height() == -1.
-                 Utils.convertDrawableToBitmap() calls Bitmap.createBitmap(-1, -1, ...)
-                 which throws IllegalArgumentException and crashes the app.
-                 Without these meta-data, androidbrowserhelper skips the splash
-                 transfer path and launches the TWA directly. The Android 12+
-                 system splash (based on app icon + windowBackground) provides
-                 the startup visual instead. -->
+            <meta-data
+                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+                android:resource="@drawable/splash" />
+            <!-- splash.xml now contains a BitmapDrawable layer (ic_launcher_foreground)
+                 which provides valid intrinsic dimensions to the LayerDrawable.
+                 This fixes the previous crash where Utils.convertDrawableToBitmap()
+                 called Bitmap.createBitmap(-1, -1, ...) on a ColorDrawable-only
+                 layer-list. The splash now shows the official VitaZen logo on all
+                 Android versions (not just 12+ system splash). -->
+            <meta-data
+                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+                android:resource="@color/backgroundColor" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

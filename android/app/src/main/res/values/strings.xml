@@ -3,7 +3,4 @@
     <string name="appName">VitaZen</string>
     <string name="shortName">VitaZen</string>
     <string name="assetStatements">[{"relation":["delegate_permission/common.handle_all_urls","delegate_permission/common.get_login_creds"],"target":{"namespace":"android_app","package_name":"com.vitazen.app.v1","sha256_cert_fingerprints":["79:B0:47:5F:52:C6:A4:29:AD:B0:36:47:AF:F7:76:DA:F4:F2:4B:2B:5F:D1:00:76:51:B4:0D:2F:77:72:62:E4"]}}]</string>
-    <string-array name="additional_trusted_origins">
-        <item>https://vitazen.app</item>
-    </string-array>
 </resources>

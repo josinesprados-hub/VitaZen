@@ -7,19 +7,20 @@ import androidx.browser.customtabs.CustomTabsCallback
 import com.google.androidbrowserhelper.trusted.LauncherActivity
 
 /**
- * Custom LauncherActivity that fixes three crash causes in androidbrowserhelper:2.5.0:
+ * Custom LauncherActivity that fixes crash causes in androidbrowserhelper:2.5.0:
  *
  * 1. QualityEnforcer crash: The library's QualityEnforcer throws a RuntimeException on the
  *    main thread when Chrome sends a "quality_enforcement.crash" callback (which happens when
  *    Digital Asset Links verification fails on Chrome 91+). This replaces it with a safe
  *    callback that logs instead of crashing.
  *
- * 2. Black screen: The library never sets a content view on LauncherActivity when
- *    splashImageDrawableId == 0 (our case). This sets a background-colored view before
- *    launching, preventing the black flash and reducing the chance of OEM-specific kills.
- *
- * 3. Graceful fallback: Wraps the TWA launch in try/catch so that any unexpected
+ * 2. Graceful fallback: Wraps the TWA launch in try/catch so that any unexpected
  *    exceptions during the launch flow don't crash the app.
+ *
+ * NOTE: The previous "black screen" fix (setting a placeholder View) was removed
+ * because the library's SimpleSplashScreenStrategy now handles the splash screen
+ * when SPLASH_IMAGE_DRAWABLE meta-data is present. Calling setContentView() after
+ * super.onCreate() would destroy the library's splash ImageView.
  */
 class SafeLauncherActivity : LauncherActivity() {
 
@@ -28,22 +29,17 @@ class SafeLauncherActivity : LauncherActivity() {
     }
 
     /**
-     * Set a content view BEFORE the library's onCreate runs, and enable fullscreen
-     * immersive mode for a smooth, premium launch transition into the TWA.
+     * Set immersive fullscreen mode for a smooth, premium launch transition.
      *
-     * The library only sets a content view if splashScreenNeeded() returns true,
-     * which requires splashImageDrawableId != 0. Since we removed SPLASH_IMAGE_DRAWABLE,
-     * the library never sets a content view, leaving the activity with a black window.
+     * The library's SimpleSplashScreenStrategy handles the content view (splash
+     * ImageView with the VitaZen logo) when SPLASH_IMAGE_DRAWABLE meta-data is
+     * present. We must NOT call setContentView() here — doing so would destroy
+     * the library's splash ImageView.
      *
-     * Immersive mode hides the status bar and navigation bar during the brief
-     * moment between the launcher activity starting and the TWA/CCT opening in
-     * Chrome. This creates a seamless fullscreen-to-fullscreen transition.
+     * The window background (@color/backgroundColor = black) from the theme
+     * serves as fallback if the splash is not shown for any reason.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        // CRITICAL: super.onCreate() must run first to initialize the Window
-        // and DecorView. Calling enableImmersiveMode() or setContentView()
-        // before super.onCreate() causes NullPointerException because
-        // window.insetsController and the decor view are not yet created.
         try {
             super.onCreate(savedInstanceState)
         } catch (e: Exception) {
@@ -53,13 +49,8 @@ class SafeLauncherActivity : LauncherActivity() {
         }
 
         // Enable fullscreen immersive mode for smooth launch transition.
-        // Now safe because the Window and DecorView are fully initialized.
+        // Safe after super.onCreate() because Window and DecorView are initialized.
         enableImmersiveMode()
-
-        // Set a plain view with the window background color to avoid black screen.
-        // The TWA/CCT will cover this almost immediately.
-        val placeholder = View(this)
-        setContentView(placeholder)
     }
 
     /**
