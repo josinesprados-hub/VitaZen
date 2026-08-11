@@ -312,16 +312,16 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm text-[#666] group-hover:text-[#999] transition-colors">{config.name}</h3>
                         <PrivacyMask compact>
-                          <span className="text-[10px] text-[#333]">Nivel {level}</span>
+                          <span className="text-[10px] text-[#555]">Nivel {level}</span>
                         </PrivacyMask>
                       </div>
                       {/* DASH-34/35: Discreet streak + XP info */}
                       <PrivacyMask compact>
                         <div className="flex items-center gap-2 mt-0.5">
                           {streak > 0 && (
-                            <span className="text-[9px] text-[#2a2a2a]">{streak}d</span>
+                            <span className="text-[9px] text-[#444]">{streak}d</span>
                           )}
-                          <span className="text-[9px] text-[#222]">{xp % 100}/{xpToNextLevel} XP</span>
+                          <span className="text-[9px] text-[#555]">{xp % 100}/{xpToNextLevel} XP</span>
                         </div>
                       </PrivacyMask>
                       {/* DASH-31/37: Progress bar always visible (never disappears, even at level boundaries) */}
