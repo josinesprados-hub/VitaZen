@@ -391,10 +391,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     }
   }, [activeThread, fetchMessages, storageKey]);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages — only if user is near bottom
+  // (within 150px). Preserves scroll position when reading history.
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container) {
+    if (!container) return;
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+    if (isNearBottom) {
       requestAnimationFrame(() => {
         container.scrollTop = container.scrollHeight;
       });
@@ -1103,7 +1106,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   }
 
   return (
-    <div className="mentor-full-viewport sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
+    <div className="mentor-full-viewport safe-top sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
         <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">

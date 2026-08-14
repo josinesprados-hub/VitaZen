@@ -288,15 +288,15 @@ html {
 }
 
 /* Mentor chat — full viewport on mobile, normal flow on desktop.
-   position:absolute avoids the fixed fullscreen layer that causes
-   compositor deadlocks in Android TWA/WebView. The parent page
-   wrapper provides position:relative + min-height:100dvh so the
-   absolute element still fills the viewport identically. */
+   position:fixed fills the viewport regardless of parent height.
+   The previous position:absolute + height:100% failed because
+   the parent had min-height (not height), causing height:100%
+   to resolve to auto and breaking scroll containment.
+   z-index:40 ensures the mentor covers the TopBar (z-30). */
 .mentor-full-viewport {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 30;
-  height: 100%;
+  z-index: 40;
   background: #000;
 }
 @media (min-width: 640px) {
