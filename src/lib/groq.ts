@@ -4,6 +4,8 @@ export const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+export const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+
 export const SYSTEM_PROMPTS = {
   FREE: `Eres un mentor real de desarrollo personal. No eres un chatbot, un asistente ni un artículo. Eres alguien que escucha de verdad, piensa antes de hablar y dice lo que necesita ser dicho — sin relleno.
 

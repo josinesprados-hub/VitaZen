@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { groq, SYSTEM_PROMPTS } from '@/lib/groq';
+import { groq, GROQ_MODEL, SYSTEM_PROMPTS } from '@/lib/groq';
 import { checkAILimit, getDailyLimit, rollbackAILimit } from '@/lib/limits';
 import { buildMentorContext, buildContextualSystemPrompt } from '@/lib/mentor-context';
 import { trackEvent } from '@/lib/analytics-server';
@@ -200,7 +200,7 @@ async function handler(request: NextRequest) {
     // instead of continuing to wait for a response that nobody will receive.
     // The groq-sdk (v1.1.2+) accepts { signal } as RequestOptions.
     const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: GROQ_MODEL,
       messages: groqMessages,
       temperature: isPremium ? 0.8 : 0.5,
       max_tokens: isPremium ? 2048 : 800,
@@ -266,7 +266,7 @@ async function handler(request: NextRequest) {
       try {
         // Also propagate client signal to the title generation call
         const titleCompletion = await groq.chat.completions.create({
-          model: 'llama-3.3-70b-versatile',
+          model: GROQ_MODEL,
           messages: [
             {
               role: 'system',
