@@ -2,7 +2,25 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { madridDaysAgo } from '@/lib/dates';
+import { startOfMadridDaysAgo } from '@/lib/dates';
+
+// ═══════════════════════════════════════════
+// Serialización manual — evita problemas con Date/BigInt de Prisma
+// ═══════════════════════════════════════════
+
+function serializeFinanceLog(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    id: String(row.id ?? ''),
+    date: row.date instanceof Date ? row.date.toISOString() : String(row.date ?? ''),
+    type: String(row.type ?? ''),
+    category: String(row.category ?? ''),
+    amount: typeof row.amount === 'number' ? row.amount : 0,
+    description: row.description != null ? String(row.description) : null,
+    mood: row.mood != null ? String(row.mood) : null,
+    contexto: row.contexto != null ? String(row.contexto) : null,
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : (row.createdAt != null ? String(row.createdAt) : new Date().toISOString()),
+  };
+}
 
 // ═══════════════════════════════════════════
 // GET — Fetch finance logs
@@ -25,21 +43,12 @@ export async function GET(request: NextRequest) {
     days = Math.max(0, days);
 
     const logs = await db.financeLog.findMany({
-      where: { userId: user.id, date: { gte: madridDaysAgo(days) } },
+      where: { userId: user.id, date: { gte: startOfMadridDaysAgo(days) } },
       orderBy: { date: 'desc' },
-      select: {
-        id: true,
-        date: true,
-        type: true,
-        category: true,
-        amount: true,
-        description: true,
-        mood: true,
-        contexto: true,
-      },
     });
 
-    return NextResponse.json({ logs });
+    const serialized = logs.map(l => serializeFinanceLog(l as unknown as Record<string, unknown>));
+    return NextResponse.json({ logs: serialized });
   } catch (error) {
     console.error('Finance GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -86,25 +95,14 @@ export async function POST(request: NextRequest) {
         date: dateObj,
         type,
         category: category.trim().slice(0, 100),
-        amount: Math.round(amount * 100) / 100, // Prevent floating point issues
+        amount: Math.round(amount * 100) / 100,
         description: description?.trim()?.slice(0, 500) || null,
         mood: mood?.trim()?.slice(0, 50) || null,
         contexto: contexto?.trim()?.slice(0, 1000) || null,
       },
-      select: {
-        id: true,
-        date: true,
-        type: true,
-        category: true,
-        amount: true,
-        description: true,
-        mood: true,
-        contexto: true,
-        createdAt: true,
-      },
     });
 
-    return NextResponse.json({ log });
+    return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>) });
   } catch (error) {
     console.error('Finance POST error:', error);
     return NextResponse.json({ error: 'Error al crear el registro.' }, { status: 500 });
@@ -132,7 +130,6 @@ export async function PUT(request: NextRequest) {
     // Verify ownership
     const existing = await db.financeLog.findUnique({
       where: { id: logId },
-      select: { userId: true },
     });
 
     if (!existing || existing.userId !== user.id) {
@@ -179,20 +176,9 @@ export async function PUT(request: NextRequest) {
     const log = await db.financeLog.update({
       where: { id: logId },
       data: updateData,
-      select: {
-        id: true,
-        date: true,
-        type: true,
-        category: true,
-        amount: true,
-        description: true,
-        mood: true,
-        contexto: true,
-        createdAt: true,
-      },
     });
 
-    return NextResponse.json({ log });
+    return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>) });
   } catch (error) {
     console.error('Finance PUT error:', error);
     return NextResponse.json({ error: 'Error al actualizar el registro.' }, { status: 500 });
@@ -220,7 +206,6 @@ export async function DELETE(request: NextRequest) {
     // Verify ownership before deleting
     const existing = await db.financeLog.findUnique({
       where: { id: logId },
-      select: { userId: true },
     });
 
     if (!existing || existing.userId !== user.id) {

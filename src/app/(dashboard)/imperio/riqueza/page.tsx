@@ -743,7 +743,7 @@ export default function RiquezaPage() {
     setFetchError(false);
     try {
       const res = await apiFetch('/api/finance?days=365');
-      if (res.ok) { const d = await res.json(); setLogs(d.logs); }
+      if (res.ok) { const d = await res.json(); setLogs(d.logs || []); }
     } catch (e) {
       console.error(e);
       setFetchError(true);
