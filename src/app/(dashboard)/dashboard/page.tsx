@@ -14,7 +14,7 @@ import LifePatternsSection from '@/components/patterns/LifePatternsSection';
 import PremiumReflection from '@/components/ui/PremiumReflection';
 import { MonthlyClosurePrompt } from './MonthlyClosurePrompt';
 
-import { Shield, Brain, Zap, Gem, TrendingUp, Sparkles, Sunrise } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { getEmotionEmoji } from '@/lib/emotion-emojis';
 
@@ -46,7 +46,6 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string }> 
   energia: { name: 'Energía', icon: Zap, color: '#c8a55a' },
   riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a' },
   crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a' },
-  mentor: { name: 'Mentor', icon: Sparkles, color: '#c8a55a' },
 };
 
 export default function DashboardPage() {
@@ -120,19 +119,22 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user || !onboardingConfirmed) return;
 
-    if (screenshotMode) {
-      const { SCREENSHOT_EMPIRES, SCREENSHOT_TODAY_CHECKIN } = require('@/lib/screenshot-data');
-      setEmpires(SCREENSHOT_EMPIRES);
-      setTodayCheckin(SCREENSHOT_TODAY_CHECKIN);
-      setLoading(false);
-      return;
-    }
-
     let cancelled = false;
     const controller = new AbortController();
 
     const fetchData = async () => {
       try {
+        // Screenshot mode: load frozen editorial data via dynamic import
+        // (avoids including screenshot-data in the production bundle).
+        if (screenshotMode) {
+          const { SCREENSHOT_EMPIRES, SCREENSHOT_TODAY_CHECKIN } = await import('@/lib/screenshot-data');
+          if (cancelled) return;
+          setEmpires(SCREENSHOT_EMPIRES);
+          setTodayCheckin(SCREENSHOT_TODAY_CHECKIN);
+          setLoading(false);
+          return;
+        }
+
         // Only fetch what the vital dashboard needs:
         // Empires (for the grid) and today's check-in state.
         // Emotional state, momentum, streaks, challenges, and metrics
@@ -286,7 +288,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ─── Right Column: Quiet Presence ─── */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-8 lg:space-y-10 mt-6 lg:mt-0 lg:pt-2 sm:lg:pt-4">
+        <div className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-8 lg:space-y-10 mt-6 lg:mt-0 lg:pt-4">
 
           {/* 6. Empire Grid — quiet companions, not widgets */}
           <div className="dash-section-enter dash-section-delay-5">
