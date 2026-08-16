@@ -77,7 +77,7 @@ const CopyMessageButton = React.memo(function CopyMessageButton({ content }: Cop
       className="
         flex items-center justify-center
         w-6 h-6 rounded-md
-        text-[#333] hover:text-champagne/50
+        text-[#999] hover:text-champagne/50
         transition-colors duration-200
         focus:outline-none focus-visible:ring-1 focus-visible:ring-champagne/30
         opacity-60 hover:opacity-100

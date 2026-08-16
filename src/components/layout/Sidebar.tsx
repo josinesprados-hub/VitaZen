@@ -191,7 +191,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </Link>
 
             <div className="pt-5 pb-2">
-              <p className="px-4 text-xs text-[#555] uppercase tracking-widest font-semibold">Imperios</p>
+              <p className="px-4 text-xs text-[#888] uppercase tracking-widest font-semibold">Imperios</p>
             </div>
 
             {EMPIRES.map((empire) => {
@@ -264,7 +264,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 await signOut();
                 router.replace('/login');
               }}
-              className="flex items-center gap-2 w-full px-4 py-3 text-sm text-[#666] hover:text-[#999] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press mt-1"
+              className="flex items-center gap-2 w-full px-4 py-3 text-sm text-[#888] hover:text-[#999] hover:bg-[#1a1a1a] rounded-lg transition-colors touch-press mt-1"
             >
               <LogOut size={16} />
               Cerrar sesión

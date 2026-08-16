@@ -113,7 +113,7 @@ export default function ElitePage() {
           Un espacio más conectado<br className="hidden sm:block" /> con el tiempo
         </h1>
 
-        <p className="text-[#777] text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
+        <p className="text-[#999] text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
           Más conexiones. Más tiempo. Más claridad.
         </p>
       </div>
@@ -122,7 +122,7 @@ export default function ElitePage() {
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
           <Circle size={3} className="text-champagne/25" fill="currentColor" />
-          <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
+          <p className="text-[#888] text-[10px] uppercase tracking-[0.2em] font-medium">
             Qué cambia con Élite
           </p>
         </div>
@@ -211,7 +211,7 @@ export default function ElitePage() {
       <div className="mb-14 sm:mb-20">
         <div className="flex items-center justify-center gap-2 mb-8">
           <Eye size={12} className="text-champagne/25" />
-          <p className="text-[#555] text-[10px] uppercase tracking-[0.2em] font-medium">
+          <p className="text-[#888] text-[10px] uppercase tracking-[0.2em] font-medium">
             Dos planes
           </p>
         </div>
@@ -221,22 +221,22 @@ export default function ElitePage() {
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-7">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 rounded-xl bg-[#1a1a1a] flex items-center justify-center">
-                <Eye size={16} className="text-[#555]" />
+                <Eye size={16} className="text-[#888]" />
               </div>
               <div>
                 <h3 className="text-white font-semibold text-lg">Free</h3>
-                <p className="text-[#666] text-xl font-bold tracking-tight">0€<span className="text-sm font-normal text-[#444]">/mes</span></p>
+                <p className="text-[#888] text-xl font-bold tracking-tight">0€<span className="text-sm font-normal text-[#999]">/mes</span></p>
               </div>
             </div>
 
-            <p className="text-[#777] text-sm leading-relaxed mb-5">
+            <p className="text-[#999] text-sm leading-relaxed mb-5">
               Lo primero para empezar a entenderte.
               Hábitos, estados, notas, el mentor, los 5 imperios.
               Un buen punto de partida.
             </p>
 
             <div className="border-t border-[#1a1a1a] pt-4">
-              <p className="text-[#333] text-[10px] uppercase tracking-wider font-medium mb-3">Para empezar</p>
+              <p className="text-[#999] text-[10px] uppercase tracking-wider font-medium mb-3">Para empezar</p>
               <ul className="space-y-2">
                 {[
                   'Registro manual de hábitos y estados',
@@ -246,8 +246,8 @@ export default function ElitePage() {
                   'Check-in y seguimiento emocional',
                   'Memoria de tu vida',
                 ].map((item) => (
-                  <li key={item} className="text-[#666] text-xs flex items-start gap-2">
-                    <span className="text-[#333] mt-0.5">·</span>
+                  <li key={item} className="text-[#888] text-xs flex items-start gap-2">
+                    <span className="text-[#999] mt-0.5">·</span>
                     {item}
                   </li>
                 ))}
@@ -337,7 +337,7 @@ export default function ElitePage() {
                 </>
               )}
             </button>
-            <p className="text-[#333] text-[10px] mt-3">5€/mes · Cancela cuando quieras</p>
+            <p className="text-[#999] text-[10px] mt-3">5€/mes · Cancela cuando quieras</p>
           </div>
         </div>
       )}

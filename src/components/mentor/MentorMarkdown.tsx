@@ -52,7 +52,7 @@ const LazyCodeBlock = React.lazy(async () => {
       return (
         <div className="my-3 rounded-lg overflow-hidden border border-[#222]">
           <div className="flex items-center px-3 py-1.5 bg-[#111] border-b border-[#222]">
-            <span className="text-[10px] text-[#666] uppercase tracking-wider font-medium">{lang}</span>
+            <span className="text-[10px] text-[#888] uppercase tracking-wider font-medium">{lang}</span>
           </div>
           <SyntaxHighlighter
             language={lang}
@@ -172,7 +172,7 @@ const mentorComponents = {
       return (
         <React.Suspense
           fallback={
-            <pre className="my-3 p-3 rounded-lg bg-[#0d0d0d] border border-[#222] text-sm text-white/70 overflow-x-auto font-mono">
+            <pre className="my-3 p-3 rounded-lg bg-[#0d0d0d] border border-[#222] text-sm text-white/80 overflow-x-auto font-mono">
               {code}
             </pre>
           }

@@ -165,7 +165,7 @@ export default function PremiumErrorState({
       </p>
 
       {/* Subtitle */}
-      <p className={cn('text-[#555] max-w-xs mx-auto leading-relaxed', sizeConfig.subtitleClass)}>
+      <p className={cn('text-[#888] max-w-xs mx-auto leading-relaxed', sizeConfig.subtitleClass)}>
         {subtitle || config.subtitle}
       </p>
 
@@ -191,14 +191,14 @@ export default function PremiumErrorState({
             secondaryAction.href ? (
               <a
                 href={secondaryAction.href}
-                className="text-[#555] text-xs hover:text-[#999] transition-colors"
+                className="text-[#888] text-xs hover:text-[#999] transition-colors"
               >
                 {secondaryAction.label}
               </a>
             ) : (
               <button
                 onClick={secondaryAction.onClick}
-                className="text-[#555] text-xs hover:text-[#999] transition-colors"
+                className="text-[#888] text-xs hover:text-[#999] transition-colors"
               >
                 {secondaryAction.label}
               </button>

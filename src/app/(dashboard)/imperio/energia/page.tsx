@@ -44,7 +44,7 @@ function RatingInput({ value, onChange, label }: { value: number; onChange: (v: 
       <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} onClick={() => onChange(n)}
-            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:border-champagne'}`}>
+            className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#888] hover:border-champagne'}`}>
             {n}
           </button>
         ))}
@@ -368,14 +368,14 @@ export default function EnergiaPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(log.date)}</span>
-                        <span className="text-[#333] text-xs">·</span>
+                        <span className="text-[#999] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(log.createdAt)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                   </div>
                 </div>
                 {log.notes && (
@@ -444,14 +444,14 @@ export default function EnergiaPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(log.date)}</span>
-                        <span className="text-[#333] text-xs">·</span>
+                        <span className="text-[#999] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(log.createdAt)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                   </div>
                 </div>
                 {(log.meals || log.notes) && (
@@ -460,7 +460,7 @@ export default function EnergiaPage() {
                       <p className="text-xs text-[#888] leading-relaxed">{log.meals}</p>
                     )}
                     {log.notes && (
-                      <p className="text-xs text-[#666] italic leading-relaxed">{log.notes}</p>
+                      <p className="text-xs text-[#888] italic leading-relaxed">{log.notes}</p>
                     )}
                   </div>
                 )}

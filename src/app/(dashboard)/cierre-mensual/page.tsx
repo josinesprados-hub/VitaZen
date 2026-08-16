@@ -164,7 +164,7 @@ export default function CierreMensualPage() {
         {/* Back link */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 text-[#555] hover:text-champagne transition-colors text-xs mb-12"
+          className="flex items-center gap-2 text-[#888] hover:text-champagne transition-colors text-xs mb-12"
         >
           <ArrowLeft size={14} />
           Volver
@@ -181,13 +181,13 @@ export default function CierreMensualPage() {
           <textarea
             value={reflectionText}
             onChange={(e) => setReflectionText(e.target.value)}
-            className="w-full bg-transparent border-b border-[#1a1a1a] focus:border-champagne/30 text-white text-base leading-relaxed py-4 px-1 resize-none outline-none transition-colors min-h-[120px] placeholder:text-[#333]"
+            className="w-full bg-transparent border-b border-[#1a1a1a] focus:border-champagne/30 text-white text-base leading-relaxed py-4 px-1 resize-none outline-none transition-colors min-h-[120px] placeholder:text-[#999]"
             placeholder=""
             rows={4}
           />
 
           {/* Privacy note — subtle, calm */}
-          <p className="text-[#333] text-[10px] mt-3 text-center tracking-wide">
+          <p className="text-[#999] text-[10px] mt-3 text-center tracking-wide">
             {REFLECTION_PRIVACY_NOTE}
           </p>
 
@@ -204,7 +204,7 @@ export default function CierreMensualPage() {
             <button
               onClick={() => handleSaveReflection(true)}
               disabled={saving}
-              className="text-[#444] hover:text-[#666] transition-colors text-xs"
+              className="text-[#999] hover:text-[#888] transition-colors text-xs"
             >
               {SKIP_REFLECTION}
             </button>
@@ -227,7 +227,7 @@ export default function CierreMensualPage() {
       {/* Back link */}
       <Link
         href="/dashboard"
-        className="flex items-center gap-2 text-[#555] hover:text-champagne transition-colors text-xs mb-8"
+        className="flex items-center gap-2 text-[#888] hover:text-champagne transition-colors text-xs mb-8"
       >
         <ArrowLeft size={14} />
         Volver
@@ -242,7 +242,7 @@ export default function CierreMensualPage() {
       {closure?.reflection && (
         <div className="mt-8 mb-10">
           <div className="border-l border-[#151515] pl-4">
-            <span className="text-[9px] text-[#333] uppercase tracking-wider">Tu reflexión</span>
+            <span className="text-[9px] text-[#999] uppercase tracking-wider">Tu reflexión</span>
             <p className="text-[#888] text-sm italic leading-relaxed mt-2">
               {closure.reflection}
             </p>
@@ -253,15 +253,15 @@ export default function CierreMensualPage() {
       {/* No data state */}
       {!digest.hasData && digest.noDataMessage && (
         <div className="text-center py-20">
-          <p className="text-[#555] text-sm">{digest.noDataMessage.title}</p>
-          <p className="text-[#333] text-xs mt-2">{digest.noDataMessage.subtitle}</p>
+          <p className="text-[#888] text-sm">{digest.noDataMessage.title}</p>
+          <p className="text-[#999] text-xs mt-2">{digest.noDataMessage.subtitle}</p>
         </div>
       )}
 
       {/* Intention Balance */}
       {digest.intentionBalance && digest.intentionBalance.total > 0 && (
         <div className="mt-8">
-          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{INTENTION_BALANCE_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-4 tracking-wide">{INTENTION_BALANCE_TITLE}</h2>
           <IntentionBar balance={digest.intentionBalance} />
         </div>
       )}
@@ -269,7 +269,7 @@ export default function CierreMensualPage() {
       {/* Evolution */}
       {isPremium && digest.evolution && (
         <div className="mt-6">
-          <h2 className="text-[11px] text-[#444] mb-2 tracking-wide">{ELITE_EVOLUTION}</h2>
+          <h2 className="text-[11px] text-[#999] mb-2 tracking-wide">{ELITE_EVOLUTION}</h2>
           <p className="text-[#888] text-sm italic">{digest.evolution.label}</p>
         </div>
       )}
@@ -286,11 +286,11 @@ export default function CierreMensualPage() {
       {/* Memories */}
       {isPremium && digest.memories.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{MEMORIES_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-4 tracking-wide">{MEMORIES_TITLE}</h2>
           <div className="space-y-3">
             {digest.memories.map((memory, i) => (
               <div key={i} className="border-l border-[#151515] pl-3">
-                <p className="text-[#777] text-xs italic leading-relaxed">{memory.text}</p>
+                <p className="text-[#999] text-xs italic leading-relaxed">{memory.text}</p>
                 <p className="text-[9px] text-[#2a2a2a] mt-1">
                   {EMPIRE_LABELS[memory.empire] || memory.empire} · {safeFormatDateShort(memory.date)}
                 </p>
@@ -312,7 +312,7 @@ export default function CierreMensualPage() {
       {/* Financial Balance */}
       {digest.financial && (
         <div className="mt-8">
-          <h2 className="text-[11px] text-[#444] mb-4 tracking-wide">{FINANCIAL_BALANCE_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-4 tracking-wide">{FINANCIAL_BALANCE_TITLE}</h2>
           <FinancialDisplay financial={digest.financial} />
         </div>
       )}
@@ -320,21 +320,21 @@ export default function CierreMensualPage() {
       {/* Rhythm */}
       {digest.rhythm && (
         <div className="mt-6">
-          <h2 className="text-[11px] text-[#444] mb-2 tracking-wide">{RHYTHM_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-2 tracking-wide">{RHYTHM_TITLE}</h2>
           <p className="text-[#888] text-sm italic">{digest.rhythm.rhythmLabel}</p>
           <PrivacyMask compact>
             <div className="flex flex-wrap gap-3 mt-2">
               {digest.rhythm.checkinDays > 0 && (
-                <span className="text-[9px] text-[#444]">{digest.rhythm.checkinDays} check-ins</span>
+                <span className="text-[9px] text-[#999]">{digest.rhythm.checkinDays} check-ins</span>
               )}
               {digest.rhythm.financeLogs > 0 && (
-                <span className="text-[9px] text-[#444]">{digest.rhythm.financeLogs} registros financieros</span>
+                <span className="text-[9px] text-[#999]">{digest.rhythm.financeLogs} registros financieros</span>
               )}
               {digest.rhythm.journalEntries > 0 && (
-                <span className="text-[9px] text-[#444]">{digest.rhythm.journalEntries} entradas</span>
+                <span className="text-[9px] text-[#999]">{digest.rhythm.journalEntries} entradas</span>
               )}
               {digest.rhythm.meditationSessions > 0 && (
-                <span className="text-[9px] text-[#444]">{digest.rhythm.meditationSessions} meditaciones</span>
+                <span className="text-[9px] text-[#999]">{digest.rhythm.meditationSessions} meditaciones</span>
               )}
             </div>
           </PrivacyMask>
@@ -344,7 +344,7 @@ export default function CierreMensualPage() {
       {/* FREE hint */}
       {!isPremium && (
         <div className="mt-8 text-center">
-          <p className="text-[9px] text-[#333] flex items-center justify-center gap-1">
+          <p className="text-[9px] text-[#999] flex items-center justify-center gap-1">
             <Circle size={3} fill="currentColor" className="text-champagne/40" />
             {ELITE_DEEPER}
           </p>
@@ -366,7 +366,7 @@ export default function CierreMensualPage() {
 
 function IntentionBar({ balance }: { balance: IntentionBalance }) {
   const total = balance.total;
-  if (total === 0) return <p className="text-[#555] text-xs">{INTENTION_BALANCE_EMPTY}</p>;
+  if (total === 0) return <p className="text-[#888] text-xs">{INTENTION_BALANCE_EMPTY}</p>;
 
   const segments = [
     { key: 'tranquility', value: balance.tranquility },
@@ -401,7 +401,7 @@ function IntentionBar({ balance }: { balance: IntentionBalance }) {
                 className="w-1.5 h-1.5 rounded-full"
                 style={{ backgroundColor: INTENTION_LABELS[seg.key]?.color || '#555', opacity: 0.7 }}
               />
-              <span className="text-[10px] text-[#666]">
+              <span className="text-[10px] text-[#888]">
                 {INTENTION_LABELS[seg.key]?.label || seg.key} · {seg.value}
               </span>
             </div>
@@ -428,8 +428,8 @@ function FinancialDisplay({ financial }: { financial: FinancialSummary }) {
       <PrivacyMask compact>
         {/* Balance */}
         <div className="flex items-baseline justify-between mb-4">
-          <span className="text-[#666] text-xs">Balance</span>
-          <span className={`text-lg font-light ${financial.balance >= 0 ? 'text-white' : 'text-white/70'}`}>
+          <span className="text-[#888] text-xs">Balance</span>
+          <span className={`text-lg font-light ${financial.balance >= 0 ? 'text-white' : 'text-white/80'}`}>
             {fmt(financial.balance)}
           </span>
         </div>
@@ -437,11 +437,11 @@ function FinancialDisplay({ financial }: { financial: FinancialSummary }) {
         {/* Income / Expenses */}
         <div className="flex gap-6 mb-4">
           <div>
-            <p className="text-[10px] text-[#555] mb-0.5">Ingresos</p>
+            <p className="text-[10px] text-[#888] mb-0.5">Ingresos</p>
             <p className="text-sm text-white/80">{fmt(financial.income)}</p>
           </div>
           <div>
-            <p className="text-[10px] text-[#555] mb-0.5">Gastos</p>
+            <p className="text-[10px] text-[#888] mb-0.5">Gastos</p>
             <p className="text-sm text-white/80">{fmt(financial.expenses)}</p>
           </div>
         </div>
@@ -449,12 +449,12 @@ function FinancialDisplay({ financial }: { financial: FinancialSummary }) {
         {/* Top categories — calm, not ranked */}
         {financial.topCategories.length > 0 && (
           <div className="border-t border-[#1a1a1a] pt-3 mt-3">
-            <p className="text-[10px] text-[#444] mb-2">Categorías con más movimiento</p>
+            <p className="text-[10px] text-[#999] mb-2">Categorías con más movimiento</p>
             <div className="space-y-1.5">
               {financial.topCategories.slice(0, 3).map((cat, i) => (
                 <div key={i} className="flex items-center justify-between">
-                  <span className="text-xs text-[#777]">{cat.category}</span>
-                  <span className="text-xs text-[#555]">{fmt(cat.amount)}</span>
+                  <span className="text-xs text-[#999]">{cat.category}</span>
+                  <span className="text-xs text-[#888]">{fmt(cat.amount)}</span>
                 </div>
               ))}
             </div>

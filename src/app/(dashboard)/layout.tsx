@@ -155,7 +155,7 @@ export default function DashboardLayout({
             <p className="text-sm text-[#888] font-medium mb-1.5">
               {isOffline ? 'Sin conexión' : 'Cargando tu espacio'}
             </p>
-            <p className="text-xs text-[#555] leading-relaxed mb-5">
+            <p className="text-xs text-[#888] leading-relaxed mb-5">
               {isOffline
                 ? 'Revisa tu conexión a internet e intenta de nuevo.'
                 : 'La conexión está tardando más de lo habitual. Tus datos están seguros.'}

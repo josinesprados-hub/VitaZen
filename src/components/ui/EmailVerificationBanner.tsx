@@ -110,7 +110,7 @@ export function EmailVerificationBanner() {
         <p className="text-sm text-[#ccc] font-medium">
           Verifica tu email
         </p>
-        <p className="text-xs text-[#666] mt-0.5">
+        <p className="text-xs text-[#888] mt-0.5">
           {sent
             ? 'Enviado. Revisa tu bandeja de entrada y spam.'
             : 'Confirma tu acceso para proteger tu cuenta.'
@@ -145,7 +145,7 @@ export function EmailVerificationBanner() {
 
       <button
         onClick={() => setDismissed(true)}
-        className="text-[#444] hover:text-[#888] transition-colors ml-1 flex-shrink-0"
+        className="text-[#999] hover:text-[#888] transition-colors ml-1 flex-shrink-0"
         aria-label="Dismiss"
       >
         <X size={14} />

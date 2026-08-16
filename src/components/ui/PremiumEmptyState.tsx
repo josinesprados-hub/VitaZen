@@ -54,7 +54,7 @@ export default function PremiumEmptyState({
       container: 'py-8',
       iconWrapper: 'w-12 h-12 rounded-xl',
       iconSize: 20,
-      iconClass: variant === 'gold' ? 'text-champagne/40' : 'text-[#444]',
+      iconClass: variant === 'gold' ? 'text-champagne/40' : 'text-[#999]',
       titleClass: 'text-sm',
       subtitleClass: 'text-xs',
     },
@@ -62,7 +62,7 @@ export default function PremiumEmptyState({
       container: 'py-14',
       iconWrapper: 'w-14 h-14 rounded-2xl',
       iconSize: 24,
-      iconClass: variant === 'gold' ? 'text-champagne/50' : 'text-[#555]',
+      iconClass: variant === 'gold' ? 'text-champagne/50' : 'text-[#888]',
       titleClass: 'text-sm',
       subtitleClass: 'text-xs',
     },
@@ -70,7 +70,7 @@ export default function PremiumEmptyState({
       container: 'py-20',
       iconWrapper: 'w-16 h-16 rounded-2xl',
       iconSize: 28,
-      iconClass: variant === 'gold' ? 'text-champagne/50' : 'text-[#555]',
+      iconClass: variant === 'gold' ? 'text-champagne/50' : 'text-[#888]',
       titleClass: 'text-sm',
       subtitleClass: 'text-xs',
     },
@@ -94,13 +94,13 @@ export default function PremiumEmptyState({
       </div>
 
       {/* Title */}
-      <p className={cn('text-[#666] font-medium mb-1', config.titleClass)}>
+      <p className={cn('text-[#888] font-medium mb-1', config.titleClass)}>
         {title}
       </p>
 
       {/* Subtitle */}
       {subtitle && (
-        <p className={cn('text-[#444] mt-1', config.subtitleClass)}>
+        <p className={cn('text-[#999] mt-1', config.subtitleClass)}>
           {subtitle}
         </p>
       )}

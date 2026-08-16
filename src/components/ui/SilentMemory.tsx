@@ -91,7 +91,7 @@ export function SilentMemory() {
 
   return (
     <p
-      className={`text-[13px] sm:text-sm text-[#555] italic tracking-wide transition-opacity duration-1000 select-none ${
+      className={`text-[13px] sm:text-sm text-[#888] italic tracking-wide transition-opacity duration-1000 select-none ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >

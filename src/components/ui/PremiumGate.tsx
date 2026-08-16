@@ -66,7 +66,7 @@ export default function PremiumGate({
             fill="currentColor"
           />
           {displayLabel && (
-            <p className={`text-[#444] text-center leading-snug ${
+            <p className={`text-[#999] text-center leading-snug ${
               compact ? 'text-[9px]' : 'text-[10px]'
             }`}>
               {displayLabel}
@@ -117,7 +117,7 @@ export function PremiumInlineBadge({
   }
 
   return (
-    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#555] px-2 py-0.5">
+    <span className="inline-flex items-center gap-1 text-[9px] font-medium text-[#888] px-2 py-0.5">
       {freeLabel}
     </span>
   );
@@ -143,7 +143,7 @@ export function PremiumHistoryGate({
 
   return (
     <div className="flex items-center justify-center gap-2 py-4 mt-2 border-t border-[#1a1a1a]/40">
-      <div className="flex items-center gap-1.5 text-[10px] text-[#444]">
+      <div className="flex items-center gap-1.5 text-[10px] text-[#999]">
         <Circle size={3} className="text-champagne/25" fill="currentColor" />
         <span>
           Hay más aquí —{' '}

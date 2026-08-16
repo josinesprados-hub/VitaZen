@@ -72,7 +72,7 @@ export function MomentumCard() {
             <Activity size={14} className="text-champagne/30 sm:w-[18px] sm:h-[18px]" />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu ritmo</h2>
+            <h2 className="text-sm sm:text-base font-medium text-[#888]">Tu ritmo</h2>
             <p className="fallback-warm">Aparecerá con tu actividad</p>
           </div>
         </div>
@@ -107,8 +107,8 @@ export function MomentumCard() {
             {getLevelLabel(data.level)}
           </span>
           {data.trend === 'up' && <TrendingUp size={12} className="text-champagne" />}
-          {data.trend === 'down' && <TrendingDown size={12} className="text-[#666]" />}
-          {data.trend === 'stable' && <Minus size={12} className="text-[#555]" />}
+          {data.trend === 'down' && <TrendingDown size={12} className="text-[#888]" />}
+          {data.trend === 'stable' && <Minus size={12} className="text-[#888]" />}
         </div>
       </div>
 

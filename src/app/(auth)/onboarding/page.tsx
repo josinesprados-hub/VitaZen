@@ -255,7 +255,7 @@ function WelcomeStep({ userName, onNext }: { userName?: string | null; onNext: (
         Hola{userName ? `, ${userName}` : ''}
       </h1>
       <p className="text-[#999] text-base mb-2">Esto no va a ser largo.</p>
-      <p className="text-[#666] text-sm mb-10 max-w-sm mx-auto leading-relaxed">
+      <p className="text-[#888] text-sm mb-10 max-w-sm mx-auto leading-relaxed">
         Unos minutos. Nada más.
       </p>
 
@@ -329,7 +329,7 @@ function GoalsStep({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="text-[#666] text-sm hover:text-white transition-colors"
+          className="text-[#888] text-sm hover:text-white transition-colors"
         >
           Atrás
         </button>
@@ -405,7 +405,7 @@ function FocusStep({
                     </h3>
                     <span className="text-sm">{option.emoji}</span>
                   </div>
-                  <p className="text-xs text-[#666] mt-0.5">{option.description}</p>
+                  <p className="text-xs text-[#888] mt-0.5">{option.description}</p>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
@@ -429,7 +429,7 @@ function FocusStep({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="text-[#666] text-sm hover:text-white transition-colors"
+          className="text-[#888] text-sm hover:text-white transition-colors"
           disabled={saving}
         >
           Atrás

@@ -49,6 +49,6 @@ export function ReturnTrigger() {
   if (!message) return null;
 
   return (
-    <p className="text-sm text-[#555] mt-1 card-enter">{message}</p>
+    <p className="text-sm text-[#888] mt-1 card-enter">{message}</p>
   );
 }

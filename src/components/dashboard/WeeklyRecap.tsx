@@ -123,7 +123,7 @@ function TrendBadge({ value, invert = false }: { value: number; invert?: boolean
     );
   }
   return (
-    <span className="flex items-center gap-1 text-[11px] text-[#555]">
+    <span className="flex items-center gap-1 text-[11px] text-[#888]">
       <Minus size={11} /> —
     </span>
   );
@@ -260,7 +260,7 @@ export function WeeklyRecap() {
               <CalendarRange size={16} className="text-champagne/30 sm:w-[20px] sm:h-[20px]" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-medium text-[#666]">Tu semana</h2>
+              <h2 className="text-sm sm:text-base font-medium text-[#888]">Tu semana</h2>
               <p className="fallback-warm">Con más actividad aparecerá</p>
             </div>
           </div>
@@ -316,12 +316,12 @@ export function WeeklyRecap() {
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] sm:text-[11px] text-[#666]">{data.weekLabel}</p>
+                <p className="text-[10px] sm:text-[11px] text-[#888]">{data.weekLabel}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               {!isPremium && (
-                <span className="text-[10px] text-[#555] items-center gap-1 hidden sm:flex">
+                <span className="text-[10px] text-[#888] items-center gap-1 hidden sm:flex">
                   <Circle size={3} fill="currentColor" className="text-champagne/30" />
                   Hay más aquí con el tiempo
                 </span>
@@ -356,7 +356,7 @@ export function WeeklyRecap() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-white font-medium">{data.scoreLabel}</p>
-              <p className="text-[10px] text-[#666]">{data.progress.totalActivities} acciones</p>
+              <p className="text-[10px] text-[#888]">{data.progress.totalActivities} acciones</p>
             </div>
             </PrivacyMask>
             <Link
@@ -396,7 +396,7 @@ export function WeeklyRecap() {
                 </svg>
                 <div className="text-center relative z-10">
                   <p className="text-xl sm:text-2xl font-bold text-white">{data.score}</p>
-                  <p className="text-[8px] sm:text-[9px] text-[#666] uppercase tracking-wider">/100</p>
+                  <p className="text-[8px] sm:text-[9px] text-[#888] uppercase tracking-wider">/100</p>
                 </div>
               </div>
               <div className="flex-1 min-w-0">
@@ -405,13 +405,13 @@ export function WeeklyRecap() {
                   {data.scoreLabel}
                 </p>
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Activity size={11} className="text-[#666] sm:w-[13px] sm:h-[13px]" />
-                  <span className="text-[10px] sm:text-[11px] text-[#666]">
+                  <Activity size={11} className="text-[#888] sm:w-[13px] sm:h-[13px]" />
+                  <span className="text-[10px] sm:text-[11px] text-[#888]">
                     {data.progress.totalActivities} acciones
                   </span>
                 </div>
               </div>
-              <ArrowRight size={14} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0" />
+              <ArrowRight size={14} className="text-[#999] group-hover:text-champagne/50 transition-colors shrink-0" />
             </PrivacyMask>
             </Link>
 
@@ -448,7 +448,7 @@ export function WeeklyRecap() {
                             }}
                           />
                         </div>
-                        <span className="text-[9px] sm:text-[10px] text-[#666] w-6 sm:w-8 text-right">{metric.value}</span>
+                        <span className="text-[9px] sm:text-[10px] text-[#888] w-6 sm:w-8 text-right">{metric.value}</span>
                       </div>
                     );
                   })}
@@ -478,10 +478,10 @@ export function WeeklyRecap() {
                     >
                       <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                         <Icon size={10} className="text-champagne sm:w-[12px] sm:h-[12px]" />
-                  <p className="text-[9px] sm:text-[10px] text-[#666] uppercase tracking-wider label-discrete">{item.label}</p>
+                  <p className="text-[9px] sm:text-[10px] text-[#888] uppercase tracking-wider label-discrete">{item.label}</p>
                       </div>
                       <p className="text-lg sm:text-xl font-bold text-white">{item.value}</p>
-                      <p className="text-[8px] sm:text-[9px] text-[#555]">{item.unit}</p>
+                      <p className="text-[8px] sm:text-[9px] text-[#888]">{item.unit}</p>
                     </Link>
                   );
                 })}
@@ -509,7 +509,7 @@ export function WeeklyRecap() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] sm:text-[13px] text-white font-medium truncate">{habit.name}</p>
-                        <p className="text-[9px] sm:text-[10px] text-[#666]">
+                        <p className="text-[9px] sm:text-[10px] text-[#888]">
                           <Flame size={8} className="inline mr-0.5 text-champagne sm:w-[9px] sm:h-[9px]" />
                           {habit.streak}d racha
                         </p>
@@ -526,9 +526,9 @@ export function WeeklyRecap() {
                 </PrivacyMask>
               ) : (
                 <div className="text-center py-4 sm:py-6">
-                  <CheckCircle size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
-                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin hábitos activos</p>
-                  <p className="text-[9px] sm:text-[10px] text-[#444]"></p>
+                  <CheckCircle size={18} className="text-[#999] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
+                  <p className="text-[10px] sm:text-[12px] text-[#888]">Sin hábitos activos</p>
+                  <p className="text-[9px] sm:text-[10px] text-[#999]"></p>
                 </div>
               )}
             </div>
@@ -546,7 +546,7 @@ export function WeeklyRecap() {
                 <PrivacyMask compact>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Link href="/checkin" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Emociones</p>
+                    <p className="text-[9px] sm:text-[10px] text-[#888] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Emociones</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.emotionTrend != null ? `${data.evolution.emotionTrend > 0 ? '+' : ''}${data.evolution.emotionTrend}` : '—'}
@@ -555,7 +555,7 @@ export function WeeklyRecap() {
                     </div>
                   </Link>
                   <Link href="/imperio/energia" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
+                    <p className="text-[9px] sm:text-[10px] text-[#888] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Energía</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.energyTrend != null ? `${data.evolution.energyTrend > 0 ? '+' : ''}${data.evolution.energyTrend}` : '—'}
@@ -564,7 +564,7 @@ export function WeeklyRecap() {
                     </div>
                   </Link>
                   <Link href="/imperio/mente" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Estrés</p>
+                    <p className="text-[9px] sm:text-[10px] text-[#888] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Estrés</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.stressTrend != null ? (data.evolution.stressTrend > 0 ? '↓ bajó' : '↑ subió') : '—'}
@@ -573,7 +573,7 @@ export function WeeklyRecap() {
                     </div>
                   </Link>
                   <Link href="/insights" className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-2 sm:p-3 hover:border-champagne/15 transition-colors cursor-pointer group touch-press">
-                    <p className="text-[9px] sm:text-[10px] text-[#666] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Actividad</p>
+                    <p className="text-[9px] sm:text-[10px] text-[#888] mb-1 sm:mb-1.5 group-hover:text-[#999] transition-colors">Actividad</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] sm:text-[13px] text-white font-medium">
                         {data.evolution?.activityTrend != null ? `${data.evolution.activityTrend > 0 ? '+' : ''}${data.evolution.activityTrend}` : '—'}
@@ -604,19 +604,19 @@ export function WeeklyRecap() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
                         <h3 className="text-[11px] sm:text-[13px] font-semibold text-white">{data.mainInsight.title}</h3>
-                        <span className="text-[7px] sm:text-[8px] px-1 sm:px-1.5 py-0.5 rounded-full bg-[#1a1a1a] text-[#666] uppercase tracking-wider">
+                        <span className="text-[7px] sm:text-[8px] px-1 sm:px-1.5 py-0.5 rounded-full bg-[#1a1a1a] text-[#888] uppercase tracking-wider">
                           {data.mainInsight.category}
                         </span>
                       </div>
                       <p className="text-[10px] sm:text-[12px] text-[#999] leading-relaxed line-clamp-2 sm:line-clamp-none">{data.mainInsight.description}</p>
                     </div>
-                    <ArrowRight size={12} className="text-[#333] group-hover:text-champagne/50 transition-colors shrink-0 mt-1" />
+                    <ArrowRight size={12} className="text-[#999] group-hover:text-champagne/50 transition-colors shrink-0 mt-1" />
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-4 sm:py-6">
-                  <Sparkles size={18} className="text-[#333] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
-                  <p className="text-[10px] sm:text-[12px] text-[#555]">Sin observaciones</p>
+                  <Sparkles size={18} className="text-[#999] mx-auto mb-1.5 sm:mb-2 sm:w-[20px] sm:h-[20px]" />
+                  <p className="text-[10px] sm:text-[12px] text-[#888]">Sin observaciones</p>
                 </div>
               )}
             </Link>
@@ -659,9 +659,9 @@ export function WeeklyRecap() {
             <button
               onMouseEnter={() => setEmailHover(true)}
               onMouseLeave={() => setEmailHover(false)}
-              className="hidden sm:flex items-center gap-2 text-[11px] text-[#555] hover:text-champagne transition-colors duration-300 group cursor-default"
+              className="hidden sm:flex items-center gap-2 text-[11px] text-[#888] hover:text-champagne transition-colors duration-300 group cursor-default"
             >
-              <Mail size={12} className={`transition-colors duration-300 ${emailHover ? 'text-champagne' : 'text-[#444]'}`} />
+              <Mail size={12} className={`transition-colors duration-300 ${emailHover ? 'text-champagne' : 'text-[#999]'}`} />
               <span>Resumen semanal por email próximamente</span>
             </button>
           </div>

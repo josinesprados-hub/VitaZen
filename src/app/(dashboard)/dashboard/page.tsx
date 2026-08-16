@@ -264,8 +264,8 @@ export default function DashboardPage() {
               <div className="flex items-center gap-3 py-1">
                 {/* DASH-1: emoji from shared single source of truth (same as CheckInModal) */}
                 <span className="text-sm">{getEmotionEmoji(todayCheckin.emotion)}</span>
-                <p className="text-xs text-[#555] truncate flex-1">«{todayCheckin.intention}»</p>
-                <Link href="/checkin" className="text-[10px] text-[#444] hover:text-champagne transition-colors shrink-0">Historial</Link>
+                <p className="text-xs text-[#888] truncate flex-1">«{todayCheckin.intention}»</p>
+                <Link href="/checkin" className="text-[10px] text-[#999] hover:text-champagne transition-colors shrink-0">Historial</Link>
               </div>
             ) : (
               <button
@@ -275,7 +275,7 @@ export default function DashboardPage() {
                 <div className="w-9 h-9 rounded-lg bg-champagne/8 flex items-center justify-center group-hover:bg-champagne/15 transition-colors">
                   <Sunrise size={15} className="text-champagne/60 group-hover:text-champagne transition-colors" />
                 </div>
-                <span className="text-sm text-[#555] group-hover:text-[#888] transition-colors">Check-in</span>
+                <span className="text-sm text-[#888] group-hover:text-[#888] transition-colors">Check-in</span>
               </button>
             )}
           </div>
@@ -310,18 +310,18 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm text-[#666] group-hover:text-[#999] transition-colors">{config.name}</h3>
+                        <h3 className="text-sm text-[#888] group-hover:text-[#999] transition-colors">{config.name}</h3>
                         <PrivacyMask compact>
-                          <span className="text-[10px] text-[#555]">Nivel {level}</span>
+                          <span className="text-[10px] text-[#888]">Nivel {level}</span>
                         </PrivacyMask>
                       </div>
                       {/* DASH-34/35: Discreet streak + XP info */}
                       <PrivacyMask compact>
                         <div className="flex items-center gap-2 mt-0.5">
                           {streak > 0 && (
-                            <span className="text-[9px] text-[#444]">{streak}d</span>
+                            <span className="text-[9px] text-[#999]">{streak}d</span>
                           )}
-                          <span className="text-[9px] text-[#555]">{xp % 100}/{xpToNextLevel} XP</span>
+                          <span className="text-[9px] text-[#888]">{xp % 100}/{xpToNextLevel} XP</span>
                         </div>
                       </PrivacyMask>
                       {/* DASH-31/37: Progress bar always visible (never disappears, even at level boundaries) */}

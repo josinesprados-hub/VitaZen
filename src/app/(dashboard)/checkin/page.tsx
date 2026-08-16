@@ -304,14 +304,14 @@ export default function CheckinPage() {
                 { label: 'Estrés', val: todayCheckin.stress },
               ].map((item) => (
                 <div key={item.label} className="text-center">
-                  <p className="text-sm font-medium text-champagne/70">{item.val}<span className="text-[10px] text-[#444]">/5</span></p>
-                  <p className="text-[10px] text-[#444]">{item.label}</p>
+                  <p className="text-sm font-medium text-champagne/70">{item.val}<span className="text-[10px] text-[#999]">/5</span></p>
+                  <p className="text-[10px] text-[#999]">{item.label}</p>
                 </div>
               ))}
             </div>
           </PrivacyMask>
           {todayCheckin.note && (
-            <p className="text-[11px] text-[#555] mt-2.5 border-t border-[#1a1a1a] pt-2.5">{todayCheckin.note}</p>
+            <p className="text-[11px] text-[#888] mt-2.5 border-t border-[#1a1a1a] pt-2.5">{todayCheckin.note}</p>
           )}
         </div>
       )}
@@ -322,7 +322,7 @@ export default function CheckinPage() {
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={16} className="text-champagne/60" />
             <h2 className="text-base font-semibold text-white">Tendencias</h2>
-            <span className="text-[11px] text-[#555]">últimos {trends.totalDays} días</span>
+            <span className="text-[11px] text-[#888]">últimos {trends.totalDays} días</span>
           </div>
 
           <PrivacyMask compact>
@@ -339,7 +339,7 @@ export default function CheckinPage() {
                       <Icon size={12} className="text-champagne/60" />
                       <span className="label-discrete">{metric.label}</span>
                     </div>
-                    <p className="text-lg font-semibold text-white mb-1.5">{val.toFixed(1)}<span className="text-[10px] text-[#444]">/5</span></p>
+                    <p className="text-lg font-semibold text-white mb-1.5">{val.toFixed(1)}<span className="text-[10px] text-[#999]">/5</span></p>
                     <MiniBarChart data={trends.daily} metricKey={metric.key} />
                   </div>
                 );
@@ -357,7 +357,7 @@ export default function CheckinPage() {
             <h2 className="text-base font-semibold text-white">Historial</h2>
           </div>
           {checkins.length > 0 && (
-            <span className="text-[11px] text-[#555] bg-[#0a0a0a] border border-[#1a1a1a] rounded-full px-2.5 py-0.5">{checkins.length} check-in{checkins.length !== 1 ? 's' : ''}</span>
+            <span className="text-[11px] text-[#888] bg-[#0a0a0a] border border-[#1a1a1a] rounded-full px-2.5 py-0.5">{checkins.length} check-in{checkins.length !== 1 ? 's' : ''}</span>
           )}
         </div>
 
@@ -394,7 +394,7 @@ export default function CheckinPage() {
                           { label: 'Enfoque', val: c.focus },
                           { label: 'Estrés', val: c.stress },
                         ].map((item) => (
-                          <span key={item.label} className="text-[10px] text-[#444]">
+                          <span key={item.label} className="text-[10px] text-[#999]">
                             {item.label} <span className="text-champagne/60">{item.val}</span>
                           </span>
                         ))}
@@ -403,10 +403,10 @@ export default function CheckinPage() {
                     {c.note && <p className="text-[10px] text-[#3a3a3a] mt-0.5 truncate">{c.note}</p>}
                   </div>
                   <div className="flex items-center gap-0.5 flex-shrink-0">
-                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-champagne/8 text-[#444] hover:text-champagne transition-all touch-press-sm" title="Editar">
+                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-champagne/8 text-[#999] hover:text-champagne transition-all touch-press-sm" title="Editar">
                       <Pencil size={13} />
                     </button>
-                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/8 text-[#444] hover:text-red-400 transition-all touch-press-sm" title="Eliminar">
+                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/8 text-[#999] hover:text-red-400 transition-all touch-press-sm" title="Eliminar">
                       <Trash2 size={13} />
                     </button>
                   </div>

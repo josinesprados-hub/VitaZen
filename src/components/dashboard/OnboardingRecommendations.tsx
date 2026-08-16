@@ -124,12 +124,12 @@ export function OnboardingRecommendations() {
               </div>
               <div>
                 <h3 className="text-xs sm:text-sm font-semibold text-white">Tu ritmo</h3>
-                <p className="text-[10px] sm:text-[11px] text-[#666]">Lo que elegiste</p>
+                <p className="text-[10px] sm:text-[11px] text-[#888]">Lo que elegiste</p>
               </div>
             </div>
             <button
               onClick={() => setDismissed(true)}
-              className="text-[#555] hover:text-[#999] transition-colors text-[10px] sm:text-xs"
+              className="text-[#888] hover:text-[#999] transition-colors text-[10px] sm:text-xs"
             >
               Cerrar
             </button>
@@ -147,9 +147,9 @@ export function OnboardingRecommendations() {
               <p className="text-xs sm:text-sm font-medium text-white group-hover:text-champagne transition-colors">
                 {focusConfig.name}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-[#666] line-clamp-1">{focusConfig.tip}</p>
+              <p className="text-[10px] sm:text-[11px] text-[#888] line-clamp-1">{focusConfig.tip}</p>
             </div>
-            <ArrowRight size={12} className="text-[#555] group-hover:text-champagne transition-colors sm:w-[14px] sm:h-[14px]" />
+            <ArrowRight size={12} className="text-[#888] group-hover:text-champagne transition-colors sm:w-[14px] sm:h-[14px]" />
           </Link>
 
           {/* Tips */}
@@ -167,7 +167,7 @@ export function OnboardingRecommendations() {
           {/* Habit count */}
           {habitCount > 0 && (
             <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-[#1a1a1a]/60">
-              <p className="text-[9px] sm:text-[10px] text-[#555]">
+              <p className="text-[9px] sm:text-[10px] text-[#888]">
                 {habitCount} hábito{habitCount > 1 ? 's' : ''}
               </p>
             </div>

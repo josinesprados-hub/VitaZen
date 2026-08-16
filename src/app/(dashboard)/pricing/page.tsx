@@ -91,7 +91,7 @@ export default function PricingPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
           Mirar la vida más despacio
         </h1>
-        <p className="text-[#777] text-base max-w-md mx-auto leading-relaxed">
+        <p className="text-[#999] text-base max-w-md mx-auto leading-relaxed">
           No necesitas más herramientas. Necesitas más conexión.
         </p>
       </div>
@@ -102,21 +102,21 @@ export default function PricingPage() {
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-7 sm:p-8">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-xl bg-[#1a1a1a] flex items-center justify-center">
-              <Eye size={18} className="text-[#555]" />
+              <Eye size={18} className="text-[#888]" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-white">Free</h2>
-              <p className="text-[#555] text-xs">0€/mes</p>
+              <p className="text-[#888] text-xs">0€/mes</p>
             </div>
           </div>
 
           <div className="mb-6">
             <span className="text-3xl font-bold text-white">0€</span>
-            <span className="text-[#555] text-sm">/mes</span>
+            <span className="text-[#888] text-sm">/mes</span>
           </div>
 
           <div className="space-y-3 mb-8">
-            <p className="text-[#444] text-[10px] uppercase tracking-wider font-medium">Para empezar</p>
+            <p className="text-[#999] text-[10px] uppercase tracking-wider font-medium">Para empezar</p>
             {[
               'Registro manual de hábitos y estados',
               'Mentor IA con ritmo diario',
@@ -126,7 +126,7 @@ export default function PricingPage() {
               'Memoria de tu vida',
             ].map((feature) => (
               <div key={feature} className="flex items-start gap-3">
-                <Check size={14} className="text-[#333] shrink-0 mt-0.5" />
+                <Check size={14} className="text-[#999] shrink-0 mt-0.5" />
                 <p className="text-sm text-[#888]">{feature}</p>
               </div>
             ))}
@@ -134,7 +134,7 @@ export default function PricingPage() {
 
           <button
             disabled
-            className="w-full py-3 rounded-xl border border-[#1a1a1a] text-[#444] font-medium text-sm cursor-not-allowed"
+            className="w-full py-3 rounded-xl border border-[#1a1a1a] text-[#999] font-medium text-sm cursor-not-allowed"
           >
             Tu espacio actual
           </button>
@@ -154,7 +154,7 @@ export default function PricingPage() {
 
           <div className="mb-6">
             <span className="text-3xl font-bold text-champagne/80">5€</span>
-            <span className="text-[#777] text-sm">/mes</span>
+            <span className="text-[#999] text-sm">/mes</span>
           </div>
 
           <div className="space-y-3 mb-6">
@@ -199,7 +199,7 @@ export default function PricingPage() {
       {/* Silent philosophy — not sales copy */}
       <div className="text-center mt-12 sm:mt-16 mb-2">
         <div className="max-w-md mx-auto">
-          <p className="text-[#333] text-xs">
+          <p className="text-[#999] text-xs">
             Sin compromiso. Cancela cuando quieras.
           </p>
         </div>

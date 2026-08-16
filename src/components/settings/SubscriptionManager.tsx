@@ -109,7 +109,7 @@ export function SubscriptionManager() {
             {loading ? (
               <Loader2 size={16} className="animate-spin text-champagne" />
             ) : (
-              <ChevronRight size={16} className="text-[#555] group-hover:text-champagne transition-colors" />
+              <ChevronRight size={16} className="text-[#888] group-hover:text-champagne transition-colors" />
             )}
           </div>
         </button>
@@ -123,12 +123,12 @@ export function SubscriptionManager() {
       {/* Free status */}
       <div className="flex items-center gap-3">
         <div className="icon-sm">
-          <Eye size={14} className="text-[#555]" />
+          <Eye size={14} className="text-[#888]" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm text-white font-medium">Free</p>
-            <span className="text-[9px] font-medium text-[#555] px-2 py-0.5">0€/mes</span>
+            <span className="text-[9px] font-medium text-[#888] px-2 py-0.5">0€/mes</span>
           </div>
           <p className="text-xs text-[#999] mt-0.5">
             Registro, observaci&oacute;n y los 5 imperios
@@ -146,9 +146,9 @@ export function SubscriptionManager() {
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-medium">Élite</p>
-          <p className="text-xs text-[#777]">Más detalle y profundidad en tu experiencia</p>
+          <p className="text-xs text-[#999]">Más detalle y profundidad en tu experiencia</p>
         </div>
-        <ChevronRight size={16} className="text-[#444] group-hover:text-champagne transition-colors" />
+        <ChevronRight size={16} className="text-[#999] group-hover:text-champagne transition-colors" />
       </button>
     </div>
   );

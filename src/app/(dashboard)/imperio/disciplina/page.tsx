@@ -330,7 +330,7 @@ export default function DisciplinaPage() {
           <h3 className="text-champagne font-medium mb-1">{challenge.challenge.title}</h3>
           <p className="text-[#999] text-sm mb-4 line-clamp-3">{challenge.challenge.description}</p>
           {!challenge.completed ? (
-            <p className="text-[11px] text-[#666] flex items-center gap-1.5">
+            <p className="text-[11px] text-[#888] flex items-center gap-1.5">
               <Lightbulb size={12} className="text-champagne/60" />
               Completa la acción correspondiente para completar este desafío automáticamente
             </p>
@@ -415,10 +415,10 @@ export default function DisciplinaPage() {
                   </button>
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
-                    {habit.description && <p className="text-[#666] text-xs">{habit.description}</p>}
+                    {habit.description && <p className="text-[#888] text-xs">{habit.description}</p>}
                     <div className="flex items-center gap-3 mt-1">
                       <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(habit.createdAt)}</span>
-                      <span className="text-[#333] text-xs">·</span>
+                      <span className="text-[#999] text-xs">·</span>
                       <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(habit.createdAt)}</span>
                     </div>
                   </div>
@@ -430,10 +430,10 @@ export default function DisciplinaPage() {
                     </span>
                   )}
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar">
+                    <button onClick={() => startEdit(habit)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar">
                       <Pencil size={14} />
                     </button>
-                    <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar">
+                    <button onClick={() => deleteHabit(habit.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar">
                       <Trash2 size={14} />
                     </button>
                   </div>

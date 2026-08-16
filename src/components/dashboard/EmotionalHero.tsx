@@ -83,7 +83,7 @@ export function EmotionalHero({ refreshKey }: { refreshKey?: number }) {
   if (error || !state) {
     return (
       <div className="py-6 sm:py-8">
-        <p className="text-[11px] text-[#333]">Aparecerá con tu primer check-in</p>
+        <p className="text-[11px] text-[#999]">Aparecerá con tu primer check-in</p>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export function EmotionalHero({ refreshKey }: { refreshKey?: number }) {
         {/* Status indicator — a single breathing dot */}
         <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
           <div className={`w-2 h-2 rounded-full ${indicator.dot} ${indicator.pulse}`} />
-          <span className="text-[11px] sm:text-xs text-[#555] tracking-wide">{state.statusLabel}</span>
+          <span className="text-[11px] sm:text-xs text-[#888] tracking-wide">{state.statusLabel}</span>
         </div>
 
         {/* The observation — human, not analytical */}
@@ -120,7 +120,7 @@ export function EmotionalHero({ refreshKey }: { refreshKey?: number }) {
 
         {/* Recommendation — only when it adds value, never commanding */}
         {state.recommendation && (
-          <p className="text-[11px] sm:text-xs text-[#444] mt-3 sm:mt-4">
+          <p className="text-[11px] sm:text-xs text-[#999] mt-3 sm:mt-4">
             {state.recommendation}
           </p>
         )}

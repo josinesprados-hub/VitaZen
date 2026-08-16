@@ -262,7 +262,7 @@ export default function PerfilPage() {
                     onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Tu nombre"
                     maxLength={100}
-                    className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11"
+                    className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#888] focus:border-champagne h-11"
                   />
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function PerfilPage() {
                       Élite
                     </span>
                   ) : (
-                    <span className="text-[9px] font-medium text-[#555]">Free</span>
+                    <span className="text-[9px] font-medium text-[#888]">Free</span>
                   )}
                 </div>
               </>
@@ -302,7 +302,7 @@ export default function PerfilPage() {
                 onChange={(e) => setForm(prev => ({ ...prev, country: e.target.value }))}
                 placeholder="Ej: España"
                 maxLength={80}
-                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11"
+                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#888] focus:border-champagne h-11"
               />
             ) : (
               <p className="text-white text-sm mt-1">{displayUser?.country || '—'}</p>
@@ -319,7 +319,7 @@ export default function PerfilPage() {
                 onChange={(e) => setForm(prev => ({ ...prev, city: e.target.value }))}
                 placeholder="Ej: Madrid"
                 maxLength={80}
-                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11"
+                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#888] focus:border-champagne h-11"
               />
             ) : (
               <p className="text-white text-sm mt-1">{displayUser?.city || '—'}</p>
@@ -331,7 +331,7 @@ export default function PerfilPage() {
         <div>
           <Label className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
             <Calendar size={12} />
-            Edad <span className="text-[#555]">(opcional)</span>
+            Edad <span className="text-[#888]">(opcional)</span>
           </Label>
           {editing ? (
             <NumericInput
@@ -342,7 +342,7 @@ export default function PerfilPage() {
               allowDecimal={false}
               min={1}
               max={150}
-              className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne h-11 w-32 rounded-md border px-3 py-2 text-sm"
+              className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#888] focus:border-champagne h-11 w-32 rounded-md border px-3 py-2 text-sm"
             />
           ) : (
             <p className="text-white text-sm mt-1">{displayUser?.age ? `${displayUser.age} años` : '—'}</p>
@@ -351,7 +351,7 @@ export default function PerfilPage() {
 
         {/* Bio */}
         <div>
-          <Label className="text-[#999] text-xs mb-1.5">Bio <span className="text-[#555]">(opcional)</span></Label>
+          <Label className="text-[#999] text-xs mb-1.5">Bio <span className="text-[#888]">(opcional)</span></Label>
           {editing ? (
             <>
               <Textarea
@@ -360,9 +360,9 @@ export default function PerfilPage() {
                 placeholder="Cuéntanos algo sobre ti..."
                 maxLength={300}
                 rows={3}
-                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#555] focus:border-champagne resize-none"
+                className="bg-[#000000] border-[#1a1a1a] text-white placeholder:text-[#888] focus:border-champagne resize-none"
               />
-              <p className="text-[#555] text-xs mt-1">{form.bio.length}/300</p>
+              <p className="text-[#888] text-xs mt-1">{form.bio.length}/300</p>
             </>
           ) : (
             <p className="text-white text-sm mt-1">{displayUser?.bio || '—'}</p>

@@ -168,7 +168,7 @@ export function NotificationPreferences() {
           <p className="text-sm text-[#999]">
             Recibe recordatorios suaves y útiles. Nada de spam, sin culpa, sin presión.
           </p>
-          <div className="text-xs text-[#666] space-y-1.5">
+          <div className="text-xs text-[#888] space-y-1.5">
             <p className="flex items-center gap-2">
               <Check size={12} className="text-champagne" />
               Máximo 2 notificaciones al día
@@ -374,7 +374,7 @@ export function NotificationPreferences() {
                 className={`w-7 h-7 rounded-full text-xs font-medium transition-all ${
                   preferences.maxDailyNotifications >= n
                     ? 'bg-champagne text-black'
-                    : 'bg-[#1a1a1a] text-[#666] hover:bg-[#222]'
+                    : 'bg-[#1a1a1a] text-[#888] hover:bg-[#222]'
                 }`}
               >
                 {n}

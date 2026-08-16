@@ -97,14 +97,14 @@ export function MonthlyClosurePrompt() {
           className="flex items-center gap-3 flex-1 py-3 hover:opacity-80 transition-all group touch-press"
         >
           <Calendar size={13} className="text-champagne/25 group-hover:text-champagne/50 transition-colors shrink-0" />
-          <p className="text-[11px] text-[#555] group-hover:text-[#777] transition-colors flex-1">
+          <p className="text-[11px] text-[#888] group-hover:text-[#999] transition-colors flex-1">
             {message}
           </p>
         </Link>
         {/* DASH-18/29: Discreet dismiss button — persists until next month */}
         <button
           onClick={handleDismiss}
-          className="text-[10px] text-[#333] hover:text-[#555] transition-colors shrink-0 ml-2 py-3"
+          className="text-[10px] text-[#999] hover:text-[#888] transition-colors shrink-0 ml-2 py-3"
           aria-label="Ahora no"
         >
           <X size={11} />

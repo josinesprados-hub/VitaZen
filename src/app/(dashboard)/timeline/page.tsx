@@ -312,7 +312,7 @@ export default function TimelinePage() {
                     {group.label}
                   </h2>
                   {group.sublabel && (
-                    <p className="text-xs text-[#555] mt-0.5 capitalize">{group.sublabel}</p>
+                    <p className="text-xs text-[#888] mt-0.5 capitalize">{group.sublabel}</p>
                   )}
                   {/* Imperio rhythm dots — which dimensions were present this day */}
                   {imperios.length > 1 && (
@@ -367,7 +367,7 @@ export default function TimelinePage() {
                                 {item.title}
                               </span>
                               {item.description && (
-                                <span className="text-[11px] text-[#555] truncate">
+                                <span className="text-[11px] text-[#888] truncate">
                                   {item.description}
                                 </span>
                               )}
@@ -404,7 +404,7 @@ export default function TimelinePage() {
 
                               {/* Description */}
                               {item.description && (
-                                <p className="text-[#666] text-xs mt-1.5 leading-relaxed line-clamp-3">
+                                <p className="text-[#888] text-xs mt-1.5 leading-relaxed line-clamp-3">
                                   {item.description}
                                 </p>
                               )}
@@ -427,8 +427,8 @@ export default function TimelinePage() {
                                     { label: 'Sueño', val: item.meta.sleep },
                                     { label: 'Estrés', val: item.meta.stress },
                                   ].map(({ label, val }) => (
-                                    <span key={label} className="text-[10px] text-[#444]">
-                                      {label} <span className="text-[#666]"><PrivacyMask compact>{val}</PrivacyMask></span>
+                                    <span key={label} className="text-[10px] text-[#999]">
+                                      {label} <span className="text-[#888]"><PrivacyMask compact>{val}</PrivacyMask></span>
                                     </span>
                                   ))}
                                 </div>

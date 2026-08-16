@@ -239,7 +239,7 @@ export default function AjustesPage() {
               <p className="text-xs text-[#999]">Nombre, foto, ubicación y bio</p>
             </div>
           </div>
-          <ChevronRight size={16} className="text-[#555] group-hover:text-champagne transition-colors" />
+          <ChevronRight size={16} className="text-[#888] group-hover:text-champagne transition-colors" />
         </button>
 
         {/* Divider */}
@@ -261,7 +261,7 @@ export default function AjustesPage() {
           </div>
           <div className="text-left">
             <p className="text-sm font-medium">Cerrar sesión</p>
-            <p className="text-xs text-[#666]">Salir de tu cuenta</p>
+            <p className="text-xs text-[#888]">Salir de tu cuenta</p>
           </div>
         </button>
       </div>
@@ -284,7 +284,7 @@ export default function AjustesPage() {
               {displayUser?.plan === 'PREMIUM' ? (
                 <span className="text-[9px] font-medium text-champagne/50">Élite</span>
               ) : (
-                <span className="text-[9px] font-medium text-[#555]">Free</span>
+                <span className="text-[9px] font-medium text-[#888]">Free</span>
               )}
             </div>
           </div>

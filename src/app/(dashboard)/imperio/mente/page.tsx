@@ -173,7 +173,7 @@ function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
         </div>
         <div>
           <p className="text-champagne text-sm font-medium">Ritmo natural</p>
-          <p className="text-[#666] text-xs">Sin patrón fijo</p>
+          <p className="text-[#888] text-xs">Sin patrón fijo</p>
         </div>
       </div>
     );
@@ -191,7 +191,7 @@ function PatternFlow({ phases }: { phases: BreathingPhase[] }) {
             }`}>
               <span className="text-champagne text-xs font-semibold">{phase.seconds}s</span>
             </div>
-            <span className="text-[10px] text-[#666] mt-1.5 whitespace-nowrap">{phase.label}</span>
+            <span className="text-[10px] text-[#888] mt-1.5 whitespace-nowrap">{phase.label}</span>
           </div>
           {i < activePhases.length - 1 && (
             <div className="w-4 h-px bg-[#333] mb-5 shrink-0" />
@@ -535,7 +535,7 @@ export default function MentePage() {
           <Wind size={20} className="text-champagne" />
           <div>
             <h2 className="text-lg font-semibold text-white">Sesión de Respiración</h2>
-            <p className="text-[#666] text-xs mt-0.5">Elige una técnica y practica</p>
+            <p className="text-[#888] text-xs mt-0.5">Elige una técnica y practica</p>
           </div>
         </div>
 
@@ -545,7 +545,7 @@ export default function MentePage() {
             <p className="text-xs text-champagne uppercase tracking-widest mb-2">{selectedType.label}</p>
             <p className={`text-5xl font-bold mb-1 font-mono text-champagne ${!paused ? 'breathing-counter' : ''}`}>{formatTime(timer)}</p>
             {paused && <p className="text-champagne text-xs uppercase tracking-widest mb-1">En pausa</p>}
-            <p className="text-[#666] text-sm mb-8">Duración sugerida: {selectedType.duration} min</p>
+            <p className="text-[#888] text-sm mb-8">Duración sugerida: {selectedType.duration} min</p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setPaused(!paused)}
@@ -569,7 +569,7 @@ export default function MentePage() {
             {/* Back to techniques */}
             <button
               onClick={() => setViewingGuide(null)}
-              className="flex items-center gap-2 text-[#666] text-sm hover:text-champagne transition-colors mb-5"
+              className="flex items-center gap-2 text-[#888] text-sm hover:text-champagne transition-colors mb-5"
             >
               <ArrowLeft size={15} />
               <span>Técnicas</span>
@@ -581,7 +581,7 @@ export default function MentePage() {
                 <Wind size={24} className="text-champagne" />
               </div>
               <h3 className="text-xl font-bold text-white">{guideTechnique.label}</h3>
-              <p className="text-[#666] text-sm mt-1">{guideTechnique.subtitle} · {guideTechnique.duration} min</p>
+              <p className="text-[#888] text-sm mt-1">{guideTechnique.subtitle} · {guideTechnique.duration} min</p>
             </div>
 
             {/* Breathing pattern */}
@@ -659,9 +659,9 @@ export default function MentePage() {
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <p className="text-white text-sm font-medium group-hover:text-champagne transition-colors">{tech.label}</p>
-                  <ChevronRight size={14} className="text-[#555] group-hover:text-champagne transition-colors shrink-0" />
+                  <ChevronRight size={14} className="text-[#888] group-hover:text-champagne transition-colors shrink-0" />
                 </div>
-                <p className="text-[#666] text-xs mb-2.5">{tech.subtitle} · {tech.duration} min</p>
+                <p className="text-[#888] text-xs mb-2.5">{tech.subtitle} · {tech.duration} min</p>
                 <div className="inline-flex items-center gap-1.5 bg-champagne/8 border border-champagne/20 rounded px-2 py-0.5">
                   <div className="w-1 h-1 rounded-full bg-champagne" />
                   <p className="text-champagne text-[10px]">{tech.recommendation}</p>
@@ -679,11 +679,11 @@ export default function MentePage() {
             <Clock size={20} className="text-champagne" />
             <div>
               <h2 className="text-lg font-semibold text-white">Historial de Sesiones</h2>
-              <p className="text-[#666] text-xs mt-0.5">Tu evolución en la práctica</p>
+              <p className="text-[#888] text-xs mt-0.5">Tu evolución en la práctica</p>
             </div>
           </div>
           {sessions.length > 0 && (
-            <span className="text-xs text-[#666] bg-[#000000] border border-[#1a1a1a] rounded-full px-3 py-1">{sessions.length} sesión{sessions.length !== 1 ? 'es' : ''}</span>
+            <span className="text-xs text-[#888] bg-[#000000] border border-[#1a1a1a] rounded-full px-3 py-1">{sessions.length} sesión{sessions.length !== 1 ? 'es' : ''}</span>
           )}
         </div>
 
@@ -709,9 +709,9 @@ export default function MentePage() {
                       <p className="text-white text-sm font-medium">{tech?.label ?? session.type.replace('_', ' ')}</p>
                       <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Timer size={11} />{session.duration} min</span>
-                        <span className="text-[#333] text-xs">·</span>
+                        <span className="text-[#999] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Calendar size={11} />{safeFormatDate(session.completedAt)}</span>
-                        <span className="text-[#333] text-xs">·</span>
+                        <span className="text-[#999] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]"><Clock size={11} />{safeFormatTime(session.completedAt)}</span>
                       </div>
                     </div>
@@ -719,14 +719,14 @@ export default function MentePage() {
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={() => startEdit(session)}
-                      className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press"
+                      className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press"
                       title="Editar sesión"
                     >
                       <Pencil size={14} />
                     </button>
                     <button
                       onClick={() => setPendingDeleteId(session.id)}
-                      className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press"
+                      className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press"
                       title="Eliminar sesión"
                     >
                       <Trash2 size={14} />

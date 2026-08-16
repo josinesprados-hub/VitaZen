@@ -154,7 +154,7 @@ function ObservationCard({ observation }: { observation: ObservationData }) {
 function WaitingState() {
   return (
     <div className="text-center py-8 sm:py-10">
-      <p className="text-xs sm:text-sm text-[#333] leading-relaxed max-w-xs mx-auto">
+      <p className="text-xs sm:text-sm text-[#999] leading-relaxed max-w-xs mx-auto">
         {EMPTY_STATE_MESSAGE}
       </p>
     </div>
@@ -187,7 +187,7 @@ function PremiumPreview({ observation }: { observation: ObservationData }) {
       <div className="border border-[#161616] rounded-2xl px-5 py-4 bg-[#0c0c0c]/50">
         <div className="flex items-center justify-center gap-2">
           <Circle size={3} className="text-champagne/20" fill="currentColor" />
-          <span className="text-[10px] sm:text-[11px] text-[#444] tracking-wide">
+          <span className="text-[10px] sm:text-[11px] text-[#999] tracking-wide">
             Más conexiones con el tiempo
           </span>
         </div>
@@ -298,7 +298,7 @@ export default function LifePatternsSection() {
       {/* Header — whisper, not announcement */}
       <div className="flex items-center gap-2 mb-3">
         <Link2 size={10} className="text-champagne/15" />
-        <span className="text-[10px] sm:text-[11px] text-[#333]">{SECTION_TITLE}</span>
+        <span className="text-[10px] sm:text-[11px] text-[#999]">{SECTION_TITLE}</span>
         <Circle size={3} className="text-champagne/15 ml-auto" fill="currentColor" />
       </div>
 

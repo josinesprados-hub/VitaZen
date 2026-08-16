@@ -257,7 +257,7 @@ export default function LogrosPage() {
               </div>
               <div>
                 <p className="text-white font-semibold">Camino</p>
-                <p className="text-xs text-[#666]">{data.stats.unlocked} de {data.stats.total} momentos recordados</p>
+                <p className="text-xs text-[#888]">{data.stats.unlocked} de {data.stats.total} momentos recordados</p>
               </div>
             </div>
             <span className="text-2xl font-bold text-champagne">{data.stats.percent}%</span>
@@ -268,7 +268,7 @@ export default function LogrosPage() {
               style={{ width: `${data.stats.percent}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#555] flex items-center gap-1 mt-3">
+          <p className="text-[10px] text-[#888] flex items-center gap-1 mt-3">
             <Circle size={3} fill="currentColor" className="text-champagne/30" />
             Más con el tiempo
           </p>
@@ -303,7 +303,7 @@ export default function LogrosPage() {
           <div className="flex items-center gap-2 mb-5">
             <Circle size={8} fill="currentColor" className="text-champagne" />
             <h2 className="label-discrete text-champagne">Recordado</h2>
-            <span className="text-xs text-[#666] ml-1">({unlockedList.length})</span>
+            <span className="text-xs text-[#888] ml-1">({unlockedList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {unlockedList.map((achievement, index) => (
@@ -319,7 +319,7 @@ export default function LogrosPage() {
           <div className="flex items-center gap-2 mb-5">
             <Eye size={16} className="text-champagne/40" />
             <h2 className="label-discrete" style={{ color: 'rgba(200,165,90,0.5)' }}>Cerca de aparecer</h2>
-            <span className="text-xs text-[#444] ml-1">({mysteryList.length})</span>
+            <span className="text-xs text-[#999] ml-1">({mysteryList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {mysteryList.map((achievement, index) => (
@@ -333,9 +333,9 @@ export default function LogrosPage() {
       {lockedVisibleList.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-5">
-            <Lock size={16} className="text-[#555]" />
+            <Lock size={16} className="text-[#888]" />
             <h2 className="label-discrete" style={{ color: '#555' }}>Por aparecer</h2>
-            <span className="text-xs text-[#444] ml-1">({lockedVisibleList.length})</span>
+            <span className="text-xs text-[#999] ml-1">({lockedVisibleList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {lockedVisibleList.map((achievement, index) => (
@@ -387,7 +387,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
           <Icon
             size={22}
             className={`transition-colors duration-300 ${
-              isUnlocked ? 'text-champagne' : 'text-[#333]'
+              isUnlocked ? 'text-champagne' : 'text-[#999]'
             }`}
           />
         </div>
@@ -404,14 +404,14 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
           </div>
           <h3
             className={`font-semibold text-sm truncate transition-colors ${
-              isUnlocked ? 'text-white' : 'text-[#555]'
+              isUnlocked ? 'text-white' : 'text-[#888]'
             }`}
           >
             {achievement.title}
           </h3>
           <p
             className={`text-xs mt-0.5 line-clamp-2 leading-relaxed ${
-              isUnlocked ? 'text-[#888]' : 'text-[#444]'
+              isUnlocked ? 'text-[#888]' : 'text-[#999]'
             }`}
           >
             {achievement.description}
@@ -421,10 +421,10 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
           <PrivacyMask compact>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#555]">
+                <span className="text-[10px] text-[#888]">
                   {achievement.current}/{achievement.target}
                 </span>
-                <span className={`text-[10px] font-semibold ${isUnlocked ? 'text-champagne' : 'text-[#444]'}`}>
+                <span className={`text-[10px] font-semibold ${isUnlocked ? 'text-champagne' : 'text-[#999]'}`}>
                   {achievement.percent}%
                 </span>
               </div>
@@ -441,7 +441,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
 
           {/* Unlocked date — subtle, like a memory */}
           {isUnlocked && achievement.unlockedAt && (
-            <p className="text-[9px] text-[#555] mt-2">
+            <p className="text-[9px] text-[#888] mt-2">
               Recordado {new Date(achievement.unlockedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           )}
@@ -479,7 +479,7 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
           <h3 className="font-semibold text-sm text-champagne/40 italic">
             ???
           </h3>
-          <p className="text-xs mt-0.5 text-[#555] italic">
+          <p className="text-xs mt-0.5 text-[#888] italic">
             Algo está por aparecer
           </p>
 
@@ -487,7 +487,7 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
           <PrivacyMask compact>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#555]">
+                <span className="text-[10px] text-[#888]">
                   {achievement.current}/{achievement.target}
                 </span>
                 <span className="text-[10px] font-semibold text-champagne/50">

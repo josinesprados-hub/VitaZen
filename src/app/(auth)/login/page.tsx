@@ -200,7 +200,7 @@ export default function LoginPage() {
               {checkingEmail && (
                 <div className="mt-2 flex items-center gap-1.5">
                   <div className="w-3 h-3 border border-champagne/30 border-t-champagne/70 rounded-full animate-spin" />
-                  <span className="text-[#666] text-xs">Verificando...</span>
+                  <span className="text-[#888] text-xs">Verificando...</span>
                 </div>
               )}
             </div>
@@ -247,7 +247,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-[#1a1a1a]"></div>
-            <span className="px-4 text-[#666] text-sm">o</span>
+            <span className="px-4 text-[#888] text-sm">o</span>
             <div className="flex-1 h-px bg-[#1a1a1a]"></div>
           </div>
 

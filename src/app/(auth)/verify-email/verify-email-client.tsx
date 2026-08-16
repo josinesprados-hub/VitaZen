@@ -151,7 +151,7 @@ export default function VerifyEmailClient() {
             </div>
             <div>
               <p className="text-white text-lg font-light">Verificando tu email</p>
-              <p className="text-[#666] text-sm mt-2">Un momento...</p>
+              <p className="text-[#888] text-sm mt-2">Un momento...</p>
             </div>
           </div>
         )}
@@ -204,7 +204,7 @@ export default function VerifyEmailClient() {
               <p className="text-[#888] text-sm mt-2 leading-relaxed">
                 Revisa tu bandeja de entrada y haz clic en el enlace de verificación.
               </p>
-              <p className="text-[#555] text-xs mt-3">Si no lo encuentras, revisa la carpeta de spam.</p>
+              <p className="text-[#888] text-xs mt-3">Si no lo encuentras, revisa la carpeta de spam.</p>
             </div>
             <button
               onClick={async () => {
@@ -235,7 +235,7 @@ export default function VerifyEmailClient() {
             </button>
             <button
               onClick={() => router.replace('/dashboard')}
-              className="text-[#666] text-sm hover:text-[#999] transition-colors"
+              className="text-[#888] text-sm hover:text-[#999] transition-colors"
             >
               Ir al dashboard
             </button>
@@ -290,7 +290,7 @@ export default function VerifyEmailClient() {
               </button>
               <button
                 onClick={() => router.replace('/dashboard')}
-                className="text-[#666] text-sm hover:text-[#999] transition-colors"
+                className="text-[#888] text-sm hover:text-[#999] transition-colors"
               >
                 Ir al dashboard
               </button>

@@ -51,7 +51,7 @@ export default function ContextualHelp({ storageKey, title, text }: ContextualHe
     return (
       <button
         onClick={() => { reshown(); }}
-        className="inline-flex items-center justify-center w-5 h-5 rounded-md text-[#333] hover:text-champagne/60 hover:bg-champagne/5 transition-colors"
+        className="inline-flex items-center justify-center w-5 h-5 rounded-md text-[#999] hover:text-champagne/60 hover:bg-champagne/5 transition-colors"
         aria-label={`Ayuda: ${title}`}
         title={title}
       >
@@ -102,7 +102,7 @@ export default function ContextualHelp({ storageKey, title, text }: ContextualHe
         </div>
         <button
           onClick={() => { setShowFull(false); dismiss(); }}
-          className="shrink-0 p-1 rounded-lg text-[#555] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+          className="shrink-0 p-1 rounded-lg text-[#888] hover:text-white hover:bg-[#1a1a1a] transition-colors"
           aria-label="Cerrar ayuda"
         >
           <X size={14} />

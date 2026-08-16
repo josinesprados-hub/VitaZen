@@ -347,10 +347,10 @@ export default function PrivacyPolicyPage() {
 
         {/* Footer */}
         <footer className="pt-8 border-t border-champagne/20 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-300">
             VitaZen — Ecosistema de desarrollo personal
           </p>
-          <p className="text-xs text-gray-600 mt-2">
+          <p className="text-xs text-gray-400 mt-2">
             Esta política es vinculante y aplica a todos los servicios ofrecidos en vitazen.cc
             y en la aplicación Android de VitaZen.
           </p>
@@ -361,7 +361,7 @@ export default function PrivacyPolicyPage() {
             >
               Política de Privacidad
             </Link>
-            <span className="text-gray-600">|</span>
+            <span className="text-gray-400">|</span>
             <Link
               href="/terms"
               className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2"

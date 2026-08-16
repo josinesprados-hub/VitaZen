@@ -74,7 +74,7 @@ function MoodDisplay({ mood }: { mood: number | null }) {
     <Heart
       key={i}
       size={12}
-      className={i < mood ? 'text-champagne fill-champagne' : 'text-[#333]'}
+      className={i < mood ? 'text-champagne fill-champagne' : 'text-[#999]'}
     />
   ));
   return <span className="flex items-center gap-0.5">{hearts}</span>;
@@ -282,7 +282,7 @@ export default function CrecimientoPage() {
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <button key={n} onClick={() => setEditForm({ ...editForm, mood: n })}
-                        className={`rating-btn w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#666]'}`}>
+                        className={`rating-btn w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#888]'}`}>
                         {n}
                       </button>
                     ))}
@@ -369,7 +369,7 @@ export default function CrecimientoPage() {
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} onClick={() => setForm({ ...form, mood: n })}
-                      className={`rating-btn w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#666]'}`}>
+                      className={`rating-btn w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#888]'}`}>
                       {n}
                     </button>
                   ))}
@@ -412,19 +412,19 @@ export default function CrecimientoPage() {
                     >
                       {/* Top row: title + actions */}
                       <div className="flex items-start justify-between gap-3 mb-2">
-                        <h4 className="text-champagne font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#666] italic">Sin título</span>}</h4>
+                        <h4 className="text-champagne font-medium text-sm leading-snug flex-1">{entry.title || <span className="text-[#888] italic">Sin título</span>}</h4>
                         {!screenshotMode && (
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <button
                               onClick={() => startEdit(entry)}
-                              className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press"
+                              className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press"
                               title="Editar"
                             >
                               <Pencil size={14} />
                             </button>
                             <button
                               onClick={() => setPendingDeleteId(entry.id)}
-                              className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press"
+                              className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press"
                               title="Eliminar"
                             >
                               <Trash2 size={14} />
@@ -438,13 +438,13 @@ export default function CrecimientoPage() {
                         <span className="flex items-center gap-1 text-xs text-[#999]">
                           <Calendar size={11} /> {formatDate(entry.createdAt)}
                         </span>
-                        <span className="text-[#333] text-xs">·</span>
+                        <span className="text-[#999] text-xs">·</span>
                         <span className="flex items-center gap-1 text-xs text-[#999]">
                           <Clock size={11} /> {formatTime(entry.createdAt)}
                         </span>
                         {entry.mood && (
                           <>
-                            <span className="text-[#333] text-xs">·</span>
+                            <span className="text-[#999] text-xs">·</span>
                             <MoodDisplay mood={entry.mood} />
                           </>
                         )}
@@ -478,7 +478,7 @@ export default function CrecimientoPage() {
 
                       {/* Edited indicator */}
                       {entry.updatedAt && new Date(entry.updatedAt).getTime() - new Date(entry.createdAt).getTime() > 1000 && (
-                        <p className="text-[10px] text-[#444] mt-2 italic">Editado</p>
+                        <p className="text-[10px] text-[#999] mt-2 italic">Editado</p>
                       )}
                     </div>
                   ))}

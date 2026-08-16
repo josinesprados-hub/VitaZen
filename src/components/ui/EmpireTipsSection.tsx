@@ -56,7 +56,7 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
         <Lightbulb size={20} className="text-champagne" />
         <h2 className="text-lg font-semibold text-white">Notas</h2>
       </div>
-      <p className="text-[#666] text-xs mb-5">{subtitle}</p>
+      <p className="text-[#888] text-xs mb-5">{subtitle}</p>
 
       <div className="space-y-3">
         {loading ? (
@@ -89,12 +89,12 @@ export default function EmpireTipsSection({ empire, subtitle }: EmpireTipsSectio
           </>
         ) : error ? (
           // API failed — gentle error state
-          <p className="text-[#555] text-sm py-4 text-center">
+          <p className="text-[#888] text-sm py-4 text-center">
             No se pudieron cargar las notas
           </p>
         ) : (
           // No tips available (DB empty or not seeded)
-          <p className="text-[#444] text-sm py-4 text-center">
+          <p className="text-[#999] text-sm py-4 text-center">
             Sin notas disponibles
           </p>
         )}

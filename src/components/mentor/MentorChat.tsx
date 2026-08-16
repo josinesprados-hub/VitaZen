@@ -724,7 +724,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       <div className="p-3 border-b border-[#1a1a1a] space-y-2">
         <Link
           href={backHref}
-          className="text-[#666] text-xs hover:text-champagne flex items-center gap-1 transition-colors"
+          className="text-[#888] text-xs hover:text-champagne flex items-center gap-1 transition-colors"
         >
           <ChevronLeft size={12} /> Volver
         </Link>
@@ -743,13 +743,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
             tab === 'active'
               ? 'text-champagne'
-              : 'text-[#666] hover:text-[#999]'
+              : 'text-[#888] hover:text-[#999]'
           }`}
         >
           Todas
           {totalActiveCount > 0 && (
             <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-              tab === 'active' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
+              tab === 'active' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#888]'
             }`}>
               {totalActiveCount}
             </span>
@@ -763,13 +763,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
             tab === 'archived'
               ? 'text-champagne'
-              : 'text-[#666] hover:text-[#999]'
+              : 'text-[#888] hover:text-[#999]'
           }`}
         >
           Archivadas
           {totalArchivedCount > 0 && (
             <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-              tab === 'archived' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#555]'
+              tab === 'archived' ? 'bg-champagne/20 text-champagne' : 'bg-[#1a1a1a] text-[#888]'
             }`}>
               {totalArchivedCount}
             </span>
@@ -783,7 +783,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
             tab === 'favorites'
               ? 'text-champagne'
-              : 'text-[#666] hover:text-[#999]'
+              : 'text-[#888] hover:text-[#999]'
           }`}
         >
           <Star size={12} className="inline -mt-px" />
@@ -797,7 +797,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {tab !== 'favorites' && (
       <div className="px-3 py-2 border-b border-[#1a1a1a]">
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
@@ -809,7 +809,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#555] hover:text-white transition-colors p-0.5"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#888] hover:text-white transition-colors p-0.5"
               aria-label="Limpiar búsqueda"
             >
               <X size={12} />
@@ -827,10 +827,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             {favorites.length === 0 && (
               <div className="text-center py-12 animate-in">
                 <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
-                  <Star size={24} className="text-[#444]" />
+                  <Star size={24} className="text-[#999]" />
                 </div>
-                <p className="text-[#555] text-sm font-medium mb-1">Sin favoritos</p>
-                <p className="text-[#444] text-xs">Marca respuestas del mentor para guardarlas aqui</p>
+                <p className="text-[#888] text-sm font-medium mb-1">Sin favoritos</p>
+                <p className="text-[#999] text-xs">Marca respuestas del mentor para guardarlas aqui</p>
               </div>
             )}
             {favorites.map((fav) => {
@@ -851,7 +851,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               >
                 <p className="text-xs text-champagne/70 mb-1 truncate">{fav.thread.title}</p>
                 <p className="text-[13px] leading-snug line-clamp-2">{fav.content.slice(0, 120)}</p>
-                <p className="text-[10px] text-[#555] mt-1">{getRelativeDate(fav.favoritedAt)}</p>
+                <p className="text-[10px] text-[#888] mt-1">{getRelativeDate(fav.favoritedAt)}</p>
               {isArchived && (
                 <span className="inline-block mt-1 text-[9px] bg-champagne/10 text-champagne/60 px-1.5 py-0.5 rounded-full border border-champagne/15">
                   Archivada
@@ -871,7 +871,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           return (
             <div key={group} className="animate-in" style={{ animationDelay: '50ms' }}>
               <div className="flex items-center justify-between px-3 py-1.5">
-                <p className="text-[10px] text-[#555] uppercase tracking-widest font-semibold">
+                <p className="text-[10px] text-[#888] uppercase tracking-widest font-semibold">
                   {group}
                 </p>
                 {groupIdx === 0 && !isPremium && visibleThreads.length > 5 && (
@@ -886,10 +886,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         key={thread.id}
                         className="group flex items-center rounded-lg px-3 py-2.5 text-[#ccc]"
                       >
-                        <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#555]" />
+                        <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#888]" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate leading-tight">{thread.title}</p>
-                          <p className="text-[10px] text-[#555] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
+                          <p className="text-[10px] text-[#888] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
                         </div>
                       </div>
                     ))}
@@ -914,12 +914,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       }}
                     >
                       {thread.archived ? (
-                        <Archive size={14} className="shrink-0 mr-2.5 text-[#555]" />
+                        <Archive size={14} className="shrink-0 mr-2.5 text-[#888]" />
                       ) : (
                         <MessageCircle
                           size={14}
                           className={`shrink-0 mr-2.5 ${
-                            activeThread === thread.id ? 'text-champagne' : 'text-[#555]'
+                            activeThread === thread.id ? 'text-champagne' : 'text-[#888]'
                           }`}
                         />
                       )}
@@ -946,7 +946,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                             </button>
                             <button
                               onClick={() => setEditingThreadId(null)}
-                              className="text-[#666] hover:text-white p-0.5"
+                              className="text-[#888] hover:text-white p-0.5"
                             >
                               <X size={12} />
                             </button>
@@ -956,7 +956,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                             <p className={`text-sm truncate leading-tight ${thread.archived ? 'italic opacity-70' : ''}`}>
                               {thread.title}
                             </p>
-                            <p className="text-[10px] text-[#555] mt-0.5">
+                            <p className="text-[10px] text-[#888] mt-0.5">
                               {getRelativeDate(thread.updatedAt)}
                             </p>
                           </>
@@ -966,7 +966,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       {editingThreadId !== thread.id && (
                         <button
                           onClick={(e) => handleContextMenu(e, thread.id)}
-                          className="text-[#444] hover:text-champagne p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
+                          className="text-[#999] hover:text-champagne p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
                           title="Más opciones"
                         >
                           <MoreVertical size={14} />
@@ -990,10 +990,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         {tab === 'active' && activeThreads.length === 0 && !searchQuery && (
           <div className="text-center py-12 animate-in">
             <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
-              <Inbox size={24} className="text-[#444]" />
+              <Inbox size={24} className="text-[#999]" />
             </div>
-            <p className="text-[#555] text-sm font-medium mb-1">Sin conversaciones</p>
-            <p className="text-[#444] text-xs">Crea una nueva para empezar</p>
+            <p className="text-[#888] text-sm font-medium mb-1">Sin conversaciones</p>
+            <p className="text-[#999] text-xs">Crea una nueva para empezar</p>
           </div>
         )}
 
@@ -1001,10 +1001,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         {tab === 'archived' && archivedThreads.length === 0 && !searchQuery && (
           <div className="text-center py-12 animate-in">
             <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
-              <MessageSquareOff size={24} className="text-[#444]" />
+              <MessageSquareOff size={24} className="text-[#999]" />
             </div>
-            <p className="text-[#555] text-sm font-medium mb-1">Sin archivadas</p>
-            <p className="text-[#444] text-xs">Las conversaciones archivadas aparecerán aquí</p>
+            <p className="text-[#888] text-sm font-medium mb-1">Sin archivadas</p>
+            <p className="text-[#999] text-xs">Las conversaciones archivadas aparecerán aquí</p>
           </div>
         )}
 
@@ -1012,10 +1012,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         {searchQuery.trim() && searchedThreads.length === 0 && (
           <div className="text-center py-12 animate-in">
             <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
-              <Search size={24} className="text-[#444]" />
+              <Search size={24} className="text-[#999]" />
             </div>
-            <p className="text-[#555] text-sm font-medium mb-1">Sin resultados</p>
-            <p className="text-[#444] text-xs">No se encontró "{searchQuery.trim()}"</p>
+            <p className="text-[#888] text-sm font-medium mb-1">Sin resultados</p>
+            <p className="text-[#999] text-xs">No se encontró "{searchQuery.trim()}"</p>
           </div>
         )}
       </div>
@@ -1024,7 +1024,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {!isPremium && remaining !== null && (
         <div className="p-3 border-t border-[#1a1a1a]">
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-[#666] flex items-center gap-1.5">
+            <span className="text-[#888] flex items-center gap-1.5">
               <Zap size={10} />
               Mensajes hoy
             </span>
@@ -1308,7 +1308,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         ))}
                       </div>
                       {!isPremium && (
-                        <p className="text-[10px] text-[#555] mt-4 flex items-center justify-center gap-1">
+                        <p className="text-[10px] text-[#888] mt-4 flex items-center justify-center gap-1">
                           <Circle size={3} fill="currentColor" className="text-champagne/30" />
                           El mentor recuerda más cuando profundizas
                         </p>
@@ -1419,7 +1419,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                           className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-champagne/50 focus-visible:outline-none ${
                             copiedId === msg.id
                               ? 'text-green-400 opacity-100'
-                              : 'text-[#333] opacity-60 hover:opacity-100 hover:text-champagne/50'
+                              : 'text-[#999] opacity-60 hover:opacity-100 hover:text-champagne/50'
                           }`}
                         >
                           {copiedId === msg.id ? (
@@ -1599,7 +1599,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-white transition-colors"
                   >
-                    <Pencil size={14} className="text-[#666]" />
+                    <Pencil size={14} className="text-[#888]" />
                     Renombrar
                   </button>
 
@@ -1611,7 +1611,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
                     >
-                      <ArchiveRestore size={14} className="text-[#666]" />
+                      <ArchiveRestore size={14} className="text-[#888]" />
                       Restaurar
                     </button>
                   ) : (
@@ -1622,7 +1622,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
                     >
-                      <Archive size={14} className="text-[#666]" />
+                      <Archive size={14} className="text-[#888]" />
                       Archivar
                     </button>
                   )}
@@ -1636,7 +1636,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-red-500/10 hover:text-red-400 transition-colors"
                   >
-                    <Trash2 size={14} className="text-[#666]" />
+                    <Trash2 size={14} className="text-[#888]" />
                     Eliminar
                   </button>
                 </>
@@ -1677,7 +1677,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* BUG-06: Debounce blocked feedback — subtle and discrete */}
       {debounceBlocked && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#2a2a2a] text-[#666] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#2a2a2a] text-[#888] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in">
           Espera un momento entre mensajes
         </div>
       )}
@@ -1711,11 +1711,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               <div className="space-y-3 mb-6 text-left">
                 <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
                   <p className="text-xs text-[#999] font-medium mb-0.5">Conversaciones sin límite diario</p>
-                  <p className="text-[10px] text-[#555]">El mentor está cuando lo necesitas</p>
+                  <p className="text-[10px] text-[#888]">El mentor está cuando lo necesitas</p>
                 </div>
                 <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-3.5">
                   <p className="text-xs text-[#999] font-medium mb-0.5">Memoria que acumula contexto</p>
-                  <p className="text-[10px] text-[#555]">Cada conversación profundiza la anterior</p>
+                  <p className="text-[10px] text-[#888]">Cada conversación profundiza la anterior</p>
                 </div>
               </div>
 
@@ -1732,7 +1732,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                 </Link>
                 <button
                   onClick={() => setShowLimitModal(false)}
-                  className="w-full text-[#666] py-2.5 hover:text-[#999] transition-colors text-sm"
+                  className="w-full text-[#888] py-2.5 hover:text-[#999] transition-colors text-sm"
                 >
                   Volver mañana
                 </button>

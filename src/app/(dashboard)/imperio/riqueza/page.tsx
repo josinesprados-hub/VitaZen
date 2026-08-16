@@ -263,7 +263,7 @@ function resolveIntention(mood: string | null): string | null {
 function IntentionSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="text-[10px] text-[#555] mb-1.5 block tracking-wide uppercase">Intención del movimiento</label>
+      <label className="text-[10px] text-[#888] mb-1.5 block tracking-wide uppercase">Intención del movimiento</label>
       <div className="flex gap-1.5 flex-wrap">
         {INTENTIONS.map(i => (
           <button
@@ -273,7 +273,7 @@ function IntentionSelector({ value, onChange }: { value: string; onChange: (v: s
             className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
               value === i.value
                 ? 'bg-champagne/10 border-champagne/25 text-champagne/90'
-                : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
+                : 'bg-transparent border-[#1a1a1a] text-[#999] hover:border-[#2a2a2a] hover:text-[#888]'
             }`}
           >
             {i.label}
@@ -295,7 +295,7 @@ function CategoryChips({ categories, value, onChange }: { categories: string[]; 
           className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
             value === cat
               ? 'bg-champagne/10 border-champagne/25 text-champagne/90'
-              : 'bg-transparent border-[#1a1a1a] text-[#444] hover:border-[#2a2a2a] hover:text-[#666]'
+              : 'bg-transparent border-[#1a1a1a] text-[#999] hover:border-[#2a2a2a] hover:text-[#888]'
           }`}
         >
           {cat}
@@ -332,7 +332,7 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
             <div key={flow.intention} className="space-y-2">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm sm:text-base text-[#aaa] tracking-wide">{flow.label}</span>
-                <span className="text-xs sm:text-sm text-[#666] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
+                <span className="text-xs sm:text-sm text-[#888] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
               </div>
               <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
                 <div
@@ -442,7 +442,7 @@ function QuickCapture({
               {parsed.type === 'income' ? 'Ingreso' : 'Gasto'}
             </span>
             <span className="text-[#1a1a1a]">·</span>
-            <span className="text-xs text-[#555] truncate">{parsed.category}</span>
+            <span className="text-xs text-[#888] truncate">{parsed.category}</span>
             <span className="text-[#1a1a1a]">·</span>
             <span className={`text-xs font-medium tabular-nums flex-shrink-0 ${parsed.type === 'income' ? 'text-champagne' : 'text-red-400/70'}`}>
               {parsed.type === 'income' ? '+' : '-'}{formatCurrency(parsed.amount)}
@@ -457,7 +457,7 @@ function QuickCapture({
           </button>
         </div>
       ) : (
-        <p className="text-[11px] text-[#333]">Escribe concepto y cantidad</p>
+        <p className="text-[11px] text-[#999]">Escribe concepto y cantidad</p>
       )}
 
       {/* ─── Two clearly separated actions ─── */}
@@ -476,7 +476,7 @@ function QuickCapture({
           <button
             type="button"
             onClick={() => setShowContexto(true)}
-            className="text-[11px] text-[#555] active:text-[#888] transition-colors tracking-wide"
+            className="text-[11px] text-[#888] active:text-[#888] transition-colors tracking-wide"
           >
             + Añadir contexto
           </button>
@@ -1079,7 +1079,7 @@ export default function RiquezaPage() {
               <span className="text-sm font-semibold text-white tracking-tight">Nuevo movimiento</span>
               <button
                 onClick={closeAddSheet}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[#555] active:text-white active:bg-[#1a1a1a] transition-colors -mr-1"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#888] active:text-white active:bg-[#1a1a1a] transition-colors -mr-1"
                 aria-label="Cerrar"
               >
                 <X size={16} />
@@ -1131,7 +1131,7 @@ export default function RiquezaPage() {
               <span className="text-sm font-semibold text-white tracking-tight">Editar registro</span>
               <button
                 onClick={() => { setEditingLog(null); setSubmitError(null); }}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[#555] active:text-white active:bg-[#1a1a1a] transition-colors -mr-1"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#888] active:text-white active:bg-[#1a1a1a] transition-colors -mr-1"
                 aria-label="Cerrar"
               >
                 <X size={16} />
@@ -1181,7 +1181,7 @@ export default function RiquezaPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Finanzas</h1>
-            <p className="text-[#777] text-sm sm:text-base mt-0.5">Cómo fluye tu dinero</p>
+            <p className="text-[#999] text-sm sm:text-base mt-0.5">Cómo fluye tu dinero</p>
           </div>
         </div>
       </div>
@@ -1199,7 +1199,7 @@ export default function RiquezaPage() {
 
       {/* ── Month Navigation ── */}
       <div className="flex items-center justify-between">
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#888] hover:text-champagne">
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-2">
@@ -1209,7 +1209,7 @@ export default function RiquezaPage() {
             <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-champagne/60 hover:text-champagne ml-1 underline underline-offset-2">Hoy</button>
           )}
         </div>
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#666] hover:text-champagne">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#888] hover:text-champagne">
           <ChevronRight size={18} />
         </button>
       </div>
@@ -1227,13 +1227,13 @@ export default function RiquezaPage() {
         />
       ) : (
         <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6 sm:p-8 lg:p-10">
-          <p className="text-sm sm:text-base text-[#666] mb-6 sm:mb-8 tracking-wide">Este mes tu dinero ha fluido así</p>
+          <p className="text-sm sm:text-base text-[#888] mb-6 sm:mb-8 tracking-wide">Este mes tu dinero ha fluido así</p>
           {hasIntentions ? (
             <IntentionBalance flows={intentionFlows} totalExpense={cmExpense} />
           ) : currentMonthLogs.length > 0 ? (
-            <p className="text-xs sm:text-sm text-[#444] leading-relaxed">Asigna intenciones a tus movimientos para ver hacia dónde fluye tu energía.</p>
+            <p className="text-xs sm:text-sm text-[#999] leading-relaxed">Asigna intenciones a tus movimientos para ver hacia dónde fluye tu energía.</p>
           ) : (
-            <p className="text-xs sm:text-sm text-[#444]">Sin movimientos este mes.</p>
+            <p className="text-xs sm:text-sm text-[#999]">Sin movimientos este mes.</p>
           )}
         </div>
       )}
@@ -1248,9 +1248,9 @@ export default function RiquezaPage() {
               </span>
             </div>
             <div className="flex items-center gap-3 mt-2">
-              {cmIncome > 0 && <span className="text-xs sm:text-sm text-[#777]">+{formatCurrency(cmIncome)} ingresos</span>}
+              {cmIncome > 0 && <span className="text-xs sm:text-sm text-[#999]">+{formatCurrency(cmIncome)} ingresos</span>}
               {cmIncome > 0 && cmExpense > 0 && <span className="text-[#222] text-xs">·</span>}
-              {cmExpense > 0 && <span className="text-xs sm:text-sm text-[#777]">{formatCurrency(cmExpense)} gastos</span>}
+              {cmExpense > 0 && <span className="text-xs sm:text-sm text-[#999]">{formatCurrency(cmExpense)} gastos</span>}
             </div>
           </PrivacyMask>
         </div>
@@ -1289,7 +1289,7 @@ export default function RiquezaPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border whitespace-nowrap ${
                   period === p.key
                     ? 'bg-champagne/15 border-champagne/30 text-champagne'
-                    : 'bg-[#000000] border-[#1a1a1a] text-[#666] hover:text-[#999] hover:border-[#333]'
+                    : 'bg-[#000000] border-[#1a1a1a] text-[#888] hover:text-[#999] hover:border-[#333]'
                 }`}
               >
                 {p.label}
@@ -1307,8 +1307,8 @@ export default function RiquezaPage() {
               return (
                 <div key={dateLabel}>
                   <div className="flex items-center justify-between mb-2.5">
-                    <span className="text-[11px] font-medium text-[#555] uppercase tracking-wider">{dateLabel}</span>
-                    <span className="text-[11px] text-[#333]">
+                    <span className="text-[11px] font-medium text-[#888] uppercase tracking-wider">{dateLabel}</span>
+                    <span className="text-[11px] text-[#999]">
                       {dayIncome > 0 && <span className="text-champagne/40">+{formatCurrency(dayIncome)}</span>}
                       {dayIncome > 0 && dayExpense > 0 && <span className="text-[#1a1a1a] mx-1.5">·</span>}
                       {dayExpense > 0 && <span className="text-red-400/40">{formatCurrency(dayExpense)}</span>}
@@ -1324,11 +1324,11 @@ export default function RiquezaPage() {
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-white font-medium">{log.category}</span>
                               {moodInfo && (
-                                <span className="text-[10px] text-[#444] tracking-wide">{moodInfo.label.toLowerCase()}</span>
+                                <span className="text-[10px] text-[#999] tracking-wide">{moodInfo.label.toLowerCase()}</span>
                               )}
                             </div>
                             {log.description && (
-                              <p className="text-xs text-[#555] truncate mt-0.5">{log.description}</p>
+                              <p className="text-xs text-[#888] truncate mt-0.5">{log.description}</p>
                             )}
                             {log.contexto && (
                               <p className="text-[11px] text-[#3a3a3a] truncate mt-0.5 italic font-light">{log.contexto}</p>
@@ -1341,8 +1341,8 @@ export default function RiquezaPage() {
                               </p>
                             </PrivacyMask>
                             <div className="flex items-center gap-1 flex-shrink-0">
-                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#666] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                              <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#666] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
+                              <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
                             </div>
                           </div>
                         </div>

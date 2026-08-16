@@ -82,7 +82,7 @@ function ValueSlider({
             className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all duration-200 value-btn ${
               v <= value
                 ? 'bg-champagne text-[#000000]'
-                : 'bg-[#1a1a1a] text-[#555] hover:bg-[#222] hover:text-[#888]'
+                : 'bg-[#1a1a1a] text-[#888] hover:bg-[#222] hover:text-[#888]'
             }`}
           >
             {v}
@@ -233,7 +233,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
           ref={closeButtonRef}
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#555] hover:text-white hover:bg-[#1a1a1a] transition-colors z-10 close-btn"
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#888] hover:text-white hover:bg-[#1a1a1a] transition-colors z-10 close-btn"
         >
           <X size={16} />
         </button>
@@ -243,7 +243,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
           <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[75dvh] overflow-y-auto scroll-contain safe-bottom">
             <div className="text-center mb-2">
               <h3 id="checkin-modal-title" className="text-lg font-bold text-white">¿Cómo estás hoy?</h3>
-              <p id="checkin-modal-desc" className="text-xs text-[#666]">Sin juicio</p>
+              <p id="checkin-modal-desc" className="text-xs text-[#888]">Sin juicio</p>
             </div>
 
             <ValueSlider label="Estado emocional" value={emotion} onChange={setEmotion} labels={EMOTION_LABELS} sliderId="emotion" />
@@ -269,7 +269,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             {/* Optional note */}
             <div>
               <label className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">
-                Nota <span className="text-[#444] normal-case">(opcional)</span>
+                Nota <span className="text-[#999] normal-case">(opcional)</span>
               </label>
               <textarea
                 value={note}
@@ -290,7 +290,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             </button>
             <button
               onClick={onClose}
-              className="w-full text-[#555] text-xs mt-2 hover:text-[#999] transition-colors"
+              className="w-full text-[#888] text-xs mt-2 hover:text-[#999] transition-colors"
             >
               Más tarde
             </button>

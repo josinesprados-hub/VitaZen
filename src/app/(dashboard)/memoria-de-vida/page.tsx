@@ -166,7 +166,7 @@ export default function EtapasPage() {
       {/* Back */}
       <Link
         href="/dashboard"
-        className="flex items-center gap-2 text-[#555] hover:text-champagne transition-colors text-xs mb-8 sm:mb-10"
+        className="flex items-center gap-2 text-[#888] hover:text-champagne transition-colors text-xs mb-8 sm:mb-10"
       >
         <ArrowLeft size={14} />
         Volver
@@ -187,7 +187,7 @@ export default function EtapasPage() {
         {data.oldestMonth && data.newestMonth && (
           <div className="mt-6 inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-[#1a1a1a] bg-[#0a0a0a]">
             <div className="w-1.5 h-1.5 rounded-full bg-champagne/40" />
-            <span className="text-[10px] text-[#555] tracking-wide">
+            <span className="text-[10px] text-[#888] tracking-wide">
               {getTimeRangeLabel(data.oldestMonth, data.newestMonth)}
             </span>
           </div>
@@ -198,16 +198,16 @@ export default function EtapasPage() {
       {!hasContent && (
         <div className="text-center py-24 sm:py-32">
           <div className="w-2.5 h-2.5 rounded-full bg-champagne/15 mx-auto mb-6" />
-          <p className="text-[#555] text-sm">{NO_DATA_TITLE}</p>
-          <p className="text-[#333] text-xs mt-3">{NO_DATA_SUBTITLE}</p>
+          <p className="text-[#888] text-sm">{NO_DATA_TITLE}</p>
+          <p className="text-[#999] text-xs mt-3">{NO_DATA_SUBTITLE}</p>
         </div>
       )}
 
       {/* ─── Little data state ─── */}
       {hasContent && !data.hasEnoughData && (
         <div className="text-center py-6 mb-10">
-          <p className="text-[#444] text-xs">{LITTLE_DATA_TITLE}</p>
-          <p className="text-[#333] text-[10px] mt-1.5">{LITTLE_DATA_SUBTITLE}</p>
+          <p className="text-[#999] text-xs">{LITTLE_DATA_TITLE}</p>
+          <p className="text-[#999] text-[10px] mt-1.5">{LITTLE_DATA_SUBTITLE}</p>
         </div>
       )}
 
@@ -216,7 +216,7 @@ export default function EtapasPage() {
           ═══════════════════════════════════════ */}
       {stages.length > 0 && (
         <div className="mb-16 sm:mb-24">
-          <h2 className="text-[11px] text-[#444] mb-10 sm:mb-14 tracking-widest uppercase">{STAGES_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-10 sm:mb-14 tracking-widest uppercase">{STAGES_TITLE}</h2>
 
           {/* Timeline with glass cards */}
           <div className="relative ml-1 sm:ml-2 border-l border-[#131313] pl-8 sm:pl-12 space-y-6 sm:space-y-8">
@@ -250,7 +250,7 @@ export default function EtapasPage() {
           ═══════════════════════════════════════ */}
       {isPremium && transitions.length > 0 && (
         <div className="mb-16 sm:mb-24">
-          <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{TRANSITIONS_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-8 sm:mb-10 tracking-widest uppercase">{TRANSITIONS_TITLE}</h2>
 
           <div className="space-y-5 sm:space-y-6">
             {transitions.map((t, index) => (
@@ -279,7 +279,7 @@ export default function EtapasPage() {
           ═══════════════════════════════════════ */}
       {isPremium && data.memories.length > 0 && (
         <div className="mb-16 sm:mb-24">
-          <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{MEMORIES_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-8 sm:mb-10 tracking-widest uppercase">{MEMORIES_TITLE}</h2>
 
           <div className="space-y-4 sm:space-y-5">
             {data.memories.map((memory, i) => (
@@ -289,7 +289,7 @@ export default function EtapasPage() {
                 style={{ animationDelay: `${i * 0.04}s` }}
               >
                 <div className="bg-[#0a0a0a]/40 border border-[#111] rounded-lg px-4.5 py-3.5 sm:px-5 sm:py-4">
-                  <p className="text-[#777] text-xs sm:text-sm italic leading-relaxed">{memory.text}</p>
+                  <p className="text-[#999] text-xs sm:text-sm italic leading-relaxed">{memory.text}</p>
                   <p className="text-[10px] text-[#2a2a2a] mt-2">
                     {EMPIRE_LABELS[memory.empire] || memory.empire} · {safeFormatDateShort(memory.date)}
                   </p>
@@ -308,7 +308,7 @@ export default function EtapasPage() {
           ═══════════════════════════════════════ */}
       {isPremium && patterns.length > 0 && (
         <div className="mb-16 sm:mb-24">
-          <h2 className="text-[11px] text-[#444] mb-8 sm:mb-10 tracking-widest uppercase">{PATTERNS_TITLE}</h2>
+          <h2 className="text-[11px] text-[#999] mb-8 sm:mb-10 tracking-widest uppercase">{PATTERNS_TITLE}</h2>
 
           <div className="space-y-5 sm:space-y-6">
             {patterns.map((p, index) => (
@@ -350,7 +350,7 @@ export default function EtapasPage() {
         <div className="text-center mt-10 mb-4">
           <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#111] bg-[#0a0a0a]/50">
             <div className="w-1 h-1 rounded-full bg-champagne/30" />
-            <p className="text-[10px] text-[#444] tracking-wide">
+            <p className="text-[10px] text-[#999] tracking-wide">
               {FREE_LIMIT_MESSAGE}
             </p>
           </div>
