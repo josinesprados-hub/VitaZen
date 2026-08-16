@@ -8,6 +8,7 @@ import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { Switch } from '@/components/ui/switch';
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
 import { SubscriptionManager } from '@/components/settings/SubscriptionManager';
+import { APP_VERSION } from '@/config/version';
 import {
   Mail,
   Eye,
@@ -20,7 +21,6 @@ import {
   Check,
 } from 'lucide-react';
 
-const APP_VERSION = '1.0.0';
 
 export default function AjustesPage() {
   const { user, firebaseUser, signOut, refreshUser } = useAuth();
