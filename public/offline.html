@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>VitaZen — Sin conexión</title>
+  <link rel="icon" href="/favicon.ico?v=7">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000000;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      text-align: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 320px; }
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 32px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #c8a55a 0%, #a8863a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      color: #000000;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+    p {
+      color: #888888;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    button {
+      background: #c8a55a;
+      color: #000000;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:hover { opacity: 0.9; }
+    button:active { opacity: 0.7; transform: scale(0.98); }
+    .offline-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      opacity: 0.3;
+    }
+    .offline-icon svg { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">V</div>
+    <div class="offline-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"/>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+        <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <line x1="12" y1="20" x2="12.01" y2="20"/>
+      </svg>
+    </div>
+    <h1>Sin conexión</h1>
+    <p>No hay conexión a Internet disponible. Revisa tu conexión e inténtalo de nuevo.</p>
+    <button onclick="window.location.reload()">Reintentar</button>
+  </div>
+</body>
+</html>

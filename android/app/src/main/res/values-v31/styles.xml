@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ (API 31+): Native splash screen configuration.
+
+         On API 31+, the system displays a splash screen using the adaptive icon
+         (ic_launcher_foreground) by default. VitaZen's ic_launcher_foreground is a
+         white "V" monogram, while the TWA splash (via SimpleSplashScreenStrategy)
+         shows the full gold VitaZen logo (splash_logo). This mismatch caused users
+         to see TWO DIFFERENT logos during startup.
+
+         This v31 override configures the native splash to use the SAME gold logo
+         (splash_logo) as the TWA splash, producing a seamless single-logo experience
+         on Android 12, 13, 14, and 15.
+
+         How it works:
+           1. System splash shows splash_logo (gold) via windowSplashScreenAnimatedIcon
+           2. TWA's SimpleSplashScreenStrategy shows splash.xml (also gold splash_logo)
+           3. Visual continuity: same logo, same black background, zero perceptible transition
+
+         Requirements:
+           - core-splashscreen:1.0.1 dependency (already in build.gradle line 80)
+           - splash_logo.png in drawable-{density} directories (already present)
+
+         Reference: https://developer.android.com/develop/ui/views/launch/splash-screen
+    -->
+    <style name="Theme.LauncherActivity" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Base launcher theme attributes (must be re-declared: v31 replaces values/styles.xml) -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="colorPrimary">@color/backgroundColor</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <!-- Android 12+ native splash screen attributes -->
+        <!-- Animated icon: uses the same splash_logo as the TWA splash (gold VitaZen logo) -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <!-- Background: solid black, matching backgroundColor (#000000) -->
+        <item name="android:windowSplashScreenBackground">@color/backgroundColor</item>
+        <!-- Icon background: transparent so the logo sits directly on the black background -->
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+    </style>
+</resources>

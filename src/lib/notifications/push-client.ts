@@ -189,14 +189,21 @@ export function onForegroundMessage(
 
 /**
  * Get or create a service worker registration.
- * We register the firebase-messaging-sw.js if no active registration exists.
+ * Registers the unified sw.js (handles both PWA caching and FCM push).
+ * Falls back to firebase-messaging-sw.js for any existing registrations.
  */
 async function getOrCreateSWRegistration(): Promise<ServiceWorkerRegistration> {
   try {
-    const existingReg = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
-    if (existingReg) return existingReg;
+    // Prefer the unified production SW (sw.js)
+    const unifiedReg = await navigator.serviceWorker.getRegistration('/sw.js');
+    if (unifiedReg) return unifiedReg;
 
-    return navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+    // Check for legacy firebase-messaging-sw.js registration
+    const legacyReg = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+    if (legacyReg) return legacyReg;
+
+    // Register the unified production service worker
+    return navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     });
   } catch (error) {
