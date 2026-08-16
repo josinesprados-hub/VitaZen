@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
@@ -324,12 +325,12 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-[#999]">Legal</p>
             <div className="flex items-center gap-3">
-              <a href="/privacy" className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2">
+              <Link href="/privacy" className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2">
                 Privacidad
-              </a>
-              <a href="/terms" className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2">
+              </Link>
+              <Link href="/terms" className="text-xs text-champagne hover:text-champagne-hover transition-colors underline underline-offset-2">
                 Términos
-              </a>
+              </Link>
             </div>
           </div>
         </div>

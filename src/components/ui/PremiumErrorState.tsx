@@ -29,6 +29,8 @@ import { cn } from '@/lib/utils';
 //     onRetry={() => window.location.reload()}
 //   />
 
+import Link from 'next/link';
+
 import {
   WifiOff,
   RefreshCw,
@@ -189,12 +191,12 @@ export default function PremiumErrorState({
           {/* Secondary action */}
           {secondaryAction && (
             secondaryAction.href ? (
-              <a
+              <Link
                 href={secondaryAction.href}
                 className="text-[#888] text-xs hover:text-[#999] transition-colors"
               >
                 {secondaryAction.label}
-              </a>
+              </Link>
             ) : (
               <button
                 onClick={secondaryAction.onClick}

@@ -14,7 +14,7 @@ import LifePatternsSection from '@/components/patterns/LifePatternsSection';
 import PremiumReflection from '@/components/ui/PremiumReflection';
 import { MonthlyClosurePrompt } from './MonthlyClosurePrompt';
 
-import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise } from 'lucide-react';
+import { Shield, Brain, Zap, Gem, TrendingUp, Sparkles, Sunrise } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { getEmotionEmoji } from '@/lib/emotion-emojis';
 
@@ -46,6 +46,7 @@ const EMPIRE_CONFIG: Record<string, { name: string; icon: any; color: string }> 
   energia: { name: 'Energía', icon: Zap, color: '#c8a55a' },
   riqueza: { name: 'Finanzas', icon: Gem, color: '#c8a55a' },
   crecimiento: { name: 'Crecimiento', icon: TrendingUp, color: '#c8a55a' },
+  mentor: { name: 'Mentor', icon: Sparkles, color: '#c8a55a' },
 };
 
 export default function DashboardPage() {

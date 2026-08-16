@@ -50,6 +50,12 @@ const FOCUS_CONFIG: Record<string, { name: string; icon: any; href: string; tip:
     href: '/imperio/crecimiento',
     tip: 'Reflexión y evolución.',
   },
+  mentor: {
+    name: 'Mentor',
+    icon: Sparkles,
+    href: '/imperio/mentor',
+    tip: 'Guía inteligente.',
+  },
 };
 
 export function OnboardingRecommendations() {
