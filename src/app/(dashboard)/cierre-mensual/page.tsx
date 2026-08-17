@@ -419,7 +419,7 @@ function IntentionBar({ balance }: { balance: IntentionBalance }) {
 function FinancialDisplay({ financial }: { financial: FinancialSummary }) {
   const fmt = (n: number) => {
     const abs = Math.abs(n);
-    const formatted = abs.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const formatted = abs.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     return (n < 0 ? '-' : '') + formatted + ' €';
   };
 
