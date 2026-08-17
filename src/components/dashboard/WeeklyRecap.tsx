@@ -183,7 +183,7 @@ export function WeeklyRecap() {
           checkins: 5,
           habitsCompleted: 12,
           meditationSessions: 5,
-          journalEntries: 4,
+          journalEntries: 3,
         },
         topHabits: [
           { name: 'Meditación matutina', streak: 7 },

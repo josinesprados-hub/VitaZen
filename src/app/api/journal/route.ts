@@ -183,6 +183,9 @@ export async function PUT(request: NextRequest) {
       data: { title: safeTitle, content: safeContent, mood, gratitude: safeGratitude },
     });
 
+    // Trigger widget snapshot refresh (non-blocking)
+    onJournalChange(user.id, user.plan);
+
     return NextResponse.json({ entry: updated });
   } catch (error) {
     console.error('Journal PUT error:', error);

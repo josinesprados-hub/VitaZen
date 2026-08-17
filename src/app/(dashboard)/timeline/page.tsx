@@ -89,7 +89,7 @@ const IMPERIO_CONFIG: Record<string, {
 // Activity type → imperio fallback (in case API doesn't send imperio)
 const TYPE_IMPERIO: Record<string, string> = {
   meditation: 'mente',
-  journal: 'mente',
+  journal: 'crecimiento',
   wellness: 'energia',
   nutrition: 'energia',
   habits: 'disciplina',

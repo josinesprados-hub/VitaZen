@@ -7,7 +7,7 @@ import { formatCurrency } from '@/lib/utils';
 // Imperio mapping — each activity belongs to a vital dimension
 const TYPE_IMPERIO: Record<string, string> = {
   meditation: 'mente',
-  journal: 'mente',
+  journal: 'crecimiento',
   wellness: 'energia',
   nutrition: 'energia',
   habits: 'disciplina',
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
           items.push({
             id: e.id,
             type: 'journal',
-            imperio: 'mente',
+            imperio: 'crecimiento',
             title: e.title || 'Reflexión',
             description: e.content.length > 100 ? e.content.substring(0, 100) + '…' : e.content,
             date: e.createdAt,
