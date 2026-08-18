@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getMadridDateKey, daysBetweenDateKeys, safeFormatDate, safeFormatTime } from '@/lib/dates';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_HABITS, SCREENSHOT_CHALLENGE as SCREENSHOT_HABIT_CHALLENGE } from '@/lib/screenshot-data';
-import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock } from 'lucide-react';
+import { Shield, Plus, Check, Trash2, Flame, Trophy, Lightbulb, Pencil, Calendar, Clock, Undo2 } from 'lucide-react';
 import ContextualHelp from '@/components/ui/ContextualHelp';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -64,6 +64,8 @@ export default function DisciplinaPage() {
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [undoState, setUndoState] = useState<{ habitId: string; previousLastCompletedAt: string | null } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const justCompletedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Auto-dismiss action error toast
@@ -73,12 +75,21 @@ export default function DisciplinaPage() {
     return () => clearTimeout(timer);
   }, [actionError]);
 
-  // Cleanup timer on unmount
+  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
     };
   }, []);
+
+  // Auto-dismiss undo option after 5 seconds
+  useEffect(() => {
+    if (!undoState) return;
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = setTimeout(() => setUndoState(null), 5000);
+    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); };
+  }, [undoState]);
 
   // Lock body scroll when any modal is open — save/restore scroll position
   useEffect(() => {
@@ -157,6 +168,10 @@ export default function DisciplinaPage() {
 
   const completeHabit = async (habitId: string) => {
     try {
+      // Capturar estado previo antes de la llamada (H-9 undo base)
+      const currentHabit = habits.find(h => h.id === habitId);
+      const previousLastCompletedAt = currentHabit?.lastCompletedAt ?? null;
+
       const res = await apiFetch('/api/habits', {
         method: 'PATCH',
         body: JSON.stringify({ habitId }),
@@ -168,6 +183,8 @@ export default function DisciplinaPage() {
         setShowReward(true);
         if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
         justCompletedTimerRef.current = setTimeout(() => setJustCompletedId(null), 600);
+        // Activar opción de deshacer (H-9)
+        setUndoState({ habitId, previousLastCompletedAt });
         refreshChallenge(); // Completing a habit may auto-complete today's challenge
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -175,6 +192,29 @@ export default function DisciplinaPage() {
       }
     } catch (error) {
       console.error('Error completing habit:', error);
+      setActionError('Sin conexión. Inténtalo de nuevo.');
+    }
+  };
+
+  // H-9: Deshacer la última completación
+  const undoComplete = async () => {
+    if (!undoState) return;
+    const { habitId, previousLastCompletedAt } = undoState;
+    setUndoState(null); // Ocultar inmediatamente
+    try {
+      const res = await apiFetch('/api/habits/undo', {
+        method: 'POST',
+        body: JSON.stringify({ habitId, previousLastCompletedAt }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHabits(prev => prev.map(h => h.id === habitId ? data.habit : h));
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setActionError(errData.error || errData.message || 'Error al deshacer');
+      }
+    } catch (error) {
+      console.error('Error undoing habit:', error);
       setActionError('Sin conexión. Inténtalo de nuevo.');
     }
   };
@@ -448,6 +488,21 @@ export default function DisciplinaPage() {
       <EmpireTipsSection empire="disciplina" subtitle="Ideas para tu disciplina" />
       {/* Micro-reward for habit completion */}
       <MicroReward trigger={showReward} message="Hábito completado" onComplete={() => setShowReward(false)} />
+
+      {/* H-9: Undo toast — aparece tras completar, se auto-oculta a los 5s */}
+      {undoState && !actionError && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in flex items-center gap-3"
+        >
+          <span>Completado</span>
+          <button
+            onClick={undoComplete}
+            className="flex items-center gap-1.5 bg-champagne/10 hover:bg-champagne/20 text-champagne px-3 py-1 rounded-lg transition-colors touch-press"
+          >
+            <Undo2 size={12} /> Deshacer
+          </button>
+        </div>
+      )}
 
       {/* Action error toast — auto-dismisses */}
       {actionError && (

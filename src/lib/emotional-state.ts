@@ -140,7 +140,12 @@ function computeStress(data: RawData): { value: number; prevValue: number } {
 function computeConsistency(data: RawData): { value: number; prevValue: number } {
   // Consistency from check-in frequency + habit completion + meditation frequency
   const checkinRatio = Math.min(data.thisWeekCheckins.length / 5, 1); // 5 check-ins = 100%
-  const habitRatio = Math.min(data.thisWeekHabits.length / 7, 1); // 7 days = 100%
+  // H-3 FIX: Habit ratio based on completedHabits/activeHabits.
+  // Previously used thisWeekHabits.length/7 (arbitrary), now uses
+  // actual consistency: 3/3 habits completed = 100%.
+  const habitRatio = data.totalActiveHabits > 0
+    ? Math.min(data.thisWeekHabits.length / data.totalActiveHabits, 1)
+    : 0;
   const medRatio = Math.min(data.thisWeekMeditations.length / 4, 1); // 4 sessions = 100%
 
   let value = checkinRatio * 100 * 0.35;
@@ -149,7 +154,10 @@ function computeConsistency(data: RawData): { value: number; prevValue: number }
 
   // Previous week — same weights as current week for fair comparison
   const prevCheckinRatio = Math.min(data.prevWeekCheckins.length / 5, 1);
-  const prevHabitRatio = Math.min(data.prevWeekHabits.length / 7, 1);
+  // H-3 FIX: Same ratio-based formula for previous week comparison.
+  const prevHabitRatio = data.totalActiveHabits > 0
+    ? Math.min(data.prevWeekHabits.length / data.totalActiveHabits, 1)
+    : 0;
   const prevMedRatio = Math.min(data.prevWeekMeditations.length / 4, 1);
   let prevValue = prevCheckinRatio * 100 * 0.35;
   prevValue += prevHabitRatio * 100 * 0.35;
