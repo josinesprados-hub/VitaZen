@@ -159,7 +159,7 @@ export async function PATCH(request: NextRequest) {
       let newStreak = habit.streak;
 
       if (lastCompleted) {
-        const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
+        const lastDateKey = getMadridDateKey(lastCompleted);
         // Compute day diff using date keys (timezone-aware)
         const todayMs = startOfMadridDay(todayDateKey).getTime();
         const lastMs = startOfMadridDay(lastDateKey).getTime();
