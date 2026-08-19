@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useMeditationTimer } from '@/hooks/useMeditationTimer';
 import { Brain, Play, Pause, Clock, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil, ArrowLeft, ChevronRight } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
@@ -206,9 +207,7 @@ export default function MentePage() {
   const { apiFetch } = useApi();
   const { user } = useAuth();
   const [sessions, setSessions] = useState<Meditation[]>([]);
-  const [meditating, setMeditating] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [timer, setTimer] = useState(0);
+  const { seconds: timer, isRunning: meditating, isPaused: paused, start: timerStart, pause: timerPause, resume: timerResume, stop: timerStop } = useMeditationTimer();
   const [selectedType, setSelectedType] = useState(BREATHING_TECHNIQUES[0]);
   const [viewingGuide, setViewingGuide] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -219,6 +218,8 @@ export default function MentePage() {
   const [editType, setEditType] = useState<string>('');
   const [editSaving, setEditSaving] = useState(false);
   const [fetchError, setFetchError] = useState(false);
+  // M-3: User-visible error messages for silent failures
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Ref for auto-scrolling into view when meditation starts
   const breathingSectionRef = useRef<HTMLDivElement>(null);
@@ -256,19 +257,14 @@ export default function MentePage() {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (meditating && !paused) {
-      interval = setInterval(() => setTimer(t => t + 1), 1000);
-    }
-    return () => clearInterval(interval);
-  }, [meditating, paused]);
+  // M-1 + M-2: Timer logic moved to useMeditationTimer hook
+  // - M-1: Wake Lock API keeps screen on during meditation
+  // - M-2: Drift-proof timer using Date.now() instead of setInterval increment
 
   const startMeditation = (type: BreathingTechnique) => {
     setSelectedType(type);
-    setTimer(0);
-    setPaused(false);
-    setMeditating(true);
+    setActionError(null);
+    timerStart();
     // Scroll to the page header so the user keeps context ("Mente" + subtitle +
     // top of the breathing card).  We measure the sticky TopBar height at runtime
     // to correctly handle safe-area-inset-top on notched iPhones.
@@ -284,9 +280,8 @@ export default function MentePage() {
   };
 
   const endMeditation = async () => {
-    setMeditating(false);
-    setPaused(false);
-    const duration = Math.max(1, Math.floor(timer / 60));
+    const finalSeconds = timerStop();
+    const duration = Math.max(1, Math.floor(finalSeconds / 60));
     const type = selectedType.type;
     setCompletedSession({ duration, type });
     try {
@@ -297,11 +292,15 @@ export default function MentePage() {
       if (res.ok) {
         const data = await res.json();
         setSessions(prev => [data.session, ...prev]);
+      } else {
+        // M-3: Show error to user instead of silent failure
+        setActionError('No se ha podido guardar la sesión. Inténtalo de nuevo.');
       }
     } catch (error) {
       console.error('Error saving meditation:', error);
+      // M-3: Show error to user instead of silent failure
+      setActionError('Error de conexión. La sesión no se ha guardado.');
     }
-    setTimer(0);
   };
 
   const formatTime = (seconds: number) => {
@@ -329,11 +328,13 @@ export default function MentePage() {
         setSessions(prev => prev.map(s => s.id === editingSession.id ? data.session : s));
         setEditingSession(null);
       } else {
-        const errData = await res.json().catch(() => ({}));
-        console.error('Meditation PUT failed:', res.status, errData);
+        // M-3: Show error to user instead of silent failure
+        setActionError('No se ha podido actualizar la sesión.');
       }
     } catch (error) {
       console.error('Error updating session:', error);
+      // M-3: Show error to user instead of silent failure
+      setActionError('Error de conexión al actualizar.');
     } finally {
       setEditSaving(false);
     }
@@ -349,11 +350,13 @@ export default function MentePage() {
       if (res.ok) {
         setSessions(prev => prev.filter(s => s.id !== pendingDeleteId));
       } else {
-        const errData = await res.json().catch(() => ({}));
-        console.error('Meditation DELETE failed:', res.status, errData);
+        // M-3: Show error to user instead of silent failure
+        setActionError('No se ha podido eliminar la sesión.');
       }
     } catch (error) {
       console.error('Error deleting session:', error);
+      // M-3: Show error to user instead of silent failure
+      setActionError('Error de conexión al eliminar.');
     } finally {
       setPendingDeleteId(null);
     }
@@ -382,11 +385,31 @@ export default function MentePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+      {/* ─── Action Error Banner (M-3) ─── */}
+      {actionError && (
+        <div
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[70] bg-red-500/90 text-white text-sm font-medium px-5 py-3 rounded-xl shadow-lg max-w-sm text-center"
+          role="alert"
+        >
+          {actionError}
+          <button
+            onClick={() => setActionError(null)}
+            className="ml-3 underline text-white/80 hover:text-white"
+            aria-label="Cerrar mensaje de error"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
       {/* ─── Completion Overlay ─── */}
       {completedSession && (
         <div
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center breathing-complete-backdrop p-0 sm:p-4"
           onClick={() => setCompletedSession(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Sesión completada"
         >
           <div
             className="breathing-complete-content p-6 sm:p-10 max-w-md w-full flex flex-col items-center"
@@ -410,6 +433,7 @@ export default function MentePage() {
             <button
               onClick={() => setCompletedSession(null)}
               className="bg-champagne text-black font-semibold px-8 py-3 rounded-xl hover:bg-champagne-hover transition-colors touch-press shrink-0"
+              aria-label="Cerrar sesión completada"
             >
               Cerrar
             </button>
@@ -422,6 +446,9 @@ export default function MentePage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setEditingSession(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Editar sesión"
         >
           <div
             className="modal-content p-8 max-w-md w-full"
@@ -463,6 +490,7 @@ export default function MentePage() {
               <button
                 onClick={() => setEditingSession(null)}
                 className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors"
+                aria-label="Cancelar edición"
               >
                 Cancelar
               </button>
@@ -470,6 +498,7 @@ export default function MentePage() {
                 onClick={saveEdit}
                 disabled={editSaving}
                 className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Guardar cambios"
               >
                 {editSaving ? 'Guardando...' : 'Guardar'}
               </button>
@@ -483,6 +512,9 @@ export default function MentePage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setPendingDeleteId(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirmar eliminación"
         >
           <div
             className="modal-content-destructive p-8 max-w-md w-full"
@@ -497,12 +529,14 @@ export default function MentePage() {
               <button
                 onClick={() => setPendingDeleteId(null)}
                 className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors"
+                aria-label="Cancelar eliminación"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmDelete}
                 className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors"
+                aria-label="Confirmar eliminación de sesión"
               >
                 Eliminar
               </button>
@@ -548,7 +582,7 @@ export default function MentePage() {
             <p className="text-[#888] text-sm mb-8">Duración sugerida: {selectedType.duration} min</p>
             <div className="flex items-center justify-center gap-3">
               <button
-                onClick={() => setPaused(!paused)}
+                onClick={() => paused ? timerResume() : timerPause()}
                 className={`flex items-center gap-2 bg-[#000000] border text-champagne font-semibold px-6 py-3 rounded-xl hover:bg-champagne/10 transition-colors ${!paused ? 'breathing-btn-outline border-champagne/30' : 'border-champagne/30'}`}
               >
                 {paused ? <><Play size={16} /> Continuar</> : <><Pause size={16} /> Pausar</>}
@@ -721,6 +755,7 @@ export default function MentePage() {
                       onClick={() => startEdit(session)}
                       className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press"
                       title="Editar sesión"
+                      aria-label="Editar sesión"
                     >
                       <Pencil size={14} />
                     </button>
@@ -728,6 +763,7 @@ export default function MentePage() {
                       onClick={() => setPendingDeleteId(session.id)}
                       className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press"
                       title="Eliminar sesión"
+                      aria-label="Eliminar sesión"
                     >
                       <Trash2 size={14} />
                     </button>
