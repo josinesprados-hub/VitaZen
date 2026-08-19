@@ -185,20 +185,27 @@ function parseQuickCapture(input: string, historyMap: Record<string, string>): P
 function parseEuropeanQuick(raw: string): number {
   const trimmed = raw.trim();
   if (!trimmed) return 0;
-  const hasComma = trimmed.includes(',');
-  const hasDot = trimmed.includes('.');
+  const lastDot = trimmed.lastIndexOf('.');
+  const lastComma = trimmed.lastIndexOf(',');
   let normalized: string;
 
-  if (hasComma && hasDot) {
-    normalized = trimmed.replace(/\./g, '').replace(',', '.');
-  } else if (hasComma) {
-    normalized = trimmed.replace(',', '.');
-  } else if (hasDot) {
-    normalized = /^\d{1,3}(\.\d{3})+$/.test(trimmed)
-      ? trimmed.replace(/\./g, '')
-      : trimmed;
-  } else {
+  if (lastDot === -1 && lastComma === -1) {
+    // No separators: "1250" → 1250
     normalized = trimmed;
+  } else if (lastComma > lastDot) {
+    // European: comma is decimal separator ("1.250,50" or "1250,50")
+    normalized = trimmed.replace(/\./g, '').replace(',', '.');
+  } else if (lastDot > lastComma) {
+    // International: dot is decimal separator ("1,250.50" or "1250.50")
+    // For dot-only values like "1.250", disambiguate: if the dot-only part
+    // matches European thousands grouping, treat dots as thousands.
+    if (lastComma === -1 && /^\d{1,3}(\.\d{3})+$/.test(trimmed)) {
+      normalized = trimmed.replace(/\./g, '');
+    } else {
+      normalized = trimmed.replace(/,/g, '');
+    }
+  } else {
+    normalized = trimmed.replace(/[.,]/g, '');
   }
 
   normalized = normalized.replace(/\.$/, '');
