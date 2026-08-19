@@ -1,7 +1,7 @@
 import { db } from './db';
 import { startOfNextDayMadrid } from '@/lib/dates';
 
-const FREE_DAILY_LIMIT = 15;
+const FREE_DAILY_LIMIT = 10;
 
 /**
  * Get the daily message limit for a given plan.

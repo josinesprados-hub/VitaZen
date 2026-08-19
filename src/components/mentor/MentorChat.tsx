@@ -152,7 +152,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [remaining, setRemaining] = useState<number | null>(null);
-  const [dailyLimit, setDailyLimit] = useState<number>(15);
+  const [dailyLimit, setDailyLimit] = useState<number>(10);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
@@ -247,7 +247,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         // Initialize remaining/limit from server if available
         if (data.remaining !== undefined && data.remaining !== null) {
           setRemaining(data.remaining);
-          setDailyLimit(data.limit || 15);
+          setDailyLimit(data.limit || 10);
         }
         // Only set active thread on initial load (when none is set)
         if (allThreads.length > 0 && !activeThreadRef.current) {
@@ -283,7 +283,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
             if (data.remaining !== undefined && data.remaining !== null) {
               setRemaining(data.remaining);
-              setDailyLimit(data.limit || 15);
+              setDailyLimit(data.limit || 10);
             }
             if (data.threads.length > 0 && !activeThreadRef.current) {
               let savedThreadId: string | null = null;
@@ -509,15 +509,19 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         body: JSON.stringify({ threadId }),
       });
       if (res.ok) {
-        // M-3 FIX: Calculate nextActiveId from the CURRENT threads state
-        // BEFORE calling setThreads. Previously, nextActiveId was assigned
-        // inside the setThreads updater as a side effect, but React 19's
-        // automatic batching defers updater execution — the variable was
-        // read as null before the updater ran.
-        const remaining = threads.filter(t => t.id !== threadId);
-        const nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
-        setThreads(remaining);
-        if (activeThread === threadId) {
+        // C-4 FIX: Use functional updater to read the LATEST threads state.
+        // Previously `threads` (a closure) could be stale if the user
+        // triggered another action (archive, unarchive) while the DELETE
+        // was in flight — causing the filter to operate on outdated data.
+        // Also use activeThreadRef.current instead of the `activeThread`
+        // closure for the same reason.
+        let nextActiveId: string | null = null;
+        setThreads(prev => {
+          const remaining = prev.filter(t => t.id !== threadId);
+          nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
+          return remaining;
+        });
+        if (activeThreadRef.current === threadId) {
           setActiveThread(nextActiveId);
           setMessages([]);
           try { localStorage.removeItem(storageKey); } catch {}
@@ -534,13 +538,17 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         body: JSON.stringify({ threadId, archived: true }),
       });
       if (res.ok) {
-        // M-3 FIX: Calculate nextActiveId from the CURRENT threads state
-        // BEFORE calling setThreads. Same fix as deleteThread.
-        const updated = threads.map(t => t.id === threadId ? { ...t, archived: true } : t);
-        const nextActiveId = updated.filter(t => !t.archived)[0]?.id ?? null;
-        setThreads(updated);
+        // C-4 FIX: Use functional updater to read the LATEST threads state.
+        // Previously `threads` (a closure) could be stale if the user
+        // triggered delete or another archive while this was in flight.
+        let nextActiveId: string | null = null;
+        setThreads(prev => {
+          const updated = prev.map(t => t.id === threadId ? { ...t, archived: true } : t);
+          nextActiveId = updated.filter(t => !t.archived)[0]?.id ?? null;
+          return updated;
+        });
         // If the archived thread was active, switch to the next active one
-        if (activeThread === threadId) {
+        if (activeThreadRef.current === threadId) {
           if (nextActiveId) {
             setActiveThread(nextActiveId);
           } else {
@@ -640,7 +648,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         if (activeThreadRef.current === sentThreadId) {
           setMessages(prev => [...prev, assistantMessage]);
           setRemaining(data.remaining);
-          setDailyLimit(data.limit || 15);
+          setDailyLimit(data.limit || 10);
           setIsContextual(!!data.contextual);
         }
 
@@ -1353,9 +1361,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                             li: ({ children }) => (
                               <li className="text-sm text-white leading-relaxed">{children}</li>
                             ),
-                            a: ({ href, children }) => (
-                              <a href={href} target="_blank" rel="noopener noreferrer" className="text-champagne hover:text-champagne-hover underline underline-offset-2">{children}</a>
-                            ),
+                            a: ({ href, children }) => {
+                              const safeHref = href && /^https?:\/\//i.test(href) ? href : undefined;
+                              return (
+                                <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-champagne hover:text-champagne-hover underline underline-offset-2">{children}</a>
+                              );
+                            },
                             code: ({ className, children, ...props }) => {
                               const isInline = !className;
                               if (isInline) {
