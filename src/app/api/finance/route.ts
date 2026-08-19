@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { startOfMadridDaysAgo } from '@/lib/dates';
+import { startOfMadridDaysAgo, startOfMadridDay } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // Serialización manual — evita problemas con Date/BigInt de Prisma
@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
     const logs = await db.financeLog.findMany({
       where: { userId: user.id, date: { gte: startOfMadridDaysAgo(days) } },
       orderBy: { date: 'desc' },
+      take: 2000,
     });
 
     const serialized = logs.map(l => serializeFinanceLog(l as unknown as Record<string, unknown>));
@@ -83,10 +84,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'La fecha es obligatoria.' }, { status: 400 });
     }
 
-    // Parse date and set to start of day in Madrid timezone
-    const dateObj = new Date(date + 'T00:00:00+01:00');
+    // Parse date using Madrid-aware utility
+    const dateObj = startOfMadridDay(date);
     if (isNaN(dateObj.getTime())) {
       return NextResponse.json({ error: 'Fecha inválida.' }, { status: 400 });
+    }
+
+    // Dedup: reject if an identical record exists in the last 10 seconds
+    const roundedAmount = Math.round(amount * 100) / 100;
+    const dedupCutoff = new Date(Date.now() - 10_000);
+    const existing = await db.financeLog.findFirst({
+      where: {
+        userId: user.id,
+        date: dateObj,
+        type,
+        category: category.trim().slice(0, 100),
+        amount: roundedAmount,
+        createdAt: { gte: dedupCutoff },
+      },
+    });
+    if (existing) {
+      return NextResponse.json({ log: serializeFinanceLog(existing as unknown as Record<string, unknown>), duplicated: true });
     }
 
     const log = await db.financeLog.create({
@@ -95,7 +113,7 @@ export async function POST(request: NextRequest) {
         date: dateObj,
         type,
         category: category.trim().slice(0, 100),
-        amount: Math.round(amount * 100) / 100,
+        amount: roundedAmount,
         description: description?.trim()?.slice(0, 500) || null,
         mood: mood?.trim()?.slice(0, 50) || null,
         contexto: contexto?.trim()?.slice(0, 1000) || null,
@@ -157,7 +175,7 @@ export async function PUT(request: NextRequest) {
       updateData.amount = Math.round(amount * 100) / 100;
     }
     if (date !== undefined) {
-      const dateObj = new Date(date + 'T00:00:00+01:00');
+      const dateObj = startOfMadridDay(date);
       if (isNaN(dateObj.getTime())) {
         return NextResponse.json({ error: 'Fecha inválida.' }, { status: 400 });
       }

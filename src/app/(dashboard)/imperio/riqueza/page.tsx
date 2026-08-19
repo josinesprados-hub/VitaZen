@@ -215,10 +215,14 @@ function getMonthRange(date: Date) {
   return getMadridMonthRange(yyyyMM);
 }
 
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
 function filterLogsByRange(logs: FinanceLog[], start: Date, end: Date) {
   return logs.filter(l => {
     const d = new Date(l.date);
-    return d >= start && d <= end;
+    return d >= start && d < end;
   });
 }
 
@@ -660,6 +664,7 @@ export default function RiquezaPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
   const [period, setPeriod] = useState<Period>('month');
   const [viewingMonth, setViewingMonth] = useState<Date | null>(null);
@@ -707,16 +712,10 @@ export default function RiquezaPage() {
       const windowH = window.innerHeight;
       const keyboardH = Math.max(0, windowH - vvHeight - vvOffsetTop);
       const maxH = Math.max(vvHeight * 0.85, 200);
-      const safeBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-bottom').trim() || '0', 10);
 
       // Set on document root so BOTH add-sheet and edit-sheet inherit it
       document.documentElement.style.setProperty('--bs-max-h', `${maxH}px`);
       document.documentElement.style.setProperty('--bs-keyboard-h', `${keyboardH}px`);
-
-      // Diagnostic logs — visible in Safari Web Inspector on real iPhone
-      console.log('[BS-DEBUG] vv.height=%d vv.offsetTop=%d window.innerHeight=%d keyboardH=%d --bs-max-h=%dpx --bs-keyboard-h=%dpx safeArea=%d',
-        Math.round(vvHeight), Math.round(vvOffsetTop), Math.round(windowH),
-        Math.round(keyboardH), Math.round(maxH), Math.round(keyboardH), safeBottom);
     };
 
     vv.addEventListener('resize', onResize);
@@ -810,9 +809,9 @@ export default function RiquezaPage() {
   // Computed — financial overview
   // ═══════════════════════════════════════════
 
-  const cmIncome = currentMonthLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
-  const cmExpense = currentMonthLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
-  const cmBalance = cmIncome - cmExpense;
+  const cmIncome = round2(currentMonthLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0));
+  const cmExpense = round2(currentMonthLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0));
+  const cmBalance = round2(cmIncome - cmExpense);
 
   // ═══════════════════════════════════════════
   // Computed — Intention Balance
@@ -826,25 +825,25 @@ export default function RiquezaPage() {
     for (const l of currentMonthLogs) {
       const resolved = resolveIntention(l.mood);
       if (resolved && totals[resolved] !== undefined) {
-        totals[resolved] += l.amount;
+        totals[resolved] = round2((totals[resolved] || 0) + l.amount);
         counts[resolved] = (counts[resolved] || 0) + 1;
       } else if (resolved) {
-        totals[resolved] = l.amount;
+        totals[resolved] = round2(l.amount);
         counts[resolved] = 1;
       } else {
-        unassigned += l.amount;
+        unassigned = round2(unassigned + l.amount);
       }
     }
 
     const flows: IntentionFlow[] = INTENTIONS.map(i => ({
       intention: i.value,
       label: i.label,
-      amount: totals[i.value] || 0,
+      amount: round2(totals[i.value] || 0),
       count: counts[i.value] || 0,
     }));
 
     if (unassigned > 0) {
-      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: unassigned, count: 0 });
+      flows.push({ intention: 'unassigned', label: 'Sin intención', amount: round2(unassigned), count: 0 });
     }
 
     return flows;
@@ -996,6 +995,7 @@ export default function RiquezaPage() {
 
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
+    setDeleteError(null);
     try {
       const res = await apiFetch('/api/finance', {
         method: 'DELETE',
@@ -1004,8 +1004,13 @@ export default function RiquezaPage() {
       if (res.ok) {
         setLogs(prev => prev.filter(l => l.id !== pendingDeleteId));
         showToast('Eliminado');
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setDeleteError(errData?.error || 'No se ha podido eliminar el registro');
       }
-    } catch (error) { console.error('Error deleting finance log:', error); }
+    } catch (error) {
+      setDeleteError('Error de conexión. Inténtalo de nuevo.');
+    }
     finally { setPendingDeleteId(null); }
   };
 
@@ -1062,6 +1067,9 @@ export default function RiquezaPage() {
         <div
           className="bs-overlay"
           onClick={closeAddSheet}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Nuevo movimiento"
         >
           <div
             ref={addSheetRef}
@@ -1118,7 +1126,7 @@ export default function RiquezaPage() {
 
       {/* ── Edit Overlay — reuses bs-sheet for consistency ── */}
       {editingLog && (
-        <div className="bs-overlay" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
+        <div className="bs-overlay" onClick={() => { setEditingLog(null); setSubmitError(null); }} role="dialog" aria-modal="true" aria-label="Editar registro">
           <div
             className="bs-sheet"
             style={{ height: 'auto', maxHeight: 'min(85dvh, var(--bs-max-h, 9999px))' }}
@@ -1158,15 +1166,16 @@ export default function RiquezaPage() {
 
       {/* ── Delete Confirmation ── */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => setPendingDeleteId(null)}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => { setPendingDeleteId(null); setDeleteError(null); }} role="alertdialog" aria-modal="true" aria-label="Confirmar eliminación">
           <div className="modal-content-destructive p-6 sm:p-8 w-full sm:max-w-md safe-bottom" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-2">Eliminar registro</h3>
             <p className="text-[#999] text-sm text-center mb-6">Esta acción no se puede deshacer</p>
+            {deleteError && <p className="text-red-400 text-xs text-center mb-4" role="alert">{deleteError}</p>}
             <div className="flex items-center justify-center gap-3">
-              <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
+              <button onClick={() => { setPendingDeleteId(null); setDeleteError(null); }} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
             </div>
           </div>
@@ -1199,7 +1208,7 @@ export default function RiquezaPage() {
 
       {/* ── Month Navigation ── */}
       <div className="flex items-center justify-between">
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#888] hover:text-champagne">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() - 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#888] hover:text-champagne" aria-label="Mes anterior">
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-2">
@@ -1209,7 +1218,7 @@ export default function RiquezaPage() {
             <button onClick={() => setViewingMonth(new Date())} className="text-[10px] text-champagne/60 hover:text-champagne ml-1 underline underline-offset-2">Hoy</button>
           )}
         </div>
-        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#888] hover:text-champagne">
+        <button onClick={() => viewingMonth && setViewingMonth(new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 1))} className="p-2.5 rounded-lg hover:bg-[#1a1a1a] transition-colors text-[#888] hover:text-champagne" aria-label="Mes siguiente">
           <ChevronRight size={18} />
         </button>
       </div>
@@ -1218,7 +1227,7 @@ export default function RiquezaPage() {
       {isEmpty ? (
         <PremiumEmptyState
           icon={Wallet}
-          title="Sin movimientos este mes"
+          title="Registra tu primer movimiento"
           subtitle="Empieza cuando quieras."
           cta="Registrar"
           onCta={() => { setQuickMode(true); setShowAdd(true); }}
@@ -1302,8 +1311,8 @@ export default function RiquezaPage() {
         {Object.keys(groupedHistory).length > 0 ? (
           <div className="space-y-5 max-h-[600px] overflow-y-auto overscroll-contain">
             {Object.entries(groupedHistory).map(([dateLabel, dateLogs]) => {
-              const dayIncome = dateLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0);
-              const dayExpense = dateLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
+              const dayIncome = round2(dateLogs.filter(l => l.type === 'income').reduce((s, l) => s + l.amount, 0));
+              const dayExpense = round2(dateLogs.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0));
               return (
                 <div key={dateLabel}>
                   <div className="flex items-center justify-between mb-2.5">
@@ -1341,8 +1350,8 @@ export default function RiquezaPage() {
                               </p>
                             </PrivacyMask>
                             <div className="flex items-center gap-1 flex-shrink-0">
-                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                              <button onClick={() => setPendingDeleteId(log.id)} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+                              <button onClick={() => startEdit(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" aria-label={`Editar ${log.category}`}><Pencil size={14} /></button>
+                              <button onClick={() => { setPendingDeleteId(log.id); setDeleteError(null); }} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" aria-label={`Eliminar ${log.category}`}><Trash2 size={14} /></button>
                             </div>
                           </div>
                         </div>
