@@ -76,8 +76,9 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
         ref={menuRef}
         role="menu"
         aria-label="Opciones de conversación"
-        className="fixed z-50 bg-[#111] border border-[#2a2a2a] rounded-xl py-1.5 shadow-2xl shadow-black/60 min-w-[180px] animate-in context-menu"
+        className="fixed z-50 bg-[#111] border border-[#2a2a2a] rounded-xl py-1.5 shadow-2xl shadow-black/60 min-w-[180px] max-w-[calc(100vw-16px)] animate-in context-menu"
         style={{
+          // M-9 FIX: Clamp to viewport bounds, prevent overflow in mobile drawer
           top: Math.min(y + 50, window.innerHeight - 200),
           left: Math.max(8, Math.min(x + 16, window.innerWidth - 200)),
         }}

@@ -97,6 +97,15 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // Debounce feedback state
   const [debounceBlocked, setDebounceBlocked] = useState(false);
 
+  // M-3: Action-in-progress refs (prevent duplicate destructive requests)
+  const deletingThreadRef = useRef<string | null>(null);
+  const archivingThreadRef = useRef<string | null>(null);
+  const renamingThreadRef = useRef<string | null>(null);
+
+  // M-7: Timeout refs for cleanup on unmount
+  const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // NOTE: copiedId removed — B-3 FIX: copy state is now self-contained in MessageBubble
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -128,6 +137,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const prevUserIdRef = useRef<string | null>(null);
   const visibilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // M-7: Cleanup all timeout refs on unmount
+  useEffect(() => {
+    return () => {
+      if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
   const isPremium = displayUser?.plan === 'PREMIUM';
 
   // User-scoped storage key: prevents cross-user thread leaks on shared devices
@@ -141,75 +158,76 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // evaluates the const variable before it's initialized → TDZ crash:
   //   "Cannot access 'eB' before initialization"
 
+  // M-6 FIX: Extracted thread data processing to eliminate duplication.
+  // Both the initial fetch and the retry used identical 20-line blocks.
+  const processThreadsData = useCallback((data: any, isInitialLoad: boolean) => {
+    const allThreads: Thread[] = data.threads;
+    setThreads(allThreads);
+    // M-5 FIX: historyLimited set only here (single source of truth: threads API)
+    setHistoryLimited(!!data.historyLimited);
+    // BUG-04: Store real counts from server for tab badges
+    if (data.totalActiveCount !== undefined) setTotalActiveCount(data.totalActiveCount);
+    if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
+    // Initialize remaining/limit from server if available
+    if (data.remaining !== undefined && data.remaining !== null) {
+      setRemaining(data.remaining);
+      setDailyLimit(data.limit || 10);
+    }
+    // Only set active thread on initial load (when none is set)
+    if (isInitialLoad && allThreads.length > 0 && !activeThreadRef.current) {
+      let savedThreadId: string | null = null;
+      try { savedThreadId = localStorage.getItem(storageKey); } catch {}
+      // Only restore if saved thread is active (not archived)
+      const savedExists = savedThreadId && allThreads.some((t: Thread) => t.id === savedThreadId && !t.archived);
+      const activeThreadsList = allThreads.filter((t: Thread) => !t.archived);
+      setActiveThread(savedExists ? savedThreadId! : (activeThreadsList.length > 0 ? activeThreadsList[0].id : null));
+    } else if (isInitialLoad && allThreads.length === 0 && !activeThreadRef.current) {
+      // No threads at all — clear stale localStorage
+      try { localStorage.removeItem(storageKey); } catch {}
+    }
+  }, [storageKey]);
+
   const fetchThreads = useCallback(async (isRetry = false) => {
     try {
       const res = await apiFetch('/api/ai/threads');
       if (res.ok) {
         const data = await res.json();
-        const allThreads: Thread[] = data.threads;
-        setThreads(allThreads);
-        setHistoryLimited(!!data.historyLimited);
-        // BUG-04: Store real counts from server for tab badges
-        if (data.totalActiveCount !== undefined) setTotalActiveCount(data.totalActiveCount);
-        if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
-        // Initialize remaining/limit from server if available
-        if (data.remaining !== undefined && data.remaining !== null) {
-          setRemaining(data.remaining);
-          setDailyLimit(data.limit || 10);
-        }
-        // Only set active thread on initial load (when none is set)
-        if (allThreads.length > 0 && !activeThreadRef.current) {
-          let savedThreadId: string | null = null;
-          try { savedThreadId = localStorage.getItem(storageKey); } catch {}
-
-          // Only restore if saved thread is active (not archived)
-          const savedExists = savedThreadId && allThreads.some((t: Thread) => t.id === savedThreadId && !t.archived);
-          const activeThreads = allThreads.filter((t: Thread) => !t.archived);
-          setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
-        } else if (allThreads.length === 0 && !activeThreadRef.current) {
-          // No threads at all — clear stale localStorage
-          try { localStorage.removeItem(storageKey); } catch {}
-        }
-      } else if (!isRetry) {
-        // Auto-retry once on server error (transient failures)
-        await new Promise(r => setTimeout(r, 1000));
-        return fetchThreads(true);
+        processThreadsData(data, !isRetry);
+        return;
       }
-    } catch (e) { 
-      console.error(e); 
-      if (!isRetry) {
-        // Auto-retry once on network error
-        await new Promise(r => setTimeout(r, 1500));
-        try {
-          const res = await apiFetch('/api/ai/threads');
-          if (res.ok) {
-            const data = await res.json();
-            setThreads(data.threads);
-            setHistoryLimited(!!data.historyLimited);
-            // BUG-04: Store real counts from server for tab badges
-            if (data.totalActiveCount !== undefined) setTotalActiveCount(data.totalActiveCount);
-            if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
-            if (data.remaining !== undefined && data.remaining !== null) {
-              setRemaining(data.remaining);
-              setDailyLimit(data.limit || 10);
-            }
-            if (data.threads.length > 0 && !activeThreadRef.current) {
-              let savedThreadId: string | null = null;
-              try { savedThreadId = localStorage.getItem(storageKey); } catch {}
-              const savedExists = savedThreadId && data.threads.some((t: Thread) => t.id === savedThreadId && !t.archived);
-              const activeThreads = data.threads.filter((t: Thread) => !t.archived);
-              setActiveThread(savedExists ? savedThreadId! : (activeThreads.length > 0 ? activeThreads[0].id : null));
-            }
-            setLoadError(false);
-            setLoading(false);
-            return;
-          }
-        } catch {}
+      // M-4 FIX: Show error on non-retry server failure
+      if (isRetry) {
+        setLoadError(true);
+        return;
+      }
+      // Auto-retry once on server error (transient failures)
+      await new Promise(r => setTimeout(r, 1000));
+      return fetchThreads(true);
+    } catch (e) {
+      console.error(e);
+      if (isRetry) {
+        // M-4: Final retry failed — user already sees loadError from the retry
+        setLoadError(true);
+        return;
+      }
+      // Auto-retry once on network error
+      await new Promise(r => setTimeout(r, 1500));
+      try {
+        const res = await apiFetch('/api/ai/threads');
+        if (res.ok) {
+          const data = await res.json();
+          processThreadsData(data, true);
+          setLoadError(false);
+          return;
+        }
+      } catch (retryErr) {
+        // M-4 FIX: Log retry failure (user sees loadError state)
+        console.error('Thread fetch retry failed:', retryErr);
       }
       setLoadError(true);
     }
     finally { setLoading(false); }
-  }, [apiFetch, storageKey]);
+  }, [apiFetch, processThreadsData]);
 
   const fetchMessages = useCallback(async (threadId: string) => {
     const thisFetchId = ++fetchIdRef.current;
@@ -222,12 +240,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (res.ok && fetchIdRef.current === thisFetchId && !sendingRef.current) {
         const data = await res.json();
         setMessages(data.messages);
-        setHistoryLimited(!!data.historyLimited);
+        // M-5 FIX: Removed setHistoryLimited here — single source is fetchThreads
       }
+      // M-4 FIX: Silent is intentional — stale data is acceptable for background refresh
     } catch (e) { console.error(e); }
   }, [apiFetch]);
 
   // Fetch favorites when tab switches to 'favorites'
+  // M-4: Silent catch is intentional — favorites are non-critical auxiliary data
   const fetchFavorites = useCallback(async () => {
     try {
       const res = await apiFetch('/api/ai/favorites');
@@ -410,7 +430,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         setMessages([]);
         setTab('active');
         setDrawerOpen(false);
-        setTimeout(() => chatInputRef.current?.focus(), 100);
+        // M-7 FIX: Store timeout ref for cleanup on unmount
+        if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+        focusTimerRef.current = setTimeout(() => chatInputRef.current?.focus(), 100);
       } else {
         const data = await res.json();
         if (data.error?.includes('Maximum')) {
@@ -421,6 +443,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   };
 
   const deleteThread = async (threadId: string) => {
+    // M-3 FIX: Prevent duplicate delete requests
+    if (deletingThreadRef.current === threadId) return;
+    deletingThreadRef.current = threadId;
     try {
       const res = await apiFetch('/api/ai/threads', {
         method: 'DELETE',
@@ -439,12 +464,18 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setMessages([]);
           try { localStorage.removeItem(storageKey); } catch {}
         }
+      } else {
+        // M-4 FIX: Show error on non-OK response
+        setActionError('No se pudo eliminar la conversación');
       }
     } catch (e) { console.error(e); setActionError('No se pudo eliminar'); }
-    finally { setDeleteConfirm(null); }
+    finally { setDeleteConfirm(null); deletingThreadRef.current = null; }
   };
 
   const archiveThread = async (threadId: string) => {
+    // M-3 FIX: Prevent duplicate archive requests
+    if (archivingThreadRef.current === threadId) return;
+    archivingThreadRef.current = threadId;
     try {
       const res = await apiFetch('/api/ai/threads', {
         method: 'PATCH',
@@ -467,8 +498,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             setMessages([]);
           }
         }
+      } else {
+        // M-4 FIX: Show error on non-OK response
+        setActionError('No se pudo archivar la conversación');
       }
     } catch (e) { console.error(e); setActionError('No se pudo archivar'); }
+    finally { archivingThreadRef.current = null; }
   };
 
   const unarchiveThread = async (threadId: string) => {
@@ -488,6 +523,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       setEditingThreadId(null);
       return;
     }
+    // M-3 FIX: Prevent duplicate rename requests
+    if (renamingThreadRef.current === threadId) return;
+    renamingThreadRef.current = threadId;
     try {
       const res = await apiFetch('/api/ai/threads', {
         method: 'PATCH',
@@ -495,9 +533,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       });
       if (res.ok) {
         setThreads(prev => prev.map(t => t.id === threadId ? { ...t, title: newTitle.trim() } : t));
+      } else {
+        // M-4 FIX: Show error on non-OK response
+        setActionError('No se pudo renombrar');
       }
     } catch (e) { console.error(e); setActionError('No se pudo renombrar'); }
-    finally { setEditingThreadId(null); }
+    finally { setEditingThreadId(null); renamingThreadRef.current = null; }
   };
 
   const sendMessage = async () => {
@@ -508,7 +549,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     if (now - lastSendTime.current < 1000) {
       // BUG-06: Show discrete feedback when blocked by debounce
       setDebounceBlocked(true);
-      setTimeout(() => setDebounceBlocked(false), 800);
+      // M-7 FIX: Store timeout ref for cleanup on unmount
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = setTimeout(() => setDebounceBlocked(false), 800);
       return;
     }
     lastSendTime.current = now;
@@ -537,7 +580,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         const data = await res.json();
         setShowLimitModal(true);
         setRemaining(0);
-        setDailyLimit(data.limit || 15);
+        setDailyLimit(data.limit || 10);
         // Remove the optimistic user message since it was blocked
         setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         // L-4 FIX: Restore the input text so the user doesn't lose their message.
@@ -562,12 +605,17 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           setIsContextual(!!data.contextual);
         }
 
-        // Refresh threads to get updated title and updatedAt
-        const threadsRes = await apiFetch('/api/ai/threads');
-        if (threadsRes.ok) {
-          const threadsData = await threadsRes.json();
-          setThreads(threadsData.threads);
-          setHistoryLimited(!!threadsData.historyLimited);
+        // M-2 FIX: Refresh threads to get updated title and updatedAt.
+        // Wrapped in own try/catch — a failure here MUST NOT remove
+        // the message that was already sent successfully.
+        try {
+          const threadsRes = await apiFetch('/api/ai/threads');
+          if (threadsRes.ok) {
+            const threadsData = await threadsRes.json();
+            setThreads(threadsData.threads);
+          }
+        } catch {
+          // M-4: Silent — thread list refresh is non-critical after successful send
         }
       } else if (res.status !== 403) {
         // Non-403 error: remove optimistic message and show error
@@ -712,7 +760,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
         <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
-          Sin conexión — los mensajes se enviarán cuando vuelva la red
+          Sin conexión — verifica tu red para enviar mensajes
         </div>
       )}
 
@@ -934,7 +982,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           {/* Backdrop */}
           <div
             className="fixed inset-0 z-40 bg-black/60 sm:hidden"
-            onClick={() => setDrawerOpen(false)}
+            onClick={() => { setDrawerOpen(false); setContextMenu(null); }}
           />
           {/* Drawer panel — slides from left */}
           <div className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area">

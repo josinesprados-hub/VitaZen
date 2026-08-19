@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, X } from 'lucide-react';
 import FavoriteButton from './FavoriteButton';
 import { markdownComponents } from './markdownComponents';
 import type { Message } from './MentorChatTypes';
@@ -33,13 +33,19 @@ const MessageBubble = React.memo(function MessageBubble({
 }: MessageBubbleProps) {
   // Self-contained copy state — B-3: no parent re-render needed
   const [copied, setCopied] = useState(false);
+  // B-2 FIX: Show copy failure feedback
+  const [copyError, setCopyError] = useState(false);
 
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(msg.content);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {}
+    } catch {
+      // B-2 FIX: Inform user that copy failed
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 2000);
+    }
   }, [msg.content]);
 
   const bubbleClass = msg.role === 'user'
@@ -73,11 +79,13 @@ const MessageBubble = React.memo(function MessageBubble({
           {/* BUG-02: Copy response button */}
           <button
             onClick={handleCopy}
-            aria-label={copied ? 'Copiado' : 'Copiar respuesta'}
+            aria-label={copied ? 'Copiado' : copyError ? 'Error al copiar' : 'Copiar respuesta'}
             className={"w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-champagne/50 focus-visible:outline-none " + copyBtnClass}
           >
             {copied ? (
               <Check size={13} className="text-green-400" />
+            ) : copyError ? (
+              <X size={13} className="text-red-400" />
             ) : (
               <Copy size={13} />
             )}

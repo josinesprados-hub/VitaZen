@@ -201,7 +201,7 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
                   <Star size={24} className="text-[#999]" />
                 </div>
                 <p className="text-[#888] text-sm font-medium mb-1">Sin favoritos</p>
-                <p className="text-[#999] text-xs">Marca respuestas del mentor para guardarlas aqui</p>
+                <p className="text-[#999] text-xs">Marca respuestas del mentor para guardarlas aquí</p>
               </div>
             )}
             {favorites.map((fav) => {

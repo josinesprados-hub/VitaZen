@@ -106,13 +106,6 @@ export async function checkAILimit(userId: string, plan: string): Promise<{ allo
   });
 }
 
-/**
- * @deprecated Increment is now handled atomically inside checkAILimit().
- * This function is kept as a no-op for API compatibility.
- */
-export async function incrementAIUsage(userId: string): Promise<void> {
-  // No-op: the increment is now atomic within checkAILimit()
-}
 
 /**
  * Rollback one AI usage credit after a failed Groq call.
