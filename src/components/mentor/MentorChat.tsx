@@ -198,6 +198,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const deleteModalRef = useRef<HTMLDivElement>(null);
+  const limitModalRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   /** Sync textarea height with content (no-op if empty → collapses to 1 line) */
   const syncTextareaHeight = useCallback(() => {
@@ -351,6 +354,29 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     }
   }, [deleteConfirm, showLimitModal, drawerOpen]);
 
+  // A-2: Close modals and context menu on Escape key
+  useEffect(() => {
+    if (!deleteConfirm && !showLimitModal && !contextMenu && !drawerOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (deleteConfirm) { setDeleteConfirm(null); return; }
+      if (showLimitModal) { setShowLimitModal(false); return; }
+      if (contextMenu) { setContextMenu(null); return; }
+      if (drawerOpen) { setDrawerOpen(false); return; }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [deleteConfirm, showLimitModal, contextMenu, drawerOpen]);
+
+  // A-2: Focus trap — return focus to the first focusable element inside the modal
+  useEffect(() => {
+    const container = deleteConfirm ? deleteModalRef.current : showLimitModal ? limitModalRef.current : null;
+    if (!container) return;
+    // Move focus to the first focusable element inside the modal
+    const focusable = container.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length > 0) focusable[0].focus();
+  }, [deleteConfirm, showLimitModal]);
+
   // Close context menu on click outside
   useEffect(() => {
     const handler = () => setContextMenu(null);
@@ -358,6 +384,31 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       document.addEventListener('click', handler);
       return () => document.removeEventListener('click', handler);
     }
+  }, [contextMenu]);
+
+  // A-4: Keyboard navigation for context menu
+  useEffect(() => {
+    if (!contextMenu) return;
+    const menu = contextMenuRef.current;
+    if (!menu) return;
+    const items = menu.querySelectorAll<HTMLElement>('[role="menuitem"]');
+    if (items.length === 0) return;
+    let index = -1;
+    const setIndex = (i: number) => {
+      index = i;
+      items.forEach((el, idx) => el.setAttribute('aria-selected', idx === i ? 'true' : 'false'));
+      if (i >= 0 && i < items.length) items[i].focus();
+    };
+    setIndex(0);
+    const handler = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowDown': e.preventDefault(); setIndex(index < items.length - 1 ? index + 1 : 0); break;
+        case 'ArrowUp': e.preventDefault(); setIndex(index > 0 ? index - 1 : items.length - 1); break;
+        case 'Enter': case ' ': e.preventDefault(); if (index >= 0) items[index].click(); break;
+      }
+    };
+    menu.addEventListener('keydown', handler);
+    return () => menu.removeEventListener('keydown', handler);
   }, [contextMenu]);
 
   // Initial thread fetch
@@ -848,6 +899,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               return (
               <div
                 key={fav.id}
+                role="button"
+                tabIndex={0}
                 className="rounded-lg px-3 py-2.5 cursor-pointer text-[#ccc] hover:bg-[#1a1a1a]/60 transition-all duration-200"
                 onClick={() => {
                   setActiveThread(fav.thread.id);
@@ -855,6 +908,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                   // so the user can see the selected thread
                   setTab(isArchived ? 'archived' : 'active');
                   setDrawerOpen(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveThread(fav.thread.id);
+                    setTab(isArchived ? 'archived' : 'active');
+                    setDrawerOpen(false);
+                  }
                 }}
               >
                 <p className="text-xs text-champagne/70 mb-1 truncate">{fav.thread.title}</p>
@@ -908,6 +969,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                   {groupThreads.map((thread) => (
                     <div
                       key={thread.id}
+                      role="button"
+                      tabIndex={0}
                       className={`group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ${
                         activeThread === thread.id
                           ? 'bg-champagne/10 text-champagne'
@@ -917,6 +980,12 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                       }`}
                       onClick={() => {
                         if (editingThreadId !== thread.id) {
+                          setActiveThread(thread.id);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if ((e.key === 'Enter' || e.key === ' ') && editingThreadId !== thread.id) {
+                          e.preventDefault();
                           setActiveThread(thread.id);
                         }
                       }}
@@ -949,12 +1018,14 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                             <button
                               onClick={() => renameThread(thread.id, editTitle)}
                               className="text-champagne hover:text-champagne-hover p-0.5"
+                              aria-label="Guardar nombre"
                             >
                               <Check size={12} />
                             </button>
                             <button
                               onClick={() => setEditingThreadId(null)}
                               className="text-[#888] hover:text-white p-0.5"
+                              aria-label="Cancelar edición"
                             >
                               <X size={12} />
                             </button>
@@ -975,7 +1046,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                         <button
                           onClick={(e) => handleContextMenu(e, thread.id)}
                           className="text-[#999] hover:text-champagne p-1 rounded transition-all opacity-60 group-hover:opacity-100 ml-1"
-                          title="Más opciones"
+                          aria-label="Más opciones"
                         >
                           <MoreVertical size={14} />
                         </button>
@@ -1153,6 +1224,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           <button
             onClick={() => setDrawerOpen(true)}
             className="p-1.5 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+            aria-label="Abrir conversaciones"
           >
             <Menu size={20} />
           </button>
@@ -1204,7 +1276,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
-            title={sidebarOpen ? 'Ocultar sidebar' : 'Mostrar sidebar'}
+            aria-label={sidebarOpen ? 'Ocultar panel de conversaciones' : 'Mostrar panel de conversaciones'}
           >
             {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
           </button>
@@ -1526,6 +1598,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     type="submit"
                     disabled={sending || !input.trim() || (!isPremium && remaining === 0) || !!activeThreadData?.archived}
                     className="bg-champagne text-black font-semibold w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center touch-press"
+                    aria-label="Enviar mensaje"
                   >
                     <Send size={18} />
                   </button>
@@ -1571,6 +1644,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               <button
                 onClick={() => setDrawerOpen(false)}
                 className="p-1.5 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors"
+                aria-label="Cerrar conversaciones"
               >
                 <X size={18} />
               </button>
@@ -1591,6 +1665,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           />
           {/* Menu */}
           <div
+            ref={contextMenuRef}
+            role="menu"
+            aria-label="Opciones de conversación"
             className="fixed z-50 bg-[#111] border border-[#2a2a2a] rounded-xl py-1.5 shadow-2xl shadow-black/60 min-w-[180px] animate-in context-menu"
             style={{
               top: Math.min(contextMenu.y + 50, window.innerHeight - 200),
@@ -1603,6 +1680,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               return (
                 <>
                   <button
+                    role="menuitem"
+                    tabIndex={-1}
                     onClick={() => {
                       setEditingThreadId(thread.id);
                       setEditTitle(thread.title);
@@ -1616,6 +1695,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
                   {thread.archived ? (
                     <button
+                      role="menuitem"
+                      tabIndex={-1}
                       onClick={() => {
                         unarchiveThread(thread.id);
                         setContextMenu(null);
@@ -1627,6 +1708,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     </button>
                   ) : (
                     <button
+                      role="menuitem"
+                      tabIndex={-1}
                       onClick={() => {
                         archiveThread(thread.id);
                         setContextMenu(null);
@@ -1638,9 +1721,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                     </button>
                   )}
 
-                  <div className="my-1.5 border-t border-[#1a1a1a]" />
+                  <div className="my-1.5 border-t border-[#1a1a1a]" role="separator" />
 
                   <button
+                    role="menuitem"
+                    tabIndex={-1}
                     onClick={() => {
                       setDeleteConfirm(thread.id);
                       setContextMenu(null);
@@ -1660,11 +1745,18 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* ────────── Delete Confirmation Modal ────────── */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setDeleteConfirm(null)}>
-          <div className="modal-content-destructive p-8 max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            ref={deleteModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            className="modal-content-destructive p-8 max-w-sm w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle size={28} className="text-red-400" />
+              <AlertTriangle size={28} className="text-red-400" aria-hidden="true" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Eliminar conversación</h3>
+            <h3 id="delete-modal-title" className="text-lg font-bold text-white mb-2">Eliminar conversación</h3>
             <p className="text-[#999] mb-6 text-sm leading-relaxed">
               Esta acción eliminará la conversación y todos sus mensajes de forma permanente. No se puede deshacer.
             </p>
@@ -1688,7 +1780,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* BUG-06: Debounce blocked feedback — subtle and discrete */}
       {debounceBlocked && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#2a2a2a] text-[#888] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in">
+        <div role="status" aria-live="polite" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-[#2a2a2a] text-[#888] text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in">
           Espera un momento entre mensajes
         </div>
       )}
@@ -1696,6 +1788,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Action error toast — auto-dismisses */}
       {actionError && (
         <div
+          role="status"
+          aria-live="polite"
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
           onClick={() => setActionError('')}
         >
@@ -1705,14 +1799,21 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
       {/* ────────── Premium Limit Modal ────────── */}
       {showLimitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-          <div className="modal-content bg-[#0a0a0a] border border-champagne/20 rounded-2xl max-w-md w-full overflow-hidden context-menu">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setShowLimitModal(false)}>
+          <div
+            ref={limitModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="limit-modal-title"
+            className="modal-content bg-[#0a0a0a] border border-champagne/20 rounded-2xl max-w-md w-full overflow-hidden context-menu"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-8 text-center">
               <div className="w-10 h-10 rounded-xl bg-champagne/8 flex items-center justify-center mx-auto mb-5">
-                <Circle size={5} fill="currentColor" className="text-champagne/40" />
+                <Circle size={5} fill="currentColor" className="text-champagne/40" aria-hidden="true" />
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-2">
+              <h3 id="limit-modal-title" className="text-xl font-bold text-white mb-2">
                 Tu ritmo de hoy se ha completado
               </h3>
               <p className="text-[#999] mb-6 text-sm leading-relaxed">
@@ -1737,7 +1838,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
                   onClick={() => setShowLimitModal(false)}
                 >
                   <span className="flex items-center justify-center gap-2">
-                    <Circle size={4} fill="currentColor" />
+                    <Circle size={4} fill="currentColor" aria-hidden="true" />
                     Conocer Élite
                   </span>
                 </Link>
