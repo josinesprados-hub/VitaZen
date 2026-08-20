@@ -434,6 +434,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
         thisWeekFinance: [],
         prevWeekFinance: [],
         empireProgress: [],
+        totalActiveHabits: 0,
       };
 
       const es = await getEmotionalState(userId, plan, rawDataForEmotionalState);

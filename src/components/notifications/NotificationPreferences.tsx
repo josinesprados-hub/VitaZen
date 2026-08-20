@@ -140,6 +140,8 @@ export function NotificationPreferences() {
       setError('No se ha podido cambiar la zona horaria.');
     }
     setSavingKey(null);
+    // H-05: return focus to trigger after selection
+    timezoneButtonRef.current?.focus();
   };
 
   // ERR-4: retry loading preferences

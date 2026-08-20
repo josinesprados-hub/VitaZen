@@ -62,6 +62,7 @@ export interface RawData {
   thisWeekHabits: any[];
   prevWeekHabits: any[];
   allHabits: any[];
+  totalActiveHabits: number;
   thisWeekMeditations: any[];
   prevWeekMeditations: any[];
   thisWeekJournals: any[];
@@ -107,6 +108,7 @@ export async function gatherData(userId: string): Promise<RawData> {
     thisWeekFinance,
     prevWeekFinance,
     empireProgress,
+    totalActiveHabits,
   ] = await Promise.all([
     db.dailyCheckin.findMany({
       where: { userId, date: { gte: sevenDaysAgo } },
@@ -168,6 +170,11 @@ export async function gatherData(userId: string): Promise<RawData> {
     db.empireProgress.findMany({
       where: { userId },
     }),
+    // H-3 FIX: Total active habits for ratio-based scoring.
+    // Previously used completions/7, now uses completedHabits/activeHabits.
+    db.habitLog.count({
+      where: { userId },
+    }),
   ]);
 
   return {
@@ -187,6 +194,7 @@ export async function gatherData(userId: string): Promise<RawData> {
     thisWeekFinance,
     prevWeekFinance,
     empireProgress,
+    totalActiveHabits,
   };
 }
 
@@ -220,6 +228,7 @@ const EMPIRE_NAMES: Record<string, string> = {
 // ─────────────────────────────────────────
 
 function buildSummary(data: RawData): WeeklySummary {
+  const { totalActiveHabits } = data;
   const checkins = {
     count: data.thisWeekCheckins.length,
     avgEmotion: Math.round(avg(data.thisWeekCheckins.map((c: any) => c.emotion)) * 10) / 10,
@@ -271,7 +280,7 @@ function buildSummary(data: RawData): WeeklySummary {
   };
 
   const totalActivities = checkins.count + habits.completed + meditation.sessions + journal.entries + wellness.logs + nutrition.logs;
-  const score = calculateWellnessScore(checkins, habits, meditation, journal, wellness);
+  const score = calculateWellnessScore(checkins, habits, meditation, journal, wellness, totalActiveHabits);
 
   // I-1 FIX: Use Madrid timezone for week label.
   // Previously used toLocaleDateString without timeZone option, which
@@ -303,7 +312,8 @@ function calculateWellnessScore(
   habits: any,
   meditation: any,
   journal: any,
-  wellness: any
+  wellness: any,
+  totalActiveHabits: number
 ): number {
   let score = 0;
 
@@ -313,8 +323,12 @@ function calculateWellnessScore(
   // Emotional average (0-20)
   score += (checkins.avgEmotion / 5) * 20;
 
-  // Habit completion (0-20)
-  score += Math.min(habits.completed / 7, 1) * 20;
+  // H-3 FIX: Habit completion ratio (0-20).
+  // Measures actual consistency: 3/3 habits completed = 100%.
+  // Guard: 0 active habits → 0 contribution.
+  score += totalActiveHabits > 0
+    ? Math.min(habits.completed / totalActiveHabits, 1) * 20
+    : 0;
 
   // Meditation (0-20)
   score += Math.min(meditation.sessions / 4, 1) * 20;

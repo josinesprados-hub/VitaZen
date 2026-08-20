@@ -52,23 +52,32 @@ export function getTodayDateKey(): string {
  * Compute the UTC instant of midnight (00:00:00) in Madrid
  * for a given Madrid date key (YYYY-MM-DD).
  *
- * Algorithm:
- * 1. Create a reference point at noon UTC on the given date.
- *    Noon UTC is guaranteed to fall on the same calendar date
- *    in Madrid (Madrid is at most UTC+2, so noon UTC = 14:00 Madrid).
- * 2. Determine what time it is in Madrid at that noon UTC instant.
- * 3. Subtract the ms-since-midnight to get midnight in Madrid.
- *
- * Returns a UTC Date that represents "midnight in Madrid" on that date.
- * Safe for DST transitions: noon reference avoids edge cases at midnight.
+ * Algorithm (no noon-UTC reference):
+ * Madrid has exactly two possible UTC offsets:
+ *   CET  = UTC+1 → midnight Madrid = 23:00 UTC (previous day)
+ *   CEST = UTC+2 → midnight Madrid = 22:00 UTC (previous day)
+ * We compute both candidates and verify which one(s) map back
+ * to the target dateKey using getMadridDateKey.
+ * On normal days only one verifies; on the October DST transition
+ * (25-hour day) both verify — we pick the earlier (22:00 UTC),
+ * which is the true midnight. On the March DST transition (23-hour
+ * day), only CET (23:00 UTC) verifies.
  */
 export function startOfMadridDay(dateKey: string): Date {
-  const noonUtc = new Date(dateKey + 'T12:00:00Z');
-  const parts = noonUtc
-    .toLocaleString('sv-SE', { timeZone: MADRID_TZ })
-    .split(' ')[1].split(':').map(Number);
-  const msSinceMadridMidnight = (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
-  return new Date(noonUtc.getTime() - msSinceMadridMidnight);
+  const [year, month, day] = dateKey.split('-').map(Number);
+
+  // Two candidates for midnight Madrid in UTC:
+  //   CEST (UTC+2): midnight = 22:00 UTC previous day
+  //   CET  (UTC+1): midnight = 23:00 UTC previous day
+  // Date.UTC normalizes negative hours across day/month/year boundaries.
+  const utcCest = Date.UTC(year, month - 1, day, -2, 0, 0);
+  const utcCet  = Date.UTC(year, month - 1, day, -1, 0, 0);
+
+  // Verify: which candidate, when formatted in Madrid, gives dateKey?
+  // On October DST day both verify; we pick CEST (earlier = true midnight).
+  // On normal days only the correct offset verifies.
+  if (getMadridDateKey(new Date(utcCest)) === dateKey) return new Date(utcCest);
+  return new Date(utcCet);
 }
 
 /**

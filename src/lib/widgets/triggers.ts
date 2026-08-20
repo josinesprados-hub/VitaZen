@@ -85,6 +85,14 @@ export function onEnergiaChange(userId: string, plan: string): void {
 }
 
 /**
+ * Call when a user creates, updates, or deletes a finance log.
+ * Affects: momentum widget
+ */
+export function onFinanceChange(userId: string, plan: string): void {
+  triggerWidgetRefresh(userId, ['momentum'], plan).catch(() => {});
+}
+
+/**
  * Call when a user's plan changes (FREE → PREMIUM or vice versa).
  * Affects: all widgets (premium features may change payload content)
  */

@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     // H-06 FIX: Validate description length — previously unbounded, allowing
     // arbitrary data storage in the database.
     if (description !== undefined && description !== null) {
-      if (typeof description !== 'string') return NextResponse.json({ error: 'description must be a string' }, { status: 400 });
+      if (typeof description !== 'string') return NextResponse.json({ error: 'La descripción debe ser texto' }, { status: 400 });
       if (description.length > 500) return NextResponse.json({ error: 'La descripción es demasiado larga (máx. 500 caracteres)' }, { status: 400 });
     }
 
@@ -159,7 +159,7 @@ export async function PATCH(request: NextRequest) {
       let newStreak = habit.streak;
 
       if (lastCompleted) {
-        const lastDateKey = lastCompleted.toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).split(' ')[0];
+        const lastDateKey = getMadridDateKey(lastCompleted);
         // Compute day diff using date keys (timezone-aware)
         const todayMs = startOfMadridDay(todayDateKey).getTime();
         const lastMs = startOfMadridDay(lastDateKey).getTime();
@@ -238,8 +238,8 @@ export async function PATCH(request: NextRequest) {
       return { status: 'ok' as const, habit: updated };
     });
 
-    if (txResult.status === 'not_found') return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
-    if (txResult.status === 'already_completed') return NextResponse.json({ error: 'Already completed today' }, { status: 400 });
+    if (txResult.status === 'not_found') return NextResponse.json({ error: 'Hábito no encontrado' }, { status: 404 });
+    if (txResult.status === 'already_completed') return NextResponse.json({ error: 'Ya completado en este período' }, { status: 400 });
 
     const updated = txResult.habit;
 

@@ -4,7 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getAIUsageRemaining } from '@/lib/limits';
 
-const MAX_THREADS_FREE = 20;
+const MAX_THREADS_FREE = 5;
 const MAX_THREADS_PREMIUM = 100;
 
 // History limits: FREE sees last 10 threads, PREMIUM sees all

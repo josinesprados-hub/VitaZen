@@ -19,6 +19,8 @@ export {
   onMeditationChange,
   onJournalChange,
   onChallengeChange,
+  onEnergiaChange,
+  onFinanceChange,
   onPlanChange,
 } from './triggers';
 

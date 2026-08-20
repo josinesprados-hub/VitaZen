@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { startOfMadridDaysAgo } from '@/lib/dates';
+import { startOfMadridDaysAgo, startOfMadridDay, getTodayDateKey, getMadridDateKey, madridDayBoundaries } from '@/lib/dates';
+import { onFinanceChange } from '@/lib/widgets/triggers';
 
 // ═══════════════════════════════════════════
 // Serialización manual — evita problemas con Date/BigInt de Prisma
@@ -45,6 +46,7 @@ export async function GET(request: NextRequest) {
     const logs = await db.financeLog.findMany({
       where: { userId: user.id, date: { gte: startOfMadridDaysAgo(days) } },
       orderBy: { date: 'desc' },
+      take: 2000,
     });
 
     const serialized = logs.map(l => serializeFinanceLog(l as unknown as Record<string, unknown>));
@@ -83,24 +85,84 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'La fecha es obligatoria.' }, { status: 400 });
     }
 
-    // Parse date and set to start of day in Madrid timezone
-    const dateObj = new Date(date + 'T00:00:00+01:00');
+    // Parse date using Madrid-aware utility
+    const dateObj = startOfMadridDay(date);
     if (isNaN(dateObj.getTime())) {
       return NextResponse.json({ error: 'Fecha inválida.' }, { status: 400 });
     }
 
-    const log = await db.financeLog.create({
-      data: {
+    // Dedup: reject if an identical record exists in the last 10 seconds
+    const roundedAmount = Math.round(amount * 100) / 100;
+    const dedupCutoff = new Date(Date.now() - 10_000);
+    const existing = await db.financeLog.findFirst({
+      where: {
         userId: user.id,
         date: dateObj,
         type,
         category: category.trim().slice(0, 100),
-        amount: Math.round(amount * 100) / 100,
-        description: description?.trim()?.slice(0, 500) || null,
-        mood: mood?.trim()?.slice(0, 50) || null,
-        contexto: contexto?.trim()?.slice(0, 1000) || null,
+        amount: roundedAmount,
+        createdAt: { gte: dedupCutoff },
       },
     });
+    if (existing) {
+      return NextResponse.json({ log: serializeFinanceLog(existing as unknown as Record<string, unknown>), duplicated: true });
+    }
+
+    // F-4: XP (+10) and streak (first finance log of the Madrid day)
+    // Mirrors the meditation/energia pattern: advisory lock → create → check
+    // first-of-day → upsert EmpireProgress with XP + conditional streak.
+    const todayDateKey = getTodayDateKey();
+    const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
+
+    const log = await db.$transaction(async (tx) => {
+      // Advisory lock on (userId, today) — prevents concurrent POSTs from both
+      // seeing isFirstLogToday=true and double-incrementing the streak.
+      const lockSeed = user.id + '|riqueza|' + todayDateKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
+      const created = await tx.financeLog.create({
+        data: {
+          userId: user.id,
+          date: dateObj,
+          type,
+          category: category.trim().slice(0, 100),
+          amount: roundedAmount,
+          description: description?.trim()?.slice(0, 500) || null,
+          mood: mood?.trim()?.slice(0, 50) || null,
+          contexto: contexto?.trim()?.slice(0, 1000) || null,
+        },
+      });
+
+      // Check if any OTHER finance log was already created today (Madrid).
+      // Uses createdAt (server timestamp) to determine the user's active day,
+      // not the user-assigned `date` field which can be backdated.
+      const otherLogToday = await tx.financeLog.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: created.id },
+          createdAt: { gte: todayStart, lt: todayEnd },
+        },
+        select: { id: true },
+      });
+      const isFirstLogToday = !otherLogToday;
+
+      await tx.empireProgress.upsert({
+        where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
+        update: {
+          xp: { increment: 10 },
+          ...(isFirstLogToday ? { streak: { increment: 1 } } : {}),
+        },
+        create: { userId: user.id, empire: 'riqueza', xp: 10, streak: 1 },
+      });
+
+      return created;
+    });
+
+    // F-12: trigger widget refresh (non-blocking)
+    onFinanceChange(user.id, user.plan);
 
     return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>) });
   } catch (error) {
@@ -157,7 +219,7 @@ export async function PUT(request: NextRequest) {
       updateData.amount = Math.round(amount * 100) / 100;
     }
     if (date !== undefined) {
-      const dateObj = new Date(date + 'T00:00:00+01:00');
+      const dateObj = startOfMadridDay(date);
       if (isNaN(dateObj.getTime())) {
         return NextResponse.json({ error: 'Fecha inválida.' }, { status: 400 });
       }
@@ -177,6 +239,9 @@ export async function PUT(request: NextRequest) {
       where: { id: logId },
       data: updateData,
     });
+
+    // F-12: trigger widget refresh (non-blocking)
+    onFinanceChange(user.id, user.plan);
 
     return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>) });
   } catch (error) {
@@ -212,9 +277,46 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Registro no encontrado.' }, { status: 404 });
     }
 
-    await db.financeLog.delete({
-      where: { id: logId },
+    // F-4: Revert XP and streak inside a transaction.
+    // Mirrors the meditation DELETE pattern: delete → check if deleted log was
+    // the sole trigger for today's streak → conditionally decrement.
+    const todayDateKey = getTodayDateKey();
+    await db.$transaction(async (tx) => {
+      await tx.financeLog.delete({ where: { id: logId } });
+
+      const riquezaProgress = await tx.empireProgress.findUnique({
+        where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
+      });
+      if (!riquezaProgress) return;
+
+      // Only revert streak if the deleted log was created today (Madrid)
+      // AND no other finance log exists for today.
+      let decrementStreak = false;
+      const logDateKey = getMadridDateKey(existing.createdAt);
+      if (logDateKey === todayDateKey) {
+        const { start, end } = madridDayBoundaries(todayDateKey);
+        const otherLogToday = await tx.financeLog.findFirst({
+          where: {
+            userId: user.id,
+            id: { not: logId },
+            createdAt: { gte: start, lt: end },
+          },
+          select: { id: true },
+        });
+        decrementStreak = !otherLogToday;
+      }
+
+      await tx.empireProgress.update({
+        where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
+        data: {
+          xp: Math.max(0, riquezaProgress.xp - 10),
+          ...(decrementStreak ? { streak: Math.max(0, riquezaProgress.streak - 1) } : {}),
+        },
+      });
     });
+
+    // F-12: trigger widget refresh (non-blocking)
+    onFinanceChange(user.id, user.plan);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -141,7 +141,7 @@ export function useApi() {
       // If caller already aborted, skip the fetch entirely
       if (callerSignal.aborted) {
         clearTimeout(timeoutId);
-        return new Response(JSON.stringify({ error: 'Request aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ error: 'Solicitud cancelada' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
       }
       // Listen for caller abort and forward to our controller
       callerSignal.addEventListener('abort', () => timeoutController.abort(), { once: true });
@@ -200,7 +200,7 @@ export function useApi() {
         // ─── Retry on network errors / timeout ───
         // But NOT if the caller explicitly aborted (e.g. navigation away)
         if (callerSignal?.aborted) {
-          return new Response(JSON.stringify({ error: 'Request aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
+          return new Response(JSON.stringify({ error: 'Solicitud cancelada' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
         }
 
         if (isSafeToRetry && isRetryableError(error)) {
@@ -233,12 +233,12 @@ export function useApi() {
           } catch (retryError) {
             clearTimeout(retryTimeoutId);
             // Second failure — return a synthetic network error response
-            return new Response(JSON.stringify({ error: 'Network error' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ error: 'Sin conexión' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
           }
         }
 
         // Non-retryable error (e.g. caller abort) — return error response
-        return new Response(JSON.stringify({ error: 'Request failed' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ error: 'Error en la solicitud' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
       }
     };
 
@@ -255,7 +255,7 @@ export function useApi() {
       res = await fetchPromise;
     } catch (fetchErr) {
       // Should not happen — executeWithRetry always returns a Response
-      return new Response(JSON.stringify({ error: 'Unexpected error' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: 'Error inesperado' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
     }
 
     // ─── 401 handling (preserved from original) ───

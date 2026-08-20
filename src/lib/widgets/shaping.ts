@@ -122,6 +122,7 @@ export async function shapeMomentumPayload(
   // the trend calculation to avoid the systematic bias.
   const [
     prevMeditation, prevJournal, prevCheckins, prevChallenges, prevWellness, prevNutrition,
+    totalActiveHabits,
   ] = await Promise.all([
     db.meditationSession.count({
       where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
@@ -140,6 +141,12 @@ export async function shapeMomentumPayload(
     }),
     db.nutritionLog.count({
       where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
+    }),
+    // H-3 FIX: Total active habits for ratio-based scoring.
+    // Previously used completions/7 (arbitrary divisor), now uses
+    // completedHabits/activeHabits (measures actual consistency).
+    db.habitLog.count({
+      where: { userId },
     }),
   ]);
 
@@ -235,7 +242,12 @@ export async function shapeMomentumPayload(
 
   // ─── Calculate Score (same algorithm as /api/dashboard/momentum) ───
   const activityScore = Math.min(25, Math.round((activeDays / 7) * 25));
-  const habitScore = Math.min(20, Math.round((habitCompletions / 7) * 20));
+  // H-3 FIX: Ratio of completed habits to total active habits.
+  // Measures actual consistency: 3/3 habits completed = 100%.
+  // Guard: 0 active habits → 0 score (no habits to complete).
+  const habitScore = totalActiveHabits > 0
+    ? Math.min(20, Math.round((habitCompletions / totalActiveHabits) * 20))
+    : 0;
   const checkinScore = Math.min(15, Math.round((checkins / 7) * 15));
   const meditationScore = Math.min(15, Math.round((meditationSessions / 5) * 15));
   const journalScore = Math.min(10, Math.round((journalEntries / 3) * 10));
