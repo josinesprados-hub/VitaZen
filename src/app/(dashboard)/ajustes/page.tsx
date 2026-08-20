@@ -86,8 +86,14 @@ export default function AjustesPage() {
         throw new Error(data.error || 'Error al guardar');
       }
 
-      // Refresh user data in auth context
-      await refreshUser();
+      // ERR-5: Separate refreshUser failure from save failure.
+      // The setting was saved on the server. If refreshUser fails,
+      // the local state is still correct (optimistic). Don't revert.
+      try {
+        await refreshUser();
+      } catch {
+        // Non-critical: the setting is saved, auth context will sync later
+      }
 
       // Show saved indicator
       setSavedKeys(prev => new Set(prev).add(key));
@@ -99,7 +105,7 @@ export default function AjustesPage() {
         });
       }, 2000));
     } catch (err: any) {
-      // Revert on error
+      // Revert on error (only reached if the PUT itself failed)
       setSettings(prev => ({ ...prev, [key]: !value }));
       setError(err.message || 'Error al guardar los ajustes');
     } finally {

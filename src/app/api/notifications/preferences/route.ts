@@ -81,7 +81,6 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof body.pushEnabled === 'boolean') data.pushEnabled = body.pushEnabled;
     if (typeof body.checkinReminders === 'boolean') data.checkinReminders = body.checkinReminders;
-    // streakReminders: kept in DB for backward compat, no longer set from API
     if (typeof body.weeklyRecap === 'boolean') data.weeklyRecap = body.weeklyRecap;
     if (typeof body.comebackReminders === 'boolean') data.comebackReminders = body.comebackReminders;
     if (typeof body.reflectionReminders === 'boolean') data.reflectionReminders = body.reflectionReminders;

@@ -251,32 +251,6 @@ async function registerTokenWithServer(token: string): Promise<void> {
 }
 
 /**
- * Unregister the FCM token from our backend.
- */
-async function unregisterTokenWithServer(token: string): Promise<void> {
-  try {
-    const { getAuth } = await import('firebase/auth');
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) return;
-
-    const idToken = await currentUser.getIdToken();
-
-    await fetch('/api/notifications/register-token', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${idToken}`,
-      },
-      body: JSON.stringify({ token }),
-    });
-  } catch (error) {
-    console.error('[PushClient] Error unregistering token:', error);
-  }
-}
-
-/**
  * Track permission state changes on the server.
  * Called when the user changes browser notification settings.
  */

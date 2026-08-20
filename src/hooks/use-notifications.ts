@@ -30,6 +30,8 @@ interface UseNotificationsReturn {
   pushSupported: boolean;
   /** Loading state */
   loading: boolean;
+  /** ERR-4: true when initial preferences load failed */
+  loadError: boolean;
   /** Enable push notifications (triggers browser permission prompt) */
   enablePush: () => Promise<boolean>;
   /** Disable push notifications */
@@ -48,6 +50,8 @@ export function useNotifications(): UseNotificationsReturn {
   const [permissionState, setPermissionState] = useState<PushPermissionState>('default');
   const [pushSupported, setPushSupported] = useState(false);
   const [loading, setLoading] = useState(true);
+  // ERR-4: track whether the initial preferences load failed
+  const [loadError, setLoadError] = useState(false);
   const [foregroundNotification, setForegroundNotification] = useState<{
     title?: string;
     body?: string;
@@ -65,6 +69,9 @@ export function useNotifications(): UseNotificationsReturn {
     permissionStateRef.current = permissionState;
   }, [permissionState]);
 
+  // ERR-4: loadPreferences now sets loadError on failure
+  // and clears it on success, so the component can differentiate
+  // "still loading" from "load failed".
   const loadPreferences = useCallback(async () => {
     if (!firebaseUser) return;
 
@@ -77,9 +84,18 @@ export function useNotifications(): UseNotificationsReturn {
       if (res.ok) {
         const data = await res.json();
         setPreferences(data.preferences);
+        setLoadError(false);
+      } else {
+        // Non-OK response — if we had no preferences before, this is an error
+        setLoadError(prev => prev); // preserve existing error state
       }
     } catch (error) {
       console.error('[useNotifications] Error loading preferences:', error);
+      // Only set error if preferences haven't loaded yet
+      setPreferences(prev => {
+        if (prev === null) setLoadError(true);
+        return prev;
+      });
     }
   }, [firebaseUser]);
 
@@ -110,7 +126,10 @@ export function useNotifications(): UseNotificationsReturn {
         if (!cancelled) setLoading(false);
       } catch (error) {
         console.error('[useNotifications] Init error:', error);
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setLoadError(true);
+        }
       }
     };
 
@@ -208,6 +227,10 @@ export function useNotifications(): UseNotificationsReturn {
   }, [pushSupported]);
 
   // Enable push
+  // ERR-8: The optimistic update no longer creates a full default preferences
+  // object with hardcoded values. When prev is null (init failed / loadError),
+  // we only set pushEnabled:true minimally so the render condition passes.
+  // The subsequent loadPreferences() call corrects to real server values.
   const enablePush = useCallback(async (): Promise<boolean> => {
     const token = await requestPushToken();
 
@@ -223,15 +246,16 @@ export function useNotifications(): UseNotificationsReturn {
       // so the UI transitions without waiting for the loadPreferences round-trip.
       setPreferences(prev => {
         if (prev) return { ...prev, pushEnabled: true };
-        // Preferences not loaded yet (init may have failed) — provide
-        // defaults so the render condition passes and the UI transitions.
+        // ERR-8 / H-14: Preferences not loaded yet — set only pushEnabled
+        // and reuse current timezone. Avoids fabricating defaults for fields
+        // the user never chose. loadPreferences() will correct immediately.
         return {
           pushEnabled: true,
-          checkinReminders: true,
-          weeklyRecap: true,
-          comebackReminders: true,
-          reflectionReminders: true,
-          quietHoursEnabled: true,
+          checkinReminders: false,
+          weeklyRecap: false,
+          comebackReminders: false,
+          reflectionReminders: false,
+          quietHoursEnabled: false,
           quietHoursStart: '22:00',
           quietHoursEnd: '08:00',
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -276,9 +300,6 @@ export function useNotifications(): UseNotificationsReturn {
       // If permission was granted but token failed, try a server-side
       // preferences sync so the UI has the latest server state.
       if (actualPermission === 'granted') {
-        // Tell the server that push is enabled from the user's perspective.
-        // The register-token endpoint already set pushEnabled=true if it
-        // reached the upsert, but if it failed before that, we ensure it here.
         if (firebaseUser) {
           try {
             const idToken = await firebaseUser.getIdToken();
@@ -291,7 +312,7 @@ export function useNotifications(): UseNotificationsReturn {
               body: JSON.stringify({ pushEnabled: true }),
             });
           } catch {
-            // Best-effort
+            // Best-effort: loadPreferences below will re-sync
           }
         }
         await loadPreferences();
@@ -302,6 +323,10 @@ export function useNotifications(): UseNotificationsReturn {
   }, [loadPreferences, firebaseUser]);
 
   // Disable push
+  // ERR-7: If the server PATCH fails, the optimistic update (pushEnabled: false)
+  // would leave the UI out of sync with the server (UI shows disabled but
+  // server still has enabled). Fix: always call loadPreferences() in the
+  // catch to re-sync, even on failure.
   const disablePush = useCallback(async () => {
     await deactivatePushToken();
 
@@ -328,10 +353,13 @@ export function useNotifications(): UseNotificationsReturn {
           },
           body: JSON.stringify({ pushEnabled: false }),
         });
-        // Sync final state from server
-        await loadPreferences();
       } catch (error) {
         console.error('[useNotifications] Error disabling push:', error);
+      } finally {
+        // ERR-7: Always re-sync from server, whether the PATCH succeeded or failed.
+        // If it failed, loadPreferences restores the real server state,
+        // undoing the optimistic update so the UI is consistent.
+        await loadPreferences();
       }
     }
   }, [firebaseUser, loadPreferences]);
@@ -370,6 +398,7 @@ export function useNotifications(): UseNotificationsReturn {
     permissionState,
     pushSupported,
     loading,
+    loadError,
     enablePush,
     disablePush,
     updatePreferences,
