@@ -147,8 +147,8 @@ export default function AjustesPage() {
 
       {/* Email Notifications Section */}
       {/* NOTE: 'Resumen semanal' → weekly-recap-sender.ts (cron). */}
-      <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
+      <div role="region" aria-labelledby="settings-email-heading" className="card-primary p-6 sm:p-8 space-y-5">
+        <h3 id="settings-email-heading" className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Mail size={14} />
           Notificaciones por email
         </h3>
@@ -174,6 +174,7 @@ export default function AjustesPage() {
               <Check size={14} className="text-champagne" />
             )}
             <Switch
+              aria-label="Activar resumen semanal por correo electrónico"
               checked={settings.weeklyEmailSummary}
               onCheckedChange={(v) => handleToggle('weeklyEmailSummary', v)}
             />
@@ -188,8 +189,8 @@ export default function AjustesPage() {
       {/* REAL: privacyStatsVisible now controls whether personal metrics (scores, streaks,
           counts, balances) are visually masked in the UI. When false (= private), sensitive
           numbers are gently blurred via <PrivacyMask>. Emotional content stays visible. */}
-      <div className="card-primary p-6 sm:p-8 space-y-5">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
+      <div role="region" aria-labelledby="settings-privacy-heading" className="card-primary p-6 sm:p-8 space-y-5">
+        <h3 id="settings-privacy-heading" className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Shield size={14} />
           Privacidad
         </h3>
@@ -215,6 +216,7 @@ export default function AjustesPage() {
               <Check size={14} className="text-champagne" />
             )}
             <Switch
+              aria-label="Mostrar estadísticas"
               checked={settings.privacyStatsVisible}
               onCheckedChange={(v) => handleToggle('privacyStatsVisible', v)}
             />
@@ -223,8 +225,8 @@ export default function AjustesPage() {
       </div>
 
       {/* Account Section */}
-      <div className="card-primary p-6 sm:p-8 space-y-4">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest">Cuenta</h3>
+      <div role="region" aria-labelledby="settings-account-heading" className="card-primary p-6 sm:p-8 space-y-4">
+        <h3 id="settings-account-heading" className="text-sm font-semibold text-champagne uppercase tracking-widest">Cuenta</h3>
 
         {/* Profile link */}
         <button
@@ -268,8 +270,8 @@ export default function AjustesPage() {
       </div>
 
       {/* App Info Section */}
-      <div className="card-primary p-6 sm:p-8 space-y-4">
-        <h3 className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
+      <div role="region" aria-labelledby="settings-info-heading" className="card-primary p-6 sm:p-8 space-y-4">
+        <h3 id="settings-info-heading" className="text-sm font-semibold text-champagne uppercase tracking-widest flex items-center gap-2">
           <Info size={14} />
           Información
         </h3>
@@ -343,6 +345,7 @@ export default function AjustesPage() {
           <p className="text-sm text-red-400">{error}</p>
           <button
             onClick={() => setError(null)}
+            aria-label="Cerrar"
             className="ml-auto text-[#999] hover:text-white text-xs"
           >
             Cerrar

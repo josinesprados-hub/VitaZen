@@ -214,10 +214,17 @@ export default function DashboardLayout({
         <div className="h-full bg-champagne route-progress-bar" />
       </div>
 
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[70] focus:px-3 focus:py-2 focus:rounded-md focus:bg-champagne focus:text-black focus:text-sm focus:font-medium focus:outline-none focus:ring-2 focus:ring-champagne/50"
+      >
+        Saltar al contenido
+      </a>
+
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="lg:ml-64">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />
-        <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-8 sm:pb-10 overflow-x-contain">
+        <main id="main-content" className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-8 sm:pb-10 overflow-x-contain">
           {!screenshotMode && <EmailVerificationBanner />}
           {children}
         </main>
