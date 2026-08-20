@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import {
-  UpdateNotificationPreferencesPayload,
   NotificationPreferencesResponse,
 } from '@/lib/notifications/types';
 
@@ -74,39 +73,53 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const body: UpdateNotificationPreferencesPayload = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'El formato de la solicitud no es válido' }, { status: 400 });
+    }
 
-    // Validate and sanitize
+    // Reject non-object bodies
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ error: 'El formato de la solicitud no es válido' }, { status: 400 });
+    }
+
+    const record = body as Record<string, unknown>;
+
+    // Validate and sanitize — only accept known fields
     const data: Record<string, unknown> = {};
 
-    if (typeof body.pushEnabled === 'boolean') data.pushEnabled = body.pushEnabled;
-    if (typeof body.checkinReminders === 'boolean') data.checkinReminders = body.checkinReminders;
-    if (typeof body.weeklyRecap === 'boolean') data.weeklyRecap = body.weeklyRecap;
-    if (typeof body.comebackReminders === 'boolean') data.comebackReminders = body.comebackReminders;
-    if (typeof body.reflectionReminders === 'boolean') data.reflectionReminders = body.reflectionReminders;
-    if (typeof body.quietHoursEnabled === 'boolean') data.quietHoursEnabled = body.quietHoursEnabled;
+    if (typeof record.pushEnabled === 'boolean') data.pushEnabled = record.pushEnabled;
+    if (typeof record.checkinReminders === 'boolean') data.checkinReminders = record.checkinReminders;
+    if (typeof record.weeklyRecap === 'boolean') data.weeklyRecap = record.weeklyRecap;
+    if (typeof record.comebackReminders === 'boolean') data.comebackReminders = record.comebackReminders;
+    if (typeof record.reflectionReminders === 'boolean') data.reflectionReminders = record.reflectionReminders;
+    if (typeof record.quietHoursEnabled === 'boolean') data.quietHoursEnabled = record.quietHoursEnabled;
 
-    // Validate time format HH:mm
-    if (body.quietHoursStart && /^\d{2}:\d{2}$/.test(body.quietHoursStart)) {
-      data.quietHoursStart = body.quietHoursStart;
+    // Validate time format HH:mm (00:00–23:59)
+    const VALID_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+    if (typeof record.quietHoursStart === 'string' && VALID_TIME.test(record.quietHoursStart)) {
+      data.quietHoursStart = record.quietHoursStart;
     }
-    if (body.quietHoursEnd && /^\d{2}:\d{2}$/.test(body.quietHoursEnd)) {
-      data.quietHoursEnd = body.quietHoursEnd;
+    if (typeof record.quietHoursEnd === 'string' && VALID_TIME.test(record.quietHoursEnd)) {
+      data.quietHoursEnd = record.quietHoursEnd;
     }
 
-    // Validate timezone (try formatting with it)
-    if (body.timezone) {
+    // Validate timezone: must be a non-empty string that Intl accepts
+    if (typeof record.timezone === 'string' && record.timezone.length > 0) {
       try {
-        new Intl.DateTimeFormat('en-US', { timeZone: body.timezone });
-        data.timezone = body.timezone;
+        new Intl.DateTimeFormat('en-US', { timeZone: record.timezone });
+        data.timezone = record.timezone;
       } catch {
-        return NextResponse.json({ error: 'Invalid timezone' }, { status: 400 });
+        return NextResponse.json({ error: 'Zona horaria no válida' }, { status: 400 });
       }
     }
 
-    // Validate daily cap range
-    if (typeof body.maxDailyNotifications === 'number') {
-      const cap = Math.min(Math.max(body.maxDailyNotifications, 1), 2);
+    // Validate daily cap range (must be integer, not NaN/Infinity)
+    if (typeof record.maxDailyNotifications === 'number' &&
+        Number.isFinite(record.maxDailyNotifications)) {
+      const cap = Math.min(Math.max(Math.floor(record.maxDailyNotifications), 1), 2);
       data.maxDailyNotifications = cap;
     }
 

@@ -46,8 +46,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const body = await request.json();
-    const { weeklyEmailSummary, dailyReminders, privacyStatsVisible } = body;
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'El formato de la solicitud no es válido' }, { status: 400 });
+    }
+
+    // Reject non-object bodies (arrays, strings, numbers, null)
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return NextResponse.json({ error: 'El formato de la solicitud no es válido' }, { status: 400 });
+    }
+
+    const record = body as Record<string, unknown>;
 
     // NOTE (settings):
     //   weeklyEmailSummary  → CONSUMED by weekly-recap-sender.ts (cron)
@@ -56,14 +67,20 @@ export async function PUT(request: NextRequest) {
     //     Controls visual masking of personal metrics (scores, streaks, counts, balances).
     //     When false (= private), sensitive numbers are gently blurred in the UI.
 
-    // Only accept boolean values for settings
+    // Only accept known boolean fields. Extra fields are silently ignored
+    // (Prisma would reject unknown fields anyway, but explicit allowlisting
+    // provides a clear security boundary and HTTP 400 for empty payloads).
+    const ALLOWED_SETTINGS = ['weeklyEmailSummary', 'dailyReminders', 'privacyStatsVisible'] as const;
     const data: Record<string, boolean> = {};
-    if (typeof weeklyEmailSummary === 'boolean') data.weeklyEmailSummary = weeklyEmailSummary;
-    if (typeof dailyReminders === 'boolean') data.dailyReminders = dailyReminders;
-    if (typeof privacyStatsVisible === 'boolean') data.privacyStatsVisible = privacyStatsVisible;
+
+    for (const key of ALLOWED_SETTINGS) {
+      if (typeof record[key] === 'boolean') {
+        data[key] = record[key] as boolean;
+      }
+    }
 
     if (Object.keys(data).length === 0) {
-      return NextResponse.json({ error: 'No valid settings provided' }, { status: 400 });
+      return NextResponse.json({ error: 'No se han proporcionado ajustes válidos' }, { status: 400 });
     }
 
     const updatedUser = await db.user.update({
