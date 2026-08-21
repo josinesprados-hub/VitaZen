@@ -21,7 +21,6 @@ export interface SendNotificationResult {
   success: boolean;
   reason?: string;
   logId?: string;
-  deferUntil?: Date;
 }
 
 /**
@@ -47,7 +46,6 @@ export async function sendNotification(
     return {
       success: false,
       reason: gate.reason,
-      deferUntil: gate.deferUntil,
     };
   }
 
@@ -145,54 +143,26 @@ export async function sendNotification(
 }
 
 /**
- * GLOBAL-6 FIX: Documented limitation — deferred notifications are NOT delivered.
+ * H-17 (FASE 8E): deferNotification removed.
  *
- * The original deferNotification was designed to schedule a notification for
- * later delivery after quiet hours end. However, the actual scheduling
- * infrastructure (cron job, queue table) was never implemented. The function
- * only created a NotificationLog entry with wasInQuietHours=true and returned
- * { deferred: true }, but no caller ever retried delivery.
+ * This function was dead code — exported but never called by any production
+ * path (cron jobs, API routes, batch processors). It claimed to defer
+ * notifications during quiet hours, but the infrastructure to actually
+ * re-deliver them (queue table, recovery cron) was never implemented.
  *
- * This means notifications that fell during quiet hours were silently lost.
+ * The real quiet-hours handling works correctly via canSendNotification()
+ * in scheduler.ts, which blocks the send and returns reason='quiet_hours'.
+ * The three batch processors (checkin, reflection, daily) also pre-filter
+ * quiet hours before calling sendNotification().
  *
- * Fix: The function now clearly documents this as a known limitation. The
- * NotificationLog entry is still created (for observability — we can see
- * which notifications were suppressed by quiet hours), but the return value
- * no longer claims the notification will be delivered later.
- *
- * To fully fix this, a future iteration would need:
- *   1. A new `DeferredNotification` table storing the pending notification.
- *   2. A cron job that runs every 15 minutes, checks if quiet hours have
- *      ended, and delivers deferred notifications.
- *   3. Dedup logic to prevent re-delivering notifications that were already
- *      delivered by a subsequent cron run.
- *
- * This is a architectural change that requires a new Prisma model and a new
- * cron endpoint — beyond the scope of this sprint.
+ * To implement real deferred delivery, FASE 12 would need:
+ *   1. A new `DeferredNotification` Prisma model (queue table).
+ *   2. A recovery cron (every 15 min) that delivers pending notifications
+ *      after quiet hours end.
+ *   3. Dedup logic to prevent re-delivery by subsequent cron runs.
+ *   4. computeQuietHoursExit() to calculate precise exit time (currently
+ *      uses a fixed 10h defer — documented as FASE 12).
  */
-export function deferNotification(
-  userId: string,
-  type: NotificationType,
-  deferUntil: Date,
-  templateVars?: Record<string, string | number>,
-): { deferred: boolean; deferUntil: Date; willBeDelivered: false } {
-  // Mark that this was attempted during quiet hours
-  // Log the attempt so cooldowns still apply
-  db.notificationLog.create({
-    data: {
-      userId,
-      type,
-      title: `[SUPPRESSED — quiet hours] ${type}`,
-      body: `Was scheduled for ${deferUntil.toISOString()} but will NOT be delivered (deferred notification infrastructure not implemented)`,
-      wasDelivered: false,
-      wasInQuietHours: true,
-    },
-  }).catch(() => {
-    // Non-critical: just tracking
-  });
-
-  return { deferred: true, deferUntil, willBeDelivered: false };
-}
 
 /**
  * Get the number of notifications sent to a user today.
