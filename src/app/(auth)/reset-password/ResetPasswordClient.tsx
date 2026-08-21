@@ -51,8 +51,20 @@ export default function ResetPasswordClient() {
     e.preventDefault();
     setError('');
 
-    if (newPassword.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+    if (newPassword.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+    if (!/[A-ZÁÉÍÓÚÑ]/.test(newPassword)) {
+      setError('La contraseña debe tener al menos una letra mayúscula');
+      return;
+    }
+    if (!/[a-záéíóúñ]/.test(newPassword)) {
+      setError('La contraseña debe tener al menos una letra minúscula');
+      return;
+    }
+    if (!/\d/.test(newPassword)) {
+      setError('La contraseña debe tener al menos un número');
       return;
     }
 
@@ -150,9 +162,9 @@ export default function ResetPasswordClient() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
-                      placeholder="Mínimo 6 caracteres"
+                      placeholder="Mínimo 8 caracteres, mayúscula y número"
                     />
                     <button
                       type="button"
@@ -176,7 +188,7 @@ export default function ResetPasswordClient() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                       placeholder="Repite tu contraseña"
                     />

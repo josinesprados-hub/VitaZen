@@ -250,6 +250,19 @@ export async function POST(request: NextRequest) {
   // the !secretUsed check above returns 400 if event was never constructed.
   const verifiedEvent = event!;
 
+  // ─── FASE 9A (A-2): Reject test-mode events in Vercel production ────
+  // Vercel always sets NODE_ENV=production. Stripe test events signed
+  // with the test webhook secret pass signature verification, but
+  // must not modify real user data in production.
+  // Allow test events locally (NODE_ENV !== 'production').
+  if (process.env.NODE_ENV === 'production' && !verifiedEvent.livemode) {
+    serverLog.warn('webhook/stripe', 'Test-mode event rejected in production', {
+      eventType: verifiedEvent.type,
+      eventId: verifiedEvent.id,
+    });
+    return NextResponse.json({ received: true, rejected: 'test_event_in_production' });
+  }
+
   // ─── Idempotency check ──────────────────────────────────────────
   if (await isEventProcessed(verifiedEvent.id)) {
     serverLog.info('webhook/stripe', 'Duplicate event skipped', { eventType, eventId });
@@ -366,7 +379,6 @@ export async function POST(request: NextRequest) {
                 currentPeriodEnd: periodEnd,
               },
               update: {
-                userId,
                 stripePriceId,
                 status: 'active',
                 currentPeriodStart: periodStart,

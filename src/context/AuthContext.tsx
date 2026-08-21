@@ -81,8 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const idToken = await fbUser.getIdToken();
         const res = await fetch('/api/auth/sync', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idToken }),
+          headers: { Authorization: `Bearer ${idToken}` },
         });
 
         if (res.ok) {
@@ -168,8 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('[Auth] session lookup failed, falling back to sync');
       const syncRes = await fetch('/api/auth/sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
+        headers: { Authorization: `Bearer ${idToken}` },
       });
       if (syncRes.ok) {
         const data = await syncRes.json();

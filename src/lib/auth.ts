@@ -1,12 +1,15 @@
 import { adminAuth } from './firebase-admin';
 import { db } from './db';
+import { serverLog } from './observability/server-logger';
 
 export async function verifyFirebaseToken(idToken: string) {
   try {
     const decodedToken = await adminAuth.verifyIdToken(idToken);
     return decodedToken;
-  } catch (error) {
-    console.error('Error verifying Firebase token:', error);
+  } catch {
+    // FASE 9A (A-6): Log only generic message — never the raw error object
+    // which may contain token contents, SDK internals, or credentials.
+    serverLog.error('auth/verifyToken', 'Firebase token verification failed');
     return null;
   }
 }

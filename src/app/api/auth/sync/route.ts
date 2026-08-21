@@ -13,10 +13,14 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 
 async function handler(request: NextRequest) {
   try {
-    const { idToken } = await request.json();
-
+    // FASE 9A (A-4): Extract token from Authorization header (not request body)
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Token de autorización requerido' }, { status: 401 });
+    }
+    const idToken = authHeader.split('Bearer ')[1];
     if (!idToken) {
-      return NextResponse.json({ error: 'ID token required' }, { status: 400 });
+      return NextResponse.json({ error: 'Token de autorización requerido' }, { status: 401 });
     }
 
     const decodedToken = await verifyFirebaseToken(idToken);

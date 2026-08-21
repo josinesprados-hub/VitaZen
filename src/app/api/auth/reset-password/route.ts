@@ -116,8 +116,22 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Token requerido' }, { status: 400 });
     }
 
-    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
-      return NextResponse.json({ error: 'La contraseña debe tener al menos 6 caracteres' }, { status: 400 });
+    if (!newPassword || typeof newPassword !== 'string') {
+      return NextResponse.json({ error: 'Contraseña requerida' }, { status: 400 });
+    }
+
+    // FASE 9A (A-5): Robust password policy
+    if (newPassword.length < 8) {
+      return NextResponse.json({ error: 'La contraseña debe tener al menos 8 caracteres' }, { status: 400 });
+    }
+    if (!/[A-ZÁÉÍÓÚÑ]/.test(newPassword)) {
+      return NextResponse.json({ error: 'La contraseña debe tener al menos una letra mayúscula' }, { status: 400 });
+    }
+    if (!/[a-záéíóúñ]/.test(newPassword)) {
+      return NextResponse.json({ error: 'La contraseña debe tener al menos una letra minúscula' }, { status: 400 });
+    }
+    if (!/\d/.test(newPassword)) {
+      return NextResponse.json({ error: 'La contraseña debe tener al menos un número' }, { status: 400 });
     }
 
     // Find valid token first (needed for per-user rate limit)

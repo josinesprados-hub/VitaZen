@@ -31,7 +31,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const days = Math.min(parseInt(searchParams.get('days') || '30'), 90);
+    const daysRaw = parseInt(searchParams.get('days') || '30', 10);
+    const days = Math.max(1, Math.min(90, daysRaw || 30));
 
     const since = new Date();
     since.setDate(since.getDate() - days);
