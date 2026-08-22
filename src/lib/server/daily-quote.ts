@@ -225,7 +225,6 @@ async function computeDailyQuoteWithPersistence(
       create: {
         userId,
         quoteState: JSON.stringify(updatedState),
-        tipsState: '{}',
         memoryState: '{}',
         lastVisitAt: new Date(),
         dateKey: todayKey,

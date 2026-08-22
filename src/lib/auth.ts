@@ -162,23 +162,27 @@ export async function syncUserToDatabase(firebaseUid: string, email: string, nam
 
   if (existingUser) return existingUser;
 
-  const user = await db.user.create({
-    data: {
-      firebaseUid,
-      email,
-      name: name || email.split('@')[0],
-    },
-  });
+  const user = await db.$transaction(async (tx) => {
+    const created = await tx.user.create({
+      data: {
+        firebaseUid,
+        email,
+        name: name || email.split('@')[0],
+      },
+    });
 
-  // Initialize empire progress for all 5 empires
-  await db.empireProgress.createMany({
-    data: [
-      { userId: user.id, empire: 'disciplina' },
-      { userId: user.id, empire: 'mente' },
-      { userId: user.id, empire: 'energia' },
-      { userId: user.id, empire: 'riqueza' },
-      { userId: user.id, empire: 'crecimiento' },
-    ],
+    // Initialize empire progress for all 5 empires
+    await tx.empireProgress.createMany({
+      data: [
+        { userId: created.id, empire: 'disciplina' },
+        { userId: created.id, empire: 'mente' },
+        { userId: created.id, empire: 'energia' },
+        { userId: created.id, empire: 'riqueza' },
+        { userId: created.id, empire: 'crecimiento' },
+      ],
+    });
+
+    return created;
   });
 
   return user;
