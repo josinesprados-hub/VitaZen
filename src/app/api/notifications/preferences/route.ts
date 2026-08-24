@@ -21,16 +21,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get or create preferences
-    let prefs = await db.notificationPreference.findUnique({
+    // Get or create preferences (atomic upsert eliminates TOCTOU race — DI-01 fix)
+    const prefs = await db.notificationPreference.upsert({
       where: { userId: user.id },
+      update: {}, // No-op when row already exists — we only need to ensure it exists
+      create: { userId: user.id },
     });
-
-    if (!prefs) {
-      prefs = await db.notificationPreference.create({
-        data: { userId: user.id },
-      });
-    }
 
     // Count active tokens to determine push permission state
     const activeTokens = await db.pushToken.count({
