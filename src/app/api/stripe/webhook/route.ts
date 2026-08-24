@@ -70,29 +70,48 @@ function serializeWebhookError(error: unknown): Record<string, unknown> {
 //   - Track duplicate analytics events
 // The StripeEventLog table stores processed event IDs.
 // Auto-cleaned: events older than 7 days are pruned on each webhook call.
+//
+// C-03 FIX: Claim-first pattern replaces the previous check-then-mark
+// approach (isEventProcessed → process → markEventProcessed) which had
+// a TOCTOU window between the READ and WRITE. Now we WRITE first (claim
+// the event via create), and only proceed if the claim succeeds. If
+// another worker already claimed the same eventId, the @@unique
+// constraint rejects it with P2002, and we skip processing.
+// On processing failure, the claim is rolled back (deleted) so Stripe
+// can safely retry the event.
 
 const EVENT_TTL_DAYS = 7;
 
-async function isEventProcessed(eventId: string): Promise<boolean> {
-  try {
-    const existing = await db.stripeEventLog.findUnique({ where: { eventId } });
-    return !!existing;
-  } catch {
-    // If the table doesn't exist yet (migration not applied), log and continue
-    // rather than blocking ALL webhook processing.
-    serverLog.warn('webhook/stripe', 'StripeEventLog table not available — skipping dedup', { eventId });
-    return false;
-  }
-}
-
-async function markEventProcessed(eventId: string, eventType: string): Promise<void> {
+async function claimEvent(eventId: string, eventType: string): Promise<boolean> {
   try {
     await db.stripeEventLog.create({
       data: { eventId, eventType },
     });
+    return true; // Claim succeeded — this worker owns the event
+  } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: string }).code === 'P2002'
+    ) {
+      // Unique constraint violation — another worker already claimed
+      // this event. Safe to skip.
+      return false;
+    }
+    // If the table doesn't exist yet (migration not applied), or any
+    // other error, log and allow processing to continue (fail-open).
+    // This preserves the original fail-open behavior.
+    serverLog.warn('webhook/stripe', 'Event claim failed (non-P2002) — continuing', { eventId });
+    return true;
+  }
+}
+
+async function rollbackClaim(eventId: string): Promise<void> {
+  try {
+    await db.stripeEventLog.deleteMany({ where: { eventId } });
   } catch {
-    // Unique constraint violation = already processed (race condition)
-    // This is fine — another worker beat us to it.
+    // Best-effort rollback — don't block the 500 response
   }
 }
 
@@ -263,9 +282,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, rejected: 'test_event_in_production' });
   }
 
-  // ─── Idempotency check ──────────────────────────────────────────
-  if (await isEventProcessed(verifiedEvent.id)) {
-    serverLog.info('webhook/stripe', 'Duplicate event skipped', { eventType, eventId });
+  // ─── C-03 FIX: Claim-first idempotency ─────────────────────────
+  // Attempt to atomically claim this event BEFORE processing.
+  // If another worker already claimed it, we skip all side effects.
+  if (!(await claimEvent(verifiedEvent.id, verifiedEvent.type))) {
+    serverLog.info('webhook/stripe', 'Duplicate event skipped (claim-first)', { eventType, eventId });
     return NextResponse.json({ received: true, deduplicated: true });
   }
 
@@ -295,8 +316,7 @@ export async function POST(request: NextRequest) {
             sessionId: session.id,
             eventType,
           });
-          // Still mark as processed to avoid infinite retries
-          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
+          // Event already claimed — just clean up old events
           await cleanupOldEvents();
           break;
         }
@@ -458,7 +478,7 @@ export async function POST(request: NextRequest) {
           serverLog.warn('webhook/stripe', 'customer.subscription.updated — cannot resolve userId', {
             subId: subscription.id,
           });
-          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
+          // Event already claimed — just clean up old events
           await cleanupOldEvents();
           break;
         }
@@ -607,7 +627,7 @@ export async function POST(request: NextRequest) {
           serverLog.warn('webhook/stripe', 'customer.subscription.deleted — cannot resolve userId', {
             subId: subscription.id,
           });
-          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
+          // Event already claimed — just clean up old events
           await cleanupOldEvents();
           break;
         }
@@ -692,7 +712,7 @@ export async function POST(request: NextRequest) {
             subId: subscription.id,
             customerId: subscription.customer,
           });
-          await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
+          // Event already claimed — just clean up old events
           await cleanupOldEvents();
           break;
         }
@@ -838,16 +858,16 @@ export async function POST(request: NextRequest) {
       ...(checkoutSessionContext && { checkout: checkoutSessionContext }),
       ...errorDetails,
     });
-    // DON'T mark as processed — Stripe will retry, which is correct
-    // because the handler failed. If the error is persistent, we need
-    // to know about it (and Stripe will alert us after multiple failures).
+    // C-03 FIX: Rollback the claim so Stripe can retry the event.
+    // The claim was made before processing (claim-first pattern), so we
+    // must remove it on failure to allow Stripe's retry mechanism to work.
+    await rollbackClaim(verifiedEvent.id);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 
-  // ─── Mark event as processed + cleanup old events ────────────────
-  // Only mark as processed if the handler succeeded (no throw).
-  // This way, Stripe retries are useful for actual failures.
-  await markEventProcessed(verifiedEvent.id, verifiedEvent.type);
+  // ─── Cleanup old events ─────────────────────────────────────────
+  // Event was already claimed before processing (claim-first pattern).
+  // No need to mark again — just clean up expired entries.
   await cleanupOldEvents();
 
   const durationMs = Date.now() - start;
