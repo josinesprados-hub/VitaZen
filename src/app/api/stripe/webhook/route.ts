@@ -660,12 +660,12 @@ export async function POST(request: NextRequest) {
           } else {
             serverLog.info('webhook/stripe', 'Subscription canceled but another active sub exists — keeping PREMIUM');
           }
-        });
 
-        // Mark this subscription as canceled
-        await db.subscription.updateMany({
-          where: { stripeSubscriptionId: subscription.id },
-          data: { status: 'canceled' },
+          // Mark this subscription as canceled
+          await tx.subscription.updateMany({
+            where: { stripeSubscriptionId: subscription.id },
+            data: { status: 'canceled' },
+          });
         });
 
         break;
