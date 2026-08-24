@@ -782,15 +782,41 @@ export async function POST(request: NextRequest) {
           break;
         }
 
+        // Retrieve the subscription to get updated period dates (Stripe API — outside TX)
+        let subscription: Stripe.Subscription;
         try {
-          // Retrieve the subscription to get updated period dates
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          const firstItem = subscription.items.data[0];
-          const itemPeriodStart = firstItem?.current_period_start;
-          const itemPeriodEnd = firstItem?.current_period_end;
+          subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        } catch (e) {
+          serverLog.error('webhook/stripe', 'Failed to retrieve subscription from Stripe', e, { subscriptionId });
+          break;
+        }
+        const firstItem = subscription.items.data[0];
+        const itemPeriodStart = firstItem?.current_period_start;
+        const itemPeriodEnd = firstItem?.current_period_end;
 
+        // Resolve userId for advisory lock key (fast indexed lookup)
+        const existingSub = await db.subscription.findUnique({
+          where: { stripeSubscriptionId: subscriptionId },
+          select: { userId: true },
+        });
+        if (!existingSub) {
+          serverLog.warn('webhook/stripe', 'invoice.paid — subscription not found in DB', { subscriptionId });
+          break;
+        }
+
+        // DI-04 FIX: Wrap period update + plan sync in a single transaction
+        // with advisory lock to prevent partial writes and races with other
+        // plan-changing events (subscription.deleted, subscription.created, etc.)
+        await db.$transaction(async (tx) => {
+          await tx.$executeRaw`
+            SELECT pg_advisory_xact_lock(
+              ('x' || substring(md5(${existingSub.userId} || '|plan-sync'), 1, 16))::bit(64)::bigint
+            )
+          `;
+
+          // Update subscription period dates on successful payment/renewal
           if (typeof itemPeriodStart === 'number' && typeof itemPeriodEnd === 'number') {
-            await db.subscription.update({
+            await tx.subscription.update({
               where: { stripeSubscriptionId: subscriptionId },
               data: {
                 currentPeriodStart: new Date(itemPeriodStart * 1000),
@@ -806,23 +832,15 @@ export async function POST(request: NextRequest) {
           }
 
           // Ensure user plan is PREMIUM on successful invoice payment
-          const existingSub = await db.subscription.findUnique({
-            where: { stripeSubscriptionId: subscriptionId },
-            select: { userId: true },
-          });
-          if (existingSub) {
-            const user = await db.user.findUnique({ where: { id: existingSub.userId } });
-            if (user && user.plan !== 'PREMIUM' && ['active', 'trialing'].includes(subscription.status)) {
-              await db.user.update({
-                where: { id: existingSub.userId },
-                data: { plan: 'PREMIUM' },
-              });
-              serverLog.info('webhook/stripe', 'invoice.paid — user restored to PREMIUM');
-            }
+          const user = await tx.user.findUnique({ where: { id: existingSub.userId } });
+          if (user && user.plan !== 'PREMIUM' && ['active', 'trialing'].includes(subscription.status)) {
+            await tx.user.update({
+              where: { id: existingSub.userId },
+              data: { plan: 'PREMIUM' },
+            });
+            serverLog.info('webhook/stripe', 'invoice.paid — user restored to PREMIUM');
           }
-        } catch (e) {
-          serverLog.error('webhook/stripe', 'Failed to process invoice.paid', e, { subscriptionId });
-        }
+        });
 
         break;
       }
