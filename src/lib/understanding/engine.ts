@@ -579,46 +579,43 @@ function extractSignals(message: string, sourceRef: string): DetectedSignal[] {
  * Reinforcement increases confidence using diminishing returns.
  */
 async function upsertInsight(userId: string, signal: DetectedSignal): Promise<void> {
-  // Look for existing insight in the same category
-  const existing = await db.emotionalInsight.findMany({
+  // C-01 FIX: Use exact-match lookup via @@unique([userId, category, insight])
+  // to eliminate TOCTOU. The insight text is static (from EXTRACTION_RULES),
+  // so exact match is the correct deduplication key.
+  const existing = await db.emotionalInsight.findFirst({
     where: {
       userId,
       category: signal.category,
+      insight: signal.insight,
     },
-    orderBy: { updatedAt: 'desc' },
-    take: 5,
   });
 
-  // Try to find a match by insight text similarity
-  const match = existing.find(e => {
-    const existingWords = e.insight.toLowerCase().split(/\s+/);
-    const newWords = signal.insight.toLowerCase().split(/\s+/);
-    // Simple overlap: if 40%+ of words match, consider it the same insight
-    const commonWords = existingWords.filter(w => newWords.includes(w));
-    return commonWords.length / Math.max(existingWords.length, 1) >= 0.4;
-  });
-
-  if (match) {
+  if (existing) {
     // Reinforce existing insight
-    const newConfidence = computeNewConfidence(match.confidence, match.evidenceCount);
+    const newConfidence = computeNewConfidence(existing.confidence, existing.evidenceCount);
     await db.emotionalInsight.update({
-      where: { id: match.id },
+      where: { id: existing.id },
       data: {
-        confidence: Math.round(newConfidence * 100) / 100, // 2 decimal precision
-        evidenceCount: match.evidenceCount + 1,
+        confidence: Math.round(newConfidence * 100) / 100,
+        evidenceCount: existing.evidenceCount + 1,
         lastEvidenceAt: new Date(),
         sourceType: signal.sourceType,
         sourceRef: signal.sourceRef,
       },
     });
-  } else {
-    // Create new hypothesis
+    return;
+  }
+
+  // No exact match found — attempt create.
+  // If a concurrent request created the same row between our findFirst
+  // and this create, the @@unique constraint will reject it with P2002.
+  try {
     await db.emotionalInsight.create({
       data: {
         userId,
         insight: signal.insight,
         category: signal.category,
-        confidence: 0.3, // hypothesis starting point
+        confidence: 0.3,
         evidenceCount: 1,
         lastEvidenceAt: new Date(),
         firstSeenAt: new Date(),
@@ -626,6 +623,42 @@ async function upsertInsight(userId: string, signal: DetectedSignal): Promise<vo
         sourceRef: signal.sourceRef,
       },
     });
+  } catch (error: unknown) {
+    // C-01 FIX: Only handle Prisma unique constraint violation (P2002).
+    // Any other error must propagate — do not silently swallow.
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: string }).code === 'P2002'
+    ) {
+      // Another request created the row — retrieve and reinforce it.
+      const concurrent = await db.emotionalInsight.findFirst({
+        where: {
+          userId,
+          category: signal.category,
+          insight: signal.insight,
+        },
+      });
+      if (concurrent) {
+        const newConfidence = computeNewConfidence(concurrent.confidence, concurrent.evidenceCount);
+        await db.emotionalInsight.update({
+          where: { id: concurrent.id },
+          data: {
+            confidence: Math.round(newConfidence * 100) / 100,
+            evidenceCount: concurrent.evidenceCount + 1,
+            lastEvidenceAt: new Date(),
+            sourceType: signal.sourceType,
+            sourceRef: signal.sourceRef,
+          },
+        });
+      }
+      // If concurrent is somehow null (extremely rare: row deleted between
+      // P2002 and findFirst), we accept the lost evidence — next signal
+      // will recreate it. This is the safe degradation path.
+    } else {
+      throw error;
+    }
   }
 }
 

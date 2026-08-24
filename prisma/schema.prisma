@@ -580,6 +580,7 @@ model EmotionalInsight {
   @@index([userId, category])
   @@index([userId, confidence])
   @@index([userId, updatedAt])
+  @@unique([userId, category, insight])
 }
 
 // ═══════════════════════════════════════════
