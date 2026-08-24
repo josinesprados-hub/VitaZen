@@ -74,25 +74,44 @@ async function handler(request: NextRequest) {
       // emailVerified were synced. A user who changed their Firebase email
       // had a stale DB email, causing transactional emails and Stripe
       // receipts to go to the wrong address.
+      // DI-05 FIX: Handle P2002 (unique constraint) when the new email
+      // already belongs to another user. Log the conflict and continue
+      // instead of crashing with a 500.
       if (decodedToken.email_verified && decodedToken.email && existingUser.email !== decodedToken.email) {
         serverLog.info('auth/sync', 'Email changed in Firebase — syncing to DB', {
           oldEmail: existingUser.email,
           newEmail: decodedToken.email,
         });
-        await db.user.update({
-          where: { id: existingUser.id },
-          data: { email: decodedToken.email },
-        });
-        existingUser.email = decodedToken.email;
+        try {
+          await db.user.update({
+            where: { id: existingUser.id },
+            data: { email: decodedToken.email },
+          });
+          existingUser.email = decodedToken.email;
 
-        // Also update the Stripe customer email if the user has one
-        if (existingUser.stripeCustomerId) {
-          try {
-            await stripe.customers.update(existingUser.stripeCustomerId, {
-              email: decodedToken.email,
+          // Also update the Stripe customer email if the user has one
+          if (existingUser.stripeCustomerId) {
+            try {
+              await stripe.customers.update(existingUser.stripeCustomerId, {
+                email: decodedToken.email,
+              });
+            } catch (stripeErr) {
+              serverLog.error('auth/sync', 'Failed to update Stripe customer email', stripeErr);
+            }
+          }
+        } catch (dbErr: unknown) {
+          const isP2002 =
+            typeof dbErr === 'object' && dbErr !== null &&
+            'code' in dbErr && (dbErr as { code: string }).code === 'P2002';
+          if (isP2002) {
+            serverLog.warn('auth/sync', 'Email sync skipped — new email already belongs to another user', {
+              userId: existingUser.id,
+              attemptedEmail: decodedToken.email,
+              currentEmail: existingUser.email,
             });
-          } catch (stripeErr) {
-            serverLog.error('auth/sync', 'Failed to update Stripe customer email', stripeErr);
+            // Keep existingUser.email as-is — do not update to the conflicting value
+          } else {
+            throw dbErr; // Re-throw non-P2002 errors
           }
         }
       }
