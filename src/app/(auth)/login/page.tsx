@@ -143,7 +143,7 @@ export default function LoginPage() {
           {/* Provider mismatch error — after failed auth attempt */}
           {error && (
             <div className="bg-champagne/5 border border-champagne/20 rounded-lg p-4 mb-4">
-              <p className="text-champagne text-sm leading-relaxed">{error}</p>
+              <p id="login-error" className="text-champagne text-sm leading-relaxed">{error}</p>
               {providerHint === 'google' && (
                 <button
                   type="button"
@@ -177,6 +177,7 @@ export default function LoginPage() {
                 onChange={(e) => handleEmailChange(e.target.value)}
                 onBlur={handleEmailBlur}
                 autoComplete="email"
+                aria-describedby={error ? 'login-error' : undefined}
                 required
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
@@ -216,6 +217,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
+                  aria-describedby={error ? 'login-error' : undefined}
                   required
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="••••••••"

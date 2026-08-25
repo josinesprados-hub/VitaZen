@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
 
           {error && (
             <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4">
-              <p className="text-red-400 text-sm">{error}</p>
+              <p id="forgot-error" className="text-red-400 text-sm">{error}</p>
             </div>
           )}
 
@@ -76,6 +76,7 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
+                aria-describedby={error ? 'forgot-error' : undefined}
                 required
                 disabled={success}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors disabled:opacity-50"

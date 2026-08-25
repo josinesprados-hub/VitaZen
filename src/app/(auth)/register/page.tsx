@@ -151,7 +151,7 @@ export default function RegisterPage() {
           {/* Provider mismatch error — after failed auth attempt */}
           {error && (
             <div className="bg-champagne/5 border border-champagne/20 rounded-lg p-4 mb-4">
-              <p className="text-champagne text-sm leading-relaxed">{error}</p>
+              <p id="register-error" className="text-champagne text-sm leading-relaxed">{error}</p>
               {providerHint === 'google' && (
                 <button
                   type="button"
@@ -183,6 +183,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
+                aria-describedby={error ? 'register-error' : undefined}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="Tu nombre completo"
               />
@@ -197,6 +198,7 @@ export default function RegisterPage() {
                 onChange={(e) => handleEmailChange(e.target.value)}
                 onBlur={handleEmailBlur}
                 autoComplete="email"
+                aria-describedby={error ? 'register-error' : undefined}
                 required
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
@@ -244,6 +246,7 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
+                  aria-describedby={error ? 'register-error' : undefined}
                   required
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="Mínimo 6 caracteres"
@@ -274,6 +277,8 @@ export default function RegisterPage() {
                     if (passwordMatch === false) setPasswordMatch(true);
                   }}
                   autoComplete="new-password"
+                  aria-describedby={!passwordMatch ? 'register-confirm-error' : undefined}
+                  aria-invalid={!passwordMatch}
                   required
                   className={`w-full bg-[#000000] border rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors ${passwordMatch ? 'border-[#1a1a1a]' : 'border-red-500'}`}
                   placeholder="Repite tu contraseña"
@@ -291,7 +296,7 @@ export default function RegisterPage() {
                 </button>
               </div>
               {!passwordMatch && (
-                <p className="text-red-400 text-sm mt-1">Las contraseñas no coinciden</p>
+                <p id="register-confirm-error" className="text-red-400 text-sm mt-1">Las contraseñas no coinciden</p>
               )}
             </div>
 
