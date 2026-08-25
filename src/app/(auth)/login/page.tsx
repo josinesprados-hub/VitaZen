@@ -169,12 +169,14 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-[#999] mb-2">Email</label>
+              <label htmlFor="login-email" className="block text-sm text-[#999] mb-2">Email</label>
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => handleEmailChange(e.target.value)}
                 onBlur={handleEmailBlur}
+                autoComplete="email"
                 required
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
@@ -206,12 +208,14 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-2">Contraseña</label>
+              <label htmlFor="login-password" className="block text-sm text-[#999] mb-2">Contraseña</label>
               <div className="relative">
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                   required
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="••••••••"

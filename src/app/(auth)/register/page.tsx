@@ -176,23 +176,27 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-[#999] mb-2">Nombre</label>
+              <label htmlFor="register-name" className="block text-sm text-[#999] mb-2">Nombre</label>
               <input
+                id="register-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="Tu nombre completo"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-2">Email</label>
+              <label htmlFor="register-email" className="block text-sm text-[#999] mb-2">Email</label>
               <input
+                id="register-email"
                 type="email"
                 value={email}
                 onChange={(e) => handleEmailChange(e.target.value)}
                 onBlur={handleEmailBlur}
+                autoComplete="email"
                 required
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
@@ -232,12 +236,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-2">Contraseña</label>
+              <label htmlFor="register-password" className="block text-sm text-[#999] mb-2">Contraseña</label>
               <div className="relative">
                 <input
+                  id="register-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
                   required
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="Mínimo 6 caracteres"
@@ -257,15 +263,17 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-2">Confirmar contraseña</label>
+              <label htmlFor="register-confirm" className="block text-sm text-[#999] mb-2">Confirmar contraseña</label>
               <div className="relative">
                 <input
+                  id="register-confirm"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
                     if (passwordMatch === false) setPasswordMatch(true);
                   }}
+                  autoComplete="new-password"
                   required
                   className={`w-full bg-[#000000] border rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors ${passwordMatch ? 'border-[#1a1a1a]' : 'border-red-500'}`}
                   placeholder="Repite tu contraseña"

@@ -155,12 +155,14 @@ export default function ResetPasswordClient() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm text-[#999] mb-2">Contraseña</label>
+                  <label htmlFor="reset-password" className="block text-sm text-[#999] mb-2">Contraseña</label>
                   <div className="relative">
                     <input
+                      id="reset-password"
                       type={showPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
+                      autoComplete="new-password"
                       required
                       minLength={8}
                       className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
@@ -181,12 +183,14 @@ export default function ResetPasswordClient() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-[#999] mb-2">Confirmar contraseña</label>
+                  <label htmlFor="reset-confirm" className="block text-sm text-[#999] mb-2">Confirmar contraseña</label>
                   <div className="relative">
                     <input
+                      id="reset-confirm"
                       type={showConfirm ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
                       required
                       minLength={8}
                       className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
