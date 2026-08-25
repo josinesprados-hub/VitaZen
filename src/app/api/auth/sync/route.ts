@@ -116,20 +116,34 @@ async function handler(request: NextRequest) {
         }
       }
 
-      // Sync firebaseUid if it doesn't match (e.g. user registered with email/password
-      // and then signed in with Google, creating a different Firebase Auth UID).
-      // This keeps the DB in sync with the current auth method.
-      // Safe because we've already verified the Firebase ID token.
+      // DI-06 FIX: Handle P2002 (unique constraint) when the new firebaseUid
+      // already belongs to another user due to a concurrent request.
+      // Log the conflict and continue instead of crashing with a 500.
       if (existingUser.firebaseUid !== decodedToken.uid) {
         serverLog.warn('auth/sync', 'firebaseUid mismatch — updating', {
           oldUid: existingUser.firebaseUid,
           newUid: decodedToken.uid,
         });
-        await db.user.update({
-          where: { id: existingUser.id },
-          data: { firebaseUid: decodedToken.uid },
-        });
-        existingUser.firebaseUid = decodedToken.uid;
+        try {
+          await db.user.update({
+            where: { id: existingUser.id },
+            data: { firebaseUid: decodedToken.uid },
+          });
+          existingUser.firebaseUid = decodedToken.uid;
+        } catch (syncErr: unknown) {
+          const isP2002 =
+            typeof syncErr === 'object' && syncErr !== null &&
+            'code' in syncErr && (syncErr as { code: string }).code === 'P2002';
+          if (isP2002) {
+            serverLog.warn('auth/sync', 'firebaseUid sync skipped — uid already belongs to another user', {
+              userId: existingUser.id,
+              attemptedUid: decodedToken.uid,
+              currentUid: existingUser.firebaseUid,
+            });
+          } else {
+            throw syncErr;
+          }
+        }
       }
 
       // ─── Welcome email retry (with dedup via welcomeEmailSent) ───

@@ -51,13 +51,26 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Sync firebaseUid if mismatch (same pattern as getAuthUser)
+      // DI-06 FIX: Handle P2002 (unique constraint) when the new firebaseUid
+      // already belongs to another user due to a concurrent request.
+      // Log the conflict and continue instead of crashing with a 500.
       if (user && user.firebaseUid !== decodedToken.uid) {
-        await db.user.update({
-          where: { id: user.id },
-          data: { firebaseUid: decodedToken.uid },
-        });
-        user.firebaseUid = decodedToken.uid;
+        try {
+          await db.user.update({
+            where: { id: user.id },
+            data: { firebaseUid: decodedToken.uid },
+          });
+          user.firebaseUid = decodedToken.uid;
+        } catch (syncErr: unknown) {
+          const isP2002 =
+            typeof syncErr === 'object' && syncErr !== null &&
+            'code' in syncErr && (syncErr as { code: string }).code === 'P2002';
+          if (isP2002) {
+            console.warn('[Session] firebaseUid sync skipped — uid already belongs to another user:', decodedToken.uid);
+          } else {
+            throw syncErr;
+          }
+        }
       }
     }
 

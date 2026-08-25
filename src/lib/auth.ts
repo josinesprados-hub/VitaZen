@@ -56,13 +56,27 @@ export async function getAuthUser(idToken: string) {
       // This happens when a user registered with one provider (e.g. email/password)
       // and later authenticates with another (e.g. Google) that has a different UID.
       // Safe because we've already verified the ID token.
+      // DI-06 FIX: Handle P2002 when the new firebaseUid already belongs to
+      // another user due to a concurrent request. Log and continue instead
+      // of crashing the calling route with a 500.
       if (user.firebaseUid !== decodedToken.uid) {
         console.warn('[Auth] getAuthUser: updating firebaseUid from', user.firebaseUid, 'to', decodedToken.uid);
-        await db.user.update({
-          where: { id: user.id },
-          data: { firebaseUid: decodedToken.uid },
-        });
-        user.firebaseUid = decodedToken.uid;
+        try {
+          await db.user.update({
+            where: { id: user.id },
+            data: { firebaseUid: decodedToken.uid },
+          });
+          user.firebaseUid = decodedToken.uid;
+        } catch (syncErr: unknown) {
+          const isP2002 =
+            typeof syncErr === 'object' && syncErr !== null &&
+            'code' in syncErr && (syncErr as { code: string }).code === 'P2002';
+          if (isP2002) {
+            console.warn('[Auth] getAuthUser: firebaseUid sync skipped — uid already belongs to another user:', decodedToken.uid);
+          } else {
+            throw syncErr;
+          }
+        }
       }
     }
   }
@@ -111,11 +125,25 @@ export async function getAuthUserBasic(idToken: string): Promise<{ id: string; p
     user = await db.user.findUnique({
       where: { email: decodedToken.email },
     });
+    // DI-06 FIX: Handle P2002 when the new firebaseUid already belongs to
+    // another user due to a concurrent request. Log and continue instead
+    // of crashing the calling route with a 500.
     if (user && user.firebaseUid !== decodedToken.uid) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { firebaseUid: decodedToken.uid },
-      });
+      try {
+        await db.user.update({
+          where: { id: user.id },
+          data: { firebaseUid: decodedToken.uid },
+        });
+      } catch (syncErr: unknown) {
+        const isP2002 =
+          typeof syncErr === 'object' && syncErr !== null &&
+          'code' in syncErr && (syncErr as { code: string }).code === 'P2002';
+        if (isP2002) {
+          console.warn('[Auth] getAuthUserBasic: firebaseUid sync skipped — uid already belongs to another user:', decodedToken.uid);
+        } else {
+          throw syncErr;
+        }
+      }
     }
   }
 
