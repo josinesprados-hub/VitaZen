@@ -5,7 +5,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/AuthContext';
 import { ScreenshotModeProvider } from '@/context/ScreenshotModeContext';
 import { ObservabilityInit } from '@/components/observability/ObservabilityInit';
-import { ViewportManager } from '@/components/layout/ViewportManager';
 import { ServiceWorkerRegistrar } from '@/components/pwa/ServiceWorkerRegistrar';
 
 const inter = Inter({
@@ -16,8 +15,6 @@ const inter = Inter({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
 };
 
@@ -70,7 +67,6 @@ export default function RootLayout({
           <ScreenshotModeProvider>
             <ObservabilityInit />
             <ServiceWorkerRegistrar />
-            <ViewportManager />
             {children}
             <Toaster />
           </ScreenshotModeProvider>
