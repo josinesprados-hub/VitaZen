@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import ContextualHelp from '@/components/ui/ContextualHelp';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 
 // A-1: Extracted components
 import type { Thread, Message, Favorite } from './MentorChatTypes';
@@ -115,6 +116,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const deleteModalRef = useRef<HTMLDivElement>(null);
   const limitModalRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  useDialogA11y(drawerRef, drawerOpen, () => { setDrawerOpen(false); setContextMenu(null); });
 
   /** Sync textarea height with content (no-op if empty → collapses to 1 line) */
   const syncTextareaHeight = useCallback(() => {
@@ -983,9 +986,16 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           <div
             className="fixed inset-0 z-40 bg-black/60 sm:hidden"
             onClick={() => { setDrawerOpen(false); setContextMenu(null); }}
+            aria-hidden="true"
           />
           {/* Drawer panel — slides from left */}
-          <div className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area">
+          <div
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Conversaciones"
+            className="fixed inset-y-0 left-0 z-50 w-[85vw] max-w-sm bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col sm:hidden animate-in drawer-enter sidebar-area"
+          >
             {/* Drawer header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a] shrink-0">
               <h2 className="text-sm font-semibold text-white">Conversaciones</h2>
@@ -1040,12 +1050,17 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Action error toast — auto-dismisses */}
       {actionError && (
         <div
-          role="status"
-          aria-live="polite"
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
-          onClick={() => setActionError('')}
+          role="alert"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in flex items-center gap-2"
         >
           {actionError}
+          <button
+            onClick={() => setActionError('')}
+            className="underline text-champagne/80 hover:text-champagne"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
         </div>
       )}
 

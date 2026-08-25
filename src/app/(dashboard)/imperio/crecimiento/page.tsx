@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { SCREENSHOT_JOURNAL_ENTRIES } from '@/lib/screenshot-data';
 import { TrendingUp, Plus, BookOpen, Heart, Pencil, Trash2, BookOpenText, Calendar, Clock } from 'lucide-react';
@@ -99,6 +100,11 @@ export default function CrecimientoPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
   const [actionError, setActionError] = useState('');
+  const editDialogRef = useRef<HTMLDivElement>(null);
+  const deleteDialogRef = useRef<HTMLDivElement>(null);
+
+  useDialogA11y(editDialogRef, !!editingEntry, () => setEditingEntry(null));
+  useDialogA11y(deleteDialogRef, !!pendingDeleteId, () => setPendingDeleteId(null));
 
   // Auto-dismiss action error toast
   useEffect(() => {
@@ -266,7 +272,7 @@ export default function CrecimientoPage() {
       {/* ═══ Edit Journal Entry Overlay ═══ */}
       {editingEntry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingEntry(null)}>
-          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={editDialogRef} role="dialog" aria-modal="true" aria-label="Editar entrada" className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-champagne" />
             </div>
@@ -306,7 +312,7 @@ export default function CrecimientoPage() {
       {/* ═══ Delete Confirmation Overlay ═══ */}
       {pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
-          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar entrada" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
@@ -507,10 +513,17 @@ export default function CrecimientoPage() {
       {/* Action error toast — auto-dismisses */}
       {actionError && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in"
-          onClick={() => setActionError('')}
+          role="alert"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in flex items-center gap-2"
         >
           {actionError}
+          <button
+            onClick={() => setActionError('')}
+            className="underline text-champagne/80 hover:text-champagne"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>

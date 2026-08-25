@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import {
   Shield,
   Brain,
@@ -44,6 +45,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const { displayUser } = useScreenshotMode();
+  const sidebarRef = useRef<HTMLElement>(null);
+  useDialogA11y(sidebarRef as React.RefObject<HTMLDivElement | null>, open, onClose);
 
   // Lock body scroll when sidebar is open on mobile.
   // overflow:hidden prevents background scrolling without position:fixed,
@@ -64,10 +67,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div
           className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden sidebar-overlay"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
       <aside
+        ref={sidebarRef}
+        role="dialog"
+        aria-modal={open ? true : undefined}
+        aria-label="Menú de navegación"
         className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[#0a0a0a] border-r border-[#1a1a1a] z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 safe-top safe-bottom ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
