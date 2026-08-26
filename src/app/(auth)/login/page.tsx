@@ -143,7 +143,7 @@ export default function LoginPage() {
           {/* Provider mismatch error — after failed auth attempt */}
           {error && (
             <div className="bg-champagne/5 border border-champagne/20 rounded-lg p-4 mb-4">
-              <p id="login-error" className="text-champagne text-sm leading-relaxed">{error}</p>
+              <p id="login-error" role="alert" className="text-champagne text-sm leading-relaxed">{error}</p>
               {providerHint === 'google' && (
                 <button
                   type="button"

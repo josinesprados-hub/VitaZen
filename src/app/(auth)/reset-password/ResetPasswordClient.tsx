@@ -149,7 +149,7 @@ export default function ResetPasswordClient() {
 
               {error && (
                 <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4">
-                  <p id="reset-error" className="text-red-400 text-sm">{error}</p>
+                  <p id="reset-error" role="alert" className="text-red-400 text-sm">{error}</p>
                 </div>
               )}
 

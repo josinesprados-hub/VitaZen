@@ -151,7 +151,7 @@ export default function RegisterPage() {
           {/* Provider mismatch error — after failed auth attempt */}
           {error && (
             <div className="bg-champagne/5 border border-champagne/20 rounded-lg p-4 mb-4">
-              <p id="register-error" className="text-champagne text-sm leading-relaxed">{error}</p>
+              <p id="register-error" role="alert" className="text-champagne text-sm leading-relaxed">{error}</p>
               {providerHint === 'google' && (
                 <button
                   type="button"
@@ -298,7 +298,7 @@ export default function RegisterPage() {
                 </button>
               </div>
               {!passwordMatch && (
-                <p id="register-confirm-error" className="text-red-400 text-sm mt-1">Las contraseñas no coinciden</p>
+                <p id="register-confirm-error" role="alert" className="text-red-400 text-sm mt-1">Las contraseñas no coinciden</p>
               )}
             </div>
 
