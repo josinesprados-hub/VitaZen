@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, RefObject } from 'react';
+import React, { useEffect, RefObject, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 
 // ─────────────────────────────────────────
 // DeleteConfirmModal — extracted from MentorChat (A-1)
@@ -20,10 +21,13 @@ const DeleteConfirmModal = React.memo(function DeleteConfirmModal({
   onConfirm,
   onClose,
 }: DeleteConfirmModalProps) {
+  const internalRef = useRef<HTMLDivElement>(null);
+  const dialogRef = (modalRef as React.RefObject<HTMLDivElement | null>) ?? internalRef;
+  useDialogA11y(dialogRef, true, onClose);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={onClose}>
       <div
-        ref={modalRef}
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-modal-title"

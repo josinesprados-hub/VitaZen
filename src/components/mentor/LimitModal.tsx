@@ -1,8 +1,9 @@
 'use client';
 
-import React, { RefObject } from 'react';
+import React, { RefObject, useRef } from 'react';
 import { Circle } from 'lucide-react';
 import Link from 'next/link';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 
 // ─────────────────────────────────────────
 // LimitModal — extracted from MentorChat (A-1)
@@ -14,10 +15,14 @@ interface LimitModalProps {
 }
 
 const LimitModal = React.memo(function LimitModal({ modalRef, onClose }: LimitModalProps) {
+  // Use a fallback ref in case the parent doesn't pass one
+  const internalRef = useRef<HTMLDivElement>(null);
+  const dialogRef = (modalRef as React.RefObject<HTMLDivElement | null>) ?? internalRef;
+  useDialogA11y(dialogRef, true, onClose);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={onClose}>
       <div
-        ref={modalRef}
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="limit-modal-title"
