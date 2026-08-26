@@ -40,6 +40,11 @@
   --transition-slow: 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
+/* shadcn/ui ring color — champagne, matching the design system */
+:root {
+  --ring: 40 49% 56%;
+}
+
 @layer base {
   * {
     border-color: var(--color-card-border);
@@ -2360,9 +2365,12 @@ input, textarea, select {
   }
 }
 
-/* Focus visible ring — smooth expansion, not instant pop */
-*:focus-visible {
-  transition: box-shadow 0.2s ease;
+/* Focus visible indicator — champagne outline for keyboard navigation.
+   Inputs use their own border-color system (see input:focus rule above).
+   Components with outline-none retain their ring-based indicators. */
+:focus-visible {
+  outline: 2px solid rgba(200, 165, 90, 0.5);
+  outline-offset: 2px;
 }
 
 /* Select item hover — smooth background transition */
