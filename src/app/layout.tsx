@@ -20,7 +20,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://vitazen.cc'),
-  title: 'VitaZen',
+  title: {
+    template: '%s — VitaZen',
+    default: 'VitaZen',
+  },
   description: 'Ecosistema de desarrollo personal basado en 5 imperios: Disciplina, Mente, Energía, Finanzas y Crecimiento.',
   icons: {
     icon: [

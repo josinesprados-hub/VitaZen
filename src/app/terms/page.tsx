@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Términos y Condiciones — VitaZen',
+  title: {
+    absolute: 'Términos y Condiciones — VitaZen',
+  },
   description: 'Términos y condiciones de uso de VitaZen. Condiciones generales, suscripciones, cancelaciones y responsabilidades.',
   openGraph: {
     title: 'Términos y Condiciones — VitaZen',

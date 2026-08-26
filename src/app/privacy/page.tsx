@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Política de Privacidad — VitaZen',
+  title: {
+    absolute: 'Política de Privacidad — VitaZen',
+  },
   description: 'Política de privacidad de VitaZen. Información sobre cómo recopilamos, usamos y protegemos tus datos personales.',
   openGraph: {
     title: 'Política de Privacidad — VitaZen',
