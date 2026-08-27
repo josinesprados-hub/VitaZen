@@ -8,7 +8,6 @@ import { MentorSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import {
   Brain,
-  Plus,
   MessageCircle,
   X,
   ChevronLeft,
@@ -176,16 +175,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       setRemaining(data.remaining);
       setDailyLimit(data.limit || 10);
     }
-    // Only set active thread on initial load (when none is set)
-    if (isInitialLoad && allThreads.length > 0 && !activeThreadRef.current) {
-      let savedThreadId: string | null = null;
-      try { savedThreadId = localStorage.getItem(storageKey); } catch {}
-      // Only restore if saved thread is active (not archived)
-      const savedExists = savedThreadId && allThreads.some((t: Thread) => t.id === savedThreadId && !t.archived);
-      const activeThreadsList = allThreads.filter((t: Thread) => !t.archived);
-      setActiveThread(savedExists ? savedThreadId! : (activeThreadsList.length > 0 ? activeThreadsList[0].id : null));
-    } else if (isInitialLoad && allThreads.length === 0 && !activeThreadRef.current) {
-      // No threads at all — clear stale localStorage
+    // MENTOR-01: On initial load, do NOT auto-select any thread.
+    // User always starts with a fresh empty conversation (ChatGPT pattern).
+    // Previous conversations remain accessible from the sidebar.
+    if (isInitialLoad && !activeThreadRef.current) {
       try { localStorage.removeItem(storageKey); } catch {}
     }
   }, [storageKey]);
@@ -455,15 +448,11 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         body: JSON.stringify({ threadId }),
       });
       if (res.ok) {
-        // C-4 FIX: Use functional updater to read the LATEST threads state.
-        let nextActiveId: string | null = null;
-        setThreads(prev => {
-          const remaining = prev.filter(t => t.id !== threadId);
-          nextActiveId = remaining.filter(t => !t.archived)[0]?.id ?? null;
-          return remaining;
-        });
+        // MENTOR-01: Remove thread and go to empty state (ChatGPT pattern).
+        // After deletion, user sees fresh conversation instead of auto-opening next.
+        setThreads(prev => prev.filter(t => t.id !== threadId));
         if (activeThreadRef.current === threadId) {
-          setActiveThread(nextActiveId);
+          setActiveThread(null);
           setMessages([]);
           try { localStorage.removeItem(storageKey); } catch {}
         }
@@ -546,7 +535,38 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
 
   const sendMessage = async () => {
     const content = input.trim();
-    if (!content || !activeThread || sendingRef.current) return;
+    if (!content || sendingRef.current) return;
+
+    // MENTOR-01: Auto-create thread if none is active (ChatGPT pattern).
+    // User can type in the empty state; a thread is created on first send.
+    let targetThreadId = activeThread;
+    if (!targetThreadId) {
+      try {
+        const res = await apiFetch('/api/ai/threads', {
+          method: 'POST',
+          body: JSON.stringify({ title: 'Nueva conversación' }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          targetThreadId = data.thread.id;
+          setThreads(prev => [data.thread, ...prev]);
+          setActiveThread(targetThreadId);
+          setMessages([]);
+          setTab('active');
+          setDrawerOpen(false);
+        } else {
+          const data = await res.json();
+          if (data.error?.includes('Maximum')) {
+            setActionError('Límite de conversaciones alcanzado');
+          }
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+        setActionError('No se pudo crear la conversación');
+        return;
+      }
+    }
 
     const now = Date.now();
     if (now - lastSendTime.current < 1000) {
@@ -559,7 +579,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     }
     lastSendTime.current = now;
 
-    const sentThreadId = activeThread;
+    const sentThreadId = targetThreadId;
     sendingRef.current = true;
 
     const userMessage: Message = {
@@ -957,22 +977,29 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
               />
             </>
           ) : (
-            /* No active thread — empty state */
-            <div className="flex items-center justify-center flex-1 min-h-0">
-              <div className="text-center animate-in px-4">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
-                  <IconComponent size={28} className="text-champagne sm:size-8" />
+            /* No active thread — empty state with input (MENTOR-01: ChatGPT pattern) */
+            <>
+              <div className="flex items-center justify-center flex-1 min-h-0">
+                <div className="text-center animate-in px-4">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-champagne/10 flex items-center justify-center mx-auto mb-4">
+                    <IconComponent size={28} className="text-champagne sm:size-8" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
+                  <p className="text-[#999] text-sm">Escribe tu mensaje para comenzar una nueva conversación</p>
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Mentor IA</h3>
-                <p className="text-[#999] text-sm mb-4">Crea una conversación para comenzar</p>
-                <button
-                  onClick={createThread}
-                  className="inline-flex items-center gap-2 bg-champagne text-black font-semibold px-5 py-3 rounded-xl hover:bg-champagne-hover transition-colors text-sm touch-press"
-                >
-                  <Plus size={16} /> Nueva conversación
-                </button>
               </div>
-            </div>
+              <ChatInput
+                input={input}
+                onInputChange={(v) => { setInput(v); requestAnimationFrame(syncTextareaHeight); }}
+                onSend={sendMessage}
+                sending={sending}
+                isPremium={isPremium}
+                remaining={remaining}
+                isArchived={false}
+                inputRef={chatInputRef}
+                onShowLimitModal={() => setShowLimitModal(true)}
+              />
+            </>
           )}
         </div>
       </div>
