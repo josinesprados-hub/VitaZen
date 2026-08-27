@@ -32,7 +32,7 @@ export function useDialogA11y(
     const focusTimer = setTimeout(() => {
       if (!dialogRef.current) return;
       const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
       );
       if (focusable.length > 0) focusable[0].focus();
     }, 50);
@@ -47,7 +47,7 @@ export function useDialogA11y(
       // Focus trap: Tab and Shift+Tab cycle within the dialog
       if (e.key === 'Tab' && dialogRef.current) {
         const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
         );
         if (focusable.length === 0) return;
         const first = focusable[0];
