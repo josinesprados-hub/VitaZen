@@ -184,6 +184,7 @@ export default function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
                 aria-describedby={error ? 'register-error' : undefined}
+                aria-invalid={!!error}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="Tu nombre completo"
               />
@@ -199,6 +200,7 @@ export default function RegisterPage() {
                 onBlur={handleEmailBlur}
                 autoComplete="email"
                 aria-describedby={error ? 'register-error' : undefined}
+                aria-invalid={!!error}
                 required
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
@@ -247,6 +249,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
                   aria-describedby={error ? 'register-error' : undefined}
+                  aria-invalid={!!error}
                   required
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="Mínimo 6 caracteres"

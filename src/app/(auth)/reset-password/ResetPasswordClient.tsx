@@ -195,6 +195,7 @@ export default function ResetPasswordClient() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       autoComplete="new-password"
                       aria-describedby={error ? 'reset-error' : undefined}
+                      aria-invalid={!!error}
                       required
                       minLength={8}
                       className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"

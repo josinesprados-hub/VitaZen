@@ -77,6 +77,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 aria-describedby={error ? 'forgot-error' : undefined}
+                aria-invalid={!!error}
                 required
                 disabled={success}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors disabled:opacity-50"

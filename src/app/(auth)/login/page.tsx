@@ -178,6 +178,7 @@ export default function LoginPage() {
                 onBlur={handleEmailBlur}
                 autoComplete="email"
                 aria-describedby={error ? 'login-error' : undefined}
+                aria-invalid={!!error}
                 required
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
@@ -218,6 +219,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
                   aria-describedby={error ? 'login-error' : undefined}
+                  aria-invalid={!!error}
                   required
                   className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
                   placeholder="••••••••"
