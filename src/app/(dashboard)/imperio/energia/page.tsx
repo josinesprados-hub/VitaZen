@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { Zap, Droplets, Apple, Heart, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
@@ -70,6 +71,13 @@ export default function EnergiaPage() {
   const [editNutritionForm, setEditNutritionForm] = useState({ meals: '', water: 0, calories: 0, notes: '' });
   const [editNutritionSaving, setEditNutritionSaving] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<{ id: string; type: 'wellness' | 'nutrition' } | null>(null);
+  const wellnessDialogRef = useRef<HTMLDivElement>(null);
+  const nutritionDialogRef = useRef<HTMLDivElement>(null);
+  const deleteDialogRef = useRef<HTMLDivElement>(null);
+
+  useDialogA11y(wellnessDialogRef, !!editingWellness, () => setEditingWellness(null));
+  useDialogA11y(nutritionDialogRef, !!editingNutrition, () => setEditingNutrition(null));
+  useDialogA11y(deleteDialogRef, !!pendingDeleteId, () => setPendingDeleteId(null));
   const [fetchError, setFetchError] = useState(false);
   const [submittingWellness, setSubmittingWellness] = useState(false);
   const [submittingNutrition, setSubmittingNutrition] = useState(false);
@@ -241,7 +249,7 @@ export default function EnergiaPage() {
       {/* Edit Wellness Overlay */}
       {editingWellness && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingWellness(null)}>
-          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={wellnessDialogRef} role="dialog" aria-modal="true" aria-label="Editar bienestar" className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-champagne" />
             </div>
@@ -265,7 +273,7 @@ export default function EnergiaPage() {
       {/* Edit Nutrition Overlay */}
       {editingNutrition && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setEditingNutrition(null)}>
-          <div className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={nutritionDialogRef} role="dialog" aria-modal="true" aria-label="Editar nutrición" className="modal-content p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-champagne/10 flex items-center justify-center mx-auto mb-5">
               <Pencil size={20} className="text-champagne" />
             </div>
@@ -297,7 +305,7 @@ export default function EnergiaPage() {
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
-          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar registro" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
