@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { useAuth } from '@/context/AuthContext';
 import {
   Gem, Plus, Pencil, Trash2, Wallet,
@@ -679,6 +680,12 @@ export default function RiquezaPage() {
   const [quickMode, setQuickMode] = useState(true);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const addSheetRef = useRef<HTMLDivElement>(null);
+  const editSheetRef = useRef<HTMLDivElement>(null);
+  const deleteDialogRef = useRef<HTMLDivElement>(null);
+
+  useDialogA11y(addSheetRef, showAdd && !editingLog && !pendingDeleteId, closeAddSheet);
+  useDialogA11y(editSheetRef, !!editingLog, () => { setEditingLog(null); setSubmitError(null); });
+  useDialogA11y(deleteDialogRef, !!pendingDeleteId, () => { setPendingDeleteId(null); setDeleteError(null); });
 
   // Cleanup toast timer on unmount
   useEffect(() => {
@@ -1074,12 +1081,12 @@ export default function RiquezaPage() {
         <div
           className="bs-overlay"
           onClick={closeAddSheet}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Nuevo movimiento"
         >
           <div
             ref={addSheetRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Nuevo movimiento"
             className="bs-sheet"
             style={!quickMode ? { height: 'auto', maxHeight: 'min(90dvh, var(--bs-max-h, 9999px))' } : undefined}
             onClick={(e) => e.stopPropagation()}
@@ -1133,8 +1140,12 @@ export default function RiquezaPage() {
 
       {/* ── Edit Overlay — reuses bs-sheet for consistency ── */}
       {editingLog && (
-        <div className="bs-overlay" onClick={() => { setEditingLog(null); setSubmitError(null); }} role="dialog" aria-modal="true" aria-label="Editar registro">
+        <div className="bs-overlay" onClick={() => { setEditingLog(null); setSubmitError(null); }}>
           <div
+            ref={editSheetRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Editar registro"
             className="bs-sheet"
             style={{ height: 'auto', maxHeight: 'min(85dvh, var(--bs-max-h, 9999px))' }}
             onClick={(e) => e.stopPropagation()}
@@ -1173,8 +1184,8 @@ export default function RiquezaPage() {
 
       {/* ── Delete Confirmation ── */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => { setPendingDeleteId(null); setDeleteError(null); }} role="alertdialog" aria-modal="true" aria-label="Confirmar eliminación">
-          <div className="modal-content-destructive p-6 sm:p-8 w-full sm:max-w-md safe-bottom" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-backdrop p-0 sm:p-4" onClick={() => { setPendingDeleteId(null); setDeleteError(null); }}>
+          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Confirmar eliminación" className="modal-content-destructive p-6 sm:p-8 w-full sm:max-w-md safe-bottom" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>

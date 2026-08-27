@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { useAuth } from '@/context/AuthContext';
 import { useMeditationTimer } from '@/hooks/useMeditationTimer';
 import { Brain, Play, Pause, Clock, Wind, Trash2, Calendar, Timer, CheckCircle, Pencil, ArrowLeft, ChevronRight } from 'lucide-react';
@@ -214,6 +215,13 @@ export default function MentePage() {
   const [completedSession, setCompletedSession] = useState<{ duration: number; type: string } | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingSession, setEditingSession] = useState<Meditation | null>(null);
+  const completionDialogRef = useRef<HTMLDivElement>(null);
+  const editSessionDialogRef = useRef<HTMLDivElement>(null);
+  const deleteDialogRef = useRef<HTMLDivElement>(null);
+
+  useDialogA11y(completionDialogRef, !!completedSession, () => setCompletedSession(null));
+  useDialogA11y(editSessionDialogRef, !!editingSession, () => setEditingSession(null));
+  useDialogA11y(deleteDialogRef, !!pendingDeleteId, () => setPendingDeleteId(null));
   const [editDuration, setEditDuration] = useState<number>(0);
   const [editType, setEditType] = useState<string>('');
   const [editSaving, setEditSaving] = useState(false);
@@ -407,11 +415,12 @@ export default function MentePage() {
         <div
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center breathing-complete-backdrop p-0 sm:p-4"
           onClick={() => setCompletedSession(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Sesión completada"
         >
           <div
+            ref={completionDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Sesión completada"
             className="breathing-complete-content p-6 sm:p-10 max-w-md w-full flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
@@ -446,11 +455,12 @@ export default function MentePage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setEditingSession(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Editar sesión"
         >
           <div
+            ref={editSessionDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Editar sesión"
             className="modal-content p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
@@ -512,11 +522,12 @@ export default function MentePage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4"
           onClick={() => setPendingDeleteId(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Confirmar eliminación"
         >
           <div
+            ref={deleteDialogRef}
+            role="alertdialog"
+            aria-modal="true"
+            aria-label="Confirmar eliminación"
             className="modal-content-destructive p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
