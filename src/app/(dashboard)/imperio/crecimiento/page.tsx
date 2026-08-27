@@ -425,6 +425,7 @@ export default function CrecimientoPage() {
                               onClick={() => startEdit(entry)}
                               className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press"
                               title="Editar"
+                              aria-label="Editar entrada"
                             >
                               <Pencil size={14} />
                             </button>
@@ -432,6 +433,7 @@ export default function CrecimientoPage() {
                               onClick={() => setPendingDeleteId(entry.id)}
                               className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press"
                               title="Eliminar"
+                              aria-label="Eliminar entrada"
                             >
                               <Trash2 size={14} />
                             </button>

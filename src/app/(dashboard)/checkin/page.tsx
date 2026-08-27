@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback, memo } from 'react';
+import { useEffect, useState, useCallback, memo, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useDialogA11y } from '@/hooks/useDialogA11y';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { CheckinSkeleton } from '@/components/ui/PremiumSkeleton';
 import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
@@ -107,6 +108,9 @@ export default function CheckinPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingCheckin, setEditingCheckin] = useState<CheckinData | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const deleteDialogRef = useRef<HTMLDivElement>(null);
+
+  useDialogA11y(deleteDialogRef, !!pendingDeleteId, () => setPendingDeleteId(null));
 
   // Lock body scroll when delete confirmation overlay is open — save/restore scroll position
   useEffect(() => {
@@ -250,7 +254,7 @@ export default function CheckinPage() {
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
-          <div className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar check-in" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
@@ -403,10 +407,10 @@ export default function CheckinPage() {
                     {c.note && <p className="text-[10px] text-[#3a3a3a] mt-0.5 truncate">{c.note}</p>}
                   </div>
                   <div className="flex items-center gap-0.5 flex-shrink-0">
-                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-champagne/8 text-[#999] hover:text-champagne transition-all touch-press-sm" title="Editar">
+                    <button onClick={() => startEditCheckin(c)} className="p-2 rounded-lg hover:bg-champagne/8 text-[#999] hover:text-champagne transition-all touch-press-sm" title="Editar" aria-label="Editar check-in">
                       <Pencil size={13} />
                     </button>
-                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/8 text-[#999] hover:text-red-400 transition-all touch-press-sm" title="Eliminar">
+                    <button onClick={() => setPendingDeleteId(c.id)} className="p-2 rounded-lg hover:bg-red-500/8 text-[#999] hover:text-red-400 transition-all touch-press-sm" title="Eliminar" aria-label="Eliminar check-in">
                       <Trash2 size={13} />
                     </button>
                   </div>
