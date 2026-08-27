@@ -87,7 +87,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               <img src="/images/v-gold-logo.png" alt="VitaZen" className="w-10 h-10 rounded-[20%]" />
               <span className="text-champagne text-xl font-bold tracking-widest">VITAZEN</span>
             </Link>
-            <button onClick={onClose} className="lg:hidden text-white hover:text-champagne close-btn">
+            <button onClick={onClose} aria-label="Cerrar menú" className="lg:hidden text-white hover:text-champagne close-btn">
               <X size={20} />
             </button>
           </div>

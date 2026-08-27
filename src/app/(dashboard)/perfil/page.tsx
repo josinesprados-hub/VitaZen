@@ -235,6 +235,7 @@ export default function PerfilPage() {
               <>
                 <button
                   onClick={() => fileInputRef.current?.click()}
+                  aria-label="Cambiar foto de perfil"
                   className={`absolute inset-0 w-24 h-24 rounded-full bg-black/60 flex items-center justify-center transition-opacity touch-press ${editing ? 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                 >
                   <Camera size={20} className="text-white" />

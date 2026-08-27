@@ -131,6 +131,7 @@ export function EmailVerificationBanner() {
           <button
             onClick={handleSendVerification}
             disabled={sending}
+            aria-label="Verificar email"
             className="flex items-center gap-1.5 text-xs text-champagne hover:text-white transition-colors disabled:opacity-50"
           >
             {sending ? (
