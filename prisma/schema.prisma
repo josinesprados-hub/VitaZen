@@ -54,6 +54,7 @@ model User {
 
   notificationPreference NotificationPreference?
   notificationLog   NotificationLog[]
+  deferredNotifications  DeferredNotification[]
   widgetSnapshots        WidgetSnapshot[]
   monthlyClosures        MonthlyClosure[]
   weeklyEmailLogs        WeeklyEmailLog[]
@@ -436,6 +437,30 @@ model NotificationLog {
 
   @@index([userId, type, sentAt])
   @@index([userId, sentAt])
+}
+
+// Queue for notifications deferred during Quiet Hours.
+// Recovery cron delivers them after the quiet period ends.
+// PROD-01 (FASE 12-P1-B)
+model DeferredNotification {
+  id            String   @id @default(cuid())
+  userId        String
+  type          String   // NotificationType: checkin | daily | weekly_recap | comeback | reflection
+  title         String   // resolved template title at defer time
+  body          String   // resolved template body at defer time
+  scheduledFor  DateTime // when quiet hours end — computed by computeQuietHoursExit()
+  status        String   @default("pending") // pending | delivering | sent | failed | expired
+  attemptCount  Int      @default(0)
+  lastAttemptAt DateTime?
+  processedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledFor]) // recovery cron: find pending + due
+  @@index([userId, status]) // per-user queries
+  @@index([createdAt]) // cleanup / monitoring
 }
 
 // ═══════════════════════════════════════════

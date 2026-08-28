@@ -43,6 +43,25 @@ export async function sendNotification(
   // ── 1. Gate checks ──
   const gate: ScheduleGateResult = await canSendNotification(userId, type);
   if (!gate.allowed) {
+    // PROD-01: Defer notifications blocked by quiet hours instead of discarding
+    if (gate.reason === 'quiet_hours' && gate.deferUntil) {
+      try {
+        const template = overrideTemplate || getTemplate(type, templateVars);
+        await db.deferredNotification.create({
+          data: {
+            userId,
+            type,
+            title: template.title,
+            body: template.body,
+            scheduledFor: gate.deferUntil,
+            status: 'pending',
+          },
+        });
+      } catch (deferErr) {
+        // Log but don't throw — the caller still gets success:false
+        console.error('[Notifications] Failed to defer notification:', deferErr);
+      }
+    }
     return {
       success: false,
       reason: gate.reason,
@@ -143,25 +162,11 @@ export async function sendNotification(
 }
 
 /**
- * H-17 (FASE 8E): deferNotification removed.
+ * H-17 (FASE 8E): deferNotification — replaced by PROD-01 (FASE 12-P1-B).
  *
- * This function was dead code — exported but never called by any production
- * path (cron jobs, API routes, batch processors). It claimed to defer
- * notifications during quiet hours, but the infrastructure to actually
- * re-deliver them (queue table, recovery cron) was never implemented.
- *
- * The real quiet-hours handling works correctly via canSendNotification()
- * in scheduler.ts, which blocks the send and returns reason='quiet_hours'.
- * The three batch processors (checkin, reflection, daily) also pre-filter
- * quiet hours before calling sendNotification().
- *
- * To implement real deferred delivery, FASE 12 would need:
- *   1. A new `DeferredNotification` Prisma model (queue table).
- *   2. A recovery cron (every 15 min) that delivers pending notifications
- *      after quiet hours end.
- *   3. Dedup logic to prevent re-delivery by subsequent cron runs.
- *   4. computeQuietHoursExit() to calculate precise exit time (currently
- *      uses a fixed 10h defer — documented as FASE 12).
+ * Deferred notifications are now persisted as DeferredNotification records
+ * inside sendNotification() when quiet_hours blocks. The recovery cron at
+ * /api/cron/delivery-recovery delivers them after quiet hours end.
  */
 
 /**
