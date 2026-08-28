@@ -99,12 +99,23 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
         >
           <ChevronLeft size={12} /> Volver
         </Link>
+        {/* MENTOR-01: Free users at 5/5 threads — button disabled with actionable message */}
+        {!isPremium && totalActiveCount >= 5 ? (
+          <button
+            disabled
+            className="w-full flex items-center justify-center gap-2 bg-champagne/30 text-black/50 font-semibold py-2.5 rounded-lg cursor-not-allowed text-sm"
+            aria-disabled="true"
+          >
+            <Plus size={16} /> 5/5 conversaciones
+          </button>
+        ) : (
         <button
           onClick={onCreateThread}
           className="w-full flex items-center justify-center gap-2 bg-champagne text-black font-semibold py-2.5 rounded-lg hover:bg-champagne-hover transition-colors text-sm"
         >
           <Plus size={16} /> Nueva conversación
         </button>
+        )}
       </div>
 
       {/* Tab selector: Todas / Archivadas / Favoritos */}

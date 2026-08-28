@@ -432,7 +432,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       } else {
         const data = await res.json();
         if (data.error?.includes('Maximum')) {
-          setActionError('Límite de conversaciones alcanzado');
+          // MENTOR-01: Actionable error — tell user to delete first
+          setActionError('Límite de 5 conversaciones. Elimina una para crear otra.');
         }
       }
     } catch (e) { console.error(e); setActionError('No se pudo crear la conversación'); }
@@ -557,7 +558,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         } else {
           const data = await res.json();
           if (data.error?.includes('Maximum')) {
-            setActionError('Límite de conversaciones alcanzado');
+            // MENTOR-01: Actionable error — tell user to delete first
+            setActionError('Límite de 5 conversaciones. Elimina una para crear otra.');
           }
           return;
         }
