@@ -76,7 +76,7 @@ const CopyMessageButton = React.memo(function CopyMessageButton({ content }: Cop
       aria-label={copied ? 'Respuesta copiada' : 'Copiar respuesta'}
       className="
         flex items-center justify-center
-        w-6 h-6 rounded-md
+        w-[44px] h-[44px] -m-[10px] rounded-md
         text-[#999] hover:text-champagne/50
         transition-colors duration-200
         focus:outline-none focus-visible:ring-1 focus-visible:ring-champagne/30

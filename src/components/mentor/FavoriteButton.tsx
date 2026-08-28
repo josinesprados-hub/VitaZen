@@ -44,7 +44,7 @@ const FavoriteButton = React.memo(function FavoriteButton({ messageId, isFavorit
       onClick={toggle}
       disabled={loading}
       aria-label={isFavorited ? 'Quitar de favoritos' : 'Marcar como favorito'}
-      className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-champagne/50 focus-visible:outline-none ${
+      className={`w-[44px] h-[44px] -m-[10px] rounded-md flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-champagne/50 focus-visible:outline-none ${
         isFavorited
           ? 'text-champagne opacity-100'
           : 'text-[#999] opacity-60 hover:opacity-100 hover:text-champagne/50'

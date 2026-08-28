@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, RefObject } from 'react';
+import React, { useEffect, useRef, useCallback, RefObject } from 'react';
 import { Pencil, Archive, ArchiveRestore, Trash2 } from 'lucide-react';
 import type { Thread } from './MentorChatTypes';
 
 // ─────────────────────────────────────────
 // ThreadContextMenu — extracted from MentorChat (A-1)
 // Includes A-4 keyboard navigation from FASE 7A.
+// M-01: Tab/Shift+Tab close menu and restore focus to trigger.
+// M-06: Escape defense-in-depth, focus restoration, aria-hidden backdrop.
 // ─────────────────────────────────────────
 
 interface ThreadContextMenuProps {
@@ -15,7 +17,9 @@ interface ThreadContextMenuProps {
   y: number;
   threads: Thread[];
   menuRef: RefObject<HTMLDivElement | null>;
- onRename: (threadId: string, newTitle: string) => void;
+  /** Ref to the trigger button that opened the menu (for focus restoration). */
+  triggerRef?: RefObject<HTMLElement | null>;
+  onRename: (threadId: string, newTitle: string) => void;
   onArchive: (threadId: string) => void;
   onUnarchive: (threadId: string) => void;
   onDeleteRequest: (threadId: string) => void;
@@ -29,6 +33,7 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
   y,
   threads,
   menuRef,
+  triggerRef,
   onRename,
   onArchive,
   onUnarchive,
@@ -38,7 +43,25 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
 }: ThreadContextMenuProps) {
   const thread = threads.find(t => t.id === threadId);
 
-  // A-4: Keyboard navigation for context menu
+  // Store onClose in a ref for stable access in callbacks
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
+  // Restore focus to the trigger element that opened the menu
+  const restoreTriggerFocus = useCallback(() => {
+    const el = triggerRef?.current;
+    if (el && el.isConnected) {
+      el.focus();
+    }
+  }, [triggerRef]);
+
+  // Close menu and restore focus to trigger
+  const handleClose = useCallback(() => {
+    restoreTriggerFocus();
+    onCloseRef.current();
+  }, [restoreTriggerFocus]);
+
+  // A-4: Keyboard navigation + M-01/M-06: Tab/Shift+Tab/Escape handling
   useEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
@@ -56,20 +79,33 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
         case 'ArrowDown': e.preventDefault(); setIndex(index < items.length - 1 ? index + 1 : 0); break;
         case 'ArrowUp': e.preventDefault(); setIndex(index > 0 ? index - 1 : items.length - 1); break;
         case 'Enter': case ' ': e.preventDefault(); if (index >= 0) items[index].click(); break;
+        // M-01: Tab / Shift+Tab — close menu, restore focus to trigger
+        case 'Tab':
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose();
+          break;
+        // M-06: Escape — defense-in-depth, restore focus to trigger
+        case 'Escape':
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose();
+          break;
       }
     };
     menu.addEventListener('keydown', handler);
     return () => menu.removeEventListener('keydown', handler);
-  }, [menuRef]);
+  }, [menuRef, handleClose]);
 
   if (!thread) return null;
 
   return (
     <>
-      {/* Backdrop */}
+      {/* M-06: Backdrop — aria-hidden for screen readers */}
       <div
         className="fixed inset-0 z-40"
-        onClick={onClose}
+        onClick={handleClose}
+        aria-hidden="true"
       />
       {/* Menu */}
       <div
@@ -88,7 +124,7 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
           tabIndex={-1}
           onClick={() => {
             onEditStart(thread.id, thread.title);
-            onClose();
+            handleClose();
           }}
           className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-white transition-colors"
         >
@@ -102,7 +138,7 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
             tabIndex={-1}
             onClick={() => {
               onUnarchive(thread.id);
-              onClose();
+              handleClose();
             }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
           >
@@ -115,7 +151,7 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
             tabIndex={-1}
             onClick={() => {
               onArchive(thread.id);
-              onClose();
+              handleClose();
             }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-[#1a1a1a] hover:text-champagne transition-colors"
           >
@@ -131,7 +167,7 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
           tabIndex={-1}
           onClick={() => {
             onDeleteRequest(thread.id);
-            onClose();
+            handleClose();
           }}
           className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#ccc] hover:bg-red-500/10 hover:text-red-400 transition-colors"
         >

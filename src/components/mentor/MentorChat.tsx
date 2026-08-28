@@ -115,6 +115,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const deleteModalRef = useRef<HTMLDivElement>(null);
   const limitModalRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  // M-06: Ref to the trigger button that opened the context menu (for focus restoration)
+  const contextMenuTriggerRef = useRef<HTMLElement | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   useDialogA11y(drawerRef, drawerOpen, () => { setDrawerOpen(false); setContextMenu(null); });
 
@@ -705,6 +707,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const handleContextMenu = (e: React.MouseEvent, threadId: string) => {
     e.stopPropagation();
     e.preventDefault();
+    // M-06: Capture trigger element for focus restoration
+    contextMenuTriggerRef.current = e.currentTarget as HTMLElement;
     const rect = (e.currentTarget as HTMLElement).closest('.sidebar-area')?.getBoundingClientRect();
     const x = rect ? e.clientX - rect.left : e.clientX;
     const y = rect ? e.clientY - rect.top : e.clientY;
@@ -1050,6 +1054,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           y={contextMenu.y}
           threads={threads}
           menuRef={contextMenuRef}
+          triggerRef={contextMenuTriggerRef}
           onRename={renameThread}
           onArchive={archiveThread}
           onUnarchive={unarchiveThread}
