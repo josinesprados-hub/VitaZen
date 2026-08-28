@@ -242,23 +242,113 @@ export function isInQuietHours(
 
 /**
  * Given we're in quiet hours, compute the next valid send time
- * (the end of the quiet window on the same or next day).
+ * (the next occurrence of `endStr` in `timezone`, same day or next day).
+ *
+ * Uses only the provided `now` parameter — never Date.now().
+ * Timezone math via Intl.DateTimeFormat, consistent with isInQuietHours()
+ * and getUserTodayStart().
  */
 export function computeQuietHoursExit(
   now: Date,
   endStr: string,  // "HH:mm"
   timezone: string,
 ): Date {
-  // Simple approach: defer by enough hours to be safely past quiet hours.
-  // A precise calculation requires full timezone calendar math which is
-  // overkill for this foundation. We add 1 hour past the quiet end.
-  const [endH, endM] = endStr.split(':').map(Number);
+  try {
+    const [endH, endM] = endStr.split(':').map(Number);
+    const endMinutes = endH * 60 + endM;
 
-  // Create a target date for "today at end time + 1h buffer" in user tz
-  // Then convert back to UTC. For now, use a safe 10-hour defer.
-  // This gets refined when actual scheduling infrastructure lands.
-  const deferMs = 10 * 60 * 60 * 1000; // 10 hours — safe for any quiet window
-  return new Date(Date.now() + deferMs);
+    // Current local time in the user's timezone (same pattern as isInQuietHours)
+    const timeFmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+    });
+    const timeParts = timeFmt.formatToParts(now);
+    const curH = parseInt(timeParts.find(p => p.type === 'hour')?.value ?? '0', 10);
+    const curM = parseInt(timeParts.find(p => p.type === 'minute')?.value ?? '0', 10);
+    const curMinutes = curH * 60 + curM;
+
+    // Current local date in the user's timezone (same pattern as getUserTodayStart)
+    const dateFmt = new Intl.DateTimeFormat('en-CA', { timeZone: timezone });
+    const todayStr = dateFmt.format(now); // "YYYY-MM-DD"
+
+    // If current local time >= end time, exit is tomorrow; otherwise today
+    const needTomorrow = curMinutes >= endMinutes;
+
+    // Build the target date string using pure calendar arithmetic
+    // (not time-offset heuristics which break near midnight or across DST).
+    let targetDateStr: string;
+    if (needTomorrow) {
+      const [ty, tm, td] = todayStr.split('-').map(Number);
+      const nextDay = new Date(ty, tm - 1, td + 1); // Date handles month/year overflow
+      const ny = nextDay.getFullYear();
+      const nm = String(nextDay.getMonth() + 1).padStart(2, '0');
+      const nd = String(nextDay.getDate()).padStart(2, '0');
+      targetDateStr = `${ny}-${nm}-${nd}`;
+    } else {
+      targetDateStr = todayStr;
+    }
+
+    return resolveLocalToUTC(targetDateStr, endH, endM, timezone);
+  } catch {
+    // Fallback: compute from now using endStr hours (no fixed 10 h)
+    console.warn('[Scheduler] computeQuietHoursExit fallback for tz:', timezone);
+    const [endH, endM] = endStr.split(':').map(Number);
+    return new Date(now.getTime() + ((endH + 1) * 60 + endM) * 60 * 1000);
+  }
+}
+
+/**
+ * Convert a local wall-clock time in a specific timezone to a UTC Date.
+ *
+ * Strategy (no external libs, pure Intl):
+ *  1. Build a candidate UTC instant at "dateStr T hour:minute:00Z".
+ *  2. Ask Intl what local time that candidate corresponds to in `timezone`.
+ *  3. Measure the drift between wanted local and actual local.
+ *  4. Apply the drift correction to the candidate.
+ *
+ * This handles DST transitions correctly because Intl always reflects
+ * the real offset at the candidate instant.
+ */
+function resolveLocalToUTC(
+  dateStr: string, // "YYYY-MM-DD"
+  hour: number,
+  minute: number,
+  timezone: string,
+): Date {
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+
+  // Step 1 — candidate (may be off by the timezone offset)
+  const candidate = new Date(
+    `${dateStr}T${pad2(hour)}:${pad2(minute)}:00Z`,
+  );
+
+  // Step 2 — what local time does the candidate actually represent?
+  const tzFmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: 'numeric', minute: 'numeric', hour12: false,
+  });
+  const parts = tzFmt.formatToParts(candidate);
+  const pYear   = parseInt(parts.find(p => p.type === 'year')!.value, 10);
+  const pMonth  = parseInt(parts.find(p => p.type === 'month')!.value, 10);
+  const pDay    = parseInt(parts.find(p => p.type === 'day')!.value, 10);
+  const pHour   = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0', 10);
+  const pMinute = parseInt(parts.find(p => p.type === 'minute')?.value ?? '0', 10);
+
+  // Step 3 — compute drift
+  const wantedMs = new Date(
+    parseInt(dateStr.slice(0, 4), 10),
+    parseInt(dateStr.slice(5, 7), 10) - 1,
+    parseInt(dateStr.slice(8, 10), 10),
+    hour, minute, 0, 0,
+  ).getTime();
+  const actualMs = new Date(pYear, pMonth - 1, pDay, pHour, pMinute, 0, 0).getTime();
+  const correction = wantedMs - actualMs;
+
+  // Step 4 — apply correction
+  return new Date(candidate.getTime() + correction);
 }
 
 /**
