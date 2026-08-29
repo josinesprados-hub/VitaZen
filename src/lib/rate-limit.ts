@@ -18,6 +18,7 @@
 //   if (limited) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
 // ═══════════════════════════════════════════
 
+import { NextResponse } from 'next/server';
 import { db } from './db';
 
 export interface RateLimitConfig {
@@ -161,6 +162,51 @@ export const RATE_LIMITS = {
 
   // ── Stripe ──
   'stripe:checkout':      { maxRequests: 3,  windowMs: 300_000 },  // 3/5min (external API call)
+  'stripe:portal':        { maxRequests: 5,  windowMs: 300_000 },  // 5/5min (external API call)
+  'stripe:restore':       { maxRequests: 3,  windowMs: 300_000 },  // 3/5min (multiple external API calls)
+
+  // ── Additional data write endpoints (PROD-09) ──
+  'meditation:put':       { maxRequests: 20, windowMs: 60_000 },    // 20/min
+  'meditation:delete':    { maxRequests: 10, windowMs: 60_000 },    // 10/min (XP revert risk)
+  'onboarding:post':      { maxRequests: 3,  windowMs: 300_000 },  // 3/5min (heavy transaction)
+  'notifications:deactivate-all': { maxRequests: 5, windowMs: 60_000 },  // 5/min
+  'notifications:permission':     { maxRequests: 10, windowMs: 60_000 },  // 10/min
+  'widgets:refresh':      { maxRequests: 20, windowMs: 60_000 },    // 20/min (on top of internal limit)
 } as const;
 
 export type RateLimitKey = keyof typeof RATE_LIMITS;
+
+// ═══════════════════════════════════════════
+// PROD-10 — Retry-After helper
+// ═══════════════════════════════════════════
+//
+// Centralized 429 response builder. All rate-limited routes MUST use this
+// function instead of constructing their own 429 response, to guarantee:
+//   1. The standard HTTP Retry-After header is always present.
+//   2. The header value matches the body's retryAfter field.
+//   3. The value is an integer (seconds, per RFC 7231 §7.1.3).
+//
+// Usage:
+//   const rl = await rateLimit(user.id, 'checkin:post', RATE_LIMITS['checkin:post']);
+//   if (rl.limited) return rateLimitedResponse(rl);
+
+/**
+ * Build a 429 Too Many Requests response with Retry-After header.
+ *
+ * @param result - The RateLimitResult from rateLimit()
+ * @param customMessage - Optional custom error message (defaults to 'Too many requests')
+ * @returns NextResponse with status 429, Retry-After header, and JSON body
+ */
+export function rateLimitedResponse(
+  result: { resetAt: number; current?: number },
+  customMessage?: string,
+): NextResponse {
+  const retryAfterSec = Math.max(1, Math.ceil((result.resetAt - Date.now()) / 1000));
+  return NextResponse.json(
+    { error: customMessage ?? 'Too many requests', retryAfter: result.resetAt },
+    {
+      status: 429,
+      headers: { 'Retry-After': String(retryAfterSec) },
+    },
+  );
+}

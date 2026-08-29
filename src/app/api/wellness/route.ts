@@ -6,7 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'wellness:post', RATE_LIMITS['wellness:post']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const { date, mood, energy, sleep, stress, notes } = await request.json();
 
@@ -195,7 +195,7 @@ export async function PUT(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'wellness:put', RATE_LIMITS['wellness:put']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { logId, mood, energy, sleep, stress, notes } = body;
@@ -244,7 +244,7 @@ export async function DELETE(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'wellness:delete', RATE_LIMITS['wellness:delete']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { logId } = body;

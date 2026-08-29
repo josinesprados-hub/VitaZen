@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getAIUsageRemaining } from '@/lib/limits';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 const MAX_THREADS_FREE = 5;
 const MAX_THREADS_PREMIUM = 100;
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'ai:threads:post', RATE_LIMITS['ai:threads:post']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const maxThreads = user.plan === 'PREMIUM' ? MAX_THREADS_PREMIUM : MAX_THREADS_FREE;
     const threadCount = await db.aIThread.count({
@@ -136,8 +136,8 @@ export async function POST(request: NextRequest) {
       const prismaError = e as { code?: string };
       if (prismaError.code === 'P2002') {
         return NextResponse.json(
-          { error: 'Rate limited — please try again' },
-          { status: 429 }
+          { error: 'Rate limited — please try again', retryAfter: 5 },
+          { status: 429, headers: { 'Retry-After': '5' } }
         );
       }
       throw e;
@@ -164,7 +164,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'ai:threads:patch', RATE_LIMITS['ai:threads:patch']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const { threadId, title, archived } = await request.json();
 
@@ -210,7 +210,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'ai:threads:delete', RATE_LIMITS['ai:threads:delete']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const { threadId } = await request.json();
 

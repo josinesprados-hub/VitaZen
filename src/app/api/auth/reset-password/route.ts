@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     if (recentRequests >= 3) {
       return NextResponse.json(
         { error: 'Demasiadas solicitudes. Inténtalo en 15 minutos.', retryAfter: 900 },
-        { status: 429 }
+        { status: 429, headers: { 'Retry-After': '900' } }
       );
     }
 
@@ -158,7 +158,7 @@ export async function PUT(request: NextRequest) {
     if (recentAttempts > 10) {
       return NextResponse.json(
         { error: 'Demasiados intentos. Inténtalo más tarde.', retryAfter: 900 },
-        { status: 429 }
+        { status: 429, headers: { 'Retry-After': '900' } }
       );
     }
 

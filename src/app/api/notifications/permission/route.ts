@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // POST /api/notifications/permission — Track browser permission state change
 export async function POST(request: NextRequest) {
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'notifications:permission', RATE_LIMITS['notifications:permission']);
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { permissionState } = body;

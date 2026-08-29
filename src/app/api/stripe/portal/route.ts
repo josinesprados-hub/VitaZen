@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
       console.warn('[Portal] User not found for provided token');
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'stripe:portal', RATE_LIMITS['stripe:portal']);
+    if (rl.limited) return rateLimitedResponse(rl);
 
     if (!user.stripeCustomerId) {
       console.warn('[Portal] No stripeCustomerId for user:', user.id, '— plan:', user.plan);

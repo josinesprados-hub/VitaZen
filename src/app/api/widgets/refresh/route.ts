@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { refreshWidgetSnapshot } from '@/lib/widgets/refresh';
 import { WIDGET_TYPES, WidgetType } from '@/lib/widgets/types';
 import { trackWidgetApiError, trackWidgetRefreshRateLimit } from '@/lib/observability/tracking';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════
 // POST /api/widgets/refresh
@@ -29,6 +30,10 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    // ── HTTP rate limit (on top of internal widget refresh rate limit) ──
+    const rl = await rateLimit(user.id, 'widgets:refresh', RATE_LIMITS['widgets:refresh']);
+    if (rl.limited) return rateLimitedResponse(rl);
 
     // ── Parse request ──
     const body = await request.json();

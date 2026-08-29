@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // POST /api/notifications/register-token — Register or refresh a push token
 export async function POST(request: NextRequest) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'notifications:register', RATE_LIMITS['notifications:register']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { token, platform, userAgent } = body;
@@ -145,7 +145,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'notifications:unregister', RATE_LIMITS['notifications:unregister']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { token } = body;

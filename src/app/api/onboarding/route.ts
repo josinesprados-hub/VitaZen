@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // GET /api/onboarding — Check onboarding status
 export async function GET(request: NextRequest) {
@@ -56,6 +57,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'onboarding:post', RATE_LIMITS['onboarding:post']);
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { goals, primaryFocus, stressLevel, energyLevel, focusLevel, initialHabits, name } = body;

@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { stripe, PLANS } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { serverLog } from '@/lib/observability/server-logger';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════
 // POST /api/stripe/restore
@@ -44,6 +45,9 @@ async function handler(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'stripe:restore', RATE_LIMITS['stripe:restore']);
+    if (rl.limited) return rateLimitedResponse(rl);
 
     // If user already has a stripeCustomerId, check if it has an active sub
     if (user.stripeCustomerId) {

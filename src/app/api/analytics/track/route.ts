@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { startOfTodayMadrid, startOfNextDayMadrid } from '@/lib/dates';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════════════════════
 // POST /api/analytics/track
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Rate limit only for authenticated users
     if (userId) {
       const rl = await rateLimit(userId, 'analytics:track', RATE_LIMITS['analytics:track']);
-      if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+      if (rl.limited) return rateLimitedResponse(rl);
     }
 
     // Deduplicate daily_session: only one per user per calendar day

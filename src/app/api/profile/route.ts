@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { validateAvatarUrlServer } from '@/lib/avatar';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // GET /api/profile — Fetch current user profile
 export async function GET(request: NextRequest) {
@@ -56,7 +56,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'profile:put', RATE_LIMITS['profile:put']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { name, avatarUrl, country, city, age, bio } = body;

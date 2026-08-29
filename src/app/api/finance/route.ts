@@ -4,7 +4,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { startOfMadridDaysAgo, startOfMadridDay, getTodayDateKey, getMadridDateKey, madridDayBoundaries } from '@/lib/dates';
 import { onFinanceChange } from '@/lib/widgets/triggers';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════
 // Serialización manual — evita problemas con Date/BigInt de Prisma
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'finance:post', RATE_LIMITS['finance:post']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { date, type, category, amount, description, mood, contexto } = body;
@@ -187,7 +187,7 @@ export async function PUT(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'finance:put', RATE_LIMITS['finance:put']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { logId, date, type, category, amount, description, mood, contexto } = body;
@@ -269,7 +269,7 @@ export async function DELETE(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'finance:delete', RATE_LIMITS['finance:delete']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { logId } = body;

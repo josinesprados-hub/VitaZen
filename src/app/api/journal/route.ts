@@ -5,8 +5,8 @@ import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onJournalChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-import { startOfMadridDay } from '@/lib/dates';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { startOfMadridDay, madridDayBoundaries } from '@/lib/dates';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'journal:post', RATE_LIMITS['journal:post']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const { title, content, mood, gratitude } = await request.json();
 
@@ -88,9 +88,12 @@ export async function POST(request: NextRequest) {
       },
     });
     if (entriesToday >= 5) {
+      // Calculate seconds until midnight Madrid for Retry-After
+      const { end: dayEnd } = madridDayBoundaries(getTodayDateKey());
+      const retrySec = Math.max(1, Math.ceil((dayEnd.getTime() - Date.now()) / 1000));
       return NextResponse.json(
-        { error: 'Has alcanzado el límite de entradas de diario por hoy (5)' },
-        { status: 429 }
+        { error: 'Has alcanzado el límite de entradas de diario por hoy (5)', retryAfter: Date.now() + retrySec * 1000 },
+        { status: 429, headers: { 'Retry-After': String(retrySec) } }
       );
     }
 
@@ -151,7 +154,7 @@ export async function PUT(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'journal:put', RATE_LIMITS['journal:put']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { entryId, title, content, mood, gratitude } = body;
@@ -208,7 +211,7 @@ export async function DELETE(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'journal:delete', RATE_LIMITS['journal:delete']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { entryId } = body;

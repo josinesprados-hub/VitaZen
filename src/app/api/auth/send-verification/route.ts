@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     if (recentToken) {
       return NextResponse.json(
         { error: 'Espera un minuto antes de solicitar otro enlace', retryAfter: 60 },
-        { status: 429 }
+        { status: 429, headers: { 'Retry-After': '60' } }
       );
     }
 
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     if (error?.code === 'auth/too-many-requests') {
       return NextResponse.json(
         { error: 'Demasiados intentos. Inténtalo más tarde.', retryAfter: 300 },
-        { status: 429 }
+        { status: 429, headers: { 'Retry-After': '300' } }
       );
     }
 

@@ -7,7 +7,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'habits:post', RATE_LIMITS['habits:post']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const { name, description, frequency } = await request.json();
 
@@ -71,9 +71,12 @@ export async function POST(request: NextRequest) {
       },
     });
     if (habitsCreatedToday >= 5) {
+      // Calculate seconds until midnight Madrid for Retry-After
+      const { end: dayEnd } = madridDayBoundaries(getTodayDateKey());
+      const retrySec = Math.max(1, Math.ceil((dayEnd.getTime() - Date.now()) / 1000));
       return NextResponse.json(
-        { error: 'Has alcanzado el límite de creación de hábitos por hoy (5)' },
-        { status: 429 }
+        { error: 'Has alcanzado el límite de creación de hábitos por hoy (5)', retryAfter: Date.now() + retrySec * 1000 },
+        { status: 429, headers: { 'Retry-After': String(retrySec) } }
       );
     }
 
@@ -114,7 +117,7 @@ export async function PATCH(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'habits:patch', RATE_LIMITS['habits:patch']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const { habitId } = await request.json();
 
@@ -274,7 +277,7 @@ export async function PUT(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'habits:put', RATE_LIMITS['habits:put']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { habitId, name, description, frequency } = body;
@@ -331,7 +334,7 @@ export async function DELETE(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const rl = await rateLimit(user.id, 'habits:delete', RATE_LIMITS['habits:delete']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { habitId } = body;

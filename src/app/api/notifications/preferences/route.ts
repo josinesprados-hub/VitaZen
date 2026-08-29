@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 import {
   NotificationPreferencesResponse,
 } from '@/lib/notifications/types';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // GET /api/notifications/preferences — Fetch user notification preferences
 export async function GET(request: NextRequest) {
@@ -71,7 +71,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'notifications:preferences', RATE_LIMITS['notifications:preferences']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     let body: unknown;
     try {

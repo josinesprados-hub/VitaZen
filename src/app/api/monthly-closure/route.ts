@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { generateMonthlyDigest, getPreviousMonthForClosure, isClosurePeriod, type MonthlyDigest } from '@/lib/monthly-closure/digest';
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // ─── GET ───
 
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const rl = await rateLimit(user.id, 'monthly-closure:post', RATE_LIMITS['monthly-closure:post']);
-    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+    if (rl.limited) return rateLimitedResponse(rl);
 
     const body = await request.json();
     const { month, reflection, markSummaryViewed } = body;
