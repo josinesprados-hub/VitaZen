@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 async function handler(request: NextRequest) {
   try {
@@ -36,6 +37,9 @@ async function handler(request: NextRequest) {
     }
 
     if (request.method === 'PATCH') {
+      const rl = await rateLimit(user.id, 'ai:favorites:patch', RATE_LIMITS['ai:favorites:patch']);
+      if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+
       const { messageId } = await request.json();
       if (!messageId) {
         return NextResponse.json({ error: 'messageId is required' }, { status: 400 });

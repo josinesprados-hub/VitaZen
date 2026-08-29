@@ -7,6 +7,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,6 +37,9 @@ export async function POST(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'habits:post', RATE_LIMITS['habits:post']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { name, description, frequency } = await request.json();
 
@@ -108,6 +112,9 @@ export async function PATCH(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'habits:patch', RATE_LIMITS['habits:patch']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { habitId } = await request.json();
 
@@ -266,6 +273,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    const rl = await rateLimit(user.id, 'habits:put', RATE_LIMITS['habits:put']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+
     const body = await request.json();
     const { habitId, name, description, frequency } = body;
     const habit = await db.habitLog.findUnique({ where: { id: habitId } });
@@ -319,6 +329,9 @@ export async function DELETE(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'habits:delete', RATE_LIMITS['habits:delete']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const body = await request.json();
     const { habitId } = body;

@@ -7,6 +7,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onCheckinChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey } from '@/lib/deterministic';
 import { startOfTodayMadrid, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 // ─── GET: today's checkin + history ─────────────────────
 
@@ -100,6 +101,9 @@ export async function POST(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'checkin:post', RATE_LIMITS['checkin:post']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { emotion, energy, focus, stress, intention, note } = await request.json();
 
@@ -222,6 +226,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    const rl = await rateLimit(user.id, 'checkin:put', RATE_LIMITS['checkin:put']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+
     const { checkinId, emotion, energy, focus, stress, intention, note } = await request.json();
 
     const existing = await db.dailyCheckin.findUnique({ where: { id: checkinId } });
@@ -272,6 +279,9 @@ export async function DELETE(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'checkin:delete', RATE_LIMITS['checkin:delete']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { checkinId } = await request.json();
 

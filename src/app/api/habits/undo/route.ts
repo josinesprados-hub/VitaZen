@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
 import { onHabitChange } from '@/lib/widgets/triggers';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * POST /api/habits/undo
@@ -35,6 +36,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'habits:undo', RATE_LIMITS['habits:undo']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { habitId, previousLastCompletedAt } = await request.json();
 

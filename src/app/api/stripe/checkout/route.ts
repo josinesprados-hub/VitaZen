@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { stripe, PLANS } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'stripe:checkout', RATE_LIMITS['stripe:checkout']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     if (user.plan === 'PREMIUM') {
       // User already has premium — check if they have an active subscription

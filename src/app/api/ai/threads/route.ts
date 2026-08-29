@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getAIUsageRemaining } from '@/lib/limits';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 const MAX_THREADS_FREE = 5;
 const MAX_THREADS_PREMIUM = 100;
@@ -92,6 +93,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const rl = await rateLimit(user.id, 'ai:threads:post', RATE_LIMITS['ai:threads:post']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+
     const maxThreads = user.plan === 'PREMIUM' ? MAX_THREADS_PREMIUM : MAX_THREADS_FREE;
     const threadCount = await db.aIThread.count({
       where: { userId: user.id, archived: false },
@@ -159,6 +163,9 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const rl = await rateLimit(user.id, 'ai:threads:patch', RATE_LIMITS['ai:threads:patch']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+
     const { threadId, title, archived } = await request.json();
 
     if (!threadId) {
@@ -201,6 +208,9 @@ export async function DELETE(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const rl = await rateLimit(user.id, 'ai:threads:delete', RATE_LIMITS['ai:threads:delete']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { threadId } = await request.json();
 

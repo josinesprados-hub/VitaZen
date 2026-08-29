@@ -11,6 +11,7 @@ import { serverLog } from '@/lib/observability/server-logger';
 import { getUnderstandingContext, extractAndPersist } from '@/lib/understanding/engine';
 import { optimizeContext } from '@/lib/decision/engine';
 import { reason } from '@/lib/reasoning/engine';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 async function handler(request: NextRequest) {
   // T-2 FIX: Track whether the AI limit was consumed so we can roll it back
@@ -37,6 +38,9 @@ async function handler(request: NextRequest) {
 
     userId = user.id;
     userPlan = user.plan;
+
+    const rl = await rateLimit(user.id, 'ai:chat', RATE_LIMITS['ai:chat']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const isPremium = user.plan === 'PREMIUM';
     const dailyLimit = getDailyLimit(user.plan);

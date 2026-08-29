@@ -6,6 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onJournalChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { startOfMadridDay } from '@/lib/dates';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,6 +41,9 @@ export async function POST(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'journal:post', RATE_LIMITS['journal:post']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { title, content, mood, gratitude } = await request.json();
 
@@ -146,6 +150,9 @@ export async function PUT(request: NextRequest) {
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    const rl = await rateLimit(user.id, 'journal:put', RATE_LIMITS['journal:put']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
+
     const body = await request.json();
     const { entryId, title, content, mood, gratitude } = body;
     const entry = await db.journalEntry.findUnique({ where: { id: entryId } });
@@ -199,6 +206,9 @@ export async function DELETE(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'journal:delete', RATE_LIMITS['journal:delete']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const body = await request.json();
     const { entryId } = body;

@@ -7,6 +7,7 @@ import { onMeditationChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
 import { VALID_MEDITATION_TYPES } from '@/lib/meditation-types';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -151,6 +152,9 @@ export async function POST(request: NextRequest) {
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await getAuthUserBasic(authHeader.split('Bearer ')[1]);
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const rl = await rateLimit(user.id, 'meditation:post', RATE_LIMITS['meditation:post']);
+    if (rl.limited) return NextResponse.json({ error: 'Too many requests', retryAfter: rl.resetAt }, { status: 429 });
 
     const { duration, type } = await request.json();
 
