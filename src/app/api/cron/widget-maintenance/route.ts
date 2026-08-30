@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+export const maxDuration = 300;
 import { NextRequest, NextResponse } from 'next/server';
 import { cleanupExpiredSnapshots, batchRefreshExpiredSnapshots } from '@/lib/widgets';
 import { startCacheCleanup } from '@/lib/widgets/cache';

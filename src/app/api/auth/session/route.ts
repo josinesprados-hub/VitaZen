@@ -1,7 +1,28 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyFirebaseToken, getAuthUser } from '@/lib/auth';
+import { verifyFirebaseToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+
+// ═══════════════════════════════════════════
+// PROD-04-R: GET /api/auth/session — READ-ONLY
+// ═══════════════════════════════════════════
+//
+// This endpoint performs NO writes (no DB updates, no Stripe calls).
+// All synchronization (firebaseUid, emailVerified, email, Stripe)
+// is handled by POST /api/auth/sync, which runs on every
+// onAuthStateChanged event (page load, login, tab focus).
+//
+// Additionally, getAuthUser() and getAuthUserBasic() in @/lib/auth
+// sync emailVerified on every authenticated API call.
+//
+// Why this is safe:
+// - POST /api/auth/sync covers all 4 sync operations that were here.
+// - GET is only called via refreshUser() (post-save, post-checkout, etc.),
+//   NOT on page load. The primary auth path is syncUser() → POST /sync.
+// - refreshUser() falls back to POST /sync if GET fails.
+// - Email changes are extremely infrequent; a 1-refresh delay is acceptable.
+//
+// DO NOT re-introduce side effects here.
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,8 +33,6 @@ export async function GET(request: NextRequest) {
 
     const idToken = authHeader.split('Bearer ')[1];
 
-    // Verify token once — reuse the decoded result for both
-    // user lookup and emailVerified sync (was verifying twice).
     const decodedToken = await verifyFirebaseToken(idToken);
 
     if (!decodedToken) {
@@ -34,10 +53,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Fallback: search by email if firebaseUid doesn't match
-    // (same logic as getAuthUser, but without a second token verify)
     // BUG-A1 FIX: Only allow email fallback if the email is verified.
-    // Without this check, an attacker can create a Firebase account with the
-    // victim's email and overwrite their firebaseUid, taking over the account.
     if (!user && decodedToken.email && decodedToken.email_verified) {
       user = await db.user.findUnique({
         where: { email: decodedToken.email },
@@ -50,75 +66,10 @@ export async function GET(request: NextRequest) {
           },
         },
       });
-
-      // DI-06 FIX: Handle P2002 (unique constraint) when the new firebaseUid
-      // already belongs to another user due to a concurrent request.
-      // Log the conflict and continue instead of crashing with a 500.
-      if (user && user.firebaseUid !== decodedToken.uid) {
-        try {
-          await db.user.update({
-            where: { id: user.id },
-            data: { firebaseUid: decodedToken.uid },
-          });
-          user.firebaseUid = decodedToken.uid;
-        } catch (syncErr: unknown) {
-          const isP2002 =
-            typeof syncErr === 'object' && syncErr !== null &&
-            'code' in syncErr && (syncErr as { code: string }).code === 'P2002';
-          if (isP2002) {
-            console.warn('[Session] firebaseUid sync skipped — uid already belongs to another user:', decodedToken.uid);
-          } else {
-            throw syncErr;
-          }
-        }
-      }
     }
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Sync emailVerified from token to DB if needed (single token verify)
-    if (decodedToken.email_verified && !user.emailVerified) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: true },
-      });
-      user.emailVerified = true;
-    }
-
-    // BUG-B3 FIX: Sync email from Firebase if it changed and is verified.
-    // Previously, the DB email was never updated — only firebaseUid and
-    // emailVerified were synced. A user who changed their Firebase email
-    // had a stale DB email, causing transactional emails and Stripe
-    // receipts to go to the wrong address.
-    if (decodedToken.email_verified && decodedToken.email && user.email !== decodedToken.email) {
-      // F8.4-02 FIX: Check email uniqueness before updating to prevent
-      // P2002 unique constraint violation if another user already has this email.
-      const existingEmail = await db.user.findUnique({
-        where: { email: decodedToken.email },
-      });
-      if (existingEmail && existingEmail.id !== user.id) {
-        console.warn('[Session] Email sync skipped — another user already has this email:', decodedToken.email);
-      } else {
-        await db.user.update({
-          where: { id: user.id },
-          data: { email: decodedToken.email },
-        });
-        user.email = decodedToken.email;
-
-        // Also update the Stripe customer email if the user has one
-        if (user.stripeCustomerId) {
-          try {
-            const { stripe } = await import('@/lib/stripe');
-            await stripe.customers.update(user.stripeCustomerId, {
-              email: decodedToken.email,
-            });
-          } catch {
-            // Non-blocking — Stripe email update failure should not prevent login
-          }
-        }
-      }
     }
 
     return NextResponse.json({
