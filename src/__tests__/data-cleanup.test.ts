@@ -7,19 +7,37 @@
  * They mock Prisma and validate the exact WHERE clauses, batch sizes,
  * safety invariants, and idempotency of each cleanup function.
  *
- * NOTE: DeferredNotification tests are omitted because the model
- * does not exist in the current schema. When PROD-01 is merged,
- * tests for cleanupTerminalDeferredNotifications() should be added.
+ * NOTE: The DeferredNotification model exists in schema.prisma (PROD-01 merged).
  */
 
-// ─── Mock setup ───────────────────────────────────────────────
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const MOCK_DB = {
-  analyticsEvent: createModelMock(),
-  notificationLog: createModelMock(),
-  pushToken: createModelMock(),
-  deferredNotification: createModelMock(),
-};
+// ─── Mock setup (hoisted so vi.mock factory can reference it) ───
+
+function applyWhere(
+  rows: Array<Record<string, unknown>>,
+  where: Record<string, unknown>,
+): Array<Record<string, unknown>> {
+  return rows.filter(row => {
+    for (const [key, val] of Object.entries(where)) {
+      if (typeof val === 'object' && val !== null) {
+        if ('startsWith' in val) {
+          if (!(row[key] as string).startsWith((val as { startsWith: string }).startsWith)) return false;
+        } else if ('not' in val) {
+          const inner = (val as { not: { startsWith: string } }).not;
+          if ('startsWith' in inner && (row[key] as string).startsWith(inner.startsWith)) return false;
+        } else if ('lt' in val) {
+          if (new Date(row[key] as string) >= new Date((val as { lt: Date }).lt)) return false;
+        } else if ('in' in val) {
+          if (!((val as { in: unknown[] }).in).includes(row[key])) return false;
+        }
+      } else {
+        if (row[key] !== val) return false;
+      }
+    }
+    return true;
+  });
+}
 
 function createModelMock() {
   let data: Array<{ id: string; [k: string]: unknown }> = [];
@@ -58,35 +76,18 @@ function createModelMock() {
   return mock;
 }
 
-function applyWhere(
-  rows: Array<Record<string, unknown>>,
-  where: Record<string, unknown>,
-): Array<Record<string, unknown>> {
-  return rows.filter(row => {
-    for (const [key, val] of Object.entries(where)) {
-      if (typeof val === 'object' && val !== null) {
-        if ('startsWith' in val) {
-          if (!(row[key] as string).startsWith((val as { startsWith: string }).startsWith)) return false;
-        } else if ('not' in val) {
-          const inner = (val as { not: { startsWith: string } }).not;
-          if ('startsWith' in inner && (row[key] as string).startsWith(inner.startsWith)) return false;
-        } else if ('lt' in val) {
-          if (new Date(row[key] as string) >= new Date((val as { lt: Date }).lt)) return false;
-        } else if ('in' in val) {
-          if (!((val as { in: unknown[] }).in).includes(row[key])) return false;
-        }
-      } else {
-        if (row[key] !== val) return false;
-      }
-    }
-    return true;
-  });
-}
+const { MOCK_DB } = vi.hoisted(() => ({
+  MOCK_DB: {
+    analyticsEvent: createModelMock(),
+    notificationLog: createModelMock(),
+    pushToken: createModelMock(),
+    deferredNotification: createModelMock(),
+  },
+}));
 
 // Mock the db module
 vi.mock('@/lib/db', () => ({ db: MOCK_DB }));
 
-import { describe, it, expect, beforeEach } from 'vitest';
 import {
   cleanupRateLimitEvents,
   cleanupNotificationLogs,
