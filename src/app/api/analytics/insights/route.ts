@@ -44,10 +44,17 @@ export async function GET(request: NextRequest) {
     // New approach: three targeted groupBy queries (event counts, DAU per day,
     // unique users) — DB does the heavy lifting, only tiny result sets in memory.
 
+    // P5/P6: Exclude rate-limiting events (rl:*) from product metrics.
+    // These are internal infrastructure events, not user-facing product events.
+    const productEventFilter = {
+      createdAt: { gte: since } as const,
+      event: { not: { startsWith: 'rl:' } } as const,
+    };
+
     // ─── Event counts + unique users per event (single query) ──
     const eventAgg = await db.analyticsEvent.groupBy({
       by: ['event'],
-      where: { createdAt: { gte: since } },
+      where: productEventFilter,
       _count: { id: true, userId: true },
     });
 
@@ -64,7 +71,7 @@ export async function GET(request: NextRequest) {
     const uniquePerEventRows = await db.$queryRaw<Array<{ event: string; unique_users: bigint }>>`
       SELECT event, COUNT(DISTINCT "userId")::bigint AS unique_users
       FROM "AnalyticsEvent"
-      WHERE "createdAt" >= ${since} AND "userId" IS NOT NULL
+      WHERE "createdAt" >= ${since} AND "userId" IS NOT NULL AND event NOT LIKE 'rl:%'
       GROUP BY event
     `;
     const uniqueUsersPerEvent: Record<string, number> = {};
@@ -91,13 +98,13 @@ export async function GET(request: NextRequest) {
     const totalUniqueResult = await db.$queryRaw<Array<{ count: bigint }>>`
       SELECT COUNT(DISTINCT "userId")::bigint AS count
       FROM "AnalyticsEvent"
-      WHERE "createdAt" >= ${since} AND "userId" IS NOT NULL
+      WHERE "createdAt" >= ${since} AND "userId" IS NOT NULL AND event NOT LIKE 'rl:%'
     `;
     const totalUniqueUsers = Number(totalUniqueResult[0]?.count ?? 0);
 
-    // ─── Total event count (single query) ──
+    // ─── Total event count (single query, excludes rl:*) ──
     const totalEvents = await db.analyticsEvent.count({
-      where: { createdAt: { gte: since } },
+      where: productEventFilter,
     });
 
     // ─── Retention (registered users still active) ──
@@ -115,6 +122,7 @@ export async function GET(request: NextRequest) {
           WHERE b."userId" = a."userId"
             AND b."createdAt" >= ${since}
             AND b."userId" IS NOT NULL
+            AND b.event NOT LIKE 'rl:%'
             AND b.event != 'user_registered'
         )
     `;
