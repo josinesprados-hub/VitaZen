@@ -114,7 +114,7 @@ export default function TermsPage() {
             4. Facturación y renovaciones
           </h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            La suscripción Élite se renueva automáticamente al final de cada periodo mensual.
+            La suscripción Élite se renueva automáticamente al final de cada período mensual.
             El pago se procesa a través de Stripe, nuestro proveedor de pagos seguro. No
             almacenamos datos bancarios ni números de tarjeta en nuestros servidores; toda la
             información de pago es gestionada directamente por Stripe conforme a las normativas
@@ -123,7 +123,7 @@ export default function TermsPage() {
           <p className="text-gray-300 leading-relaxed mb-4">
             Al activar una suscripción, autorizas a VitaZen a cobrar el importe correspondiente
             de forma recurrente mediante el método de pago registrado. La renovación se
-            procesará automáticamente en la fecha de vencimiento de cada periodo. Recibirás un
+            procesará automáticamente en la fecha de vencimiento de cada período. Recibirás un
             recibo por correo electrónico tras cada cobro realizado.
           </p>
           <p className="text-gray-300 leading-relaxed">
@@ -143,12 +143,12 @@ export default function TermsPage() {
           <p className="text-gray-300 leading-relaxed mb-4">
             Puedes cancelar tu suscripción Élite en cualquier momento desde la sección de
             ajustes de la aplicación o a través del portal de gestión de Stripe. La cancelación
-            surtirá efecto al final del periodo de facturación actual, lo que significa que
-            seguirás teniendo acceso a las funcionalidades Élite hasta que expire el periodo
+            surtirá efecto al final del período de facturación actual, lo que significa que
+            seguirás teniendo acceso a las funcionalidades Élite hasta que expire el período
             ya pagado.
           </p>
           <p className="text-gray-300 leading-relaxed mb-4">
-            No se realizarán reembolsos parciales por periodos no utilizados dentro de un ciclo
+            No se realizarán reembolsos parciales por períodos no utilizados dentro de un ciclo
             de facturación en curso. Por ejemplo, si cancelas a mitad de mes, conservarás el
             acceso Élite hasta el final de ese mes, pero no recibirás un reembolso
             proporcional por los días restantes.
@@ -184,7 +184,7 @@ export default function TermsPage() {
           <p className="text-gray-300 leading-relaxed">
             Nos reservamos el derecho de suspender o cancelar cuentas que incumplan estos
             términos, sin perjuicio de otras acciones legales que podamos emprender. En caso
-            de cancelación por incumplimiento, no se realizarán reembolsos por periodos de
+            de cancelación por incumplimiento, no se realizarán reembolsos por períodos de
             suscripción no consumados.
           </p>
         </section>
@@ -229,7 +229,7 @@ export default function TermsPage() {
           <p className="text-gray-300 leading-relaxed mb-4">
             La suscripción Élite te otorga una licencia personal, no exclusiva,
             intransferible y revocable para acceder y utilizar los contenidos y servicios de
-            VitaZen durante el periodo de suscripción activo. Esta licencia no te permite
+            VitaZen durante el período de suscripción activo. Esta licencia no te permite
             reproducir, distribuir, modificar, crear obras derivadas, exhibir públicamente ni
             explotar comercialmente ningún elemento de la aplicación sin autorización expresa
             por escrito.

@@ -14,7 +14,7 @@ const TOKEN_EXPIRY_HOURS = 1;
 export async function GET(request: NextRequest) {
   try {
     if (!db.passwordResetToken) {
-      return NextResponse.json({ error: 'Error de configuracion del servidor' }, { status: 500 });
+      return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
     }
     const token = request.nextUrl.searchParams.get('token');
     if (!token) {

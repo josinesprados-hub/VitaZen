@@ -542,7 +542,7 @@
   {
     "empire": "riqueza",
     "title": "La edad y el riesgo",
-    "content": "La tolerancia al riesgo debería disminuir con el tiempo, no porque seas menos capaz, sino porque tienes menos tiempo para recuperar. La razón es aritmética: una caída del 50 % a los 30 años se recupera en décadas de aportaciones; a los 60, no hay décadas. La glide path de los fondos objetivo (target-date) formaliza este principio reduciendo automáticamente la exposición a renta variable conforme se acerca la fecha de jubilación. La regla práctica de «100 menos tu edad = porcentaje en renta variable» es una aproximación burda; la lógica subyacente es correcta. Ajustar el riesgo a la edad no es conservadurismo: es calibrar la exposición a la capacidad real de recuperación.",
+    "content": "La tolerancia al riesgo debería disminuir con el tiempo, no porque seas menos capaz, sino porque tienes menos tiempo para recuperar. La razón es aritmética: una caída del 50 % a los 30 años se recupera en décadas de aportaciones; a los 60, no hay décadas. La trayectoria de desinversión (glide path) de los fondos objetivo (target-date) formaliza este principio reduciendo automáticamente la exposición a renta variable conforme se acerca la fecha de jubilación. La regla práctica de «100 menos tu edad = porcentaje en renta variable» es una aproximación burda; la lógica subyacente es correcta. Ajustar el riesgo a la edad no es conservadurismo: es calibrar la exposición a la capacidad real de recuperación.",
     "plan": "PREMIUM"
   },
   {
@@ -596,13 +596,13 @@
   {
     "empire": "riqueza",
     "title": "El paseo aleatorio y los mercados eficientes",
-    "content": "Los precios incorporan toda la información disponible tan rápido que superar al mercado de forma consistente es prácticamente imposible. Los errores son impredecibles. La mejor estrategia no es ganarle al mercado, sino participar. Malkiel (1973, actualizado en 2023) lo argumentó en A Random Walk Down Wall Street. La hipótesis de los mercados eficientes (Fama 1970) matiza que la eficiencia no es perfecta, pero sí suficiente para que el coste de buscar ineficiencias supere el beneficio de explotarlas después de costes. La consecuencia práctica es que, para la mayoría de inversores, un fondo indexado de bajo coste supera al intento de selección de valores.",
+    "content": "Los precios incorporan toda la información disponible tan rápido que superar al mercado de forma consistente es prácticamente imposible. Los errores son impredecibles. La mejor estrategia no es ganarle al mercado, sino participar. Malkiel (1973, actualizado en 2023) lo argumentó en «A Random Walk Down Wall Street». La hipótesis de los mercados eficientes (Fama 1970) matiza que la eficiencia no es perfecta, pero sí suficiente para que el coste de buscar ineficiencias supere el beneficio de explotarlas después de costes. La consecuencia práctica es que, para la mayoría de inversores, un fondo indexado de bajo coste supera al intento de selección de valores.",
     "plan": "PREMIUM"
   },
   {
     "empire": "riqueza",
     "title": "Los cuatro pilares de la inversión",
-    "content": "La teoría, la historia, la psicología y el negocio de la inversión son los cuatro pilares. Ignorar cualquiera de ellos es construir sobre arena. Los inversores que solo miran números sin entender psicología, o que confían en la teoría sin conocer la historia, construyen carteras frágiles. Bernstein (2002) lo articuló en The Four Pillars of Investing. La teoría enseña la relación entre riesgo y retorno; la historia enseña cómo se han comportado los mercados en crisis reales; la psicología enseña los sesgos que te hacen tomar malas decisiones; el negocio enseña cómo se incentivan los intermediarios. Un inversor completo domina los cuatro: ninguno basta por separado.",
+    "content": "La teoría, la historia, la psicología y el negocio de la inversión son los cuatro pilares. Ignorar cualquiera de ellos es construir sobre arena. Los inversores que solo miran números sin entender psicología, o que confían en la teoría sin conocer la historia, construyen carteras frágiles. Bernstein (2002) lo articuló en «The Four Pillars of Investing». La teoría enseña la relación entre riesgo y retorno; la historia enseña cómo se han comportado los mercados en crisis reales; la psicología enseña los sesgos que te hacen tomar malas decisiones; el negocio enseña cómo se incentivan los intermediarios. Un inversor completo domina los cuatro: ninguno basta por separado.",
     "plan": "PREMIUM"
   },
   {
@@ -632,13 +632,13 @@
   {
     "empire": "riqueza",
     "title": "La neurociencia del gasto",
-    "content": "Tu cerebro activa la recompensa al anticipar una compra y el dolor al pagar. Los responsables de marketing maximizan la anticipación y minimizan la sensación de pago. Entender que tu cerebro está siendo manipulado es el primer paso para contrarrestarlo. Zweig (2007) lo documentó en Your Money and Your Brain basándose en estudios de neurociencia financiera. El circuito de recompensa se activa antes de la compra (anticipación), no después; el dolor del pago se reduce cuando el pago se separa temporalmente de la compra (crédito, suscripción). La defensa es restablecer la conexión entre compra y pago: pagar en efectivo, eliminar tarjetas guardadas, revisar el cargo en el momento de la decisión. Donde el marketing reduce la fricción, tú debes recuperar la fricción.",
+    "content": "Tu cerebro activa la recompensa al anticipar una compra y el dolor al pagar. Los responsables de marketing maximizan la anticipación y minimizan la sensación de pago. Entender que tu cerebro está siendo manipulado es el primer paso para contrarrestarlo. Zweig (2007) lo documentó en «Your Money and Your Brain» basándose en estudios de neurociencia financiera. El circuito de recompensa se activa antes de la compra (anticipación), no después; el dolor del pago se reduce cuando el pago se separa temporalmente de la compra (crédito, suscripción). La defensa es restablecer la conexión entre compra y pago: pagar en efectivo, eliminar tarjetas guardadas, revisar el cargo en el momento de la decisión. Donde el marketing reduce la fricción, tú debes recuperar la fricción.",
     "plan": "PREMIUM"
   },
   {
     "empire": "riqueza",
     "title": "El pensamiento de segundo orden",
-    "content": "Primer orden: «Las acciones bajan, debería comprar». Segundo orden: «Todos van a comprar, los precios subirán demasiado y corregirán: debería esperar». Pensar un paso más allá de lo obvio separa al inversor promedio del excepcional. Howard Marks popularizó esta distinción en The Most Important Thing (2011): lo obvio no da ventaja, porque todo el mundo lo ve. La ventaja está en el segundo nivel, donde se anticipa lo que los demás harán con la información obvia. El pensamiento de segundo orden no es intuición: es análisis explícito de la cadena de consecuencias. Antes de una decisión, articula el primer nivel (lo evidente) y el segundo (lo que pasará después); si los dos coinciden, la decisión es trivial; si difieren, la diferencia es donde está la ventaja.",
+    "content": "Primer orden: «Las acciones bajan, debería comprar». Segundo orden: «Todos van a comprar, los precios subirán demasiado y corregirán: debería esperar». Pensar un paso más allá de lo obvio separa al inversor promedio del excepcional. Howard Marks popularizó esta distinción en «The Most Important Thing» (2011): lo obvio no da ventaja, porque todo el mundo lo ve. La ventaja está en el segundo nivel, donde se anticipa lo que los demás harán con la información obvia. El pensamiento de segundo orden no es intuición: es análisis explícito de la cadena de consecuencias. Antes de una decisión, articula el primer nivel (lo evidente) y el segundo (lo que pasará después); si los dos coinciden, la decisión es trivial; si difieren, la diferencia es donde está la ventaja.",
     "plan": "PREMIUM"
   },
   {

@@ -79,7 +79,7 @@ export default function PremiumGate({
                 compact ? 'text-[9px]' : 'text-[10px]'
               }`}
             >
-              Descubre más · Élite
+              Explorar Élite
             </Link>
           )}
         </div>
@@ -151,7 +151,7 @@ export function PremiumHistoryGate({
             href="/elite"
             className="text-champagne/50 hover:text-champagne/80 transition-colors"
           >
-            conocer Élite
+            Explorar Élite
           </Link>
         </span>
       </div>

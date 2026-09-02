@@ -775,7 +775,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             fetchThreads();
           }}
           secondaryAction={{
-            label: 'Volver al dashboard',
+            label: 'Volver al Inicio',
             href: backHref,
           }}
           size="lg"

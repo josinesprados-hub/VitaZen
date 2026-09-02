@@ -104,7 +104,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               }`}
             >
               <LayoutDashboard size={18} />
-              Dashboard
+              Inicio
             </Link>
 
             <Link

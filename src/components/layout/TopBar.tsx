@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 
 const PAGE_TITLES: Record<string, string> = {
-  '/dashboard': 'Dashboard',
+  '/dashboard': 'Inicio',
   '/checkin': 'Check-in',
   '/insights': 'Observaciones',
   '/timeline': 'Memoria',

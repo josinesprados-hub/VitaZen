@@ -32,8 +32,8 @@ function TipCard({ tip, locked }: { tip: Tip; locked?: boolean }) {
             <PremiumInlineBadge isPremium={true} freeLabel="" premiumLabel="Élite" />
           </div>
           <h3 className="text-champagne font-medium text-sm mb-3">{tip.title}</h3>
-          <p className="text-[#888] text-sm mb-3">🔒 Disponible con Élite</p>
-          <Link href="/elite" className="text-champagne/40 hover:text-champagne/70 transition-colors text-[10px]">Conocer Élite</Link>
+          <p className="text-[#888] text-sm mb-3">Disponible con Élite</p>
+          <Link href="/elite" className="text-champagne/40 hover:text-champagne/70 transition-colors text-[10px]">Explorar Élite</Link>
         </>
       ) : (
         <>

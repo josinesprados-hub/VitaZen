@@ -80,7 +80,7 @@ export function SubscriptionManager() {
               </p>
             ) : subscription?.currentPeriodEnd ? (
               <p className="text-xs text-[#999] mt-0.5">
-                Pr&oacute;xima renovaci&oacute;n: {formatDate(subscription.currentPeriodEnd)}
+                Próxima renovación: {formatDate(subscription.currentPeriodEnd)}
               </p>
             ) : (
               <p className="text-xs text-[#999] mt-0.5">
@@ -101,8 +101,8 @@ export function SubscriptionManager() {
               <CreditCard size={14} className="text-champagne/50" />
             </div>
             <div className="text-left">
-              <p className="text-sm text-white font-medium">Gestionar suscripci&oacute;n</p>
-              <p className="text-xs text-[#999]">Cancelar, cambiar m&eacute;todo de pago</p>
+              <p className="text-sm text-white font-medium">Gestionar suscripción</p>
+              <p className="text-xs text-[#999]">Cancelar, cambiar método de pago</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -131,7 +131,7 @@ export function SubscriptionManager() {
             <span className="text-[9px] font-medium text-[#888] px-2 py-0.5">0€/mes</span>
           </div>
           <p className="text-xs text-[#999] mt-0.5">
-            Registro, observaci&oacute;n y los 5 imperios
+            Registro, observación y los 5 imperios
           </p>
         </div>
       </div>

@@ -139,7 +139,19 @@ async function generateRecapData(userId: string, plan: string): Promise<WeeklyRe
     const mainInsight = insights.length > 0 ? insights[0] : null;
 
     // Mentor recommendation (reuse logic from weekly-recap API)
-    const recommendation = generateEmailRecommendation(summary.score, emotionalResult.statusLabel, emotionalResult.metrics.energy.value, emotionalResult.metrics.consistency.value, plan);
+    let recommendation = generateEmailRecommendation(summary.score, emotionalResult.statusLabel, emotionalResult.metrics.energy.value, emotionalResult.metrics.consistency.value, plan);
+
+    // Editorial dedup (FASE 13-E): the weekly email must not repeat
+    // "Semana tranquila" when it already appears as the wellness score
+    // label or as the main insight title in the same email context.
+    const recommendationKey = recommendation.replace(/\.$/, '');
+    if (
+      recommendationKey &&
+      (recommendationKey === getScoreLabel(summary.score) ||
+        (mainInsight && mainInsight.title === recommendationKey))
+    ) {
+      recommendation = '';
+    }
 
     return {
       name: '', // Will be filled per user

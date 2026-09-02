@@ -237,7 +237,7 @@ export default function VerifyEmailClient() {
               onClick={() => router.replace('/dashboard')}
               className="text-[#888] text-sm hover:text-[#999] transition-colors"
             >
-              Ir al dashboard
+              Ir al Inicio
             </button>
           </div>
         )}
@@ -292,7 +292,7 @@ export default function VerifyEmailClient() {
                 onClick={() => router.replace('/dashboard')}
                 className="text-[#888] text-sm hover:text-[#999] transition-colors"
               >
-                Ir al dashboard
+                Ir al Inicio
               </button>
             </div>
           </div>

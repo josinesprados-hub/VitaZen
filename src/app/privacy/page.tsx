@@ -69,7 +69,7 @@ export default function PrivacyPolicyPage() {
               adquieres el plan Élite, procesamos la transacción a través de Stripe. No
               almacenamos números de tarjeta bancaria, CVV ni datos bancarios completos en nuestros
               servidores. Stripe nos proporciona únicamente información agregada como el estado de la
-              suscripción, el periodo de facturación y un identificador de cliente seguro.
+              suscripción, el período de facturación y un identificador de cliente seguro.
             </li>
           </ul>
 
@@ -214,7 +214,7 @@ export default function PrivacyPolicyPage() {
             durante el tiempo necesario para cumplir con las finalidades descritas en esta política.
             Si decides eliminar tu cuenta, borraremos o anonimizaremos tus datos en un plazo máximo
             de 30 días, salvo que estemos obligados a conservar cierta información por requisitos
-            legales o fiscales (por ejemplo, datos de facturación durante el periodo legalmente
+            legales o fiscales (por ejemplo, datos de facturación durante el período legalmente
             requerido). Los datos de uso agregados y anónimos pueden conservarse indefinidamente con
             fines estadísticos y de mejora del servicio.
           </p>

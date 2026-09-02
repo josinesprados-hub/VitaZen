@@ -41,7 +41,7 @@ export default function InsightsPageError({
         subtitle="Tu actividad está guardada. Intenta recargar para ver tus datos."
         onRetry={reset}
         secondaryAction={{
-          label: 'Volver al dashboard',
+          label: 'Volver al Inicio',
           href: '/dashboard',
         }}
         size="lg"

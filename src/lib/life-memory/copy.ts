@@ -24,7 +24,7 @@ export const MEMORIES_TITLE = 'Momentos';
 export const MEMORIES_SUBTITLE = 'Fragmentos de tu vida';
 
 export const TRANSITIONS_TITLE = 'Transiciones';
-export const TRANSITIONS_SUBTITLE = 'Cambios entre periodos';
+export const TRANSITIONS_SUBTITLE = 'Cambios entre períodos';
 
 export const PATTERNS_TITLE = 'Conexiones';
 export const PATTERNS_SUBTITLE = 'Relaciones entre partes de tu vida';

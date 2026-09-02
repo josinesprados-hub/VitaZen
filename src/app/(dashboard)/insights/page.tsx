@@ -216,7 +216,7 @@ export default function InsightsPage() {
           subtitle="Tu actividad está guardada. Intenta recargar para ver tus datos."
           onRetry={() => window.location.reload()}
           secondaryAction={{
-            label: 'Volver al dashboard',
+            label: 'Volver al Inicio',
             href: '/dashboard',
           }}
           size="lg"
@@ -567,7 +567,7 @@ export default function InsightsPage() {
           <p className="text-[11px] text-[#888]">
             Más detalle con el tiempo —{' '}
             <Link href="/elite" className="text-champagne/50 hover:text-champagne/80 transition-colors">
-              conocer Élite
+              Explorar Élite
             </Link>
           </p>
         </div>

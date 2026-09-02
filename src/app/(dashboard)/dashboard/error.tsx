@@ -37,7 +37,7 @@ export default function DashboardPageError({
     <div className="max-w-7xl mx-auto min-h-[60dvh] flex items-center justify-center">
       <PremiumErrorState
         variant={isNetError ? 'network' : 'loading'}
-        title="No se pudo cargar el dashboard"
+        title="No se pudo cargar el Inicio"
         subtitle="Tu progreso está seguro. Intenta recargar para volver a verlo."
         onRetry={reset}
         size="lg"

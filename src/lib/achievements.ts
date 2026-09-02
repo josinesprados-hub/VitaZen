@@ -100,7 +100,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
 
   // Ritmo largo: constancia que se asienta con el tiempo (5)
   { key: 'hidden_checkin_100', title: 'Cien Mañanas', description: '100 check-ins diarios', category: 'checkin', icon: 'Sunrise', target: 100, hidden: true },
-  { key: 'hidden_journal_200', title: 'Escritura Constancia', description: '200 entradas en el diario', category: 'journal', icon: 'BookOpen', target: 200, hidden: true },
+  { key: 'hidden_journal_200', title: 'Escritura Constante', description: '200 entradas en el diario', category: 'journal', icon: 'BookOpen', target: 200, hidden: true },
   { key: 'hidden_meditation_200', title: 'Práctica Asentada', description: '200 sesiones de meditación', category: 'meditation', icon: 'Wind', target: 200, hidden: true },
   { key: 'hidden_wellness_100', title: 'Observación Profunda', description: '100 registros de bienestar', category: 'wellness', icon: 'Heart', target: 100, hidden: true },
   { key: 'hidden_nutrition_100', title: 'Cuerpo Atendido', description: '100 registros de nutrición', category: 'nutrition', icon: 'Leaf', target: 100, hidden: true },

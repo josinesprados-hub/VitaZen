@@ -42,7 +42,7 @@ export default function MentorPageError({
         subtitle="No se pudo conectar con el asistente. Tu historial está a salvo."
         onRetry={reset}
         secondaryAction={{
-          label: 'Volver al dashboard',
+          label: 'Volver al Inicio',
           href: '/dashboard',
         }}
         size="lg"

@@ -245,24 +245,24 @@ function stageObservation(
   switch (flavor) {
     case 'calm':
       if (total > 0 && tranquility / total > 0.5)
-        base = 'Este fue uno de tus periodos con más calma.';
+        base = 'Este fue uno de tus períodos con más calma.';
       else
-        base = 'Un periodo tranquilo, con poca presión.';
+        base = 'Un período tranquilo, con poca presión.';
       break;
 
     case 'growth':
       if (total > 0 && growth / total > 0.5)
-        base = 'Este fue uno de tus periodos más activos.';
+        base = 'Este fue uno de tus períodos más activos.';
       else
         base = 'Tu actividad fue mayor que en meses anteriores.';
       break;
 
     case 'intensity':
-      base = 'Fue un periodo con mucha actividad y varios cambios.';
+      base = 'Fue un período con mucha actividad y varios cambios.';
       break;
 
     case 'dispersion':
-      base = 'Tus días fueron muy distintos entre sí durante este periodo.';
+      base = 'Tus días fueron muy distintos entre sí durante este período.';
       break;
 
     case 'exhaustion':
@@ -270,7 +270,7 @@ function stageObservation(
       break;
 
     case 'quiet':
-      base = 'Hubo menos registros, por lo que este periodo ofrece menos información.';
+      base = 'Hubo menos registros, por lo que este período ofrece menos información.';
       break;
 
     case 'stability':
@@ -357,26 +357,26 @@ function generateTransitionObservation(
 ): string {
   // Just changes. Not improvements or setbacks.
   const transitions: Record<string, string> = {
-    'exhaustion->calm': 'Tu nivel de tranquilidad aumentó respecto al periodo anterior.',
+    'exhaustion->calm': 'Tu nivel de tranquilidad aumentó respecto al período anterior.',
     'exhaustion->stability': 'Encontraste un ritmo más estable que antes.',
-    'intensity->calm': 'Después de un periodo intenso, la actividad se calmó.',
+    'intensity->calm': 'Después de un período intenso, la actividad se calmó.',
     'intensity->stability': 'Tu ritmo se volvió más constante después de varias semanas activas.',
     'dispersion->stability': 'Tus días se volvieron más uniformes que antes.',
-    'dispersion->calm': 'La variabilidad entre días disminuyó respecto al periodo anterior.',
-    'quiet->growth': 'Después de un periodo con poca actividad, tu nivel de actividad aumentó.',
+    'dispersion->calm': 'La variabilidad entre días disminuyó respecto al período anterior.',
+    'quiet->growth': 'Después de un período con poca actividad, tu nivel de actividad aumentó.',
     'quiet->stability': 'Tu ritmo pasó de ser irregular a más constante.',
-    'calm->growth': 'Después de un periodo tranquilo, aumentó tu nivel de actividad.',
-    'calm->intensity': 'Un periodo tranquilo seguido de uno con más cambios y actividad.',
-    'growth->calm': 'Después de un periodo activo, la actividad disminuyó.',
-    'growth->stability': 'Tu actividad se estabilizó tras un periodo de crecimiento.',
+    'calm->growth': 'Después de un período tranquilo, aumentó tu nivel de actividad.',
+    'calm->intensity': 'Un período tranquilo seguido de uno con más cambios y actividad.',
+    'growth->calm': 'Después de un período activo, la actividad disminuyó.',
+    'growth->stability': 'Tu actividad se estabilizó tras un período de crecimiento.',
     'stability->intensity': 'Después de un ritmo constante, el nivel de actividad aumentó.',
-    'stability->dispersion': 'Tus días se volvieron más irregulares que en el periodo anterior.',
-    'stability->exhaustion': 'Tu nivel de energía disminuyó respecto al periodo anterior.',
+    'stability->dispersion': 'Tus días se volvieron más irregulares que en el período anterior.',
+    'stability->exhaustion': 'Tu nivel de energía disminuyó respecto al período anterior.',
     'calm->dispersion': 'Tus días se volvieron más distintos entre sí.',
-    'growth->intensity': 'La alta actividad del periodo anterior trajo consigo más intensidad.',
-    'intensity->exhaustion': 'Después de un periodo muy activo, tu energía bajó.',
-    'exhaustion->growth': 'Tras un periodo con poca energía, la actividad volvió a subir.',
-    'quiet->calm': 'Tu nivel de actividad fue mayor tras un periodo con poca información.',
+    'growth->intensity': 'La alta actividad del período anterior trajo consigo más intensidad.',
+    'intensity->exhaustion': 'Después de un período muy activo, tu energía bajó.',
+    'exhaustion->growth': 'Tras un período con poca energía, la actividad volvió a subir.',
+    'quiet->calm': 'Tu nivel de actividad fue mayor tras un período con poca información.',
   };
 
   const key = `${from}->${to}`;

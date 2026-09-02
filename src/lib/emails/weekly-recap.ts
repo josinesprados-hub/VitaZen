@@ -136,7 +136,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     ? `
     <tr>
       <td class="content-cell" style="padding:24px 0 0;background-color:#080808;" bgcolor="#080808">
-        ${sectionLabel('INSIGHT')}
+        ${sectionLabel('OBSERVACIÓN')}
         <p class="white-text" style="color:#ffffff;font-size:14px;font-weight:400;margin:0 0 4px;line-height:1.4;font-family:${FONT_STACK_CSS};">${escapeHtml(data.mainInsight!.title)}</p>
         <p class="secondary-text" style="color:#999;font-size:13px;line-height:1.5;margin:0;font-family:${FONT_STACK_CSS};">${escapeHtml(data.mainInsight!.description)}</p>
       </td>
@@ -250,12 +250,14 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
           ${hasInsight ? `<tr><td class="content-cell" style="padding:0 40px;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">${insightHtml}</td></tr>` : ''}
 
           <!-- Recommendation -->
+          ${data.mentorRecommendation ? `
           <tr>
             <td class="content-cell" style="padding:24px 40px 0;font-family:${FONT_STACK_CSS};background-color:#080808;" bgcolor="#080808">
               ${sectionLabel('RECOMENDACIÓN')}
               <p class="body-text" style="color:#d4d4d4;font-size:13px;line-height:1.6;margin:0;font-family:${FONT_STACK_CSS};">${escapeHtml(data.mentorRecommendation)}</p>
             </td>
           </tr>
+          ` : ''}
 
           <!-- CTA Button -->
           <tr>
@@ -300,7 +302,7 @@ export function weeklyRecapEmail(data: WeeklyRecapEmailData): EmailContent {
     : '';
 
   const insightText = hasInsight
-    ? `\nInsight: ${data.mainInsight!.title}\n${data.mainInsight!.description}`
+    ? `\nObservación: ${data.mainInsight!.title}\n${data.mainInsight!.description}`
     : '';
 
   const text = `Tu semana, ${data.name}.
@@ -320,9 +322,7 @@ Estado emocional:
   Energía: ${data.emotionalState.energy}/100
   Consistencia: ${data.emotionalState.consistency}/100
 ${habitsText}
-${insightText}
-
-Recomendación: ${data.mentorRecommendation}
+${insightText}${data.mentorRecommendation ? `\n\nRecomendación: ${data.mentorRecommendation}` : ''}
 
 Acceder: ${APP_URL}/dashboard
 

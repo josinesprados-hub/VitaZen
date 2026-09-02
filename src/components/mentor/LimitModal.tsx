@@ -60,7 +60,7 @@ const LimitModal = React.memo(function LimitModal({ modalRef, onClose }: LimitMo
             >
               <span className="flex items-center justify-center gap-2">
                 <Circle size={4} fill="currentColor" aria-hidden="true" />
-                Conocer Élite
+                Explorar Élite
               </span>
             </Link>
             <button
