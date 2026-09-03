@@ -683,6 +683,14 @@ export default function RiquezaPage() {
   const editSheetRef = useRef<HTMLDivElement>(null);
   const deleteDialogRef = useRef<HTMLDivElement>(null);
 
+  // Shared close handler for the add sheet
+  const closeAddSheet = () => {
+    setShowAdd(false);
+    setSubmitError(null);
+    setQuickMode(true);
+    setForm({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
+  };
+
   useDialogA11y(addSheetRef, showAdd && !editingLog && !pendingDeleteId, closeAddSheet);
   useDialogA11y(editSheetRef, !!editingLog, () => { setEditingLog(null); setSubmitError(null); });
   useDialogA11y(deleteDialogRef, !!pendingDeleteId, () => { setPendingDeleteId(null); setDeleteError(null); });
@@ -1054,14 +1062,6 @@ export default function RiquezaPage() {
   // ═══════════════════════════════════════════
 
   const isEmpty = logs.length === 0;
-
-  // Shared close handler for the add sheet
-  const closeAddSheet = () => {
-    setShowAdd(false);
-    setSubmitError(null);
-    setQuickMode(true);
-    setForm({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
-  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-24">

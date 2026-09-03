@@ -14,10 +14,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // ─── Mock setup (hoisted so vi.mock factory can reference it) ───
 
-function applyWhere(
-  rows: Array<Record<string, unknown>>,
+function applyWhere<T extends Record<string, unknown>>(
+  rows: T[],
   where: Record<string, unknown>,
-): Array<Record<string, unknown>> {
+): T[] {
   return rows.filter(row => {
     for (const [key, val] of Object.entries(where)) {
       if (typeof val === 'object' && val !== null) {

@@ -81,7 +81,7 @@ const MOCK_USER_DATA = {
 };
 
 const { MOCK_DB, mockUserFindUnique } = vi.hoisted(() => {
-  let findUniqueImpl: ReturnType<typeof vi.fn>;
+  let findUniqueImpl: (...args: unknown[]) => unknown;
   const findUniqueMock = vi.fn();
   findUniqueMock.mockImplementation((...args: unknown[]) =>
     findUniqueImpl ? findUniqueImpl(...args) : Promise.resolve(null),

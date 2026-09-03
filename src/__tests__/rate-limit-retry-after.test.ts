@@ -164,6 +164,12 @@ describe('PROD-10 — Integration: rateLimit + rateLimitedResponse', () => {
     expect(typeof result.resetAt).toBe('number');
 
     // Verify it works with rateLimitedResponse
+    // Narrow the discriminated union first: rateLimitedResponse requires a
+    // defined resetAt, which is only guaranteed on the limited branch. The
+    // guard keeps this type-safe without casts or non-null assertions.
+    if (result.limited !== true) {
+      throw new Error('Expected the request to be rate-limited');
+    }
     const res = rateLimitedResponse(result);
     expect(res.status).toBe(429);
     expect(res.headers.get('Retry-After')).not.toBeNull();

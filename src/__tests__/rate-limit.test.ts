@@ -27,7 +27,7 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, RATE_LIMITS, type RateLimitResult } from '@/lib/rate-limit';
 
 describe('rateLimit()', () => {
   beforeEach(() => {
@@ -220,7 +220,7 @@ describe('rateLimit()', () => {
   it('tracks increments across multiple requests', async () => {
     _mockCreate.mockResolvedValue({});
 
-    const results = [];
+    const results: RateLimitResult[] = [];
     for (let i = 0; i < 5; i++) {
       _mockCount.mockResolvedValueOnce(i);
       const r = await rateLimit('user-1', 'checkin:post', RATE_LIMITS['checkin:post']);

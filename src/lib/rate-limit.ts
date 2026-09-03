@@ -28,14 +28,29 @@ export interface RateLimitConfig {
   windowMs: number;
 }
 
-export interface RateLimitResult {
-  /** Whether the request was rate-limited */
-  limited: boolean;
-  /** Current count within the window (undefined on DB error) */
-  current?: number;
-  /** Reset time in ms since epoch (undefined on DB error) */
-  resetAt?: number;
-}
+/**
+ * Discriminated result of a rate limit check.
+ *
+ * Narrow with the `limited` flag before reading `resetAt`/`current`:
+ * only the limited branch guarantees both fields are present.
+ */
+export type RateLimitResult =
+  | {
+      /** Whether the request was rate-limited (true in this branch) */
+      limited: true;
+      /** Current count within the window */
+      current: number;
+      /** Reset time in ms since epoch */
+      resetAt: number;
+    }
+  | {
+      /** Whether the request was rate-limited (false in this branch) */
+      limited: false;
+      /** Current count within the window (undefined on DB error) */
+      current?: number;
+      /** Reset time in ms since epoch (undefined on DB error) */
+      resetAt?: number;
+    };
 
 /**
  * Check and enforce a per-user rate limit.
