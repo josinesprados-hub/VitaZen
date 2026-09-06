@@ -6,6 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
+import { checkLogDateWindow } from '@/lib/log-date-window';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -47,6 +48,27 @@ export async function POST(request: NextRequest) {
     const logDate = new Date(date);
     if (isNaN(logDate.getTime())) {
       return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+    }
+
+    // G-02 FIX: enforce the approved backdating window for NEW writes
+    // (Europe/Madrid): today, yesterday and the day before yesterday are
+    // allowed; older dates and any future date are rejected. Previously the
+    // client could send arbitrary dates and farm historical XP, historical
+    // activity and artificial streaks. This check gates NEW creates only —
+    // it never modifies, deletes or recalculates historical records, and it
+    // does not affect reads (GET) or content updates (PUT).
+    const logDateKey = getMadridDateKey(logDate);
+    const windowCheck = checkLogDateWindow(logDateKey, getTodayDateKey());
+    if (!windowCheck.ok) {
+      return NextResponse.json(
+        {
+          error:
+            windowCheck.reason === 'future'
+              ? 'Date cannot be in the future'
+              : 'Date cannot be more than 2 days in the past',
+        },
+        { status: 400 }
+      );
     }
     if (water !== undefined && water !== null) {
       if (typeof water !== 'number' || !Number.isInteger(water) || water < 0 || water > 30) {
@@ -99,7 +121,8 @@ export async function POST(request: NextRequest) {
     // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
     // todayDateKey, mirroring the finance/route.ts pattern and matching
     // the wellness/route.ts fix.
-    const logDateKey = getMadridDateKey(logDate);
+    // G-02 FIX: logDateKey is now computed once, right after date parsing,
+    // where the approved window is enforced.
     const { start, end } = madridDayBoundaries(logDateKey);
 
     const log = await db.$transaction(async (tx) => {

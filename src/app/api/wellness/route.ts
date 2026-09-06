@@ -6,6 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
+import { checkLogDateWindow } from '@/lib/log-date-window';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -68,6 +69,28 @@ export async function POST(request: NextRequest) {
     if (isNaN(parsedDate.getTime())) {
       return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
     }
+
+    // G-02 FIX: enforce the approved backdating window for NEW writes
+    // (Europe/Madrid): today, yesterday and the day before yesterday are
+    // allowed; older dates and any future date are rejected. Previously the
+    // client could send arbitrary dates and farm historical XP, historical
+    // activity and artificial streaks. This check gates NEW creates only —
+    // it never modifies, deletes or recalculates historical records, and it
+    // does not affect reads (GET) or content updates (PUT).
+    const logDateKey = getMadridDateKey(parsedDate);
+    const windowCheck = checkLogDateWindow(logDateKey, getTodayDateKey());
+    if (!windowCheck.ok) {
+      return NextResponse.json(
+        {
+          error:
+            windowCheck.reason === 'future'
+              ? 'Date cannot be in the future'
+              : 'Date cannot be more than 2 days in the past',
+        },
+        { status: 400 }
+      );
+    }
+
     const SCORE_VALIDATOR = (val: unknown, name: string) => {
       if (val !== undefined && val !== null) {
         if (typeof val !== 'number' || !Number.isInteger(val) || val < 1 || val > 5) {
@@ -115,8 +138,9 @@ export async function POST(request: NextRequest) {
     // pattern and prevents streak inflation when backdating logs.
     // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
     // todayDateKey, mirroring the finance/route.ts pattern.
+    // G-02 FIX: logDateKey is now computed once, right after date parsing,
+    // where the approved window is enforced.
     const logDate = parsedDate;
-    const logDateKey = getMadridDateKey(logDate);
     const { start, end } = madridDayBoundaries(logDateKey);
 
     const log = await db.$transaction(async (tx) => {

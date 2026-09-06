@@ -157,9 +157,20 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Mark onboarding as completed
-      await tx.user.update({
-        where: { id: user.id },
+      // G-01 FIX: Atomically claim the one-time onboarding completion.
+      // The previous code unconditionally set onboardingCompleted=true and then
+      // unconditionally incremented +25 XP on EVERY POST, so replaying the
+      // request (double click, HTTP retry, second tab, manual repeats) farmed
+      // +25 XP each time. The flag flip itself is now the gate: UPDATE with
+      // `onboardingCompleted: false` in the WHERE clause is an atomic
+      // compare-and-swap at the row level. Under READ COMMITTED, concurrent
+      // transactions serialize on the user row lock and re-evaluate the WHERE
+      // clause against the committed row version, so EXACTLY ONE request can
+      // ever transition false→true; every other caller (concurrent or
+      // sequential) matches 0 rows. All other onboarding writes below keep
+      // their original idempotent behavior.
+      const claimed = await tx.user.updateMany({
+        where: { id: user.id, onboardingCompleted: false },
         data: { onboardingCompleted: true },
       });
 
@@ -186,6 +197,9 @@ export async function POST(request: NextRequest) {
       // F7.5-04/F7.5-11 FIX: Include 'crecimiento' and use upsert so new users
       // get their 25 XP bonus (updateMany silently affects 0 rows if no
       // EmpireProgress record exists yet).
+      // G-01 FIX: XP is awarded ONLY when this request is the one that
+      // atomically flipped onboardingCompleted false→true (claimed.count === 1).
+      // Repeat POSTs and concurrent duplicates get +0 XP.
       const empireMap: Record<string, string> = {
         mente: 'mente',
         disciplina: 'disciplina',
@@ -195,7 +209,7 @@ export async function POST(request: NextRequest) {
       };
 
       const focusEmpire = empireMap[primaryFocus];
-      if (focusEmpire) {
+      if (focusEmpire && claimed.count === 1) {
         await tx.empireProgress.upsert({
           where: { userId_empire: { userId: user.id, empire: focusEmpire } },
           update: { xp: { increment: 25 } },
