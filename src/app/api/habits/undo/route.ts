@@ -17,10 +17,13 @@ import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
  * - Se decrementa la racha (streak) en 1, con floor en 0.
  * - Se restaura lastCompletedAt al valor anterior a la completación si existe;
  *   si no existe (era la primera completación), se pone a null.
- * - Se decrementa XP en 10 (floor 0) en el imperio disciplina.
+ * - G-04: se decrementa XP en 10 (floor 0) en el imperio disciplina SOLO si la
+ *   completación deshecha llegó a pagar (hábito creado antes del día Madrid de
+ *   la completación — espejo exacto de la condición de concesión de PATCH).
  * - Se decrementa la racha del imperio si este hábito fue el único completado hoy.
- * - Toda la operación se ejecuta dentro de una transacción con SELECT FOR UPDATE
- *   para evitar condiciones de carrera.
+ * - Toda la operación se ejecuta dentro de una transacción con advisory lock
+ *   (familia user|disciplina|día, G-04) y SELECT FOR UPDATE para evitar
+ *   condiciones de carrera.
  *
  * Body: { habitId: string, previousLastCompletedAt?: string | null }
  * - previousLastCompletedAt: valor previo que capturó el frontend antes de completar.
@@ -43,6 +46,16 @@ export async function POST(request: NextRequest) {
     const { habitId, previousLastCompletedAt } = await request.json();
 
     const txResult = await db.$transaction(async (tx) => {
+      // G-04 FIX: same advisory-lock family as PATCH/DELETE (CERT-1/F-4/G-03
+      // pattern) so undo cannot interleave with concurrent completions or
+      // deletions of the same Madrid day.
+      const todayDateKey = getTodayDateKey();
+      const lockSeed = user.id + '|disciplina|' + todayDateKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
       // SELECT FOR UPDATE — misma protección contra carreras que PATCH
       const habits = await tx.$queryRaw<Array<{
         id: string;
@@ -51,6 +64,7 @@ export async function POST(request: NextRequest) {
         frequency: string;
         streak: number;
         lastCompletedAt: Date | null;
+        createdAt: Date;
       }>>`SELECT * FROM "HabitLog" WHERE "id" = ${habitId} AND "userId" = ${user.id} FOR UPDATE`;
 
       const habit = habits[0];
@@ -61,9 +75,8 @@ export async function POST(request: NextRequest) {
         return { status: 'not_completed' as const };
       }
 
-      const todayDateKey = getTodayDateKey();
-      const lastDateKey = getMadridDateKey(habit.lastCompletedAt);
       const todayMs = startOfMadridDay(todayDateKey).getTime();
+      const lastDateKey = getMadridDateKey(habit.lastCompletedAt);
       const lastMs = startOfMadridDay(lastDateKey).getTime();
       const diffDays = Math.round((todayMs - lastMs) / 86400000);
 
@@ -91,33 +104,44 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Decrementar XP del imperio disciplina (floor 0)
-      const disciplinaProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+      // Decrementar XP del imperio disciplina — solo si la completación
+      // deshecha llegó a pagar (G-04), con escrituras atómicas.
+      //
+      // G-04 FIX: PATCH solo concede +10 cuando el hábito se creó ANTES del
+      // día Madrid de la completación (regla anti-farming del hábito fresco).
+      // El undo debe ser el ESPEJO EXACTO de esa condición: deshacer una
+      // completación de un hábito creado hoy (que pagó +0) no puede quitar
+      // XP. Además ambos reverts son UPDATE atómicos con GREATEST (sin
+      // read-modify-write, inmunes a lost updates frente a PATCH/challenge).
+      const completionDayStart = startOfMadridDay(
+        getMadridDateKey(habit.lastCompletedAt)
+      ).getTime();
+      const wasPayingCompletion = habit.createdAt.getTime() < completionDayStart;
+
+      // Verificar si este hábito fue el único completado hoy (la racha del
+      // imperio es independiente del XP: se mantiene el comportamiento H-12).
+      const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
+      const otherCompletedToday = await tx.habitLog.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: habitId },
+          lastCompletedAt: { gte: todayStart, lt: todayEnd },
+        },
+        select: { id: true },
       });
+      const wasOnlyCompletionToday = !otherCompletedToday;
 
-      if (disciplinaProgress) {
-        // Verificar si este hábito fue el único completado hoy
-        const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
-        const otherCompletedToday = await tx.habitLog.findFirst({
-          where: {
-            userId: user.id,
-            id: { not: habitId },
-            lastCompletedAt: { gte: todayStart, lt: todayEnd },
-          },
-          select: { id: true },
-        });
-        const wasOnlyCompletionToday = !otherCompletedToday;
-
-        await tx.empireProgress.update({
-          where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-          data: {
-            xp: Math.max(0, disciplinaProgress.xp - 10),
-            ...(wasOnlyCompletionToday
-              ? { streak: Math.max(0, disciplinaProgress.streak - 1) }
-              : {}),
-          },
-        });
+      if (wasPayingCompletion) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "xp" = GREATEST(0, "xp" - 10)
+          WHERE "userId" = ${user.id} AND "empire" = 'disciplina'`;
+      }
+      if (wasOnlyCompletionToday) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "streak" = GREATEST(0, "streak" - 1)
+          WHERE "userId" = ${user.id} AND "empire" = 'disciplina'`;
       }
 
       return { status: 'ok' as const, habit: updated };

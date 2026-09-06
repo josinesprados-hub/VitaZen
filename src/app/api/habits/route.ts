@@ -61,7 +61,16 @@ export async function POST(request: NextRequest) {
       if (description.length > 500) return NextResponse.json({ error: 'La descripción es demasiado larga (máx. 500 caracteres)' }, { status: 400 });
     }
 
-    // H-05 FIX: Rate limit habit creation to 5 per day to prevent XP farming
+    // H-05 FIX: Rate limit habit creation to 5 per day as an anti-spam guard.
+    //
+    // G-04 FIX: creating a habit NO LONGER awards any XP. The old +5 creation
+    // reward was one half of the create→complete→delete farming cycle
+    // (+5 create, +10 complete, −5 delete = +10 net per cycle, repeatable by
+    // deleting and recreating the habit). Because HabitLog is hard-deleted,
+    // no persistent record of a creation survives deletion, so a "creation
+    // reward already claimed" gate cannot be enforced reliably — the only
+    // delete-proof economy is to not reward creation at all. The H-05 quota
+    // remains as a plain anti-spam rate limit.
     const todayStart = startOfMadridDay(getTodayDateKey());
     const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
     const habitsCreatedToday = await db.habitLog.count({
@@ -80,20 +89,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // PERF-5.2: Wrap habit creation + XP award in a transaction to prevent
-    // silent XP loss if the upsert fails after the habit is created.
-    // This matches the pattern already used in checkin, meditation, wellness,
-    // nutrition, finance, and journal POST routes.
-    const habit = await db.$transaction(async (tx) => {
-      const h = await tx.habitLog.create({
-        data: { userId: user.id, name, description, frequency },
-      });
-      await tx.empireProgress.upsert({
-        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-        update: { xp: { increment: 5 } },
-        create: { userId: user.id, empire: 'disciplina', xp: 5 },
-      });
-      return h;
+    // G-04 FIX: no XP is granted here anymore, so the transaction wrapper
+    // that used to pair the create with the EmpireProgress upsert is gone.
+    // The habit row alone is the full effect of this endpoint.
+    const habit = await db.habitLog.create({
+      data: { userId: user.id, name, description, frequency },
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
@@ -143,6 +143,18 @@ export async function PATCH(request: NextRequest) {
     //  C) Schema-level unique constraint on (userId, date): would prevent
     //     duplicates but requires schema changes — explicitly forbidden.
     const txResult = await db.$transaction(async (tx) => {
+      // G-04 FIX: serialize this Madrid-day decision against concurrent
+      // PATCH/DELETE/undo operations with the SAME advisory-lock family used
+      // by CERT-1/F-4 and G-03. Without it, a DELETE of one habit could
+      // interleave with the completion of another and lose the streak update
+      // (read-modify-write race documented by the FASE 14 audit).
+      const todayDateKey = getTodayDateKey();
+      const lockSeed = user.id + '|disciplina|' + todayDateKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
       // SELECT FOR UPDATE acquires a row-level exclusive lock.
       // Concurrent PATCH requests for the same habitId will block here
       // until this transaction commits or rolls back.
@@ -164,7 +176,6 @@ export async function PATCH(request: NextRequest) {
       // Use Europe/Madrid timezone for day boundary calculation.
       // Without this, a user completing a habit at 00:30 Madrid (23:30 UTC)
       // would be considered "same day" as yesterday, breaking streak logic.
-      const todayDateKey = getTodayDateKey();
       const lastCompleted = habit.lastCompletedAt;
       let newStreak = habit.streak;
 
@@ -236,13 +247,35 @@ export async function PATCH(request: NextRequest) {
       });
       const isFirstCompletionToday = !otherCompletedToday;
 
+      // G-04 FIX: the +10 XP pays only when the habit was created BEFORE the
+      // completion's Madrid day. A habit created today and completed today is
+      // the engine of the create→complete→delete farming cycle: deleting the
+      // habit erases its lastCompletedAt, so a recreated copy passes the
+      // per-period guard again — the cycle would award +10 per loop. The
+      // fresh-habit gate uses ONLY the completed row's own createdAt (set by
+      // the server, immutable through the API), so it survives the delete:
+      // any habit that starts paying had to exist before the day it was
+      // completed, which caps the cycle at exactly the legitimate rate of a
+      // user who simply keeps one habit and completes it once per period.
+      // Streaks, counts, challenges and history are NOT affected: a fresh
+      // habit's completion still counts fully for the habit streak, the
+      // empire streak and achievements — only the XP is deferred until the
+      // habit has actually lived at least one Madrid day.
+      const isPayingCompletion =
+        habit.createdAt.getTime() < startOfMadridDay(todayDateKey).getTime();
+
       await tx.empireProgress.upsert({
         where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
         update: {
-          xp: { increment: 10 },
+          xp: { increment: isPayingCompletion ? 10 : 0 },
           ...(isFirstCompletionToday ? { streak: { increment: 1 } } : {}),
         },
-        create: { userId: user.id, empire: 'disciplina', xp: 10, streak: 1 },
+        create: {
+          userId: user.id,
+          empire: 'disciplina',
+          xp: isPayingCompletion ? 10 : 0,
+          streak: isFirstCompletionToday ? 1 : 0,
+        },
       });
 
       return { status: 'ok' as const, habit: updated };
@@ -343,30 +376,45 @@ export async function DELETE(request: NextRequest) {
 
     const todayDateKey = getTodayDateKey();
 
-    // H-12 FIX: Revert the empire streak when the deleted habit was the one
-    // that triggered today's streak increment.
-    // The H-10 check (PATCH endpoint) only increments the empire streak if no
-    // OTHER habit was completed today. When a habit that was completed today is
-    // deleted, its row disappears from the DB. A subsequent habit completion
-    // would then see "no other habit completed today" and increment the streak
-    // again — allowing a user to inflate the empire streak by repeatedly
-    // creating + completing + deleting a habit on the same day.
+    // H-12 FIX (kept, XP part superseded by G-04): Revert the empire streak
+    // when the deleted habit was the one that triggered today's streak
+    // increment. The H-10 check (PATCH endpoint) only increments the empire
+    // streak if no OTHER habit was completed today. When a habit that was
+    // completed today is deleted, its row disappears from the DB. A
+    // subsequent habit completion would then see "no other habit completed
+    // today" and increment the streak again — allowing a user to inflate the
+    // empire streak by repeatedly creating + completing + deleting a habit on
+    // the same day.
     //
-    // Fix: if the deleted habit was completed today (Madrid), check whether any
-    // other habit was also completed today. If not, this habit was the one that
-    // triggered today's streak increment — decrement the streak alongside the
-    // XP revert. The whole operation (delete + XP/streak revert) runs inside a
-    // transaction so partial failures cannot leave inconsistent state (M-4).
+    // G-04 FIX: the XP revert that used to run alongside the streak decrement
+    // is GONE — deleting a habit never touches XP anymore (neither the +5
+    // creation, which no longer exists, nor the +10 of legitimate
+    // completions, which the user keeps forever).
     await db.$transaction(async (tx) => {
-      await tx.habitLog.delete({ where: { id: habitId } });
+      // G-04 FIX: serialize this decision with concurrent PATCH/DELETE/undo
+      // for the same Madrid day — same advisory-lock family as PATCH
+      // (CERT-1/F-4/G-03 pattern). Every habit path acquires exactly one
+      // advisory lock and then at most one row lock, always in that order,
+      // so no deadlock is possible.
+      const lockSeed = user.id + '|disciplina|' + todayDateKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
 
-      const disciplinaProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
+      // G-04 FIX: deleteMany + count instead of delete — a concurrent
+      // duplicate DELETE (double click, retry after a timeout, two devices)
+      // that loses the race finds 0 rows and returns success WITHOUT
+      // re-running the streak decision, so retries can never double-revert.
+      const deleted = await tx.habitLog.deleteMany({
+        where: { id: habitId, userId: user.id },
       });
-      if (!disciplinaProgress) return;
+      if (deleted.count === 0) return;
 
-      // Determine whether the deleted habit was completed today (Madrid) and,
-      // if so, whether any other habit was also completed today.
+      // H-12 (kept): the empire streak keeps its existing semantics — it is
+      // decremented only when the deleted habit was completed today (Madrid)
+      // and no OTHER habit was completed today, i.e. when this row was the
+      // one that triggered today's increment.
       let decrementStreak = false;
       if (habit.lastCompletedAt) {
         const habitDateKey = getMadridDateKey(habit.lastCompletedAt);
@@ -385,13 +433,22 @@ export async function DELETE(request: NextRequest) {
         }
       }
 
-      await tx.empireProgress.update({
-        where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
-        data: {
-          xp: Math.max(0, disciplinaProgress.xp - 5),
-          ...(decrementStreak ? { streak: Math.max(0, disciplinaProgress.streak - 1) } : {}),
-        },
-      });
+      // G-04 FIX: NO XP is ever written on delete. XP awarded by legitimate
+      // completions belongs to the user's history even after the habit is
+      // removed ("eliminar un hábito antiguo NO elimina XP históricamente
+      // ganado por completaciones legítimas"), and the creation reward no
+      // longer exists (G-04 removed it), so there is nothing to revert.
+      // Removing the write also eliminates the old read-modify-write race
+      // (xp = max(0, xp - 5) computed from a stale read) that could erase
+      // XP granted concurrently by PATCH/undo/challenge completions.
+      if (decrementStreak) {
+        // Atomic clamped decrement — a single SQL statement, immune to
+        // lost updates against concurrent streak increments.
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "streak" = GREATEST(0, "streak" - 1)
+          WHERE "userId" = ${user.id} AND "empire" = 'disciplina'`;
+      }
     });
 
     // Trigger widget snapshot refresh (non-blocking)
