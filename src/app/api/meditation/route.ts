@@ -85,8 +85,28 @@ export async function DELETE(request: NextRequest) {
     //
     // The whole operation (delete + XP/streak revert) runs inside a transaction
     // so partial failures cannot leave inconsistent state (M-4/M-5).
+    //
+    // G-03 FIX: XP is a once-per-Madrid-day reward, so the revert must be
+    // day-based too. Previously EVERY deleted session removed 15 XP, which
+    // under G-03 would let users lose XP by deleting a repeat session that
+    // never awarded any. Now the day's +15 is reverted only when this delete
+    // leaves the session's Madrid day with NO other meditation session. The
+    // streak keeps its existing semantics (decrement only when today's sole
+    // session is deleted). The advisory lock (same family as POST, keyed to
+    // the session's Madrid day) serializes this decision against concurrent
+    // POSTs/DELETEs for the same day.
     const todayDateKey = getTodayDateKey();
+    const sessionDayKey = session.completedAt
+      ? getMadridDateKey(session.completedAt)
+      : todayDateKey;
+    const { start: dayStart, end: dayEnd } = madridDayBoundaries(sessionDayKey);
     await db.$transaction(async (tx) => {
+      const lockSeed = user.id + '|' + sessionDayKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
       await tx.meditationSession.delete({ where: { id: sessionId } });
 
       const menteProgress = await tx.empireProgress.findUnique({
@@ -94,29 +114,24 @@ export async function DELETE(request: NextRequest) {
       });
       if (!menteProgress) return;
 
-      // Determine whether the deleted session was completed today (Madrid) and,
-      // if so, whether any other session still exists for today.
-      let decrementStreak = false;
-      if (session.completedAt) {
-        const sessionDateKey = getMadridDateKey(session.completedAt);
-        if (sessionDateKey === todayDateKey) {
-          const { start, end } = madridDayBoundaries(todayDateKey);
-          const otherSessionToday = await tx.meditationSession.findFirst({
-            where: {
-              userId: user.id,
-              id: { not: sessionId },
-              completedAt: { gte: start, lt: end },
-            },
-            select: { id: true },
-          });
-          decrementStreak = !otherSessionToday;
-        }
-      }
+      // Does any OTHER session of the same Madrid day remain after this delete?
+      const otherSessionSameDay = await tx.meditationSession.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: sessionId },
+          completedAt: { gte: dayStart, lt: dayEnd },
+        },
+        select: { id: true },
+      });
+      const dayNowEmpty = !otherSessionSameDay;
+
+      const revertXp = dayNowEmpty;
+      const decrementStreak = dayNowEmpty && sessionDayKey === todayDateKey;
 
       await tx.empireProgress.update({
         where: { userId_empire: { userId: user.id, empire: 'mente' } },
         data: {
-          xp: Math.max(0, menteProgress.xp - 15),
+          xp: Math.max(0, menteProgress.xp - (revertXp ? 15 : 0)),
           ...(decrementStreak ? { streak: Math.max(0, menteProgress.streak - 1) } : {}),
         },
       });
@@ -188,6 +203,13 @@ export async function POST(request: NextRequest) {
     //
     // The whole operation (session create + empire progress upsert) runs inside
     // a transaction so partial failures cannot leave inconsistent state (M-4).
+    //
+    // G-03 FIX: XP is now also a once-per-Madrid-day reward, gated by the SAME
+    // isFirstSessionToday flag that drives the streak (computed inside the
+    // advisory-locked transaction, so two concurrent POSTs can never both see
+    // themselves as "first"). The first valid session of the day awards +15 XP;
+    // every later session of the same day still creates normally (history,
+    // stats, counts, achievements, challenges) but awards +0 XP.
     const todayDateKey = getTodayDateKey();
     const { start, end } = madridDayBoundaries(todayDateKey);
 
@@ -225,10 +247,19 @@ export async function POST(request: NextRequest) {
       await tx.empireProgress.upsert({
         where: { userId_empire: { userId: user.id, empire: 'mente' } },
         update: {
-          xp: { increment: 15 },
+          // G-03 FIX: repeat sessions of the same Madrid day award +0 XP.
+          xp: { increment: isFirstSessionToday ? 15 : 0 },
           ...(isFirstSessionToday ? { streak: { increment: 1 } } : {}),
         },
-        create: { userId: user.id, empire: 'mente', xp: 15, streak: 1 },
+        // Defensive create path: the row is normally created at signup; if it
+        // is ever missing, only a genuinely first-of-day session may seed it
+        // with the daily reward.
+        create: {
+          userId: user.id,
+          empire: 'mente',
+          xp: isFirstSessionToday ? 15 : 0,
+          streak: isFirstSessionToday ? 1 : 0,
+        },
       });
 
       return created;

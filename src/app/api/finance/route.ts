@@ -115,6 +115,15 @@ export async function POST(request: NextRequest) {
     // F-4: XP (+10) and streak (first finance log of the Madrid day)
     // Mirrors the meditation/energia pattern: advisory lock → create → check
     // first-of-day → upsert EmpireProgress with XP + conditional streak.
+    //
+    // G-03 FIX: XP is now a once-per-Madrid-day reward, gated by the SAME
+    // isFirstLogToday flag that drives the streak (computed inside the
+    // advisory-locked transaction on (userId, today), so two concurrent POSTs
+    // can never both see themselves as "first"). The first valid log of the
+    // day awards +10 XP; every later log of the same day still creates
+    // normally (history, stats, balances, achievements) but awards +0 XP.
+    // Note: "day" comes from createdAt (server clock) via the unified
+    // Europe/Madrid utilities — never from the user-supplied `date` field.
     const todayDateKey = getTodayDateKey();
     const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayDateKey);
 
@@ -156,10 +165,19 @@ export async function POST(request: NextRequest) {
       await tx.empireProgress.upsert({
         where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
         update: {
-          xp: { increment: 10 },
+          // G-03 FIX: repeat logs of the same Madrid day award +0 XP.
+          xp: { increment: isFirstLogToday ? 10 : 0 },
           ...(isFirstLogToday ? { streak: { increment: 1 } } : {}),
         },
-        create: { userId: user.id, empire: 'riqueza', xp: 10, streak: 1 },
+        // Defensive create path: the row is normally created at signup; if it
+        // is ever missing, only a genuinely first-of-day log may seed it with
+        // the daily reward.
+        create: {
+          userId: user.id,
+          empire: 'riqueza',
+          xp: isFirstLogToday ? 10 : 0,
+          streak: isFirstLogToday ? 1 : 0,
+        },
       });
 
       return created;
@@ -290,8 +308,26 @@ export async function DELETE(request: NextRequest) {
     // F-4: Revert XP and streak inside a transaction.
     // Mirrors the meditation DELETE pattern: delete → check if deleted log was
     // the sole trigger for today's streak → conditionally decrement.
+    //
+    // G-03 FIX: XP is a once-per-Madrid-day reward, so the revert must be
+    // day-based too. Previously EVERY deleted log removed 10 XP, which under
+    // G-03 would let users lose XP by deleting a repeat log that never awarded
+    // any. Now the day's +10 is reverted only when this delete leaves the
+    // log's Madrid day (by createdAt — the same day definition the award uses)
+    // with NO other finance log. The streak keeps its existing semantics
+    // (decrement only when today's sole log is deleted). The advisory lock
+    // (same family as POST, keyed to the log's Madrid day) serializes this
+    // decision against concurrent POSTs/DELETEs for the same day.
     const todayDateKey = getTodayDateKey();
+    const logDateKey = getMadridDateKey(existing.createdAt);
+    const { start: dayStart, end: dayEnd } = madridDayBoundaries(logDateKey);
     await db.$transaction(async (tx) => {
+      const lockSeed = user.id + '|riqueza|' + logDateKey;
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
+        )`;
+
       await tx.financeLog.delete({ where: { id: logId } });
 
       const riquezaProgress = await tx.empireProgress.findUnique({
@@ -299,27 +335,24 @@ export async function DELETE(request: NextRequest) {
       });
       if (!riquezaProgress) return;
 
-      // Only revert streak if the deleted log was created today (Madrid)
-      // AND no other finance log exists for today.
-      let decrementStreak = false;
-      const logDateKey = getMadridDateKey(existing.createdAt);
-      if (logDateKey === todayDateKey) {
-        const { start, end } = madridDayBoundaries(todayDateKey);
-        const otherLogToday = await tx.financeLog.findFirst({
-          where: {
-            userId: user.id,
-            id: { not: logId },
-            createdAt: { gte: start, lt: end },
-          },
-          select: { id: true },
-        });
-        decrementStreak = !otherLogToday;
-      }
+      // Does any OTHER finance log of the same Madrid day remain?
+      const otherLogSameDay = await tx.financeLog.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: logId },
+          createdAt: { gte: dayStart, lt: dayEnd },
+        },
+        select: { id: true },
+      });
+      const dayNowEmpty = !otherLogSameDay;
+
+      const revertXp = dayNowEmpty;
+      const decrementStreak = dayNowEmpty && logDateKey === todayDateKey;
 
       await tx.empireProgress.update({
         where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
         data: {
-          xp: Math.max(0, riquezaProgress.xp - 10),
+          xp: Math.max(0, riquezaProgress.xp - (revertXp ? 10 : 0)),
           ...(decrementStreak ? { streak: Math.max(0, riquezaProgress.streak - 1) } : {}),
         },
       });
