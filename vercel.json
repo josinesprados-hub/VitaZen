@@ -19,14 +19,6 @@
     {
       "path": "/api/cron/widget-maintenance",
       "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/cron/delivery-recovery",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/data-cleanup",
-      "schedule": "0 * * * *"
     }
   ]
 }
