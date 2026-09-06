@@ -1,0 +1,44 @@
+# Scheduler externo para el cron frecuente delivery-recovery de VitaZen.
+#
+# Motivo: Vercel Hobby solo permite crons diarios (400 cron_jobs_limits_reached
+# para "*/15 * * * *"). Este job invoca el endpoint existente con la misma
+# cadencia que tenía en vercel.json. La lógica vive íntegra en
+# /api/cron/delivery-recovery (claim atómico, reintentos, expiración).
+#
+# Secret requerido (repo): VITAZEN_CRON_SECRET = valor de CRON_SECRET en Vercel.
+
+name: delivery-recovery
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # aprox. cada 15 min (UTC; GitHub puede introducir retrasos)
+  workflow_dispatch: # permite ejecución manual para pruebas
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delivery-recovery
+  cancel-in-progress: true
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: GET /api/cron/delivery-recovery
+        env:
+          CRON_SECRET: ${{ secrets.VITAZEN_CRON_SECRET }}
+        run: |
+          set -eu
+          http_code=$(curl -sS -o /tmp/cron-response.json -w '%{http_code}' \
+            --max-time 330 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            https://vitazen.cc/api/cron/delivery-recovery)
+          echo "HTTP ${http_code}"
+          if [ "${http_code}" -lt 200 ] || [ "${http_code}" -ge 300 ]; then
+            echo "cron endpoint returned HTTP ${http_code}" >&2
+            cat /tmp/cron-response.json >&2 || true
+            exit 1
+          fi
+          cat /tmp/cron-response.json
