@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onJournalChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { startOfMadridDay, madridDayBoundaries } from '@/lib/dates';
@@ -139,7 +140,12 @@ export async function POST(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onJournalChange(user.id, user.plan);
 
-    return NextResponse.json({ entry });
+    // G-05 FIX: evaluate the achievements this action can affect right after
+    // the write commits (journal entries + empire_all, since POST grants XP
+    // to crecimiento). Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['journal', 'empire']);
+
+    return NextResponse.json({ entry, newlyUnlocked });
   } catch (error) {
     console.error('Journal POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -196,7 +202,12 @@ export async function PUT(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onJournalChange(user.id, user.plan);
 
-    return NextResponse.json({ entry: updated });
+    // G-05 FIX: the PUT can add/change `gratitude` after creation, which can
+    // complete hidden_gratitude_10. Evaluate the journal domain only (no XP
+    // changes here, so the empire domain cannot be affected). Best-effort.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['journal']);
+
+    return NextResponse.json({ entry: updated, newlyUnlocked });
   } catch (error) {
     console.error('Journal PUT error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

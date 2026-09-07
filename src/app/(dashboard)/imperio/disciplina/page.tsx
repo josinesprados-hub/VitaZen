@@ -15,6 +15,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { MicroReward } from '@/components/ui/MicroReward';
 import PrivacyMask from '@/components/ui/PrivacyMask';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 interface Habit {
   id: string;
@@ -159,6 +160,7 @@ export default function DisciplinaPage() {
       if (res.ok) {
         const data = await res.json();
         setHabits(prev => [data.habit, ...prev]);
+        notifyAchievementUnlocks(data);
         setNewHabit({ name: '', description: '', frequency: 'daily' });
         setShowAddHabit(false);
         refreshChallenge(); // Creating a habit may auto-complete today's challenge
@@ -185,6 +187,7 @@ export default function DisciplinaPage() {
       if (res.ok) {
         const data = await res.json();
         setHabits(prev => prev.map(h => h.id === habitId ? data.habit : h));
+        notifyAchievementUnlocks(data);
         setJustCompletedId(habitId);
         setShowReward(true);
         if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);

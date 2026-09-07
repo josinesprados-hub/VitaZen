@@ -14,6 +14,7 @@ import PremiumEmptyState from '@/components/ui/PremiumEmptyState';
 import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { MicroReward } from '@/components/ui/MicroReward';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 interface JournalEntry {
   id: string;
@@ -167,6 +168,7 @@ export default function CrecimientoPage() {
       if (res.ok) {
         const data = await res.json();
         setEntries(prev => [data.entry, ...prev]);
+        notifyAchievementUnlocks(data);
         setShowAdd(false);
         setForm({ title: '', content: '', mood: 3, gratitude: '' });
         setShowReward(true);
@@ -203,6 +205,7 @@ export default function CrecimientoPage() {
         const data = await res.json();
         setEntries(prev => prev.map(e => e.id === editingEntry.id ? data.entry : e));
         setEditingEntry(null);
+        notifyAchievementUnlocks(data);
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Journal PUT failed:', res.status, errData);

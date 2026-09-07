@@ -2186,6 +2186,19 @@ input, textarea, select {
   .return-accent-pulse { animation: none; }
 }
 
+/* G-05: achievement unlock toasts respect reduced motion.
+   The shadcn/Radix toast animates in/out with tailwindcss-animate utilities
+   (animate-in / slide-in-from-*) that the blocks above don't cover. Disable
+   every animation/transition inside the toast viewport; the toast itself
+   (role="status") stays fully readable and dismissible. */
+@media (prefers-reduced-motion: reduce) {
+  [data-radix-toast-viewport],
+  [data-radix-toast-viewport] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* ═══════════════════════════════════════════
    Mobile Density Polish — Phase 3
    ═══════════════════════════════════════════ */

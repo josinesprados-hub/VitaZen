@@ -13,6 +13,7 @@ import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { getTodayDateKey, safeFormatDate, safeFormatTime } from '@/lib/dates';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 interface WellnessLog {
   id: string;
@@ -126,6 +127,7 @@ export default function EnergiaPage() {
           const filtered = prev.filter(l => l.id !== data.log.id);
           return [data.log, ...filtered];
         });
+        notifyAchievementUnlocks(data);
         setWellnessForm({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
         setShowWellness(false);
       }
@@ -147,6 +149,7 @@ export default function EnergiaPage() {
           const filtered = prev.filter(l => l.id !== data.log.id);
           return [data.log, ...filtered];
         });
+        notifyAchievementUnlocks(data);
         setNutritionForm({ meals: '', water: 0, calories: 0, notes: '' });
         setShowNutrition(false);
       }
@@ -171,6 +174,7 @@ export default function EnergiaPage() {
         const data = await res.json();
         setWellnessLogs(prev => prev.map(l => l.id === editingWellness.id ? data.log : l));
         setEditingWellness(null);
+        notifyAchievementUnlocks(data);
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Wellness PUT failed:', res.status, errData);
@@ -196,6 +200,7 @@ export default function EnergiaPage() {
         const data = await res.json();
         setNutrition(prev => prev.map(l => l.id === editingNutrition.id ? data.log : l));
         setEditingNutrition(null);
+        notifyAchievementUnlocks(data);
       } else {
         const errData = await res.json().catch(() => ({}));
         console.error('Nutrition PUT failed:', res.status, errData);

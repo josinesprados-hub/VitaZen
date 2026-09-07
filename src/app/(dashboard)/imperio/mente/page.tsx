@@ -13,6 +13,7 @@ import PremiumErrorState from '@/components/ui/PremiumErrorState';
 import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { NumericInput } from '@/components/ui/NumericInput';
 import { safeFormatDate, safeFormatTime } from '@/lib/dates';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 interface Meditation {
   id: string;
@@ -300,6 +301,7 @@ export default function MentePage() {
       if (res.ok) {
         const data = await res.json();
         setSessions(prev => [data.session, ...prev]);
+        notifyAchievementUnlocks(data);
       } else {
         // M-3: Show error to user instead of silent failure
         setActionError('No se ha podido guardar la sesión. Inténtalo de nuevo.');
@@ -335,6 +337,7 @@ export default function MentePage() {
         const data = await res.json();
         setSessions(prev => prev.map(s => s.id === editingSession.id ? data.session : s));
         setEditingSession(null);
+        notifyAchievementUnlocks(data);
       } else {
         // M-3: Show error to user instead of silent failure
         setActionError('No se ha podido actualizar la sesión.');

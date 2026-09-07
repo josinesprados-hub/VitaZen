@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
     // where the approved window is enforced.
     const { start, end } = madridDayBoundaries(logDateKey);
 
-    const log = await db.$transaction(async (tx) => {
+    const { result: log, created: logCreated } = await db.$transaction(async (tx) => {
       // Acquire transaction-scoped advisory lock on (userId, logDateKey).
       // Key MUST match the one in wellness/route.ts so cross-type POSTs are
       // serialized.
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return result;
+      return { result, created: !existing };
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
@@ -185,7 +186,16 @@ export async function POST(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);
 
-    return NextResponse.json({ log });
+    // G-05 FIX: evaluate nutrition achievements right after the write commits.
+    // Only the CREATE path changes achievement metrics (nutritionLog.count and
+    // the +10 XP that can complete empire_all); the update path writes
+    // meals/water/calories/notes, which no achievement condition reads, so no
+    // evaluation is run there (G-05: no unnecessary evaluations). Best-effort.
+    const newlyUnlocked = logCreated
+      ? await evaluateAchievements(user.id, ['nutrition', 'empire'])
+      : [];
+
+    return NextResponse.json({ log, newlyUnlocked });
   } catch (error) {
     console.error('Nutrition POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -236,6 +246,10 @@ export async function PUT(request: NextRequest) {
 
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);
+
+    // G-05 NOTE: no achievement evaluation here on purpose. No achievement
+    // condition reads meals/water/calories/notes, and this PUT never creates
+    // rows or XP — there is nothing it can complete. (See evaluateAchievements.)
 
     return NextResponse.json({ log: updated });
   } catch (error) {

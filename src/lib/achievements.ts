@@ -131,11 +131,15 @@ export function getHiddenAchievements(): AchievementDef[] {
 }
 
 // ─── Progress Calculation ────────────────────────────────
-// Runs all DB queries in parallel for efficiency.
-// Uses Promise.allSettled so that a single failing query
-// (e.g. missing table, Neon timeout) doesn't crash the
-// entire function — the affected achievements degrade to 0.
-// Returns a map of achievement key → current progress number.
+// G-05: progress is computed by per-domain COLLECTORS. Each collector owns
+// the queries and formulas for one family of achievements, so an action that
+// touches one domain only pays for that domain's queries.
+//   - calculateProgress()      → runs EVERY collector (full evaluation).
+//   - evaluateAchievements()   → runs only the requested domains (selective).
+// The formulas are the same as the previous monolithic implementation — only
+// the execution boundaries changed. Each collector uses Promise.allSettled so
+// a single failing query (missing table, Neon timeout) degrades only its own
+// achievements to 0 instead of crashing the whole function.
 
 type Settled<T> = PromiseFulfilledResult<T> | PromiseRejectedResult;
 
@@ -147,120 +151,145 @@ function fulfilled<T>(result: Settled<T>, fallback: T): T {
   return fallback;
 }
 
-export async function calculateProgress(userId: string): Promise<Record<string, number>> {
+// ─── Achievement Domains (G-05) ──────────────────────────
+// Disjoint groups whose union is exactly the 45 achievement keys (asserted by
+// tests). A domain maps 1:1 to the metric families an action can change:
+//   - 'empire' is driven by XP grants, so every XP-awarding action evaluates
+//     it together with its own domain (empire_all / hidden_empire_balance).
+//   - 'time' has NO triggering action: hidden_one_year depends only on
+//     user.createdAt, so it is only computed on the full path (GET /logros).
+
+export type AchievementDomain =
+  | 'meditation'
+  | 'journal'
+  | 'wellness'
+  | 'habits'
+  | 'nutrition'
+  | 'finance'
+  | 'checkin'
+  | 'closure'
+  | 'empire'
+  | 'time';
+
+export const DOMAIN_ACHIEVEMENT_KEYS: Record<AchievementDomain, string[]> = {
+  meditation: ['meditation_first', 'meditation_10', 'meditation_30', 'meditation_100', 'hidden_meditation_3_types', 'hidden_meditation_200'],
+  journal: ['journal_first', 'journal_10', 'journal_30', 'journal_100', 'hidden_gratitude_10', 'hidden_journal_200'],
+  wellness: ['wellness_first', 'wellness_15', 'wellness_50', 'hidden_wellness_all_moods', 'hidden_wellness_100'],
+  habits: ['habits_first', 'habits_5', 'habits_steady_14', 'hidden_habit_steady_30'],
+  nutrition: ['nutrition_first', 'nutrition_15', 'nutrition_50', 'hidden_nutrition_100'],
+  finance: ['finance_first', 'finance_income_first', 'finance_20', 'finance_50', 'hidden_finance_both_5', 'hidden_finance_context_10', 'hidden_finance_100'],
+  checkin: ['checkin_first', 'checkin_7', 'checkin_30', 'hidden_checkin_100', 'hidden_six_months_present', 'hidden_comeback', 'hidden_streak_7_checkin'],
+  closure: ['monthly_closure_first', 'monthly_closure_3', 'hidden_monthly_closure_6'],
+  empire: ['empire_all', 'hidden_empire_balance'],
+  time: ['hidden_one_year'],
+};
+
+async function collectMeditationProgress(userId: string): Promise<Record<string, number>> {
   const results = await Promise.allSettled([
-    // 1. Meditation sessions
     db.meditationSession.count({ where: { userId } }),
+    db.meditationSession.findMany({
+      where: { userId },
+      distinct: ['type'],
+    }),
+  ]);
+  const meditationCount      = fulfilled(results[0], 0);
+  const meditationTypeResult = fulfilled(results[1], [] as { type: string }[]);
+  return {
+    meditation_first: Math.min(meditationCount, 1),
+    meditation_10: Math.min(meditationCount, 10),
+    meditation_30: Math.min(meditationCount, 30),
+    meditation_100: Math.min(meditationCount, 100),
+    hidden_meditation_3_types: Math.min(meditationTypeResult.length, 3),
+    hidden_meditation_200: Math.min(meditationCount, 200),
+  };
+}
 
-    // 2. Journal entries
+async function collectJournalProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
     db.journalEntry.count({ where: { userId } }),
+    db.journalEntry.count({
+      where: { userId, gratitude: { not: null } },
+    }),
+  ]);
+  const journalCount   = fulfilled(results[0], 0);
+  const gratitudeCount = fulfilled(results[1], 0);
+  return {
+    journal_first: Math.min(journalCount, 1),
+    journal_10: Math.min(journalCount, 10),
+    journal_30: Math.min(journalCount, 30),
+    journal_100: Math.min(journalCount, 100),
+    hidden_gratitude_10: Math.min(gratitudeCount, 10),
+    hidden_journal_200: Math.min(journalCount, 200),
+  };
+}
 
-    // 3. Wellness logs
+async function collectWellnessProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
     db.wellnessLog.count({ where: { userId } }),
+    db.wellnessLog.findMany({
+      where: { userId },
+      distinct: ['mood'],
+    }),
+  ]);
+  const wellnessCount      = fulfilled(results[0], 0);
+  const wellnessMoodResult = fulfilled(results[1], [] as { mood: number }[]);
+  return {
+    wellness_first: Math.min(wellnessCount, 1),
+    wellness_15: Math.min(wellnessCount, 15),
+    wellness_50: Math.min(wellnessCount, 50),
+    hidden_wellness_all_moods: Math.min(wellnessMoodResult.length, 5),
+    hidden_wellness_100: Math.min(wellnessCount, 100),
+  };
+}
 
-    // 4. Habit logs (habits created)
+async function collectHabitsProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
     db.habitLog.count({ where: { userId } }),
-
-    // 5. Max habit streak
     db.habitLog.findMany({
       where: { userId },
       orderBy: { streak: 'desc' },
       take: 1,
     }),
+  ]);
+  const habitsCount     = fulfilled(results[0], 0);
+  const maxStreakResult = fulfilled(results[1], [] as { streak: number }[]);
+  const maxStreak = maxStreakResult[0]?.streak || 0;
+  return {
+    habits_first: Math.min(habitsCount, 1),
+    habits_5: Math.min(habitsCount, 5),
+    habits_steady_14: Math.min(maxStreak, 14),
+    hidden_habit_steady_30: Math.min(maxStreak, 30),
+  };
+}
 
-    // 6. Nutrition logs
+async function collectNutritionProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
     db.nutritionLog.count({ where: { userId } }),
+  ]);
+  const nutritionCount = fulfilled(results[0], 0);
+  return {
+    nutrition_first: Math.min(nutritionCount, 1),
+    nutrition_15: Math.min(nutritionCount, 15),
+    nutrition_50: Math.min(nutritionCount, 50),
+    hidden_nutrition_100: Math.min(nutritionCount, 100),
+  };
+}
 
-    // 7-9. Finance logs — consolidated from 3 separate count queries into 1 groupBy
+async function collectFinanceProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
+    // Consolidated from 3 separate count queries into 1 groupBy
     db.financeLog.groupBy({
       by: ['type'],
       where: { userId },
       _count: { type: true },
     }),
-
-    // 10. User data (createdAt)
-    db.user.findUnique({ where: { id: userId } }),
-
-    // 11. Daily check-ins
-    db.dailyCheckin.count({ where: { userId } }),
-
-    // 12. Monthly closures
-    db.monthlyClosure.count({ where: { userId } }),
-
-    // 13. Empires with activity (xp > 0) — also used to derive level for hidden_empire_balance
-    db.empireProgress.findMany({
-      where: { userId, xp: { gt: 0 } },
-    }),
-
-    // 14. Journal entries with gratitude
-    db.journalEntry.count({
-      where: { userId, gratitude: { not: null } },
-    }),
-
-    // 15. Finance logs with contexto ("¿Qué pasó?")
     db.financeLog.count({
       where: { userId, contexto: { not: null } },
     }),
-
-    // 16. Distinct meditation types
-    db.meditationSession.findMany({
-      where: { userId },
-      distinct: ['type'],
-    }),
-
-    // 17. Distinct wellness moods
-    db.wellnessLog.findMany({
-      where: { userId },
-      distinct: ['mood'],
-    }),
-
-    // 18. REMOVED — empire level is now derived from XP (query #13) using the
-    // same formula as GET /api/empire: Math.floor(xp / 100) + 1.
-    // The stored `level` field was never updated, making the old query always return 0.
-
-    // 19. Recent check-ins for streak detection (take: 60 is sufficient for 7-day streak)
-    db.dailyCheckin.findMany({
-      where: { userId },
-      orderBy: { date: 'desc' },
-      take: 60,
-    }),
-
-    // 20. All check-in dates for comeback & distinct month detection
-    // PERF-5.2: Added take: 1095 (~3 years of daily checkins). Hidden achievements
-    // like "comeback after 14+ days" only need recent history. 1095 covers 3 full
-    // years — far beyond any realistic gap detection need.
-    // select: { date: true } avoids transferring heavy fields (intention, note).
-    db.dailyCheckin.findMany({
-      where: { userId },
-      select: { date: true },
-      orderBy: { date: 'desc' },
-      take: 1095,
-    }),
   ]);
+  const financeGroupBy      = fulfilled(results[0], [] as { type: string; _count: { type: number } }[]);
+  const financeContextCount = fulfilled(results[1], 0);
 
-  const meditationCount     = fulfilled(results[0],  0);
-  const journalCount        = fulfilled(results[1],  0);
-  const wellnessCount       = fulfilled(results[2],  0);
-  const habitsCount         = fulfilled(results[3],  0);
-  const maxStreakResult     = fulfilled(results[4],  [] as { streak: number }[]);
-  const nutritionCount      = fulfilled(results[5],  0);
-  const financeGroupBy      = fulfilled(results[6],  [] as { type: string; _count: { type: number } }[]);
-  const userData            = fulfilled(results[7],  null as { createdAt: Date } | null);
-  const checkinCount        = fulfilled(results[8],  0);
-  const monthlyClosureCount = fulfilled(results[9],  0);
-  const empireActiveResult  = fulfilled(results[10], [] as { empire: string; xp: number }[]);
-  const gratitudeCount      = fulfilled(results[11], 0);
-  const financeContextCount = fulfilled(results[12], 0);
-  const meditationTypeResult = fulfilled(results[13], [] as { type: string }[]);
-  const wellnessMoodResult  = fulfilled(results[14], [] as { mood: number }[]);
-  // Derive empires with level >= 5 from XP, using the same formula as GET /api/empire.
-  // This replaces the old query #18 which checked the stored `level` field (never updated).
-  const XP_PER_LEVEL = 100;
-  const empireHighLevelResult = empireActiveResult.filter(ep => Math.floor(ep.xp / XP_PER_LEVEL) + 1 >= 5);
-  const recentCheckins      = fulfilled(results[15], [] as { date: Date }[]);
-  const allCheckinDates     = fulfilled(results[16], [] as { date: Date }[]);
-
-  // Extract finance counts from groupBy result (was 3 separate queries)
   let financeCount = 0;
   let incomeCount = 0;
   let expenseCount = 0;
@@ -270,94 +299,48 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
     if (row.type === 'expense') expenseCount = row._count.type;
   }
 
-  const progress: Record<string, number> = {};
-  const maxStreak = maxStreakResult[0]?.streak || 0;
+  return {
+    finance_first: Math.min(financeCount, 1),
+    finance_income_first: Math.min(incomeCount, 1),
+    finance_20: Math.min(financeCount, 20),
+    finance_50: Math.min(financeCount, 50),
+    hidden_finance_both_5: Math.min(Math.min(incomeCount, expenseCount), 5),
+    hidden_finance_context_10: Math.min(financeContextCount, 10),
+    hidden_finance_100: Math.min(financeCount, 100),
+  };
+}
 
-  // ─── Visible: Meditación ──────────────────
-  progress['meditation_first'] = Math.min(meditationCount, 1);
-  progress['meditation_10'] = Math.min(meditationCount, 10);
-  progress['meditation_30'] = Math.min(meditationCount, 30);
-  progress['meditation_100'] = Math.min(meditationCount, 100);
+async function collectCheckinProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
+    db.dailyCheckin.count({ where: { userId } }),
+    // Recent check-ins for streak detection (take: 60 is enough for 7 days)
+    db.dailyCheckin.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      take: 60,
+    }),
+    // All check-in dates for comeback & distinct month detection.
+    // PERF-5.2: take: 1095 (~3 years) — far beyond any realistic gap need.
+    // select: { date: true } avoids transferring heavy fields.
+    db.dailyCheckin.findMany({
+      where: { userId },
+      select: { date: true },
+      orderBy: { date: 'desc' },
+      take: 1095,
+    }),
+  ]);
+  const checkinCount    = fulfilled(results[0], 0);
+  const recentCheckins  = fulfilled(results[1], [] as { date: Date }[]);
+  const allCheckinDates = fulfilled(results[2], [] as { date: Date }[]);
 
-  // ─── Visible: Diario ──────────────────────
-  progress['journal_first'] = Math.min(journalCount, 1);
-  progress['journal_10'] = Math.min(journalCount, 10);
-  progress['journal_30'] = Math.min(journalCount, 30);
-  progress['journal_100'] = Math.min(journalCount, 100);
-
-  // ─── Visible: Bienestar ───────────────────
-  progress['wellness_first'] = Math.min(wellnessCount, 1);
-  progress['wellness_15'] = Math.min(wellnessCount, 15);
-  progress['wellness_50'] = Math.min(wellnessCount, 50);
-
-  // ─── Visible: Hábitos ─────────────────────
-  progress['habits_first'] = Math.min(habitsCount, 1);
-  progress['habits_5'] = Math.min(habitsCount, 5);
-  progress['habits_steady_14'] = Math.min(maxStreak, 14);
-
-  // ─── Visible: Nutrición ───────────────────
-  progress['nutrition_first'] = Math.min(nutritionCount, 1);
-  progress['nutrition_15'] = Math.min(nutritionCount, 15);
-  progress['nutrition_50'] = Math.min(nutritionCount, 50);
-
-  // ─── Visible: Finanzas ────────────────────
-  progress['finance_first'] = Math.min(financeCount, 1);
-  progress['finance_income_first'] = Math.min(incomeCount, 1);
-  progress['finance_20'] = Math.min(financeCount, 20);
-  progress['finance_50'] = Math.min(financeCount, 50);
-
-  // ─── Visible: Check-in & General ──────────
-  progress['checkin_first'] = Math.min(checkinCount, 1);
-  progress['checkin_7'] = Math.min(checkinCount, 7);
-  progress['checkin_30'] = Math.min(checkinCount, 30);
-  progress['empire_all'] = Math.min(empireActiveResult.length, 5);
-  progress['monthly_closure_first'] = Math.min(monthlyClosureCount, 1);
-  progress['monthly_closure_3'] = Math.min(monthlyClosureCount, 3);
-
-  // ─── Hidden: Tiempo ───────────────────────
-  if (userData) {
-    // Use Madrid calendar days, not raw ms — avoids ±1 day drift from DST/timezone
-    const createdKey = getMadridDateKey(new Date(userData.createdAt.getTime()));
-    const todayKey = getTodayDateKey();
-    const daysSince = daysBetweenDateKeys(createdKey, todayKey);
-    progress['hidden_one_year'] = Math.min(daysSince, 365);
-  } else {
-    progress['hidden_one_year'] = 0;
-  }
-
-  // Distinct months with check-ins — uses allCheckinDates (no take limit) so months
-  // aren't truncated by the take: 60 cap on recentCheckins.
-  // Madrid calendar avoids UTC drift near midnight.
+  // Distinct months with check-ins — allCheckinDates so months aren't
+  // truncated by the take: 60 cap. Madrid calendar avoids UTC drift.
   const distinctMonths = new Set(
     allCheckinDates.map(c => getMadridDateKey(new Date(c.date)).slice(0, 7))
   );
-  progress['hidden_six_months_present'] = Math.min(distinctMonths.size, 6);
 
-  // ─── Hidden: Profundidad ──────────────────
-  progress['hidden_gratitude_10'] = Math.min(gratitudeCount, 10);
-  progress['hidden_finance_context_10'] = Math.min(financeContextCount, 10);
-  progress['hidden_meditation_3_types'] = Math.min(meditationTypeResult.length, 3);
-  progress['hidden_wellness_all_moods'] = Math.min(wellnessMoodResult.length, 5);
-  progress['hidden_habit_steady_30'] = Math.min(maxStreak, 30);
-
-  // ─── Hidden: Ritmo largo ──────────────────
-  progress['hidden_checkin_100'] = Math.min(checkinCount, 100);
-  progress['hidden_journal_200'] = Math.min(journalCount, 200);
-  progress['hidden_meditation_200'] = Math.min(meditationCount, 200);
-  progress['hidden_wellness_100'] = Math.min(wellnessCount, 100);
-  progress['hidden_nutrition_100'] = Math.min(nutritionCount, 100);
-
-  // ─── Hidden: Equilibrio y momentos ────────
-  // Dos Direcciones: minimum of income and expense counts
-  progress['hidden_finance_both_5'] = Math.min(Math.min(incomeCount, expenseCount), 5);
-
-  progress['hidden_monthly_closure_6'] = Math.min(monthlyClosureCount, 6);
-  progress['hidden_empire_balance'] = Math.min(empireHighLevelResult.length, 3);
-
-  // Regreso: detect gap of 7+ days between consecutive check-ins
-  // Uses allCheckinDates (no take limit) so the gap can be anywhere in history,
-  // not just within the last 60 check-ins.
-  // Uses getMadridDateKey() for calendar-day comparison — avoids ±1 day drift
+  // Regreso: detect gap of 7+ days between consecutive check-ins.
+  // Madrid calendar-day comparison — avoids ±1 day DST drift.
   let hasComeback = false;
   if (allCheckinDates.length >= 2) {
     for (let i = 0; i < allCheckinDates.length - 1; i++) {
@@ -370,20 +353,90 @@ export async function calculateProgress(userId: string): Promise<Record<string, 
       }
     }
   }
-  progress['hidden_comeback'] = hasComeback ? 1 : 0;
 
-  // Siete Mañanas: 7 consecutive check-ins
-  // Uses getMadridDateKey() for timezone-safe date normalization — same
-  // source of truth as Dashboard, Momentum, Mentor, Silent Memories, Challenges.
+  // Siete Mañanas: 7 consecutive check-ins — same source of truth as
+  // Dashboard, Momentum, Mentor, Silent Memories and Challenges.
   const consecutiveDays = recentCheckins.length > 0
     ? calcStreakFromKeys(new Set(recentCheckins.map(c => getMadridDateKey(new Date(c.date)))))
     : 0;
-  progress['hidden_streak_7_checkin'] = Math.min(consecutiveDays, 7);
 
-  // Trayectoria Económica
-  progress['hidden_finance_100'] = Math.min(financeCount, 100);
+  return {
+    checkin_first: Math.min(checkinCount, 1),
+    checkin_7: Math.min(checkinCount, 7),
+    checkin_30: Math.min(checkinCount, 30),
+    hidden_checkin_100: Math.min(checkinCount, 100),
+    hidden_six_months_present: Math.min(distinctMonths.size, 6),
+    hidden_comeback: hasComeback ? 1 : 0,
+    hidden_streak_7_checkin: Math.min(consecutiveDays, 7),
+  };
+}
 
-  return progress;
+async function collectClosureProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
+    db.monthlyClosure.count({ where: { userId } }),
+  ]);
+  const monthlyClosureCount = fulfilled(results[0], 0);
+  return {
+    monthly_closure_first: Math.min(monthlyClosureCount, 1),
+    monthly_closure_3: Math.min(monthlyClosureCount, 3),
+    hidden_monthly_closure_6: Math.min(monthlyClosureCount, 6),
+  };
+}
+
+async function collectEmpireAchievementProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
+    // Empires with activity (xp > 0) — level derived from XP below
+    db.empireProgress.findMany({
+      where: { userId, xp: { gt: 0 } },
+    }),
+  ]);
+  const empireActiveResult = fulfilled(results[0], [] as { empire: string; xp: number }[]);
+  // hidden_empire_balance: level derived from XP using the same formula as
+  // GET /api/empire: Math.floor(xp / 100) + 1 (the stored `level` field was
+  // never updated, so the old query always returned 0 — already fixed here).
+  const XP_PER_LEVEL = 100;
+  const empireHighLevelResult = empireActiveResult.filter(ep => Math.floor(ep.xp / XP_PER_LEVEL) + 1 >= 5);
+  return {
+    empire_all: Math.min(empireActiveResult.length, 5),
+    hidden_empire_balance: Math.min(empireHighLevelResult.length, 3),
+  };
+}
+
+// 'time' has no triggering action: hidden_one_year only depends on
+// user.createdAt, so it is computed on the full path only (GET /logros).
+async function collectTimeProgress(userId: string): Promise<Record<string, number>> {
+  const results = await Promise.allSettled([
+    db.user.findUnique({ where: { id: userId } }),
+  ]);
+  const userData = fulfilled(results[0], null as { createdAt: Date } | null);
+  if (!userData) {
+    return { hidden_one_year: 0 };
+  }
+  // Madrid calendar days, not raw ms — avoids ±1 day drift from DST/timezone
+  const createdKey = getMadridDateKey(new Date(userData.createdAt.getTime()));
+  const todayKey = getTodayDateKey();
+  const daysSince = daysBetweenDateKeys(createdKey, todayKey);
+  return { hidden_one_year: Math.min(daysSince, 365) };
+}
+
+const PROGRESS_COLLECTORS: Record<AchievementDomain, (userId: string) => Promise<Record<string, number>>> = {
+  meditation: collectMeditationProgress,
+  journal: collectJournalProgress,
+  wellness: collectWellnessProgress,
+  habits: collectHabitsProgress,
+  nutrition: collectNutritionProgress,
+  finance: collectFinanceProgress,
+  checkin: collectCheckinProgress,
+  closure: collectClosureProgress,
+  empire: collectEmpireAchievementProgress,
+  time: collectTimeProgress,
+};
+
+export async function calculateProgress(userId: string): Promise<Record<string, number>> {
+  const parts = await Promise.all(
+    Object.values(PROGRESS_COLLECTORS).map(run => run(userId).catch(() => ({})))
+  );
+  return Object.assign({}, ...parts);
 }
 
 // ─── Auto-Unlock ─────────────────────────────────────────
@@ -436,6 +489,104 @@ export async function checkAndUnlock(userId: string): Promise<UnlockResult> {
   }
 
   return { newlyUnlocked, progressData, unlockedKeys };
+}
+
+// ─── Action-Time Evaluation (G-05) ───────────────────────
+// Evaluates ONLY the achievement domains an action can affect, right after
+// that action's write commits, and unlocks any achievement whose target is
+// now met. This is the PRIMARY unlock mechanism since G-05 — the user no
+// longer needs to visit /logros for a fulfilled condition to be recorded.
+// GET /api/achievements (checkAndUnlock above) remains as the full-path
+// safety net for anything a selective evaluation could not see (e.g. pure
+// time-based achievements, evaluations that failed transiently).
+//
+// Concurrency & atomicity:
+//   - Achievement rows are guarded by @@unique([userId, key]). Two concurrent
+//     evaluations may both try to create the same record; exactly one create
+//     wins and the loser catches the unique-violation (P2002) and simply does
+//     NOT claim the "newly unlocked" feedback. Duplicates are impossible.
+//   - Best-effort by design: the triggering action has ALREADY committed when
+//     this runs, so any error here must never fail the action. On error the
+//     unlock is not lost — it self-heals on the next evaluated action or on
+//     GET /api/achievements.
+//   - Runs OUTSIDE the action's transaction (no shared advisory locks, only
+//     count-style reads + achievement creates), so it cannot deadlock with
+//     the G-03/G-04 lock families.
+
+export interface AchievementUnlockedInfo {
+  key: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: string;
+}
+
+export async function evaluateAchievements(
+  userId: string,
+  domains: AchievementDomain[],
+): Promise<AchievementUnlockedInfo[]> {
+  try {
+    const wanted = new Set<AchievementDomain>(domains);
+    if (wanted.size === 0) return [];
+
+    // Selective progress: run only the requested domain collectors.
+    const parts = await Promise.all(
+      (Object.keys(PROGRESS_COLLECTORS) as AchievementDomain[])
+        .filter(d => wanted.has(d))
+        .map(d => PROGRESS_COLLECTORS[d](userId).catch(() => ({})))
+    );
+    const progressData = Object.assign({}, ...parts);
+
+    const candidateKeys = new Set<string>();
+    for (const d of wanted) {
+      for (const k of DOMAIN_ACHIEVEMENT_KEYS[d]) candidateKeys.add(k);
+    }
+    const candidates = ACHIEVEMENTS.filter(a => candidateKeys.has(a.key));
+    if (candidates.length === 0) return [];
+
+    // NOTE: `where` filter keeps the payload light; no `select` — PrismaPg
+    // driver adapter can return null for queries with select.
+    const unlocked = await db.achievement.findMany({
+      where: { userId, key: { in: [...candidateKeys] } },
+    });
+    if (!unlocked) {
+      throw new Error('PrismaPg adapter returned null for achievement.findMany in evaluateAchievements — userId: ' + userId);
+    }
+    const unlockedKeys = new Set(unlocked.map(a => a.key));
+
+    const newlyUnlocked: AchievementUnlockedInfo[] = [];
+    for (const def of candidates) {
+      if (unlockedKeys.has(def.key)) continue;
+
+      const current = progressData[def.key] || 0;
+      if (current >= def.target) {
+        try {
+          await db.achievement.create({
+            data: { userId, key: def.key },
+          });
+          newlyUnlocked.push({
+            key: def.key,
+            title: def.title,
+            description: def.description,
+            category: def.category,
+            icon: def.icon,
+          });
+          unlockedKeys.add(def.key);
+        } catch {
+          // Unique constraint violation (P2002) — a concurrent request won
+          // the unlock. The record exists; this caller just doesn't claim
+          // the feedback. Any other transient create error is equally
+          // non-fatal: the unlock self-heals on a later evaluation.
+        }
+      }
+    }
+
+    return newlyUnlocked;
+  } catch (error) {
+    // Never fail the action because achievement evaluation failed.
+    console.error('[achievements] evaluateAchievements failed (non-fatal):', error);
+    return [];
+  }
 }
 
 // ─── Achievement Response Builder ────────────────────────

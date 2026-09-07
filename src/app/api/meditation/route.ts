@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onMeditationChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
@@ -46,7 +47,12 @@ export async function PUT(request: NextRequest) {
       data: updateData,
     });
 
-    return NextResponse.json({ session: updated });
+    // G-05 FIX: editing the session type can complete hidden_meditation_3_types.
+    // Evaluate the affected achievements right after the write commits so the
+    // unlock no longer depends on visiting /logros. Best-effort/non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['meditation']);
+
+    return NextResponse.json({ session: updated, newlyUnlocked });
   } catch (error) {
     console.error('Meditation PUT error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -271,7 +277,14 @@ export async function POST(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onMeditationChange(user.id, user.plan);
 
-    return NextResponse.json({ session });
+    // G-05 FIX: evaluate the achievements this action can affect right after
+    // the write commits, so a fulfilled condition unlocks immediately instead
+    // of waiting for a /logros visit. POST can grant XP, so the 'empire'
+    // domain (empire_all / hidden_empire_balance) is included. Best-effort
+    // and non-fatal — the session is already saved at this point.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['meditation', 'empire']);
+
+    return NextResponse.json({ session, newlyUnlocked });
   } catch (error) {
     console.error('Meditation POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

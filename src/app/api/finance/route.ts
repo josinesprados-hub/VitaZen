@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { startOfMadridDaysAgo, startOfMadridDay, getTodayDateKey, getMadridDateKey, madridDayBoundaries } from '@/lib/dates';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onFinanceChange } from '@/lib/widgets/triggers';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -186,7 +187,14 @@ export async function POST(request: NextRequest) {
     // F-12: trigger widget refresh (non-blocking)
     onFinanceChange(user.id, user.plan);
 
-    return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>) });
+    // G-05 FIX: evaluate the achievements this action can affect right after
+    // the write commits (finance logs + empire_all, since POST can grant XP).
+    // Best-effort and non-fatal — the log is already saved. The dedup path
+    // above returns early on purpose: a retry of the same log must not run
+    // a new evaluation nor re-claim the unlock feedback.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['finance', 'empire']);
+
+    return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>), newlyUnlocked });
   } catch (error) {
     console.error('Finance POST error:', error);
     return NextResponse.json({ error: 'Error al crear el registro.' }, { status: 500 });
@@ -268,7 +276,13 @@ export async function PUT(request: NextRequest) {
     // F-12: trigger widget refresh (non-blocking)
     onFinanceChange(user.id, user.plan);
 
-    return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>) });
+    // G-05 FIX: the PUT can change `type` or fill `contexto` after creation,
+    // which can complete finance_income_first, hidden_finance_both_5 and
+    // hidden_finance_context_10. No XP changes here → finance domain only.
+    // Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['finance']);
+
+    return NextResponse.json({ log: serializeFinanceLog(log as unknown as Record<string, unknown>), newlyUnlocked });
   } catch (error) {
     console.error('Finance PUT error:', error);
     return NextResponse.json({ error: 'Error al actualizar el registro.' }, { status: 500 });

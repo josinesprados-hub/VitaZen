@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { generateMonthlyDigest, getPreviousMonthForClosure, isClosurePeriod, type MonthlyDigest } from '@/lib/monthly-closure/digest';
+import { evaluateAchievements } from '@/lib/achievements';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // ─── GET ───
@@ -125,7 +126,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ ok: true, month });
+    // G-05 FIX: a first (or third, or sixth) monthly closure completes
+    // monthly_closure_first/3 / hidden_monthly_closure_6. Closures are rare
+    // (at most one per month), so evaluating on every POST is cheap. No XP
+    // is involved → closure domain only. Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['closure']);
+
+    return NextResponse.json({ ok: true, month, newlyUnlocked });
   } catch (error) {
     console.error('[Monthly Closure] POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

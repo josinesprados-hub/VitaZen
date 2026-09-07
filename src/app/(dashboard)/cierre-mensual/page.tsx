@@ -9,6 +9,7 @@ import PrivacyMask from '@/components/ui/PrivacyMask';
 import Link from 'next/link';
 import PremiumGate from '@/components/ui/PremiumGate';
 import { safeFormatDateShort } from '@/lib/dates';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 import {
   REFLECTION_TITLE,
   REFLECTION_PRIVACY_NOTE,
@@ -136,6 +137,8 @@ export default function CierreMensualPage() {
       });
 
       if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data) notifyAchievementUnlocks(data);
         setPhase('summary');
       }
     } catch (error) {

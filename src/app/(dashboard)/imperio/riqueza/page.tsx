@@ -16,6 +16,7 @@ import { NumericInput } from '@/components/ui/NumericInput';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { formatCurrency } from '@/lib/utils';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 import { getTodayDateKey, getMadridMonthRange, getCurrentMonthKey, safeFormatDateShort } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
@@ -925,6 +926,7 @@ export default function RiquezaPage() {
         setShowAdd(false);
         setForm({ type: 'expense', category: '', amount: 0, description: '', date: '', mood: '', contexto: '' });
         setQuickMode(true);
+        notifyAchievementUnlocks(data);
         showToast('Registrado');
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -957,6 +959,7 @@ export default function RiquezaPage() {
         setLogs(prev => [result.log, ...prev]);
         setShowAdd(false);
         setQuickMode(true);
+        notifyAchievementUnlocks(result);
         showToast('Registrado');
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -1005,6 +1008,7 @@ export default function RiquezaPage() {
         const data = await res.json();
         setLogs(prev => prev.map(l => l.id === editingLog.id ? data.log : l));
         setEditingLog(null);
+        notifyAchievementUnlocks(data);
         showToast('Actualizado');
       } else {
         const errData = await res.json().catch(() => ({}));

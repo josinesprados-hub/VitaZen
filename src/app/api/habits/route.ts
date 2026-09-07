@@ -4,6 +4,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
@@ -102,7 +103,13 @@ export async function POST(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);
 
-    return NextResponse.json({ habit });
+    // G-05 FIX: creating a habit changes habitLog.count, which is exactly what
+    // habits_first / habits_5 measure. Evaluate the habits domain right after
+    // the write commits (G-04 already removed creation XP, so the empire
+    // domain cannot change here). Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['habits']);
+
+    return NextResponse.json({ habit, newlyUnlocked });
   } catch (error) {
     console.error('Habits POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -295,7 +302,13 @@ export async function PATCH(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);
 
-    return NextResponse.json({ habit: updated });
+    // G-05 FIX: completing a habit updates its streak (habits_steady_14 /
+    // hidden_habit_steady_30) and can grant +10 XP to disciplina (G-04
+    // paying-completion gate), which can complete empire_all /
+    // hidden_empire_balance. Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['habits', 'empire']);
+
+    return NextResponse.json({ habit: updated, newlyUnlocked });
   } catch (error) {
     console.error('Habits PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -13,9 +13,12 @@ import { serverLog } from '@/lib/observability/server-logger';
 
 // ═══════════════════════════════════════════
 // GET — List achievements with progress
-// Also auto-unlocks achievements that meet their target.
-// This is the only unlock trigger: achievements
-// are "remembered" when the user visits this page.
+// SAFETY NET since G-05: the PRIMARY unlock mechanism is now action-time
+// evaluation (evaluateAchievements, invoked by the mutation endpoints right
+// after their writes commit). This endpoint still runs the FULL evaluation
+// (checkAndUnlock) so anything a selective evaluation could not see — e.g.
+// the pure time-based hidden_one_year, or a transient evaluation failure —
+// is unlocked here when the user opens /logros.
 // ═══════════════════════════════════════════
 
 async function handler(request: NextRequest) {

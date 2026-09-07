@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
+import { evaluateAchievements } from '@/lib/achievements';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 // GET /api/onboarding — Check onboarding status
@@ -223,8 +224,15 @@ export async function POST(request: NextRequest) {
     // Track onboarding completion (fire-and-forget, outside transaction)
     trackEvent({ event: 'onboarding_completed', userId: user.id, properties: { primaryFocus } });
 
+    // G-05 FIX: onboarding creates the initial habits (habitLog.createMany),
+    // which is exactly what habits_first / habits_5 measure, and can grant
+    // the one-time +25 XP (G-01 gate) that may complete empire_all. Evaluate
+    // right after the transaction commits. Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['habits', 'empire']);
+
     return NextResponse.json({
       success: true,
+      newlyUnlocked,
       data: {
         goals: JSON.parse(onboardingData.goals),
         primaryFocus: onboardingData.primaryFocus,

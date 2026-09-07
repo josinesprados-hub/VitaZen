@@ -38,6 +38,7 @@ import {
   Zap,
 } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -170,6 +171,23 @@ export default function LogrosPage() {
           const json = await res.json();
           if (!cancelled) {
             setData(json);
+            // G-05 safety-net feedback: achievements unlocked by THIS visit
+            // (e.g. time-based hidden_one_year, or an action-time evaluation
+            // that failed transiently). Already-unlocked achievements are
+            // never reported again, so this cannot duplicate feedback.
+            const newKeys: unknown = json.newlyUnlocked;
+            if (Array.isArray(newKeys) && newKeys.length > 0) {
+              const rich = (json.achievements ?? [])
+                .filter((a: { key: string }) => newKeys.includes(a.key))
+                .map((a: { key: string; title: string; description: string; category: string; icon: string }) => ({
+                  key: a.key,
+                  title: a.title,
+                  description: a.description,
+                  category: a.category,
+                  icon: a.icon,
+                }));
+              notifyAchievementUnlocks({ newlyUnlocked: rich });
+            }
           }
         } else {
           // 401 is handled by useApi (token refresh / sign-out).

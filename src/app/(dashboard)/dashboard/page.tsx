@@ -17,6 +17,7 @@ import { MonthlyClosurePrompt } from './MonthlyClosurePrompt';
 import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { getEmotionEmoji } from '@/lib/emotion-emojis';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 // DASH-2: Greeting must use Madrid timezone, not browser-local.
 // The rest of the app uses getTodayDateKey() (Madrid) for "today" boundaries,
@@ -187,6 +188,7 @@ export default function DashboardPage() {
     const result = await res.json();
     const wasFirstCheckin = !todayCheckin;
     setTodayCheckin(result.checkin);
+    notifyAchievementUnlocks(result);
 
     // DASH-5: Refresh empire data so the grid immediately reflects the +10 XP
     // awarded to the mente empire on first check-in of the day. Without this,

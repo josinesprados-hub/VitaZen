@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries } from '@/lib/dates';
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
     const logDate = parsedDate;
     const { start, end } = madridDayBoundaries(logDateKey);
 
-    const log = await db.$transaction(async (tx) => {
+    const { result: log, created: logCreated } = await db.$transaction(async (tx) => {
       // Acquire transaction-scoped advisory lock on (userId, logDateKey).
       // Key is derived from md5(userId || '|' || logDateKey) — first 8 bytes as a
       // bigint. Collisions are acceptable (worst case: two unrelated users
@@ -195,7 +196,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return result;
+      return { result, created: !existing };
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
@@ -204,7 +205,16 @@ export async function POST(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);
 
-    return NextResponse.json({ log });
+    // G-05 FIX: evaluate wellness achievements right after the write commits.
+    // The POST always writes mood (create OR update), so hidden_wellness_all_moods
+    // can complete on either path; the 'empire' domain is only relevant on the
+    // create path (+10 XP). Best-effort and non-fatal.
+    const newlyUnlocked = await evaluateAchievements(
+      user.id,
+      logCreated ? ['wellness', 'empire'] : ['wellness'],
+    );
+
+    return NextResponse.json({ log, newlyUnlocked });
   } catch (error) {
     console.error('Wellness POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -253,7 +263,11 @@ export async function PUT(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);
 
-    return NextResponse.json({ log: updated });
+    // G-05 FIX: the PUT can change `mood`, which can complete
+    // hidden_wellness_all_moods. Wellness domain only (no XP here). Best-effort.
+    const newlyUnlocked = await evaluateAchievements(user.id, ['wellness']);
+
+    return NextResponse.json({ log: updated, newlyUnlocked });
   } catch (error) {
     console.error('Wellness PUT error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

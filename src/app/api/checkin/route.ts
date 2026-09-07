@@ -4,6 +4,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
+import { evaluateAchievements } from '@/lib/achievements';
 import { onCheckinChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey } from '@/lib/deterministic';
 import { startOfTodayMadrid, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
     // PostgreSQL's md5 + substring. We reuse the same hash approach elsewhere
     // in VitaZen for deterministic keys.
     const todayKey = getTodayDateKey();
-    const checkin = await db.$transaction(async (tx) => {
+    const { result: checkin, created: checkinCreated } = await db.$transaction(async (tx) => {
       // Acquire transaction-scoped advisory lock on (userId, today).
       // Key is derived from md5(userId || '|' || dateKey) — first 8 bytes as a
       // bigint. Collisions are acceptable (worst case: two unrelated users
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return result;
+      return { result, created: !existingCheckin };
     });
 
     // Track checkin event
@@ -210,7 +211,17 @@ export async function POST(request: NextRequest) {
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);
 
-    return NextResponse.json({ checkin });
+    // G-05 FIX: evaluate check-in achievements right after the write commits.
+    // Only the CREATE path changes achievement metrics (checkin count, date
+    // list — checkin_first/7/30, hidden_comeback, hidden_streak_7_checkin,
+    // hidden_six_months_present — and the +10 XP for empire_all). The update
+    // path writes fields no achievement condition reads, so it is not
+    // evaluated (G-05: no unnecessary evaluations). Best-effort and non-fatal.
+    const newlyUnlocked = checkinCreated
+      ? await evaluateAchievements(user.id, ['checkin', 'empire'])
+      : [];
+
+    return NextResponse.json({ checkin, newlyUnlocked });
   } catch (error) {
     console.error('Checkin POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

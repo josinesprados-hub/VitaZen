@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys } from '@/lib/dates';
+import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -194,6 +195,7 @@ export default function CheckinPage() {
       if (!res.ok) throw new Error(`Check-in save failed: ${res.status}`);
       const result = await res.json();
       setTodayCheckin(result.checkin);
+      notifyAchievementUnlocks(result);
       return { xpAwarded: wasFirstCheckin ? 10 : 0 };
     }
   }, [apiFetch, editingCheckin, todayCheckin]);
