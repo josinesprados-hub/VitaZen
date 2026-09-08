@@ -15,6 +15,7 @@ import { db } from '@/lib/db';
 import { detectPatterns } from '@/lib/patterns/detector';
 import type { CrossEmpireData } from '@/lib/patterns/types';
 import { startOf90DaysAgoMadrid } from '@/lib/dates';
+import { currentHabitStreak } from '@/lib/streaks';
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
       // PERF-5.2: Added take: 100 — pattern detection only needs recent habits.
       db.habitLog.findMany({
         where: { userId },
-        select: { name: true, streak: true, lastCompletedAt: true },
+        select: { name: true, streak: true, lastCompletedAt: true, frequency: true },
         take: 100,
       }),
       db.dailyCheckin.findMany({
@@ -87,8 +88,10 @@ export async function GET(request: NextRequest) {
       meditationSessions: meditationSessions.map(s => ({
         duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
       })),
+      // G-06 FIX: pattern data carries the CURRENT habit streak (stored
+      // count gated by its own lastCompletedAt), never a frozen counter.
       habitLogs: habitLogs.map(h => ({
-        name: h.name, streak: h.streak,
+        name: h.name, streak: currentHabitStreak(h),
         lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
       })),
       checkins: checkins.map(c => ({

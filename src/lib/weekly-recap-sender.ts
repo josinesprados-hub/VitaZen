@@ -17,6 +17,7 @@ import { db } from './db';
 import { getMadridWeekKey, startOf7DaysAgoMadrid } from '@/lib/dates';
 import { generateWeeklyInsights, gatherData } from './insights';
 import { getEmotionalState } from './emotional-state';
+import { currentHabitStreak } from './streaks';
 import { weeklyRecapEmail, type WeeklyRecapEmailData } from './emails/weekly-recap';
 import { resend } from './resend';
 
@@ -128,12 +129,21 @@ async function generateRecapData(userId: string, plan: string): Promise<WeeklyRe
     }
 
     // Get top habits
-    const topHabits = await db.habitLog.findMany({
+    // G-06 FIX: report the CURRENT streak (stored count gated by the
+    // habit's own lastCompletedAt) — frozen chains from abandoned habits
+    // no longer reach the weekly email.
+    const habitRows = await db.habitLog.findMany({
       where: { userId, streak: { gt: 0 } },
       orderBy: { streak: 'desc' },
-      take: 3,
-      select: { name: true, streak: true },
+      take: 25, // fetch pool: gating may retire frozen chains, then top 3 are kept
+      select: { name: true, streak: true, lastCompletedAt: true, frequency: true },
     });
+    const topHabits = habitRows
+      .map((h) => ({ name: h.name, currentStreak: currentHabitStreak(h) }))
+      .filter((h) => h.currentStreak > 0)
+      .sort((a, b) => b.currentStreak - a.currentStreak)
+      .slice(0, 3)
+      .map((h) => ({ name: h.name, streak: h.currentStreak }));
 
     // Main insight
     const mainInsight = insights.length > 0 ? insights[0] : null;

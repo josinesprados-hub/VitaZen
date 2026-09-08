@@ -1,6 +1,7 @@
 import { db } from './db';
 import { formatCurrency } from './utils';
 import { getTodayDateKey, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
+import { currentHabitStreak, gateEmpireStreak } from '@/lib/streaks';
 
 // ═══════════════════════════════════════════
 // WEEKLY INSIGHTS ENGINE
@@ -74,6 +75,13 @@ export interface RawData {
   thisWeekFinance: any[];
   prevWeekFinance: any[];
   empireProgress: any[];
+  // G-06 FIX: latest real activity per empire event source, used to gate
+  // the stored empire streaks before presentation (null = no activity).
+  lastMeditation: { completedAt: Date } | null;
+  lastFinance: { createdAt: Date } | null;
+  lastWellness: { date: Date } | null;
+  lastNutrition: { date: Date } | null;
+  lastHabitCompletion: { lastCompletedAt: Date | null } | null;
 }
 
 export async function gatherData(userId: string): Promise<RawData> {
@@ -109,6 +117,13 @@ export async function gatherData(userId: string): Promise<RawData> {
     prevWeekFinance,
     empireProgress,
     totalActiveHabits,
+    // G-06 FIX: last real activity per empire event source, used to gate
+    // the stored empire streaks (see lastActivityByEmpire below).
+    lastMeditation,
+    lastFinance,
+    lastWellness,
+    lastNutrition,
+    lastHabitCompletion,
   ] = await Promise.all([
     db.dailyCheckin.findMany({
       where: { userId, date: { gte: sevenDaysAgo } },
@@ -175,6 +190,36 @@ export async function gatherData(userId: string): Promise<RawData> {
     db.habitLog.count({
       where: { userId },
     }),
+    // ─── G-06 FIX: latest real activity per empire event source ───
+    // Same day definitions the streak write paths use: mente =
+    // completedAt (server), riqueza = createdAt (server, F-4/G-03 — never
+    // the backdatable `date`), energia = log `date` (E-3, G-02 window),
+    // disciplina = any habit's lastCompletedAt. Bounded findFirst reads.
+    db.meditationSession.findFirst({
+      where: { userId },
+      orderBy: { completedAt: 'desc' },
+      select: { completedAt: true },
+    }),
+    db.financeLog.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: { createdAt: true },
+    }),
+    db.wellnessLog.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      select: { date: true },
+    }),
+    db.nutritionLog.findFirst({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      select: { date: true },
+    }),
+    db.habitLog.findFirst({
+      where: { userId, lastCompletedAt: { not: null } },
+      orderBy: { lastCompletedAt: 'desc' },
+      select: { lastCompletedAt: true },
+    }),
   ]);
 
   return {
@@ -195,6 +240,11 @@ export async function gatherData(userId: string): Promise<RawData> {
     prevWeekFinance,
     empireProgress,
     totalActiveHabits,
+    lastMeditation,
+    lastFinance,
+    lastWellness,
+    lastNutrition,
+    lastHabitCompletion,
   };
 }
 
@@ -237,10 +287,18 @@ function buildSummary(data: RawData): WeeklySummary {
     avgStress: Math.round(avg(data.thisWeekCheckins.map((c: any) => c.stress)) * 10) / 10,
   };
 
-  const topHabit = data.allHabits.length > 0 ? data.allHabits[0] : null;
+  // G-06 FIX: topHabit/topStreak now use the CURRENT streak (stored count
+  // gated by the habit's own lastCompletedAt) instead of the raw stored
+  // maximum — a habit not completed for 3 weeks no longer headlines the
+  // weekly recap with a frozen "Lecturas, 12 días".
+  const currentHabitsRanked = data.allHabits
+    .map((h: any) => ({ habit: h, currentStreak: currentHabitStreak(h) }))
+    .filter((x: { currentStreak: number }) => x.currentStreak > 0)
+    .sort((a: { currentStreak: number }, b: { currentStreak: number }) => b.currentStreak - a.currentStreak);
+  const topHabit = currentHabitsRanked.length > 0 ? currentHabitsRanked[0].habit : null;
   const habits = {
     completed: data.thisWeekHabits.length,
-    topStreak: topHabit?.streak || 0,
+    topStreak: topHabit ? currentHabitStreak(topHabit) : 0,
     topHabit: topHabit?.name || null,
   };
 
@@ -271,11 +329,25 @@ function buildSummary(data: RawData): WeeklySummary {
     balance: Math.round((finThis.income - finThis.expense) * 100) / 100,
   };
 
+  // G-06 FIX: bestEmpireStreak is gated by each empire's LAST REAL
+  // ACTIVITY (same source its write path uses), so an inactive empire's
+  // stored counter can no longer masquerade as the current streak.
+  const energiaCandidates = [data.lastWellness?.date, data.lastNutrition?.date]
+    .filter((d: unknown): d is Date => d instanceof Date)
+    .map((d: Date) => d.getTime());
+  const lastActivityByEmpire: Record<string, Date | null> = {
+    disciplina: data.lastHabitCompletion?.lastCompletedAt ?? null,
+    mente: data.lastMeditation?.completedAt ?? null,
+    riqueza: data.lastFinance?.createdAt ?? null,
+    energia: energiaCandidates.length > 0 ? new Date(Math.max(...energiaCandidates)) : null,
+    crecimiento: null, // no streak write path exists — always 0
+  };
   const bestEmpire = data.empireProgress
-    .filter((e: any) => e.streak > 0)
-    .sort((a: any, b: any) => b.streak - a.streak)[0];
+    .map((e: any) => ({ ...e, currentStreak: gateEmpireStreak(e.streak, lastActivityByEmpire[e.empire] ?? null) }))
+    .filter((e: { currentStreak: number }) => e.currentStreak > 0)
+    .sort((a: { currentStreak: number }, b: { currentStreak: number }) => b.currentStreak - a.currentStreak)[0];
   const streaks = {
-    bestEmpireStreak: bestEmpire?.streak || 0,
+    bestEmpireStreak: bestEmpire?.currentStreak || 0,
     bestEmpireName: bestEmpire ? EMPIRE_NAMES[bestEmpire.empire] || bestEmpire.empire : null,
   };
 

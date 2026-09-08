@@ -14,6 +14,7 @@
 
 import { db } from '@/lib/db';
 import { getMadridDateKey, getTodayDateKey, daysBetweenDateKeys, calcStreakFromKeys } from '@/lib/dates';
+import { currentMaxHabitStreak } from '@/lib/streaks';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -245,15 +246,25 @@ async function collectWellnessProgress(userId: string): Promise<Record<string, n
 async function collectHabitsProgress(userId: string): Promise<Record<string, number>> {
   const results = await Promise.allSettled([
     db.habitLog.count({ where: { userId } }),
+    // G-06 FIX: maxStreak used to be max(HabitLog.streak) — a stored
+    // counter that stays frozen after inactivity, so a habit abandoned
+    // weeks ago could still unlock habits_steady_14 /
+    // hidden_habit_steady_30 (false positive). The achievement now
+    // receives the CURRENT streak: the stored count is only valid while
+    // the habit's own lastCompletedAt says the chain is alive (today/
+    // yesterday for daily habits, H-8 continuation windows for
+    // weekly/monthly). Keys, targets and unlock semantics are unchanged —
+    // only the data source stops quoting frozen counters. Already-unlocked
+    // achievements are never revoked (one-way unlock, G-05).
     db.habitLog.findMany({
       where: { userId },
-      orderBy: { streak: 'desc' },
-      take: 1,
+      select: { streak: true, lastCompletedAt: true, frequency: true },
+      take: 100, // PERF-5.2 cap, mirrors GET /api/habits
     }),
   ]);
   const habitsCount     = fulfilled(results[0], 0);
-  const maxStreakResult = fulfilled(results[1], [] as { streak: number }[]);
-  const maxStreak = maxStreakResult[0]?.streak || 0;
+  const habitRows       = fulfilled(results[1], [] as { streak: number; lastCompletedAt: Date | null; frequency: string }[]);
+  const maxStreak = currentMaxHabitStreak(habitRows);
   return {
     habits_first: Math.min(habitsCount, 1),
     habits_5: Math.min(habitsCount, 5),

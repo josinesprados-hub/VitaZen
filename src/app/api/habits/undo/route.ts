@@ -4,6 +4,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
+import { currentHabitStreak } from '@/lib/streaks';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -160,7 +161,12 @@ export async function POST(request: NextRequest) {
     // Disparar refresco de widgets (non-blocking)
     onHabitChange(user.id, user.plan);
 
-    return NextResponse.json({ habit: txResult.habit });
+    // G-06 FIX: respond with the CURRENT streak. Undoing a completion
+    // restores the previous lastCompletedAt; if the restored chain is no
+    // longer extendable (e.g. the previous completion was 2+ days ago and
+    // the frontend had no previous value), the stored count must not be
+    // presented as current — same gating as GET/PATCH/PUT.
+    return NextResponse.json({ habit: { ...txResult.habit, streak: currentHabitStreak(txResult.habit) } });
   } catch (error) {
     console.error('Habits UNDO error:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

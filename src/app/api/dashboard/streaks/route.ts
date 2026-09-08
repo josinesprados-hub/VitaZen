@@ -4,6 +4,7 @@ import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getMadridDateKey } from '@/lib/deterministic';
 import { calcStreak, startOf60DaysAgoMadrid, addDaysToDateKey, getTodayDateKey } from '@/lib/dates';
+import { currentMaxHabitStreak } from '@/lib/streaks';
 
 // Get a human, non-toxic message for streak state
 function getStreakMessage(streak: number, wasActiveYesterday: boolean): { message: string; tone: 'active' | 'warm' | 'gentle' } {
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
       }),
       db.habitLog.findMany({
         where: { userId: user.id, lastCompletedAt: { not: null, gte: sixtyDaysAgo } },
-        select: { lastCompletedAt: true, streak: true },
+        select: { lastCompletedAt: true, streak: true, frequency: true },
         orderBy: { lastCompletedAt: 'desc' },
       }),
       db.journalEntry.findMany({
@@ -84,9 +85,16 @@ export async function GET(request: NextRequest) {
     // which is the "best habit streak" the user has. This is consistent with
     // how the disciplina page displays streak per habit, and how the insights
     // engine uses topStreak = max(HabitLog.streak).
-    const habitStreak = habitDates.length > 0
-      ? Math.max(...habitDates.map(h => h.streak))
-      : 0;
+    //
+    // G-06 FIX: the stored counter is a cache of the chain ending at
+    // lastCompletedAt — it is NOT current when inactivity has broken the
+    // chain. currentMaxHabitStreak gates each habit's value by its own
+    // lastCompletedAt (today/yesterday for daily habits; H-8 continuation
+    // windows for weekly/monthly), so a habit completed 20 days ago can no
+    // longer report "streak 45" as today's streak. The count itself is
+    // unchanged while the chain is alive, and no write-back or cron is
+    // involved: aliveness is derived at read time from real activity.
+    const habitStreak = currentMaxHabitStreak(habitDates);
     const journalStreak = calcStreak(journalDates.map(j => j.createdAt));
     const checkinStreak = calcStreak(checkinDates.map(c => c.date));
     const wellnessStreak = calcStreak(wellnessDates.map(w => w.date));

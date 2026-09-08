@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { formatCurrency } from '@/lib/utils';
+import { currentHabitStreak } from '@/lib/streaks';
 
 // Imperio mapping — each activity belongs to a vital dimension
 const TYPE_IMPERIO: Record<string, string> = {
@@ -148,14 +149,18 @@ export async function GET(request: NextRequest) {
         take: limit,
       }).then((habits) => {
         for (const h of habits) {
+          // G-06 FIX: the timeline shows the CURRENT streak (stored count
+          // gated by the habit's own lastCompletedAt), not the frozen
+          // counter — an abandoned habit stops advertising old days.
+          const currentStreak = currentHabitStreak(h);
           items.push({
             id: h.id,
             type: 'habits',
             imperio: 'disciplina',
             title: h.name,
-            description: h.description || (h.streak > 0 ? `${h.streak} días` : ''),
+            description: h.description || (currentStreak > 0 ? `${currentStreak} días` : ''),
             date: h.lastCompletedAt || h.createdAt,
-            meta: { streak: h.streak, frequency: h.frequency },
+            meta: { streak: currentStreak, frequency: h.frequency },
           });
         }
       })

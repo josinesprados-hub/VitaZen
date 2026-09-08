@@ -18,6 +18,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { currentHabitStreak } from '@/lib/streaks';
 import { detectLifeStages, getPastMonths } from '@/lib/life-memory/stages';
 import { getHighlightedMemories, buildTimeline, observationsFromPatterns } from '@/lib/life-memory/observations';
 import type { PatternObservationData } from '@/lib/life-memory/observations';
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       // PERF-5.2: Added take: 100 — life memory only needs recent habits.
       db.habitLog.findMany({
         where: { userId: user.id },
-        select: { name: true, streak: true, lastCompletedAt: true },
+        select: { name: true, streak: true, lastCompletedAt: true, frequency: true },
         take: 100,
       }),
       db.dailyCheckin.findMany({
@@ -85,7 +86,9 @@ export async function GET(request: NextRequest) {
       financeLogs: financeLogs.map(l => ({ date: l.date.toISOString(), type: l.type, category: l.category, amount: l.amount, mood: l.mood, contexto: l.contexto })),
       wellnessLogs: wellnessLogs.map(l => ({ date: l.date.toISOString(), mood: l.mood, energy: l.energy, sleep: l.sleep, stress: l.stress })),
       meditationSessions: meditationSessions.map(s => ({ duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString() })),
-      habitLogs: habitLogs.map(h => ({ name: h.name, streak: h.streak, lastCompletedAt: h.lastCompletedAt?.toISOString() || null })),
+      // G-06 FIX: life memory receives the CURRENT habit streak (stored
+      // count gated by its own lastCompletedAt), never a frozen counter.
+      habitLogs: habitLogs.map(h => ({ name: h.name, streak: currentHabitStreak(h), lastCompletedAt: h.lastCompletedAt?.toISOString() || null })),
       checkins: checkins.map(c => ({ date: c.date.toISOString(), emotion: c.emotion, energy: c.energy, focus: c.focus, stress: c.stress })),
       journalEntries: journalEntries.map(j => ({ content: j.content, mood: j.mood, createdAt: j.createdAt.toISOString() })),
     };

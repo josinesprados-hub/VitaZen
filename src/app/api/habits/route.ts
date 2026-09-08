@@ -8,6 +8,7 @@ import { evaluateAchievements } from '@/lib/achievements';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
+import { currentHabitStreak } from '@/lib/streaks';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -25,7 +26,16 @@ export async function GET(request: NextRequest) {
       take: 100,
     });
 
-    return NextResponse.json({ habits });
+    // G-06 FIX: HabitLog.streak is a stored counter that used to be frozen
+    // after inactivity (a habit not completed for weeks still reported
+    // "🔥 20"). The value returned to the UI is now the CURRENT streak:
+    // the stored count while its own lastCompletedAt says the chain is
+    // still alive (today/yesterday for daily habits, H-8 continuation
+    // windows for weekly/monthly), 0 otherwise. Derived at read time from
+    // real activity — no cron, no write-back, stored rows untouched.
+    const currentHabits = habits.map((h) => ({ ...h, streak: currentHabitStreak(h) }));
+
+    return NextResponse.json({ habits: currentHabits });
   } catch (error) {
     console.error('Habits GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -293,7 +303,8 @@ export async function PATCH(request: NextRequest) {
 
     const updated = txResult.habit;
 
-    // Track habit completion
+    // Track habit completion (stored streak — identical to the current one
+    // here: the completion just happened, so the chain is alive by design).
     trackEvent({ event: 'habit_completed', userId: user.id, properties: { habitId, streak: updated.streak } });
 
     // Auto-complete today's challenge if it matches (non-blocking)
@@ -308,7 +319,10 @@ export async function PATCH(request: NextRequest) {
     // hidden_empire_balance. Best-effort and non-fatal.
     const newlyUnlocked = await evaluateAchievements(user.id, ['habits', 'empire']);
 
-    return NextResponse.json({ habit: updated, newlyUnlocked });
+    // G-06 FIX: respond with the CURRENT streak (alive by construction
+    // here — the completion just happened — so identical to the stored
+    // one; gated for uniformity with every other habit response).
+    return NextResponse.json({ habit: { ...updated, streak: currentHabitStreak(updated) }, newlyUnlocked });
   } catch (error) {
     console.error('Habits PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -365,7 +379,10 @@ export async function PUT(request: NextRequest) {
       data,
     });
 
-    return NextResponse.json({ habit: updated });
+    // G-06 FIX: same current-streak gating as GET/PATCH — after a
+    // frequency change the stored streak is 0 (H-9), and any other edit
+    // keeps the value consistent with what GET will return.
+    return NextResponse.json({ habit: { ...updated, streak: currentHabitStreak(updated) } });
   } catch (error) {
     console.error('Habits PUT error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

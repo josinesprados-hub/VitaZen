@@ -83,10 +83,26 @@ export function startOfMadridDay(dateKey: string): Date {
 /**
  * Compute the UTC instant of midnight in Madrid for the start
  * and end of a given Madrid calendar day.
+ *
+ * G-06 FIX: `end` is now the TRUE next Madrid midnight instead of
+ * `start + 24h`. On DST transition days a Madrid calendar day is not
+ * 24 hours long:
+ *   - Spring (23-hour day, e.g. 2025-03-30): start+24h landed at
+ *     01:00 Madrid of the NEXT day, so `lt: end` windows leaked the
+ *     first hour of the following day.
+ *   - Autumn (25-hour day, e.g. 2025-10-26): start+24h landed at
+ *     23:00 Madrid of the SAME day, so `lt: end` windows dropped the
+ *     last hour of the day (23:00–24:00).
+ * Computing `end` as startOfMadridDay(next date key) is exact for both
+ * transitions (and for normal days it equals start+24h). The next date
+ * key is derived with addDaysToDateKey (noon-UTC technique, DST-safe),
+ * and startOfMadridDay picks the correct UTC instant via candidate
+ * verification — so the pair (start, end) always spans exactly the
+ * Madrid calendar day, whatever its length.
  */
 export function madridDayBoundaries(dateKey: string): { start: Date; end: Date } {
   const start = startOfMadridDay(dateKey);
-  return { start, end: new Date(start.getTime() + MS_PER_DAY) };
+  return { start, end: startOfMadridDay(addDaysToDateKey(dateKey, 1)) };
 }
 
 /**

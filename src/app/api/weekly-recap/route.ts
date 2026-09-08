@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { generateWeeklyInsights, gatherData, type WeeklySummary, type WeeklyComparison, type Insight } from '@/lib/insights';
 import { getEmotionalState, type EmotionalState } from '@/lib/emotional-state';
 import { trackEvent } from '@/lib/analytics-server';
+import { currentHabitStreak } from '@/lib/streaks';
 
 // ═══════════════════════════════════════════
 // WEEKLY RECAP API
@@ -205,8 +206,16 @@ async function getTopHabits(userId: string): Promise<{ name: string; streak: num
   const habits = await db.habitLog.findMany({
     where: { userId, streak: { gt: 0 } },
     orderBy: { streak: 'desc' },
-    take: 3,
-    select: { name: true, streak: true },
+    take: 25, // fetch pool: gating may retire frozen chains, then top 3 are kept
+    select: { name: true, streak: true, lastCompletedAt: true, frequency: true },
   });
-  return habits;
+  // G-06 FIX: report the CURRENT streak (stored count gated by the habit's
+  // own lastCompletedAt) — a habit abandoned 3 weeks ago no longer appears
+  // in the recap with its frozen count.
+  return habits
+    .map((h) => ({ name: h.name, currentStreak: currentHabitStreak(h) }))
+    .filter((h) => h.currentStreak > 0)
+    .sort((a, b) => b.currentStreak - a.currentStreak)
+    .slice(0, 3)
+    .map((h) => ({ name: h.name, streak: h.currentStreak }));
 }

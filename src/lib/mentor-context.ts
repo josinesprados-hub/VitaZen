@@ -1,5 +1,6 @@
 import { db } from './db';
 import { getMadridDateKey, getTodayDateKey } from './deterministic';
+import { currentHabitStreak, gateEmpireStreak } from './streaks';
 import { getEmotionalState } from './emotional-state';
 import type { RawData } from './insights';
 import { detectPatterns } from './patterns/detector';
@@ -162,11 +163,11 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   // Run all queries in parallel for performance
   const [
     recentCheckins,
-    habitStreaks,
+    habitStreakRows,
     recentMeditations,
     recentJournals,
     recentThreads,
-    empireProgress,
+    empireProgressRows,
     weeklyMeditations,
     weeklyJournals,
     weeklyCheckins,
@@ -182,6 +183,14 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     prevWeekMeditations,
     prevWeekJournals,
     prevWeekNutritionLogs,
+    // G-06 FIX: last real activity per empire event source (used to gate
+    // the stored empire streaks so the Mentor never quotes a frozen chain
+    // as the current one). PREMIUM only — empireProgress is PREMIUM only.
+    lastMeditation,
+    lastFinance,
+    lastWellness,
+    lastNutrition,
+    lastHabitCompletion,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -191,10 +200,13 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     }),
 
     // Active habits with streaks: FREE gets 4, PREMIUM gets 8
+    // G-06 FIX: fetch a pool (25) and gate by lastCompletedAt afterwards —
+    // frozen chains from abandoned habits must not occupy the slots or be
+    // quoted as current streaks in the Mentor prompt.
     db.habitLog.findMany({
       where: { userId, streak: { gt: 0 } },
       orderBy: { streak: 'desc' },
-      take: isPremium ? 8 : 4,
+      take: 25,
     }),
 
     // Meditation sessions: FREE gets 1, PREMIUM gets 5
@@ -327,7 +339,52 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     isPremium
       ? db.nutritionLog.findMany({ where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { date: true } })
       : Promise.resolve([] as { date: Date }[]),
+
+    // ─── G-06 FIX: latest real activity per empire event source ───
+    // Same day definitions the streak write paths use: mente = completedAt
+    // (server), riqueza = createdAt (server, F-4/G-03), energia = log date
+    // (E-3/G-02), disciplina = any habit's lastCompletedAt.
+    isPremium
+      ? db.meditationSession.findFirst({ where: { userId }, orderBy: { completedAt: 'desc' }, select: { completedAt: true } })
+      : Promise.resolve(null),
+    isPremium
+      ? db.financeLog.findFirst({ where: { userId }, orderBy: { createdAt: 'desc' }, select: { createdAt: true } })
+      : Promise.resolve(null),
+    isPremium
+      ? db.wellnessLog.findFirst({ where: { userId }, orderBy: { date: 'desc' }, select: { date: true } })
+      : Promise.resolve(null),
+    isPremium
+      ? db.nutritionLog.findFirst({ where: { userId }, orderBy: { date: 'desc' }, select: { date: true } })
+      : Promise.resolve(null),
+    isPremium
+      ? db.habitLog.findFirst({ where: { userId, lastCompletedAt: { not: null } }, orderBy: { lastCompletedAt: 'desc' }, select: { lastCompletedAt: true } })
+      : Promise.resolve(null),
   ]);
+
+  // ─── G-06 FIX: derive CURRENT streaks from real activity ───
+  // Habits: stored counter gated by its own lastCompletedAt (today/
+  // yesterday for daily, H-8 windows for weekly/monthly).
+  const habitStreaks = habitStreakRows
+    .map((h) => ({ ...h, streak: currentHabitStreak(h) }))
+    .filter((h) => h.streak > 0)
+    .sort((a, b) => b.streak - a.streak)
+    .slice(0, isPremium ? 8 : 4);
+
+  // Empires: stored counter gated by each empire's last real activity.
+  const energiaCandidates = [lastWellness?.date, lastNutrition?.date]
+    .filter((d): d is Date => d instanceof Date)
+    .map((d) => d.getTime());
+  const lastActivityByEmpire: Record<string, Date | null> = {
+    disciplina: lastHabitCompletion?.lastCompletedAt ?? null,
+    mente: lastMeditation?.completedAt ?? null,
+    riqueza: lastFinance?.createdAt ?? null,
+    energia: energiaCandidates.length > 0 ? new Date(Math.max(...energiaCandidates)) : null,
+    crecimiento: null, // no streak write path exists — always 0
+  };
+  const empireProgress = empireProgressRows.map((e) => ({
+    ...e,
+    streak: gateEmpireStreak(e.streak, lastActivityByEmpire[e.empire] ?? null),
+  }));
 
   // Derive counts from date arrays (for weeklyActivity display)
   const weeklyMeditationCount = weeklyMeditations.length;
@@ -435,6 +492,14 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
         prevWeekFinance: [],
         empireProgress: [],
         totalActiveHabits: 0,
+        // Not used by getEmotionalState — satisfies the RawData contract
+        // (the empire last-activity fields only matter for streak gating,
+        // which buildMentorContext already applied to ctx.empireProgress).
+        lastMeditation: null,
+        lastFinance: null,
+        lastWellness: null,
+        lastNutrition: null,
+        lastHabitCompletion: null,
       };
 
       const es = await getEmotionalState(userId, plan, rawDataForEmotionalState);
@@ -532,7 +597,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
         }),
         db.habitLog.findMany({
           where: { userId },
-          select: { name: true, streak: true, lastCompletedAt: true },
+          select: { name: true, streak: true, lastCompletedAt: true, frequency: true },
           orderBy: { lastCompletedAt: 'desc' },
           take: 50,
         }),
@@ -563,7 +628,9 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           duration: s.duration, type: s.type, completedAt: s.completedAt.toISOString(),
         })),
         habitLogs: pHabits.map(h => ({
-          name: h.name, streak: h.streak,
+          // G-06 FIX: the cross-empire pattern data carries the CURRENT
+          // streak, not the frozen stored counter.
+          name: h.name, streak: currentHabitStreak(h),
           lastCompletedAt: h.lastCompletedAt?.toISOString() || null,
         })),
         checkins: pCheckins.map(c => ({
