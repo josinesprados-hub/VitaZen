@@ -66,7 +66,7 @@ export default function DisciplinaPage() {
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null);
   const [showReward, setShowReward] = useState(false);
   const [actionError, setActionError] = useState('');
-  const [undoState, setUndoState] = useState<{ habitId: string; previousLastCompletedAt: string | null } | null>(null);
+  const [undoState, setUndoState] = useState<{ habitId: string } | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const justCompletedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const editDialogRef = useRef<HTMLDivElement>(null);
@@ -176,10 +176,6 @@ export default function DisciplinaPage() {
 
   const completeHabit = async (habitId: string) => {
     try {
-      // Capturar estado previo antes de la llamada (H-9 undo base)
-      const currentHabit = habits.find(h => h.id === habitId);
-      const previousLastCompletedAt = currentHabit?.lastCompletedAt ?? null;
-
       const res = await apiFetch('/api/habits', {
         method: 'PATCH',
         body: JSON.stringify({ habitId }),
@@ -192,8 +188,9 @@ export default function DisciplinaPage() {
         setShowReward(true);
         if (justCompletedTimerRef.current) clearTimeout(justCompletedTimerRef.current);
         justCompletedTimerRef.current = setTimeout(() => setJustCompletedId(null), 600);
-        // Activar opción de deshacer (H-9)
-        setUndoState({ habitId, previousLastCompletedAt });
+        // Activar opción de deshacer (H-9). G-08: el servidor ya no acepta
+        // ninguna fecha del cliente — el estado anterior lo deriva él solo.
+        setUndoState({ habitId });
         refreshChallenge(); // Completing a habit may auto-complete today's challenge
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -208,12 +205,12 @@ export default function DisciplinaPage() {
   // H-9: Deshacer la última completación
   const undoComplete = async () => {
     if (!undoState) return;
-    const { habitId, previousLastCompletedAt } = undoState;
+    const { habitId } = undoState;
     setUndoState(null); // Ocultar inmediatamente
     try {
       const res = await apiFetch('/api/habits/undo', {
         method: 'POST',
-        body: JSON.stringify({ habitId, previousLastCompletedAt }),
+        body: JSON.stringify({ habitId }),
       });
       if (res.ok) {
         const data = await res.json();

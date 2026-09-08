@@ -16,8 +16,21 @@ import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
  * - El hábito debe haber sido completado en el período actual (hoy para daily,
  *   esta semana para weekly, este mes para monthly).
  * - Se decrementa la racha (streak) en 1, con floor en 0.
- * - Se restaura lastCompletedAt al valor anterior a la completación si existe;
- *   si no existe (era la primera completación), se pone a null.
+ * - G-08 FIX: el servidor NO acepta ninguna fecha del cliente para reconstruir
+ *   el estado anterior. HabitLog no conserva historial diario de completaciones,
+ *   así que la fecha previa real NO puede conocerse de forma verificable — y un
+ *   dato desconocido no se inventa (ni desde el cliente, ni por cálculo sobre el
+ *   streak). La única representación segura del estado anterior es null:
+ *   lastCompletedAt = null. Consecuencias analizadas y aceptadas:
+ *     · La presentación G-06 (currentHabitStreak) muestra 0 mientras no haya
+ *       nueva completación (isAlive(null) = false) — conservador, nunca falso.
+ *     · El próximo PATCH parte de newStreak = 1 (ancla null) — la racha previa
+ *       ya fue decrementada por este undo, así que no se pierde nada adicional.
+ *     · El streak decrementado queda como dato interno sin ancla; ningún
+ *       consumidor lo muestra desnudo (todo pasa por el gate G-06).
+ *   Body legado: "previousLastCompletedAt" se ACEPTA e IGNORA silenciosamente
+ *   (compatibilidad con clientes antiguos); ningún valor del body influye en el
+ *   resultado.
  * - G-04: se decrementa XP en 10 (floor 0) en el imperio disciplina SOLO si la
  *   completación deshecha llegó a pagar (hábito creado antes del día Madrid de
  *   la completación — espejo exacto de la condición de concesión de PATCH).
@@ -26,9 +39,7 @@ import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
  *   (familia user|disciplina|día, G-04) y SELECT FOR UPDATE para evitar
  *   condiciones de carrera.
  *
- * Body: { habitId: string, previousLastCompletedAt?: string | null }
- * - previousLastCompletedAt: valor previo que capturó el frontend antes de completar.
- *   Si no se envía o es null, se pone lastCompletedAt a null.
+ * Body: { habitId: string }  — "previousLastCompletedAt" legacy: ignorado.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -44,7 +55,18 @@ export async function POST(request: NextRequest) {
     const rl = await rateLimit(user.id, 'habits:undo', RATE_LIMITS['habits:undo']);
     if (rl.limited) return rateLimitedResponse(rl);
 
-    const { habitId, previousLastCompletedAt } = await request.json();
+    // G-08 FIX: defensive body parsing — a malformed/non-JSON body is user
+    // input, never an internal error (no 500 from request.json()).
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Cuerpo de la petición inválido' }, { status: 400 });
+    }
+    const { habitId } = body as { habitId?: unknown };
+    if (typeof habitId !== 'string' || habitId.length === 0) {
+      return NextResponse.json({ error: 'habitId es requerido' }, { status: 400 });
+    }
+    // "previousLastCompletedAt" is deliberately NOT read: the client cannot
+    // dictate the prior state (G-08). Any value in the body is ignored.
 
     const txResult = await db.$transaction(async (tx) => {
       // G-04 FIX: same advisory-lock family as PATCH/DELETE (CERT-1/F-4/G-03
@@ -92,10 +114,15 @@ export async function POST(request: NextRequest) {
       // Calcular nueva racha: decrementar en 1, floor 0
       const newStreak = Math.max(0, habit.streak - 1);
 
-      // Restaurar lastCompletedAt
-      const restoredLastCompletedAt = previousLastCompletedAt
-        ? new Date(previousLastCompletedAt)
-        : null;
+      // G-08 FIX: the previous anchor CANNOT be reconstructed from the DB
+      // (HabitLog keeps no per-day completion history) and the client is no
+      // longer trusted to supply it. "Dato desconocido > dato inventado": the
+      // only safe representation of the pre-undo state is null. Consequences
+      // are bounded and analyzed in the endpoint doc comment: the G-06 gate
+      // presents 0 until the next real completion, and the next PATCH starts
+      // a fresh chain (newStreak = 1) — the previous streak was already
+      // decremented here, so nothing additional is lost.
+      const restoredLastCompletedAt = null;
 
       const updated = await tx.habitLog.update({
         where: { id: habitId },
