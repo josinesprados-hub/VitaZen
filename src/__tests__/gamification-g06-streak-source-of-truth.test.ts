@@ -647,10 +647,12 @@ describe('G-06 — habit write paths keep streak coherence under concurrency (G-
     const r2 = await PATCH(makeRequest('/api/habits', 'PATCH', { habitId: 'habit-1' }) as any);
     expect(r2.status).toBe(400);
 
-    // One advisory lock per completion request; empire streak incremented once.
+    // One advisory lock per completion request; empire streak modified once.
+    // G-07 FIX: first completion with no yesterday activity (mocked) → the
+    // global streak is explicitly SET to 1 (was: blind { increment: 1 }).
     expect(lockCalls()).toHaveLength(2);
     expect(H.empireProgressUpsert).toHaveBeenCalledTimes(1);
-    expect((H.empireProgressUpsert.mock.calls[0][0].update as any).streak).toEqual({ increment: 1 });
+    expect((H.empireProgressUpsert.mock.calls[0][0].update as any).streak).toEqual(1);
   });
 
   it('18. undo decrements habit + empire streak and answers with the CURRENT streak', async () => {
@@ -704,7 +706,8 @@ describe('G-06 — habit write paths keep streak coherence under concurrency (G-
     expect(res.status).toBe(200);
 
     expect(xpIncrements()).toEqual([0]); // anti-farming gate intact
-    expect((H.empireProgressUpsert.mock.calls[0][0].update as any).streak).toEqual({ increment: 1 });
+    // G-07 FIX: no yesterday activity (mocked) → explicit set to 1.
+    expect((H.empireProgressUpsert.mock.calls[0][0].update as any).streak).toEqual(1);
   });
 });
 

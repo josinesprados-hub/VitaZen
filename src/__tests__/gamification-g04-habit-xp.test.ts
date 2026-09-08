@@ -279,7 +279,7 @@ describe('G-04 — PATCH /api/habits pays +10 XP only for habits created before 
     H.MOCK_TX.habitLog.findFirst.mockResolvedValue(null); // first completion of the day
   });
 
-  it('3. old habit (created 2 days ago), first completion → +10 XP and streak +1 (legitimate economy unchanged)', async () => {
+  it('3. old habit (created 2 days ago), first completion → +10 XP; global streak STARTS at 1 (no yesterday activity in mock) (G-07 semantics)', async () => {
     const res = await completeHabit(habitRow());
     expect(res.status).toBe(200);
 
@@ -287,7 +287,9 @@ describe('G-04 — PATCH /api/habits pays +10 XP only for habits created before 
     expect(H.empireProgressUpsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { userId_empire: { userId: 'user-1', empire: 'disciplina' } },
-        update: { xp: { increment: 10 }, streak: { increment: 1 } },
+        // G-07 FIX: with no habit activity yesterday (mocked), the global
+        // streak is explicitly SET to 1 instead of blindly incrementing.
+        update: { xp: { increment: 10 }, streak: 1 },
       }),
     );
   });
@@ -305,7 +307,8 @@ describe('G-04 — PATCH /api/habits pays +10 XP only for habits created before 
     expect(H.empireProgressUpsert).toHaveBeenCalledTimes(1);
     const call = H.empireProgressUpsert.mock.calls[0][0];
     expect(call.update.xp).toEqual({ increment: 0 });
-    expect(call.update).toEqual({ xp: { increment: 0 }, streak: { increment: 1 } });
+    // G-07 FIX: no yesterday activity (mocked) → explicit set to 1.
+    expect(call.update).toEqual({ xp: { increment: 0 }, streak: 1 });
   });
 
   it('5. completions on 5 different days → +10 each (+50 total), and deleting the habit keeps all of it (CASE 3, mandate 3)', async () => {

@@ -7,7 +7,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onHabitChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-import { madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
+import { madridDayBoundaries, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
 import { currentHabitStreak } from '@/lib/streaks';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -264,6 +264,54 @@ export async function PATCH(request: NextRequest) {
       });
       const isFirstCompletionToday = !otherCompletedToday;
 
+      // ─── G-07 FIX (residual): continuity of the GLOBAL disciplina streak ───
+      // The stored EmpireProgress.streak used to be increment-only: after a
+      // gap day the next first-completion-of-day blindly did stored+1, so a
+      // user with streak N who skipped one day and returned read N+1 instead
+      // of 1 (the per-habit streak already reset via H-8; the global one
+      // didn't).
+      //
+      // Canonical semantics: the global disciplina streak counts consecutive
+      // Madrid days ending today with >=1 habit completion. Only the FIRST
+      // completion of the day (isFirstCompletionToday, decided above under
+      // the advisory lock) may modify it, and the modification depends on
+      // REAL activity — never on the stored counter itself:
+      //
+      //   - some habit was completed YESTERDAY (Madrid)  → stored + 1
+      //     (atomic increment, same as before)
+      //   - yesterday had NO completion                  → 1 (explicit set)
+      //
+      // The continuity check queries actual HabitLog rows (any habit,
+      // including the one being completed) inside [start of yesterday,
+      // start of today) — the same Europe/Madrid boundaries used everywhere
+      // since H-11/G-06 (DST-safe: startOfMadridDay + addDaysToDateKey, never
+      // start+24h). It runs INSIDE the advisory-locked transaction, so two
+      // different habits completing simultaneously cannot both act on it:
+      // the second sees otherCompletedToday and skips this branch entirely.
+      // Known data-model limitation (pre-existing): a habit deleted after
+      // being completed yesterday takes its completion evidence with it, so
+      // yesterday may look empty; the delete path has the same blindness.
+      //
+      // XP is untouched by this decision (G-04 paying-completion gate below
+      // is independent of the streak branch).
+      let empireStreakUpdate: Record<string, unknown> = {};
+      if (isFirstCompletionToday) {
+        const yesterdayKey = addDaysToDateKey(todayDateKey, -1);
+        const anyCompletionYesterday = await tx.habitLog.findFirst({
+          where: {
+            userId: user.id,
+            lastCompletedAt: {
+              gte: startOfMadridDay(yesterdayKey),
+              lt: todayStart,
+            },
+          },
+          select: { id: true },
+        });
+        empireStreakUpdate = anyCompletionYesterday
+          ? { streak: { increment: 1 } }
+          : { streak: 1 };
+      }
+
       // G-04 FIX: the +10 XP pays only when the habit was created BEFORE the
       // completion's Madrid day. A habit created today and completed today is
       // the engine of the create→complete→delete farming cycle: deleting the
@@ -285,7 +333,7 @@ export async function PATCH(request: NextRequest) {
         where: { userId_empire: { userId: user.id, empire: 'disciplina' } },
         update: {
           xp: { increment: isPayingCompletion ? 10 : 0 },
-          ...(isFirstCompletionToday ? { streak: { increment: 1 } } : {}),
+          ...empireStreakUpdate,
         },
         create: {
           userId: user.id,
