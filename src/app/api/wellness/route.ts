@@ -127,10 +127,18 @@ export async function POST(request: NextRequest) {
     // Fix: acquire a transaction-scoped advisory lock keyed on (userId, today)
     // BEFORE reading or writing. Then check if ANY energia log (wellness OR
     // nutrition) already exists for today. Only increment streak if none
-    // exists. XP still increments per log (wellness +10, nutrition +10).
-    // The advisory lock serializes concurrent wellness POSTs, concurrent
-    // nutrition POSTs, AND cross-type races (wellness POST racing with
-    // nutrition POST) — all share the same (userId, today) key.
+    // exists. The advisory lock serializes concurrent wellness POSTs,
+    // concurrent nutrition POSTs, AND cross-type races (wellness POST racing
+    // with nutrition POST) — all share the same (userId, today) key.
+    //
+    // F-2 FIX: XP is now ALSO a once-per-Madrid-day reward, gated by the SAME
+    // isFirstEnergiaLogToday flag that drives the streak. `@@unique([userId,
+    // date])` is an instant-based key, so a manipulated client could send two
+    // different timestamps of the SAME Madrid day, create two rows, and farm
+    // +10 XP twice. Now the first energia log of the day awards +10 XP and
+    // every later log of the same day (wellness OR nutrition) awards +0 XP —
+    // the exact G-03 finance/meditation pattern. Rows are still always saved
+    // (history, stats, achievements); only the XP payout is day-gated.
     //
     // The date stored is the Madrid date key provided by the client (frontend
     // sends getTodayDateKey()). We compute the Madrid day window from the LOG's
@@ -164,10 +172,13 @@ export async function POST(request: NextRequest) {
         create: { userId: user.id, date: logDate, mood, energy, sleep, stress, notes: safeNotes },
       });
 
-      // Award XP and streak to energia empire only on first creation (not on
-      // updates). The streak is only incremented if no OTHER energia log
-      // (wellness OR nutrition) exists for today — so the first log of either
-      // type triggers the streak, and the second type only adds XP.
+      // F-2 FIX: award XP and streak to the energia empire only on first
+      // creation (not on updates), and ONLY for the FIRST energia log
+      // (wellness OR nutrition) of this Madrid natural day. The day identity
+      // comes from the log's Madrid date key (G-02-validated), never from the
+      // raw instant. The same isFirstEnergiaLogToday flag that drives the
+      // streak drives XP, computed cross-module inside the advisory-locked
+      // transaction — so no sequence of timestamps can exceed +10 XP/day.
       if (!existing) {
         const otherEnergiaLogToday = await tx.wellnessLog.findFirst({
           where: {
@@ -189,10 +200,18 @@ export async function POST(request: NextRequest) {
         await tx.empireProgress.upsert({
           where: { userId_empire: { userId: user.id, empire: 'energia' } },
           update: {
-            xp: { increment: 10 },
+            xp: { increment: isFirstEnergiaLogToday ? 10 : 0 },
             ...(isFirstEnergiaLogToday ? { streak: { increment: 1 } } : {}),
           },
-          create: { userId: user.id, empire: 'energia', xp: 10, streak: 1 },
+          // Defensive create path: the row is normally created at signup; if
+          // it is ever missing, only a genuinely first-of-day log may seed it
+          // with the daily reward (mirrors the finance G-03 pattern).
+          create: {
+            userId: user.id,
+            empire: 'energia',
+            xp: isFirstEnergiaLogToday ? 10 : 0,
+            streak: isFirstEnergiaLogToday ? 1 : 0,
+          },
         });
       }
 
@@ -307,6 +326,16 @@ export async function DELETE(request: NextRequest) {
     //
     // The whole operation (delete + XP/streak revert) runs inside a transaction
     // so partial failures cannot leave inconsistent state (E-2).
+    //
+    // F-2 FIX: XP revert is now day-coherent with the award. Since XP is a
+    // once-per-Madrid-day reward, deleting a repeat log that never awarded XP
+    // must NOT remove 10 XP. The day's +10 is reverted only when this delete
+    // leaves the log's Madrid day (the same day definition the award uses)
+    // with NO other energia log (wellness OR nutrition) — mirroring the
+    // finance G-03 DELETE pattern. The streak keeps its existing semantics:
+    // decremented only when the deleted log belongs to today (Madrid) and the
+    // day is now empty of energia logs. (No advisory lock here by design —
+    // DELETE locking is tracked separately as F-5, out of scope.)
     const todayDateKey = getTodayDateKey();
     await db.$transaction(async (tx) => {
       await tx.wellnessLog.delete({ where: { id: logId } });
@@ -316,35 +345,36 @@ export async function DELETE(request: NextRequest) {
       });
       if (!energiaProgress) return;
 
-      // Determine whether the deleted log was for today (Madrid) and, if so,
-      // whether any other energia log (wellness OR nutrition) still exists for
-      // today.
-      let decrementStreak = false;
+      // Determine the deleted log's Madrid natural day and check whether any
+      // other energia log (wellness OR nutrition) still exists for that day.
       const logDateKey = getMadridDateKey(log.date);
-      if (logDateKey === todayDateKey) {
-        const { start, end } = madridDayBoundaries(todayDateKey);
-        const otherWellnessToday = await tx.wellnessLog.findFirst({
-          where: {
-            userId: user.id,
-            id: { not: logId },
-            date: { gte: start, lt: end },
-          },
-          select: { id: true },
-        });
-        const otherNutritionToday = !otherWellnessToday ? await tx.nutritionLog.findFirst({
-          where: {
-            userId: user.id,
-            date: { gte: start, lt: end },
-          },
-          select: { id: true },
-        }) : null;
-        decrementStreak = !otherWellnessToday && !otherNutritionToday;
-      }
+      const { start: dayStart, end: dayEnd } = madridDayBoundaries(logDateKey);
+      const otherWellnessSameDay = await tx.wellnessLog.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: logId },
+          date: { gte: dayStart, lt: dayEnd },
+        },
+        select: { id: true },
+      });
+      const otherNutritionSameDay = !otherWellnessSameDay ? await tx.nutritionLog.findFirst({
+        where: {
+          userId: user.id,
+          date: { gte: dayStart, lt: dayEnd },
+        },
+        select: { id: true },
+      }) : null;
+      const dayNowEmpty = !otherWellnessSameDay && !otherNutritionSameDay;
+
+      // F-2: revert the day's +10 only if the day is now empty; the streak is
+      // only touched when the deleted log was today's AND the day is empty.
+      const revertXp = dayNowEmpty;
+      const decrementStreak = dayNowEmpty && logDateKey === todayDateKey;
 
       await tx.empireProgress.update({
         where: { userId_empire: { userId: user.id, empire: 'energia' } },
         data: {
-          xp: Math.max(0, energiaProgress.xp - 10),
+          xp: Math.max(0, energiaProgress.xp - (revertXp ? 10 : 0)),
           ...(decrementStreak ? { streak: Math.max(0, energiaProgress.streak - 1) } : {}),
         },
       });

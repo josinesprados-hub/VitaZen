@@ -17,7 +17,7 @@ import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { formatCurrency } from '@/lib/utils';
 import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
-import { getTodayDateKey, getMadridMonthRange, getCurrentMonthKey, safeFormatDateShort } from '@/lib/dates';
+import { getTodayDateKey, getMadridDateKey, getMadridMonthRange, getCurrentMonthKey, safeFormatDateShort } from '@/lib/dates';
 
 // ═══════════════════════════════════════════
 // Types
@@ -977,7 +977,12 @@ export default function RiquezaPage() {
       category: log.category,
       amount: log.amount,
       description: log.description || '',
-      date: log.date.split('T')[0],
+      // F-1 FIX: `date` is stored as the UTC instant of Madrid midnight, so
+      // slicing the ISO string (`split('T')[0]`) yields the PREVIOUS UTC day
+      // and silently shifted the record one day back on every edit. The
+      // prefilled value must be the natural Europe/Madrid day of the record,
+      // derived with the canonical timezone utility (src/lib/dates.ts).
+      date: getMadridDateKey(new Date(log.date)),
       mood: log.mood || '',
       contexto: log.contexto || '',
     });
