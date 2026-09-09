@@ -82,8 +82,18 @@ export async function POST(request: NextRequest) {
     // reward already claimed" gate cannot be enforced reliably — the only
     // delete-proof economy is to not reward creation at all. The H-05 quota
     // remains as a plain anti-spam rate limit.
-    const todayStart = startOfMadridDay(getTodayDateKey());
-    const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    // N-3 FIX: the quota window is the CANONICAL Madrid civil day
+    // [start of today Madrid, start of tomorrow Madrid) from
+    // madridDayBoundaries — never start+24h. A Madrid calendar day is not
+    // always 24 hours long (2026-03-29 has 23h, 2026-10-25 has 25h), so the
+    // old fixed-duration window drifted ±1h across DST transitions: on the
+    // spring day it leaked the first hour of the NEXT day into this count,
+    // and on the autumn day it dropped the last hour of the day (creations
+    // at 23:30 Madrid were counted toward the NEXT day's quota). The
+    // canonical pair is the same DST-safe window already used by the H-10
+    // (first-completion check below), G-07 and H-12 checks in this file —
+    // and by the Retry-After computation right below.
+    const { start: todayStart, end: todayEnd } = madridDayBoundaries(getTodayDateKey());
     const habitsCreatedToday = await db.habitLog.count({
       where: {
         userId: user.id,
