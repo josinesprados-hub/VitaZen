@@ -89,21 +89,6 @@ export async function POST(request: NextRequest) {
     // day, e.g. 2026-03-29) it correctly stops at the real next midnight.
     const todayKey = getTodayDateKey();
     const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayKey);
-    const entriesToday = await db.journalEntry.count({
-      where: {
-        userId: user.id,
-        createdAt: { gte: todayStart, lt: todayEnd },
-      },
-    });
-    if (entriesToday >= 5) {
-      // Calculate seconds until midnight Madrid for Retry-After
-      const { end: dayEnd } = madridDayBoundaries(getTodayDateKey());
-      const retrySec = Math.max(1, Math.ceil((dayEnd.getTime() - Date.now()) / 1000));
-      return NextResponse.json(
-        { error: 'Has alcanzado el límite de entradas de diario por hoy (5)', retryAfter: Date.now() + retrySec * 1000 },
-        { status: 429, headers: { 'Retry-After': String(retrySec) } }
-      );
-    }
 
     // C-1 FIX: Wrap journalEntry.create + empireProgress.upsert in a
     // transaction with an advisory lock. Previously, these were two separate
@@ -119,13 +104,39 @@ export async function POST(request: NextRequest) {
     // per-day uniqueness, so there is no "first log of the day" concept).
     // This avoids collisions with checkin ('|'), energia ('|energia|'), and
     // riqueza ('|riqueza|') advisory locks.
-    const entry = await db.$transaction(async (tx) => {
+    //
+    // F-7 FIX (closes N-1 TOCTOU from the Fase 14 final audit): the
+    // daily-quota COUNT used to run BEFORE this transaction. A burst of N
+    // concurrent POSTs could all observe count < 5, then serialize
+    // one-by-one on the advisory lock and each still create an entry and pay
+    // +20 XP (up to +200 XP observed vs the intended +100/day cap). The
+    // quota decision now runs under the SAME serialization as the write:
+    //     BEGIN → advisory lock → COUNT → quota check → CREATE/XP → COMMIT
+    // The window above is computed from the canonical Madrid natural day
+    // (F-3 intact); the count that DECIDES the quota is the one executed
+    // after the lock, inside the same transaction that creates the entry, so
+    // no concurrent POST can slip between the check and the write.
+    const result = await db.$transaction(async (tx) => {
       // C-1 FIX: advisory lock serializes concurrent journal POSTs and DELETEs
       // for the same user, preventing interleave that could cause XP drift.
+      // F-7: acquired FIRST — before the quota count.
       await tx.$executeRaw`
         SELECT pg_advisory_xact_lock(
           ('x' || substring(md5(${user.id} || '|crecimiento'), 1, 16))::bit(64)::bigint
         )`;
+
+      // F-7: quota recount INSIDE the transaction, AFTER the advisory lock.
+      const entriesToday = await tx.journalEntry.count({
+        where: {
+          userId: user.id,
+          createdAt: { gte: todayStart, lt: todayEnd },
+        },
+      });
+      if (entriesToday >= 5) {
+        // Quota exhausted under serialization: no entry, no XP, and no
+        // achievements/side effects (the 429 is built outside the tx).
+        return { quotaExceeded: true as const };
+      }
 
       const created = await tx.journalEntry.create({
         data: { userId: user.id, title: safeTitle, content: safeContent, mood, gratitude: safeGratitude },
@@ -138,8 +149,20 @@ export async function POST(request: NextRequest) {
         create: { userId: user.id, empire: 'crecimiento', xp: 20 },
       });
 
-      return created;
+      return { quotaExceeded: false as const, entry: created };
     });
+
+    if (result.quotaExceeded) {
+      // Calculate seconds until midnight Madrid for Retry-After
+      const { end: dayEnd } = madridDayBoundaries(getTodayDateKey());
+      const retrySec = Math.max(1, Math.ceil((dayEnd.getTime() - Date.now()) / 1000));
+      return NextResponse.json(
+        { error: 'Has alcanzado el límite de entradas de diario por hoy (5)', retryAfter: Date.now() + retrySec * 1000 },
+        { status: 429, headers: { 'Retry-After': String(retrySec) } }
+      );
+    }
+
+    const entry = result.entry;
 
     // Auto-complete today's challenge if it matches (non-blocking)
     tryAutoCompleteChallenge(user.id, 'journal').catch(() => {});

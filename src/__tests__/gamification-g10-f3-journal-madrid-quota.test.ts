@@ -26,7 +26,9 @@
  * Test strategy (same conventions as gamification-g03/g09):
  * - Route-level tests mock @/lib/db, @/lib/auth, @/lib/rate-limit and the
  *   fire-and-forget side effects; the quota COUNT window passed to Prisma
- *   is captured and asserted.
+ *   is captured and asserted. Since F-7 the count runs INSIDE the
+ *   transaction (after the advisory lock), so it is mocked/captured on the
+ *   transaction client — the asserted window/XP semantics are unchanged.
  * - getTodayDateKey is mocked (mutable state) at BOTH specifier paths
  *   (@/lib/dates and @/lib/deterministic) — the relative re-export inside
  *   deterministic.ts must not bypass the mock. getMadridDateKey,
@@ -61,6 +63,9 @@ const H = vi.hoisted(() => {
   const MOCK_TX = {
     $executeRaw: vi.fn().mockResolvedValue(1),
     journalEntry: {
+      // F-7: the quota count runs inside the transaction (after the advisory
+      // lock) — each test pins the number of entries "already" today.
+      count: vi.fn().mockResolvedValue(0),
       create: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
         id: 'je-1',
         ...data,
@@ -74,7 +79,8 @@ const H = vi.hoisted(() => {
   const MOCK_DB = {
     $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(MOCK_TX)),
     journalEntry: {
-      // Quota count — each test pins the number of entries "already" today.
+      // No longer used by POST (F-7 moved the quota count into the tx);
+      // kept so a regression back to a pre-transaction count is visible.
       count: vi.fn().mockResolvedValue(0),
     },
   };
@@ -161,7 +167,8 @@ interface CapturedCountArg {
 
 /** The quota window the route passed to the Prisma count, as ISO strings + span in hours. */
 function capturedWindow(): { gte: string; lt: string; spanHours: number } {
-  const calls = H.MOCK_DB.journalEntry.count.mock.calls as unknown as [CapturedCountArg][];
+  // F-7: the deciding count is the one inside the transaction.
+  const calls = H.MOCK_TX.journalEntry.count.mock.calls as unknown as [CapturedCountArg][];
   expect(calls.length).toBeGreaterThan(0);
   const { where } = calls[calls.length - 1][0];
   const gte = where.createdAt.gte.toISOString();
@@ -201,7 +208,8 @@ describe('F-3 — la cuota de Journal usa el día natural Europe/Madrid', () => 
     vi.clearAllMocks();
     H.state.todayKey = DAY_AUTUMN;
     H.MOCK_DB.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(H.MOCK_TX));
-    H.MOCK_DB.journalEntry.count.mockResolvedValue(0);
+    H.MOCK_TX.journalEntry.count.mockResolvedValue(0);
+    H.MOCK_DB.journalEntry.count.mockClear();
     H.getAuthUserBasicMock.mockResolvedValue({ id: 'user-1', plan: 'free', firebaseUid: 'fb-1', email: 'user@test.com' });
     H.rateLimitMock.mockResolvedValue({ limited: false });
   });
@@ -235,7 +243,7 @@ describe('F-3 — la cuota de Journal usa el día natural Europe/Madrid', () => 
     expect(getMadridDateKey(t)).toBe(DAY_AUTUMN);
 
     // 5th entry of the day: accepted and paid.
-    H.MOCK_DB.journalEntry.count.mockResolvedValueOnce(4);
+    H.MOCK_TX.journalEntry.count.mockResolvedValueOnce(4);
     const res5 = await postEntry();
     expect(res5.status).toBe(200);
     const w = capturedWindow();
@@ -244,7 +252,7 @@ describe('F-3 — la cuota de Journal usa el día natural Europe/Madrid', () => 
     expect(xpIncrements()).toEqual([20]);
 
     // 6th entry (same Madrid day, final hour): quota rejects without XP.
-    H.MOCK_DB.journalEntry.count.mockResolvedValueOnce(5);
+    H.MOCK_TX.journalEntry.count.mockResolvedValueOnce(5);
     const res6 = await postEntry();
     expect(res6.status).toBe(429);
     expect(xpIncrements()).toEqual([20]); // unchanged — no second payout
@@ -280,7 +288,7 @@ describe('F-3 — la cuota de Journal usa el día natural Europe/Madrid', () => 
     // Day 25 exhausted (5 entries already exist) — the 429 fires even though
     // the "real clock" is irrelevant: the quota keys off the Madrid day.
     H.state.todayKey = DAY_AUTUMN;
-    H.MOCK_DB.journalEntry.count.mockResolvedValueOnce(5);
+    H.MOCK_TX.journalEntry.count.mockResolvedValueOnce(5);
     const resExhausted = await postEntry();
     expect(resExhausted.status).toBe(429);
     expect(xpIncrements()).toEqual([]);
@@ -294,7 +302,7 @@ describe('F-3 — la cuota de Journal usa el día natural Europe/Madrid', () => 
     // First entry of day 26: fresh quota, +20 XP, window starts at the exact
     // instant that closed day 25 (no gap, no overlap).
     H.state.todayKey = '2026-10-26';
-    H.MOCK_DB.journalEntry.count.mockResolvedValueOnce(0);
+    H.MOCK_TX.journalEntry.count.mockResolvedValueOnce(0);
     const res26 = await postEntry();
     expect(res26.status).toBe(200);
 
