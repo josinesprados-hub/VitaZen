@@ -318,20 +318,35 @@ export async function DELETE(request: NextRequest) {
     // with NO other energia log (wellness OR nutrition) — mirroring the
     // finance G-03 DELETE pattern. The streak keeps its existing semantics:
     // decremented only when the deleted log belongs to today (Madrid) and the
-    // day is now empty of energia logs. (No advisory lock here by design —
-    // DELETE locking is tracked separately as F-5, out of scope.)
+    // day is now empty of energia logs.
+    //
+    // F-5A FIX (concurrency): identical to the wellness DELETE — the operation
+    // runs under the SAME advisory-lock family the POSTs use
+    // ('user|energia|<logDateKey>'), keyed from the STORED row date
+    // (getMadridDateKey(log.date)), never from a client-supplied value. A
+    // nutrition DELETE of day D therefore collides with POST/DELETE wellness
+    // and POST/DELETE nutrition of the same Madrid day and serializes with
+    // them; different days never block each other. The reverts are single
+    // atomic clamped SQL statements (GREATEST(0, value - 10)) that commute
+    // with the POSTs' atomic `xp: { increment: 10 }` even across different
+    // days — no lost update, no stale absolute write, no negative XP.
     const todayDateKey = getTodayDateKey();
+    // The deleted log's Madrid natural day, derived from the REAL stored date.
+    const logDateKey = getMadridDateKey(log.date);
+
     await db.$transaction(async (tx) => {
+      // F-5A: same lock expression and key namespace as the POSTs — first
+      // statement inside the transaction, before any read or write.
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${user.id} || '|energia|' || ${logDateKey}), 1, 16))::bit(64)::bigint
+        )`;
+
       await tx.nutritionLog.delete({ where: { id: logId } });
 
-      const energiaProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'energia' } },
-      });
-      if (!energiaProgress) return;
-
-      // Determine the deleted log's Madrid natural day and check whether any
-      // other energia log (wellness OR nutrition) still exists for that day.
-      const logDateKey = getMadridDateKey(log.date);
+      // Determine whether any OTHER energia log (wellness OR nutrition) still
+      // exists for the deleted log's Madrid natural day (DST-exact window from
+      // the canonical utilities, never a fixed 24h span).
       const { start: dayStart, end: dayEnd } = madridDayBoundaries(logDateKey);
       const otherNutritionSameDay = await tx.nutritionLog.findFirst({
         where: {
@@ -350,18 +365,24 @@ export async function DELETE(request: NextRequest) {
       }) : null;
       const dayNowEmpty = !otherNutritionSameDay && !otherWellnessSameDay;
 
-      // F-2: revert the day's +10 only if the day is now empty; the streak is
-      // only touched when the deleted log was today's AND the day is empty.
+      // F-2 semantics kept: revert the day's +10 only if the day is now empty;
+      // touch the streak only when the deleted log was today's AND empty.
       const revertXp = dayNowEmpty;
       const decrementStreak = dayNowEmpty && logDateKey === todayDateKey;
 
-      await tx.empireProgress.update({
-        where: { userId_empire: { userId: user.id, empire: 'energia' } },
-        data: {
-          xp: Math.max(0, energiaProgress.xp - (revertXp ? 10 : 0)),
-          ...(decrementStreak ? { streak: Math.max(0, energiaProgress.streak - 1) } : {}),
-        },
-      });
+      // F-5A: atomic, clamped reverts (see comment above).
+      if (revertXp) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "xp" = GREATEST(0, "xp" - 10)
+          WHERE "userId" = ${user.id} AND "empire" = 'energia'`;
+      }
+      if (decrementStreak) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "streak" = GREATEST(0, "streak" - 1)
+          WHERE "userId" = ${user.id} AND "empire" = 'energia'`;
+      }
     });
 
     // Trigger widget snapshot refresh (non-blocking)

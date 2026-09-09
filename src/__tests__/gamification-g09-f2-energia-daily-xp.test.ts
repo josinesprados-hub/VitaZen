@@ -552,6 +552,33 @@ describe('F-2 — POST /api/nutrition pays +10 XP only on the first energia log 
 });
 
 // ─── F-2 — DELETE coherence (day-aware XP revert) ────────────
+// F-5A NOTE: the DELETE XP/streak reverts are now single ATOMIC clamped SQL
+// statements (GREATEST(0, value - 10)) executed via $executeRaw inside the
+// advisory lock, instead of an empireProgress.update read-modify-write with
+// absolute values. The semantics asserted here are unchanged: the day's +10
+// is reverted only when the delete leaves the Madrid day empty; the streak
+// only when that day is today. These helpers read the raw statements.
+
+interface RawCall { sql: string; params: any[] }
+
+function rawCalls(): RawCall[] {
+  return (H.MOCK_TX.$executeRaw.mock.calls as any[][]).map((c) => ({
+    sql: (c[0] as string[]).join(' '),
+    params: c.slice(1),
+  }));
+}
+
+function energiaLockCalls(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('pg_advisory_xact_lock'));
+}
+
+function energiaXpDecrementCalls(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('GREATEST(0, "xp" - 10)') && c.sql.includes("'energia'"));
+}
+
+function energiaStreakDecrementCalls(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('GREATEST(0, "streak" - 1)'));
+}
 
 describe('F-2 — DELETE /api/wellness reverts XP only when the Madrid day is left empty', () => {
   beforeEach(() => {
@@ -579,12 +606,16 @@ describe('F-2 — DELETE /api/wellness reverts XP only when the Madrid day is le
     const res = await DELETE(makeRequest('/api/wellness', 'DELETE', { logId: 'wl-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { userId_empire: { userId: 'user-1', empire: 'energia' } },
-        data: { xp: 30, streak: 2 },
-      }),
-    );
+    // F-5A: the DELETE runs under the SAME advisory lock family as the POST,
+    // keyed by the log's STORED Madrid day.
+    const locks = energiaLockCalls();
+    expect(locks).toHaveLength(1);
+    expect(`${locks[0].params[0]}|energia|${locks[0].params[1]}`).toBe('user-1|energia|2026-09-07');
+
+    // Exactly one atomic clamped -10 for energia and one streak decrement.
+    expect(energiaXpDecrementCalls()).toHaveLength(1);
+    expect(energiaXpDecrementCalls()[0].params[0]).toBe('user-1');
+    expect(energiaStreakDecrementCalls()).toHaveLength(1);
   });
 
   it('16. deleting a REPEAT log of today (another wellness exists) → XP and streak untouched', async () => {
@@ -596,13 +627,10 @@ describe('F-2 — DELETE /api/wellness reverts XP only when the Madrid day is le
     expect(res.status).toBe(200);
 
     // The repeat log never paid XP — its delete must not subtract any.
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 40 },
-      }),
-    );
-    const call = H.empireProgressUpdate.mock.calls[0][0];
-    expect(call.data).not.toHaveProperty('streak');
+    expect(energiaXpDecrementCalls()).toHaveLength(0);
+    expect(energiaStreakDecrementCalls()).toHaveLength(0);
+    // The advisory lock is still taken (serialization with POSTs/DELETEs).
+    expect(energiaLockCalls()).toHaveLength(1);
   });
 
   it('17. deleting today\u2019s wellness while a nutrition log of the same day exists → no revert (cross-module)', async () => {
@@ -613,11 +641,8 @@ describe('F-2 — DELETE /api/wellness reverts XP only when the Madrid day is le
     const res = await DELETE(makeRequest('/api/wellness', 'DELETE', { logId: 'wl-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { xp: 40 } }),
-    );
-    const call = H.empireProgressUpdate.mock.calls[0][0];
-    expect(call.data).not.toHaveProperty('streak');
+    expect(energiaXpDecrementCalls()).toHaveLength(0);
+    expect(energiaStreakDecrementCalls()).toHaveLength(0);
   });
 
   it('18. deleting yesterday\u2019s only log → XP of that day reverted, today\u2019s streak untouched', async () => {
@@ -627,13 +652,12 @@ describe('F-2 — DELETE /api/wellness reverts XP only when the Madrid day is le
     const res = await DELETE(makeRequest('/api/wellness', 'DELETE', { logId: 'wl-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 30 },
-      }),
-    );
-    const call = H.empireProgressUpdate.mock.calls[0][0];
-    expect(call.data).not.toHaveProperty('streak');
+    // The day's +10 is reverted atomically…
+    expect(energiaXpDecrementCalls()).toHaveLength(1);
+    // …but the streak belongs to TODAY, not to the deleted log's day.
+    expect(energiaStreakDecrementCalls()).toHaveLength(0);
+    const locks = energiaLockCalls();
+    expect(`${locks[0].params[0]}|energia|${locks[0].params[1]}`).toBe('user-1|energia|2026-09-06');
   });
 });
 
@@ -663,11 +687,12 @@ describe('F-2 — DELETE /api/nutrition reverts XP only when the Madrid day is l
     const res = await DELETE(makeRequest('/api/nutrition', 'DELETE', { logId: 'nl-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 30, streak: 2 },
-      }),
-    );
+    // F-5A: the nutrition DELETE uses the SAME 'user|energia|<day>' family.
+    const locks = energiaLockCalls();
+    expect(locks).toHaveLength(1);
+    expect(`${locks[0].params[0]}|energia|${locks[0].params[1]}`).toBe('user-1|energia|2026-09-07');
+    expect(energiaXpDecrementCalls()).toHaveLength(1);
+    expect(energiaStreakDecrementCalls()).toHaveLength(1);
   });
 
   it('20. deleting a REPEAT log of today (another nutrition exists) → XP and streak untouched', async () => {
@@ -678,9 +703,8 @@ describe('F-2 — DELETE /api/nutrition reverts XP only when the Madrid day is l
     const res = await DELETE(makeRequest('/api/nutrition', 'DELETE', { logId: 'nl-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { xp: 40 } }),
-    );
+    expect(energiaXpDecrementCalls()).toHaveLength(0);
+    expect(energiaStreakDecrementCalls()).toHaveLength(0);
   });
 
   it('21. deleting today\u2019s nutrition while a wellness log of the same day exists → no revert (cross-module)', async () => {
@@ -691,8 +715,7 @@ describe('F-2 — DELETE /api/nutrition reverts XP only when the Madrid day is l
     const res = await DELETE(makeRequest('/api/nutrition', 'DELETE', { logId: 'nl-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { xp: 40 } }),
-    );
+    expect(energiaXpDecrementCalls()).toHaveLength(0);
+    expect(energiaStreakDecrementCalls()).toHaveLength(0);
   });
 });

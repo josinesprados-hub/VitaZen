@@ -334,20 +334,43 @@ export async function DELETE(request: NextRequest) {
     // with NO other energia log (wellness OR nutrition) — mirroring the
     // finance G-03 DELETE pattern. The streak keeps its existing semantics:
     // decremented only when the deleted log belongs to today (Madrid) and the
-    // day is now empty of energia logs. (No advisory lock here by design —
-    // DELETE locking is tracked separately as F-5, out of scope.)
+    // day is now empty of energia logs.
+    //
+    // F-5A FIX (concurrency): the delete now runs under the SAME advisory-lock
+    // family the POST uses — 'user|energia|<logDateKey>'. The key comes from
+    // the STORED row date (getMadridDateKey(log.date)), never from any
+    // client-supplied value, so a DELETE of day D collides with every other
+    // energia mutation of day D (POST/DELETE wellness, POST/DELETE nutrition)
+    // and serializes with them; different Madrid days keep different keys and
+    // never block each other. This closes the G-10 interleavings:
+    //   DELETE+DELETE (two same-day logs) could both skip the revert or both
+    //     apply it (lost/duplicated -10), and
+    //   DELETE+POST could overwrite the +10 the POST just granted.
+    // Additionally the reverts are now SINGLE atomic clamped SQL statements
+    // (GREATEST(0, value - 10)) instead of a read-modify-write with absolute
+    // values. Inside the lock this is equivalent for same-day operations, but
+    // unlike the RMW it also COMMUTES with the POST's atomic
+    // `xp: { increment: 10 }` across different days (a backdated-log DELETE
+    // and a today-POST hold different lock keys by design): the old absolute
+    // write could resurrect a stale XP total and silently drop the POST's +10.
+    // GREATEST(0, ...) keeps both counters non-negative.
     const todayDateKey = getTodayDateKey();
+    // The deleted log's Madrid natural day, derived from the REAL stored date.
+    const logDateKey = getMadridDateKey(log.date);
+
     await db.$transaction(async (tx) => {
+      // F-5A: same lock expression and key namespace as the POST — first
+      // statement inside the transaction, before any read or write.
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${user.id} || '|energia|' || ${logDateKey}), 1, 16))::bit(64)::bigint
+        )`;
+
       await tx.wellnessLog.delete({ where: { id: logId } });
 
-      const energiaProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'energia' } },
-      });
-      if (!energiaProgress) return;
-
-      // Determine the deleted log's Madrid natural day and check whether any
-      // other energia log (wellness OR nutrition) still exists for that day.
-      const logDateKey = getMadridDateKey(log.date);
+      // Determine whether any OTHER energia log (wellness OR nutrition) still
+      // exists for the deleted log's Madrid natural day (DST-exact window from
+      // the canonical utilities, never a fixed 24h span).
       const { start: dayStart, end: dayEnd } = madridDayBoundaries(logDateKey);
       const otherWellnessSameDay = await tx.wellnessLog.findFirst({
         where: {
@@ -366,18 +389,26 @@ export async function DELETE(request: NextRequest) {
       }) : null;
       const dayNowEmpty = !otherWellnessSameDay && !otherNutritionSameDay;
 
-      // F-2: revert the day's +10 only if the day is now empty; the streak is
-      // only touched when the deleted log was today's AND the day is empty.
+      // F-2 semantics kept: revert the day's +10 only if the day is now empty;
+      // touch the streak only when the deleted log was today's AND empty.
       const revertXp = dayNowEmpty;
       const decrementStreak = dayNowEmpty && logDateKey === todayDateKey;
 
-      await tx.empireProgress.update({
-        where: { userId_empire: { userId: user.id, empire: 'energia' } },
-        data: {
-          xp: Math.max(0, energiaProgress.xp - (revertXp ? 10 : 0)),
-          ...(decrementStreak ? { streak: Math.max(0, energiaProgress.streak - 1) } : {}),
-        },
-      });
+      // F-5A: atomic, clamped reverts (see comment above). Each statement is a
+      // single row-locked UPDATE, so no stale read can overwrite a concurrent
+      // award, and the counters can never go negative.
+      if (revertXp) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "xp" = GREATEST(0, "xp" - 10)
+          WHERE "userId" = ${user.id} AND "empire" = 'energia'`;
+      }
+      if (decrementStreak) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "streak" = GREATEST(0, "streak" - 1)
+          WHERE "userId" = ${user.id} AND "empire" = 'energia'`;
+      }
     });
 
     // Trigger widget snapshot refresh (non-blocking)

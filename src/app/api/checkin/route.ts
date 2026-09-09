@@ -6,7 +6,7 @@ import { trackEvent } from '@/lib/analytics-server';
 import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onCheckinChange } from '@/lib/widgets/triggers';
-import { getTodayDateKey } from '@/lib/deterministic';
+import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { startOfTodayMadrid, startOfMadridDay, addDaysToDateKey } from '@/lib/dates';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -304,18 +304,35 @@ export async function DELETE(request: NextRequest) {
     // failures cannot leave inconsistent state. Previously, if the XP revert
     // failed after the delete succeeded, the user lost the check-in but the
     // mente empire kept the +10 XP — silent drift over time.
+    //
+    // F-5A FIX (concurrency): the DELETE now runs under the SAME advisory-lock
+    // family the POST uses — 'user|<dayKey>' (no domain namespace), keyed from
+    // the STORED row date via getMadridDateKey, never from a client-supplied
+    // value. A DELETE of day D therefore collides with the POST of day D (same
+    // key expression and namespace) and serializes with it, closing the G-10
+    // interleaving where a concurrent DELETE could overwrite the +10 the POST
+    // had just granted. Additionally, the mente XP revert is now a single
+    // atomic clamped SQL statement (GREATEST(0, xp - 10)) instead of a
+    // read-modify-write with an absolute value: it COMMUTES with the POST's
+    // atomic `xp: { increment: 10 }`, so no interleave — same day or across
+    // days — can lose an award, and the counter can never go negative.
+    const dayKey = getMadridDateKey(existing.date);
+
     await db.$transaction(async (tx) => {
+      // F-5A: same lock expression and key namespace as the POST — first
+      // statement inside the transaction, before any read or write.
+      await tx.$executeRaw`
+        SELECT pg_advisory_xact_lock(
+          ('x' || substring(md5(${user.id} || '|' || ${dayKey}), 1, 16))::bit(64)::bigint
+        )`;
+
       await tx.dailyCheckin.delete({ where: { id: checkinId } });
 
-      const menteProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'mente' } },
-      });
-      if (!menteProgress) return;
-
-      await tx.empireProgress.update({
-        where: { userId_empire: { userId: user.id, empire: 'mente' } },
-        data: { xp: Math.max(0, menteProgress.xp - 10) },
-      });
+      // F-5A: atomic, clamped XP revert (see comment above).
+      await tx.$executeRaw`
+        UPDATE "EmpireProgress"
+        SET "xp" = GREATEST(0, "xp" - 10)
+        WHERE "userId" = ${user.id} AND "empire" = 'mente'`;
     });
 
     // Trigger widget snapshot refresh (non-blocking)

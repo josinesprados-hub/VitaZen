@@ -46,7 +46,7 @@
  * addDaysToDateKey, daysBetweenDateKeys, getMadridDateKey) stays REAL.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // ─── Fixed "today" (Madrid) for deterministic tests ──────────
 
@@ -279,11 +279,25 @@ function defaultAuth() {
 }
 
 // ─── Tests 1–4: calcStreakFromKeys — the pure activity-derived streak ──
+//
+// F-5A FIX (test determinism): calcStreakFromKeys resolves "today" through
+// the REAL internal getTodayDateKey of dates.ts (a vi.mock of the exported
+// specifier cannot redirect that internal binding), so these tests were
+// accidentally coupled to the system clock: with DAY_1 hardcoded to
+// 2026-09-07 they passed only when the suite ran on 2026-09-07. The clock is
+// now pinned with Vitest fake timers faking ONLY Date (timers stay real, so
+// promises/awaits are unaffected): noon UTC of 2026-09-07 → Madrid date key
+// 2026-09-07 = DAY_1 for every run. The clock is restored after each test.
 
 describe('G-06 — calcStreakFromKeys derives the streak from real activity (Europe/Madrid)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     H.state.todayKey = DAY_1;
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-09-07T12:00:00.000Z') });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('1. three consecutive active days → streak 3 (CASE 1)', () => {
@@ -401,6 +415,11 @@ describe('G-06 — GET /api/dashboard/streaks presents only activity-true streak
   beforeEach(() => {
     vi.clearAllMocks();
     H.state.todayKey = DAY_1;
+    // F-5A FIX (test determinism): same fake clock as tests 1–4 — the streak
+    // helpers resolve "today" through the internal real getTodayDateKey, so
+    // the suite must pin the system Date to DAY_1 noon UTC instead of relying
+    // on the wall clock. Restored after each test.
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-09-07T12:00:00.000Z') });
     defaultAuth();
     H.MOCK_DB.meditationSession.findMany.mockResolvedValue([]);
     H.MOCK_DB.habitLog.findMany.mockResolvedValue([]);
@@ -450,6 +469,10 @@ describe('G-06 — GET /api/dashboard/streaks presents only activity-true streak
     expect(data.wellnessStreak).toBe(0);
     expect(data.nutritionStreak).toBe(0);
     expect(data.generalStreak).toBe(0);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 });
 
