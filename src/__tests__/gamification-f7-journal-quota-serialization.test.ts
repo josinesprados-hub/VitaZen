@@ -16,7 +16,9 @@
  *     BEGIN → advisory lock → COUNT → quota check → CREATE/XP → COMMIT
  * Window semantics are untouched (F-3 intact: canonical
  * madridDayBoundaries(todayKey)); XP is untouched (+20 per valid entry,
- * max 5/day); DELETE semantics are untouched (same lock, no quota logic).
+ * max 5/day); DELETE semantics are untouched (same lock, atomic clamped
+ * −20 revert, no quota logic — the revert mechanism was hardened to the
+ * single atomic F-5B statement by N-2).
  *
  * Test strategy (controlled concurrency, project pattern from f5a/f5b):
  * - Route-level tests mock @/lib/db, @/lib/auth, @/lib/rate-limit and the
@@ -70,8 +72,19 @@ const H = vi.hoisted(() => {
   const MOCK_TX = {
     $executeRaw: vi.fn(async (...args: unknown[]) => {
       const strings = args[0] as unknown[];
-      lockCalls.push({ sql: strings.join(''), params: args.slice(1) });
-      events.push('lock');
+      const sql = strings.join('');
+      // Capture every raw statement verbatim (locks + the N-2 atomic revert).
+      lockCalls.push({ sql, params: args.slice(1) });
+      if (sql.includes('pg_advisory_xact_lock')) {
+        events.push('lock');
+      } else if (sql.includes('GREATEST(0, "xp" - 20)')) {
+        // N-2: the DELETE revert is an atomic clamped statement — replay its
+        // exact effect on the ledger (F-5B architecture).
+        events.push('xp-revert');
+        state.xpAwarded = Math.max(0, state.xpAwarded - 20);
+      } else {
+        events.push('raw');
+      }
       return 1;
     }),
     journalEntry: {
@@ -441,7 +454,7 @@ describe('F-7 — el lock user|crecimiento sigue serializando POST↔POST y POST
     expect(H.state.xpAwarded).toBe(100);
   });
 
-  it('3. la semántica del DELETE no cambia: revert absoluto Math.max(0, xp - 20) y sin count de cuota', async () => {
+  it('3. la semántica del DELETE no cambia: revert atómico GREATEST(0, xp - 20) sobre crecimiento, sin count de cuota y sin RMW', async () => {
     H.state.entries = 3;
     H.state.xpAwarded = 60;
     H.MOCK_DB.journalEntry.findUnique.mockResolvedValue({ id: 'je-2', userId: 'user-1' });
@@ -449,11 +462,16 @@ describe('F-7 — el lock user|crecimiento sigue serializando POST↔POST y POST
     const res = await deleteEntry('je-2');
     expect(res.status).toBe(200);
 
-    // The revert write is the unchanged clamped absolute value: 60 − 20 → 40.
-    const updates = H.MOCK_TX.empireProgress.update.mock.calls as any[][];
-    expect(updates.length).toBe(1);
-    expect(updates[0][0].data.xp).toBe(40);
-    expect(H.state.xpAwarded).toBe(40);
+    // N-2: the revert is ONE atomic clamped statement on the crecimiento row
+    // (same architecture as the meditation/finance DELETE reverts) — no
+    // read-modify-write via empireProgress.update.
+    const reverts = H.lockCalls.filter((c) => c.sql.includes('GREATEST(0, "xp" - 20)'));
+    expect(reverts.length).toBe(1);
+    expect(reverts[0].sql).toContain('"EmpireProgress"');
+    expect(reverts[0].sql).toContain("'crecimiento'");
+    expect(reverts[0].params).toEqual(['user-1']);
+    expect(H.MOCK_TX.empireProgress.update).not.toHaveBeenCalled();
+    expect(H.state.xpAwarded).toBe(40); // 60 − 20, replayed with the SQL clamp
     expect(H.state.entries).toBe(2);
 
     // DELETE never consults the quota (no count in its transaction).

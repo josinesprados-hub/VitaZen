@@ -260,9 +260,9 @@ export async function DELETE(request: NextRequest) {
     if (!entry) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
     if (entry.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // C-1 FIX: Wrap journalEntry.delete + empireProgress.update in a
+    // C-1 FIX: Wrap journalEntry.delete + empireProgress revert in a
     // transaction with an advisory lock. Previously, these were two separate
-    // non-atomic writes. If the empireProgress update failed after the
+    // non-atomic writes. If the empireProgress revert failed after the
     // journalEntry delete succeeded, the entry was gone but the +20 XP stayed
     // — permanently inflated XP. Same bug class as R-3 (finance DELETE),
     // M-5 (checkin DELETE), E-2 (wellness/nutrition DELETE).
@@ -276,16 +276,25 @@ export async function DELETE(request: NextRequest) {
 
       await tx.journalEntry.delete({ where: { id: entryId } });
 
-      // Revert XP for crecimiento empire (never below 0, don't create if missing)
-      const crecimientoProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'crecimiento' } },
-      });
-      if (crecimientoProgress) {
-        await tx.empireProgress.update({
-          where: { userId_empire: { userId: user.id, empire: 'crecimiento' } },
-          data: { xp: Math.max(0, crecimientoProgress.xp - 20) },
-        });
-      }
+      // N-2 FIX: the revert is now a SINGLE atomic clamped UPDATE (the exact
+      // F-5B architecture of the meditation/finance DELETE reverts). The
+      // previous code was a read-modify-write: it read EmpireProgress.xp and
+      // wrote the computed ABSOLUTE total back. An absolute write only
+      // serializes with writers holding the SAME advisory lock, but the
+      // one-time onboarding bonus (G-01 CAS) awards its +25 to this very row
+      // via an atomic increment WITHOUT this lock family. Race (audited as
+      // N-2): DELETE reads xp=20 → onboarding commits xp=45 → DELETE writes
+      // max(0, 20-20)=0 → the +25 is silently destroyed. A single row-locked
+      // statement re-reads the LATEST committed value inside the UPDATE
+      // itself and COMMUTES with any atomic increment, so the only XP ever
+      // removed is exactly this entry's +20 — never another source's
+      // (invariant: after DELETE, xp >= XP legitimately granted elsewhere).
+      // 0 rows affected if the row is missing (same as the old null guard:
+      // no row is created).
+      await tx.$executeRaw`
+        UPDATE "EmpireProgress"
+        SET "xp" = GREATEST(0, "xp" - 20)
+        WHERE "userId" = ${user.id} AND "empire" = 'crecimiento'`;
     });
 
     // Trigger widget snapshot refresh (non-blocking)
