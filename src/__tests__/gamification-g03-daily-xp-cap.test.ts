@@ -171,6 +171,33 @@ function xpIncrements(): number[] {
   );
 }
 
+// ─── F-5B raw-statement helpers ──────────────────────────────
+
+interface RawCall { sql: string; params: any[] }
+
+function rawCalls(): RawCall[] {
+  return (H.MOCK_TX.$executeRaw.mock.calls as any[][]).map((c) => ({
+    sql: (c[0] as string[]).join(' '),
+    params: c.slice(1),
+  }));
+}
+
+function menteXpDecrements(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('GREATEST(0, "xp" - 15)') && c.sql.includes("'mente'"));
+}
+
+function menteStreakDecrements(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('GREATEST(0, "streak" - 1)') && c.sql.includes("'mente'"));
+}
+
+function riquezaXpDecrements(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('GREATEST(0, "xp" - 10)') && c.sql.includes("'riqueza'"));
+}
+
+function riquezaStreakDecrements(): RawCall[] {
+  return rawCalls().filter((c) => c.sql.includes('GREATEST(0, "streak" - 1)') && c.sql.includes("'riqueza'"));
+}
+
 // ─── G-03 — Meditation POST ──────────────────────────────────
 
 describe('G-03 — POST /api/meditation awards +15 XP only on the first session of the Madrid day', () => {
@@ -494,6 +521,10 @@ describe('G-03 — POST /api/finance awards +10 XP only on the first log of the 
 });
 
 // ─── G-03 — Meditation DELETE coherence ──────────────────────
+// F-5B note: the XP/streak reverts are now atomic clamped SQL statements
+// (GREATEST(0, value − N) on the shared mente row) instead of a
+// read-modify-write with absolute values. The day-coherent semantics these
+// tests assert are unchanged; only the write primitive differs.
 
 describe('G-03 — DELETE /api/meditation reverts the daily XP coherently', () => {
   beforeEach(() => {
@@ -502,7 +533,6 @@ describe('G-03 — DELETE /api/meditation reverts the daily XP coherently', () =
     H.MOCK_DB.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(H.MOCK_TX));
     H.getAuthUserBasicMock.mockResolvedValue({ id: 'user-1', plan: 'free', firebaseUid: 'fb-1', email: 'user@test.com' });
     H.rateLimitMock.mockResolvedValue({ limited: false });
-    H.empireProgressFindUnique.mockResolvedValue({ xp: 100, streak: 5 });
   });
 
   it('13. deleting a repeat session of today (another remains) → XP untouched', async () => {
@@ -518,13 +548,11 @@ describe('G-03 — DELETE /api/meditation reverts the daily XP coherently', () =
     expect(res.status).toBe(200);
 
     expect(H.MOCK_TX.meditationSession.delete).toHaveBeenCalledWith({ where: { id: 'sess-2' } });
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 100 }, // 100 - 0: the repeat session never awarded XP
-      }),
-    );
-    const data = H.empireProgressUpdate.mock.calls[0][0].data;
-    expect(data).not.toHaveProperty('streak');
+    // The repeat session never awarded XP → NO revert of any kind.
+    expect(H.MOCK_TX.$executeRaw).toHaveBeenCalledTimes(1); // the advisory lock only
+    expect(menteXpDecrements()).toHaveLength(0);
+    expect(menteStreakDecrements()).toHaveLength(0);
+    expect(H.empireProgressUpdate).not.toHaveBeenCalled();
   });
 
   it('14. deleting the sole session of today → −15 XP and streak −1', async () => {
@@ -539,11 +567,13 @@ describe('G-03 — DELETE /api/meditation reverts the daily XP coherently', () =
     const res = await DELETE(makeRequest('/api/meditation', 'DELETE', { sessionId: 'sess-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 85, streak: 4 }, // 100-15, 5-1
-      }),
-    );
+    // Exactly one clamped −15 and one clamped streak −1, both on 'mente'.
+    const xpDecs = menteXpDecrements();
+    expect(xpDecs).toHaveLength(1);
+    expect(xpDecs[0].sql).toContain('GREATEST(0, "xp" - 15)');
+    expect(xpDecs[0].sql).toContain("'mente'");
+    expect(menteStreakDecrements()).toHaveLength(1);
+    expect(H.empireProgressUpdate).not.toHaveBeenCalled();
   });
 
   it('15. deleting the sole session of a PAST day → −15 XP, streak untouched', async () => {
@@ -558,13 +588,10 @@ describe('G-03 — DELETE /api/meditation reverts the daily XP coherently', () =
     const res = await DELETE(makeRequest('/api/meditation', 'DELETE', { sessionId: 'sess-past' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 85 }, // streak semantics preserved: past days never decrement
-      }),
-    );
-    const data = H.empireProgressUpdate.mock.calls[0][0].data;
-    expect(data).not.toHaveProperty('streak');
+    // Streak semantics preserved: past days never decrement.
+    expect(menteXpDecrements()).toHaveLength(1);
+    expect(menteStreakDecrements()).toHaveLength(0);
+    expect(H.empireProgressUpdate).not.toHaveBeenCalled();
 
     // The "other session" check queried the PAST day's Madrid window.
     const where = H.MOCK_TX.meditationSession.findFirst.mock.calls[0][0].where;
@@ -583,12 +610,19 @@ describe('G-03 — DELETE /api/meditation reverts the daily XP coherently', () =
     const { DELETE } = await import('@/app/api/meditation/route');
     await DELETE(makeRequest('/api/meditation', 'DELETE', { sessionId: 'sess-1' }) as any);
 
-    expect(H.MOCK_TX.$executeRaw).toHaveBeenCalledTimes(1);
+    // 1 lock + 1 xp revert + 1 streak revert.
+    expect(H.MOCK_TX.$executeRaw).toHaveBeenCalledTimes(3);
+    // The FIRST statement of the transaction is the lock, with the POST's key.
+    expect(H.MOCK_TX.$executeRaw.mock.calls[0][0].join(' ')).toContain('pg_advisory_xact_lock');
     expect(H.MOCK_TX.$executeRaw.mock.calls[0][1]).toBe('user-1|2026-09-07');
   });
 });
 
 // ─── G-03 — Finance DELETE coherence ─────────────────────────
+
+// F-5B note: the finance XP/streak reverts are now atomic clamped SQL
+// statements (GREATEST(0, value − 10) on the shared riqueza row) instead of a
+// read-modify-write with absolute values. Day semantics unchanged.
 
 describe('G-03 — DELETE /api/finance reverts the daily XP coherently', () => {
   beforeEach(() => {
@@ -597,7 +631,6 @@ describe('G-03 — DELETE /api/finance reverts the daily XP coherently', () => {
     H.MOCK_DB.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(H.MOCK_TX));
     H.getAuthUserBasicMock.mockResolvedValue({ id: 'user-1', plan: 'free', firebaseUid: 'fb-1', email: 'user@test.com' });
     H.rateLimitMock.mockResolvedValue({ limited: false });
-    H.empireProgressFindUnique.mockResolvedValue({ xp: 100, streak: 5 });
   });
 
   it('17. deleting a repeat log of today (another remains) → XP untouched', async () => {
@@ -613,13 +646,11 @@ describe('G-03 — DELETE /api/finance reverts the daily XP coherently', () => {
     expect(res.status).toBe(200);
 
     expect(H.MOCK_TX.financeLog.delete).toHaveBeenCalledWith({ where: { id: 'log-2' } });
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 100 }, // 100 - 0
-      }),
-    );
-    const data = H.empireProgressUpdate.mock.calls[0][0].data;
-    expect(data).not.toHaveProperty('streak');
+    // The repeat log never awarded XP → NO revert of any kind.
+    expect(H.MOCK_TX.$executeRaw).toHaveBeenCalledTimes(1); // the advisory lock only
+    expect(riquezaXpDecrements()).toHaveLength(0);
+    expect(riquezaStreakDecrements()).toHaveLength(0);
+    expect(H.empireProgressUpdate).not.toHaveBeenCalled();
   });
 
   it('18. deleting the sole log of today → −10 XP and streak −1', async () => {
@@ -634,11 +665,13 @@ describe('G-03 — DELETE /api/finance reverts the daily XP coherently', () => {
     const res = await DELETE(makeRequest('/api/finance', 'DELETE', { logId: 'log-1' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 90, streak: 4 }, // 100-10, 5-1
-      }),
-    );
+    // Exactly one clamped −10 and one clamped streak −1, both on 'riqueza'.
+    const xpDecs = riquezaXpDecrements();
+    expect(xpDecs).toHaveLength(1);
+    expect(xpDecs[0].sql).toContain('GREATEST(0, "xp" - 10)');
+    expect(xpDecs[0].sql).toContain("'riqueza'");
+    expect(riquezaStreakDecrements()).toHaveLength(1);
+    expect(H.empireProgressUpdate).not.toHaveBeenCalled();
   });
 
   it('19. deleting the sole log of a PAST day → −10 XP, streak untouched', async () => {
@@ -653,13 +686,9 @@ describe('G-03 — DELETE /api/finance reverts the daily XP coherently', () => {
     const res = await DELETE(makeRequest('/api/finance', 'DELETE', { logId: 'log-past' }) as any);
     expect(res.status).toBe(200);
 
-    expect(H.empireProgressUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: { xp: 90 },
-      }),
-    );
-    const data = H.empireProgressUpdate.mock.calls[0][0].data;
-    expect(data).not.toHaveProperty('streak');
+    expect(riquezaXpDecrements()).toHaveLength(1);
+    expect(riquezaStreakDecrements()).toHaveLength(0);
+    expect(H.empireProgressUpdate).not.toHaveBeenCalled();
 
     // Day determination uses createdAt (server clock) mapped to Madrid.
     const where = H.MOCK_TX.financeLog.findFirst.mock.calls[0][0].where;
@@ -678,7 +707,10 @@ describe('G-03 — DELETE /api/finance reverts the daily XP coherently', () => {
     const { DELETE } = await import('@/app/api/finance/route');
     await DELETE(makeRequest('/api/finance', 'DELETE', { logId: 'log-1' }) as any);
 
-    expect(H.MOCK_TX.$executeRaw).toHaveBeenCalledTimes(1);
+    // 1 lock + 1 xp revert + 1 streak revert.
+    expect(H.MOCK_TX.$executeRaw).toHaveBeenCalledTimes(3);
+    // The FIRST statement of the transaction is the lock, with the POST's key.
+    expect(H.MOCK_TX.$executeRaw.mock.calls[0][0].join(' ')).toContain('pg_advisory_xact_lock');
     expect(H.MOCK_TX.$executeRaw.mock.calls[0][1]).toBe('user-1|riqueza|2026-09-07');
   });
 });

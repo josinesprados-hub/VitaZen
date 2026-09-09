@@ -332,6 +332,28 @@ export async function DELETE(request: NextRequest) {
     // (decrement only when today's sole log is deleted). The advisory lock
     // (same family as POST, keyed to the log's Madrid day) serializes this
     // decision against concurrent POSTs/DELETEs for the same day.
+    //
+    // F-5B FIX (concurrency): the XP/streak revert is no longer a
+    // read-modify-write with absolute values. The old code read
+    // riquezaProgress.xp inside the transaction and wrote the computed total
+    // back (`xp: max(0, xp - 10)`). That write only serializes with operations
+    // holding the SAME lock key (`user|riqueza|<logDay>`): a POST of ANOTHER
+    // day holds a different key and its atomic `xp: { increment: 10 }` could
+    // commit between this DELETE's read and write — the stale absolute write
+    // silently dropped the award it never saw (G-10 lost update, cross-day).
+    // The reverts are now SINGLE atomic clamped SQL statements
+    // (GREATEST(0, value - 10)). Inside the same-day lock this is equivalent
+    // to the old behavior, but unlike the RMW each statement is a single
+    // row-locked UPDATE that COMMUTES with the POST's atomic increment
+    // regardless of lock key — so a DELETE of day A and a POST of day B can
+    // no longer lose an update, and neither counter can ever go negative.
+    // The lock family stays `user|riqueza|<createdAtDay>`: it serializes the
+    // day-scoped DECISION (delete → "does any other log of this createdAt day
+    // remain?"), while the shared-counter write is protected by its own
+    // atomicity. The stale progress read (and its null guard) is gone: the
+    // UPDATEs are no-ops when the row does not exist. The day key still comes
+    // from the STORED createdAt (F-1): the editable `date` field is never
+    // consulted for XP semantics.
     const todayDateKey = getTodayDateKey();
     const logDateKey = getMadridDateKey(existing.createdAt);
     const { start: dayStart, end: dayEnd } = madridDayBoundaries(logDateKey);
@@ -343,11 +365,6 @@ export async function DELETE(request: NextRequest) {
         )`;
 
       await tx.financeLog.delete({ where: { id: logId } });
-
-      const riquezaProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
-      });
-      if (!riquezaProgress) return;
 
       // Does any OTHER finance log of the same Madrid day remain?
       const otherLogSameDay = await tx.financeLog.findFirst({
@@ -363,13 +380,22 @@ export async function DELETE(request: NextRequest) {
       const revertXp = dayNowEmpty;
       const decrementStreak = dayNowEmpty && logDateKey === todayDateKey;
 
-      await tx.empireProgress.update({
-        where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
-        data: {
-          xp: Math.max(0, riquezaProgress.xp - (revertXp ? 10 : 0)),
-          ...(decrementStreak ? { streak: Math.max(0, riquezaProgress.streak - 1) } : {}),
-        },
-      });
+      // F-5B: atomic, clamped reverts (see comment above). Each statement is
+      // a single row-locked UPDATE on the shared riqueza row, so no stale
+      // read can overwrite a concurrent award and the counters can never go
+      // negative.
+      if (revertXp) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "xp" = GREATEST(0, "xp" - 10)
+          WHERE "userId" = ${user.id} AND "empire" = 'riqueza'`;
+      }
+      if (decrementStreak) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "streak" = GREATEST(0, "streak" - 1)
+          WHERE "userId" = ${user.id} AND "empire" = 'riqueza'`;
+      }
     });
 
     // F-12: trigger widget refresh (non-blocking)

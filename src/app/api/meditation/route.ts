@@ -101,6 +101,28 @@ export async function DELETE(request: NextRequest) {
     // session is deleted). The advisory lock (same family as POST, keyed to
     // the session's Madrid day) serializes this decision against concurrent
     // POSTs/DELETEs for the same day.
+    //
+    // F-5B FIX (concurrency): the XP/streak revert is no longer a
+    // read-modify-write with absolute values. The old code read
+    // menteProgress.xp inside the transaction and wrote the computed total
+    // back (`xp: max(0, xp - 15)`). That write only serializes with operations
+    // holding the SAME lock key (`user|<sessionDay>`): a POST of ANOTHER day
+    // (or a check-in, which shares the global mente counter) holds a
+    // different key and its atomic `xp: { increment: N }` could commit between
+    // this DELETE's read and write — the stale absolute write silently
+    // dropped the award it never saw (G-10 lost update, cross-day).
+    // The reverts are now SINGLE atomic clamped SQL statements
+    // (GREATEST(0, value - N)). Inside the same-day lock this is equivalent
+    // to the old behavior, but unlike the RMW each statement is a single
+    // row-locked UPDATE that COMMUTES with every other atomic writer of the
+    // shared EmpireProgress(mente) row regardless of lock key — so no
+    // interleave (same day, cross-day, meditation↔check-in) can lose an
+    // award, and neither counter can ever go negative. The lock family stays
+    // `user|<madridDay>` (same key as POST and check-in): it serializes the
+    // day-scoped DECISION (delete → "does any other session of this day
+    // remain?"), while the shared-counter write is protected by its own
+    // atomicity. The stale progress read (and its null guard) is gone: the
+    // UPDATEs are no-ops when the row does not exist.
     const todayDateKey = getTodayDateKey();
     const sessionDayKey = session.completedAt
       ? getMadridDateKey(session.completedAt)
@@ -114,11 +136,6 @@ export async function DELETE(request: NextRequest) {
         )`;
 
       await tx.meditationSession.delete({ where: { id: sessionId } });
-
-      const menteProgress = await tx.empireProgress.findUnique({
-        where: { userId_empire: { userId: user.id, empire: 'mente' } },
-      });
-      if (!menteProgress) return;
 
       // Does any OTHER session of the same Madrid day remain after this delete?
       const otherSessionSameDay = await tx.meditationSession.findFirst({
@@ -134,13 +151,22 @@ export async function DELETE(request: NextRequest) {
       const revertXp = dayNowEmpty;
       const decrementStreak = dayNowEmpty && sessionDayKey === todayDateKey;
 
-      await tx.empireProgress.update({
-        where: { userId_empire: { userId: user.id, empire: 'mente' } },
-        data: {
-          xp: Math.max(0, menteProgress.xp - (revertXp ? 15 : 0)),
-          ...(decrementStreak ? { streak: Math.max(0, menteProgress.streak - 1) } : {}),
-        },
-      });
+      // F-5B: atomic, clamped reverts (see comment above). Each statement is
+      // a single row-locked UPDATE on the shared mente row, so no stale read
+      // can overwrite a concurrent award and the counters can never go
+      // negative.
+      if (revertXp) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "xp" = GREATEST(0, "xp" - 15)
+          WHERE "userId" = ${user.id} AND "empire" = 'mente'`;
+      }
+      if (decrementStreak) {
+        await tx.$executeRaw`
+          UPDATE "EmpireProgress"
+          SET "streak" = GREATEST(0, "streak" - 1)
+          WHERE "userId" = ${user.id} AND "empire" = 'mente'`;
+      }
     });
 
     // Trigger widget snapshot refresh (non-blocking)
