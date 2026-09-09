@@ -6,7 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onJournalChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-import { startOfMadridDay, madridDayBoundaries } from '@/lib/dates';
+import { madridDayBoundaries } from '@/lib/dates';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -78,10 +78,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'At least one field is required' }, { status: 400 });
     }
 
-    // H-05 FIX: Rate limit journal creation to 5 per day to prevent XP farming
+    // H-05 FIX: Rate limit journal creation to 5 per day to prevent XP farming.
+    // F-3 FIX: the quota window now uses the canonical Europe/Madrid natural
+    // day — madridDayBoundaries(todayKey).end — instead of `start + 24h`.
+    // A Madrid calendar day is NOT always 24 hours: on the autumn DST
+    // transition (25-hour day, e.g. 2026-10-25) `start + 24h` ended at
+    // 23:00 Madrid, so entries written during the final hour of that day
+    // escaped the 5/day quota and each still paid +20 XP. On normal days the
+    // canonical end equals start+24h, and on the spring transition (23-hour
+    // day, e.g. 2026-03-29) it correctly stops at the real next midnight.
     const todayKey = getTodayDateKey();
-    const todayStart = startOfMadridDay(todayKey);
-    const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const { start: todayStart, end: todayEnd } = madridDayBoundaries(todayKey);
     const entriesToday = await db.journalEntry.count({
       where: {
         userId: user.id,
