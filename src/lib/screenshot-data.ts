@@ -119,14 +119,8 @@ export const SCREENSHOT_TODAY_CHECKIN = {
 };
 
 // ─── Momentum ────────────────────────────────
-
-export const SCREENSHOT_MOMENTUM = {
-  score: 71,
-  level: 'estable',
-  description: 'Ritmo constante.',
-  trend: 'stable' as const,
-  currentStreak: 9,
-};
+// (SCREENSHOT_MOMENTUM removed in N-6: its only consumer was the orphaned
+// MomentumCard component, deleted in the same cleanup.)
 
 // ─── Emotional State ─────────────────────────
 

@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     const entry = result.entry;
 
     // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'journal').catch(() => {});
+    tryAutoCompleteChallenge(user.id, 'journal', undefined, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onJournalChange(user.id, user.plan);

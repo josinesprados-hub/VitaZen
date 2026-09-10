@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'wellness').catch(() => {});
+    tryAutoCompleteChallenge(user.id, 'wellness', undefined, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);

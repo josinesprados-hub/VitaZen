@@ -29,6 +29,14 @@
 
 import { db } from '@/lib/db';
 import { startOfTodayMadrid } from '@/lib/dates';
+// N-6: single canonical mapping now lives in a dependency-free module so
+// client widgets (challenge card) render the same empire the server pays.
+import { CHALLENGE_CATEGORY_TO_EMPIRE } from './challenge-empire';
+import { onChallengeChange } from '@/lib/widgets/triggers';
+
+// Backwards-compatible re-export: existing consumers (N-5 tests, routes)
+// import the mapping from here.
+export { CHALLENGE_CATEGORY_TO_EMPIRE } from './challenge-empire';
 
 // Which challenge categories can be auto-completed by each action
 const ACTION_CATEGORIES: Record<string, string[]> = {
@@ -40,36 +48,9 @@ const ACTION_CATEGORIES: Record<string, string[]> = {
   nutrition: ['salud'],
 };
 
-/**
- * N-5 (Opción B): challenge category → empire that receives the +25 XP.
- *
- * The real challenge categories (DailyChallenge.category, seed) are action
- * themes, not empire names, so this is the single canonical mapping. It is
- * grounded in the code, not invented:
- *
- *   disciplina   → disciplina   (name match; completed by the habit action,
- *                               whose XP source is the disciplina empire)
- *   habitos      → disciplina   (same habit action — habits ARE the
- *                               disciplina empire's event source)
- *   mentalidad   → mente        (mind category ↔ mente empire; meditation,
- *                               mente's XP source, completes it)
- *   productividad→ crecimiento  (completed by journal — the crecimiento
- *                               empire's XP source)
- *   salud        → energia      (health ↔ energia; wellness/nutrition —
- *                               energia's XP sources — complete it)
- *
- * There is no challenge category completed by a finance action, so the
- * riqueza empire never receives challenge XP. An UNKNOWN category is
- * fail-closed: the challenge is NOT completed and NO XP is granted
- * (add the category here first if a new one is ever seeded).
- */
-export const CHALLENGE_CATEGORY_TO_EMPIRE: Record<string, string> = {
-  disciplina: 'disciplina',
-  habitos: 'disciplina',
-  mentalidad: 'mente',
-  productividad: 'crecimiento',
-  salud: 'energia',
-};
+// (CHALLENGE_CATEGORY_TO_EMPIRE moved to ./challenge-empire — N-6. See the
+// full canonical-mapping rationale in that module; the re-export above
+// keeps the historical import path stable.)
 
 /**
  * Try to auto-complete today's challenge if its category matches the performed action.
@@ -79,7 +60,8 @@ export const CHALLENGE_CATEGORY_TO_EMPIRE: Record<string, string> = {
 export async function tryAutoCompleteChallenge(
   userId: string,
   action: keyof typeof ACTION_CATEGORIES,
-  habitName?: string
+  habitName?: string,
+  plan?: string
 ): Promise<void> {
   try {
     const today = startOfTodayMadrid();
@@ -160,6 +142,23 @@ export async function tryAutoCompleteChallenge(
     if (awarded) {
       const matchReason = categoryMatch ? 'category' : 'title';
       console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason}) → +25 XP to ${targetEmpire}`);
+
+      // N-6 FIX: challenge completion is a documented momentum dependency
+      // (triggers.ts: "Challenge completion → invalidate momentum") but the
+      // onChallengeChange trigger was never wired, so the OS widget snapshot
+      // kept serving the pre-completion challenge count until expiry/cron —
+      // the only unwired momentum dependency after N-5 spread challenge XP
+      // across five empires. Fire-and-forget: never blocks or fails the
+      // parent action (triggerWidgetRefresh swallows its own errors), and a
+      // failed plan lookup still fires with the plan-agnostic default.
+      try {
+        const fetchedPlan = plan
+          ? null
+          : (await db.user.findUnique({ where: { id: userId }, select: { plan: true } }).catch(() => null))?.plan;
+        onChallengeChange(userId, plan ?? fetchedPlan ?? 'FREE');
+      } catch {
+        // Non-critical: the snapshot refreshes on expiry/read regardless.
+      }
     }
   } catch (error) {
     // Never fail the parent action if auto-completion fails

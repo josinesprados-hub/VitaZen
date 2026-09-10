@@ -24,7 +24,7 @@ import {
 
 // ─── Helpers ────────────────────────────────
 
-import { deterministicIndex, getTodayDateKey, getMadridDateKey, startOf7DaysAgoMadrid, startOf14DaysAgoMadrid, calcStreakFromKeys, startOfTodayMadrid } from '@/lib/dates';
+import { deterministicIndex, getTodayDateKey, getMadridDateKey, startOf7DaysAgoMadrid, startOf14DaysAgoMadrid, startOf60DaysAgoMadrid, calcStreakFromKeys, startOfTodayMadrid } from '@/lib/dates';
 
 // ─── Reflection Widget ──────────────────────
 //
@@ -194,42 +194,48 @@ export async function shapeMomentumPayload(
   const activeDays = allRecentDates.size;
 
   // Calculate streak (simplified — look backwards from today)
+  //
+  // N-6 FIX — temporal window coherence: the streak here is the SAME metric
+  // as /api/dashboard/momentum ("Reuses the same logic", see this file's
+  // momentum header). The dashboard route bounds it to the last 60 Madrid
+  // days ("no real streak exceeds this"), but this widget used `take: 30`
+  // RECORDS per activity type — not a time window at all. A user with many
+  // actions per day exhausted the 30-record budget in a handful of days, so
+  // the widget systematically UNDERCOUNTED the streak (and its streakBonus)
+  // versus the dashboard. Both consumers now use the identical 60-day
+  // Madrid window, so the streak depends on calendar days, never on how
+  // many records happen to fit in a take limit.
+  const sixtyDaysAgo = startOf60DaysAgoMadrid();
   const [allMed, allHab, allJou, allCheck, allWell, allNut] = await Promise.all([
     db.meditationSession.findMany({
-      where: { userId },
+      where: { userId, completedAt: { gte: sixtyDaysAgo } },
       select: { completedAt: true },
       orderBy: { completedAt: 'desc' },
-      take: 30,
     }),
     db.habitLog.findMany({
-      where: { userId, lastCompletedAt: { not: null } },
+      where: { userId, lastCompletedAt: { not: null, gte: sixtyDaysAgo } },
       select: { lastCompletedAt: true },
       orderBy: { lastCompletedAt: 'desc' },
-      take: 30,
     }),
     db.journalEntry.findMany({
-      where: { userId },
+      where: { userId, createdAt: { gte: sixtyDaysAgo } },
       select: { createdAt: true },
       orderBy: { createdAt: 'desc' },
-      take: 30,
     }),
     db.dailyCheckin.findMany({
-      where: { userId },
+      where: { userId, date: { gte: sixtyDaysAgo } },
       select: { date: true },
       orderBy: { date: 'desc' },
-      take: 30,
     }),
     db.wellnessLog.findMany({
-      where: { userId },
+      where: { userId, date: { gte: sixtyDaysAgo } },
       select: { date: true },
       orderBy: { date: 'desc' },
-      take: 30,
     }),
     db.nutritionLog.findMany({
-      where: { userId },
+      where: { userId, date: { gte: sixtyDaysAgo } },
       select: { date: true },
       orderBy: { date: 'desc' },
-      take: 30,
     }),
   ]);
 

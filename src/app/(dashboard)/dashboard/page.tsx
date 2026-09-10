@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
+import { useMadridDayRefresh } from '@/hooks/useMadridDayRefresh';
 import { CheckInModal } from '@/components/checkin/CheckInModal';
 import { EmotionalHero } from '@/components/dashboard/EmotionalHero';
 import { SilentMemory } from '@/components/ui/SilentMemory';
@@ -60,6 +61,12 @@ export default function DashboardPage() {
   const [todayCheckin, setTodayCheckin] = useState<any | null>(null);
   const [showCheckinModal, setShowCheckinModal] = useState(false);
   const [emotionalRefreshKey, setEmotionalRefreshKey] = useState(0); // DASH-5: trigger EmotionalHero refetch after check-in
+  // N-6: bumped by the Madrid day watcher so the day-scoped widgets below
+  // (empire grid streaks/XP, today's check-in row) refetch at the real
+  // Madrid midnight (DST-exact) or on tab resume into a new day — instead
+  // of showing yesterday's data for as long as the page stays open.
+  const [madridDayTick, setMadridDayTick] = useState(0);
+  useMadridDayRefresh(() => setMadridDayTick(t => t + 1));
 
   const onboardingConfirmed = user?.onboardingCompleted === true;
 
@@ -171,7 +178,7 @@ export default function DashboardPage() {
       cancelled = true;
       controller.abort();
     };
-  }, [user, onboardingConfirmed, apiFetch, screenshotMode]);
+  }, [user, onboardingConfirmed, apiFetch, screenshotMode, madridDayTick]);
 
   const handleCheckinSave = useCallback(async (data: any): Promise<{ xpAwarded: number }> => {
     // DASH-7: Throw on API error so the modal shows the error state instead of

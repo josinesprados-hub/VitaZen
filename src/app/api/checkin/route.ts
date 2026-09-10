@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
     trackEvent({ event: 'checkin_created', userId: user.id, properties: { emotion, energy, focus, stress } });
 
     // Auto-complete today's challenge if it matches (non-blocking, idempotent)
-    tryAutoCompleteChallenge(user.id, 'checkin').catch(() => {});
+    tryAutoCompleteChallenge(user.id, 'checkin', undefined, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onCheckinChange(user.id, user.plan);

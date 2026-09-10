@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useDialogA11y } from '@/hooks/useDialogA11y';
+import { useMadridDayRefresh } from '@/hooks/useMadridDayRefresh';
+import { CHALLENGE_CATEGORY_TO_EMPIRE, EMPIRE_LABELS } from '@/lib/challenge-empire';
 import { useAuth } from '@/context/AuthContext';
 import { getMadridDateKey, daysBetweenDateKeys, safeFormatDate, safeFormatTime } from '@/lib/dates';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
@@ -149,6 +151,13 @@ export default function DisciplinaPage() {
       // Silent — never disrupt the parent action
     }
   }, [apiFetch]);
+
+  // N-6: the daily challenge is day-scoped — GET /api/challenges creates and
+  // returns the challenge for the Madrid day of the REQUEST. Without this,
+  // a page left open across midnight kept showing yesterday's challenge
+  // (already completed) until a full remount. Refetch on the exact Madrid
+  // midnight (DST-exact) and on tab resume into a new day.
+  useMadridDayRefresh(() => { fetchData(); });
 
   const addHabit = async () => {
     if (!newHabit.name.trim()) return;
@@ -298,6 +307,16 @@ export default function DisciplinaPage() {
     );
   }
 
+  // N-5 coherence (N-6): the challenge card must not present every reward as
+  // disciplina. The +25 XP destination is derived from the SAME canonical
+  // mapping the server pays with (challenge-empire.ts — shared source of
+  // truth). Fail-closed like the backend: an unknown category renders no
+  // badge instead of a wrong empire.
+  const rewardEmpire = challenge
+    ? CHALLENGE_CATEGORY_TO_EMPIRE[challenge.challenge.category]
+    : undefined;
+  const rewardEmpireLabel = rewardEmpire ? EMPIRE_LABELS[rewardEmpire] : null;
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
       {/* Edit Habit Overlay */}
@@ -371,6 +390,11 @@ export default function DisciplinaPage() {
           <div className="flex items-center gap-3 mb-4">
             <Trophy size={20} className="text-champagne" />
             <h2 className="text-lg font-semibold text-white">Desafío Diario</h2>
+            {rewardEmpireLabel && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-champagne/8 text-[#999] whitespace-nowrap">
+                +25 XP · {rewardEmpireLabel}
+              </span>
+            )}
             {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-champagne/15 text-champagne font-medium check-pop">Completado</span>}
           </div>
           <h3 className="text-champagne font-medium mb-1">{challenge.challenge.title}</h3>
