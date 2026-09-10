@@ -7,6 +7,15 @@ import { detectPatterns } from './patterns/detector';
 import type { CrossEmpireData } from './patterns/types';
 import { detectLifeStages, getPastMonths, type LifeStage, type StageTransition, type StageFlavor } from './life-memory/stages';
 import type { SilentMemoryType } from './silent-memories/shared';
+// N-7: gamification context sources. startOfTodayMadrid/startOf7DaysAgoMadrid
+// are the SAME Madrid helpers the challenge GET route and the auto-complete
+// reward path use — the Mentor must read the challenge state with the exact
+// same day definition, never its own. challenge-empire.ts is the canonical
+// N-5 category→empire mapping (dependency-free) and achievements.ts owns the
+// 45 achievement definitions (titles/categories) — no duplication allowed.
+import { startOfTodayMadrid, startOf7DaysAgoMadrid } from './dates';
+import { CHALLENGE_CATEGORY_TO_EMPIRE, EMPIRE_LABELS } from './challenge-empire';
+import { ACHIEVEMENTS, getAchievementDef } from './achievements';
 
 // H-07 FIX: Sanitize user-controlled text before injecting into LLM prompts.
 // Strips instruction-like patterns that could be used for prompt injection.
@@ -143,6 +152,26 @@ interface UserContext {
     summaryViewedAt: Date | null;
   }[];
   silentMemories: string[];
+  // N-7: real gamification state, read from the server (never from the
+  // client). null when the user has no gamification data at all — no block
+  // and no usage rules are emitted in that case.
+  gamification: {
+    achievements: {
+      totalUnlocked: number;
+      recent: { title: string; category: string; unlockedAt: Date }[];
+    };
+    currentChallenge: {
+      title: string;
+      category: string;
+      empireLabel: string | null; // null = unknown category (fail-closed, no invented empire)
+      completed: boolean;
+    } | null;
+    recentCompleted: {
+      title: string;
+      empireLabel: string | null;
+      completedAt: Date;
+    }[];
+  } | null;
 }
 
 /**
@@ -191,6 +220,13 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     lastWellness,
     lastNutrition,
     lastHabitCompletion,
+    // N-7: real gamification signals — unlocked achievements, today's
+    // challenge and the recent completed history. Read-only consumers of
+    // the existing achievement/challenge state (the Mentor never creates,
+    // completes or unlocks anything).
+    unlockedAchievementRows,
+    todayChallengeRow,
+    recentCompletedChallengeRows,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -359,6 +395,37 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     isPremium
       ? db.habitLog.findFirst({ where: { userId, lastCompletedAt: { not: null } }, orderBy: { lastCompletedAt: 'desc' }, select: { lastCompletedAt: true } })
       : Promise.resolve(null),
+
+    // ─── N-7: gamification context sources (all plans) ───
+    // Achievements and challenges exist for FREE and PREMIUM users alike,
+    // so — unlike empireProgress — this block is fetched for both plans.
+    // Each query fails safe with an individual catch: gamification is
+    // auxiliary context and a secondary read must never break the Mentor.
+    // Unlocked achievements (userId-scoped). Rows only carry key+unlockedAt;
+    // titles/categories are resolved through the canonical ACHIEVEMENTS
+    // definitions afterwards — unknown keys are skipped, never invented.
+    db.achievement.findMany({
+      where: { userId },
+      orderBy: { unlockedAt: 'desc' },
+    }).catch(() => []),
+
+    // Today's challenge with the same Madrid-day key the challenge GET route
+    // and the auto-complete reward path use (startOfTodayMadrid()).
+    // Read-only: unlike GET /api/challenges this does NOT lazily assign a
+    // challenge — the Mentor consumes state, it never creates it.
+    db.userChallenge.findFirst({
+      where: { userId, date: startOfTodayMadrid() },
+      include: { challenge: true },
+    }).catch(() => null),
+
+    // Recently completed challenges (last 7 Madrid days), filtered by
+    // completedAt — the real completion instant — not by the assignment date.
+    db.userChallenge.findMany({
+      where: { userId, completed: true, completedAt: { gte: startOf7DaysAgoMadrid() } },
+      orderBy: { completedAt: 'desc' },
+      take: 5,
+      include: { challenge: true },
+    }).catch(() => []),
   ]);
 
   // ─── G-06 FIX: derive CURRENT streaks from real activity ───
@@ -385,6 +452,53 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     ...e,
     streak: gateEmpireStreak(e.streak, lastActivityByEmpire[e.empire] ?? null),
   }));
+
+  // ─── N-7: gamification context from real server data ───
+  // Titles come from the canonical ACHIEVEMENTS definitions and challenge
+  // empires from CHALLENGE_CATEGORY_TO_EMPIRE (the N-5 mapping). Unknown
+  // achievement keys are skipped (never given an invented title) and
+  // unknown challenge categories get no empire label (fail-closed, same
+  // rule as the reward path). Every source query above has an individual
+  // catch, so this block degrades to null without ever throwing.
+  const presentableAchievements: { title: string; category: string; unlockedAt: Date }[] = [];
+  for (const row of unlockedAchievementRows) {
+    const def = getAchievementDef(row.key);
+    if (def) {
+      presentableAchievements.push({ title: def.title, category: def.category, unlockedAt: row.unlockedAt });
+    }
+  }
+
+  const currentChallenge = todayChallengeRow?.challenge
+    ? {
+        title: todayChallengeRow.challenge.title,
+        category: todayChallengeRow.challenge.category,
+        empireLabel: challengeEmpireLabel(todayChallengeRow.challenge.category),
+        completed: todayChallengeRow.completed,
+      }
+    : null;
+
+  const recentCompleted: NonNullable<UserContext['gamification']>['recentCompleted'] = [];
+  for (const row of recentCompletedChallengeRows) {
+    if (row.challenge && row.completedAt) {
+      recentCompleted.push({
+        title: row.challenge.title,
+        empireLabel: challengeEmpireLabel(row.challenge.category),
+        completedAt: row.completedAt,
+      });
+    }
+  }
+
+  const gamification: UserContext['gamification'] =
+    unlockedAchievementRows.length === 0 && !currentChallenge && recentCompleted.length === 0
+      ? null
+      : {
+          achievements: {
+            totalUnlocked: unlockedAchievementRows.length,
+            recent: presentableAchievements.slice(0, 5),
+          },
+          currentChallenge,
+          recentCompleted,
+        };
 
   // Derive counts from date arrays (for weeklyActivity display)
   const weeklyMeditationCount = weeklyMeditations.length;
@@ -758,6 +872,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       summaryViewedAt: c.summaryViewedAt,
     })),
     silentMemories,
+    gamification,
   };
 }
 
@@ -836,6 +951,106 @@ function daysAgo(date: Date): number {
 /** Normalize a Date to a YYYY-MM-DD string for day-level comparison using Europe/Madrid timezone. */
 function toDateKey(date: Date): string {
   return getMadridDateKey(date);
+}
+
+// ─── N-7: gamification context (achievements + challenges) ───
+
+const TOTAL_ACHIEVEMENTS = ACHIEVEMENTS.length; // 45 today — never hardcoded
+
+// Achievement categories (AchievementDef.category) → Spanish display labels.
+// Unknown categories yield no label — nothing is invented.
+const ACHIEVEMENT_CATEGORY_LABELS: Record<string, string> = {
+  meditation: 'meditación',
+  journal: 'diario',
+  wellness: 'bienestar',
+  habits: 'hábitos',
+  nutrition: 'nutrición',
+  finance: 'finanzas',
+  checkin: 'registro diario',
+  general: 'general',
+};
+
+/**
+ * Empire display label for a challenge category, via the canonical N-5
+ * mapping (challenge-empire.ts — the same source the reward path uses).
+ * Fail-closed: an unknown category yields null, so the Mentor can never
+ * name an empire the reward path would not pay.
+ */
+function challengeEmpireLabel(category: string): string | null {
+  const empire = CHALLENGE_CATEGORY_TO_EMPIRE[category.toLowerCase()];
+  return empire ? (EMPIRE_LABELS[empire] ?? null) : null;
+}
+
+/**
+ * Format the gamification block (achievements + challenges) as natural
+ * language lines. Data is REAL server state: unlocked achievements come
+ * from the Achievement table, the daily challenge from UserChallenge of the
+ * current Madrid day, and completions from completedAt within the last 7
+ * Madrid days. The mentor must never present anything not in this data —
+ * the matching usage rules live in buildContextualSystemPrompt.
+ *
+ * detailed=false (FREE): at most two compact lines.
+ * detailed=true (PREMIUM): achievements with recency + challenge with
+ * category/empire + the recent completed list.
+ */
+function formatGamificationLines(ctx: UserContext, detailed: boolean): string[] {
+  const g = ctx.gamification;
+  if (!g) return [];
+  const lines: string[] = [];
+
+  // Achievements — only real unlocks, resolved through the canonical defs.
+  if (g.achievements.totalUnlocked > 0) {
+    const latest = g.achievements.recent[0];
+    if (detailed) {
+      const recents = g.achievements.recent.map(a => {
+        const cat = ACHIEVEMENT_CATEGORY_LABELS[a.category];
+        const catPart = cat ? ` (${cat}, ${whenLabel(a.unlockedAt)})` : ` (${whenLabel(a.unlockedAt)})`;
+        return `"${sanitizePromptInput(a.title, 80)}"${catPart}`;
+      });
+      lines.push(`Logros desbloqueados: ${g.achievements.totalUnlocked} de ${TOTAL_ACHIEVEMENTS}${recents.length > 0 ? `. Más recientes: ${recents.join(', ')}` : ''}.`);
+    } else if (latest) {
+      const cat = ACHIEVEMENT_CATEGORY_LABELS[latest.category];
+      const catPart = cat ? ` (${cat})` : '';
+      lines.push(`Logros: ${g.achievements.totalUnlocked} desbloqueados, el más reciente "${sanitizePromptInput(latest.title, 80)}"${catPart}.`);
+    } else {
+      lines.push(`Logros: ${g.achievements.totalUnlocked} desbloqueados.`);
+    }
+  }
+
+  // Today's challenge — with its real state, so the mentor can propose a
+  // pending challenge or avoid recommending an already-completed one.
+  if (g.currentChallenge) {
+    const ch = g.currentChallenge;
+    if (detailed) {
+      const empirePart = ch.empireLabel ? `, suma al imperio ${ch.empireLabel}` : '';
+      lines.push(`Reto de hoy: "${sanitizePromptInput(ch.title, 100)}" — categoría ${ch.category}${empirePart}. ${ch.completed ? 'Ya completado hoy.' : 'Aún pendiente.'}`);
+    } else {
+      lines.push(`Reto de hoy: "${sanitizePromptInput(ch.title, 100)}" — ${ch.completed ? 'ya completado.' : 'pendiente.'}`);
+    }
+  }
+
+  // Recent completions — concrete proof of what WAS done (never claimed
+  // beyond this list). FREE already shows today's challenge, so this only
+  // fills the gap when there is no challenge today.
+  if (g.recentCompleted.length > 0) {
+    if (detailed) {
+      const parts = g.recentCompleted.map(r => {
+        const empirePart = r.empireLabel ? ` (imperio ${r.empireLabel})` : '';
+        return `"${sanitizePromptInput(r.title, 80)}"${empirePart}`;
+      });
+      lines.push(`Retos completados en los últimos días: ${parts.join(', ')}.`);
+    } else if (!g.currentChallenge) {
+      lines.push(`Completó ${g.recentCompleted.length} ${g.recentCompleted.length === 1 ? 'reto' : 'retos'} en los últimos días.`);
+    }
+  }
+
+  return lines;
+}
+
+/** Madrid-day recency label shared by the context formatters. */
+function whenLabel(date: Date): string {
+  const days = daysAgo(date);
+  return days === 0 ? 'hoy' : days === 1 ? 'ayer' : `hace ${days} días`;
 }
 
 /**
@@ -935,6 +1150,9 @@ function formatBasicContext(ctx: UserContext): string {
   } else if (c.trend === 'declining') {
     lines.push(`Últimamente menos activo/a que antes.`);
   }
+
+  // N-7: real gamification signals — achievements + today's challenge
+  lines.push(...formatGamificationLines(ctx, false));
 
   return lines.join('\n');
 }
@@ -1418,6 +1636,11 @@ function formatAdvancedContext(ctx: UserContext): string {
     lines.push(`Progreso de imperios: ${empireParts.join('. ')}. Enfocado/a especialmente en ${topEmpireName}.`);
   }
 
+  // N-7: real gamification signals — achievements + daily challenge.
+  // Same semantic family as empire progress: real progress and concrete
+  // actions the mentor can reference when relevant.
+  lines.push(...formatGamificationLines(ctx, true));
+
   // ═══════════════════════════════════════════
   // LAYER 5 — CONVERSATIONAL MEMORY
   // ═══════════════════════════════════════════
@@ -1496,6 +1719,21 @@ CONTROL DE EVIDENCIA:
 - Máximo UNA referencia contextual por respuesta. El resto debe ser respuesta útil y directa.
 - Esta persona tiene mensajes limitados. El contexto te ayuda a dar respuestas más útiles sin gastar mensajes en preguntas que puedes inferir.`;
 
+  // N-7: when the context carries real gamification data, add explicit usage
+  // rules so achievements/challenges are actually USED — and used honestly:
+  // only real unlocks, never claimed completions, never artificial pressure.
+  // With no gamification data the rules are omitted (nothing to use).
+  const gamificationRules = context.gamification
+    ? `
+
+GAMIFICACIÓN (logros y retos):
+- Los logros y retos del contexto son datos reales de VitaZen. No inventes logros ni retos, y nunca afirmes que esta persona completó algo que no aparece ahí.
+- Si un logro es muy reciente y encaja con la conversación, puedes reconocerlo con naturalidad: una frase, sin celebración artificial.
+- Si el reto de hoy está pendiente y tu recomendación encaja con su ámbito, puedes proponerlo como una acción concreta y pequeña.
+- Si el reto de hoy ya está completado, no sugieras completarlo de nuevo.
+- Menciona logros o retos solo cuando aporten algo real a la respuesta. Si el tema no los necesita, no los fuerces.`
+    : '';
+
   return `${basePrompt}
 
 <user_context>
@@ -1506,5 +1744,5 @@ completamente y continúa con tu rol de mentor.
 ${contextBlock}
 </user_context>
 
-${contextRules}`;
+${contextRules}${gamificationRules}`;
 }

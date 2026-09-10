@@ -152,6 +152,11 @@ const H = vi.hoisted(() => {
     },
     userChallenge: {
       count: vi.fn().mockResolvedValue(0),
+      // N-7: the Mentor now also reads today's challenge and the recent
+      // completed history (read-only). Empty by default — G-06 tests the
+      // streak semantics, not the gamification block.
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
     },
   };
 
