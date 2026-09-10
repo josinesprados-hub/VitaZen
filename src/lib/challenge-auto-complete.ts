@@ -16,6 +16,15 @@
  * (after trim + toLowerCase), the challenge is also auto-completed.
  * This allows challenges like "Limpia tu espacio de trabajo" (productividad)
  * to be completed when a habit with the same name is performed.
+ *
+ * N-5 (Opción B) — XP destination:
+ *   Each completed challenge awards +25 XP to the empire of its OWN category
+ *   (CHALLENGE_CATEGORY_TO_EMPIRE below), never unconditionally to
+ *   disciplina. The category comes from DailyChallenge.category — seeded,
+ *   server-side data; the client can never influence it (the manual
+ *   completion endpoint is 403-deprecated and no API accepts a category).
+ *   The reward grants XP only (never streak) and keeps the D-1 CAS
+ *   guarantees: exactly one award per challenge, concurrency-safe.
  */
 
 import { db } from '@/lib/db';
@@ -29,6 +38,37 @@ const ACTION_CATEGORIES: Record<string, string[]> = {
   journal: ['mentalidad', 'productividad'],
   wellness: ['salud'],
   nutrition: ['salud'],
+};
+
+/**
+ * N-5 (Opción B): challenge category → empire that receives the +25 XP.
+ *
+ * The real challenge categories (DailyChallenge.category, seed) are action
+ * themes, not empire names, so this is the single canonical mapping. It is
+ * grounded in the code, not invented:
+ *
+ *   disciplina   → disciplina   (name match; completed by the habit action,
+ *                               whose XP source is the disciplina empire)
+ *   habitos      → disciplina   (same habit action — habits ARE the
+ *                               disciplina empire's event source)
+ *   mentalidad   → mente        (mind category ↔ mente empire; meditation,
+ *                               mente's XP source, completes it)
+ *   productividad→ crecimiento  (completed by journal — the crecimiento
+ *                               empire's XP source)
+ *   salud        → energia      (health ↔ energia; wellness/nutrition —
+ *                               energia's XP sources — complete it)
+ *
+ * There is no challenge category completed by a finance action, so the
+ * riqueza empire never receives challenge XP. An UNKNOWN category is
+ * fail-closed: the challenge is NOT completed and NO XP is granted
+ * (add the category here first if a new one is ever seeded).
+ */
+export const CHALLENGE_CATEGORY_TO_EMPIRE: Record<string, string> = {
+  disciplina: 'disciplina',
+  habitos: 'disciplina',
+  mentalidad: 'mente',
+  productividad: 'crecimiento',
+  salud: 'energia',
 };
 
 /**
@@ -74,6 +114,17 @@ export async function tryAutoCompleteChallenge(
 
     if (!categoryMatch && !titleMatch) return;
 
+    // N-5: resolve the reward empire from the challenge's own category
+    // (server-side source: DailyChallenge.category — never client input).
+    // Fail-closed: an unknown category does not complete the challenge.
+    const targetEmpire = CHALLENGE_CATEGORY_TO_EMPIRE[challengeCategory];
+    if (!targetEmpire) {
+      console.error(
+        `[Challenge] Unknown category "${challengeCategory}" — challenge not auto-completed (fail-closed, no XP)`
+      );
+      return;
+    }
+
     // D-1 FIX: Race condition during challenge auto-completion.
     // The original code used `db.userChallenge.update({ where: { id } })` without
     // `completed: false` in the WHERE clause, then unconditionally incremented XP.
@@ -94,18 +145,21 @@ export async function tryAutoCompleteChallenge(
       });
       if (result.count === 0) return false; // Already completed by a concurrent call
 
-      // Award XP to disciplina empire (same as manual completion did)
+      // N-5: award +25 XP to the empire of the challenge's own category
+      // (was: always disciplina). XP only — the challenge reward never
+      // touches streaks. Same atomic upsert as before, now targeting the
+      // resolved empire row.
       await tx.empireProgress.upsert({
-        where: { userId_empire: { userId, empire: 'disciplina' } },
+        where: { userId_empire: { userId, empire: targetEmpire } },
         update: { xp: { increment: 25 } },
-        create: { userId, empire: 'disciplina', xp: 25 },
+        create: { userId, empire: targetEmpire, xp: 25 },
       });
       return true;
     });
 
     if (awarded) {
       const matchReason = categoryMatch ? 'category' : 'title';
-      console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason})`);
+      console.log(`[Challenge] Auto-completed "${userChallenge.challenge.title}" via action: ${action} (match: ${matchReason}) → +25 XP to ${targetEmpire}`);
     }
   } catch (error) {
     // Never fail the parent action if auto-completion fails
