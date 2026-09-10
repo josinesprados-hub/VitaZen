@@ -309,7 +309,10 @@ model EmpireProgress {
   id       String  @id @default(cuid())
   userId   String
   empire   String  // disciplina | mente | energia | riqueza | crecimiento
-  level    Int     @default(1)
+  // N-4: `level` column removed — it was never written after creation and
+  // every consumer derives the level from XP at read time:
+  // level = Math.floor(xp / 100) + 1 (GET /api/empire, mentor-context,
+  // achievements). XP remains the single source of truth.
   xp       Int     @default(0)
   streak   Int     @default(0)
 
