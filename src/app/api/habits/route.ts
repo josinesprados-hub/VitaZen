@@ -459,10 +459,17 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
     const { habitId } = body;
-    const habit = await db.habitLog.findFirst({ where: { id: habitId, userId: user.id } });
-    if (!habit) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
-
-    const todayDateKey = getTodayDateKey();
+    // E-0.2 FIX (F-NEW-2): this pre-lock read is a UX fast-path ONLY (404 for
+    // unknown habits without opening a transaction). It is deliberately NOT
+    // the source of truth for the streak decision: any state that
+    // participates in a gamification decision is re-read INSIDE the advisory
+    // lock that serializes its writers — same rule PATCH and undo already
+    // follow (SELECT ... FOR UPDATE under the same lock family).
+    const habitExists = await db.habitLog.findFirst({
+      where: { id: habitId, userId: user.id },
+      select: { id: true },
+    });
+    if (!habitExists) return NextResponse.json({ error: 'Habit not found' }, { status: 404 });
 
     // H-12 FIX (kept, XP part superseded by G-04): Revert the empire streak
     // when the deleted habit was the one that triggered today's streak
@@ -484,11 +491,29 @@ export async function DELETE(request: NextRequest) {
       // (CERT-1/F-4/G-03 pattern). Every habit path acquires exactly one
       // advisory lock and then at most one row lock, always in that order,
       // so no deadlock is possible.
+      //
+      // E-0.2 FIX: `todayDateKey` is now computed INSIDE the transaction,
+      // exactly like PATCH and undo do. A pre-lock day key could differ from
+      // the tx-time key near Madrid midnight, fragmenting the lock family
+      // right when serialization matters most.
+      const todayDateKey = getTodayDateKey();
       const lockSeed = user.id + '|disciplina|' + todayDateKey;
       await tx.$executeRaw`
         SELECT pg_advisory_xact_lock(
           ('x' || substring(md5(${lockSeed}), 1, 16))::bit(64)::bigint
         )`;
+
+      // E-0.2 FIX (F-NEW-2): re-read the habit row AFTER acquiring the
+      // advisory lock. The previous implementation decided the streak revert
+      // from the pre-lock fast-path snapshot, so a PATCH or undo that
+      // committed between that read and this lock was invisible to the
+      // decision: a completion that happened inside the window could escape
+      // its revert (under-decrement), and an undo that had already reverted
+      // the day's increment could be reverted again (over-decrement). Under
+      // the lock this read is authoritative: no PATCH/undo/DELETE for the
+      // same user|disciplina|Madrid-day can be in flight.
+      const habit = await tx.habitLog.findFirst({ where: { id: habitId, userId: user.id } });
+      if (!habit) return; // lost the race against a committed duplicate DELETE — idempotent success, no streak decision
 
       // G-04 FIX: deleteMany + count instead of delete — a concurrent
       // duplicate DELETE (double click, retry after a timeout, two devices)

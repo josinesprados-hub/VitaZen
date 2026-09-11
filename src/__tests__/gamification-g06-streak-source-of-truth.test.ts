@@ -712,7 +712,12 @@ describe('G-06 — habit write paths keep streak coherence under concurrency (G-
     const row = habitRow({ streak: 4, lastCompletedAt: noonUTC(0) });
     H.MOCK_DB.habitLog.findFirst.mockResolvedValue(row);
     H.MOCK_TX.habitLog.deleteMany.mockResolvedValue({ count: 1 });
-    H.MOCK_TX.habitLog.findFirst.mockResolvedValue(null); // no other habit completed today
+    // E-0.2 contract: the first tx-level findFirst is the fresh in-lock read
+    // of the habit itself (string id filter); the other-completed-today
+    // window (id.not filter) still finds nothing.
+    H.MOCK_TX.habitLog.findFirst.mockImplementation(async (args: any) =>
+      typeof args?.where?.id === 'string' ? row : null,
+    );
 
     const { DELETE } = await import('@/app/api/habits/route');
     const res = await DELETE(makeRequest('/api/habits', 'DELETE', { habitId: 'habit-1' }) as any);

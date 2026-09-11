@@ -206,7 +206,15 @@ async function completeHabit(habit: Record<string, unknown>) {
 }
 
 async function deleteHabit(row: Record<string, unknown> | null, deleteCount = 1) {
+  // E-0.2 contract: DELETE re-reads the habit INSIDE the advisory lock and
+  // decides from that fresh read, so the tx-level findFirst is called twice:
+  // first for the fresh read (string id filter → the row itself), then for
+  // the other-completed-today window (id.not filter → no match). The
+  // pre-lock read stays a UX fast-path only.
   H.MOCK_DB.habitLog.findFirst.mockResolvedValue(row);
+  H.MOCK_TX.habitLog.findFirst.mockImplementation(async (args: any) =>
+    typeof args?.where?.id === 'string' ? row : null,
+  );
   H.MOCK_TX.habitLog.deleteMany.mockResolvedValue({ count: deleteCount });
   const { DELETE } = await import('@/app/api/habits/route');
   return DELETE(makeRequest('/api/habits', 'DELETE', { habitId: 'habit-1' }) as any);
