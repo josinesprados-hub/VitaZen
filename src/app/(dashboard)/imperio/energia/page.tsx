@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/context/AuthContext';
 import { useDialogA11y } from '@/hooks/useDialogA11y';
+import { useMadridDayRefresh } from '@/hooks/useMadridDayRefresh';
 import { Zap, Droplets, Apple, Heart, Pencil, Trash2, Calendar, Clock } from 'lucide-react';
 import EmpireTipsSection from '@/components/ui/EmpireTipsSection';
 import ContextualHelp from '@/components/ui/ContextualHelp';
@@ -41,13 +42,32 @@ interface NutritionLog {
 // all rating buttons on every state change (visual flicker + lost :active state).
 // N-8: radiogroup semantics so the selected value is exposed to screen
 // readers instead of being conveyed by the champagne fill alone.
+// E-2 (H-4): roving tabindex + arrow-key navigation, replicating the ARIA
+// radio pattern consolidated in CheckInModal's ValueSlider — one single
+// tab stop per group, ArrowRight/ArrowUp increment, ArrowLeft/ArrowDown
+// decrement, always clamped to the 1–5 range. No Home/End handling: the
+// reference pattern does not implement it either.
 function RatingInput({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
   return (
     <div>
       <label className="text-sm text-[#999] mb-1 block">{label}</label>
       <div className="flex gap-2" role="radiogroup" aria-label={label}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} onClick={() => onChange(n)} role="radio" aria-checked={n === value} aria-label={`${label}: ${n}`}
+          <button key={n} type="button" onClick={() => onChange(n)} role="radio" aria-checked={n === value} aria-label={`${label}: ${n}`}
+            tabIndex={n === value ? 0 : -1}
+            onKeyDown={(e) => {
+              const next: Record<string, number | undefined> = {
+                ArrowRight: Math.min(5, value + 1),
+                ArrowUp: Math.min(5, value + 1),
+                ArrowLeft: Math.max(1, value - 1),
+                ArrowDown: Math.max(1, value - 1),
+              };
+              const target = next[e.key];
+              if (target !== undefined) {
+                e.preventDefault();
+                onChange(target);
+              }
+            }}
             className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#888] hover:border-champagne'}`}>
             {n}
           </button>
@@ -84,6 +104,18 @@ export default function EnergiaPage() {
   const [fetchError, setFetchError] = useState(false);
   const [submittingWellness, setSubmittingWellness] = useState(false);
   const [submittingNutrition, setSubmittingNutrition] = useState(false);
+  // E-2 (H-3): visible, screen-reader-announced error feedback for every
+  // energia write flow (POST/PUT wellness, POST/PUT nutrition, DELETE both).
+  // Previously every failure path ended in console.error only — the UI kept
+  // pretending nothing happened. Same contract as CheckInModal: a boolean
+  // flag rendered as <p role="alert"> with a fixed, brief message; server
+  // internals, stack traces and sensitive data are never shown.
+  const [wellnessSaveError, setWellnessSaveError] = useState(false);
+  const [nutritionSaveError, setNutritionSaveError] = useState(false);
+  const [editWellnessError, setEditWellnessError] = useState(false);
+  const [editNutritionError, setEditNutritionError] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Lock body scroll when modal is open — save/restore scroll position
   useEffect(() => {
@@ -115,9 +147,18 @@ export default function EnergiaPage() {
     fetchData();
   }, [fetchData]);
 
+  // E-2 (H-8): this page is day-scoped — today's wellness/nutrition rows and
+  // the "hoy" target of new logs. When the page stays open across the next
+  // Madrid civil midnight (or the tab resumes into a new day), refetch so it
+  // never keeps showing yesterday's state. Uses the shared DST-exact watcher
+  // hook (dashboard/disciplina pattern) — no timers of our own, no polling,
+  // exactly one refetch per real day transition.
+  useMadridDayRefresh(() => { fetchData(); });
+
   const submitWellness = async () => {
     if (submittingWellness) return;
     setSubmittingWellness(true);
+    setWellnessSaveError(false);
     try {
       const res = await apiFetch('/api/wellness', {
         method: 'POST',
@@ -132,14 +173,24 @@ export default function EnergiaPage() {
         notifyAchievementUnlocks(data);
         setWellnessForm({ mood: 3, energy: 3, sleep: 3, stress: 3, notes: '' });
         setShowWellness(false);
+      } else {
+        // E-2 (H-3): the API rejected the save (validation, rate limit,
+        // server error) — tell the user instead of staying silent.
+        setWellnessSaveError(true);
+        const errData = await res.json().catch(() => ({}));
+        console.error('Wellness POST failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error submitting wellness:', error); }
+    } catch (error) {
+      console.error('Error submitting wellness:', error);
+      setWellnessSaveError(true);
+    }
     finally { setSubmittingWellness(false); }
   };
 
   const submitNutrition = async () => {
     if (submittingNutrition) return;
     setSubmittingNutrition(true);
+    setNutritionSaveError(false);
     try {
       const res = await apiFetch('/api/nutrition', {
         method: 'POST',
@@ -154,14 +205,23 @@ export default function EnergiaPage() {
         notifyAchievementUnlocks(data);
         setNutritionForm({ meals: '', water: 0, calories: 0, notes: '' });
         setShowNutrition(false);
+      } else {
+        // E-2 (H-3): visible failure feedback (see submitWellness).
+        setNutritionSaveError(true);
+        const errData = await res.json().catch(() => ({}));
+        console.error('Nutrition POST failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error submitting nutrition:', error); }
+    } catch (error) {
+      console.error('Error submitting nutrition:', error);
+      setNutritionSaveError(true);
+    }
     finally { setSubmittingNutrition(false); }
   };
 
   const startEditWellness = (log: WellnessLog) => {
     setEditingWellness(log);
     setEditWellnessForm({ mood: log.mood, energy: log.energy, sleep: log.sleep, stress: log.stress, notes: log.notes || '' });
+    setEditWellnessError(false); // E-2 (H-3): a reopened dialog never inherits a previous failure
   };
 
   const saveEditWellness = async () => {
@@ -178,16 +238,22 @@ export default function EnergiaPage() {
         setEditingWellness(null);
         notifyAchievementUnlocks(data);
       } else {
+        // E-2 (H-3): visible failure feedback (see submitWellness).
+        setEditWellnessError(true);
         const errData = await res.json().catch(() => ({}));
         console.error('Wellness PUT failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error updating wellness log:', error); }
+    } catch (error) {
+      console.error('Error updating wellness log:', error);
+      setEditWellnessError(true);
+    }
     finally { setEditWellnessSaving(false); }
   };
 
   const startEditNutrition = (log: NutritionLog) => {
     setEditingNutrition(log);
     setEditNutritionForm({ meals: log.meals || '', water: log.water, calories: log.calories || 0, notes: log.notes || '' });
+    setEditNutritionError(false); // E-2 (H-3): a reopened dialog never inherits a previous failure
   };
 
   const saveEditNutrition = async () => {
@@ -204,15 +270,22 @@ export default function EnergiaPage() {
         setEditingNutrition(null);
         notifyAchievementUnlocks(data);
       } else {
+        // E-2 (H-3): visible failure feedback (see submitWellness).
+        setEditNutritionError(true);
         const errData = await res.json().catch(() => ({}));
         console.error('Nutrition PUT failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error updating nutrition log:', error); }
+    } catch (error) {
+      console.error('Error updating nutrition log:', error);
+      setEditNutritionError(true);
+    }
     finally { setEditNutritionSaving(false); }
   };
 
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
+    setDeleting(true);
+    setDeleteError(false);
     try {
       const endpoint = pendingDeleteId.type === 'wellness' ? '/api/wellness' : '/api/nutrition';
       const bodyKey = 'logId';
@@ -226,12 +299,22 @@ export default function EnergiaPage() {
         } else {
           setNutrition(prev => prev.filter(l => l.id !== pendingDeleteId.id));
         }
+        // E-2 (H-3): close the dialog only when the delete actually
+        // succeeded. On failure the dialog stays open and announces the
+        // error (role="alert"), so the user knows the operation did not
+        // complete and can retry or cancel — previously the dialog closed
+        // in `finally` and the failure was invisible.
+        setPendingDeleteId(null);
       } else {
+        setDeleteError(true);
         const errData = await res.json().catch(() => ({}));
         console.error('DELETE failed:', res.status, errData);
       }
-    } catch (error) { console.error('Error deleting log:', error); }
-    finally { setPendingDeleteId(null); }
+    } catch (error) {
+      console.error('Error deleting log:', error);
+      setDeleteError(true);
+    }
+    finally { setDeleting(false); }
   };
 
   if (loading) {
@@ -273,6 +356,9 @@ export default function EnergiaPage() {
               <button onClick={() => setEditingWellness(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={saveEditWellness} disabled={editWellnessSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editWellnessSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
+            {editWellnessError && (
+              <p role="alert" className="text-center text-sm text-red-400 mt-3">No se pudo actualizar. Inténtalo de nuevo.</p>
+            )}
           </div>
         </div>
       )}
@@ -305,6 +391,9 @@ export default function EnergiaPage() {
               <button onClick={() => setEditingNutrition(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={saveEditNutrition} disabled={editNutritionSaving} className="bg-champagne text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-champagne-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{editNutritionSaving ? 'Guardando...' : 'Guardar'}</button>
             </div>
+            {editNutritionError && (
+              <p role="alert" className="text-center text-sm text-red-400 mt-3">No se pudo actualizar. Inténtalo de nuevo.</p>
+            )}
           </div>
         </div>
       )}
@@ -320,8 +409,11 @@ export default function EnergiaPage() {
             <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
             <div className="flex items-center justify-center gap-3">
               <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
-              <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
+              <button onClick={confirmDelete} disabled={deleting} aria-busy={deleting} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Eliminar</button>
             </div>
+            {deleteError && (
+              <p role="alert" className="text-center text-sm text-red-400 mt-3">No se pudo eliminar. Inténtalo de nuevo.</p>
+            )}
           </div>
         </div>
       )}
@@ -347,7 +439,7 @@ export default function EnergiaPage() {
       <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
-          <button onClick={() => setShowWellness(!showWellness)} aria-expanded={showWellness} aria-controls="wellness-form" className="touch-press text-sm text-champagne hover:text-champagne-hover">
+          <button onClick={() => { setShowWellness(!showWellness); setWellnessSaveError(false); }} aria-expanded={showWellness} aria-controls="wellness-form" className="touch-press text-sm text-champagne hover:text-champagne-hover">
             + Registrar hoy
           </button>
         </div>
@@ -364,6 +456,9 @@ export default function EnergiaPage() {
               <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
               <button onClick={() => setShowWellness(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
+            {wellnessSaveError && (
+              <p role="alert" className="text-sm text-red-400">No se pudo guardar. Inténtalo de nuevo.</p>
+            )}
           </div>
         )}
         {wellnessLogs.length > 0 ? (
@@ -390,7 +485,7 @@ export default function EnergiaPage() {
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar" aria-label={`Editar registro de bienestar del ${safeFormatDate(log.date)}`}><Pencil size={14} aria-hidden="true" /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar" aria-label={`Eliminar registro de bienestar del ${safeFormatDate(log.date)}`}><Trash2 size={14} aria-hidden="true" /></button>
+                    <button onClick={() => { setDeleteError(false); setPendingDeleteId({ id: log.id, type: 'wellness' }); }} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar" aria-label={`Eliminar registro de bienestar del ${safeFormatDate(log.date)}`}><Trash2 size={14} aria-hidden="true" /></button>
                   </div>
                 </div>
                 {log.notes && (
@@ -416,7 +511,7 @@ export default function EnergiaPage() {
       <div className="section-enter-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
-          <button onClick={() => setShowNutrition(!showNutrition)} aria-expanded={showNutrition} aria-controls="nutrition-form" className="touch-press text-sm text-champagne hover:text-champagne-hover">
+          <button onClick={() => { setShowNutrition(!showNutrition); setNutritionSaveError(false); }} aria-expanded={showNutrition} aria-controls="nutrition-form" className="touch-press text-sm text-champagne hover:text-champagne-hover">
             + Registrar hoy
           </button>
         </div>
@@ -441,6 +536,9 @@ export default function EnergiaPage() {
               <button onClick={submitNutrition} disabled={submittingNutrition} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingNutrition ? 'Guardando...' : 'Guardar'}</button>
               <button onClick={() => setShowNutrition(false)} className="touch-press text-[#999] px-4 py-2 text-sm">Cancelar</button>
             </div>
+            {nutritionSaveError && (
+              <p role="alert" className="text-sm text-red-400">No se pudo guardar. Inténtalo de nuevo.</p>
+            )}
           </div>
         )}
         {nutrition.length > 0 ? (
@@ -466,7 +564,7 @@ export default function EnergiaPage() {
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar" aria-label={`Editar registro nutricional del ${safeFormatDate(log.date)}`}><Pencil size={14} aria-hidden="true" /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar" aria-label={`Eliminar registro nutricional del ${safeFormatDate(log.date)}`}><Trash2 size={14} aria-hidden="true" /></button>
+                    <button onClick={() => { setDeleteError(false); setPendingDeleteId({ id: log.id, type: 'nutrition' }); }} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar" aria-label={`Eliminar registro nutricional del ${safeFormatDate(log.date)}`}><Trash2 size={14} aria-hidden="true" /></button>
                   </div>
                 </div>
                 {(log.meals || log.notes) && (

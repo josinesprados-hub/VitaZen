@@ -26,7 +26,11 @@ export async function GET(request: NextRequest) {
     const days = Math.min(daysParam, 365);
 
     // PERF-5.2: Add select to reduce response payload size.
-    // Previously returned ALL columns including id and createdAt for every row.
+    // Previously returned ALL columns for every row.
+    // E-2 (H-2): createdAt is back in the shape — the energia UI renders
+    // safeFormatTime(log.createdAt) for every row, and without it the time
+    // always fell back to "—" after a reload. Additive only: no field is
+    // removed and the stored record / "date" semantics are untouched.
     const logs = await db.wellnessLog.findMany({
       where: { userId: user.id },
       orderBy: { date: 'desc' },
@@ -39,6 +43,7 @@ export async function GET(request: NextRequest) {
         sleep: true,
         stress: true,
         notes: true,
+        createdAt: true,
       },
     });
 
