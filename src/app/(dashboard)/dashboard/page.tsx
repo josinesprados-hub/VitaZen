@@ -17,7 +17,7 @@ import { MonthlyClosurePrompt } from './MonthlyClosurePrompt';
 
 import { Shield, Brain, Zap, Gem, TrendingUp, Sunrise } from 'lucide-react';
 import PrivacyMask from '@/components/ui/PrivacyMask';
-import { getEmotionEmoji } from '@/lib/emotion-emojis';
+import { getEmotionEmoji, getEmotionLabel } from '@/lib/emotion-emojis';
 import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 // DASH-2: Greeting must use Madrid timezone, not browser-local.
@@ -275,7 +275,8 @@ export default function DashboardPage() {
             {todayCheckin ? (
               <div className="flex items-center gap-3 py-1">
                 {/* DASH-1: emoji from shared single source of truth (same as CheckInModal) */}
-                <span className="text-sm">{getEmotionEmoji(todayCheckin.emotion)}</span>
+                {/* N-8: emotion label exposed to screen readers, not just the emoji */}
+                <span className="text-sm" role="img" aria-label={`Estado emocional: ${getEmotionLabel(todayCheckin.emotion)}`}>{getEmotionEmoji(todayCheckin.emotion)}</span>
                 <p className="text-xs text-[#888] truncate flex-1">«{todayCheckin.intention}»</p>
                 <Link href="/checkin" className="text-[10px] text-[#999] hover:text-champagne transition-colors shrink-0">Historial</Link>
               </div>
@@ -322,7 +323,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm text-[#888] group-hover:text-[#999] transition-colors">{config.name}</h3>
+                        <h2 className="text-sm text-[#888] group-hover:text-[#999] transition-colors">{config.name}</h2>
                         <PrivacyMask compact>
                           <span className="text-[10px] text-[#888]">Nivel {level}</span>
                         </PrivacyMask>
@@ -331,14 +332,17 @@ export default function DashboardPage() {
                       <PrivacyMask compact>
                         <div className="flex items-center gap-2 mt-0.5">
                           {streak > 0 && (
-                            <span className="text-[9px] text-[#999]">{streak}d</span>
+                            <span className="text-[9px] text-[#999]">
+                              <span aria-hidden="true">{streak}d</span>
+                              <span className="sr-only">racha: {streak} días</span>
+                            </span>
                           )}
                           <span className="text-[9px] text-[#888]">{xp % 100}/{xpToNextLevel} XP</span>
                         </div>
                       </PrivacyMask>
                       {/* DASH-31/37: Progress bar always visible (never disappears, even at level boundaries) */}
                       <PrivacyMask compact>
-                        <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full">
+                        <div className="w-full h-px bg-[#1a1a1a] mt-1.5 overflow-hidden rounded-full" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} aria-label={`Progreso de XP en ${config.name}`}>
                           <div
                             className="h-full bg-champagne/15 rounded-full transition-all duration-700"
                             style={{ width: `${progress}%` }}

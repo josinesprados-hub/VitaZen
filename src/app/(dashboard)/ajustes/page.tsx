@@ -344,9 +344,9 @@ export default function AjustesPage() {
         </div>
       </div>
 
-      {/* Error message */}
+      {/* Error message — N-8: announced by screen readers */}
       {error && (
-        <div className="card-accent p-4 flex items-center gap-3">
+        <div role="alert" className="card-accent p-4 flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
           <p className="text-sm text-red-400">{error}</p>
           <button

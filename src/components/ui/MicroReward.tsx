@@ -40,7 +40,10 @@ export function MicroReward({ trigger, message, onComplete }: MicroRewardProps) 
   if (!visible) return null;
 
   return (
-    <div className="micro-reward-enter fixed bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+    // N-8: role="status" — the reward message is announced politely by
+    // screen readers when the element is mounted (success feedback must
+    // not be visual-only). pointer-events-none keeps it purely visual.
+    <div role="status" className="micro-reward-enter fixed bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
       <div className="bg-champagne/10 border border-champagne/25 rounded-xl px-4 py-2.5 backdrop-blur-sm micro-reward-glow">
         <p className="text-xs text-champagne font-medium text-center whitespace-nowrap">
           {message || 'Completado'}

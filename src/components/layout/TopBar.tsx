@@ -35,9 +35,11 @@ function getPageTitle(pathname: string): string | null {
 
 interface TopBarProps {
   onMenuClick: () => void;
+  /** N-8: whether the mobile sidebar is currently open (aria-expanded) */
+  menuOpen?: boolean;
 }
 
-export function TopBar({ onMenuClick }: TopBarProps) {
+export function TopBar({ onMenuClick, menuOpen = false }: TopBarProps) {
   const { displayUser } = useScreenshotMode();
   const pathname = usePathname();
   const pageTitle = getPageTitle(pathname);
@@ -50,9 +52,11 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           <button
             onClick={onMenuClick}
             className="lg:hidden flex items-center justify-center w-11 h-11 -ml-1 rounded-xl text-white hover:text-champagne hover:bg-[#1a1a1a]/50 transition-colors touch-press"
-            aria-label="Abrir menú"
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuOpen}
+            aria-controls="app-sidebar"
           >
-            <Menu size={22} />
+            <Menu size={22} aria-hidden="true" />
           </button>
           {/* Page title on mobile — gives context without needing sidebar */}
           {pageTitle && (

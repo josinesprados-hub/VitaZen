@@ -18,6 +18,8 @@ import { EmpireSkeleton } from '@/components/ui/PremiumSkeleton';
 import { MicroReward } from '@/components/ui/MicroReward';
 import PrivacyMask from '@/components/ui/PrivacyMask';
 import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
+import { HabitCompleteButton } from '@/components/habits/HabitCompleteButton';
+import { ChallengeStatus } from '@/components/gamification/ChallengeStatus';
 
 interface Habit {
   id: string;
@@ -328,11 +330,11 @@ export default function DisciplinaPage() {
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar hábito</h3>
             <div className="space-y-3">
-              <input type="text" placeholder="Nombre del hábito" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              <input type="text" placeholder="Nombre del hábito" aria-label="Nombre del hábito" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
-              <input type="text" placeholder="Descripción (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+              <input type="text" placeholder="Descripción (opcional)" aria-label="Descripción del hábito (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
-              <select value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })}
+              <select value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })} aria-label="Frecuencia del hábito"
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors appearance-none">
                 <option value="daily">Diario</option>
                 <option value="weekly">Semanal</option>
@@ -350,12 +352,12 @@ export default function DisciplinaPage() {
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onClick={() => setPendingDeleteId(null)}>
-          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar hábito" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar hábito" aria-describedby="delete-habit-warning" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Eliminar hábito</h3>
-            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <p id="delete-habit-warning" className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
             <div className="flex items-center justify-center gap-3">
               <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
@@ -395,7 +397,7 @@ export default function DisciplinaPage() {
                 +25 XP · {rewardEmpireLabel}
               </span>
             )}
-            {challenge.completed && <span className="text-xs px-2.5 py-1 rounded-full bg-champagne/15 text-champagne font-medium check-pop">Completado</span>}
+            {challenge.completed && <ChallengeStatus completed title={challenge.challenge.title} />}
           </div>
           <h3 className="text-champagne font-medium mb-1">{challenge.challenge.title}</h3>
           <p className="text-[#999] text-sm mb-4 line-clamp-3">{challenge.challenge.description}</p>
@@ -418,17 +420,20 @@ export default function DisciplinaPage() {
           <h2 className="text-lg font-semibold text-white">Mis Hábitos</h2>
           <button
             onClick={() => setShowAddHabit(!showAddHabit)}
+            aria-expanded={showAddHabit}
+            aria-controls="add-habit-form"
             className="flex items-center gap-2 text-sm text-champagne hover:text-champagne-hover touch-press"
           >
-            <Plus size={18} /> Añadir hábito
+            <Plus size={18} aria-hidden="true" /> Añadir hábito
           </button>
         </div>
 
         {showAddHabit && (
-          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
+          <div id="add-habit-form" className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
             <input
               type="text"
               placeholder="Nombre del hábito"
+              aria-label="Nombre del hábito"
               value={newHabit.name}
               onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder-[#666]"
@@ -436,6 +441,7 @@ export default function DisciplinaPage() {
             <input
               type="text"
               placeholder="Descripción (opcional)"
+              aria-label="Descripción del hábito (opcional)"
               value={newHabit.description}
               onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder-[#666]"
@@ -443,6 +449,7 @@ export default function DisciplinaPage() {
             <select
               value={newHabit.frequency}
               onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
+              aria-label="Frecuencia del hábito"
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors appearance-none"
             >
               <option value="daily">Diario</option>
@@ -471,18 +478,12 @@ export default function DisciplinaPage() {
             {habits.map((habit) => (
               <div key={habit.id} className="flex items-center justify-between bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 group hover:border-[#222] transition-colors">
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => completeHabit(habit.id)}
-                    className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all touch-press ${
-                      justCompletedId === habit.id ? 'check-pop' : ''
-                    } ${
-                      isCompletedInPeriod(habit)
-                        ? 'bg-champagne border-champagne scale-100'
-                        : 'border-[#333] hover:border-champagne hover:bg-champagne/10'
-                    }`}
-                  >
-                    <Check size={16} className={isCompletedInPeriod(habit) ? 'text-black' : 'text-champagne'} />
-                  </button>
+                  <HabitCompleteButton
+                    habitName={habit.name}
+                    completed={isCompletedInPeriod(habit)}
+                    justCompleted={justCompletedId === habit.id}
+                    onComplete={() => completeHabit(habit.id)}
+                  />
                   <div>
                     <p className="text-white text-sm font-medium">{habit.name}</p>
                     {habit.description && <p className="text-[#888] text-xs">{habit.description}</p>}
@@ -496,7 +497,8 @@ export default function DisciplinaPage() {
                 <div className="flex items-center gap-1.5">
                   {habit.streak > 0 && (
                     <span className="flex items-center gap-1 text-champagne text-xs mr-1">
-                      <Flame size={14} /> <PrivacyMask compact>{habit.streak}</PrivacyMask>
+                      <Flame size={14} aria-hidden="true" /> <PrivacyMask compact>{habit.streak}</PrivacyMask>
+                      <span className="sr-only">días de racha</span>
                     </span>
                   )}
                   <div className="flex items-center gap-1 flex-shrink-0">
@@ -522,6 +524,7 @@ export default function DisciplinaPage() {
       {/* H-9: Undo toast — aparece tras completar, se auto-oculta a los 5s */}
       {undoState && !actionError && (
         <div
+          role="status"
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-champagne/20 text-champagne text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg animate-in flex items-center gap-3"
         >
           <span>Completado</span>
@@ -529,7 +532,7 @@ export default function DisciplinaPage() {
             onClick={undoComplete}
             className="flex items-center gap-1.5 bg-champagne/10 hover:bg-champagne/20 text-champagne px-3 py-1 rounded-lg transition-colors touch-press"
           >
-            <Undo2 size={12} /> Deshacer
+            <Undo2 size={12} aria-hidden="true" /> Deshacer
           </button>
         </div>
       )}

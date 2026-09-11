@@ -88,11 +88,13 @@ html, body {
   background: var(--color-champagne);
 }
 
-/* Custom focus styles — calm, present, not flashy */
+/* Custom focus styles — calm, present, not flashy.
+   N-8: 2px @ 0.6 alpha ring so the focus indicator meets 3:1 contrast
+   against the near-black background (was 1px @ 0.3). */
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--color-champagne);
-  box-shadow: 0 0 0 1px rgba(200, 165, 90, 0.3);
+  box-shadow: 0 0 0 2px rgba(200, 165, 90, 0.6);
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 /* Error state borders must not be overridden by focus gold */
@@ -983,11 +985,12 @@ html { scroll-behavior: smooth; }
   }
 }
 
-/* Subtitle — silent accompaniment */
+/* Subtitle — silent accompaniment.
+   N-8: #777 → #8a8a8a (≈4.5:1 on #0a0a0a) so secondary text is readable */
 .subtitle-silent {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: #777;
+  color: #8a8a8a;
   line-height: 1.5;
   letter-spacing: 0.01em;
 }
@@ -997,13 +1000,15 @@ html { scroll-behavior: smooth; }
   }
 }
 
-/* Label — discrete, uppercase */
+/* Label — discrete, uppercase.
+   N-8: #555 → #888 (≈5.3:1 on #0a0a0a) — this label carries real content
+   (achievement category names) and previously sat at ≈2.7:1 */
 .label-discrete {
   font-size: 0.625rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #555;
+  color: #888;
 }
 
 /* Number with emotional weight */
@@ -2602,4 +2607,41 @@ body.screenshot-mobile {
 /* Device variant: desktop viewport control */
 body.screenshot-desktop {
   min-width: 1280px;
+}
+
+/* ═══════════════════════════════════════════
+   N-8 — Reduced-motion coverage for remaining animations
+   ───────────────────────────────────────────
+   The existing section-by-section reduced-motion blocks did not cover
+   these classes. Infinite/pulsing animations (hero pulses, shimmer,
+   badges, bounce indicators) are the most problematic for
+   vestibular disorders, so they are disabled here. One-shot entrance
+   animations (.animate-in, .drawer-enter, .context-menu) are also
+   neutralized. Product animations are NOT removed — they are only
+   skipped for users who ask for reduced motion.
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .drawer-enter,
+  .context-menu,
+  .hero-pulse-gold,
+  .hero-pulse-warm,
+  .onboarding-complete-glow,
+  .premium-shimmer,
+  .premium-shimmer-gold,
+  .archive-badge {
+    animation: none !important;
+  }
+  /* Continuous utility animations: loading states become static,
+     which is the standard reduced-motion behavior. */
+  .animate-bounce,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+  /* Smooth programmatic scrolling becomes instant */
+  html,
+  .scroll-smooth {
+    scroll-behavior: auto !important;
+  }
 }

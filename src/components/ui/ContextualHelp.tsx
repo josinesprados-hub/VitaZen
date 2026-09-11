@@ -74,13 +74,14 @@ export default function ContextualHelp({ storageKey, title, text }: ContextualHe
           onClick={() => setShowFull(true)}
           className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-champagne/5 text-champagne/40 hover:text-champagne/70 hover:bg-champagne/10 transition-colors"
           aria-label={`Ayuda: ${title}`}
+          aria-describedby={hovering ? 'contextual-help-tip' : undefined}
         >
-          <Info size={12} />
+          <Info size={12} aria-hidden="true" />
         </button>
 
         {/* Hover/focus tooltip — compact text preview */}
         {hovering && (
-          <div className="absolute left-0 top-8 z-20 w-56 bg-[#111] border border-[#222] rounded-lg px-3 py-2 shadow-lg animate-in pointer-events-none">
+          <div id="contextual-help-tip" role="tooltip" className="absolute left-0 top-8 z-20 w-56 bg-[#111] border border-[#222] rounded-lg px-3 py-2 shadow-lg animate-in pointer-events-none">
             <p className="text-[11px] text-[#888] leading-relaxed">{text}</p>
           </div>
         )}

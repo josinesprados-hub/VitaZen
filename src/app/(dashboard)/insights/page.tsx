@@ -259,8 +259,22 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      {/* Wellness Score Card — clickable to checkin */}
-      <div onClick={() => router.push('/checkin')} className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press">
+      {/* Wellness Score Card — clickable to checkin.
+          N-8: the card contains nested links (summary pills), so it cannot be a
+          real <a>. Keyboard access is provided via role="link" + Enter. */}
+      <div
+        onClick={() => router.push('/checkin')}
+        role="link"
+        tabIndex={0}
+        aria-label="Cómo te sientes — ir al check-in"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && e.target === e.currentTarget) {
+            e.preventDefault();
+            router.push('/checkin');
+          }
+        }}
+        className="block bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6 hover:border-champagne/20 transition-all duration-200 cursor-pointer group touch-press"
+      >
         <PrivacyMask>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

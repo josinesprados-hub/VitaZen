@@ -72,12 +72,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       )}
 
       <aside
+        id="app-sidebar"
         ref={sidebarRef}
         role="dialog"
         aria-modal={open ? true : undefined}
         aria-label="Menú de navegación"
         className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[#0a0a0a] border-r border-[#1a1a1a] z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 safe-top safe-bottom ${
-          open ? 'translate-x-0' : '-translate-x-full'
+          open ? 'translate-x-0' : '-translate-x-full invisible lg:visible'
         }`}
       >
         <div className="flex flex-col h-full">
@@ -93,10 +94,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
 
           {/* Dashboard link */}
-          <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto scroll-contain">
+          <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto scroll-contain" aria-label="Navegación principal">
             <Link
               href="/dashboard"
               onClick={onClose}
+              aria-current={pathname === '/dashboard' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/dashboard'
                   ? 'bg-champagne/10 text-champagne'
@@ -110,6 +112,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/timeline"
               onClick={onClose}
+              aria-current={pathname === '/timeline' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/timeline'
                   ? 'bg-champagne/10 text-champagne'
@@ -123,6 +126,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/logros"
               onClick={onClose}
+              aria-current={pathname === '/logros' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/logros'
                   ? 'bg-champagne/10 text-champagne'
@@ -136,6 +140,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/checkin"
               onClick={onClose}
+              aria-current={pathname === '/checkin' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/checkin'
                   ? 'bg-champagne/10 text-champagne'
@@ -149,6 +154,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/insights"
               onClick={onClose}
+              aria-current={pathname === '/insights' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/insights'
                   ? 'bg-champagne/10 text-champagne'
@@ -162,6 +168,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/memoria-de-vida"
               onClick={onClose}
+              aria-current={pathname === '/memoria-de-vida' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/memoria-de-vida'
                   ? 'bg-champagne/10 text-champagne'
@@ -175,6 +182,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/perfil"
               onClick={onClose}
+              aria-current={pathname === '/perfil' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/perfil'
                   ? 'bg-champagne/10 text-champagne'
@@ -188,6 +196,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Link
               href="/ajustes"
               onClick={onClose}
+              aria-current={pathname === '/ajustes' ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                 pathname === '/ajustes'
                   ? 'bg-champagne/10 text-champagne'
@@ -209,6 +218,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   key={empire.name}
                   href={empire.href}
                   onClick={onClose}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors touch-press ${
                     isActive
                       ? 'bg-champagne/10 text-champagne'

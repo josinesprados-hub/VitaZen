@@ -30,7 +30,10 @@ export const markdownComponents: Record<string, React.ComponentType<any>> = {
   a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
     const safeHref = href && /^https?:\/\//i.test(href) ? href : undefined;
     return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-champagne hover:text-champagne-hover underline underline-offset-2">{children}</a>
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-champagne hover:text-champagne-hover underline underline-offset-2">{children}
+        {/* N-8: warn screen reader users about the new tab */}
+        <span className="sr-only"> (abre en una pestaña nueva)</span>
+      </a>
     );
   },
   code: ({ className, children, ...props }: { className?: string; children?: React.ReactNode }) => {
@@ -64,13 +67,15 @@ export const markdownComponents: Record<string, React.ComponentType<any>> = {
   blockquote: ({ children }: { children?: React.ReactNode }) => (
     <blockquote className="border-l-2 border-champagne/30 pl-3 my-2 text-[#aaa] italic">{children}</blockquote>
   ),
+  // N-8: markdown headings are remapped one level down so they never create
+  // multiple <h1> elements inside the page heading outline.
   h1: ({ children }: { children?: React.ReactNode }) => (
-    <h1 className="text-lg font-bold text-white mt-3 mb-1">{children}</h1>
+    <h2 className="text-lg font-bold text-white mt-3 mb-1">{children}</h2>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="text-base font-bold text-white mt-3 mb-1">{children}</h2>
+    <h3 className="text-base font-bold text-white mt-3 mb-1">{children}</h3>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-sm font-bold text-white mt-2 mb-1">{children}</h3>
+    <h4 className="text-sm font-bold text-white mt-2 mb-1">{children}</h4>
   ),
 };

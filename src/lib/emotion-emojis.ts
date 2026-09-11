@@ -17,7 +17,22 @@ export const EMOTION_EMOJIS: Record<number, string> = {
   5: '😊',
 };
 
+// N-8: single source of truth for the emotion LABELS too — screen readers
+// must be able to announce the emotion name, not just render an emoji.
+export const EMOTION_LABELS: Record<number, string> = {
+  1: 'Muy bajo',
+  2: 'Bajo',
+  3: 'Neutral',
+  4: 'Bien',
+  5: 'Excelente',
+};
+
 /** Get the emoji for a 1-5 emotion value, with a safe fallback. */
 export function getEmotionEmoji(emotion: number): string {
   return EMOTION_EMOJIS[emotion] || '😐';
+}
+
+/** N-8: Get the accessible label for a 1-5 emotion value. */
+export function getEmotionLabel(emotion: number): string {
+  return EMOTION_LABELS[emotion] || 'Neutral';
 }

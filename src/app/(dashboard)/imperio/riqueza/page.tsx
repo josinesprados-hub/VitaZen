@@ -282,6 +282,7 @@ function IntentionSelector({ value, onChange }: { value: string; onChange: (v: s
           <button
             key={i.value}
             type="button"
+            aria-pressed={value === i.value}
             onClick={() => onChange(value === i.value ? '' : i.value)}
             className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
               value === i.value
@@ -304,6 +305,7 @@ function CategoryChips({ categories, value, onChange }: { categories: string[]; 
         <button
           key={cat}
           type="button"
+          aria-pressed={value === cat}
           onClick={() => onChange(value === cat ? '' : cat)}
           className={`px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-all border ${
             value === cat
@@ -347,7 +349,7 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
                 <span className="text-sm sm:text-base text-[#aaa] tracking-wide">{flow.label}</span>
                 <span className="text-xs sm:text-sm text-[#888] tabular-nums font-light">{formatCurrency(flow.amount)}</span>
               </div>
-              <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden">
+              <div className="h-2 sm:h-2.5 bg-[#111] rounded-full overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(barWidth)} aria-label={`Proporción de gasto: ${flow.label}`}>
                 <div
                   className="h-full rounded-full bg-champagne/25 transition-all duration-700"
                   style={{ width: `${Math.max(barWidth, 0)}%` }}
@@ -365,12 +367,14 @@ function IntentionBalance({ flows, totalExpense }: { flows: IntentionFlow[]; tot
 function SaveToast({ show, message }: { show: boolean; message: string }) {
   return (
     <div
+      role="status"
+      aria-live={show ? 'polite' : 'off'}
       className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] transition-all duration-300 ${
         show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
       <div className="bg-champagne text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg shadow-champagne/20">
-        <Check size={14} />
+        <Check size={14} aria-hidden="true" />
         {message}
       </div>
     </div>
@@ -547,11 +551,13 @@ function FullForm({
 
   return (
     <div className="space-y-4">
-      {/* Type toggle */}
-      <div className="flex gap-2">
+      {/* Type toggle — N-8: radiogroup semantics */}
+      <div className="flex gap-2" role="radiogroup" aria-label="Tipo de movimiento">
         <button
           type="button"
           onClick={() => setForm(f => ({ ...f, type: 'income' }))}
+          role="radio"
+          aria-checked={form.type === 'income'}
           className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
             form.type === 'income'
               ? 'bg-champagne text-black'
@@ -563,6 +569,8 @@ function FullForm({
         <button
           type="button"
           onClick={() => setForm(f => ({ ...f, type: 'expense' }))}
+          role="radio"
+          aria-checked={form.type === 'expense'}
           className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
             form.type === 'expense'
               ? 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -588,6 +596,7 @@ function FullForm({
         <input
           type="text"
           placeholder="Categoría"
+          aria-label="Categoría del movimiento"
           value={form.category}
           onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}
           className={inputClass}
@@ -604,6 +613,7 @@ function FullForm({
         placeholder="Cantidad (€)"
         inputMode="decimal"
         allowDecimal={true}
+        aria-label="Cantidad en euros"
         className={inputClass}
       />
 
@@ -611,6 +621,7 @@ function FullForm({
       <input
         type="text"
         placeholder="Descripción (opcional)"
+        aria-label="Descripción del movimiento (opcional)"
         value={form.description}
         onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
         className={inputClass}
@@ -620,6 +631,7 @@ function FullForm({
       <input
         type="text"
         placeholder="¿Qué pasó? (opcional)"
+        aria-label="Contexto: ¿qué pasó? (opcional)"
         value={form.contexto}
         onChange={(e) => setForm(f => ({ ...f, contexto: e.target.value }))}
         className={`${inputClass} italic`}
@@ -1321,6 +1333,7 @@ export default function RiquezaPage() {
             ]).map(p => (
               <button
                 key={p.key}
+                aria-pressed={period === p.key}
                 onClick={() => setPeriod(p.key)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border whitespace-nowrap ${
                   period === p.key
@@ -1367,7 +1380,7 @@ export default function RiquezaPage() {
                               <p className="text-xs text-[#888] truncate mt-0.5">{log.description}</p>
                             )}
                             {log.contexto && (
-                              <p className="text-[11px] text-[#3a3a3a] truncate mt-0.5 italic font-light">{log.contexto}</p>
+                              <p className="text-[11px] text-[#999] truncate mt-0.5 italic font-light">{log.contexto}</p>
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">

@@ -293,12 +293,13 @@ export default function PerfilPage() {
         {/* Location fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
+            <Label htmlFor="perfil-pais" className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
               <MapPin size={12} />
               País
             </Label>
             {editing ? (
               <Input
+                id="perfil-pais"
                 value={form.country}
                 onChange={(e) => setForm(prev => ({ ...prev, country: e.target.value }))}
                 placeholder="Ej: España"
@@ -310,12 +311,13 @@ export default function PerfilPage() {
             )}
           </div>
           <div>
-            <Label className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
+            <Label htmlFor="perfil-ciudad" className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
               <MapPin size={12} />
               Ciudad
             </Label>
             {editing ? (
               <Input
+                id="perfil-ciudad"
                 value={form.city}
                 onChange={(e) => setForm(prev => ({ ...prev, city: e.target.value }))}
                 placeholder="Ej: Madrid"
@@ -330,12 +332,13 @@ export default function PerfilPage() {
 
         {/* Age */}
         <div>
-          <Label className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
+          <Label htmlFor="perfil-edad" className="text-[#999] text-xs mb-1.5 flex items-center gap-1.5">
             <Calendar size={12} />
             Edad <span className="text-[#888]">(opcional)</span>
           </Label>
           {editing ? (
             <NumericInput
+              id="perfil-edad"
               value={form.age ? parseInt(form.age, 10) : 0}
               onChange={(v) => setForm(prev => ({ ...prev, age: v > 0 ? String(v) : '' }))}
               placeholder="Ej: 28"
@@ -352,10 +355,11 @@ export default function PerfilPage() {
 
         {/* Bio */}
         <div>
-          <Label className="text-[#999] text-xs mb-1.5">Bio <span className="text-[#888]">(opcional)</span></Label>
+          <Label htmlFor="perfil-bio" className="text-[#999] text-xs mb-1.5">Bio <span className="text-[#888]">(opcional)</span></Label>
           {editing ? (
             <>
               <Textarea
+                id="perfil-bio"
                 value={form.bio}
                 onChange={(e) => setForm(prev => ({ ...prev, bio: e.target.value }))}
                 placeholder="Cuéntanos algo sobre ti..."
@@ -417,13 +421,14 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      {/* Error message */}
+      {/* Error message — N-8: announced by screen readers */}
       {error && (
-        <div className="card-accent p-4 flex items-center gap-3">
+        <div role="alert" className="card-accent p-4 flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
           <p className="text-sm text-red-400">{error}</p>
           <button
             onClick={() => setError(null)}
+            aria-label="Cerrar error"
             className="ml-auto text-[#999] hover:text-white text-xs"
           >
             Cerrar

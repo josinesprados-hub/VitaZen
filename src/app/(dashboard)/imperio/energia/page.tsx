@@ -39,13 +39,15 @@ interface NutritionLog {
 // Rating input — module-level component to prevent remount flicker.
 // Previously defined inside EnergiaPage, causing React to unmount+remount
 // all rating buttons on every state change (visual flicker + lost :active state).
+// N-8: radiogroup semantics so the selected value is exposed to screen
+// readers instead of being conveyed by the champagne fill alone.
 function RatingInput({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
   return (
     <div>
       <label className="text-sm text-[#999] mb-1 block">{label}</label>
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="radiogroup" aria-label={label}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} onClick={() => onChange(n)}
+          <button key={n} onClick={() => onChange(n)} role="radio" aria-checked={n === value} aria-label={`${label}: ${n}`}
             className={`rating-btn w-10 h-10 rounded-lg border text-sm font-medium transition-colors ${n <= value ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#888] hover:border-champagne'}`}>
             {n}
           </button>
@@ -264,7 +266,7 @@ export default function EnergiaPage() {
               <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
               <RatingInput label="Sueño" value={editWellnessForm.sleep} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, sleep: v })} />
               <RatingInput label="Estrés" value={editWellnessForm.stress} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, stress: v })} />
-              <textarea placeholder="Notas (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
+              <textarea placeholder="Notas (opcional)" aria-label="Notas de bienestar (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
             </div>
             <div className="flex items-center justify-center gap-3 mt-7">
@@ -284,17 +286,17 @@ export default function EnergiaPage() {
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar nutrición</h3>
             <div className="space-y-3">
-              <textarea placeholder="Comidas del día" value={editNutritionForm.meals} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, meals: e.target.value })}
+              <textarea placeholder="Comidas del día" aria-label="Comidas del día" value={editNutritionForm.meals} onChange={(e) => setEditNutritionForm({ ...editNutritionForm, meals: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-20 resize-none" />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
-                  <NumericInput value={editNutritionForm.water} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
+                  <label htmlFor="edit-nutrition-agua" className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Vasos de agua</label>
+                  <NumericInput id="edit-nutrition-agua" value={editNutritionForm.water} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
                 </div>
                 <div>
-                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
-                  <NumericInput value={editNutritionForm.calories} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
+                  <label htmlFor="edit-nutrition-calorias" className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Calorías</label>
+                  <NumericInput id="edit-nutrition-calorias" value={editNutritionForm.calories} onChange={(v) => setEditNutritionForm({ ...editNutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors" />
                 </div>
               </div>
@@ -345,18 +347,18 @@ export default function EnergiaPage() {
       <div className="section-enter-1 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro de Bienestar</h2>
-          <button onClick={() => setShowWellness(!showWellness)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
+          <button onClick={() => setShowWellness(!showWellness)} aria-expanded={showWellness} aria-controls="wellness-form" className="touch-press text-sm text-champagne hover:text-champagne-hover">
             + Registrar hoy
           </button>
         </div>
 
         {showWellness && (
-          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
+          <div id="wellness-form" className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
             <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
             <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
             <RatingInput label="Sueño" value={wellnessForm.sleep} onChange={(v) => setWellnessForm({ ...wellnessForm, sleep: v })} />
             <RatingInput label="Estrés" value={wellnessForm.stress} onChange={(v) => setWellnessForm({ ...wellnessForm, stress: v })} />
-            <textarea placeholder="Notas (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
+            <textarea placeholder="Notas (opcional)" aria-label="Notas de bienestar (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
             <div className="flex gap-2">
               <button onClick={submitWellness} disabled={submittingWellness} className="touch-press bg-champagne text-black font-semibold px-4 py-2 rounded-xl text-sm hover:bg-champagne-hover disabled:opacity-50 disabled:cursor-not-allowed">{submittingWellness ? 'Guardando...' : 'Guardar'}</button>
@@ -387,8 +389,8 @@ export default function EnergiaPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+                    <button onClick={() => startEditWellness(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar" aria-label={`Editar registro de bienestar del ${safeFormatDate(log.date)}`}><Pencil size={14} aria-hidden="true" /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'wellness' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar" aria-label={`Eliminar registro de bienestar del ${safeFormatDate(log.date)}`}><Trash2 size={14} aria-hidden="true" /></button>
                   </div>
                 </div>
                 {log.notes && (
@@ -414,24 +416,24 @@ export default function EnergiaPage() {
       <div className="section-enter-2 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Registro Nutricional</h2>
-          <button onClick={() => setShowNutrition(!showNutrition)} className="touch-press text-sm text-champagne hover:text-champagne-hover">
+          <button onClick={() => setShowNutrition(!showNutrition)} aria-expanded={showNutrition} aria-controls="nutrition-form" className="touch-press text-sm text-champagne hover:text-champagne-hover">
             + Registrar hoy
           </button>
         </div>
 
         {showNutrition && (
-          <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
-            <textarea placeholder="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
+          <div id="nutrition-form" className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-3">
+            <textarea placeholder="Comidas del día" aria-label="Comidas del día" value={nutritionForm.meals} onChange={(e) => setNutritionForm({ ...nutritionForm, meals: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-20 resize-none" />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm text-[#999] mb-1 block">Vasos de agua</label>
-                <NumericInput value={nutritionForm.water} onChange={(v) => setNutritionForm({ ...nutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
+                <label htmlFor="nutrition-agua" className="text-sm text-[#999] mb-1 block">Vasos de agua</label>
+                <NumericInput id="nutrition-agua" value={nutritionForm.water} onChange={(v) => setNutritionForm({ ...nutritionForm, water: v })} inputMode="numeric" allowDecimal={false} min={0}
                   className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
               </div>
               <div>
-                <label className="text-sm text-[#999] mb-1 block">Calorías</label>
-                <NumericInput value={nutritionForm.calories} onChange={(v) => setNutritionForm({ ...nutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
+                <label htmlFor="nutrition-calorias" className="text-sm text-[#999] mb-1 block">Calorías</label>
+                <NumericInput id="nutrition-calorias" value={nutritionForm.calories} onChange={(v) => setNutritionForm({ ...nutritionForm, calories: v })} inputMode="numeric" allowDecimal={false} min={0}
                   className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm" />
               </div>
             </div>
@@ -463,8 +465,8 @@ export default function EnergiaPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar"><Pencil size={14} /></button>
-                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar"><Trash2 size={14} /></button>
+                    <button onClick={() => startEditNutrition(log)} className="p-2.5 rounded-lg hover:bg-champagne/10 text-[#888] hover:text-champagne transition-all touch-press" title="Editar" aria-label={`Editar registro nutricional del ${safeFormatDate(log.date)}`}><Pencil size={14} aria-hidden="true" /></button>
+                    <button onClick={() => setPendingDeleteId({ id: log.id, type: 'nutrition' })} className="p-2.5 rounded-lg hover:bg-red-500/10 text-[#888] hover:text-red-400 transition-all touch-press" title="Eliminar" aria-label={`Eliminar registro nutricional del ${safeFormatDate(log.date)}`}><Trash2 size={14} aria-hidden="true" /></button>
                   </div>
                 </div>
                 {(log.meals || log.notes) && (

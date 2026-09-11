@@ -70,7 +70,8 @@ const ThreadContextMenu = React.memo(function ThreadContextMenu({
     let index = -1;
     const setIndex = (i: number) => {
       index = i;
-      items.forEach((el, idx) => el.setAttribute('aria-selected', idx === i ? 'true' : 'false'));
+      // N-8: aria-selected is not a valid attribute on role="menuitem";
+      // roving focus alone conveys the active item to assistive technology.
       if (i >= 0 && i < items.length) items[i].focus();
     };
     setIndex(0);

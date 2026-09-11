@@ -84,10 +84,13 @@ const CopyMessageButton = React.memo(function CopyMessageButton({ content }: Cop
       "
     >
       {copied ? (
-        <Check size={13} strokeWidth={2} className="text-champagne/70" />
+        <Check size={13} strokeWidth={2} className="text-champagne/70" aria-hidden="true" />
       ) : (
-        <Copy size={13} strokeWidth={1.5} />
+        <Copy size={13} strokeWidth={1.5} aria-hidden="true" />
       )}
+      {/* N-8: the aria-label swap above is not reliably announced while the
+          button keeps focus — a polite status region guarantees the feedback. */}
+      <span className="sr-only" role="status">{copied ? 'Respuesta copiada' : ''}</span>
     </button>
   );
 });

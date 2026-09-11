@@ -42,7 +42,8 @@ import { notifyAchievementUnlocks } from '@/lib/achievement-feedback';
 
 // ─── Types ───────────────────────────────────────────────
 
-interface AchievementData {
+// N-8: exported so the a11y tests can build typed fixtures
+export interface AchievementData {
   key: string;
   title: string;
   description: string;
@@ -280,7 +281,7 @@ export default function LogrosPage() {
             </div>
             <span className="text-2xl font-bold text-champagne">{data.stats.percent}%</span>
           </div>
-          <div className="w-full bg-[#1a1a1a] rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-[#1a1a1a] rounded-full h-3 overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={data.stats.percent} aria-label="Progreso total de logros">
             <div
               className="bg-gradient-to-r from-champagne to-champagne-hover h-3 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${data.stats.percent}%` }}
@@ -302,13 +303,14 @@ export default function LogrosPage() {
             <button
               key={cat.key}
               onClick={() => setActiveFilter(cat.key)}
+              aria-pressed={isActive}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                 isActive
                   ? 'bg-champagne text-[#000000]'
                   : 'bg-[#0a0a0a] border border-[#1a1a1a] text-[#999] hover:border-champagne/30 hover:text-champagne'
               }`}
             >
-              <Icon size={14} />
+              <Icon size={14} aria-hidden="true" />
               {cat.label}
             </button>
           );
@@ -336,7 +338,7 @@ export default function LogrosPage() {
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-5">
             <Eye size={16} className="text-champagne/40" />
-            <h2 className="label-discrete" style={{ color: 'rgba(200,165,90,0.5)' }}>Cerca de aparecer</h2>
+            <h2 className="label-discrete" style={{ color: 'rgba(200,165,90,0.75)' }}>Cerca de aparecer</h2>
             <span className="text-xs text-[#999] ml-1">({mysteryList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -352,7 +354,7 @@ export default function LogrosPage() {
         <div>
           <div className="flex items-center gap-2 mb-5">
             <Lock size={16} className="text-[#888]" />
-            <h2 className="label-discrete" style={{ color: '#555' }}>Por aparecer</h2>
+            <h2 className="label-discrete" style={{ color: '#888' }}>Por aparecer</h2>
             <span className="text-xs text-[#999] ml-1">({lockedVisibleList.length})</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -375,12 +377,14 @@ export default function LogrosPage() {
   );
 }
 
-// ─── Achievement Card ────────────────────────────────────
+// ─── Achievement Card ────────────────────────────────
 // Clean, silent, no ribbon, no "HECHO" badge.
 // Unlocked = subtle gold dot + warm tone.
 // Locked = dimmed, quiet.
+// N-8: exported so the a11y contract (textual unlock state + progressbar
+// semantics) is covered by deterministic tests.
 
-function AchievementCard({ achievement, index }: { achievement: AchievementData; index: number }) {
+export function AchievementCard({ achievement, index }: { achievement: AchievementData; index: number }) {
   const Icon = ICON_MAP[achievement.icon] || Trophy;
   const isUnlocked = achievement.unlocked;
 
@@ -417,8 +421,10 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
               {CATEGORY_LABELS[achievement.category] || achievement.category}
             </span>
             {isUnlocked && (
-              <Circle size={5} fill="currentColor" className="text-champagne" />
+              <Circle size={5} fill="currentColor" className="text-champagne" aria-hidden="true" />
             )}
+            {/* N-8: unlock state must not depend on the gold dot alone */}
+            <span className="sr-only">{isUnlocked ? 'Logro desbloqueado' : 'Logro bloqueado'}</span>
           </div>
           <h3
             className={`font-semibold text-sm truncate transition-colors ${
@@ -446,7 +452,7 @@ function AchievementCard({ achievement, index }: { achievement: AchievementData;
                   {achievement.percent}%
                 </span>
               </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={achievement.percent} aria-label={`Progreso del logro ${achievement.title}`}>
                 <div
                   className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
                     isUnlocked ? 'bg-champagne' : 'bg-[#333]'
@@ -512,7 +518,7 @@ function MysteryCard({ achievement, index }: { achievement: AchievementData; ind
                   {achievement.percent}%
                 </span>
               </div>
-              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={achievement.percent} aria-label="Progreso del logro oculto">
                 <div
                   className="h-1.5 rounded-full bg-champagne/30 transition-all duration-700 ease-out"
                   style={{ width: `${achievement.percent}%` }}

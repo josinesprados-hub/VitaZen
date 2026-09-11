@@ -35,6 +35,10 @@ interface NumericInputProps {
   /** Whether to allow decimal values */
   allowDecimal?: boolean;
   disabled?: boolean;
+  /** N-8: associate the input with a visible <label htmlFor> */
+  id?: string;
+  /** N-8: accessible name when no visible label can be associated */
+  'aria-label'?: string;
 }
 
 export function NumericInput({
@@ -47,6 +51,8 @@ export function NumericInput({
   inputMode = 'decimal',
   allowDecimal = true,
   disabled = false,
+  id,
+  'aria-label': ariaLabel,
 }: NumericInputProps) {
   const [raw, setRaw] = useState(formatEuropean(value, allowDecimal));
   const isFocused = useRef(false);
@@ -115,6 +121,8 @@ export function NumericInput({
       className={className}
       disabled={disabled}
       autoComplete="off"
+      id={id}
+      aria-label={ariaLabel}
     />
   );
 }

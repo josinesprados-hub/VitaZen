@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
           )}
 
           {success && (
-            <div className="bg-green-900/20 border border-green-800 rounded-lg p-3 mb-4">
+            <div role="status" className="bg-green-900/20 border border-green-800 rounded-lg p-3 mb-4">
               <p className="text-green-400 text-sm">
                 Si el email existe en nuestro sistema, recibirás un enlace de recuperación.
               </p>

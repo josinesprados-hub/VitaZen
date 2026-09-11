@@ -70,7 +70,7 @@ function ValueSlider({
           {labels[value]?.label}
         </span>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="presentation">
         {[1, 2, 3, 4, 5].map((v) => (
           <button
             key={v}
@@ -78,7 +78,23 @@ function ValueSlider({
             role="radio"
             aria-checked={v === value}
             aria-label={`${label}: ${v} — ${labels[v]?.label || ''}`}
+            tabIndex={v === value ? 0 : -1}
             onClick={() => onChange(v)}
+            onKeyDown={(e) => {
+              // N-8: ARIA radio pattern — arrow keys move through the scale,
+              // roving tabindex keeps a single tab stop per group.
+              const next: Record<string, number | undefined> = {
+                ArrowRight: Math.min(5, value + 1),
+                ArrowUp: Math.min(5, value + 1),
+                ArrowLeft: Math.max(1, value - 1),
+                ArrowDown: Math.max(1, value - 1),
+              };
+              const target = next[e.key];
+              if (target !== undefined) {
+                e.preventDefault();
+                onChange(target);
+              }
+            }}
             className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all duration-200 value-btn ${
               v <= value
                 ? 'bg-champagne text-[#000000]'
@@ -128,6 +144,17 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
   const [saveError, setSaveError] = useState(false);
   const [step, setStep] = useState(1); // Skip intro — go directly to form
   const [xpAwarded, setXpAwarded] = useState(0); // DASH-38: XP feedback after save
+
+  // N-8: move focus to the confirmation's primary action when the modal
+  // transitions to the saved step — the focused "Guardar" button is unmounted
+  // on that transition, which would otherwise drop focus to <body>.
+  const continueButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (step === 2) {
+      const t = setTimeout(() => continueButtonRef.current?.focus(), 50);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
 
   // DASH-23/26: Focus management for accessibility.
   // - dialogRef: the modal container (receives initial focus)
@@ -253,37 +280,41 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
 
             {/* Intention */}
             <div>
-              <label className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">
+              <label htmlFor="checkin-intention" className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">
                 Intención del día
               </label>
               <input
+                id="checkin-intention"
                 type="text"
                 value={intention}
                 onChange={(e) => setIntention(e.target.value)}
                 placeholder="¿Qué te propones hoy?"
                 maxLength={120}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-champagne transition-colors text-base sm:text-sm"
+                aria-required="true"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors text-base sm:text-sm"
               />
             </div>
 
             {/* Optional note */}
             <div>
-              <label className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">
+              <label htmlFor="checkin-note" className="block text-xs text-[#999] uppercase tracking-wider font-medium mb-2">
                 Nota <span className="text-[#999] normal-case">(opcional)</span>
               </label>
               <textarea
+                id="checkin-note"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Algo que quieras recordar..."
                 maxLength={300}
                 rows={2}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#444] focus:border-champagne transition-colors text-base sm:text-sm resize-none"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors text-base sm:text-sm resize-none"
               />
             </div>
 
             <button
               onClick={handleSave}
               disabled={saving || !intention.trim()}
+              aria-busy={saving}
               className="w-full btn-primary py-3 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {saving ? 'Guardando...' : 'Listo'}
@@ -303,12 +334,13 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
         )}
 
         {step === 2 && (
-          /* Done Step */
-          <div className="p-6 sm:p-8 text-center safe-bottom card-enter">
+          /* Done Step — N-8: role="status" announces the confirmation politely;
+             focus is moved to the primary action via continueButtonRef */
+          <div role="status" className="p-6 sm:p-8 text-center safe-bottom card-enter">
             <div className="w-16 h-16 rounded-2xl bg-champagne/15 flex items-center justify-center mx-auto mb-5 micro-celebrate">
-              <span className="text-3xl">✓</span>
+              <span className="text-3xl" aria-hidden="true">✓</span>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Guardado</h2>
+            <h3 className="text-xl font-bold text-white mb-2">Guardado</h3>
             {/* DASH-38: Discreet XP feedback — only shown when XP was actually awarded (first check-in of the day) */}
             {xpAwarded > 0 && (
               <p className="text-xs text-champagne/60 mb-2">
@@ -320,6 +352,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
             </p>
             <p className="text-champagne font-medium italic mb-6">«{intention}»</p>
             <button
+              ref={continueButtonRef}
               onClick={onClose}
               className="w-full btn-primary py-3 rounded-xl text-sm"
             >

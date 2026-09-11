@@ -149,7 +149,8 @@ export default function PremiumErrorState({
   }[size];
 
   return (
-    <div className={cn('text-center error-state-enter', sizeConfig.container, className)}>
+    // N-8: route/error states must be announced by screen readers
+    <div role="alert" className={cn('text-center error-state-enter', sizeConfig.container, className)}>
       {/* Icon */}
       <div
         className={cn(

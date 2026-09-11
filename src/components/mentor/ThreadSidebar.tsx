@@ -122,6 +122,7 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
       <div className="flex border-b border-[#1a1a1a]">
         <button
           onClick={() => onTabChange('active')}
+          aria-pressed={tab === 'active'}
           className={"flex-1 py-2.5 text-xs font-medium transition-colors relative " + (
             tab === 'active'
               ? 'text-champagne'
@@ -142,6 +143,7 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
         </button>
         <button
           onClick={() => onTabChange('archived')}
+          aria-pressed={tab === 'archived'}
           className={"flex-1 py-2.5 text-xs font-medium transition-colors relative " + (
             tab === 'archived'
               ? 'text-champagne'
@@ -162,13 +164,15 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
         </button>
         <button
           onClick={() => onTabChange('favorites')}
+          aria-pressed={tab === 'favorites'}
+          aria-label="Favoritos"
           className={"flex-1 py-2.5 text-xs font-medium transition-colors relative " + (
             tab === 'favorites'
               ? 'text-champagne'
               : 'text-[#888] hover:text-[#999]'
           )}
         >
-          <Star size={12} className="inline -mt-px" />
+          <Star size={12} className="inline -mt-px" aria-hidden="true" />
           {tab === 'favorites' && (
             <span className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-champagne rounded-full" />
           )}
@@ -298,6 +302,7 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
                       key={thread.id}
                       role="button"
                       tabIndex={0}
+                      aria-current={activeThread === thread.id ? 'true' : undefined}
                       className={threadClass}
                       onClick={() => {
                         if (editingThreadId !== thread.id) {
@@ -305,6 +310,11 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
                         }
                       }}
                       onKeyDown={(e) => {
+                        // N-8: ignore key events that originate from nested
+                        // interactive elements (⋯ menu button, rename input);
+                        // without this guard Enter/Space on those controls
+                        // bubbled up and selected the thread instead.
+                        if (e.target !== e.currentTarget) return;
                         if ((e.key === 'Enter' || e.key === ' ') && editingThreadId !== thread.id) {
                           e.preventDefault();
                           onSelectThread(thread.id);
@@ -333,6 +343,7 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
                                 if (e.key === 'Enter') onRenameThread(thread.id, editTitle);
                                 if (e.key === 'Escape') onCancelEdit();
                               }}
+                              aria-label="Renombrar conversación"
                               className="flex-1 bg-[#000] border border-champagne rounded px-2 py-0.5 text-base sm:text-sm text-white focus:outline-none"
                               maxLength={100}
                             />

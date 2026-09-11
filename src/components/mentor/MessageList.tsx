@@ -37,7 +37,9 @@ const MessageList = React.memo(function MessageList({
   IconComponent,
 }: MessageListProps) {
   return (
-    <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
+    // N-8: role="log" — the conversation is a polite live region, so new
+    // messages are announced without spamming (no token streaming here).
+    <div ref={scrollContainerRef} role="log" aria-label="Conversación con el mentor" className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 sm:space-y-4 overscroll-contain scroll-smooth">
       {messages.length === 0 && (
         <div className="flex items-center justify-center h-full">
           <div className="text-center animate-in">
@@ -88,15 +90,17 @@ const MessageList = React.memo(function MessageList({
         />
       ))}
       {sending && (
+        // N-8: loading feedback must be perceivable without vision
         <div className="flex justify-start animate-in">
-          <div className={"border rounded-2xl rounded-bl-md p-4 " + (
+          <div role="status" className={"border rounded-2xl rounded-bl-md p-4 " + (
             isPremium ? 'bg-[#080808] border-champagne/10' : 'bg-[#000000] border-[#1a1a1a]'
           )}>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5" aria-hidden="true">
               <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
               <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
               <span className="w-2 h-2 bg-champagne rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
+            <span className="sr-only">El mentor está escribiendo…</span>
           </div>
         </div>
       )}

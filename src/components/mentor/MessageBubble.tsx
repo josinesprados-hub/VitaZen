@@ -42,6 +42,9 @@ const MessageBubble = React.memo(function MessageBubble({
   return (
     <div className={"flex " + flexClass + " animate-in"} style={{ animationDelay: animationDelay + 'ms' }}>
       <div className={"max-w-[88%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 " + bubbleClass}>
+        {/* N-8: author identification for screen readers — bubbles are
+            visually distinguished only by alignment/color */}
+        <span className="sr-only">{msg.role === 'user' ? 'Tú: ' : 'Mentor: '}</span>
         {msg.role === 'assistant' ? (
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}

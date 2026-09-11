@@ -76,10 +76,16 @@ function MoodDisplay({ mood }: { mood: number | null }) {
     <Heart
       key={i}
       size={12}
+      aria-hidden="true"
       className={i < mood ? 'text-champagne fill-champagne' : 'text-[#999]'}
     />
   ));
-  return <span className="flex items-center gap-0.5">{hearts}</span>;
+  // N-8: the value must not be conveyed by filled hearts alone.
+  return (
+    <span className="flex items-center gap-0.5" role="img" aria-label={`Ánimo: ${mood} de 5`}>
+      {hearts}
+    </span>
+  );
 }
 
 // ─── Main Component ───────────────────────────────
@@ -281,16 +287,16 @@ export default function CrecimientoPage() {
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar entrada</h3>
             <div className="space-y-3">
-              <input type="text" placeholder="Título" value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+              <input type="text" placeholder="Título" aria-label="Título de la entrada" value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
-              <textarea placeholder="Contenido" value={editForm.content} onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
+              <textarea placeholder="Contenido" aria-label="Contenido de la entrada" value={editForm.content} onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-28 resize-none" />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Ánimo (1-5)</label>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1" role="radiogroup" aria-label="Ánimo (1-5)">
                     {[1, 2, 3, 4, 5].map((n) => (
-                      <button key={n} onClick={() => setEditForm({ ...editForm, mood: n })}
+                      <button key={n} onClick={() => setEditForm({ ...editForm, mood: n })} role="radio" aria-checked={n === editForm.mood} aria-label={`Ánimo: ${n}`}
                         className={`rating-btn w-8 h-8 rounded border text-xs ${n <= editForm.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#000000] border-[#1a1a1a] text-[#888]'}`}>
                         {n}
                       </button>
@@ -298,8 +304,8 @@ export default function CrecimientoPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Gratitud</label>
-                  <input type="text" placeholder="Agradecido por..." value={editForm.gratitude} onChange={(e) => setEditForm({ ...editForm, gratitude: e.target.value })}
+                  <label htmlFor="edit-gratitud" className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Gratitud</label>
+                  <input id="edit-gratitud" type="text" placeholder="Agradecido por..." value={editForm.gratitude} onChange={(e) => setEditForm({ ...editForm, gratitude: e.target.value })}
                     className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
                 </div>
               </div>
@@ -357,9 +363,11 @@ export default function CrecimientoPage() {
           {!screenshotMode && (
             <button
               onClick={() => setShowAdd(!showAdd)}
+              aria-expanded={showAdd}
+              aria-controls="journal-new-entry-form"
               className="flex items-center gap-1 text-sm text-champagne hover:text-champagne-hover touch-press"
             >
-              <Plus size={18} /> Nueva entrada
+              <Plus size={18} aria-hidden="true" /> Nueva entrada
             </button>
           )}
         </div>
@@ -368,16 +376,16 @@ export default function CrecimientoPage() {
         {/* ═══ New Entry Form ═══ */}
         {showAdd && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-6 space-y-3">
-            <input type="text" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
+            <input type="text" placeholder="Título" aria-label="Título de la entrada" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
-            <textarea placeholder="¿Qué hay en tu mente?" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
+            <textarea placeholder="¿Qué hay en tu mente?" aria-label="Contenido de la entrada" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-32 resize-none" />
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm text-[#999] mb-1 block">Estado de ánimo (1-5)</label>
-                <div className="flex gap-1">
+                <div className="flex gap-1" role="radiogroup" aria-label="Estado de ánimo (1-5)">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <button key={n} onClick={() => setForm({ ...form, mood: n })}
+                    <button key={n} onClick={() => setForm({ ...form, mood: n })} role="radio" aria-checked={n === form.mood} aria-label={`Estado de ánimo: ${n}`}
                       className={`rating-btn w-9 h-9 rounded border text-sm ${n <= form.mood ? 'bg-champagne border-champagne text-black' : 'bg-[#0a0a0a] border-[#1a1a1a] text-[#888]'}`}>
                       {n}
                     </button>
@@ -385,8 +393,8 @@ export default function CrecimientoPage() {
                 </div>
               </div>
               <div>
-                <label className="text-sm text-[#999] mb-1 block">Gratitud</label>
-                <input type="text" placeholder="Algo que agradecer..." value={form.gratitude} onChange={(e) => setForm({ ...form, gratitude: e.target.value })}
+                <label htmlFor="nueva-gratitud" className="text-sm text-[#999] mb-1 block">Gratitud</label>
+                <input id="nueva-gratitud" type="text" placeholder="Algo que agradecer..." value={form.gratitude} onChange={(e) => setForm({ ...form, gratitude: e.target.value })}
                   className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
               </div>
             </div>
@@ -472,6 +480,7 @@ export default function CrecimientoPage() {
                           {entry.content.length > 150 && (
                             <button
                               onClick={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
+                              aria-expanded={expandedEntry === entry.id}
                               className="text-champagne text-xs mt-1 hover:underline"
                             >
                               {expandedEntry === entry.id ? 'Ver menos' : 'Ver más'}

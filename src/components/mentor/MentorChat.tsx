@@ -788,7 +788,7 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     <div className="mentor-full-viewport safe-top sm:relative sm:inset-auto sm:z-auto sm:h-auto flex flex-col overflow-hidden sm:max-w-6xl sm:mx-auto sm:flex-1 sm:min-h-0">
       {/* Offline indicator — subtle top banner */}
       {isOffline && (
-        <div className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
+        <div role="status" className="px-3 py-1.5 bg-champagne-warm/10 border-b border-champagne-warm/20 text-champagne-warm text-xs text-center shrink-0">
           Sin conexión — verifica tu red para enviar mensajes
         </div>
       )}
@@ -800,13 +800,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       {/* Mobile header — ultra compact */}
       <div className="flex sm:hidden items-center justify-between px-3 py-2 border-b border-[#1a1a1a] shrink-0 bg-[#0a0a0a]">
         <div className="flex items-center gap-2 min-w-0">
-          <Link href={backHref} className="p-1.5 -ml-1 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors shrink-0">
-            <ChevronLeft size={20} />
+          <Link href={backHref} aria-label="Volver" className="p-1.5 -ml-1 rounded-lg text-[#999] hover:text-white hover:bg-[#1a1a1a] transition-colors shrink-0">
+            <ChevronLeft size={20} aria-hidden="true" />
           </Link>
           <IconComponent size={16} className="text-champagne shrink-0" />
-          <p className="text-sm font-semibold text-white truncate">
+          <h1 className="text-sm font-semibold text-white truncate">
             {activeThreadData?.title || 'Mentor IA'}
-          </p>
+          </h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {/* Message counter pill — mobile compact */}
@@ -814,7 +814,8 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
             <span className={"text-[10px] font-medium px-2 py-0.5 rounded-full " + (
               remaining <= 3 ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#1a1a1a] text-champagne border border-[#2a2a2a]'
             )}>
-              {remaining}
+              <span aria-hidden="true">{remaining}</span>
+              <span className="sr-only">{remaining} mensajes restantes hoy</span>
             </span>
           )}
           {isPremium && (

@@ -186,9 +186,12 @@ export default function OnboardingPage() {
     <div className="min-h-[100dvh] bg-[#000000] flex flex-col items-center justify-center px-5 py-8">
       {/* Subtle Dot Indicator */}
       <div className="flex items-center justify-center gap-2.5 mb-8 sm:mb-10">
+        {/* N-8: decorative dots get a textual step indicator for screen readers */}
+        <span className="sr-only">Paso {step + 1} de 3</span>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
+            aria-hidden="true"
             className={`rounded-full transition-all duration-500 ${
               i === step
                 ? 'w-2 h-2 bg-champagne'
@@ -299,6 +302,7 @@ function GoalsStep({
             <button
               key={goal}
               onClick={() => onToggle(goal)}
+              aria-pressed={isSelected}
               className={`text-left p-4 rounded-xl border transition-all duration-200 ${
                 isSelected
                   ? 'bg-champagne/10 border-champagne/40 onboarding-option-pop'
@@ -307,6 +311,7 @@ function GoalsStep({
             >
               <div className="flex items-center gap-2.5">
                 <div
+                  aria-hidden="true"
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
                     isSelected ? 'border-champagne bg-champagne' : 'border-[#333]'
                   }`}
@@ -372,7 +377,7 @@ function FocusStep({
         <p className="text-[#999] text-sm">Si tuvieras que elegir una, ¿cuál sería?</p>
       </div>
 
-      <div className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
+      <div className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8" role="radiogroup" aria-label="Enfoque principal">
         {FOCUS_OPTIONS.map((option) => {
           const isSelected = selected === option.key;
           const Icon = option.icon;
@@ -380,6 +385,8 @@ function FocusStep({
             <button
               key={option.key}
               onClick={() => onSelect(option.key)}
+              role="radio"
+              aria-checked={isSelected}
               className={`w-full text-left p-5 rounded-xl border transition-all duration-200 ${
                 isSelected
                   ? 'bg-champagne/10 border-champagne/40 onboarding-option-pop'
@@ -388,6 +395,7 @@ function FocusStep({
             >
               <div className="flex items-center gap-4">
                 <div
+                  aria-hidden="true"
                   className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
                     isSelected ? 'bg-champagne/20' : 'bg-champagne/10'
                   }`}
@@ -403,11 +411,12 @@ function FocusStep({
                     >
                       {option.label}
                     </h3>
-                    <span className="text-sm">{option.emoji}</span>
+                    <span className="text-sm" aria-hidden="true">{option.emoji}</span>
                   </div>
                   <p className="text-xs text-[#888] mt-0.5">{option.description}</p>
                 </div>
                 <div
+                  aria-hidden="true"
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
                     isSelected ? 'border-champagne bg-champagne' : 'border-[#333]'
                   }`}
@@ -421,7 +430,7 @@ function FocusStep({
       </div>
 
       {error && (
-        <div className="bg-champagne/5 border border-champagne/15 rounded-lg p-3 mb-4 error-state-enter">
+        <div role="alert" className="bg-champagne/5 border border-champagne/15 rounded-lg p-3 mb-4 error-state-enter">
           <p className="text-champagne/80 text-sm">{error}</p>
         </div>
       )}

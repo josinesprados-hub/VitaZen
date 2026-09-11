@@ -84,6 +84,8 @@ const MiniBarChart = memo(function MiniBarChart({ data, metricKey }: { data: Tre
           <div
             key={i}
             className="flex-1 h-5 rounded-sm bg-[#1a1a1a] overflow-hidden transition-all duration-300"
+            role="img"
+            aria-label={`${val} de 5`}
             title={`${val}/5`}
           >
             <div
@@ -256,12 +258,12 @@ export default function CheckinPage() {
       {/* Delete Confirmation Overlay */}
       {pendingDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={() => setPendingDeleteId(null)}>
-          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar check-in" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div ref={deleteDialogRef} role="alertdialog" aria-modal="true" aria-label="Eliminar check-in" aria-describedby="delete-checkin-warning" className="modal-content-destructive p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-400" />
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Eliminar check-in</h3>
-            <p className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
+            <p id="delete-checkin-warning" className="text-[#999] text-sm mb-6">Esta acción no se puede deshacer</p>
             <div className="flex items-center justify-center gap-3">
               <button onClick={() => setPendingDeleteId(null)} className="bg-[#000000] border border-[#333] text-[#999] font-medium px-5 py-2.5 rounded-xl hover:bg-[#111] transition-colors">Cancelar</button>
               <button onClick={confirmDelete} className="bg-red-500/90 text-white font-medium px-5 py-2.5 rounded-xl hover:bg-red-500 transition-colors">Eliminar</button>
