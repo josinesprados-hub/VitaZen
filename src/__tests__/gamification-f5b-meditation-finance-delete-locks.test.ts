@@ -293,6 +293,11 @@ describe('F-5B — DELETE /api/meditation serializes with the writers of the men
   });
 
   it('(E) primera sesión del día → +15 XP y streak +1 (POST intacto, award atómico)', async () => {
+    // E-0.1: the first POST issues TWO findFirst calls (today-check + G-07
+    // continuity check). Yesterday active → the day continues → streak +1.
+    H.MOCK_TX.meditationSession.findFirst
+      .mockResolvedValueOnce(null)                       // otherSessionToday
+      .mockResolvedValueOnce([{ id: 'sess-yesterday' }]); // continuity: yesterday active
     const rawSnap = rawCount();
     const res = await postMeditation();
     expect(res.status).toBe(200);
@@ -508,6 +513,11 @@ describe('F-5B — DELETE /api/finance serializes with the writers of the riquez
   });
 
   it('(E) primer log del día → +10 XP y streak +1 (POST intacto, award atómico)', async () => {
+    // E-0.1: call #1 = otherLogToday, call #2 = continuity (createdAt ayer)
+    // → the day continues → streak +1.
+    H.MOCK_TX.financeLog.findFirst
+      .mockResolvedValueOnce(null)                       // otherLogToday
+      .mockResolvedValueOnce([{ id: 'log-yesterday' }]); // continuity: yesterday active
     const rawSnap = rawCount();
     const res = await postFinance();
     expect(res.status).toBe(200);

@@ -221,6 +221,12 @@ describe('G-03 — POST /api/meditation awards +15 XP only on the first session 
   });
 
   it('1. first session of the day → created, +15 XP and streak +1', async () => {
+    // E-0.1: the first POST now makes TWO findFirst calls — call #1 is the
+    // otherSessionToday check, call #2 is the G-07-style continuity check.
+    // A yesterday session means the day CONTINUES the chain → streak +1.
+    H.MOCK_TX.meditationSession.findFirst
+      .mockResolvedValueOnce(null)                         // otherSessionToday
+      .mockResolvedValueOnce([{ id: 'sess-yesterday' }]);  // continuity: yesterday active
     const { POST } = await import('@/app/api/meditation/route');
     const res = await POST(makeRequest('/api/meditation', 'POST', MEDITATION_VALID_BODY) as any);
     expect(res.status).toBe(200);
@@ -280,28 +286,40 @@ describe('G-03 — POST /api/meditation awards +15 XP only on the first session 
   it('4. sessions on different days → one +15 reward per Madrid day', async () => {
     const { POST } = await import('@/app/api/meditation/route');
 
-    // Day 1: first session → +15.
-    H.MOCK_TX.meditationSession.findFirst.mockResolvedValueOnce(null);
+    // Day 1: first session → +15. E-0.1: each first-of-day POST issues TWO
+    // findFirst calls (today-check + yesterday continuity check).
+    H.MOCK_TX.meditationSession.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null);
     await POST(makeRequest('/api/meditation', 'POST', MEDITATION_VALID_BODY) as any);
 
     // Advance the mocked clock to the next Madrid day.
     H.state.todayKey = DAY_2;
-    H.MOCK_TX.meditationSession.findFirst.mockResolvedValueOnce(null);
+    H.MOCK_TX.meditationSession.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null);
     await POST(makeRequest('/api/meditation', 'POST', MEDITATION_VALID_BODY) as any);
 
     expect(xpIncrements()).toEqual([15, 15]);
 
-    // The "other session today?" check must query the correct Madrid window
-    // for each day (real boundaries from the unified dates utility).
+    // findFirst call order: [day1 today-check, day1 continuity-check,
+    // day2 today-check, day2 continuity-check] — each with the correct
+    // REAL Madrid window (day N and day N-1 respectively).
     const windows = H.MOCK_TX.meditationSession.findFirst.mock.calls.map(
       (c: any[]) => c[0].where.completedAt,
     );
     const day1 = madridDayBoundaries(DAY_1);
     const day2 = madridDayBoundaries(DAY_2);
+    const day0 = madridDayBoundaries('2026-09-06');
+    const day1Prev = madridDayBoundaries('2026-09-07'); // yesterday of day 2
     expect(windows[0].gte.getTime()).toBe(day1.start.getTime());
     expect(windows[0].lt.getTime()).toBe(day1.end.getTime());
-    expect(windows[1].gte.getTime()).toBe(day2.start.getTime());
-    expect(windows[1].lt.getTime()).toBe(day2.end.getTime());
+    expect(windows[1].gte.getTime()).toBe(day0.start.getTime()); // continuity day 1
+    expect(windows[1].lt.getTime()).toBe(day0.end.getTime());
+    expect(windows[2].gte.getTime()).toBe(day2.start.getTime());
+    expect(windows[2].lt.getTime()).toBe(day2.end.getTime());
+    expect(windows[3].gte.getTime()).toBe(day1Prev.start.getTime()); // continuity day 2
+    expect(windows[3].lt.getTime()).toBe(day1Prev.end.getTime());
   });
 
   it('5. two simultaneous first-of-day requests → exactly one +15, one +0, both succeed', async () => {
@@ -379,6 +397,11 @@ describe('G-03 — POST /api/finance awards +10 XP only on the first log of the 
   });
 
   it('7. first log of the day → created, +10 XP and streak +1', async () => {
+    // E-0.1: call #1 = otherLogToday, call #2 = continuity check (yesterday
+    // active on createdAt) → the day continues the chain → streak +1.
+    H.MOCK_TX.financeLog.findFirst
+      .mockResolvedValueOnce(null)                       // otherLogToday
+      .mockResolvedValueOnce([{ id: 'log-yesterday' }]); // continuity: yesterday active
     const { POST } = await import('@/app/api/finance/route');
     const res = await POST(makeRequest('/api/finance', 'POST', FINANCE_VALID_BODY) as any);
     expect(res.status).toBe(200);
@@ -432,11 +455,17 @@ describe('G-03 — POST /api/finance awards +10 XP only on the first log of the 
   it('10. logs on different days → one +10 reward per Madrid day', async () => {
     const { POST } = await import('@/app/api/finance/route');
 
-    H.MOCK_TX.financeLog.findFirst.mockResolvedValueOnce(null);
+    // E-0.1: each first-of-day POST issues TWO findFirst calls (today-check
+    // on createdAt + yesterday continuity check on createdAt).
+    H.MOCK_TX.financeLog.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null);
     await POST(makeRequest('/api/finance', 'POST', FINANCE_VALID_BODY) as any);
 
     H.state.todayKey = DAY_2;
-    H.MOCK_TX.financeLog.findFirst.mockResolvedValueOnce(null);
+    H.MOCK_TX.financeLog.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null);
     await POST(makeRequest('/api/finance', 'POST', FINANCE_VALID_BODY) as any);
 
     const increments = H.empireProgressUpsert.mock.calls.map(
@@ -444,13 +473,16 @@ describe('G-03 — POST /api/finance awards +10 XP only on the first log of the 
     );
     expect(increments).toEqual([10, 10]);
 
-    // The first-of-day check queries by createdAt inside the correct
-    // Madrid window for each day (never the user-supplied `date`).
+    // findFirst call order: [day1 today, day1 continuity, day2 today,
+    // day2 continuity] — all keyed by createdAt (never the client `date`),
+    // each inside the correct REAL Madrid window.
     const windows = H.MOCK_TX.financeLog.findFirst.mock.calls.map(
       (c: any[]) => c[0].where.createdAt,
     );
     expect(windows[0].gte.getTime()).toBe(madridDayBoundaries(DAY_1).start.getTime());
-    expect(windows[1].gte.getTime()).toBe(madridDayBoundaries(DAY_2).start.getTime());
+    expect(windows[1].gte.getTime()).toBe(madridDayBoundaries('2026-09-06').start.getTime());
+    expect(windows[2].gte.getTime()).toBe(madridDayBoundaries(DAY_2).start.getTime());
+    expect(windows[3].gte.getTime()).toBe(madridDayBoundaries(DAY_1).start.getTime());
   });
 
   it('11. two simultaneous first-of-day logs → exactly one +10, both logs preserved', async () => {

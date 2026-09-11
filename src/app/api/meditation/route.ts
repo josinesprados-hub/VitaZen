@@ -6,7 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onMeditationChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-import { madridDayBoundaries } from '@/lib/dates';
+import { madridDayBoundaries, addDaysToDateKey } from '@/lib/dates';
 import { VALID_MEDITATION_TYPES } from '@/lib/meditation-types';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -276,16 +276,40 @@ export async function POST(request: NextRequest) {
       });
       const isFirstSessionToday = !otherSessionToday;
 
+      // E-0.1 (F-NEW-1) FIX: the mente streak must not resurrect across a
+      // gap. Continuity is decided from REAL meditation activity (G-07
+      // pattern from habits), inside the SAME advisory-locked transaction:
+      //   any session within yesterday's true Madrid day → stored + 1;
+      //   yesterday empty → the streak is explicitly SET to 1.
+      // The session created above belongs to TODAY, so it never pollutes
+      // yesterday's window. Yesterday's boundaries come from the DST-exact
+      // Madrid calendar (23h/24h/25h days), never start+24h.
+      let streakUpdate: Record<string, unknown> = {};
+      if (isFirstSessionToday) {
+        const { start: yesterdayStart, end: yesterdayEnd } =
+          madridDayBoundaries(addDaysToDateKey(todayDateKey, -1));
+        const anySessionYesterday = await tx.meditationSession.findFirst({
+          where: {
+            userId: user.id,
+            completedAt: { gte: yesterdayStart, lt: yesterdayEnd },
+          },
+          select: { id: true },
+        });
+        streakUpdate = anySessionYesterday
+          ? { streak: { increment: 1 } }
+          : { streak: 1 };
+      }
+
       await tx.empireProgress.upsert({
         where: { userId_empire: { userId: user.id, empire: 'mente' } },
         update: {
           // G-03 FIX: repeat sessions of the same Madrid day award +0 XP.
           xp: { increment: isFirstSessionToday ? 15 : 0 },
-          ...(isFirstSessionToday ? { streak: { increment: 1 } } : {}),
+          ...streakUpdate,
         },
         // Defensive create path: the row is normally created at signup; if it
         // is ever missing, only a genuinely first-of-day session may seed it
-        // with the daily reward.
+        // with the daily reward (a fresh row starts a fresh chain at 1).
         create: {
           userId: user.id,
           empire: 'mente',

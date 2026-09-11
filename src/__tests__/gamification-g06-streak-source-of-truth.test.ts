@@ -787,9 +787,14 @@ describe('G-06 — regression G-03: meditation XP/streak once per Madrid day', (
   });
 
   it('22. first session of the day pays +15 and +1 streak; a repeat pays +0 and no streak', async () => {
+    // E-0.1: a first-of-day POST issues TWO findFirst calls (today-check +
+    // yesterday continuity check). Yesterday active → the day CONTINUES the
+    // chain → streak +1 (increment). The repeat POST sees today's session →
+    // no streak op at all.
     H.MOCK_TX.meditationSession.findFirst
-      .mockResolvedValueOnce(null)   // first POST: no other session today
-      .mockResolvedValueOnce({ id: 's0' }); // second POST: another session exists today
+      .mockResolvedValueOnce(null)              // POST 1: no other session today
+      .mockResolvedValueOnce({ id: 's-yesterday' }) // POST 1: continuity → yesterday active
+      .mockResolvedValueOnce({ id: 's0' });     // POST 2: another session exists today
 
     const { POST } = await import('@/app/api/meditation/route');
     const body = { duration: 10, type: 'mindfulness' };

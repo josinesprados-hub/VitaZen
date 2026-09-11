@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserBasic } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { startOfMadridDaysAgo, startOfMadridDay, getTodayDateKey, getMadridDateKey, madridDayBoundaries } from '@/lib/dates';
+import { startOfMadridDaysAgo, startOfMadridDay, getTodayDateKey, getMadridDateKey, madridDayBoundaries, addDaysToDateKey } from '@/lib/dates';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onFinanceChange } from '@/lib/widgets/triggers';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
@@ -163,12 +163,37 @@ export async function POST(request: NextRequest) {
       });
       const isFirstLogToday = !otherLogToday;
 
+      // E-0.1 (F-NEW-1) FIX: the riqueza streak must not resurrect across a
+      // gap. Continuity is decided from REAL finance activity (G-07 pattern
+      // from habits), inside the SAME advisory-locked transaction:
+      //   any log whose createdAt (server clock) falls within yesterday's
+      //   true Madrid day → stored + 1;
+      //   yesterday empty → the streak is explicitly SET to 1.
+      // createdAt is the SAME canonical instant that drives the XP day and
+      // the G-06 aliveness gate for riqueza — the user-supplied `date` field
+      // never participates in streak semantics.
+      let streakUpdate: Record<string, unknown> = {};
+      if (isFirstLogToday) {
+        const { start: yesterdayStart, end: yesterdayEnd } =
+          madridDayBoundaries(addDaysToDateKey(todayDateKey, -1));
+        const anyLogYesterday = await tx.financeLog.findFirst({
+          where: {
+            userId: user.id,
+            createdAt: { gte: yesterdayStart, lt: yesterdayEnd },
+          },
+          select: { id: true },
+        });
+        streakUpdate = anyLogYesterday
+          ? { streak: { increment: 1 } }
+          : { streak: 1 };
+      }
+
       await tx.empireProgress.upsert({
         where: { userId_empire: { userId: user.id, empire: 'riqueza' } },
         update: {
           // G-03 FIX: repeat logs of the same Madrid day award +0 XP.
           xp: { increment: isFirstLogToday ? 10 : 0 },
-          ...(isFirstLogToday ? { streak: { increment: 1 } } : {}),
+          ...streakUpdate,
         },
         // Defensive create path: the row is normally created at signup; if it
         // is ever missing, only a genuinely first-of-day log may seed it with

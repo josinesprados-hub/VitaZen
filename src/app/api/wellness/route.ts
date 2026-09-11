@@ -6,7 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-import { madridDayBoundaries } from '@/lib/dates';
+import { madridDayBoundaries, addDaysToDateKey } from '@/lib/dates';
 import { checkLogDateWindow } from '@/lib/log-date-window';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -197,11 +197,45 @@ export async function POST(request: NextRequest) {
         }) : null;
         const isFirstEnergiaLogToday = !otherEnergiaLogToday && !otherNutritionLogToday;
 
+        // E-0.1 (F-NEW-1) FIX: the energia streak is cross-module (wellness OR
+        // nutrition) and must not resurrect across a gap. Continuity is
+        // decided from REAL energia activity on the day BEFORE the log's own
+        // Madrid day (a G-02-validated backdated log continues the chain of
+        // ITS day), inside the SAME advisory-locked transaction:
+        //   wellness OR nutrition in that previous day → stored + 1;
+        //   neither → the streak is explicitly SET to 1.
+        // The log created above belongs to logDateKey itself, so it can never
+        // fall inside the previous day's window (no self-exclusion needed).
+        let streakUpdate: Record<string, unknown> = {};
+        if (isFirstEnergiaLogToday) {
+          const { start: yesterdayStart, end: yesterdayEnd } =
+            madridDayBoundaries(addDaysToDateKey(logDateKey, -1));
+          const wellnessYesterday = await tx.wellnessLog.findFirst({
+            where: {
+              userId: user.id,
+              date: { gte: yesterdayStart, lt: yesterdayEnd },
+            },
+            select: { id: true },
+          });
+          const nutritionYesterday = !wellnessYesterday
+            ? await tx.nutritionLog.findFirst({
+                where: {
+                  userId: user.id,
+                  date: { gte: yesterdayStart, lt: yesterdayEnd },
+                },
+                select: { id: true },
+              })
+            : null;
+          streakUpdate = (wellnessYesterday || nutritionYesterday)
+            ? { streak: { increment: 1 } }
+            : { streak: 1 };
+        }
+
         await tx.empireProgress.upsert({
           where: { userId_empire: { userId: user.id, empire: 'energia' } },
           update: {
             xp: { increment: isFirstEnergiaLogToday ? 10 : 0 },
-            ...(isFirstEnergiaLogToday ? { streak: { increment: 1 } } : {}),
+            ...streakUpdate,
           },
           // Defensive create path: the row is normally created at signup; if
           // it is ever missing, only a genuinely first-of-day log may seed it

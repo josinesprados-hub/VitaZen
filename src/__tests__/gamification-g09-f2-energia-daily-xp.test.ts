@@ -322,13 +322,18 @@ describe('F-2 — POST /api/wellness pays +10 XP only on the first energia log o
     // Different Madrid days → each pays its own daily reward.
     expect(xpIncrements()).toEqual([10, 10]);
 
-    // Different lock keys and different day windows.
+    // Different lock keys and different day windows. E-0.1: each first-of-day
+    // POST issues TWO wellnessLog.findFirst calls — [DAY_1 today-check,
+    // DAY_1 continuity-check (previous day), DAY_2 today-check, DAY_2
+    // continuity-check]. All four must use the correct REAL Madrid window.
     expect(lockKeys()).toEqual([`user-1|energia|${DAY_1}`, `user-1|energia|${DAY_2}`]);
     const windows = H.MOCK_TX.wellnessLog.findFirst.mock.calls.map(
       (c: any[]) => c[0].where.date,
     );
     expect(windows[0].gte.getTime()).toBe(madridDayBoundaries(DAY_1).start.getTime());
-    expect(windows[1].gte.getTime()).toBe(madridDayBoundaries(DAY_2).start.getTime());
+    expect(windows[1].gte.getTime()).toBe(madridDayBoundaries('2026-09-06').start.getTime()); // continuity of DAY_1
+    expect(windows[2].gte.getTime()).toBe(madridDayBoundaries(DAY_2).start.getTime());
+    expect(windows[3].gte.getTime()).toBe(madridDayBoundaries(DAY_1).start.getTime()); // continuity of DAY_2
   });
 
   it('6. DST spring-forward (23-hour day 2026-03-29): two instants of the same Madrid day → +10 then +0', async () => {
