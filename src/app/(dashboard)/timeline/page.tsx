@@ -423,7 +423,9 @@ export default function TimelinePage() {
                                 <div className="flex gap-3 mt-2.5">
                                   {[
                                     { label: 'Ánimo', val: item.meta.mood },
-                                    { label: 'Energía', val: item.meta.energy },
+                                    // H-1 (E-6): wellness block — "Bienestar físico",
+                                    // not to be confused with the check-in "Energía".
+                                    { label: 'Bienestar físico', val: item.meta.energy },
                                     { label: 'Sueño', val: item.meta.sleep },
                                     { label: 'Estrés', val: item.meta.stress },
                                   ].map(({ label, val }) => (

@@ -47,7 +47,7 @@ interface NutritionLog {
 // tab stop per group, ArrowRight/ArrowUp increment, ArrowLeft/ArrowDown
 // decrement, always clamped to the 1–5 range. No Home/End handling: the
 // reference pattern does not implement it either.
-function RatingInput({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
+function RatingInput({ value, onChange, label, hint }: { value: number; onChange: (v: number) => void; label: string; hint?: string }) {
   return (
     <div>
       <label className="text-sm text-[#999] mb-1 block">{label}</label>
@@ -73,6 +73,9 @@ function RatingInput({ value, onChange, label }: { value: number; onChange: (v: 
           </button>
         ))}
       </div>
+      {/* H-1 (E-6): optional plain-language scale hint so a 1–5 number rating
+          is never ambiguous. Only surfaces that need it pass `hint`. */}
+      {hint && <p className="text-xs text-[#777] mt-1.5">{hint}</p>}
     </div>
   );
 }
@@ -346,7 +349,9 @@ export default function EnergiaPage() {
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar bienestar</h3>
             <div className="space-y-4">
               <RatingInput label="Estado de ánimo" value={editWellnessForm.mood} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, mood: v })} />
-              <RatingInput label="Energía" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
+              {/* H-1 (E-6): WellnessLog.energy is "Bienestar físico" in the
+                  Imperio — the DailyCheckin check-in keeps its own "Energía". */}
+              <RatingInput label="Bienestar físico" hint="1 = Muy bajo · 2 = Bajo · 3 = Normal · 4 = Bueno · 5 = Muy bueno" value={editWellnessForm.energy} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, energy: v })} />
               <RatingInput label="Sueño" value={editWellnessForm.sleep} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, sleep: v })} />
               <RatingInput label="Estrés" value={editWellnessForm.stress} onChange={(v) => setEditWellnessForm({ ...editWellnessForm, stress: v })} />
               <textarea placeholder="Notas (opcional)" aria-label="Notas de bienestar (opcional)" value={editWellnessForm.notes} onChange={(e) => setEditWellnessForm({ ...editWellnessForm, notes: e.target.value })}
@@ -432,7 +437,7 @@ export default function EnergiaPage() {
       <ContextualHelp
         storageKey="vitazen_help_energia"
         title="Energía"
-        text="Registra tu bienestar físico y nutrición diaria. Ánimo, energía, sueño y estrés, junto con tus comidas y agua."
+        text="Registra tu bienestar físico y nutrición diaria. Ánimo, bienestar físico, sueño y estrés, junto con tus comidas y agua."
       />
 
       {/* Wellness Log */}
@@ -447,7 +452,9 @@ export default function EnergiaPage() {
         {showWellness && (
           <div id="wellness-form" className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-4 space-y-4">
             <RatingInput label="Estado de ánimo" value={wellnessForm.mood} onChange={(v) => setWellnessForm({ ...wellnessForm, mood: v })} />
-            <RatingInput label="Energía" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
+            {/* H-1 (E-6): WellnessLog.energy is "Bienestar físico" in the
+                Imperio — the DailyCheckin check-in keeps its own "Energía". */}
+            <RatingInput label="Bienestar físico" hint="1 = Muy bajo · 2 = Bajo · 3 = Normal · 4 = Bueno · 5 = Muy bueno" value={wellnessForm.energy} onChange={(v) => setWellnessForm({ ...wellnessForm, energy: v })} />
             <RatingInput label="Sueño" value={wellnessForm.sleep} onChange={(v) => setWellnessForm({ ...wellnessForm, sleep: v })} />
             <RatingInput label="Estrés" value={wellnessForm.stress} onChange={(v) => setWellnessForm({ ...wellnessForm, stress: v })} />
             <textarea placeholder="Notas (opcional)" aria-label="Notas de bienestar (opcional)" value={wellnessForm.notes} onChange={(e) => setWellnessForm({ ...wellnessForm, notes: e.target.value })}
@@ -473,7 +480,7 @@ export default function EnergiaPage() {
                     <div>
                       <div className="flex gap-1.5 sm:gap-2 flex-wrap text-xs mb-1">
                         <span className="text-champagne">Ánimo: <PrivacyMask compact>{log.mood}</PrivacyMask></span>
-                        <span className="text-champagne">Energía: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
+                        <span className="text-champagne">Bienestar físico: <PrivacyMask compact>{log.energy}</PrivacyMask></span>
                         <span className="text-champagne">Sueño: <PrivacyMask compact>{log.sleep}</PrivacyMask></span>
                       </div>
                       <div className="flex items-center gap-3">

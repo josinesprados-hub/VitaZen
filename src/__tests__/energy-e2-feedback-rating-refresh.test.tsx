@@ -397,7 +397,10 @@ describe('E-2 H-4 — RatingInput: radiogroup con roving tabindex y flechas', ()
   it('selección con ratón: click en 5 lo marca', async () => {
     await renderLoadedPage();
     const { user, wellnessSection } = await openWellnessForm();
-    const group = within(wellnessSection).getByRole('radiogroup', { name: 'Energía' });
+    // E-6 H-1: WellnessLog.energy is presented as "Bienestar físico" in the
+    // Imperio (the check-in keeps "Energía"). Same component, same ARIA radio
+    // pattern — only the accessible name changed.
+    const group = within(wellnessSection).getByRole('radiogroup', { name: 'Bienestar físico' });
 
     await user.click(radiosOf(group)[4]);
     expect(checkedOf(group).textContent).toBe('5');

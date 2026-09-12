@@ -6,7 +6,7 @@ import { tryAutoCompleteChallenge } from '@/lib/challenge-auto-complete';
 import { evaluateAchievements } from '@/lib/achievements';
 import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
-import { madridDayBoundaries, addDaysToDateKey } from '@/lib/dates';
+import { madridDayBoundaries, addDaysToDateKey, startOfMadridDay } from '@/lib/dates';
 import { checkLogDateWindow } from '@/lib/log-date-window';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -145,16 +145,41 @@ export async function POST(request: NextRequest) {
     // the exact G-03 finance/meditation pattern. Rows are still always saved
     // (history, stats, achievements); only the XP payout is day-gated.
     //
-    // The date stored is the Madrid date key provided by the client (frontend
-    // sends getTodayDateKey()). We compute the Madrid day window from the LOG's
-    // date key so the "first log of this day" check matches the log's perceived
-    // day — not necessarily today. This is consistent with the finance POST
-    // pattern and prevents streak inflation when backdating logs.
+    // H-6 (Modelo 3, E-6 FIX): the stored `date` is now NORMALIZED to the
+    // exact UTC instant of midnight (00:00) of the log's Europe/Madrid civil
+    // day BEFORE any read or write, using the existing DST-safe utility
+    // `startOfMadridDay` (src/lib/dates.ts) — correct for 24h days and for the
+    // 23h/25h DST transition days (it never does `start + 24h`).
+    //
+    // Why: `@@unique([userId, date])` is an instant-based key, so a client
+    // sending two different timestamps of the SAME Madrid day (e.g. 10:00 and
+    // 22:00) could previously create two rows for one civil day. With the
+    // normalized value both requests map to the SAME (userId, date) key, so:
+    //   - the first POST of the day  → upsert CREATE (the only row of the day)
+    //   - any later POST of the day  → findUnique hits → upsert UPDATE (edit
+    //     semantics on the existing row) — max 1 WellnessLog per user and
+    //     Madrid civil day, with ZERO schema or migration changes.
+    //   - NutritionLog keeps its own table and its own normalized key, so a
+    //     Wellness + Nutrition pair of the same day still coexists (two rows,
+    //     two tables).
+    // Gamification is unaffected: G-02 validation above still runs on the raw
+    // client instant; the advisory lock stays keyed on the same logDateKey;
+    // `isFirstEnergiaLogToday`/streak/challenge logic below still uses the
+    // madridDayBoundaries windows, and the normalized date is exactly the
+    // `start` of that window, so every existing gte/lt comparison keeps its
+    // meaning. Historical rows are never rewritten (no migration, no merge).
+    //
+    // The date concept remains the Madrid date key provided by the client
+    // (frontend sends getTodayDateKey()). The Madrid day window is derived
+    // from the LOG's date key so the "first log of this day" check matches
+    // the log's perceived day — not necessarily today. This is consistent
+    // with the finance POST pattern and prevents streak inflation when
+    // backdating logs.
     // FINAL-3 FIX: Use logDateKey (from the client-provided date) instead of
     // todayDateKey, mirroring the finance/route.ts pattern.
     // G-02 FIX: logDateKey is now computed once, right after date parsing,
     // where the approved window is enforced.
-    const logDate = parsedDate;
+    const logDate = startOfMadridDay(logDateKey);
     const { start, end } = madridDayBoundaries(logDateKey);
 
     const { result: log, created: logCreated } = await db.$transaction(async (tx) => {

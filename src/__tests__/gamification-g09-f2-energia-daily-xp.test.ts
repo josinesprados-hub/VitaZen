@@ -32,7 +32,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getMadridDateKey, madridDayBoundaries } from '@/lib/dates';
+import { getMadridDateKey, madridDayBoundaries, startOfMadridDay } from '@/lib/dates';
 
 // ─── Fixed "today" (Madrid) for deterministic route tests ────
 
@@ -222,7 +222,7 @@ describe('F-2 — POST /api/wellness pays +10 XP only on the first energia log o
     }));
   });
 
-  it('1. manipulated client — 10:00Z then 11:00Z, same Madrid day: +10 then +0, both rows saved', async () => {
+  it('1. manipulated client — 10:00Z then 11:00Z, same Madrid day: +10 then +0 (both instants normalize to ONE row since E-6 H-6)', async () => {
     const { POST } = await import('@/app/api/wellness/route');
     simulateSerializedFirstOfDay();
 
@@ -235,8 +235,19 @@ describe('F-2 — POST /api/wellness pays +10 XP only on the first energia log o
     expect(getMadridDateKey(new Date(NOON_A_UTC))).toBe(DAY_1);
     expect(getMadridDateKey(new Date(NOON_B_UTC))).toBe(DAY_1);
 
-    // Both rows are saved (history, stats, achievements are untouched)…
+    // Since E-6 H-6 both requests carry the SAME normalized Madrid-midnight
+    // date, so at DB level @@unique([userId, date]) makes the second upsert
+    // an UPDATE of the single day row. This mocked findUnique still misses
+    // (it does not model the compound key), so the route issues two upsert
+    // statements — the F-2 XP gate below remains as defense-in-depth for
+    // that legacy path.
     expect(H.MOCK_TX.wellnessLog.upsert).toHaveBeenCalledTimes(2);
+    // Both writes target the SAME normalized key — one row at DB level.
+    const dates = H.MOCK_TX.wellnessLog.upsert.mock.calls.map(
+      (c: any[]) => c[0].where.userId_date.date.getTime(),
+    );
+    expect(new Set(dates).size).toBe(1);
+    expect(dates[0]).toBe(startOfMadridDay(DAY_1).getTime());
 
     // …but XP is paid exactly once for the day.
     expect(xpIncrements()).toEqual([10, 0]);
@@ -422,7 +433,7 @@ describe('F-2 — POST /api/wellness pays +10 XP only on the first energia log o
     });
   });
 
-  it('9. exact-same-instant retry (update path) still pays nothing — G-02 window intact', async () => {
+  it('9. same-day retry hitting the stored row (update path) still pays nothing — G-02 window intact', async () => {
     H.MOCK_TX.wellnessLog.findUnique.mockResolvedValue({ id: 'wl-1' });
 
     const { POST } = await import('@/app/api/wellness/route');
@@ -463,7 +474,7 @@ describe('F-2 — POST /api/nutrition pays +10 XP only on the first energia log 
     }));
   });
 
-  it('10. manipulated client — 10:00Z then 11:00Z, same Madrid day: +10 then +0, both rows saved', async () => {
+  it('10. manipulated client — 10:00Z then 11:00Z, same Madrid day: +10 then +0 (both instants normalize to ONE row since E-6 H-6)', async () => {
     const { POST } = await import('@/app/api/nutrition/route');
     simulateSerializedFirstOfDay();
 
@@ -472,7 +483,14 @@ describe('F-2 — POST /api/nutrition pays +10 XP only on the first energia log 
     expect(resA.status).toBe(200);
     expect(resB.status).toBe(200);
 
+    // Since E-6 H-6 both requests carry the SAME normalized Madrid-midnight
+    // date — one row at DB level; see the wellness mirror test above.
     expect(H.MOCK_TX.nutritionLog.upsert).toHaveBeenCalledTimes(2);
+    const dates = H.MOCK_TX.nutritionLog.upsert.mock.calls.map(
+      (c: any[]) => c[0].where.userId_date.date.getTime(),
+    );
+    expect(new Set(dates).size).toBe(1);
+    expect(dates[0]).toBe(startOfMadridDay(DAY_1).getTime());
     expect(xpIncrements()).toEqual([10, 0]);
     const streakIncrements = H.empireProgressUpsert.mock.calls
       .map((c: any[]) => c[0]?.update?.streak as { increment: number } | undefined)

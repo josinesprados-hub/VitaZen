@@ -132,7 +132,10 @@ export async function GET(request: NextRequest) {
             type: 'wellness',
             imperio: 'energia',
             title: l.notes || 'Estado del día',
-            description: `Ánimo ${l.mood}/5 · Energía ${l.energy}/5`,
+            // H-1 (E-6): this row is a WellnessLog — its energy metric is
+            // presented as "Bienestar físico" (the DailyCheckin check-in
+            // keeps the global "Energía" name). Field/API names unchanged.
+            description: `Ánimo ${l.mood}/5 · Bienestar físico ${l.energy}/5`,
             date: l.date,
             meta: { mood: l.mood, energy: l.energy, sleep: l.sleep, stress: l.stress, notes: l.notes },
           });
