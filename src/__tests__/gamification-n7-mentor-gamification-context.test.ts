@@ -151,10 +151,6 @@ vi.mock('@/lib/understanding/engine', () => ({
   extractAndPersist: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/lib/decision/engine', () => ({
-  optimizeContext: vi.fn((systemPrompt: string) => ({ systemPrompt })),
-}));
-
 vi.mock('@/lib/reasoning/engine', () => ({
   reason: vi.fn(() => ({ instructionSnippet: null })),
 }));

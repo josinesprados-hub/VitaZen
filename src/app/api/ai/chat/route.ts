@@ -9,7 +9,6 @@ import { trackEvent } from '@/lib/analytics-server';
 import { withTiming } from '@/lib/observability/api-timing';
 import { serverLog } from '@/lib/observability/server-logger';
 import { getUnderstandingContext, extractAndPersist } from '@/lib/understanding/engine';
-import { optimizeContext } from '@/lib/decision/engine';
 import { reason } from '@/lib/reasoning/engine';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -155,24 +154,13 @@ async function handler(request: NextRequest) {
       serverLog.error('api/ai/chat', 'Understanding engine error (non-blocking)', euuError);
     }
 
-    // DE-1: Decision Engine — decide which context the mentor should use.
-    // Takes the fully assembled system prompt + user message, returns optimized version.
-    // Zero DB queries. Zero API calls. Pure string analysis. <1ms.
-    // Non-blocking: on any error, the original systemPrompt is used as-is.
-    try {
-      const decision = optimizeContext(systemPrompt, content, user.plan);
-      systemPrompt = decision.systemPrompt;
-    } catch (deError) {
-      // Non-blocking: if decision engine fails, use the unfiltered prompt
-      serverLog.error('api/ai/chat', 'Decision engine error (non-blocking)', deError);
-    }
-
     // RE-1: Reasoning Engine — decide HOW the mentor should use the available context.
-    // Takes the optimized prompt + user message + history, returns reasoning instruction.
+    // Takes the assembled system prompt + user message + history, returns reasoning instruction.
     // Zero DB queries. Zero API calls. Pure string analysis. <1ms.
     // Non-blocking: on any error, the prompt is used without reasoning instruction.
-    // The Decision Engine decides WHAT context to use.
-    // The Reasoning Engine decides HOW to use it.
+    // C-1: the former Decision Engine (DE-1, src/lib/decision/engine.ts) was removed —
+    // its parser targeted prompt markers the producer no longer emits, so it always
+    // returned the prompt unchanged (identity). Removal keeps the final prompt identical.
     try {
       const reasoning = reason({
         userMessage: content,
