@@ -187,6 +187,16 @@ export const RATE_LIMITS = {
   'notifications:deactivate-all': { maxRequests: 5, windowMs: 60_000 },  // 5/min
   'notifications:permission':     { maxRequests: 10, windowMs: 60_000 },  // 10/min
   'widgets:refresh':      { maxRequests: 20, windowMs: 60_000 },    // 20/min (on top of internal limit)
+
+  // ── Unauthenticated auth endpoints (FASE 17, N-06) ──
+  // POST /api/auth/reset-password sends a REAL email (Resend). The
+  // pre-existing per-email limit (3 tokens / 15 min, enforced inside the
+  // route) does not bound an attacker rotating target addresses from a
+  // single IP — that enables mail-bombing through our own sender domain.
+  // Per-IP limit: 5 requests / 15 min. Keyed by client IP (see getClientIp);
+  // coexists with (does NOT replace) the per-email limit. 5/15min leaves
+  // headroom for small shared NATs while capping bulk abuse.
+  'auth:reset-password:ip': { maxRequests: 5, windowMs: 900_000 },  // 5/15min
 } as const;
 
 export type RateLimitKey = keyof typeof RATE_LIMITS;
@@ -224,4 +234,43 @@ export function rateLimitedResponse(
       headers: { 'Retry-After': String(retryAfterSec) },
     },
   );
+}
+
+// ═══════════════════════════════════════════
+// CLIENT IP EXTRACTION — FASE 17 (N-06)
+// ═══════════════════════════════════════════
+//
+// Trust model (documented, not guessed): VitaZen is deployed on Vercel,
+// whose edge proxy REPLACES a client-supplied X-Forwarded-For with the real
+// connection chain — the leftmost entry is the connecting client as seen
+// by the platform. X-Real-IP is likewise platform-managed on Vercel. We
+// therefore read ONLY these two platform-managed headers and ignore
+// arbitrary client-controllable headers (x-forwarded-client-ip,
+// cf-connecting-ip, true-client-ip, custom spoofable headers, …).
+//
+// Keying: rateLimit() stores the returned value in AnalyticsEvent.userId.
+// Privacy properties of that choice:
+//   - Events with the 'rl:' prefix are EXCLUDED from all product/BI
+//     aggregations (see /api/analytics/insights filters), so IPs never
+//     surface in any analytics output.
+//   - The data-cleanup cron purges 'rl:*' rows older than 10 minutes
+//     (RL_RETENTION_MS in src/lib/data-cleanup.ts) — the IP is retained
+//     for minutes, not persisted as user data.
+//
+// Fail-open on missing headers (same philosophy as rateLimit() on DB
+// errors): if no platform IP header is present — e.g. local development
+// behind no proxy — the caller skips the IP-based limit instead of
+// lumping all requests under one shared bucket.
+export function getClientIp(request: Request): string | null {
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const first = forwardedFor.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) {
+    const trimmed = realIp.trim();
+    if (trimmed) return trimmed;
+  }
+  return null;
 }

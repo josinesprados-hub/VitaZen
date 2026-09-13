@@ -1,12 +1,13 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
+import { isAdminEmail } from '@/lib/admin';
 import { db } from '@/lib/db';
 
 // ═══════════════════════════════════════════════════════════
 // GET /api/analytics/insights
 // Query analytics data for admin/dashboard viewing.
-// Requires authentication. Returns aggregated metrics.
+// Requires authentication + ADMIN allowlist. Returns aggregated metrics.
 // ═══════════════════════════════════════════════════════════
 
 export async function GET(request: NextRequest) {
@@ -21,12 +22,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // BUG-A2 FIX: Restrict platform analytics to PREMIUM users only.
-    // Previously, any authenticated user (including FREE) could access
-    // platform-wide DAU, retention, conversion funnel, and feature usage.
-    // This is business intelligence that should not be publicly accessible.
-    // PREMIUM is used as the gate because the User model has no role field.
-    if (user.plan !== 'PREMIUM') {
+    // ─── N-01 FIX (FASE 17): platform BI is an ADMIN capability ────
+    // Previously gated on `plan === 'PREMIUM'`, which granted EVERY paying
+    // customer access to platform-wide DAU, retention, conversion funnel
+    // and feature ranking. PREMIUM is a subscription tier, not a role.
+    //
+    // Now: server-side admin allowlist (ADMIN_EMAILS env, src/lib/admin.ts).
+    //   - Fail-closed: no ADMIN_EMAILS configured → 403 for everyone,
+    //     including PREMIUM users.
+    //   - The email comes from the DB user row resolved by the verified
+    //     Firebase ID token (getAuthUser) — never from client-supplied
+    //     request data (body/query/headers are ignored by construction).
+    //   - PREMIUM no longer implies access; admins do not need PREMIUM.
+    //   - The response reveals nothing about the allowlist: both rejection
+    //     branches return the same generic body as before.
+    if (!isAdminEmail(user.email)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

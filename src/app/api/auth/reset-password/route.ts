@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { db } from '@/lib/db';
 import { adminAuth } from '@/lib/firebase-admin';
 import { sendResetPasswordEmail } from '@/lib/emails/sender';
+import { rateLimit, rateLimitedResponse, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vitazen.cc';
 const TOKEN_EXPIRY_HOURS = 1;
@@ -38,6 +39,32 @@ export async function POST(request: NextRequest) {
   try {
     if (!db.passwordResetToken) {
       return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
+    }
+
+    // ─── N-06 FIX (FASE 17): per-IP rate limit — mail-abuse protection ───
+    // This unauthenticated route triggers a REAL email send (Resend). The
+    // pre-existing per-email limit (below) cannot bound an attacker who
+    // rotates target addresses from one IP, which enables mail-bombing
+    // through our sender domain (hola@vitazen.cc) and burns its reputation.
+    //
+    // Placement: BEFORE body parsing, DB lookups and the email path — a
+    // blocked request never touches the DB user table and never sends an
+    // email. The key is the platform-managed client IP (getClientIp);
+    // coexists with (does not replace) the per-email limit. If no IP
+    // header is present (local dev without proxy) the IP limit is skipped
+    // (fail-open, same philosophy as rateLimit() on DB errors).
+    // Enumeration safety: the 429 body is identical for every email and
+    // reveals nothing about account existence.
+    const clientIp = getClientIp(request);
+    if (clientIp) {
+      const ipLimited = await rateLimit(
+        clientIp,
+        'auth:reset-password:ip',
+        RATE_LIMITS['auth:reset-password:ip'],
+      );
+      if (ipLimited.limited) {
+        return rateLimitedResponse(ipLimited, 'Demasiadas solicitudes. Inténtalo más tarde.');
+      }
     }
 
     const { email } = await request.json();

@@ -7,6 +7,7 @@ import { sendSubscriptionConfirmedEmail } from '@/lib/emails/sender';
 import { trackEvent } from '@/lib/analytics-server';
 import { serverLog } from '@/lib/observability/server-logger';
 import Stripe from 'stripe';
+import { extractInvoiceSubscriptionId } from '@/lib/stripe-invoice';
 
 // ─── Error serialization for observability ──────────────────────────
 // Extracts detailed error information without altering the error
@@ -356,7 +357,42 @@ export async function POST(request: NextRequest) {
         }
 
         // ─── ATOMIC: user update + subscription create in one transaction ───
+        //
+        // N-05 FIX (FASE 17): this transaction now takes the same
+        // `userId|plan-sync` advisory lock every other plan-changing handler
+        // takes (subscription.updated L512, subscription.deleted L640,
+        // subscription.created L727, invoice.paid L812). Previously THIS
+        // handler was the only one NOT participating in the lock family,
+        // so the H-03 guarantee (“downgrade checks serialize against a
+        // concurrent checkout.session.completed”) was one-sided:
+        // checkout did not serialize against downgrades.
+        //
+        // Race that is now closed (re-subscription after cancellation):
+        //   subscription.deleted (locked) evaluates otherActive BEFORE the
+        //   new subscription from checkout is visible → writes plan FREE
+        //   AFTER checkout wrote PREMIUM → paying user stuck on FREE.
+        // With both sides holding the same xact-scoped lock, the two
+        // transactions are serialized: either checkout commits first (the
+        // deleted event then SEES the new active sub and keeps PREMIUM)
+        // or deletion commits first (checkout then re-promotes anyway).
+        //
+        // LOCK-ORDER NOTE (deadlock safety, documented per spec):
+        // every plan handler acquires EXACTLY ONE advisory lock per
+        // transaction — `pg_advisory_xact_lock(md5(userId || '|plan-sync'))`
+        // — as the FIRST statement, and no handler ever nests a second
+        // lock inside it. With a single lock per transaction there is no
+        // (A→B while B→A) cycle possible, so no lock ordering can deadlock.
+        // Stripe events for DIFFERENT users take different lock keys and
+        // never contend. Signature validation, claim-first idempotency,
+        // plan mapping and Stripe semantics are unchanged.
         await db.$transaction(async (tx) => {
+          // Serialize against every other plan-sync writer for this user.
+          await tx.$executeRaw`
+            SELECT pg_advisory_xact_lock(
+              ('x' || substring(md5(${userId} || '|plan-sync'), 1, 16))::bit(64)::bigint
+            )
+          `;
+
           // Mark any existing active subscriptions as superseded
           const existingActive = await tx.subscription.findFirst({
             where: { userId, status: 'active' },
@@ -768,7 +804,12 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.paid': {
         const invoice = verifiedEvent.data.object as Stripe.Invoice;
-        const subscriptionId = (invoice as unknown as { subscription?: string | null }).subscription as string | null;
+        // N-02 FIX (FASE 17): read the subscription reference across Stripe
+        // API generations (modern parent.subscription_details.subscription
+        // first, legacy top-level subscription as fallback). The previous
+        // blind legacy read returned undefined under Basil/Dahlia payloads,
+        // silently skipping renewal period updates and plan re-sync.
+        const subscriptionId = extractInvoiceSubscriptionId(invoice);
 
         serverLog.info('webhook/stripe', 'invoice.paid', {
           invoiceId: invoice.id,
@@ -848,7 +889,10 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = verifiedEvent.data.object as Stripe.Invoice;
-        const subscriptionId = (invoice as unknown as { subscription?: string | null }).subscription as string | null;
+        // N-02 FIX (FASE 17): same cross-generation extraction as
+        // invoice.paid so the log line is accurate under Basil/Dahlia
+        // payloads too (observability only — no behavior change).
+        const subscriptionId = extractInvoiceSubscriptionId(invoice);
 
         serverLog.warn('webhook/stripe', 'invoice.payment_failed', {
           invoiceId: invoice.id,
