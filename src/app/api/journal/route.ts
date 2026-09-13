@@ -164,8 +164,11 @@ export async function POST(request: NextRequest) {
 
     const entry = result.entry;
 
-    // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'journal', undefined, user.plan).catch(() => {});
+    // Auto-complete today's challenge if it matches. H-11 (E-7): awaited so
+    // the +25 XP grant commits before the response is sent (fire-and-forget
+    // lost the reward on serverless freezes). Never fails the action (D-1
+    // CAS kept, internal catch-all + .catch defense).
+    await tryAutoCompleteChallenge(user.id, 'journal', undefined, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onJournalChange(user.id, user.plan);

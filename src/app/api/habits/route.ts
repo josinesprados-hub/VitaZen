@@ -117,8 +117,11 @@ export async function POST(request: NextRequest) {
       data: { userId: user.id, name, description, frequency },
     });
 
-    // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'habit', name, user.plan).catch(() => {});
+    // Auto-complete today's challenge if it matches. H-11 (E-7): awaited so
+    // the +25 XP grant commits before the response is sent (fire-and-forget
+    // lost the reward on serverless freezes). Never fails the action (D-1
+    // CAS kept, internal catch-all + .catch defense).
+    await tryAutoCompleteChallenge(user.id, 'habit', name, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);
@@ -365,8 +368,11 @@ export async function PATCH(request: NextRequest) {
     // here: the completion just happened, so the chain is alive by design).
     trackEvent({ event: 'habit_completed', userId: user.id, properties: { habitId, streak: updated.streak } });
 
-    // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'habit', updated.name, user.plan).catch(() => {});
+    // Auto-complete today's challenge if it matches. H-11 (E-7): awaited so
+    // the +25 XP grant commits before the response is sent (fire-and-forget
+    // lost the reward on serverless freezes). Never fails the action (D-1
+    // CAS kept, internal catch-all + .catch defense).
+    await tryAutoCompleteChallenge(user.id, 'habit', updated.name, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onHabitChange(user.id, user.plan);

@@ -87,6 +87,7 @@
 // ═════════════════════════════════════════════════════════════════════
 
 import {
+  addDaysToDateKey,
   daysBetweenDateKeys,
   getMadridDateKey,
   getTodayDateKey,
@@ -198,4 +199,55 @@ export function gateEmpireStreak(
     return 0;
   }
   return Math.max(0, storedStreak);
+}
+
+/**
+ * Length of the Madrid-day activity chain ENDING AT THE LAST DAY WITH
+ * ACTIVITY — the exact semantics of the STORED streak caches.
+ *
+ * H-5 (E-7): `gateEmpireStreak` fixes what READS may present as "current"
+ * (aliveness is decided at read time from the last real activity), but the
+ * STORED `EmpireProgress.streak` cache itself can drift after a DELETE:
+ * deleting a historic log never touches the counter, so the cache keeps
+ * counting a day that no longer has activity — and every later POST's
+ * `+1` / `SET 1` (E-0.1) propagates the inflated base forever.
+ *
+ * This utility recomputes what the cache SHOULD hold, using the cache's own
+ * definition — NOT `calcStreakFromKeys`' read-time semantics (which anchor
+ * the walk at today/yesterday and would cap a backfill-less chain to 0):
+ *
+ *   chain = longest run of consecutive Madrid days that ends at the most
+ *           recent day present in `activeDays`
+ *
+ *   {2026-09-01, 2026-09-02, 2026-09-03} → 3 (tip 09-03)
+ *   {2026-09-01, 2026-09-03}             → 1 (tip 09-03; 09-01 disconnected)
+ *   {}                                    → 0
+ *
+ * The caller supplies the Madrid date keys of the REAL remaining activity
+ * (for energia: the union of WellnessLog and NutritionLog days — the same
+ * cross-module definition the write path uses). A cache that already
+ * matches this value yields delta 0, so a consistency recount is a no-op.
+ *
+ * DST: day stepping uses `addDaysToDateKey` (noon-UTC technique), so the
+ * 23h/25h transition days count as exactly one day, like every other
+ * Madrid calendar day. Date keys are `YYYY-MM-DD`, so lexicographic order
+ * is chronological order.
+ */
+export function chainEndingAtLastActivity(activeDays: Iterable<string>): number {
+  const days = activeDays instanceof Set ? activeDays : new Set(activeDays);
+  if (days.size === 0) return 0;
+
+  // Most recent day with activity (the chain tip).
+  let tip: string | null = null;
+  for (const key of days) {
+    if (tip === null || key > tip) tip = key;
+  }
+
+  let streak = 0;
+  let cursor = tip as string;
+  while (days.has(cursor)) {
+    streak++;
+    cursor = addDaysToDateKey(cursor, -1);
+  }
+  return streak;
 }

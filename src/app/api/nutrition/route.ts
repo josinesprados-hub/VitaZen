@@ -8,6 +8,7 @@ import { onEnergiaChange } from '@/lib/widgets/triggers';
 import { getTodayDateKey, getMadridDateKey } from '@/lib/deterministic';
 import { madridDayBoundaries, addDaysToDateKey, startOfMadridDay } from '@/lib/dates';
 import { checkLogDateWindow } from '@/lib/log-date-window';
+import { chainEndingAtLastActivity } from '@/lib/streaks';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -258,8 +259,11 @@ export async function POST(request: NextRequest) {
       return { result, created: !existing };
     });
 
-    // Auto-complete today's challenge if it matches (non-blocking)
-    tryAutoCompleteChallenge(user.id, 'nutrition', undefined, user.plan).catch(() => {});
+    // Auto-complete today's challenge if it matches. H-11 (E-7): awaited so
+    // the +25 XP grant commits before the response is sent (fire-and-forget
+    // lost the reward on serverless freezes). Never fails the action (D-1
+    // CAS kept, internal catch-all + .catch defense).
+    await tryAutoCompleteChallenge(user.id, 'nutrition', undefined, user.plan).catch(() => {});
 
     // Trigger widget snapshot refresh (non-blocking)
     onEnergiaChange(user.id, user.plan);
@@ -441,6 +445,66 @@ export async function DELETE(request: NextRequest) {
           UPDATE "EmpireProgress"
           SET "streak" = GREATEST(0, "streak" - 1)
           WHERE "userId" = ${user.id} AND "empire" = 'energia'`;
+      }
+
+      // H-5 FIX (E-7): keep the STORED energia streak cache consistent with
+      // the activity that actually remains after this DELETE — identical to
+      // the wellness DELETE fix. The cache `EmpireProgress.streak` is a
+      // snapshot of "consecutive energia days ending at the last active
+      // day"; the rules above only correct it when the deleted log belonged
+      // to TODAY (Madrid), so a HISTORIC DELETE that empties its day left
+      // the cache counting a day with no activity, and E-0.1 propagated the
+      // inflated base on every later POST. When this DELETE empties the
+      // log's Madrid day, recompute the expected chain with
+      // `chainEndingAtLastActivity` over the Madrid date keys that STILL
+      // exist across BOTH energia tables (the same cross-module definition
+      // the POST's increment uses) and apply the correction as a
+      // COMMUTATIVE, CLAMPED delta — `GREATEST(0, streak + delta)` — so it
+      // cannot clobber a concurrent POST's atomic `+1`/`SET 1` and never
+      // goes negative. Delta 0 (consistent cache) writes NOTHING.
+      //
+      // Scope: ONLY this user, ONLY the energia streak, ONLY inside this
+      // transaction. XP is untouched (the F-2 revert above keeps its
+      // semantics); no historic rows are rewritten; no other user is ever
+      // recalculated. The extra 'user|energia|recount' advisory lock
+      // serializes concurrent recounters of the same user; lock order is
+      // always day key FIRST, recount SECOND (the day lock is already held
+      // here), so the lock graph stays acyclic and deadlock-free.
+      if (dayNowEmpty) {
+        await tx.$executeRaw`
+          SELECT pg_advisory_xact_lock(
+            ('x' || substring(md5(${user.id} || '|energia|recount'), 1, 16))::bit(64)::bigint
+          )`;
+
+        // Real remaining energia activity (both tables), as Madrid date keys.
+        const [wellnessRows, nutritionRows] = await Promise.all([
+          tx.wellnessLog.findMany({
+            where: { userId: user.id },
+            select: { date: true },
+          }),
+          tx.nutritionLog.findMany({
+            where: { userId: user.id },
+            select: { date: true },
+          }),
+        ]);
+        const remainingDays = new Set<string>();
+        for (const row of wellnessRows) remainingDays.add(getMadridDateKey(row.date));
+        for (const row of nutritionRows) remainingDays.add(getMadridDateKey(row.date));
+        const expectedChain = chainEndingAtLastActivity(remainingDays);
+
+        const empire = await tx.empireProgress.findUnique({
+          where: { userId_empire: { userId: user.id, empire: 'energia' } },
+          select: { streak: true },
+        });
+        if (empire) {
+          const delta = expectedChain - Math.max(0, empire.streak);
+          if (delta !== 0) {
+            await tx.$executeRaw`
+              UPDATE "EmpireProgress"
+              SET "streak" = GREATEST(0, "streak" + ${delta})
+              WHERE "userId" = ${user.id} AND "empire" = 'energia'`;
+          }
+        }
       }
     });
 

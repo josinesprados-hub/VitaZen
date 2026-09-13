@@ -66,6 +66,11 @@ const H = vi.hoisted(() => {
     wellnessLog: {
       findUnique: vi.fn().mockResolvedValue(null),
       findFirst: vi.fn().mockResolvedValue(null),
+      // H-5 (E-7): the DELETE's streak recount reads the remaining energia
+      // days through findMany. Empty store → expected chain 0 → with the
+      // default empireProgress.findUnique below (no row) the recount is a
+      // complete no-op, so every closed F-5A assertion keeps its meaning.
+      findMany: vi.fn().mockResolvedValue([]),
       upsert: vi.fn().mockImplementation(async ({ create }: { create: Record<string, unknown> }) => ({
         id: 'wl-new',
         ...create,
@@ -75,6 +80,7 @@ const H = vi.hoisted(() => {
     nutritionLog: {
       findUnique: vi.fn().mockResolvedValue(null),
       findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
       upsert: vi.fn().mockImplementation(async ({ create }: { create: Record<string, unknown> }) => ({
         id: 'nl-new',
         ...create,
@@ -90,6 +96,10 @@ const H = vi.hoisted(() => {
     },
     empireProgress: {
       upsert: empireProgressUpsert,
+      // H-5 (E-7): streak recount reads the stored cache; null (no row)
+      // skips the correction entirely — the recount only ever adjusts an
+      // EXISTING energia EmpireProgress row.
+      findUnique: vi.fn().mockResolvedValue(null),
       update: vi.fn().mockResolvedValue({}),
     },
   };
@@ -189,7 +199,14 @@ function rawCalls(): RawCall[] {
 }
 
 function lockCalls(): RawCall[] {
-  return rawCalls().filter((c) => c.sql.includes('pg_advisory_xact_lock'));
+  // H-5 (E-7): the DELETE's streak recount takes a SECOND advisory lock
+  // keyed 'user|energia|recount' (always AFTER the day key — fixed order
+  // day → recount). It is filtered out here so every closed F-5A assertion
+  // about the energia DAY lock family keeps asserting exactly the same
+  // thing; the recount lock itself is covered by the E-7 tests.
+  return rawCalls().filter(
+    (c) => c.sql.includes('pg_advisory_xact_lock') && !c.sql.includes('|energia|recount'),
+  );
 }
 
 function energiaLockKeys(): string[] {

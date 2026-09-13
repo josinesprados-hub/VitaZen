@@ -54,12 +54,18 @@ const H = vi.hoisted(() => {
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn(),
       findFirst: vi.fn().mockResolvedValue(null),
+      // H-5 (E-7): the DELETE's streak recount reads the remaining energia
+      // days through findMany (empty store → expected chain 0; combined
+      // with the DELETE describes' empireProgressFindUnique mock the
+      // correction is exercised, POST assertions are untouched).
+      findMany: vi.fn().mockResolvedValue([]),
       delete: vi.fn().mockResolvedValue({}),
     },
     nutritionLog: {
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn(),
       findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
       delete: vi.fn().mockResolvedValue({}),
     },
     empireProgress: {
@@ -592,7 +598,14 @@ function rawCalls(): RawCall[] {
 }
 
 function energiaLockCalls(): RawCall[] {
-  return rawCalls().filter((c) => c.sql.includes('pg_advisory_xact_lock'));
+  // H-5 (E-7): the DELETE's streak recount takes a SECOND advisory lock
+  // keyed 'user|energia|recount' (always AFTER the day key — fixed order
+  // day → recount). It is filtered out here so the closed F-2 DELETE
+  // assertions about the energia DAY lock family keep asserting exactly the
+  // same thing; the recount lock itself is covered by the E-7 tests.
+  return rawCalls().filter(
+    (c) => c.sql.includes('pg_advisory_xact_lock') && !c.sql.includes('|energia|recount'),
+  );
 }
 
 function energiaXpDecrementCalls(): RawCall[] {
@@ -616,6 +629,10 @@ describe('F-2 — DELETE /api/wellness reverts XP only when the Madrid day is le
     H.getAuthUserBasicMock.mockResolvedValue({ id: 'user-1', plan: 'free', firebaseUid: 'fb-1', email: 'user@test.com' });
     H.rateLimitMock.mockResolvedValue({ limited: false });
     H.empireProgressFindUnique.mockResolvedValue({ xp: 40, streak: 3 });
+    // H-5 (E-7): the recount's remaining-days read defaults to an empty
+    // store; individual tests override it to model surviving activity.
+    H.MOCK_TX.wellnessLog.findMany.mockResolvedValue([]);
+    H.MOCK_TX.nutritionLog.findMany.mockResolvedValue([]);
   });
 
   function ownedLog(dateIso: string) {
@@ -697,6 +714,9 @@ describe('F-2 — DELETE /api/nutrition reverts XP only when the Madrid day is l
     H.getAuthUserBasicMock.mockResolvedValue({ id: 'user-1', plan: 'free', firebaseUid: 'fb-1', email: 'user@test.com' });
     H.rateLimitMock.mockResolvedValue({ limited: false });
     H.empireProgressFindUnique.mockResolvedValue({ xp: 40, streak: 3 });
+    // H-5 (E-7): see the wellness DELETE describe — empty store by default.
+    H.MOCK_TX.wellnessLog.findMany.mockResolvedValue([]);
+    H.MOCK_TX.nutritionLog.findMany.mockResolvedValue([]);
   });
 
   function ownedLog(dateIso: string) {
