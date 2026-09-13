@@ -331,9 +331,9 @@ export default function DisciplinaPage() {
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar hábito</h3>
             <div className="space-y-3">
               <input type="text" placeholder="Nombre del hábito" aria-label="Nombre del hábito" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-[#888]" />
               <input type="text" placeholder="Descripción (opcional)" aria-label="Descripción del hábito (opcional)" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-[#888]" />
               <select value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })} aria-label="Frecuencia del hábito"
                 className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:border-champagne/50 transition-colors appearance-none">
                 <option value="daily">Diario</option>
@@ -436,7 +436,7 @@ export default function DisciplinaPage() {
               aria-label="Nombre del hábito"
               value={newHabit.name}
               onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder-[#666]"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder:text-[#888]"
             />
             <input
               type="text"
@@ -444,7 +444,7 @@ export default function DisciplinaPage() {
               aria-label="Descripción del hábito (opcional)"
               value={newHabit.description}
               onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder-[#666]"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base placeholder:text-[#888]"
             />
             <select
               value={newHabit.frequency}

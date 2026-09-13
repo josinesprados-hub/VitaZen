@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
                 aria-invalid={!!error}
                 required
                 disabled={success}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors disabled:opacity-50"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder:text-[#888] focus:border-champagne transition-colors disabled:opacity-50"
                 placeholder="tu@email.com"
               />
             </div>

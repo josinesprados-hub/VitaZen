@@ -189,7 +189,7 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Buscar conversación..."
-            className="w-full bg-[#111] border border-[#1a1a1a] rounded-lg pl-9 pr-8 py-2 text-sm text-white placeholder-[#555] focus:border-champagne/40 focus:outline-none transition-colors"
+            className="w-full bg-[#111] border border-[#1a1a1a] rounded-lg pl-9 pr-8 py-2 text-sm text-white placeholder:text-[#888] focus:border-champagne/40 focus:outline-none transition-colors"
             aria-label="Buscar conversaciones por título"
           />
           {searchQuery && (

@@ -444,7 +444,7 @@ function QuickCapture({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Café 3,50"
-          className="w-full bg-[#050505] border border-[#1a1a1a] rounded-2xl pl-4 pr-4 py-4 text-white text-base placeholder-[#333] focus:outline-none focus:border-champagne/30 transition-colors"
+          className="w-full bg-[#050505] border border-[#1a1a1a] rounded-2xl pl-4 pr-4 py-4 text-white text-base placeholder:text-[#888] focus:outline-none focus:border-champagne/30 transition-colors"
           autoFocus
           inputMode="text"
           autoComplete="off"
@@ -486,7 +486,7 @@ function QuickCapture({
             value={contexto}
             onChange={(e) => setContexto(e.target.value)}
             placeholder="¿Qué pasó? (opcional)"
-            className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-2 text-base text-[#888] placeholder-[#333] focus:outline-none focus:border-champagne/25 transition-colors"
+            className="w-full bg-transparent border-b border-[#1a1a1a] px-0 py-2 text-base text-[#888] placeholder:text-[#888] focus:outline-none focus:border-champagne/25 transition-colors"
             autoComplete="off"
           />
         ) : (
@@ -547,7 +547,7 @@ function FullForm({
   userCategories: string[];
   mode: 'create' | 'edit';
 }) {
-  const inputClass = "w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3 text-white text-base placeholder-[#666] focus:outline-none focus:border-champagne/40 transition-colors";
+  const inputClass = "w-full bg-[#000000] border border-[#1a1a1a] rounded-xl px-4 py-3 text-white text-base placeholder:text-[#888] focus:outline-none focus:border-champagne/40 transition-colors";
 
   return (
     <div className="space-y-4">

@@ -180,7 +180,7 @@ export default function LoginPage() {
                 aria-describedby={error ? 'login-error' : undefined}
                 aria-invalid={!!error}
                 required
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
               />
               {/* Proactive inline hint — appears on email blur if provider mismatch detected */}
@@ -221,7 +221,7 @@ export default function LoginPage() {
                   aria-describedby={error ? 'login-error' : undefined}
                   aria-invalid={!!error}
                   required
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                   placeholder="••••••••"
                 />
                 <button

@@ -185,7 +185,7 @@ export default function RegisterPage() {
                 autoComplete="name"
                 aria-describedby={error ? 'register-error' : undefined}
                 aria-invalid={!!error}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                 placeholder="Tu nombre completo"
               />
             </div>
@@ -202,7 +202,7 @@ export default function RegisterPage() {
                 aria-describedby={error ? 'register-error' : undefined}
                 aria-invalid={!!error}
                 required
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                 placeholder="tu@email.com"
               />
               {/* Proactive inline hint — appears on email blur if email is already registered */}
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                   aria-describedby={error ? 'register-error' : undefined}
                   aria-invalid={!!error}
                   required
-                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                  className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                   placeholder="Mínimo 6 caracteres"
                 />
                 <button
@@ -284,7 +284,7 @@ export default function RegisterPage() {
                   aria-describedby={!passwordMatch ? 'register-confirm-error' : undefined}
                   aria-invalid={!passwordMatch}
                   required
-                  className={`w-full bg-[#000000] border rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors ${passwordMatch ? 'border-[#1a1a1a]' : 'border-red-500'}`}
+                  className={`w-full bg-[#000000] border rounded-lg px-4 py-3 pr-12 text-white placeholder:text-[#888] focus:border-champagne transition-colors ${passwordMatch ? 'border-[#1a1a1a]' : 'border-red-500'}`}
                   placeholder="Repite tu contraseña"
                 />
                 <button

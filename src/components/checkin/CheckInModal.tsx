@@ -291,7 +291,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
                 placeholder="¿Qué te propones hoy?"
                 maxLength={120}
                 aria-required="true"
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors text-base sm:text-sm"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder:text-[#888] focus:border-champagne transition-colors text-base sm:text-sm"
               />
             </div>
 
@@ -307,7 +307,7 @@ export function CheckInModal({ onClose, onSave, initialData }: CheckInModalProps
                 placeholder="Algo que quieras recordar..."
                 maxLength={300}
                 rows={2}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder-[#666] focus:border-champagne transition-colors text-base sm:text-sm resize-none"
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white placeholder:text-[#888] focus:border-champagne transition-colors text-base sm:text-sm resize-none"
               />
             </div>
 

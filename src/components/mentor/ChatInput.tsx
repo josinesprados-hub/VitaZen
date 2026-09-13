@@ -42,7 +42,7 @@ const ChatInput = React.memo(function ChatInput({
     onSend();
   };
 
-  let textareaClass = 'flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base sm:text-sm placeholder-[#555] resize-none overflow-hidden leading-6 transition-colors ';
+  let textareaClass = 'flex-1 bg-[#000000] border rounded-xl px-4 py-3 text-white text-base sm:text-sm placeholder:text-[#888] resize-none overflow-hidden leading-6 transition-colors ';
   if (isArchived) {
     textareaClass += 'border-[#333] cursor-not-allowed opacity-40';
   } else if (!isPremium && remaining === 0) {

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
+import { getCheckoutErrorMessage } from '@/lib/checkout-errors';
 import { Switch } from '@/components/ui/switch';
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
 import { SubscriptionManager } from '@/components/settings/SubscriptionManager';
@@ -66,6 +67,22 @@ export default function AjustesPage() {
     const timer = setTimeout(() => setError(null), 3000);
     return () => clearTimeout(timer);
   }, [error]);
+
+  // D-6 (E-9): the pricing portal flow redirects here with
+  // ?error=portal or ?error=connection when Stripe portal fails.
+  // Consume the param ONCE on mount and show the fixed user-safe
+  // message (see lib/checkout-errors) in its own alert at the top —
+  // separate from the transient `error` above, because a user arriving
+  // from a failed redirect needs more than the 3s auto-dismiss.
+  // The URL is stripped with window.history.replaceState — no reload,
+  // no navigation loop, no settings-state loss.
+  const [redirectError, setRedirectError] = useState<string | null>(null);
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get('error');
+    if (!code) return;
+    setRedirectError(getCheckoutErrorMessage(code));
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
 
   const handleToggle = async (key: string, value: boolean) => {
     if (!firebaseUser) return;
@@ -145,6 +162,23 @@ export default function AjustesPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 page-transition">
+      {/* D-6 (E-9): checkout/portal redirect error — announced by screen
+          readers, same card-accent alert pattern as below. Dismissable,
+          never auto-persisted in the URL. */}
+      {redirectError && (
+        <div role="alert" className="card-accent p-4 flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+          <p className="text-sm text-red-400">{redirectError}</p>
+          <button
+            onClick={() => setRedirectError(null)}
+            aria-label="Cerrar"
+            className="ml-auto text-[#999] hover:text-white text-xs"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <h1 className="title-page">Ajustes</h1>

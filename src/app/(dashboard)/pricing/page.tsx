@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenshotMode } from '@/context/ScreenshotModeContext';
 import { useApi } from '@/hooks/useApi';
+import { getCheckoutErrorMessage } from '@/lib/checkout-errors';
 import { Check, Loader2, Circle, Eye } from 'lucide-react';
 
 // ═══════════════════════════════════════════
@@ -22,6 +23,20 @@ export default function PricingPage() {
   const { apiFetch } = useApi();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  // D-6 (E-9): the checkout flow redirects back here with ?error=checkout
+  // or ?error=connection when Stripe checkout fails. Consume the param ONCE
+  // on mount, show the fixed user-safe message (see lib/checkout-errors),
+  // and strip it from the URL with window.history.replaceState — no reload,
+  // no navigation loop, no state loss (Next.js-documented shallow approach).
+  // A checkout success leaves no error param, so nothing is rendered.
+  const [redirectError, setRedirectError] = useState<string | null>(null);
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get('error');
+    if (!code) return;
+    setRedirectError(getCheckoutErrorMessage(code));
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
 
   const handleUpgrade = async () => {
     setLoading(true);
@@ -82,6 +97,23 @@ export default function PricingPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6">
+      {/* D-6 (E-9): checkout redirect error — announced by screen readers,
+          same card-accent alert pattern as ajustes. Dismissable, never
+          auto-persisted in the URL. */}
+      {redirectError && (
+        <div role="alert" className="card-accent p-4 flex items-center gap-3 mb-6">
+          <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+          <p className="text-sm text-red-400">{redirectError}</p>
+          <button
+            onClick={() => setRedirectError(null)}
+            aria-label="Cerrar"
+            className="ml-auto text-[#999] hover:text-white text-xs"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
       {/* Header — depth, not commerce */}
       <div className="text-center mb-12 sm:mb-16">
         <div className="flex items-center justify-center gap-2 mb-5">

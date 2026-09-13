@@ -288,9 +288,9 @@ export default function CrecimientoPage() {
             <h3 className="text-lg font-bold text-white text-center mb-6">Editar entrada</h3>
             <div className="space-y-3">
               <input type="text" placeholder="Título" aria-label="Título de la entrada" value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-[#888]" />
               <textarea placeholder="Contenido" aria-label="Contenido de la entrada" value={editForm.content} onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
-                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666] h-28 resize-none" />
+                className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-[#888] h-28 resize-none" />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Ánimo (1-5)</label>
@@ -306,7 +306,7 @@ export default function CrecimientoPage() {
                 <div>
                   <label htmlFor="edit-gratitud" className="text-xs text-[#999] uppercase tracking-wider font-medium mb-2 block">Gratitud</label>
                   <input id="edit-gratitud" type="text" placeholder="Agradecido por..." value={editForm.gratitude} onChange={(e) => setEditForm({ ...editForm, gratitude: e.target.value })}
-                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder-[#666]" />
+                    className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-3 py-2 text-white text-base sm:text-sm focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-[#888]" />
                 </div>
               </div>
             </div>
@@ -377,9 +377,9 @@ export default function CrecimientoPage() {
         {showAdd && (
           <div className="bg-[#000000] border border-[#1a1a1a] rounded-lg p-4 mb-6 space-y-3">
             <input type="text" placeholder="Título" aria-label="Título de la entrada" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder:text-[#888]" />
             <textarea placeholder="¿Qué hay en tu mente?" aria-label="Contenido de la entrada" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666] h-32 resize-none" />
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder:text-[#888] h-32 resize-none" />
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm text-[#999] mb-1 block">Estado de ánimo (1-5)</label>
@@ -395,7 +395,7 @@ export default function CrecimientoPage() {
               <div>
                 <label htmlFor="nueva-gratitud" className="text-sm text-[#999] mb-1 block">Gratitud</label>
                 <input id="nueva-gratitud" type="text" placeholder="Algo que agradecer..." value={form.gratitude} onChange={(e) => setForm({ ...form, gratitude: e.target.value })}
-                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder-[#666]" />
+                  className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg px-4 py-2 text-white text-base sm:text-sm placeholder:text-[#888]" />
               </div>
             </div>
             <div className="flex gap-2">

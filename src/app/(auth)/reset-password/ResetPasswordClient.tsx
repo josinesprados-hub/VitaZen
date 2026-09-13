@@ -167,7 +167,7 @@ export default function ResetPasswordClient() {
                       aria-invalid={!!error}
                       required
                       minLength={8}
-                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                       placeholder="Mínimo 8 caracteres, mayúscula y número"
                     />
                     <button
@@ -198,7 +198,7 @@ export default function ResetPasswordClient() {
                       aria-invalid={!!error}
                       required
                       minLength={8}
-                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder-[#666] focus:border-champagne transition-colors"
+                      className="w-full bg-[#000000] border border-[#1a1a1a] rounded-lg px-4 py-3 pr-12 text-white placeholder:text-[#888] focus:border-champagne transition-colors"
                       placeholder="Repite tu contraseña"
                     />
                     <button
