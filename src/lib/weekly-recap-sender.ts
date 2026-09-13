@@ -20,9 +20,15 @@ import { getEmotionalState } from './emotional-state';
 import { currentHabitStreak } from './streaks';
 import { weeklyRecapEmail, type WeeklyRecapEmailData } from './emails/weekly-recap';
 import { resend } from './resend';
+import { runKeysetBatch } from './batch-pagination';
 
 const FROM_EMAIL = 'VitaZen <hola@vitazen.cc>';
 const REPLY_TO = 'hola@vitazen.cc';
+
+// N-04: page size for the eligible-users keyset scan. Same value as the
+// previous fixed `take`, but now it is a PAGE size — every page is
+// followed by the next one until the eligible population is exhausted.
+const ELIGIBLE_USERS_PAGE_SIZE = 500;
 
 // ─────────────────────────────────────────
 // IDEMPOTENCY: Week Key Calculation
@@ -64,15 +70,23 @@ interface EligibleUser {
   plan: string;
 }
 
-async function getEligibleUsers(): Promise<EligibleUser[]> {
+/**
+ * N-04: fetch ONE PAGE of eligible users via keyset pagination.
+ *
+ * Same eligibility filter as before (weeklyEmailSummary ON, email
+ * verified, active in the last 7 days) — only the traversal changed:
+ * stable `orderBy: { id: 'asc' }` (User.id is the primary key, so the
+ * sort is unique and deterministic) + `cursor` + `skip: 1`, so every
+ * run now reaches users beyond the old fixed 500-row cap instead of
+ * re-selecting the same arbitrary subset week after week.
+ *
+ * The query itself is never modified by this batch (no User writes),
+ * so `id` is a safe pagination key.
+ */
+async function fetchEligibleUsersPage(cursor: string | null): Promise<EligibleUser[]> {
   const sevenDaysAgo = startOf7DaysAgoMadrid();
 
-  // Users who: have weeklyEmailSummary ON, email verified,
-  // and have been active in the last 7 days (at least 1 check-in or activity)
-  // PERF-5.2: Safety cap to prevent unbounded user fetch.
-  // In production with thousands of users this query could return
-  // a very large result set. 500 is a safe upper bound for a weekly batch.
-  const users = await db.user.findMany({
+  return db.user.findMany({
     where: {
       weeklyEmailSummary: true,
       emailVerified: true,
@@ -90,10 +104,10 @@ async function getEligibleUsers(): Promise<EligibleUser[]> {
       name: true,
       plan: true,
     },
-    take: 500,
+    orderBy: { id: 'asc' },
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    take: ELIGIBLE_USERS_PAGE_SIZE,
   });
-
-  return users;
 }
 
 // ─────────────────────────────────────────
@@ -334,54 +348,67 @@ export async function sendWeeklyRecaps(): Promise<WeeklyRecapResult> {
   const weekKey = getMadridWeekKey();
   console.log(`[WEEKLY-RECAP] Starting weekly recap send for week ${weekKey}...`);
 
-  // PERF-5.2: Outer try/catch so that if getEligibleUsers() itself throws,
-  // the cron route receives a structured error instead of an unhandled exception.
-  let users: EligibleUser[];
-  try {
-    users = await getEligibleUsers();
-  } catch (error) {
-    console.error('[WEEKLY-RECAP] Fatal error fetching eligible users:', error);
-    return {
-      totalEligible: 0,
-      sent: 0,
-      skipped: 0,
-      idempotentSkips: 0,
-      errors: 1,
-      duration: Date.now() - startTime,
-      weekKey,
-    };
-  }
-  console.log(`[WEEKLY-RECAP] Found ${users.length} eligible users for week ${weekKey}.`);
-
   let sent = 0;
   let skipped = 0;
   let idempotentSkips = 0;
   let errors = 0;
+  let totalEligible = 0;
 
-  // Process users sequentially with a small delay between each
-  // to avoid rate limits and DB overload
-  for (const user of users) {
-    try {
-      const result = await sendWeeklyRecapToUser(user, weekKey);
-      if (result.sent) {
-        sent++;
-      } else if (result.error === 'Already sent this week') {
-        idempotentSkips++;
-      } else if (result.error === 'No meaningful activity this week') {
-        skipped++;
-      } else {
-        errors++;
-      }
-    } catch (error) {
-      errors++;
-      console.error(`[WEEKLY-RECAP] Unexpected error for user ${user.id}:`, error);
-    }
+  // PERF-5.2: Outer try/catch so that if the keyset scan itself throws,
+  // the cron route receives a structured error instead of an unhandled exception.
+  try {
+    // N-04: walk ALL pages of eligible users (keyset on User.id) instead
+    // of a single fixed take:500. Users beyond the old cap now receive
+    // their recap too. Per-user processing, idempotency (claim-first on
+    // (userId, weekKey)) and rate-limit delays are unchanged.
+    const scan = await runKeysetBatch<EligibleUser>({
+      label: 'weekly-recap',
+      pageSize: ELIGIBLE_USERS_PAGE_SIZE,
+      fetchPage: (cursor) => fetchEligibleUsersPage(cursor),
+      getKey: (user) => user.id,
+      processPage: async (page) => {
+        totalEligible += page.length;
+        console.log(`[WEEKLY-RECAP] Processing page of ${page.length} eligible users (total so far: ${totalEligible}).`);
 
-    // Small delay between emails (200ms) to respect Resend rate limits
-    // Applied every 5 emails to stay within 10 req/s on Resend free tier
-    if ((sent + errors) % 5 === 0 && (sent + errors) > 0) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
+        // Process users sequentially with a small delay between each
+        // to avoid rate limits and DB overload
+        for (const user of page) {
+          try {
+            const result = await sendWeeklyRecapToUser(user, weekKey);
+            if (result.sent) {
+              sent++;
+            } else if (result.error === 'Already sent this week') {
+              idempotentSkips++;
+            } else if (result.error === 'No meaningful activity this week') {
+              skipped++;
+            } else {
+              errors++;
+            }
+          } catch (error) {
+            errors++;
+            console.error(`[WEEKLY-RECAP] Unexpected error for user ${user.id}:`, error);
+          }
+
+          // Small delay between emails (200ms) to respect Resend rate limits
+          // Applied every 5 emails to stay within 10 req/s on Resend free tier
+          if ((sent + errors) % 5 === 0 && (sent + errors) > 0) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        }
+      },
+    });
+    console.log(`[WEEKLY-RECAP] Keyset scan finished: ${scan.pages} pages, ${scan.processed} eligible users.`);
+  } catch (error) {
+    console.error('[WEEKLY-RECAP] Fatal error fetching eligible users:', error);
+    return {
+      totalEligible,
+      sent,
+      skipped,
+      idempotentSkips,
+      errors: errors + 1,
+      duration: Date.now() - startTime,
+      weekKey,
+    };
   }
 
   const duration = Date.now() - startTime;
@@ -391,7 +418,7 @@ export async function sendWeeklyRecaps(): Promise<WeeklyRecapResult> {
   );
 
   return {
-    totalEligible: users.length,
+    totalEligible,
     sent,
     skipped,
     idempotentSkips,

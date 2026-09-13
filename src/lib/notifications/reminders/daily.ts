@@ -34,6 +34,7 @@ import { db } from '@/lib/db';
 import { sendNotification } from '../service';
 import { canSendNotification, isInQuietHours } from '../scheduler';
 import { isUserCurrentlyActive } from './reflection';
+import { runKeysetBatch } from '@/lib/batch-pagination';
 
 // ─── Configuration ──────────────────────────
 
@@ -181,104 +182,115 @@ export async function processDailyBatch(): Promise<DailyBatchResult> {
     details: [],
   };
 
-  // ── 1. Find candidates: users with dailyReminders=true AND pushEnabled=true ──
-  // Two-step query: first find users with dailyReminders on,
-  // then join with their notification preference.
-  const usersWithDailyOn = await db.user.findMany({
-    where: { dailyReminders: true },
-    select: { id: true },
-    take: BATCH_SIZE,
-  });
+  // ── Process ALL candidates via keyset pagination (N-04) ──
+  // Previously a single `take: BATCH_SIZE` with no orderBy selected an
+  // arbitrary subset; users beyond the cap were never reached by the
+  // once-a-day cron. Now the scan walks every page (stable
+  // `orderBy: { id: 'asc' }` on the unique User.id, cursor + skip: 1)
+  // and applies the exact same per-page processing to each one.
+  await runKeysetBatch<{ id: string }>({
+    label: 'daily-reminder',
+    pageSize: BATCH_SIZE,
+    fetchPage: async (cursor) =>
+      // ── Page of candidates: users with dailyReminders=true ──
+      // User.id is the primary key: unique, stable, never written by
+      // this batch → safe pagination key. Per-page follow-up queries
+      // (prefs, tokens) stay bounded by the same page size as before.
+      db.user.findMany({
+        where: { dailyReminders: true },
+        select: { id: true },
+        orderBy: { id: 'asc' },
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        take: BATCH_SIZE,
+      }),
+    getKey: (user) => user.id,
+    processPage: async (usersWithDailyOn) => {
+      if (usersWithDailyOn.length === 0) return;
 
-  if (usersWithDailyOn.length === 0) {
-    return result;
-  }
-
-  const userIds = usersWithDailyOn.map(u => u.id);
-
-  // Now find which of those users have push enabled
-  const pushEnabledPrefs = await db.notificationPreference.findMany({
-    where: {
-      userId: { in: userIds },
-      pushEnabled: true,
-    },
-    select: {
-      userId: true,
-      timezone: true,
-    },
-  });
-
-  result.total = pushEnabledPrefs.length;
-
-  if (pushEnabledPrefs.length === 0) {
-    return result;
-  }
-
-  // ── 2. Filter: must have at least one active push token ──
-  const candidateIds = pushEnabledPrefs.map(p => p.userId);
-
-  const usersWithTokens = await db.pushToken.groupBy({
-    by: ['userId'],
-    where: {
-      userId: { in: candidateIds },
-      active: true,
-    },
-    _count: { id: true },
-  });
-
-  const usersWithActiveTokens = new Set(usersWithTokens.map(u => u.userId));
-
-  // ── 3. Process each eligible user ──
-  for (const candidate of pushEnabledPrefs) {
-    // Skip users without active tokens
-    if (!usersWithActiveTokens.has(candidate.userId)) {
-      result.skipped++;
-      result.details.push({
-        userId: candidate.userId,
-        sent: false,
-        reason: 'no_active_tokens',
+      // Now find which of those users have push enabled
+      const userIds = usersWithDailyOn.map(u => u.id);
+      const pushEnabledPrefs = await db.notificationPreference.findMany({
+        where: {
+          userId: { in: userIds },
+          pushEnabled: true,
+        },
+        select: {
+          userId: true,
+          timezone: true,
+        },
       });
-      continue;
-    }
 
-    // Quick pre-check: is it even the right time of day?
-    if (!isInDailyWindow(candidate.timezone)) {
-      result.skipped++;
-      result.details.push({
-        userId: candidate.userId,
-        sent: false,
-        reason: 'outside_daily_window',
+      result.total += pushEnabledPrefs.length;
+
+      if (pushEnabledPrefs.length === 0) return;
+
+      // ── Filter: must have at least one active push token ──
+      const candidateIds = pushEnabledPrefs.map(p => p.userId);
+
+      const usersWithTokens = await db.pushToken.groupBy({
+        by: ['userId'],
+        where: {
+          userId: { in: candidateIds },
+          active: true,
+        },
+        _count: { id: true },
       });
-      continue;
-    }
 
-    try {
-      const sendResult = await sendDailyReminder(candidate.userId);
+      const usersWithActiveTokens = new Set(usersWithTokens.map(u => u.userId));
 
-      if (sendResult.sent) {
-        result.sent++;
-      } else {
-        result.skipped++;
+      // ── Process each eligible user in this page ──
+      for (const candidate of pushEnabledPrefs) {
+        // Skip users without active tokens
+        if (!usersWithActiveTokens.has(candidate.userId)) {
+          result.skipped++;
+          result.details.push({
+            userId: candidate.userId,
+            sent: false,
+            reason: 'no_active_tokens',
+          });
+          continue;
+        }
+
+        // Quick pre-check: is it even the right time of day?
+        if (!isInDailyWindow(candidate.timezone)) {
+          result.skipped++;
+          result.details.push({
+            userId: candidate.userId,
+            sent: false,
+            reason: 'outside_daily_window',
+          });
+          continue;
+        }
+
+        try {
+          const sendResult = await sendDailyReminder(candidate.userId);
+
+          if (sendResult.sent) {
+            result.sent++;
+          } else {
+            result.skipped++;
+          }
+
+          result.details.push({
+            userId: candidate.userId,
+            sent: sendResult.sent,
+            reason: sendResult.reason,
+          });
+        } catch (error) {
+          console.error('[DailyReminder] Error for user:', candidate.userId, error);
+          result.errors++;
+          result.details.push({
+            userId: candidate.userId,
+            sent: false,
+            reason: 'internal_error',
+          });
+        }
+
+        // Small delay between sends to avoid FCM rate limits
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-
-      result.details.push({
-        userId: candidate.userId,
-        sent: sendResult.sent,
-        reason: sendResult.reason,
-      });
-    } catch (error) {
-      console.error('[DailyReminder] Error for user:', candidate.userId, error);
-      result.errors++;
-      result.details.push({
-        userId: candidate.userId,
-        sent: false,
-        reason: 'internal_error',
-      });
-    }
-
-    // Small delay between sends to avoid FCM rate limits
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
+    },
+  });
 
   return result;
 }

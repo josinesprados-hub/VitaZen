@@ -15,7 +15,8 @@ import { serverLog } from '@/lib/observability/server-logger';
 // Secured with CRON_SECRET to prevent unauthorized calls.
 //
 // Safety guarantees:
-//  - Max 100 users per run (BATCH_SIZE limit)
+//  - Keyset pagination in BATCH_SIZE pages (N-04): ALL eligible users are
+//    walked page by page — no fixed per-run cap
 //  - 100ms delay between sends (FCM rate limit protection)
 //  - Full gate checks per user (preferences, quiet hours, caps, cooldowns)
 //  - Skips users who already checked in today

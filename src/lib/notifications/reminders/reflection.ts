@@ -22,6 +22,7 @@ import { db } from '@/lib/db';
 import { sendNotification } from '../service';
 import { canSendNotification, isInQuietHours } from '../scheduler';
 import { startOfTodayMadrid } from '@/lib/dates';
+import { runKeysetBatch } from '@/lib/batch-pagination';
 
 // ─── Configuration ──────────────────────────
 
@@ -253,91 +254,106 @@ export async function processReflectionBatch(): Promise<ReflectionBatchResult> {
     details: [],
   };
 
-  // ── 1. Find candidates: users with push + reflection enabled ──
-  const candidates = await db.notificationPreference.findMany({
-    where: {
-      pushEnabled: true,
-      reflectionReminders: true,
-    },
-    select: {
-      userId: true,
-      timezone: true,
-    },
-    take: BATCH_SIZE,
-  });
+  // ── Process ALL candidates via keyset pagination (N-04) ──
+  // Previously a single `take: BATCH_SIZE` with no orderBy selected an
+  // arbitrary subset; users beyond the cap were never reached by the
+  // once-a-day cron. Now the scan walks every page (stable
+  // `orderBy: { userId: 'asc' }` on the unique NotificationPreference.userId,
+  // cursor + skip: 1) with identical per-candidate processing.
+  await runKeysetBatch<{ userId: string; timezone: string }>({
+    label: 'reflection-reminder',
+    pageSize: BATCH_SIZE,
+    fetchPage: async (cursor) =>
+      // ── Page of candidates: users with push + reflection enabled ──
+      // NotificationPreference.userId is @unique and never written by
+      // this batch → safe pagination key.
+      db.notificationPreference.findMany({
+        where: {
+          pushEnabled: true,
+          reflectionReminders: true,
+        },
+        select: {
+          userId: true,
+          timezone: true,
+        },
+        orderBy: { userId: 'asc' },
+        ...(cursor ? { cursor: { userId: cursor }, skip: 1 } : {}),
+        take: BATCH_SIZE,
+      }),
+    getKey: (candidate) => candidate.userId,
+    processPage: async (candidates) => {
+      result.total += candidates.length;
 
-  result.total = candidates.length;
+      if (candidates.length === 0) return;
 
-  if (candidates.length === 0) {
-    return result;
-  }
+      // ── Filter: must have at least one active push token ──
+      const candidateIds = candidates.map(c => c.userId);
 
-  // ── 2. Filter: must have at least one active push token ──
-  const candidateIds = candidates.map(c => c.userId);
-
-  const usersWithTokens = await db.pushToken.groupBy({
-    by: ['userId'],
-    where: {
-      userId: { in: candidateIds },
-      active: true,
-    },
-    _count: { id: true },
-  });
-
-  const usersWithActiveTokens = new Set(usersWithTokens.map(u => u.userId));
-
-  // ── 3. Process each eligible user ──
-  for (const candidate of candidates) {
-    // Skip users without active tokens
-    if (!usersWithActiveTokens.has(candidate.userId)) {
-      result.skipped++;
-      result.details.push({
-        userId: candidate.userId,
-        sent: false,
-        reason: 'no_active_tokens',
+      const usersWithTokens = await db.pushToken.groupBy({
+        by: ['userId'],
+        where: {
+          userId: { in: candidateIds },
+          active: true,
+        },
+        _count: { id: true },
       });
-      continue;
-    }
 
-    // Quick pre-check: is it even the right time of day?
-    // This saves DB queries for users in wrong timezones
-    if (!isInReflectionWindow(candidate.timezone)) {
-      result.skipped++;
-      result.details.push({
-        userId: candidate.userId,
-        sent: false,
-        reason: 'outside_reflection_window',
-      });
-      continue;
-    }
+      const usersWithActiveTokens = new Set(usersWithTokens.map(u => u.userId));
 
-    try {
-      const sendResult = await sendReflectionReminder(candidate.userId);
+      // ── Process each eligible user in this page ──
+      for (const candidate of candidates) {
+        // Skip users without active tokens
+        if (!usersWithActiveTokens.has(candidate.userId)) {
+          result.skipped++;
+          result.details.push({
+            userId: candidate.userId,
+            sent: false,
+            reason: 'no_active_tokens',
+          });
+          continue;
+        }
 
-      if (sendResult.sent) {
-        result.sent++;
-      } else {
-        result.skipped++;
+        // Quick pre-check: is it even the right time of day?
+        // This saves DB queries for users in wrong timezones
+        if (!isInReflectionWindow(candidate.timezone)) {
+          result.skipped++;
+          result.details.push({
+            userId: candidate.userId,
+            sent: false,
+            reason: 'outside_reflection_window',
+          });
+          continue;
+        }
+
+        try {
+          const sendResult = await sendReflectionReminder(candidate.userId);
+
+          if (sendResult.sent) {
+            result.sent++;
+          } else {
+            result.skipped++;
+          }
+
+          result.details.push({
+            userId: candidate.userId,
+            sent: sendResult.sent,
+            reason: sendResult.reason,
+          });
+        } catch (error) {
+          console.error('[ReflectionReminder] Error for user:', candidate.userId, error);
+          result.errors++;
+          result.details.push({
+            userId: candidate.userId,
+            sent: false,
+            reason: 'internal_error',
+          });
+        }
+
+        // Small delay between sends to avoid FCM rate limits
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-
-      result.details.push({
-        userId: candidate.userId,
-        sent: sendResult.sent,
-        reason: sendResult.reason,
-      });
-    } catch (error) {
-      console.error('[ReflectionReminder] Error for user:', candidate.userId, error);
-      result.errors++;
-      result.details.push({
-        userId: candidate.userId,
-        sent: false,
-        reason: 'internal_error',
-      });
-    }
-
-    // Small delay between sends to avoid FCM rate limits
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
+    },
+  });
 
   return result;
 }
