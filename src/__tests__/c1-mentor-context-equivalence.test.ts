@@ -303,10 +303,14 @@ function seedPremiumData() {
     achievementRow('meditation_first', noonUTC(-2)),
     achievementRow('journal_first', noonUTC(-1)),
   ]);
-  H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(challengeRow({ completed: false }));
+  // C-2a (S7): the two challenge reads are ONE OR query now — today's
+  // pending challenge and the recently completed history come from the same
+  // fetch (the completed row keeps its real assignment Madrid day).
   H.MOCK_DB.userChallenge.findMany.mockResolvedValue([
+    challengeRow({ completed: false }),
     challengeRow({
       id: 'uc-0', challengeId: 'ch-0', completed: true, completedAt: noonUTC(-1),
+      date: startOfMadridDay('2026-09-06'),
       challenge: {
         id: 'ch-0', category: 'mente', title: 'Escribe 3 gratitudes', description: 'Diario',
         difficulty: 'easy', createdAt: new Date('2026-01-01T00:00:00.000Z'),

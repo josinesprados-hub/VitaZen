@@ -8,12 +8,13 @@
  * contexto").
  *
  * What N-7 adds (src/lib/mentor-context.ts):
- *   1. Three userId-scoped, individually fail-safe queries inside the main
- *      Promise.all: unlocked achievements (Achievement table), today's
- *      challenge (UserChallenge of the current Madrid day, SAME
- *      startOfTodayMadrid() key the GET route and the reward path use) and
- *      the recently completed history (completedAt within the last 7 Madrid
- *      days). Read-only: the Mentor never creates, completes or unlocks.
+ *   1. Two userId-scoped, individually fail-safe queries inside the main
+ *      Promise.all: unlocked achievements (Achievement table) and — since
+ *      C-2a (S7) — ONE UserChallenge fetch whose OR branches keep the SAME
+ *      day keys the GET route and the reward path use (today's challenge by
+ *      startOfTodayMadrid() date; completions by completedAt within the
+ *      last 7 Madrid days), split in memory. Read-only: the Mentor never
+ *      creates, completes or unlocks.
  *   2. A gamification block in the prompt built ONLY from real server data:
  *      titles resolved through the canonical ACHIEVEMENTS defs (unknown keys
  *      skipped, never invented), empires through CHALLENGE_CATEGORY_TO_EMPIRE
@@ -362,7 +363,7 @@ describe('N-7 — achievements reach the Mentor from real server data', () => {
 describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', () => {
   it('C1. a pending challenge appears as pending, with category and reward empire', async () => {
     setUserPlan('PREMIUM');
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(challengeRow({ completed: false }));
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue([challengeRow({ completed: false })]);
 
     const { buildMentorContext, formatContextForPrompt } = await import('@/lib/mentor-context');
     const ctx = await buildMentorContext('user-1', 'PREMIUM');
@@ -377,8 +378,8 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
 
   it('C2. a completed challenge appears as completed — the mentor cannot ask to redo it', async () => {
     setUserPlan('PREMIUM');
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(
-      challengeRow({ completed: true, completedAt: noonUTC(0) }),
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue(
+      [challengeRow({ completed: true, completedAt: noonUTC(0) })],
     );
 
     const { buildMentorContext, formatContextForPrompt } = await import('@/lib/mentor-context');
@@ -391,7 +392,6 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
   });
 
   it('C3. absence of a challenge today works (lazy assignment untouched)', async () => {
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(null);
     H.MOCK_DB.userChallenge.findMany.mockResolvedValue([]);
 
     const { buildMentorContext, formatContextForPrompt } = await import('@/lib/mentor-context');
@@ -404,14 +404,15 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
 
   it('C4. recent completed challenges are listed with their reward empire', async () => {
     setUserPlan('PREMIUM');
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(null);
     H.MOCK_DB.userChallenge.findMany.mockResolvedValue([
       challengeRow({
         id: 'uc-2', challengeId: 'ch-2', completed: true, completedAt: noonUTC(-1),
+        date: startOfMadridDay('2026-09-06'), // assigned the previous Madrid day
         challenge: { id: 'ch-2', category: 'productividad', title: 'Zero inbox', description: '', difficulty: 'medium', createdAt: new Date('2026-01-01T00:00:00.000Z') },
       }),
       challengeRow({
         id: 'uc-3', challengeId: 'ch-3', completed: true, completedAt: noonUTC(-2),
+        date: startOfMadridDay('2026-09-05'),
         challenge: { id: 'ch-3', category: 'mentalidad', title: 'Conversación incómoda pendiente', description: '', difficulty: 'hard', createdAt: new Date('2026-01-01T00:00:00.000Z') },
       }),
     ]);
@@ -438,8 +439,8 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
     const { buildMentorContext, formatContextForPrompt } = await import('@/lib/mentor-context');
 
     for (const { category, empireLabel } of CASES) {
-      H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(
-        challengeRow({ challenge: { ...challengeRow().challenge, category } }),
+      H.MOCK_DB.userChallenge.findMany.mockResolvedValue(
+        [challengeRow({ challenge: { ...challengeRow().challenge, category } })],
       );
       const ctx = await buildMentorContext('user-1', 'PREMIUM');
       const prompt = formatContextForPrompt(ctx);
@@ -451,8 +452,8 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
     }
 
     // fail-closed: a category outside the N-5 mapping names NO empire
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(
-      challengeRow({ challenge: { ...challengeRow().challenge, category: 'riqueza' } }),
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue(
+      [challengeRow({ challenge: { ...challengeRow().challenge, category: 'riqueza' } })],
     );
     const ctx = await buildMentorContext('user-1', 'PREMIUM');
     const prompt = formatContextForPrompt(ctx);
@@ -460,28 +461,29 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
     expect(prompt).not.toContain('suma al imperio');
   });
 
-  it('C6. today\u2019s challenge is queried with the exact Madrid-day key of the reward path', async () => {
+  it('C6. today\u2019s challenge and the completed history share ONE OR query with the exact Madrid-day keys of the reward path', async () => {
     const { buildMentorContext } = await import('@/lib/mentor-context');
     await buildMentorContext('user-1', 'FREE');
 
     // evaluated INSIDE the test, under the frozen clock
     const expected7dAgo = startOf7DaysAgoMadrid();
 
-    expect(H.MOCK_DB.userChallenge.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ userId: 'user-1', date: START_OF_TODAY }),
-      }),
-    );
-    // recent history window: completedAt within the last 7 Madrid days
+    // C-2a (S7): the two former reads are now one query whose OR branches
+    // keep the exact same day keys — today by startOfTodayMadrid() (the key
+    // GET /api/challenges and the reward path use) and completions by
+    // completedAt within the last 7 Madrid days.
     expect(H.MOCK_DB.userChallenge.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
           userId: 'user-1',
-          completed: true,
-          completedAt: { gte: expected7dAgo },
+          OR: [
+            { date: START_OF_TODAY },
+            { completed: true, completedAt: { gte: expected7dAgo } },
+          ],
         }),
       }),
     );
+    expect(H.MOCK_DB.userChallenge.findFirst).not.toHaveBeenCalled();
   });
 });
 
@@ -491,7 +493,7 @@ describe('N-7 — challenges reach the Mentor with real state and N-5 mapping', 
 
 describe('N-7 — the system prompt carries the data AND the usage rules', () => {
   it('U1. usage rules are appended when gamification data exists', async () => {
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(challengeRow({ completed: false }));
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue([challengeRow({ completed: false })]);
 
     const { buildMentorContext, buildContextualSystemPrompt } = await import('@/lib/mentor-context');
     const ctx = await buildMentorContext('user-1', 'FREE');
@@ -517,7 +519,7 @@ describe('N-7 — the system prompt carries the data AND the usage rules', () =>
     setUserPlan('PREMIUM');
     H.getAuthUserMock.mockResolvedValue({ id: 'user-1', plan: 'PREMIUM', firebaseUid: 'fb-1', email: 'u@test.com' });
     H.MOCK_DB.achievement.findMany.mockResolvedValue([achievementRow('journal_10', noonUTC(-2))]);
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(challengeRow({ completed: false }));
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue([challengeRow({ completed: false })]);
 
     const { POST } = await import('@/app/api/ai/chat/route');
     const request = new Request('http://localhost/api/ai/chat', {
@@ -556,7 +558,7 @@ describe('N-7 — the system prompt carries the data AND the usage rules', () =>
 
   it('U4. client-sent gamification fields cannot alter the server-built context', async () => {
     H.MOCK_DB.achievement.findMany.mockResolvedValue([achievementRow('journal_10', noonUTC(-2))]);
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(challengeRow({ completed: false }));
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue([challengeRow({ completed: false })]);
 
     const { POST } = await import('@/app/api/ai/chat/route');
     const request = new Request('http://localhost/api/ai/chat', {
@@ -643,7 +645,7 @@ describe('N-7 — the system prompt carries the data AND the usage rules', () =>
 describe('N-7 — fail-safe degradation', () => {
   it('F1. a failing achievements read keeps the challenge data (and vice versa)', async () => {
     H.MOCK_DB.achievement.findMany.mockRejectedValue(new Error('achievements read failed'));
-    H.MOCK_DB.userChallenge.findFirst.mockResolvedValue(challengeRow({ completed: false }));
+    H.MOCK_DB.userChallenge.findMany.mockResolvedValue([challengeRow({ completed: false })]);
 
     const { buildMentorContext, formatContextForPrompt } = await import('@/lib/mentor-context');
     const ctx = await buildMentorContext('user-1', 'FREE');
@@ -658,8 +660,10 @@ describe('N-7 — fail-safe degradation', () => {
 
   it('F2. failing challenge reads keep the achievements data', async () => {
     H.MOCK_DB.achievement.findMany.mockResolvedValue([achievementRow('journal_10', noonUTC(-2))]);
-    H.MOCK_DB.userChallenge.findFirst.mockRejectedValue(new Error('challenge read failed'));
-    H.MOCK_DB.userChallenge.findMany.mockRejectedValue(new Error('history read failed'));
+    // C-2a (S7): today's challenge and the completed history share ONE
+    // query — a failure degrades the whole challenge block, exactly like
+    // the former joint failure of both challenge reads.
+    H.MOCK_DB.userChallenge.findMany.mockRejectedValue(new Error('challenge read failed'));
 
     const { buildMentorContext, formatContextForPrompt } = await import('@/lib/mentor-context');
     const ctx = await buildMentorContext('user-1', 'FREE');

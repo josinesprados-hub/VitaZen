@@ -189,7 +189,21 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
   // Previous week window for trend comparison
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);
 
-  // Run all queries in parallel for performance
+  // C-2a (S7): the exact Madrid-day keys the challenge GET route and the
+  // auto-complete reward path use. Computed once and reused by both the
+  // merged challenge query and the in-memory split below — the G-06/N-7
+  // day definitions are untouched.
+  const todayMadrid = startOfTodayMadrid();
+  const weekAgoMadrid = startOf7DaysAgoMadrid();
+
+  // Run all queries in parallel for performance.
+  // C-2a: the former 7-day + previous-week (7–14d) fetches of check-ins,
+  // habits, meditations, journals and nutrition are consolidated into
+  // single 14-day queries split in memory at the exact same boundary
+  // instants (S2–S6); the 7-day wellness dates are derived from the
+  // existing 14-day wellness fetch (S1); today's challenge and the recent
+  // completed history share one OR query (S7). Same rows, same windows,
+  // same context — fewer redundant round trips.
   const [
     recentCheckins,
     habitStreakRows,
@@ -197,21 +211,16 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     recentJournals,
     recentThreads,
     empireProgressRows,
-    weeklyMeditations,
-    weeklyJournals,
-    weeklyCheckins,
-    weeklyHabitLogs,
-    prevWeekCheckins,
+    checkins14,
+    habitLogs14,
     user,
+    challengeRows,
+    meditations14,
+    journals14,
     onboardingRow,
     wellnessLogRows,
     financeLogRows,
-    weeklyWellnessLogs,
-    weeklyNutritionLogs,
-    prevWeekHabitLogs,
-    prevWeekMeditations,
-    prevWeekJournals,
-    prevWeekNutritionLogs,
+    nutrition14,
     // G-06 FIX: last real activity per empire event source (used to gate
     // the stored empire streaks so the Mentor never quotes a frozen chain
     // as the current one). PREMIUM only — empireProgress is PREMIUM only.
@@ -220,13 +229,12 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     lastWellness,
     lastNutrition,
     lastHabitCompletion,
-    // N-7: real gamification signals — unlocked achievements, today's
-    // challenge and the recent completed history. Read-only consumers of
-    // the existing achievement/challenge state (the Mentor never creates,
-    // completes or unlocks anything).
+    // N-7: real gamification signal — unlocked achievements. Read-only
+    // consumer of the existing achievement state (the Mentor never
+    // creates, completes or unlocks anything). C-2a (S7): today's
+    // challenge and the recent completed history now come from the single
+    // OR query above and are split in memory below.
     unlockedAchievementRows,
-    todayChallengeRow,
-    recentCompletedChallengeRows,
   ] = await Promise.all([
     // Last check-ins: FREE gets 2, PREMIUM gets 5
     db.dailyCheckin.findMany({
@@ -280,29 +288,22 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       ? db.empireProgress.findMany({ where: { userId } })
       : Promise.resolve([]),
 
-    // Weekly meditation dates: PREMIUM only (for distinct-day counting)
-    isPremium
-      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: sevenDaysAgo } }, select: { completedAt: true } })
-      : Promise.resolve([] as { completedAt: Date }[]),
-
-    // Weekly journal dates: PREMIUM only (for distinct-day counting)
-    isPremium
-      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } })
-      : Promise.resolve([] as { createdAt: Date }[]),
-
-    // Weekly checkins: both tiers (for consistency + distinct-day counting + emotional state)
-    db.dailyCheckin.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true, emotion: true, energy: true, focus: true, stress: true } }),
-
-    // Weekly habit log dates: last 7 days (for distinct-day counting)
-    db.habitLog.findMany({
-      where: { userId, lastCompletedAt: { gte: sevenDaysAgo } },
-      select: { lastCompletedAt: true },
+    // C-2a (S6): ONE 14-day check-in fetch covers the current-week AND the
+    // previous-week views. The exact sevenDaysAgo instant splits the two
+    // windows in memory (right after this Promise.all) into the same rows
+    // the two former queries returned — same filters, same fields, no new
+    // data. Both tiers (consistency + distinct-day counting + emotional state).
+    db.dailyCheckin.findMany({
+      where: { userId, date: { gte: fourteenDaysAgo } },
+      select: { date: true, emotion: true, energy: true, focus: true, stress: true },
     }),
 
-    // Previous week checkins (for trend + emotional state): both tiers
-    db.dailyCheckin.findMany({
-      where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } },
-      select: { date: true, emotion: true, energy: true, focus: true, stress: true },
+    // C-2a (S3): same consolidation for habit completion logs. The shared
+    // gte filter already excludes null lastCompletedAt, exactly as both
+    // former windows did.
+    db.habitLog.findMany({
+      where: { userId, lastCompletedAt: { gte: fourteenDaysAgo } },
+      select: { lastCompletedAt: true },
     }),
 
     // User data
@@ -310,6 +311,37 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       where: { id: userId },
       select: { name: true, plan: true },
     }),
+
+    // C-2a (S7): ONE UserChallenge fetch for both gamification sources —
+    // today's Madrid-day challenge OR challenges completed within the last
+    // 7 Madrid days (the exact same day keys as the two former reads).
+    // @@unique([userId, date]) bounds the result to at most one row per
+    // day, so dropping the former take: 5 is safe; the completedAt-desc
+    // top-5 order is re-applied in memory below. Read-only: unlike GET
+    // /api/challenges this does NOT lazily assign a challenge — the Mentor
+    // consumes state, it never creates it.
+    db.userChallenge.findMany({
+      where: {
+        userId,
+        OR: [
+          { date: todayMadrid },
+          { completed: true, completedAt: { gte: weekAgoMadrid } },
+        ],
+      },
+      include: { challenge: true },
+    }).catch(() => []),
+
+    // C-2a (S4): 14-day meditation fetch, split in memory right after the
+    // Promise.all (PREMIUM only — covers the former 7-day and previous-week
+    // date lists with the same filters and the same boundary instants).
+    isPremium
+      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: fourteenDaysAgo } }, select: { completedAt: true } })
+      : Promise.resolve([] as { completedAt: Date }[]),
+
+    // C-2a (S5): 14-day journal fetch, split in memory (PREMIUM only)
+    isPremium
+      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: fourteenDaysAgo } }, select: { createdAt: true } })
+      : Promise.resolve([] as { createdAt: Date }[]),
 
     // Onboarding data: PREMIUM only
     isPremium
@@ -327,7 +359,10 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       : Promise.resolve(null),
 
     // Wellness logs: PREMIUM only — sleep quality + notes (dedup: mood/energy/stress already in DailyCheckin)
-    // No take limit: full 14-day data needed for emotional state; display is sliced to 7 later
+    // No take limit: full 14-day data needed for emotional state; display is sliced to 7 later.
+    // C-2a (S1): the former 7-day wellness date list is derived from THIS
+    // fetch right after the Promise.all — same model, same filters, no take
+    // limit, so the 7-day rows are a strict subset of these results.
     isPremium
       ? db.wellnessLog.findMany({
           where: { userId, date: { gte: fourteenDaysAgo } },
@@ -346,34 +381,11 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
         })
       : Promise.resolve([]),
 
-    // Weekly wellness log dates: PREMIUM only (for distinct-day counting)
+    // C-2a (S2): 14-day nutrition fetch, split in memory right after the
+    // Promise.all (PREMIUM only — covers the former 7-day and previous-week
+    // date lists with the same filters and the same boundary instants).
     isPremium
-      ? db.wellnessLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
-      : Promise.resolve([] as { date: Date }[]),
-
-    // Weekly nutrition log dates: PREMIUM only (for distinct-day counting)
-    isPremium
-      ? db.nutritionLog.findMany({ where: { userId, date: { gte: sevenDaysAgo } }, select: { date: true } })
-      : Promise.resolve([] as { date: Date }[]),
-
-    // Previous week habit logs: PREMIUM only (for emotional state prevWeekHabits)
-    isPremium
-      ? db.habitLog.findMany({ where: { userId, lastCompletedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { lastCompletedAt: true } })
-      : Promise.resolve([] as { lastCompletedAt: Date | null }[]),
-
-    // Previous week meditations: PREMIUM only (for emotional state prevWeekMeditations)
-    isPremium
-      ? db.meditationSession.findMany({ where: { userId, completedAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { completedAt: true } })
-      : Promise.resolve([] as { completedAt: Date }[]),
-
-    // Previous week journals: PREMIUM only (for emotional state prevWeekJournals)
-    isPremium
-      ? db.journalEntry.findMany({ where: { userId, createdAt: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { createdAt: true } })
-      : Promise.resolve([] as { createdAt: Date }[]),
-
-    // Previous week nutrition logs: PREMIUM only (for emotional state prevWeekNutrition)
-    isPremium
-      ? db.nutritionLog.findMany({ where: { userId, date: { gte: fourteenDaysAgo, lt: sevenDaysAgo } }, select: { date: true } })
+      ? db.nutritionLog.findMany({ where: { userId, date: { gte: fourteenDaysAgo } }, select: { date: true } })
       : Promise.resolve([] as { date: Date }[]),
 
     // ─── G-06 FIX: latest real activity per empire event source ───
@@ -408,25 +420,50 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       where: { userId },
       orderBy: { unlockedAt: 'desc' },
     }).catch(() => []),
-
-    // Today's challenge with the same Madrid-day key the challenge GET route
-    // and the auto-complete reward path use (startOfTodayMadrid()).
-    // Read-only: unlike GET /api/challenges this does NOT lazily assign a
-    // challenge — the Mentor consumes state, it never creates it.
-    db.userChallenge.findFirst({
-      where: { userId, date: startOfTodayMadrid() },
-      include: { challenge: true },
-    }).catch(() => null),
-
-    // Recently completed challenges (last 7 Madrid days), filtered by
-    // completedAt — the real completion instant — not by the assignment date.
-    db.userChallenge.findMany({
-      where: { userId, completed: true, completedAt: { gte: startOf7DaysAgoMadrid() } },
-      orderBy: { completedAt: 'desc' },
-      take: 5,
-      include: { challenge: true },
-    }).catch(() => []),
   ]);
+
+  // ─── C-2a: in-memory window splits (S1–S7) ───
+  // The consolidated 14-day fetches are split at the exact same instants the
+  // former 7d / 7–14d queries used as boundaries, so each derived array
+  // contains exactly the rows its original query returned. All consumers of
+  // these arrays (counts, distinct-day sets, ESE averages) are
+  // order-insensitive, so no ordering is imposed here.
+  const weeklyCheckins = checkins14.filter(c => c.date >= sevenDaysAgo);
+  const prevWeekCheckins = checkins14.filter(c => c.date < sevenDaysAgo);
+
+  const weeklyHabitLogs = habitLogs14.filter(h => h.lastCompletedAt !== null && h.lastCompletedAt >= sevenDaysAgo);
+  const prevWeekHabitLogs = habitLogs14.filter(h => h.lastCompletedAt !== null && h.lastCompletedAt < sevenDaysAgo);
+
+  const weeklyMeditations = meditations14.filter(m => m.completedAt >= sevenDaysAgo);
+  const prevWeekMeditations = meditations14.filter(m => m.completedAt < sevenDaysAgo);
+
+  const weeklyJournals = journals14.filter(j => j.createdAt >= sevenDaysAgo);
+  const prevWeekJournals = journals14.filter(j => j.createdAt < sevenDaysAgo);
+
+  const weeklyNutritionLogs = nutrition14.filter(n => n.date >= sevenDaysAgo);
+  const prevWeekNutritionLogs = nutrition14.filter(n => n.date < sevenDaysAgo);
+
+  // C-2a (S1): the 7-day wellness dates are contained in the 14-day wellness
+  // fetch above (same model, same filters, no take limit) — derived, never
+  // re-queried.
+  const weeklyWellnessLogs = wellnessLogRows.filter(w => w.date >= sevenDaysAgo);
+
+  // C-2a (S7): split the merged challenge rows.
+  // Today's challenge: the row whose date IS the current Madrid-day key —
+  // the exact instant the challenge GET route writes (same equality the
+  // former findFirst applied; @@unique([userId, date]) makes it unique).
+  const todayChallengeRow = challengeRows.find(r => r.date.getTime() === todayMadrid.getTime()) ?? null;
+  // Recent completions: completed rows with completedAt inside the same
+  // 7-Madrid-day window — the same filter the former query ran at DB level —
+  // ordered by the same completedAt-desc key and capped at the same 5 rows
+  // the former take applied. (The filter guarantees completedAt !== null;
+  // the ?? 0 fallback is unreachable and only satisfies the nullable column
+  // type.)
+  const completedInWindow = challengeRows.filter(
+    (r) => r.completed && r.completedAt !== null && r.completedAt.getTime() >= weekAgoMadrid.getTime(),
+  );
+  completedInWindow.sort((a, b) => (b.completedAt?.getTime() ?? 0) - (a.completedAt?.getTime() ?? 0));
+  const recentCompletedChallengeRows = completedInWindow.slice(0, 5);
 
   // ─── G-06 FIX: derive CURRENT streaks from real activity ───
   // Habits: stored counter gated by its own lastCompletedAt (today/
@@ -581,11 +618,23 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
     };
   }
 
-  // Fetch emotional state from the official engine (PREMIUM only; null for FREE)
+  // ─── C-2a: premium enrichment runs in ONE concurrent round ───
+  // The five blocks below (ESE, monthly closures, life stage, patterns,
+  // silent memories) are mutually independent: they consume only userId and
+  // data already fetched above. They are executed in a single Promise.all
+  // instead of five sequential awaits, reducing the post-main-wave latency
+  // to one round trip. Error semantics are preserved EXACTLY:
+  //   - emotionalState / lifeStage / patterns / silentMemories keep their
+  //     individual non-blocking catches (failure → null / [] sentinel, the
+  //     context continues without that block);
+  //   - monthlyClosure keeps NO catch — a failure there still fails the
+  //     context build exactly as before (the route falls back to the base
+  //     prompt).
+
+  // Fetch emotional state from the official engine.
   // This is the single source of truth — no recalculation, no duplication.
-  // M-6: Reuse data already fetched in this Promise.all to avoid redundant gatherData() call.
-  let emotionalState: UserContext['emotionalState'] = null;
-  if (isPremium) {
+  // M-6: Reuse data already fetched in the main Promise.all — no extra DB access.
+  const buildEmotionalState = async (): Promise<UserContext['emotionalState']> => {
     try {
       // Build RawData from already-fetched queries — no extra DB access
       const rawDataForEmotionalState: RawData = {
@@ -617,7 +666,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       };
 
       const es = await getEmotionalState(userId, plan, rawDataForEmotionalState);
-      emotionalState = {
+      return {
         status: es.status,
         statusLabel: es.statusLabel,
         statusDescription: es.statusDescription,
@@ -626,29 +675,31 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
       };
     } catch {
       // Non-blocking: if emotional state fails, continue without it
+      return null;
     }
-  }
+  };
 
-  // Monthly closure records: consume existing closure records (PREMIUM only; empty for FREE)
+  // Monthly closure records: consume existing closure records.
   // No recalculation, no summaries — just the fact that closures exist.
-  const recentClosures = isPremium
-    ? await db.monthlyClosure.findMany({
-        where: { userId },
-        select: {
-          month: true,
-          reflection: true,
-          reflectedAt: true,
-          summaryViewedAt: true,
-        },
-        orderBy: { month: 'desc' },
-        take: 3,
-      })
-    : [];
+  // No catch — identical to the previous behavior: a failure here rejects
+  // the whole context build (the route falls back to the base prompt).
+  const fetchRecentClosures = async () => {
+    return db.monthlyClosure.findMany({
+      where: { userId },
+      select: {
+        month: true,
+        reflection: true,
+        reflectedAt: true,
+        summaryViewedAt: true,
+      },
+      orderBy: { month: 'desc' },
+      take: 3,
+    });
+  };
 
-  // Life stage detection: consume the official engine result (PREMIUM only; null for FREE)
+  // Life stage detection: consume the official engine result.
   // No recalculation, no inference — the engine is the single source of truth for life stages.
-  let lifeStage: UserContext['lifeStage'] = null;
-  if (isPremium) {
+  const buildLifeStage = async (): Promise<UserContext['lifeStage']> => {
     try {
       const months = getPastMonths(3); // last 3 months
       const { stages, transitions } = await detectLifeStages(userId, months);
@@ -665,7 +716,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
         };
         // Find the most recent transition (if any)
         const latestTransition = transitions.length > 0 ? transitions[transitions.length - 1] : null;
-        lifeStage = {
+        return {
           flavor: current.flavor,
           label: STAGE_FLAVOR_LABELS[current.flavor] || current.flavor,
           observation: current.observation,
@@ -673,15 +724,16 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           transition: latestTransition ? latestTransition.observation : null,
         };
       }
+      return null;
     } catch {
       // Non-blocking: if life stage detection fails, continue without it
+      return null;
     }
-  }
+  };
 
-  // Pattern detection: consume the official engine result (PREMIUM only; null for FREE)
+  // Pattern detection: consume the official engine result.
   // No recalculation, no cross-referencing — the engine is the single source of truth.
-  let patternObservations: UserContext['patternObservations'] = null;
-  if (isPremium) {
+  const buildPatternObservations = async (): Promise<UserContext['patternObservations']> => {
     try {
       const [
         pFinance,
@@ -758,7 +810,7 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
 
       const result = detectPatterns(crossEmpireData);
       if (result.observations.length > 0) {
-        patternObservations = result.observations.map(o => ({
+        return result.observations.map(o => ({
           id: o.id,
           connection: o.connection,
           text: o.text,
@@ -766,17 +818,18 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
           weight: o.weight,
         }));
       }
+      return null;
     } catch {
       // Non-blocking: if pattern detection fails, continue without it
+      return null;
     }
-  }
+  };
 
-  // Silent Memories: consume official observations (PREMIUM only; empty for FREE)
+  // Silent Memories: consume official observations.
   // Read from EmotionalDashboardState.memoryState.shown[] — no recalculation, no side effects.
   // These are observations that the Silent Memories engine has already generated
   // and displayed to the user on the dashboard. The mentor only consumes them.
-  let silentMemories: string[] = [];
-  if (isPremium) {
+  const buildSilentMemories = async (): Promise<string[]> => {
     try {
       const dashboardState = await db.emotionalDashboardState.findUnique({
         where: { userId },
@@ -786,12 +839,35 @@ export async function buildMentorContext(userId: string, plan: string = 'FREE'):
         const memState = JSON.parse(dashboardState.memoryState);
         if (Array.isArray(memState.shown)) {
           // shown[] is chronological (oldest first). We want the most recent.
-          silentMemories = memState.shown;
+          return memState.shown;
         }
       }
+      return [];
     } catch {
       // Non-blocking: if silent memories aren't available, continue without them
+      return [];
     }
+  };
+
+  let emotionalState: UserContext['emotionalState'] = null;
+  let recentClosures: Awaited<ReturnType<typeof fetchRecentClosures>> = [];
+  let lifeStage: UserContext['lifeStage'] = null;
+  let patternObservations: UserContext['patternObservations'] = null;
+  let silentMemories: string[] = [];
+
+  if (isPremium) {
+    const [es, closures, ls, patterns, memories] = await Promise.all([
+      buildEmotionalState(),
+      fetchRecentClosures(),
+      buildLifeStage(),
+      buildPatternObservations(),
+      buildSilentMemories(),
+    ]);
+    emotionalState = es;
+    recentClosures = closures;
+    lifeStage = ls;
+    patternObservations = patterns;
+    silentMemories = memories;
   }
 
   return {
