@@ -11,13 +11,20 @@ import { serverLog } from '@/lib/observability/server-logger';
 // Cleans up expired snapshots + refreshes stale ones
 // ═══════════════════════════════════════════
 //
-// Called periodically (e.g., every 6 hours) by Vercel Cron.
+// Called once daily at 02:00 UTC by Vercel Cron (vercel.json: "0 2 * * *").
 // Secured with CRON_SECRET to prevent unauthorized access.
 //
 // Operations:
-//   1. Clean up expired snapshots from DB (prevent table bloat)
+//   1. Start cache cleanup timer (if not already running)
 //   2. Refresh stale snapshots (keep data fresh for active users)
-//   3. Start cache cleanup timer (if not already running)
+//   3. Clean up expired snapshots from DB (prevent table bloat)
+//
+// Order matters (W-1, FASE 25): refresh runs BEFORE cleanup. Both use the
+// same expiration predicate (expiresAt < now), so if cleanup ran first the
+// refresh would always find an empty pool. Refreshing first lets the 50
+// oldest-expired snapshots survive with a fresh expiresAt; whatever stays
+// expired is then deleted and regenerates lazily on read (stale-while-
+// revalidate / sync compute on miss).
 
 export async function GET(request: NextRequest) {
   const start = Date.now();
@@ -37,11 +44,15 @@ export async function GET(request: NextRequest) {
     // ── 1. Start cache cleanup timer ──
     startCacheCleanup();
 
-    // ── 2. Clean up expired snapshots ──
-    const deletedCount = await cleanupExpiredSnapshots();
-
-    // ── 3. Refresh stale snapshots (limited batch) ──
+    // ── 2. Refresh stale snapshots (limited batch, oldest first) ──
+    // MUST run before cleanup: same predicate, so cleanup-first would
+    // always leave this batch empty (W-1).
     const refreshResult = await batchRefreshExpiredSnapshots(50);
+
+    // ── 3. Clean up expired snapshots ──
+    // Refreshed rows now have a future expiresAt and survive; the rest
+    // are deleted and regenerate lazily on read.
+    const deletedCount = await cleanupExpiredSnapshots();
     const durationMs = Date.now() - start;
 
     // Track batch processing issues

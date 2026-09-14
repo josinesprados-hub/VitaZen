@@ -178,7 +178,9 @@ export async function triggerWidgetRefresh(
 
 /**
  * Batch refresh for cron jobs.
- * Refreshes all expired snapshots for all users.
+ * Refreshes the oldest expired snapshots for all users (W-1: deterministic
+ * `expiresAt ASC` order — the most stale rows are always processed first,
+ * refreshed rows leave the pool, so no row can starve).
  * Rate-limited by design: only processes expired snapshots.
  */
 export async function batchRefreshExpiredSnapshots(
@@ -186,11 +188,13 @@ export async function batchRefreshExpiredSnapshots(
 ): Promise<{ processed: number; refreshed: number; errors: number }> {
   const now = new Date();
 
-  // Find expired snapshots (stale ones that need refresh)
+  // Find expired snapshots (stale ones that need refresh),
+  // oldest expiration first (supported by @@index([expiresAt])).
   const expired = await db.widgetSnapshot.findMany({
     where: {
       expiresAt: { lt: now },
     },
+    orderBy: { expiresAt: 'asc' },
     select: {
       userId: true,
       widgetType: true,

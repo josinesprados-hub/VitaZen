@@ -50,13 +50,16 @@ export async function processDeferredNotifications(): Promise<RecoveryResult> {
 
   // Find pending notifications that are due (scheduledFor <= now)
   // and not too old. Limit batch size for safety.
+  // R-2 (FASE 25): { id: 'asc' } is a unique tiebreaker — computeQuietHoursExit
+  // gives every deferred notification of a user the SAME scheduledFor, so ties
+  // are the norm and the batch cut must be deterministic.
   const candidates = await db.deferredNotification.findMany({
     where: {
       status: 'pending',
       scheduledFor: { lte: now },
       createdAt: { gte: maxAge },
     },
-    orderBy: { scheduledFor: 'asc' },
+    orderBy: [{ scheduledFor: 'asc' }, { id: 'asc' }],
     take: RECOVERY_BATCH_SIZE,
   });
 
