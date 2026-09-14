@@ -17,6 +17,10 @@
  *   FREE    12 → 10   (S6 −1, S7 −1)
  *   PREMIUM 58 → 51   (S1..S7 −7 in wave 1; the C-2a parallel round
  *                     keeps 1+21+6+1 = 29 enrichment queries unchanged)
+ *   PREMIUM 51 → 37   (C-2b, FASE 23: life stages 21 → 7 — the same
+ *                     closed-month windows fetched once per model and
+ *                     bucketized in memory; golden equivalence in
+ *                     c2b-life-stage-query-consolidation.test.ts)
  *
  * What these tests guarantee:
  *   - exact query counts per plan (regression guard for C-2a);
@@ -236,12 +240,12 @@ describe('C-2a — query budget per message', () => {
     expect(H.getQueryCount()).toBe(10);
   });
 
-  it('PREMIUM executes exactly 51 queries (was 58 before C-2a: S1..S7 −7 in wave 1)', async () => {
+  it('PREMIUM executes exactly 37 queries (58 before C-2a, 51 after C-2a, 37 after C-2b)', async () => {
     H.seed(baseSeed('PREMIUM'));
     const { buildMentorContext } = await import('@/lib/mentor-context');
     await buildMentorContext('user-1', 'PREMIUM');
-    // 22 wave-1 + 1 closures + 21 life stages (3 months × 7) + 6 patterns + 1 dashboard state
-    expect(H.getQueryCount()).toBe(51);
+    // 22 wave-1 + 1 closures + 7 life stages (C-2b: 3 months in 7 queries) + 6 patterns + 1 dashboard state
+    expect(H.getQueryCount()).toBe(37);
   });
 });
 

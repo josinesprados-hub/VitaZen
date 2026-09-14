@@ -76,41 +76,82 @@ interface MonthAggregation {
   nutritionLogs: number;
 }
 
-// ─── Aggregate a single month ───
+// ─── C-2b: consolidated fetch + in-memory monthly bucketization ───
+//
+// The former implementation ran SEVEN queries per month (3 findMany + 4
+// count) inside Promise.all(months.map(aggregateMonth)) — 21 queries for the
+// Mentor's 3 closed months, 42 for /api/life-memory's 6. detectLifeStages now
+// runs SEVEN queries in total, each covering the global
+// [oldest month start, newest month end) window, and splits the rows in
+// memory with the EXACT same Madrid month boundaries (getMadridMonthRange),
+// so every month receives exactly the rows its former per-month WHERE clause
+// returned. No groupBy (intention/mood need individual free-text rows),
+// no raw SQL, no take, no orderBy — the per-month row sets, the monthly
+// counts, the averages and the null-month semantics are unchanged.
 
-async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggregation | null> {
-  const { start, end } = getMadridMonthRange(yyyyMM);
+interface MonthRange {
+  start: Date;
+  end: Date;
+}
 
-  const [wellness, checkins, finances, journals, meditations, habits, nutritions] = await Promise.all([
-    db.wellnessLog.findMany({
-      where: { userId, date: { gte: start, lt: end } },
-      select: { stress: true, energy: true, sleep: true, mood: true },
-    }),
-    db.dailyCheckin.findMany({
-      where: { userId, date: { gte: start, lt: end } },
-      select: { stress: true, energy: true, emotion: true, intention: true },
-    }),
-    db.financeLog.findMany({
-      where: { userId, date: { gte: start, lt: end }, mood: { not: null } },
-      select: { mood: true },
-    }),
-    db.journalEntry.count({
-      where: { userId, createdAt: { gte: start, lt: end } },
-    }),
-    db.meditationSession.count({
-      where: { userId, completedAt: { gte: start, lt: end } },
-    }),
-    db.habitLog.count({
-      where: { userId, lastCompletedAt: { gte: start, lt: end } },
-    }),
-    db.nutritionLog.count({
-      where: { userId, date: { gte: start, lt: end } },
-    }),
-  ]);
+/**
+ * Splits rows into one bucket per month range.
+ *
+ * Equivalence contract with the former per-month DB queries: a row belongs
+ * to month i iff `date >= ranges[i].start && date < ranges[i].end` — the
+ * same `gte start / lt end` predicate the former per-month WHERE clauses
+ * applied, compared on the same absolute instants (getTime). A row matching
+ * no range is dropped, exactly as the former queries never saw it. There is
+ * deliberately no `break`: ranges derived from distinct month keys never
+ * overlap, so each row lands in at most one bucket, and keeping the loop
+ * total preserves the former "each month queried independently" semantics.
+ */
+function bucketizeByMonth<T>(
+  rows: T[],
+  getDate: (row: T) => Date | null,
+  ranges: MonthRange[],
+): T[][] {
+  const buckets: T[][] = ranges.map(() => []);
+  for (const row of rows) {
+    const date = getDate(row);
+    if (!date) continue; // nullable column (lastCompletedAt) — the former WHERE gte excluded nulls too
+    const t = date.getTime();
+    for (let i = 0; i < ranges.length; i++) {
+      if (t >= ranges[i].start.getTime() && t < ranges[i].end.getTime()) {
+        buckets[i].push(row);
+      }
+    }
+  }
+  return buckets;
+}
 
-  const meditationCount = meditations;
-  const habitCount = habits;
-  const nutritionCount = nutritions;
+// Per-month raw material, already bucketized — the exact data the former
+// per-month queries delivered (the four former .count() calls are now
+// materialized as single-field rows so the monthly distribution survives;
+// volumes are bounded: journals/nutrition ≤ days in the window, sessions ≤
+// user activity, habitLog rows ≤ total habits — the row IS the habit).
+interface MonthBucketData {
+  wellness: { stress: number; energy: number; sleep: number; mood: number }[];
+  checkins: { stress: number; energy: number; emotion: number; intention: string }[];
+  finances: { mood: string | null }[];
+  journals: number;
+  meditations: number;
+  habits: number;
+  nutritions: number;
+}
+
+// Same aggregation math the former aggregateMonth applied to its query
+// results — copied verbatim (averages, intention balance, activity totals,
+// and the all-empty-month → null rule).
+function aggregateMonthFromBuckets(month: string, data: MonthBucketData): MonthAggregation | null {
+  const wellness = data.wellness;
+  const checkins = data.checkins;
+  const finances = data.finances;
+  const journals = data.journals;
+
+  const meditationCount = data.meditations;
+  const habitCount = data.habits;
+  const nutritionCount = data.nutritions;
   const totalLogs = wellness.length + checkins.length + finances.length;
   if (totalLogs === 0 && journals === 0 && meditationCount === 0 && habitCount === 0 && nutritionCount === 0) return null;
 
@@ -145,7 +186,7 @@ async function aggregateMonth(userId: string, yyyyMM: string): Promise<MonthAggr
   }
 
   return {
-    month: yyyyMM,
+    month: month,
     avgStress: avg(allStress),
     avgEnergy: avg(allEnergy),
     avgSleep: avg(allSleep),
@@ -415,10 +456,69 @@ export async function detectLifeStages(
   const connections = options?.connections || [];
   const isPremium = options?.isPremium ?? false;
 
-  // Aggregate each month in parallel
-  const aggregations = await Promise.all(
-    months.map(m => aggregateMonth(userId, m))
-  );
+  // C-2b: SEVEN queries total (one per model) instead of seven per month.
+  // The global window is the exact union of the per-month Madrid ranges and
+  // the bucketization below re-applies each month's former gte/lt predicate
+  // on the SAME boundary instants, so every month's row set is unchanged.
+  if (months.length === 0) {
+    return { stages: [], transitions: [] };
+  }
+
+  const ranges: MonthRange[] = months.map(m => getMadridMonthRange(m));
+  const globalStart = new Date(Math.min(...ranges.map(r => r.start.getTime())));
+  const globalEnd = new Date(Math.max(...ranges.map(r => r.end.getTime())));
+
+  const [wellness, checkins, finances, journals, meditations, habits, nutritions] = await Promise.all([
+    db.wellnessLog.findMany({
+      where: { userId, date: { gte: globalStart, lt: globalEnd } },
+      select: { date: true, stress: true, energy: true, sleep: true, mood: true },
+    }),
+    db.dailyCheckin.findMany({
+      where: { userId, date: { gte: globalStart, lt: globalEnd } },
+      select: { date: true, stress: true, energy: true, emotion: true, intention: true },
+    }),
+    db.financeLog.findMany({
+      where: { userId, date: { gte: globalStart, lt: globalEnd }, mood: { not: null } },
+      select: { date: true, mood: true },
+    }),
+    db.journalEntry.findMany({
+      where: { userId, createdAt: { gte: globalStart, lt: globalEnd } },
+      select: { createdAt: true },
+    }),
+    db.meditationSession.findMany({
+      where: { userId, completedAt: { gte: globalStart, lt: globalEnd } },
+      select: { completedAt: true },
+    }),
+    db.habitLog.findMany({
+      where: { userId, lastCompletedAt: { gte: globalStart, lt: globalEnd } },
+      select: { lastCompletedAt: true },
+    }),
+    db.nutritionLog.findMany({
+      where: { userId, date: { gte: globalStart, lt: globalEnd } },
+      select: { date: true },
+    }),
+  ]);
+
+  // In-memory monthly split at the exact same Madrid boundaries the former
+  // per-month queries used — same rows per month, same fields per row.
+  const wellnessBuckets = bucketizeByMonth(wellness, w => w.date, ranges);
+  const checkinBuckets = bucketizeByMonth(checkins, c => c.date, ranges);
+  const financeBuckets = bucketizeByMonth(finances, f => f.date, ranges);
+  const journalBuckets = bucketizeByMonth(journals, j => j.createdAt, ranges);
+  const meditationBuckets = bucketizeByMonth(meditations, m => m.completedAt, ranges);
+  const habitBuckets = bucketizeByMonth(habits, h => h.lastCompletedAt, ranges);
+  const nutritionBuckets = bucketizeByMonth(nutritions, n => n.date, ranges);
+
+  // Aggregate each month — same inputs, same math, same all-empty → null rule.
+  const aggregations = months.map((m, i) => aggregateMonthFromBuckets(m, {
+    wellness: wellnessBuckets[i],
+    checkins: checkinBuckets[i],
+    finances: financeBuckets[i],
+    journals: journalBuckets[i].length,
+    meditations: meditationBuckets[i].length,
+    habits: habitBuckets[i].length,
+    nutritions: nutritionBuckets[i].length,
+  }));
 
   // Classify each month
   const stages: LifeStage[] = [];
