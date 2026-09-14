@@ -40,6 +40,15 @@ import {
 } from 'lucide-react';
 
 // ─────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────
+
+// FASE 28 — Energy Insights are derived exclusively from the daily check-in
+// energy rating. This note makes the source explicit to the user.
+// Presentation-only: no calculation, data source, API or storage change.
+const ENERGY_SOURCE_NOTE = 'Basado en tus registros de energía del check-in diario.';
+
+// ─────────────────────────────────────────
 // Types (match API response)
 // ─────────────────────────────────────────
 
@@ -392,6 +401,9 @@ export default function InsightsPage() {
                           {insight.category}
                         </span>
                       </div>
+                      {insight.category.toLowerCase() === 'energía' && (
+                        <p className="text-[10px] text-[#888] mb-1">{ENERGY_SOURCE_NOTE}</p>
+                      )}
                       <p className="text-sm text-[#999] leading-relaxed">{insight.description}</p>
                     </div>
                     <ArrowRight size={14} className="text-[#999] group-hover:text-champagne/50 transition-colors shrink-0" />
