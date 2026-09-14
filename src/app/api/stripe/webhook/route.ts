@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { stripe, PLANS } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { sendSubscriptionConfirmedEmail } from '@/lib/emails/sender';
 import { trackEvent } from '@/lib/analytics-server';
@@ -326,6 +326,35 @@ export async function POST(request: NextRequest) {
         // Fetch line items explicitly — they are NOT included in the event object
         const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
         const stripePriceId = lineItems.data[0]?.price?.id || '';
+
+        // ─── S-1 (FASE 27): defense-in-depth price verification ──────
+        // The only checkout this app creates uses PLANS.PREMIUM.priceId
+        // server-side (checkout/route.ts), so the event's price is expected
+        // to match. Verifying it here closes the path where a session created
+        // OUTSIDE the app (Stripe Dashboard, compromised API key, wrong
+        // product/price) would silently grant PREMIUM. The priceId comes from
+        // the signature-verified Stripe event (listLineItems on the session
+        // id) — never from client-supplied data.
+        //
+        // Fail-closed: a missing or mismatched priceId grants NOTHING — no
+        // plan change, no subscription record, no confirmation email. The
+        // event stays claimed (idempotency preserved: Stripe retries receive
+        // `deduplicated`), and the situation is logged for manual review,
+        // mirroring the `!userId` branch above. A falsy configured priceId
+        // (STRIPE_PREMIUM_PRICE_ID unset) also fails closed: the system must
+        // not promote anyone it cannot verify.
+        const expectedPriceId = PLANS.PREMIUM.priceId;
+        if (!expectedPriceId || stripePriceId !== expectedPriceId) {
+          serverLog.error('webhook/stripe', 'checkout.session.completed — priceId does not match the configured premium price; PREMIUM NOT granted. Manual intervention required.', undefined, {
+            sessionId: session.id,
+            receivedPriceId: stripePriceId || '(missing)',
+            priceConfigured: !!expectedPriceId,
+            eventId,
+          });
+          // Event already claimed — just clean up old events
+          await cleanupOldEvents();
+          break;
+        }
 
         // Get subscription period dates if available
         // Stripe Basil/Dahlia: current_period_start/end moved from Subscription

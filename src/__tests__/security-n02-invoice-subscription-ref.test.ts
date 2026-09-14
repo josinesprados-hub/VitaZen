@@ -89,6 +89,10 @@ let _constructEvent: ReturnType<typeof vi.fn>;
 let _stripeSubRetrieve: ReturnType<typeof vi.fn>;
 
 vi.mock('@/lib/stripe', () => ({
+  // PLANS export added (FASE 27): the webhook route now imports PLANS for the
+  // S-1 price verification. This file only exercises invoice.* handlers, so
+  // the value is irrelevant here — it just satisfies the module import.
+  PLANS: { PREMIUM: { priceId: 'price_test' } },
   stripe: {
     get webhooks() { return { get constructEvent() { return _constructEvent; } }; },
     get subscriptions() { return { get retrieve() { return _stripeSubRetrieve; } }; },

@@ -29,6 +29,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Valid FCM token is required' }, { status: 400 });
     }
 
+    // ─── V-1 (FASE 27): bound input sizes + strict platform enum ───
+    // token/userAgent previously went to PushToken with no length cap (a
+    // user could store multi-megabyte strings — self-inflicted DB bloat),
+    // and platform accepted any string. Now:
+    //   - token: FCM tokens are ~140-260 chars; 4096 is a generous upper
+    //     bound that cannot reject a real FCM token.
+    //   - platform: only the values the codebase actually supports
+    //     (RegisterPushTokenPayload in src/lib/notifications/types.ts;
+    //     the web client sends 'web'). Absent platform still defaults to
+    //     'web' below — unchanged behavior.
+    //   - userAgent: real User-Agent strings are < 400 chars; 512 is a
+    //     generous cap. Absent userAgent still becomes null — unchanged.
+    // Invalid inputs return 400 (client error) instead of ever reaching the
+    // write path.
+    const MAX_TOKEN_LENGTH = 4096;
+    if (token.length > MAX_TOKEN_LENGTH) {
+      return NextResponse.json({ error: 'FCM token too long' }, { status: 400 });
+    }
+
+    const SUPPORTED_PLATFORMS = ['web', 'ios', 'android'];
+    if (platform !== undefined && platform !== null) {
+      if (typeof platform !== 'string' || !SUPPORTED_PLATFORMS.includes(platform)) {
+        return NextResponse.json({ error: 'Invalid platform' }, { status: 400 });
+      }
+    }
+
+    const MAX_USER_AGENT_LENGTH = 512;
+    if (userAgent !== undefined && userAgent !== null) {
+      if (typeof userAgent !== 'string' || userAgent.length > MAX_USER_AGENT_LENGTH) {
+        return NextResponse.json({ error: 'User agent too long' }, { status: 400 });
+      }
+    }
+
     // Check if this token already exists (possibly under a different user)
     // FCM tokens are per-device/browser — if a different Firebase Auth user
     // logs in on the same device, getToken() returns the same FCM token.

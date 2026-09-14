@@ -43,12 +43,14 @@ export const PLANS = {
   FREE: {
     name: 'Free',
     price: 0,
-    aiMessagesLimit: 15, // Must match FREE_DAILY_LIMIT in @/lib/limits.ts
+    // A-2 (FASE 27): the dead `aiMessagesLimit: 15` field was removed — it had
+    // zero consumers and contradicted the real FREE limit (FREE_DAILY_LIMIT =
+    // 10 in @/lib/limits.ts, which is the single source of truth for AI
+    // message limits).
   },
   PREMIUM: {
     name: 'Élite',
     price: 5,
     priceId: process.env.STRIPE_PREMIUM_PRICE_ID!,
-    aiMessagesLimit: Infinity,
   },
 } as const;

@@ -172,6 +172,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'threadId required' }, { status: 400 });
     }
 
+    // ─── V-2 (FASE 27): type validation, mirroring POST's F7.5-12 ───
+    // Previously a non-string title crashed on .slice (TypeError → 500) and
+    // a non-boolean archived failed Prisma validation (→ 500). Invalid types
+    // are client errors: they must be 400 and must never reach Prisma.
+    // Valid payloads are unchanged (title still sliced to 100 below; archive
+    // semantics untouched).
+    if (title !== undefined && typeof title !== 'string') {
+      return NextResponse.json({ error: 'title must be a string' }, { status: 400 });
+    }
+    if (archived !== undefined && typeof archived !== 'boolean') {
+      return NextResponse.json({ error: 'archived must be a boolean' }, { status: 400 });
+    }
+
     const thread = await db.aIThread.findFirst({
       where: { id: threadId, userId: user.id },
     });

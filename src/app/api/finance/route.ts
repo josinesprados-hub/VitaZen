@@ -63,6 +63,13 @@ export async function GET(request: NextRequest) {
 // POST — Create a new finance log
 // ═══════════════════════════════════════════
 
+// V-3 (FASE 27): domain-based upper bound. No prior cap existed; 1e9 is far
+// beyond any legitimate personal finance transaction while keeping
+// amount * 100 (cent rounding) well inside the exact float range, so
+// Math.round(amount * 100) / 100 can never produce Infinity for a stored
+// value. Purely defensive: valid amounts behave exactly as before.
+const MAX_FINANCE_AMOUNT = 1_000_000_000;
+
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
@@ -83,8 +90,13 @@ export async function POST(request: NextRequest) {
     if (!category || typeof category !== 'string' || !category.trim()) {
       return NextResponse.json({ error: 'La categoría es obligatoria.' }, { status: 400 });
     }
-    if (!amount || typeof amount !== 'number' || amount <= 0) {
+    if (!amount || typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: 'La cantidad debe ser mayor que 0.' }, { status: 400 });
+    }
+    // V-3 (FASE 27): reject absurd magnitudes with a 400 instead of storing
+    // them or letting Math.round(x*100) produce Infinity → Prisma 500.
+    if (amount > MAX_FINANCE_AMOUNT) {
+      return NextResponse.json({ error: 'La cantidad excede el máximo permitido.' }, { status: 400 });
     }
     if (!date || typeof date !== 'string') {
       return NextResponse.json({ error: 'La fecha es obligatoria.' }, { status: 400 });
@@ -271,12 +283,23 @@ export async function PUT(request: NextRequest) {
       updateData.category = category.trim().slice(0, 100);
     }
     if (amount !== undefined) {
-      if (typeof amount !== 'number' || amount <= 0) {
+      // V-3 (FASE 27): same finite/positive/ceiling rules as POST — NaN and
+      // Infinity previously passed `amount <= 0` and died at Prisma with a 500.
+      if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
         return NextResponse.json({ error: 'La cantidad debe ser mayor que 0.' }, { status: 400 });
+      }
+      if (amount > MAX_FINANCE_AMOUNT) {
+        return NextResponse.json({ error: 'La cantidad excede el máximo permitido.' }, { status: 400 });
       }
       updateData.amount = Math.round(amount * 100) / 100;
     }
     if (date !== undefined) {
+      // V-3 (FASE 27): type-check BEFORE startOfMadridDay — a non-string date
+      // (number/null) previously crashed on .split inside the utility (500).
+      // Valid dates keep the exact same Madrid parsing and error message.
+      if (typeof date !== 'string') {
+        return NextResponse.json({ error: 'Fecha inválida.' }, { status: 400 });
+      }
       const dateObj = startOfMadridDay(date);
       if (isNaN(dateObj.getTime())) {
         return NextResponse.json({ error: 'Fecha inválida.' }, { status: 400 });

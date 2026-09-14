@@ -174,6 +174,13 @@ export const RATE_LIMITS = {
 
   // ── Analytics ──
   'analytics:track':      { maxRequests: 30, windowMs: 60_000 },    // 30/min
+  // H-01 (FASE 27): anonymous /api/analytics/track requests have no userId to
+  // key on, so they are limited per client IP instead. Same ceiling as the
+  // authenticated limit (30/min) — coherent with the product's tolerance for
+  // tracked events — but keyed by IP so one anonymous client cannot insert
+  // unbounded AnalyticsEvent rows. Rows are 'rl:'-prefixed (excluded from BI)
+  // and purged by the standard rl retention, so the IP itself is ephemeral.
+  'analytics:track:ip':   { maxRequests: 30, windowMs: 60_000 },    // 30/min per IP (anonymous only)
 
   // ── Stripe ──
   'stripe:checkout':      { maxRequests: 3,  windowMs: 300_000 },  // 3/5min (external API call)

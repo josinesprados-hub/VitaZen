@@ -42,6 +42,10 @@ let _stripeSubRetrieve: ReturnType<typeof vi.fn>;
 let _customersRetrieve: ReturnType<typeof vi.fn>;
 
 vi.mock('@/lib/stripe', () => ({
+  // PLANS export added (FASE 27): the webhook route now imports PLANS for the
+  // S-1 price verification. priceId matches this file's listLineItems mock
+  // ('price_1') so the existing "PREMIUM granted" assertions stay valid.
+  PLANS: { PREMIUM: { priceId: 'price_1' } },
   stripe: {
     get webhooks() { return { get constructEvent() { return _constructEvent; } }; },
     get checkout() { return { sessions: { get listLineItems() { return _listLineItems; } } }; },
