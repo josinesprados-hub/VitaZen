@@ -71,11 +71,27 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   const [totalActiveCount, setTotalActiveCount] = useState<number>(0);
   const [totalArchivedCount, setTotalArchivedCount] = useState<number>(0);
 
+  // FASE 30: server-side pagination for the conversation history (FREE and
+  // PREMIUM alike). nextCursor/hasMore come from the threads API; the
+  // sidebar shows a "Cargar más" button while hasMore is true.
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   // Tab: 'active' | 'archived' | 'favorites'
   const [tab, setTab] = useState<'active' | 'archived' | 'favorites'>('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [favoritesLoaded, setFavoritesLoaded] = useState(false);
+
+  // FASE 30: refs mirroring state read by async callbacks (delete needs the
+  // latest archived flag; load-more needs the latest cursor; fetches need
+  // the current tab/search without depending on render closures).
+  const threadsRef = useRef<Thread[]>([]);
+  const nextCursorRef = useRef<string | null>(null);
+  const loadingMoreRef = useRef(false);
+  const tabRef = useRef(tab);
+  const searchQueryRef = useRef(searchQuery);
 
   // Mobile drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -162,35 +178,56 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // evaluates the const variable before it's initialized → TDZ crash:
   //   "Cannot access 'eB' before initialization"
 
+  // FASE 30: build the threads request URL from the CURRENT view
+  // (tab → archived filter, search → server-side q, cursor → next page).
+  const buildThreadsUrl = useCallback((cursor?: string | null) => {
+    const params = new URLSearchParams();
+    if (tabRef.current === 'active') params.set('archived', 'false');
+    else if (tabRef.current === 'archived') params.set('archived', 'true');
+    const q = searchQueryRef.current.trim();
+    if (q) params.set('q', q);
+    if (cursor) params.set('cursor', cursor);
+    const qs = params.toString();
+    return qs ? `/api/ai/threads?${qs}` : '/api/ai/threads';
+  }, []);
+
   // M-6 FIX: Extracted thread data processing to eliminate duplication.
-  // Both the initial fetch and the retry used identical 20-line blocks.
-  const processThreadsData = useCallback((data: any, isInitialLoad: boolean) => {
-    const allThreads: Thread[] = data.threads;
-    setThreads(allThreads);
+  // FASE 30: supports append mode (load-more pages), stores the pagination
+  // cursor and mirrors refs synchronously so the next async action always
+  // sees the latest list.
+  const processThreadsData = useCallback((data: any, opts: { append?: boolean; isInitialLoad?: boolean } = {}) => {
+    const incoming: Thread[] = data.threads;
+    setThreads(prev => (opts.append ? [...prev, ...incoming] : incoming));
+    threadsRef.current = opts.append ? [...threadsRef.current, ...incoming] : incoming;
     // M-5 FIX: historyLimited set only here (single source of truth: threads API)
     setHistoryLimited(!!data.historyLimited);
-    // BUG-04: Store real counts from server for tab badges
+    // BUG-04: Store real counts from server for tab badges (refreshed on
+    // every page — appends included — so badges always show true totals)
     if (data.totalActiveCount !== undefined) setTotalActiveCount(data.totalActiveCount);
     if (data.totalArchivedCount !== undefined) setTotalArchivedCount(data.totalArchivedCount);
-    // Initialize remaining/limit from server if available
-    if (data.remaining !== undefined && data.remaining !== null) {
+    // Initialize remaining/limit from server if available (first page only)
+    if (!opts.append && data.remaining !== undefined && data.remaining !== null) {
       setRemaining(data.remaining);
       setDailyLimit(data.limit || 10);
     }
+    // FASE 30: cursor for the next history page
+    nextCursorRef.current = data.nextCursor ?? null;
+    setNextCursor(data.nextCursor ?? null);
+    setHasMore(!!data.hasMore);
     // MENTOR-01: On initial load, do NOT auto-select any thread.
     // User always starts with a fresh empty conversation (ChatGPT pattern).
     // Previous conversations remain accessible from the sidebar.
-    if (isInitialLoad && !activeThreadRef.current) {
+    if (opts.isInitialLoad && !activeThreadRef.current) {
       try { localStorage.removeItem(storageKey); } catch {}
     }
   }, [storageKey]);
 
   const fetchThreads = useCallback(async (isRetry = false) => {
     try {
-      const res = await apiFetch('/api/ai/threads');
+      const res = await apiFetch(buildThreadsUrl());
       if (res.ok) {
         const data = await res.json();
-        processThreadsData(data, !isRetry);
+        processThreadsData(data, { isInitialLoad: !isRetry });
         return;
       }
       // M-4 FIX: Show error on non-retry server failure
@@ -211,10 +248,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       // Auto-retry once on network error
       await new Promise(r => setTimeout(r, 1500));
       try {
-        const res = await apiFetch('/api/ai/threads');
+        const res = await apiFetch(buildThreadsUrl());
         if (res.ok) {
           const data = await res.json();
-          processThreadsData(data, true);
+          processThreadsData(data, { isInitialLoad: true });
           setLoadError(false);
           return;
         }
@@ -225,7 +262,22 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       setLoadError(true);
     }
     finally { setLoading(false); }
-  }, [apiFetch, processThreadsData]);
+  }, [apiFetch, buildThreadsUrl, processThreadsData]);
+
+  // FASE 30: append the next history page (full history for FREE & PREMIUM)
+  const loadMoreThreads = useCallback(async () => {
+    if (loadingMoreRef.current || !nextCursorRef.current) return;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    try {
+      const res = await apiFetch(buildThreadsUrl(nextCursorRef.current));
+      if (res.ok) {
+        const data = await res.json();
+        processThreadsData(data, { append: true });
+      }
+    } catch (e) { console.error(e); }
+    finally { loadingMoreRef.current = false; setLoadingMore(false); }
+  }, [apiFetch, buildThreadsUrl, processThreadsData]);
 
   const fetchMessages = useCallback(async (threadId: string) => {
     const thisFetchId = ++fetchIdRef.current;
@@ -303,10 +355,23 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
   // NOTE: Context menu click-outside and keyboard nav effects
   // removed — now handled inside ThreadContextMenu component.
 
-  // Initial thread fetch
+  // FASE 30: keep the mirrors in sync after every commit (async callbacks
+  // read these instead of potentially-stale render closures)
+  useEffect(() => { threadsRef.current = threads; }, [threads]);
+  useEffect(() => { nextCursorRef.current = nextCursor; }, [nextCursor]);
+
+  // FASE 30: fetch page 1 whenever the VIEW changes (tab switch or search
+  // query). Search is debounced (server-side q filter); tab switches fetch
+  // immediately. The 'favorites' tab doesn't use the threads list. This
+  // effect also performs the initial fetch on mount (tab starts as 'active').
   useEffect(() => {
-    fetchThreads();
-  }, [fetchThreads]);
+    tabRef.current = tab;
+    searchQueryRef.current = searchQuery;
+    if (tab === 'favorites') return;
+    const delay = searchQuery.trim() ? 300 : 0;
+    const timer = setTimeout(() => { fetchThreads(); }, delay);
+    return () => clearTimeout(timer);
+  }, [tab, searchQuery, fetchThreads]);
 
   // Detect user change and clean up stale state
   useEffect(() => {
@@ -424,6 +489,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
       if (res.ok) {
         const data = await res.json();
         setThreads(prev => [data.thread, ...prev]);
+        threadsRef.current = [data.thread, ...threadsRef.current];
+        // FASE 30: keep the badge in sync immediately (create consumes a slot)
+        setTotalActiveCount(c => c + 1);
         setActiveThread(data.thread.id);
         setMessages([]);
         setTab('active');
@@ -454,6 +522,18 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         // MENTOR-01: Remove thread and go to empty state (ChatGPT pattern).
         // After deletion, user sees fresh conversation instead of auto-opening next.
         setThreads(prev => prev.filter(t => t.id !== threadId));
+        // FASE 30 (BUG 3): update the tab counters IMMEDIATELY — no refetch
+        // needed. Deleting frees a slot: 5/5 → 4/5. An archived thread
+        // decrements the archived badge instead. The daily message quota is
+        // deliberately NOT touched: deleting a conversation NEVER returns
+        // messages (the conversation limit and the daily message limit are
+        // two completely independent counters, per product rule).
+        const wasArchived = threadsRef.current.find(t => t.id === threadId)?.archived ?? false;
+        if (wasArchived) {
+          setTotalArchivedCount(c => Math.max(0, c - 1));
+        } else {
+          setTotalActiveCount(c => Math.max(0, c - 1));
+        }
         if (activeThreadRef.current === threadId) {
           setActiveThread(null);
           setMessages([]);
@@ -553,6 +633,9 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
           const data = await res.json();
           targetThreadId = data.thread.id;
           setThreads(prev => [data.thread, ...prev]);
+          threadsRef.current = [data.thread, ...threadsRef.current];
+          // FASE 30: badge in sync immediately (create consumes a slot)
+          setTotalActiveCount(c => c + 1);
           setActiveThread(targetThreadId);
           setMessages([]);
           setTab('active');
@@ -635,11 +718,13 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
         // M-2 FIX: Refresh threads to get updated title and updatedAt.
         // Wrapped in own try/catch — a failure here MUST NOT remove
         // the message that was already sent successfully.
+        // FASE 30: refresh respects the current view (tab + search) and
+        // updates the pagination cursor via the shared processor.
         try {
-          const threadsRes = await apiFetch('/api/ai/threads');
+          const threadsRes = await apiFetch(buildThreadsUrl());
           if (threadsRes.ok) {
             const threadsData = await threadsRes.json();
-            setThreads(threadsData.threads);
+            processThreadsData(threadsData);
           }
         } catch {
           // M-4: Silent — thread list refresh is non-critical after successful send
@@ -735,8 +820,10 @@ export default function MentorChat({ backHref, headerIcon = 'sparkles' }: Mentor
     activeThreads,
     archivedThreads,
     groupedThreads,
-    searchedThreads,
     favorites,
+    hasMoreThreads: hasMore,
+    loadingMore,
+    onLoadMore: loadMoreThreads,
     onCreateThread: createThread,
     onSelectThread: setActiveThread,
     onTabChange: setTab,

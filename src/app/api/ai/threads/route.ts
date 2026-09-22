@@ -5,11 +5,48 @@ import { db } from '@/lib/db';
 import { getAIUsageRemaining } from '@/lib/limits';
 import { rateLimit, RATE_LIMITS, rateLimitedResponse } from '@/lib/rate-limit';
 
+// FASE 30: FREE keeps the 5 ACTIVE-conversation creation limit (server-side).
 const MAX_THREADS_FREE = 5;
-const MAX_THREADS_PREMIUM = 100;
 
-// History limits: FREE sees last 10 threads, PREMIUM sees all
-const HISTORY_LIMIT_FREE = 10;
+// ─── FASE 30 — Conversation history is NOT a premium feature ───
+// Previously FREE was truncated to the 10 most recent threads
+// (HISTORY_LIMIT_FREE) and PREMIUM to 100 (MAX_THREADS_PREMIUM used as a
+// read cap). Both truncations are gone: every user pages through their
+// ENTIRE history (active and archived) with stable keyset pagination.
+//
+// The only remaining ceiling is the PAGE SIZE below — a transport cap that
+// never hides conversations (the client requests the next page with the
+// returned cursor). It is NOT a functional limit: the number of loaded
+// threads has nothing to do with the number of conversations the user may
+// own (totalActiveCount / totalArchivedCount are real COUNT queries).
+const DEFAULT_PAGE_SIZE = 30;
+const MAX_PAGE_SIZE = 50;
+
+/** Opaque cursor: base64(JSON { u: updatedAt ISO, id }) — no user data inside. */
+function encodeThreadCursor(thread: { updatedAt: Date | string; id: string }): string {
+  return Buffer.from(
+    JSON.stringify({ u: new Date(thread.updatedAt).toISOString(), id: thread.id }),
+    'utf8',
+  ).toString('base64');
+}
+
+/** Returns null for any malformed / tampered cursor (caller answers 400). */
+function decodeThreadCursor(raw: string): { u: string; id: string } | null {
+  try {
+    const parsed = JSON.parse(Buffer.from(raw, 'base64').toString('utf8')) as {
+      u?: unknown;
+      id?: unknown;
+    };
+    if (typeof parsed?.u !== 'string' || typeof parsed?.id !== 'string' || !parsed.u || !parsed.id) {
+      return null;
+    }
+    const d = new Date(parsed.u);
+    if (Number.isNaN(d.getTime())) return null;
+    return { u: d.toISOString(), id: parsed.id };
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,23 +75,54 @@ export async function GET(request: NextRequest) {
     }
     // If no param, return all threads (both active and archived)
 
-    // PERF-5.2: Both FREE and PREMIUM paths now have safety caps.
-    // PREMIUM: MAX_THREADS_PREMIUM (100) — same ceiling as POST creation limit.
-    // FREE: HISTORY_LIMIT_FREE (10) — unchanged.
-    // Also added select on included messages to avoid transferring full content
-    // (only role + createdAt needed for thread list preview).
-    const threadLimit = isPremium ? MAX_THREADS_PREMIUM : HISTORY_LIMIT_FREE;
+    // FASE 30: server-side history search. Always filtered by the
+    // authenticated user's id — a search can never escape its own threads.
+    const qParam = (searchParams.get('q') || '').trim();
+    if (qParam) {
+      where.title = { contains: qParam, mode: 'insensitive' };
+    }
 
-    // BUG-04 FIX: Fetch real thread counts in parallel so the sidebar tab
-    // badges show the actual number of conversations, not the pagination cap.
-    // These are lightweight COUNT queries — no data transfer overhead.
+    // FASE 30: keyset pagination. Stable order (updatedAt desc) with `id` as
+    // tie-breaker (updatedAt is not unique). The cursor row is excluded via
+    // strict comparisons on the composite key. The query is ALWAYS scoped by
+    // the session user id, so a cursor — even a crafted one — can only ever
+    // traverse the caller's own threads (no IDOR by construction).
+    const cursorParam = searchParams.get('cursor');
+    if (cursorParam) {
+      const cursor = decodeThreadCursor(cursorParam);
+      if (!cursor) {
+        return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 });
+      }
+      const cursorDate = new Date(cursor.u);
+      where.AND = [
+        {
+          OR: [
+            { updatedAt: { lt: cursorDate } },
+            {
+              AND: [
+                { updatedAt: { equals: cursorDate } },
+                { id: { lt: cursor.id } },
+              ],
+            },
+          ],
+        },
+      ];
+    }
+
+    const parsedLimit = Number.parseInt(searchParams.get('limit') ?? '', 10);
+    const pageSize = Number.isFinite(parsedLimit)
+      ? Math.min(Math.max(parsedLimit, 1), MAX_PAGE_SIZE)
+      : DEFAULT_PAGE_SIZE;
+
+    // BUG-04 FIX (kept): real thread counts in parallel so the sidebar tab
+    // badges show the actual number of conversations, not the page size.
     const [totalActiveCount, totalArchivedCount, threads] = await Promise.all([
       db.aIThread.count({ where: { userId: user.id, archived: false } }),
       db.aIThread.count({ where: { userId: user.id, archived: true } }),
       db.aIThread.findMany({
         where,
-        orderBy: { updatedAt: 'desc' },
-        take: threadLimit,
+        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+        take: pageSize + 1, // fetch one extra row to detect the next page
         include: {
           messages: {
             orderBy: { createdAt: 'desc' },
@@ -65,10 +133,18 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
+    const hasMore = threads.length > pageSize;
+    const pageThreads = hasMore ? threads.slice(0, pageSize) : threads;
+    const lastThread = pageThreads[pageThreads.length - 1];
+    const nextCursor = hasMore && lastThread ? encodeThreadCursor(lastThread) : null;
+
     return NextResponse.json({
-      threads,
-      historyLimited: !isPremium,
-      historyLimit: HISTORY_LIMIT_FREE,
+      threads: pageThreads,
+      nextCursor,
+      hasMore,
+      // FASE 30: the history is never plan-truncated anymore (kept for
+      // backward client compatibility — it was consumed as a boolean flag).
+      historyLimited: false,
       remaining: usageInfo.remaining,
       limit: usageInfo.limit,
       totalActiveCount,
@@ -96,7 +172,12 @@ export async function POST(request: NextRequest) {
     const rl = await rateLimit(user.id, 'ai:threads:post', RATE_LIMITS['ai:threads:post']);
     if (rl.limited) return rateLimitedResponse(rl);
 
-    const maxThreads = user.plan === 'PREMIUM' ? MAX_THREADS_PREMIUM : MAX_THREADS_FREE;
+    // FASE 30: PREMIUM conversations are UNLIMITED (product decision —
+    // "conversaciones sin límite desde el punto de vista del usuario"). The
+    // former MAX_THREADS_PREMIUM = 100 functional creation cap is gone.
+    // Only FREE is limited (5 active conversations, archived not counted).
+    // `threadCount >= Infinity` is always false → no 403 for PREMIUM, ever.
+    const maxThreads = user.plan === 'PREMIUM' ? Infinity : MAX_THREADS_FREE;
     const threadCount = await db.aIThread.count({
       where: { userId: user.id, archived: false },
     });

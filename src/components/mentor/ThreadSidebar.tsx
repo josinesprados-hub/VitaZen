@@ -18,7 +18,6 @@ import {
   Circle,
   BrainCircuit,
 } from 'lucide-react';
-import PremiumGate, { PremiumInlineBadge, PremiumHistoryGate } from '@/components/ui/PremiumGate';
 import { getRelativeDate, DATE_GROUP_ORDER, getProgressColor } from './MentorChatTypes';
 import type { Thread, Favorite } from './MentorChatTypes';
 
@@ -44,8 +43,11 @@ interface ThreadSidebarProps {
   activeThreads: Thread[];
   archivedThreads: Thread[];
   groupedThreads: Record<string, Thread[]>;
-  searchedThreads: Thread[];
   favorites: Favorite[];
+  // FASE 30: full-history pagination (FREE & PREMIUM)
+  hasMoreThreads: boolean;
+  loadingMore: boolean;
+  onLoadMore: () => void;
   onCreateThread: () => void;
   onSelectThread: (id: string) => void;
   onTabChange: (tab: 'active' | 'archived' | 'favorites') => void;
@@ -75,8 +77,10 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
   activeThreads,
   archivedThreads,
   groupedThreads,
-  searchedThreads,
   favorites,
+  hasMoreThreads,
+  loadingMore,
+  onLoadMore,
   onCreateThread,
   onSelectThread,
   onTabChange,
@@ -253,40 +257,22 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
           </>
         ) : (
           // Thread list grouped by date (only for active/archived tabs)
-          DATE_GROUP_ORDER.map((group, groupIdx) => {
+          // FASE 30 (BUG 1): the old `isOldGroup = !isPremium && groupIdx >= 3`
+          // PremiumGate block is GONE. Conversation age is NOT a premium
+          // feature — FREE can open, rename, search, archive, restore and
+          // delete ANY of its own conversations, however old. The "Historial
+          // completo → Explorar Élite" wall must never appear on the history.
+          DATE_GROUP_ORDER.map((group) => {
           const groupThreads = groupedThreads[group];
           if (!groupThreads || groupThreads.length === 0) return null;
-          // FREE users: blur groups beyond "Esta semana" (index 3+)
-          const isOldGroup = !isPremium && groupIdx >= 3;
           return (
             <div key={group} className="animate-in" style={{ animationDelay: '50ms' }}>
               <div className="flex items-center justify-between px-3 py-1.5">
                 <p className="text-[10px] text-[#888] uppercase tracking-widest font-semibold">
                   {group}
                 </p>
-                {groupIdx === 0 && !isPremium && searchedThreads.length > 5 && (
-                  <PremiumInlineBadge isPremium={isPremium} freeLabel="7 días" premiumLabel="Ilimitado" />
-                )}
               </div>
-              {isOldGroup ? (
-                <PremiumGate isPremium={isPremium} intensity="medium" compact label="Historial completo">
-                  <div className="space-y-0.5">
-                    {groupThreads.map((thread) => (
-                      <div
-                        key={thread.id}
-                        className="group flex items-center rounded-lg px-3 py-2.5 text-[#ccc]"
-                      >
-                        <MessageCircle size={14} className="shrink-0 mr-2.5 text-[#888]" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm truncate leading-tight">{thread.title}</p>
-                          <p className="text-[10px] text-[#888] mt-0.5">{getRelativeDate(thread.updatedAt)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </PremiumGate>
-              ) : (
-                <div className="space-y-0.5">
+              <div className="space-y-0.5">
                   {groupThreads.map((thread) => {
                     let threadClass = 'group flex items-center rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-200 ';
                     if (activeThread === thread.id) {
@@ -387,15 +373,24 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
                     );
                   })}
                 </div>
-              )}
             </div>
           );
         })
         )}
 
-        {/* Premium history gate at bottom of sidebar */}
-        {!isPremium && tab === 'active' && activeThreads.length > 3 && (
-          <PremiumHistoryGate isPremium={isPremium} label="historial completo de conversaciones" />
+        {/* FASE 30: load the next history page — the ENTIRE history is
+            reachable for FREE and PREMIUM (cursor pagination). Replaces the
+            old PremiumHistoryGate upsell: no "Explorar Élite" wall here. */}
+        {hasMoreThreads && (
+          <div className="flex justify-center pt-1 pb-2">
+            <button
+              onClick={onLoadMore}
+              disabled={loadingMore}
+              className="text-[11px] text-[#888] hover:text-champagne px-4 py-1.5 rounded-lg border border-[#1a1a1a] hover:border-champagne/30 transition-colors disabled:opacity-50 disabled:cursor-wait"
+            >
+              {loadingMore ? 'Cargando...' : 'Cargar más'}
+            </button>
+          </div>
         )}
 
         {/* Empty state: active tab (hide when searching) */}
@@ -420,8 +415,9 @@ const ThreadSidebar = React.memo(function ThreadSidebar({
           </div>
         )}
 
-        {/* Empty state: search no results */}
-        {searchQuery.trim() && searchedThreads.length === 0 && (
+        {/* Empty state: search no results (FASE 30: results already come
+            server-filtered by q for the current tab) */}
+        {searchQuery.trim() && (tab === 'archived' ? archivedThreads.length === 0 : activeThreads.length === 0) && (
           <div className="text-center py-12 animate-in">
             <div className="w-14 h-14 rounded-2xl bg-[#1a1a1a] flex items-center justify-center mx-auto mb-3">
               <Search size={24} className="text-[#999]" />

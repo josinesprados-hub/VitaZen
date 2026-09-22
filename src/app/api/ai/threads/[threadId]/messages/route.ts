@@ -49,11 +49,18 @@ export async function GET(
     const MESSAGES_LIMIT_PREMIUM = 500;
 
     if (isPremium) {
-      const messages = await db.aIMessage.findMany({
+      // FASE 30 (BUG 4): previously `orderBy: asc + take: 500` returned the
+      // OLDEST 500 messages once a thread grew beyond 500 — the conversation
+      // appeared stuck in the past for PREMIUM users. Same principle as the
+      // FREE path (T-1): fetch the NEWEST 500 (orderBy: desc + take), then
+      // reverse to chronological order for display. The 500 cap stays a
+      // transport safety cap, and it now covers the MOST RECENT window.
+      const recentMessages = await db.aIMessage.findMany({
         where: { threadId },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: 'desc' },
         take: MESSAGES_LIMIT_PREMIUM,
       });
+      const messages = recentMessages.reverse(); // restore chronological order for display
       return NextResponse.json({
         messages,
         historyLimited: false,
